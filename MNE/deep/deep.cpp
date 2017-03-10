@@ -256,7 +256,7 @@ void Deep::MultiThreadsEvaluationWithClone(const DeviceDescriptor &device, const
 
 //*************************************************************************************************************
 
-void Deep::test()
+void Deep::testClone()
 {
     int numOfThreads = 2;
 

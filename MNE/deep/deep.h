@@ -111,34 +111,73 @@ public:
     */
     void setUseGPU(bool useGPU);
 
+    //=========================================================================================================
+    /**
+    * Evaluate the network in several runs
+    *
+    * @param [in] evalFunc      Function to evaluate
+    * @param [in] device        Device to use
+    */
     static void RunEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
 
+    //=========================================================================================================
+    /**
+    * Print the ouput function info to stderr stream
+    *
+    * @param [in] func      Function to evaluate
+    */
     static void OutputFunctionInfo(CNTK::FunctionPtr func);
 
-
+    //=========================================================================================================
+    /**
+    * Setup fully connected linear layer
+    *
+    * @param [in] input
+    * @param [in] outputDim
+    * @param [in] device
+    * @param [in] outputName
+    */
     inline static CNTK::FunctionPtr SetupFullyConnectedLinearLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor& device, const std::wstring& outputName = L"");
 
-
+    //=========================================================================================================
+    /**
+    * Setup fully connected deep neural network layer
+    *
+    * @param [in] input
+    * @param [in] outputDim
+    * @param [in] device
+    * @param [in] nonLinearity
+    */
     inline static CNTK::FunctionPtr SetupFullyConnectedDNNLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor& device, const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
 
-
-    /// <summary>
-    /// Shows how to use Clone() to share function parameters among multi evaluation threads.
-    /// </summary>
-    /// <description>
-    /// It first creates a new function with parameters, then spawns multi threads. Each thread uses Clone() to create a new
-    /// instance of function and then use this instance to do evaluation.
-    /// All cloned functions share the same parameters.
-    /// </description>
+    //=========================================================================================================
+    /**
+    * Shows how to use Clone() to share function parameters among multi evaluation threads.
+    *
+    * It first creates a new function with parameters, then spawns multi threads. Each thread uses Clone() to create a new
+    * instance of function and then use this instance to do evaluation.
+    * All cloned functions share the same parameters.
+    *
+    * @param [in] device
+    * @param [in] threadCount   Numbers of threads to use
+    */
     void MultiThreadsEvaluationWithClone(const CNTK::DeviceDescriptor& device, const int threadCount);
 
 
-    void test();
-
-
+    void testClone();
 
 
 protected:
+    //=========================================================================================================
+    /**
+    * Searches for a varibale by name. Returns true when variable was found.
+    *
+    * @param [in] variableLists     List of variables to search for the variable by name
+    * @param [in] varName           Name of variable to find
+    * @param [out] var              The variable, if name was found
+    *
+    * @return true when variable was found, false otherwise.
+    */
     static bool GetVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var)
     {
         for (std::vector<CNTK::Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
@@ -152,17 +191,23 @@ protected:
         return false;
     }
 
-
+    //=========================================================================================================
+    /**
+    * Searches for a input variable by name. Returns true when found
+    *
+    * @param [in] evalFunc          Input function to search for the respective input variable.
+    * @param [in] varName           Name of variable to find
+    * @param [out] var              The variable, if name was found
+    *
+    * @return true when variable was found, false otherwise.
+    */
     inline static bool GetInputVariableByName(CNTK::FunctionPtr evalFunc, std::wstring varName, CNTK::Variable& var)
     {
         return GetVariableByName(evalFunc->Arguments(), varName, var);
     }
 
-
-
 private:
     bool m_bUseGPU = false;     /**< Should the GPU be used? */
-
 
 };
 
