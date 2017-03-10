@@ -177,7 +177,7 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
 
 //*************************************************************************************************************
 
-void MriTreeItem::setRtVertColor(const QPair<QByteArray, QByteArray>& sourceColorSamples)
+void MriTreeItem::setRtVertColor(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -225,7 +225,7 @@ void MriTreeItem::onColorOriginChanged()
     }
 
     if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
-        emit colorOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                              pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>());
+        emit colorOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
+                              pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>());
     }
 }

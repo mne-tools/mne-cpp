@@ -93,8 +93,8 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
     if(file.exists()) {
         FiffCoordTrans coordTrans(file);
 
-        std::cout << std::endl << "coordTrans" << coordTrans.trans;
-        std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
+//        std::cout << std::endl << "coordTrans" << coordTrans.trans;
+//        std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
 
         for(int i = 0; i < ecdSet.size() ; ++i) {
             MatrixX3f dipoles(1, 3);
@@ -132,7 +132,7 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
 
     if(t_fileBem.exists()) {
         MNEBem t_Bem(t_fileBem);
-        m_pData3DModel->addBemData("sample", "BEM", t_Bem);
+        //m_pData3DModel->addBemData("sample", "BEM", t_Bem);
     } else {
         qCritical("ECDView::ECDView - Cannot open MNEBem file");
     }

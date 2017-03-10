@@ -212,7 +212,7 @@ public:
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void setColorOrigin(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
+    void setColorOrigin(const MatrixX3f &leftHemiColor, const MatrixX3f &rightHemiColor);
 
 private:
     //=========================================================================================================
@@ -229,7 +229,7 @@ private:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
+    void onRtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
 
     MneEstimateTreeItem*                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
     NetworkTreeItem*                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
@@ -242,7 +242,7 @@ signals:
     *
     * @param[in] sourceColorSamples        Real tiem colors for both hemispheres.
     */
-    void rtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples);
+    void rtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
 
 };
 

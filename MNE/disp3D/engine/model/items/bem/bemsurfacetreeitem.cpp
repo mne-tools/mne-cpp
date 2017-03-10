@@ -121,7 +121,7 @@ void  BemSurfaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<QByteArray>());
+            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
             break;
         default: // do nothing;
             break;
@@ -137,10 +137,10 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Create color from curvature information with default gyri and sulcus colors
-    QByteArray arrayVertColor = createVertColor(tBemSurface.rr);
+    MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, matVertColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
@@ -152,7 +152,7 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     //Add data which is held by this BemSurfaceTreeItem
     QVariant data;
 
-    data.setValue(arrayVertColor);
+    data.setValue(matVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
     data.setValue(tBemSurface.rr);
@@ -232,9 +232,9 @@ void BemSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 void BemSurfaceTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     QVariant data;
-    QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
+    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
 
-    data.setValue(arrayNewVertColor);
+    data.setValue(matNewVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
@@ -279,18 +279,15 @@ void BemSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
 
 //*************************************************************************************************************
 
-QByteArray BemSurfaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
+MatrixX3f BemSurfaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
 {
-    QByteArray arrayCurvatureColor;
-    arrayCurvatureColor.resize(vertices.rows() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
-    int idxColor = 0;
+    MatrixX3f matCurvatureColor(vertices.rows(),3);
 
-    for(int i = 0; i < vertices.rows(); ++i) {
-        rawColorArray[idxColor++] = color.redF();
-        rawColorArray[idxColor++] = color.greenF();
-        rawColorArray[idxColor++] = color.blueF();
+    for(int i = 0; i < matCurvatureColor.rows(); ++i) {
+        matCurvatureColor(i,0) = color.redF();
+        matCurvatureColor(i,1) = color.greenF();
+        matCurvatureColor(i,2) = color.blueF();
     }
 
-    return arrayCurvatureColor;
+    return matCurvatureColor;
 }
