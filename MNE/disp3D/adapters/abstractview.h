@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecdview.h
+* @file     abstractview.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ECDView class declaration.
+* @brief    AbstractView class declaration.
 *
 */
 
-#ifndef ECDVIEW_H
-#define ECDVIEW_H
+#ifndef ABSTRACTVIEW_H
+#define ABSTRACTVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
-#include "abstractview.h"
 
 
 //*************************************************************************************************************
@@ -51,17 +50,13 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace INVERSELIB {
-    class DipoleFitSettings;
-    class ECDSet;
-}
 
 
 //*************************************************************************************************************
@@ -78,37 +73,50 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class View3D;
+class Control3DWidget;
+class Data3DTreeModel;
+
 
 //=============================================================================================================
 /**
-* Adapter which provides visualization for ECD data and a control widget.
+* Adapter which provides the abstract class for all adapter views.
 *
-* @brief Visualizes ECD data.
+* @brief Adapter which provides the abstract class for all adapter views.
 */
-class DISP3DNEWSHARED_EXPORT ECDView : public AbstractView
+class DISP3DNEWSHARED_EXPORT AbstractView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ECDView> SPtr;             /**< Shared pointer type for ECDView class. */
-    typedef QSharedPointer<const ECDView> ConstSPtr;  /**< Const shared pointer type for ECDView class. */
+    typedef QSharedPointer<AbstractView> SPtr;             /**< Shared pointer type for AbstractView class. */
+    typedef QSharedPointer<const AbstractView> ConstSPtr;  /**< Const shared pointer type for AbstractView class. */
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Default constructor.
     *
     */
-    explicit ECDView(const INVERSELIB::DipoleFitSettings& dipFitSettings, const INVERSELIB::ECDSet& ecdSet, QWidget *parent = 0);
+    explicit AbstractView(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Default destructor.
     */
-    ~ECDView();
+    ~AbstractView();
 
 protected:
+    //=========================================================================================================
+    /**
+    * Creates the GUI.
+    */
+    void createGUI();
+
+    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;          /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;     /**< The Disp3D model. */
 };
 
 } // NAMESPACE
 
-#endif // ECDVIEW_H
+#endif // ABSTRACTVIEW_H
