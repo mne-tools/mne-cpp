@@ -129,7 +129,7 @@ void  SourceSpaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
     case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+        m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<QByteArray>());
         break;
     }
 }
@@ -194,7 +194,7 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     QByteArray arrayVertColor = createVertColor(tHemisphere.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, arrayVertColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();

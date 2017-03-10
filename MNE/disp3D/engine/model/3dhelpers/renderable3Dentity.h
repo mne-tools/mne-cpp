@@ -140,33 +140,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Refresh the vertices colors of the mesh.
-    *
-    * @param[in] tArrayColors     New color information for the vertices.
-    */
-    void setVertColor(const QByteArray &tArrayColors);
-
-    //=========================================================================================================
-    /**
-    * Set the information needed to create the mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    */
-    void setMeshData(const Eigen::MatrixX3f& tMatVert,
-                     const Eigen::MatrixX3f& tMatNorm,
-                     const Eigen::MatrixXi &tMatTris,
-                     const QByteArray &tArrayColors = QByteArray(),
-                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
-
-    //=========================================================================================================
-    /**
     * Sets the entity's transformation.
     *
     * @param[in] pTransform     The new entity's transform.
     */
     void setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
+
+    //=========================================================================================================
+    /**
+    * Returns the custom mesh.
+    *
+    * @return The costum mesh.
+    */
+    QPointer<CustomMesh> getCustomMesh();
 
     //=========================================================================================================
     /**

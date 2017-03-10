@@ -123,30 +123,6 @@ Renderable3DEntity::~Renderable3DEntity()
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
-{
-    if(m_pCustomMesh) {
-        m_pCustomMesh->setColor(tArrayColors);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert,
-                                     const MatrixX3f& tMatNorm,
-                                     const MatrixXi& tMatTris,
-                                     const QByteArray& tArrayColors,
-                                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
-{
-    if(m_pCustomMesh) {
-        m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors, primitiveType);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
 {
     if(!m_pTransform.isNull()) {
@@ -155,6 +131,15 @@ void Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
         this->addComponent(m_pTransform);
     }
 }
+
+
+//*************************************************************************************************************
+
+QPointer<CustomMesh> Renderable3DEntity::getCustomMesh()
+{
+    return m_pCustomMesh;
+}
+
 
 //*************************************************************************************************************
 
