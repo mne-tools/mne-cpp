@@ -71,6 +71,7 @@
 #include <QGridLayout>
 #include <QSettings>
 #include <QDebug>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -117,7 +118,9 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
     m_p3DView->setModel(m_pData3DModel);
 
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this));
+    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
+                                                                 QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
+                                                                 Qt::Window));
     m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
     QGridLayout *mainLayoutView = new QGridLayout;
