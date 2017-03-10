@@ -109,7 +109,7 @@ EcdDataTreeItem::~EcdDataTreeItem()
         m_lDipoles.at(i)->deleteLater();
     }
 
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 }

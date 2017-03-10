@@ -119,6 +119,7 @@ void CustomMesh::init()
     m_pIndexAttribute->setAttributeType(Qt3DRender::QAttribute::IndexAttribute);
     m_pIndexAttribute->setDataType(Qt3DRender::QAttribute::UnsignedInt);
     m_pIndexAttribute->setByteOffset(0);
+    m_pIndexAttribute->setBuffer(m_pIndexDataBuffer);
 
     m_pVertexAttribute = new Qt3DRender::QAttribute();
     m_pVertexAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
@@ -127,6 +128,7 @@ void CustomMesh::init()
     m_pVertexAttribute->setByteOffset(0);
     m_pVertexAttribute->setByteStride(3 * sizeof(float));
     m_pVertexAttribute->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
+    m_pVertexAttribute->setBuffer(m_pVertexDataBuffer);
 
     m_pNormalAttribute = new Qt3DRender::QAttribute();
     m_pNormalAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
@@ -135,6 +137,7 @@ void CustomMesh::init()
     m_pNormalAttribute->setByteOffset(0);
     m_pNormalAttribute->setByteStride(3 * sizeof(float));
     m_pNormalAttribute->setName(Qt3DRender::QAttribute::defaultNormalAttributeName());
+    m_pNormalAttribute->setBuffer(m_pNormalDataBuffer);
 
     m_pColorAttribute = new Qt3DRender::QAttribute();
     m_pColorAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
@@ -143,6 +146,7 @@ void CustomMesh::init()
     m_pColorAttribute->setByteOffset(0);
     m_pColorAttribute->setByteStride(3 * sizeof(float));
     m_pColorAttribute->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
+    m_pColorAttribute->setBuffer(m_pColorDataBuffer);
 
     m_pCustomGeometry->addAttribute(m_pVertexAttribute);
     m_pCustomGeometry->addAttribute(m_pNormalAttribute);
