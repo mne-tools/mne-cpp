@@ -216,7 +216,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
             QString t;
             if(!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
                 t = QString("None found, must use integer");
-            qWarning("%d datasets present, setno parameter must be set. Candidate setno names:\n%s", evoked_node.size(), t.toLatin1().constData());
+            qWarning("%d datasets present, setno parameter must be set. Candidate setno names:\n%s", evoked_node.size(), t.toUtf8().constData());
             return false;
         }
         else

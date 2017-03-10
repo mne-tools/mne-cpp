@@ -189,7 +189,7 @@ bool Label::read(const QString& p_sFileName, Label &p_Label)
 
     if(p_sFileName.mid(p_sFileName.size()-6,6).compare(".label") != 0)
     {
-        qWarning("Given file (%s) is not a .label file!\n", p_sFileName.toLatin1().constData());
+        qWarning("Given file (%s) is not a .label file!\n", p_sFileName.toUtf8().constData());
         return false;
     }
 

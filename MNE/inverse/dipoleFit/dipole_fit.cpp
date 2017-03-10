@@ -628,7 +628,7 @@ ECDSet DipoleFit::calculateFit() const
 
     if ((fit_data = DipoleFitData::setup_dipole_fit_data(   settings->mriname,
                                                             settings->measname,
-                                                            settings->bemname.isEmpty() ? NULL : settings->bemname.toLatin1().data(),
+                                                            settings->bemname.isEmpty() ? NULL : settings->bemname.toUtf8().data(),
                                                             &settings->r0,eeg_model,settings->accurate,
                                                             settings->badname,
                                                             settings->noisename,
@@ -643,7 +643,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = MneRawData::mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),TRUE,FALSE,&(settings->filter))) == NULL)
+        if ((raw = MneRawData::mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,&(settings->filter))) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -669,7 +669,7 @@ ECDSet DipoleFit::calculateFit() const
             settings->tstep = 1.0/raw->info->sfreq;
 
         printf("\tOpened raw data file %s : %d MEG and %d EEG \n",
-               settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
+               settings->measname.toUtf8().data(),fit_data->nmeg,fit_data->neeg);
     }
     else {
         printf("\n---- Reading data...\n\n");
@@ -688,7 +688,7 @@ ECDSet DipoleFit::calculateFit() const
             settings->tstep = data->current->tstep;
 
         printf("\tRead data set %d from %s : %d MEG and %d EEG \n",
-               settings->setno,settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
+               settings->setno,settings->measname.toUtf8().data(),fit_data->nmeg,fit_data->neeg);
         if (!settings->noisename.isEmpty()) {
             printf("\nScaling the noise covariance...\n");
             if (DipoleFitData::scale_noise_cov(fit_data,data->current->nave) == FAIL)

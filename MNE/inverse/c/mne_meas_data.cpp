@@ -1936,14 +1936,14 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, M
         else {
             new_data->proj = MneProjOp::mne_read_proj_op(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
-                fprintf(stderr,"\tLoaded projection from %s:\n",name.toLatin1().data());
+                fprintf(stderr,"\tLoaded projection from %s:\n",name.toUtf8().data());
                 MneProjOp::mne_proj_op_report(stderr,"\t\t",new_data->proj);
             }
             new_data->comp = MneCTFCompDataSet::mne_read_ctf_comp_data(name);
             if (new_data->comp == NULL)
                 goto out;
             if (new_data->comp->ncomp > 0)
-                fprintf(stderr,"\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toLatin1().data());
+                fprintf(stderr,"\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());
         }
         /*
          * Th bad channel stuff
@@ -1964,7 +1964,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, M
                         }
                     }
                 }
-                fprintf(stderr,"\t%d bad channels read from %s%s",new_data->nbad,name.toLatin1().data(),new_data->nbad > 0 ? ":\n" : "\n");
+                fprintf(stderr,"\t%d bad channels read from %s%s",new_data->nbad,name.toUtf8().data(),new_data->nbad > 0 ? ":\n" : "\n");
                 if (new_data->nbad > 0) {
                     fprintf(stderr,"\t\t");
                     for (k = 0; k < new_data->nbad; k++)
