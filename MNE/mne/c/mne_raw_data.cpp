@@ -2011,7 +2011,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
                     }
                 }
             }
-            fprintf(stderr,"%d bad channels read from %s%s",data->nbad,name,data->nbad > 0 ? ":\n" : "\n");
+            fprintf(stderr,"%d bad channels read from %s%s",data->nbad,name.toUtf8().constData(),data->nbad > 0 ? ":\n" : "\n");
             if (data->nbad > 0) {
                 fprintf(stderr,"\t");
                 for (k = 0; k < data->nbad; k++)
