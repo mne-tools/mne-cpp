@@ -64,6 +64,7 @@
 
 using namespace DEEPLIB;
 using namespace CNTK;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -81,14 +82,6 @@ Deep::Deep()
 Deep::~Deep()
 {
 
-}
-
-
-//*************************************************************************************************************
-
-void Deep::setUseGPU(bool useGPU)
-{
-    m_bUseGPU = useGPU;
 }
 
 
@@ -162,24 +155,6 @@ void Deep::RunEvaluationClassifier(FunctionPtr evalFunc, const DeviceDescriptor 
             fprintf(stderr, "\n");
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-void Deep::OutputFunctionInfo(FunctionPtr func)
-{
-    auto inputVariables = func->Arguments();
-    fprintf(stderr, "Function '%S': Input Variables (count=%lu)\n", func->Name().c_str(), (unsigned long)inputVariables.size());
-    for_each(inputVariables.begin(), inputVariables.end(), [](const Variable v) {
-        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
-    });
-
-    auto outputVariables = func->Outputs();
-    fprintf(stderr, "Function '%S': Output Variables (count=%lu)\n", func->Name().c_str(), (unsigned long)outputVariables.size());
-    for_each(outputVariables.begin(), outputVariables.end(), [](const Variable v) {
-        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
-    });
 }
 
 
@@ -263,4 +238,212 @@ void Deep::testClone()
     // Test multi-threads evaluation using clone.
     fprintf(stderr, "\n##### Run evaluation using clone function on CPU. #####\n");
     MultiThreadsEvaluationWithClone(DeviceDescriptor::CPUDevice(), numOfThreads);
+}
+
+
+//*************************************************************************************************************
+
+size_t Deep::inputDimensions()
+{
+    const std::wstring inputNodeName = L"features";
+
+    Variable inputVar;
+    if (!GetInputVariableByName(m_pModel, inputNodeName, inputVar)) {
+        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+        throw("Input variable not found error.");
+    }
+
+    return inputVar.Shape().TotalSize();
+}
+
+
+//*************************************************************************************************************
+
+size_t Deep::outputDimensions()
+{
+    const std::wstring outputNodeName = L"out.z";
+
+    Variable outputVar;
+    if (!GetOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
+        fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
+        throw("Output variable not found error.");
+    }
+
+    return outputVar.Shape().TotalSize();
+}
+
+
+//*************************************************************************************************************
+
+void Deep::runEvaluation(FunctionPtr model, const DeviceDescriptor &device, const CNTK::Variable& inputVar, const ValuePtr& inputValue, const CNTK::Variable& outputVar, ValuePtr& outputValue)
+{
+    std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
+    model->Forward({{inputVar, inputValue}}, outputs, device);
+    outputValue = outputs[outputVar];
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::loadModel(const QString& modelFileName, const DeviceDescriptor &device)
+{
+    QFile file(modelFileName);
+    if(!file.exists()) {
+        qCritical("Model filename (%s) does not exist.\n", modelFileName.toUtf8().constData());
+        return false;
+    }
+
+    std::wstring fileName = modelFileName.toStdWString();
+    m_pModel = Function::LoadModel(fileName, device);
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, MatrixXf& output)
+{
+    OutputFunctionInfo(m_pModel);
+
+    fprintf(stderr, "Evaluate model on device=%d\n", device.Id());
+
+//    // Run evaluation in parallel.
+//    std::vector<std::thread> threadList(threadCount);
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th] = std::thread(runEvaluation, m_pModelFunction_v2->Clone(), device,inputVar,inputValue,outputVar,outputValue);
+//    }
+
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th].join();
+//        fprintf(stderr, "thread %d joined.\n", th);
+//        fflush(stderr);
+//    }
+
+    //
+    // Input
+    //
+    const std::wstring inputNodeName = L"features";
+
+    Variable inputVar;
+    if (!GetInputVariableByName(m_pModel, inputNodeName, inputVar)) {
+        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+        throw("Input variable not found error.");
+    }
+
+    //Check if input data size matches the number of features
+    if (inputVar.Shape().TotalSize() != static_cast<size_t>(input.cols())) {
+            fprintf(stderr, "Input data size: %d, do not match feature size: %d.\n", static_cast<int>(input.rows()), static_cast<int>(inputVar.Shape().TotalSize()));
+            throw("Input data size do not match input feature size.");
+    }
+
+    // Evaluate the network in several runs
+    size_t numSamples = static_cast<size_t>(input.rows());
+    size_t numFeatures = static_cast<size_t>(input.cols());
+
+    std::vector<float> inputData(numFeatures * numSamples);
+    size_t dataIndex = 0;
+    for (int m = 0; m < numSamples; ++m) {
+        for (int n = 0; n < numFeatures; ++n) {
+//            printf("%d: %f =? %f\n",dataIndex,input(m,n),static_cast<float>(dataIndex % 255));
+            inputData[dataIndex++] = input(m,n);
+        }
+    }
+
+    NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
+    ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+
+    //
+    // Output
+    //
+    const std::wstring outputNodeName = L"out.z";
+
+    Variable outputVar;
+    if (!GetOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
+        fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
+        throw("Output variable not found error.");
+    }
+
+    ValuePtr outputValue;
+
+    //
+    // Evaluate
+    //
+    runEvaluation(m_pModel,device,inputVar,inputValue,outputVar,outputValue);
+
+    //
+    // Put the output together
+    //
+    NDShape outputShape = outputVar.Shape().AppendShape({1, numSamples});
+    std::vector<float> outputData(outputShape.TotalSize());
+    NDArrayViewPtr cpuArrayOutput = MakeSharedObject<NDArrayView>(outputShape, outputData, false);
+    cpuArrayOutput->CopyFrom(*outputValue->Data());
+
+    // consistency check
+    assert(outputData.size() == outputVar.Shape()[0] * numSamples);
+
+    dataIndex = 0;
+    size_t outputDim = outputVar.Shape()[0];
+    output.resize(numSamples, outputDim);
+    for (size_t i = 0; i < numSamples; i++)
+    {
+        for (size_t j = 0; j < outputDim; j++)
+        {
+//            fprintf(stderr, "%f ", output(i,j));
+            output(i,j) = outputData[dataIndex++];
+        }
+    }
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+void Deep::OutputFunctionInfo(FunctionPtr model)
+{
+    auto inputVariables = model->Arguments();
+    fprintf(stderr, "Function '%S': Input Variables (count=%lu)\n", model->Name().c_str(), (unsigned long)inputVariables.size());
+    for_each(inputVariables.begin(), inputVariables.end(), [](const Variable v) {
+        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
+    });
+
+    auto outputVariables = model->Outputs();
+    fprintf(stderr, "Function '%S': Output Variables (count=%lu)\n", model->Name().c_str(), (unsigned long)outputVariables.size());
+    for_each(outputVariables.begin(), outputVariables.end(), [](const Variable v) {
+        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
+    });
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::GetVariableByName(std::vector<Variable> variableLists, std::wstring varName, Variable &var)
+{
+    for (std::vector<Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
+    {
+        if (it->Name().compare(varName) == 0)
+        {
+            var = *it;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::GetInputVariableByName(FunctionPtr model, std::wstring varName, Variable &var)
+{
+    return GetVariableByName(model->Arguments(), varName, var);
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::GetOutputVaraiableByName(FunctionPtr model, std::wstring varName, Variable &var)
+{
+    return GetVariableByName(model->Outputs(), varName, var);
 }

@@ -44,7 +44,10 @@
 #include <QScatterSeries>
 #include <QCategoryAxis>
 
+#include <deep/deep.h>
 #include <deep/deepeval.h>
+
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -68,6 +71,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace CNTK;
 using namespace Eigen;
 using namespace DEEPLIB;
 using namespace QtCharts;
@@ -91,69 +95,101 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    DeepEval deepTest;
-    deepTest.testEval();
+    Deep deep_v2;
 
+    if(deep_v2.loadModel("./mne_deep_models/examples/output/models/ex_deep_one_hidden", DeviceDescriptor::CPUDevice())) {
+        fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
 
-/*
-    DeepEval deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/output/models/ex_deep_one_hidden");
+        size_t inDim = deep_v2.inputDimensions();
+        int samples = 1;
 
-    //
-    // Generate dummy input values in the appropriate structure and size
-    //
-    std::vector<float> inputs, outputs;
-    for (int i = 0; i < deepTest.inputDimensions(); i++) {
-        inputs.push_back(static_cast<float>(i % 255));
+        fprintf(stderr, "Input Dimension %d\n", (int)inDim);
+
+        MatrixXf inputs(samples,inDim);
+
+        int count = 0;
+        for (int i = 0; i < samples; i++) {
+            for (int j = 0; j < inDim; j++) {
+                inputs(i,j) = static_cast<float>(count % 255);
+                ++count;
+            }
+        }
+
+        std::cout << "inputs\n" << inputs << std::endl;
+
+        MatrixXf outputs;
+        deep_v2.evalModel(DeviceDescriptor::CPUDevice(), inputs, outputs);
+
+        std::cout << "outputs\n" << outputs << std::endl;
+
+        //
+        // Visualize
+        //
+
+        // Input
+        QImage inputImage(28,28,QImage::Format_RGB32);
+        for (int i = 0; i < inDim; i++) {
+            int gray = inputs(0,i);
+            inputImage.setPixelColor(i/28, i%28, QColor(gray,gray,gray));
+        }
+        QLabel inputView; inputView.setPixmap(QPixmap::fromImage(inputImage));
+        inputView.show();
+
+        // Output
+        QScatterSeries *series = new QScatterSeries();
+        QCategoryAxis *axisX = new QCategoryAxis();
+        series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        for (int i = 0; i < outputs.size(); i++) {
+            axisX->append(QString("%1").arg(i), i);
+            series->append(i,outputs(0,i));
+        }
+        axisX->setRange(0, 9);
+        axisX->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
+
+        QChart *chart = new QChart();
+        chart->legend()->hide();
+        chart->addSeries(series);
+        chart->createDefaultAxes();
+        chart->setTitle("Likelyhoods for Number [0-9]");
+        chart->setAxisX(axisX);
+
+        QChartView *chartView = new QChartView(chart);
+        chartView->setRenderHint(QPainter::Antialiasing);
+        chartView->show();
     }
 
-    //
-    // Evaluate the model
-    //
-    deepTest.evalModel(inputs, outputs);
 
     //
-    // Output the results
+    // Eval v1
     //
-    for (auto& value : outputs) {
-        fprintf(stderr, "%f\n", value);
+    {
+        DeepEval deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/output/models/ex_deep_one_hidden");
+
+        //
+        // Generate dummy input values in the appropriate structure and size
+        //
+        std::vector<float> inputs, outputs;
+
+        std::cout << "inputs\n";
+        for (int i = 0; i < deepTest.inputDimensions(); i++) {
+            fprintf(stderr, "%d ", (i % 255));
+            inputs.push_back(static_cast<float>(i % 255));
+        }
+        std::cout << "\n";
+
+        //
+        // Evaluate the model
+        //
+        deepTest.evalModel(inputs, outputs);
+
+        //
+        // Output the results
+        //
+        std::cout << "outputs\n";
+        for (auto& value : outputs) {
+            fprintf(stderr, "%f ", value);
+        }
+        std::cout << "\n";
     }
-
-    //
-    // Visualize
-    //
-
-    // Input
-    QImage inputImage(28,28,QImage::Format_RGB32);
-    for (int i = 0; i < inputs.size(); i++) {
-        int gray = inputs[i];
-        inputImage.setPixelColor(i/28, i%28, QColor(gray,gray,gray));
-    }
-    QLabel inputView; inputView.setPixmap(QPixmap::fromImage(inputImage));
-    inputView.show();
-
-    // Output
-    QScatterSeries *series = new QScatterSeries();
-    QCategoryAxis *axisX = new QCategoryAxis();
-    series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    for (int i = 0; i < outputs.size(); i++) {
-        axisX->append(QString("%1").arg(i), i);
-        series->append(i,outputs[i]);
-    }
-    axisX->setRange(0, 9);
-    axisX->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
-
-    QChart *chart = new QChart();
-    chart->legend()->hide();
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-    chart->setTitle("Likelyhoods for Number [0-9]");
-    chart->setAxisX(axisX);
-
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->show();
-
-*/
-
     return a.exec();
 }
