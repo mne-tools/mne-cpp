@@ -120,7 +120,7 @@ public:
     /**
     * Returns the edge weight.
     */
-    double getWeight();
+    double getWeight() const;
 
 protected:
 

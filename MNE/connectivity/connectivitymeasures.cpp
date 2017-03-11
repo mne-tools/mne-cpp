@@ -89,9 +89,9 @@ ConnectivityMeasures::ConnectivityMeasures()
 
 //*************************************************************************************************************
 
-Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, const MatrixX3f& matVert)
+Network ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, const MatrixX3f& matVert)
 {
-    Network::SPtr finalNetwork = Network::SPtr(new Network("Pearson's Correlation Coefficient"));
+    Network finalNetwork("Pearson's Correlation Coefficient");
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {
@@ -103,7 +103,7 @@ Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& mat
             rowVert(2) = matVert.row(i)(2);
         }
 
-        *finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
+        finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
     }
 
     //Create edges
@@ -111,10 +111,10 @@ Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& mat
         for(int j = i; j < matData.rows(); ++j) {
             double pearsonsCoeff = calcPearsonsCorrelationCoeff(matData.row(i), matData.row(j));
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], pearsonsCoeff));
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], pearsonsCoeff));
 
-            *finalNetwork->getNodes()[i] << pEdge;
-            *finalNetwork << pEdge;
+            *finalNetwork.getNodeAt(i) << pEdge;
+            finalNetwork << pEdge;
         }
     }
 
@@ -124,9 +124,9 @@ Network::SPtr ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& mat
 
 //*************************************************************************************************************
 
-Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
+Network ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
 {
-    Network::SPtr finalNetwork  = Network::SPtr(new Network("Cross Correlation"));
+    Network finalNetwork("Cross Correlation");
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {
@@ -138,7 +138,7 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
             rowVert(2) = matVert.row(i)(2);
         }
 
-        *finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
+        finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
     }
 
     //Create edges
@@ -146,10 +146,10 @@ Network::SPtr ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, co
         for(int j = i; j < matData.rows(); ++j) {
             QPair<int,double> crossCorrPair = calcCrossCorrelation(matData.row(i), matData.row(j));
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork->getNodes()[i], finalNetwork->getNodes()[j], crossCorrPair.second));
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], crossCorrPair.second));
 
-            *finalNetwork->getNodes()[i] << pEdge;
-            *finalNetwork << pEdge;
+            *finalNetwork.getNodeAt(i) << pEdge;
+            finalNetwork << pEdge;
         }
     }
 

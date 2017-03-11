@@ -177,7 +177,7 @@ IPlugin::PluginType Epidetect::getType() const
 
 QString Epidetect::getName() const
 {
-    return "MNE epiDetect";
+    return "epiDetect";
 }
 
 

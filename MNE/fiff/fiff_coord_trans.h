@@ -167,21 +167,23 @@ public:
     *
     * Applies the coordinate transform to given coordinates and returns the transformed coordinates
     *
-    * @param[in] rr     The coordinates
+    * @param[in] rr         The coordinates
+    * @param[in] do_move    Perform translation next to rotation yes/no
     *
     * @return Transformed coordinates
     */
-    MatrixX3f apply_trans (const MatrixX3f& rr) const;
+    MatrixX3f apply_trans(const MatrixX3f& rr, bool do_move = true) const;
 
     //=========================================================================================================
     /**
     * Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates
     *
-    * @param[in] rr     The coordinates
+    * @param[in] rr         The coordinates
+    * @param[in] do_move    Perform translation next to rotation yes/no
     *
     * @return Transformed coordinates
     */
-    MatrixX3f apply_inverse_trans (const MatrixX3f& rr) const;
+    MatrixX3f apply_inverse_trans(const MatrixX3f& rr, bool do_move = true) const;
 
     //=========================================================================================================
     /**
@@ -223,9 +225,8 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C root function ###: Implementation of the mne_print_coord_transform & mne_print_coord_transform_label function
-    *
     * Prints the coordinate transform. TODO: overload stream operator
+    * Refactored: mne_print_coord_transform, mne_print_coord_transform_label (fiff_id.c)
     */
     void print() const;
 

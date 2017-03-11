@@ -57,12 +57,11 @@
 #define NOISE_NORMALIZED(e) ((e) == ESTIMATE_dSPM || (e) == ESTIMATE_sLORETA)
 
 #include <fiff/fiff_types.h>
-#include "fiff_coord_trans_old.h"
-#include "fwd_coil_set.h"
-#include "fwd_coil_set.h"
-#include "mne_meas_data.h"
-#include "mne_surface_or_volume.h"
-#include "mne_cov_matrix.h"
+#include <fiff/c/fiff_coord_trans_old.h>
+#include <fwd/fwd_coil_set.h>
+#include "../c/mne_meas_data.h"
+#include <mne/c/mne_surface_or_volume.h>
+#include <mne/c/mne_cov_matrix.h>
 
 
 
@@ -134,7 +133,7 @@ typedef struct {
 
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
-  INVERSELIB::MneSurfaceOld*   surf;		                     /* The surface on which we are mapping */
+  MNELIB::MneSurfaceOld*   surf;		                     /* The surface on which we are mapping */
   char         *surfname;	                     /* The name of the file where the above surface came from */
   int          *surface_sel;			     /* We may calculate the interpolation only in a subset of vertices */
   int          nsurface_sel;			     /* How many points in the above */
@@ -142,21 +141,21 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **smooth_weights;                     /* The smoothing weights */
   int          nch;			             /* How many channels */
   int          *pick;		                     /* Which channels are of this modality in the original data */
-  INVERSELIB::FwdCoilSet*   coils;		                     /* Coils */
+  FWDLIB::FwdCoilSet*   coils;		                     /* Coils */
   float        origin[3];		             /* Origin */
   float        miss;		                     /* Amount of unexplained variance */
   float        **self_dots;	                     /* Dot products between the original leads */
   float        **surface_dots;			     /* Dot products from the original leads to the virtual leads */
   float        intrad;		                     /* The integration radius used */
-  INVERSELIB::MneCovMatrix* noise;				     /* Noise-covariance matrix to use */
+  MNELIB::MneCovMatrix* noise;				     /* Noise-covariance matrix to use */
   int          nest;	                             /* How many singular values to include? */
   float        **mapping_mat;		             /* The mapping matrix */
 } *fieldMappingData, fieldMappingDataRec;
 
 typedef struct {                            /* The digitizer data will be loaded from the measurement file or elsewhere */
   char           *filename;                 /* Where did these come from */
-  INVERSELIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
-  INVERSELIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
+  FIFFLIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
+  FIFFLIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
   FIFFLIB::fiffDigPoint   points;           /* The points */
   int            coord_frame;               /* The coordinate frame of the above points */
   int            *active;                   /* Which are active */
@@ -198,7 +197,7 @@ typedef struct {
 
   mnePref             mne_prefs;		     /* MNE calculation preferences */
   float               *cur_vals;                     /* Current values */
-  INVERSELIB::FiffSparseMatrix* nn_vals;			     /* Noise normalization values */
+  FIFFLIB::FiffSparseMatrix* nn_vals;			     /* Noise normalization values */
   mshColorScaleDefRec scale;	                     /* Scale presently used for display */
 
   digitizerData    dig;                              /* These are the Polhemus data */

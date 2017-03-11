@@ -37,11 +37,8 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets concurrent xml svg
+QT += widgets concurrent xml svg 3dextras
 
-qtHaveModule(3dextras) {
-    QT += 3dextras
-}
 
 DEFINES += SCDISP_LIBRARY
 
@@ -57,12 +54,14 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
-            -lscMeasd \
+            -lscMeasd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -70,12 +69,14 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lMNE$${MNE_LIB_VERSION}Disp3D \
-            -lscMeas \
+            -lscMeas
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -112,7 +113,8 @@ SOURCES += \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
-    realtimeconnectivityestimatewidget.cpp
+    realtimeconnectivityestimatewidget.cpp \
+    hpiwidget.cpp \
 
 HEADERS += \
     scdisp_global.h \
@@ -136,10 +138,12 @@ HEADERS += \
     helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \
+    hpiwidget.h \
 
 FORMS += \
-    realtimesamplearraywidget.ui \
-    helpers/quickcontrolwidget.ui
+    FormFiles/realtimesamplearraywidget.ui \
+    helpers/quickcontrolwidget.ui \
+    FormFiles/hpiwidget.ui
 
 RESOURCES += \
     scDisp.qrc
