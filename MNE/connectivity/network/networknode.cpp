@@ -92,15 +92,7 @@ NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert, QObject* parent
 
 //*************************************************************************************************************
 
-QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdges()
-{
-    return m_lEdgesIn << m_lEdgesOut;
-}
-
-
-//*************************************************************************************************************
-
-QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdgesIn()
+const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesIn() const
 {
     return m_lEdgesIn;
 }
@@ -108,7 +100,7 @@ QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdgesIn()
 
 //*************************************************************************************************************
 
-QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdgesOut()
+const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesOut() const
 {
     return m_lEdgesOut;
 }
@@ -116,23 +108,7 @@ QList<QSharedPointer<NetworkEdge> > NetworkNode::getEdgesOut()
 
 //*************************************************************************************************************
 
-const RowVectorXf& NetworkNode::getVert()
-{
-    return m_vecVert;
-}
-
-
-//*************************************************************************************************************
-
-qint16 NetworkNode::getId()
-{
-    return m_iId;
-}
-
-
-//*************************************************************************************************************
-
-qint16 NetworkNode::getDegree()
+int NetworkNode::getNumberEdges() const
 {
     return m_lEdgesIn.size() + m_lEdgesOut.size();
 }
@@ -140,7 +116,31 @@ qint16 NetworkNode::getDegree()
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getIndegree()
+const RowVectorXf& NetworkNode::getVert() const
+{
+    return m_vecVert;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getId() const
+{
+    return m_iId;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getDegree() const
+{
+    return m_lEdgesIn.size() + m_lEdgesOut.size();
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getIndegree() const
 {
     return m_lEdgesIn.size();
 }
@@ -148,7 +148,7 @@ qint16 NetworkNode::getIndegree()
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getOutdegree()
+qint16 NetworkNode::getOutdegree() const
 {
     return m_lEdgesOut.size();
 }
@@ -156,7 +156,7 @@ qint16 NetworkNode::getOutdegree()
 
 //*************************************************************************************************************
 
-double NetworkNode::getStrength()
+double NetworkNode::getStrength() const
 {
     double strength = 0;
 
@@ -174,7 +174,7 @@ double NetworkNode::getStrength()
 
 //*************************************************************************************************************
 
-double NetworkNode::getInstrength()
+double NetworkNode::getInstrength() const
 {
     double strength = 0;
 
@@ -188,7 +188,7 @@ double NetworkNode::getInstrength()
 
 //*************************************************************************************************************
 
-double NetworkNode::getOutstrength()
+double NetworkNode::getOutstrength() const
 {
     double strength = 0;
 
@@ -210,7 +210,7 @@ void NetworkNode::setHubStatus(bool bIsHub)
 
 //*************************************************************************************************************
 
-bool NetworkNode::getHubStatus()
+bool NetworkNode::getHubStatus() const
 {
     return m_bIsHub;
 }

@@ -1,24 +1,24 @@
 <RCC>
     <qresource prefix="/">
-        <file>model/materials/shaders/gl3/light.inc.frag</file>
-        <file>model/materials/shaders/gl3/pervertexphongalpha.frag</file>
-        <file>model/materials/shaders/gl3/pervertexphongalpha.vert</file>
-        <file>model/materials/shaders/gl3/shownormals.frag</file>
-        <file>model/materials/shaders/gl3/shownormals.geom</file>
-        <file>model/materials/shaders/gl3/shownormals.vert</file>
-        <file>model/materials/shaders/gl3/network.frag</file>
-        <file>model/materials/shaders/gl3/network.vert</file>
-        <file>model/materials/shaders/es2/light.inc.frag</file>
-        <file>model/materials/shaders/es2/network.frag</file>
-        <file>model/materials/shaders/es2/network.vert</file>
-        <file>model/materials/shaders/es2/pervertexphongalpha.frag</file>
-        <file>model/materials/shaders/es2/pervertexphongalpha.vert</file>
-        <file>model/materials/shaders/gl4/pervertextessphongalpha.frag</file>
-        <file>model/materials/shaders/gl4/pervertextessphongalpha.geom</file>
-        <file>model/materials/shaders/gl4/pervertextessphongalpha.tcs</file>
-        <file>model/materials/shaders/gl4/pervertextessphongalpha.vert</file>
-        <file>model/materials/shaders/gl4/pervertextessphongalpha_pn_triangles.tes</file>
-        <file>model/materials/shaders/gl4/pervertextessphongalpha_simple.tes</file>
-        <file>model/materials/shaders/gl4/light.inc.frag</file>
+        <file>engine/model/materials/shaders/es2/light.inc.frag</file>
+        <file>engine/model/materials/shaders/es2/network.frag</file>
+        <file>engine/model/materials/shaders/es2/network.vert</file>
+        <file>engine/model/materials/shaders/es2/pervertexphongalpha.frag</file>
+        <file>engine/model/materials/shaders/es2/pervertexphongalpha.vert</file>
+        <file>engine/model/materials/shaders/gl3/light.inc.frag</file>
+        <file>engine/model/materials/shaders/gl3/network.frag</file>
+        <file>engine/model/materials/shaders/gl3/network.vert</file>
+        <file>engine/model/materials/shaders/gl3/pervertexphongalpha.frag</file>
+        <file>engine/model/materials/shaders/gl3/pervertexphongalpha.vert</file>
+        <file>engine/model/materials/shaders/gl3/shownormals.frag</file>
+        <file>engine/model/materials/shaders/gl3/shownormals.geom</file>
+        <file>engine/model/materials/shaders/gl3/shownormals.vert</file>
+        <file>engine/model/materials/shaders/gl4/light.inc.frag</file>
+        <file>engine/model/materials/shaders/gl4/pervertextessphongalpha.frag</file>
+        <file>engine/model/materials/shaders/gl4/pervertextessphongalpha.geom</file>
+        <file>engine/model/materials/shaders/gl4/pervertextessphongalpha.tcs</file>
+        <file>engine/model/materials/shaders/gl4/pervertextessphongalpha.vert</file>
+        <file>engine/model/materials/shaders/gl4/pervertextessphongalpha_pn_triangles.tes</file>
+        <file>engine/model/materials/shaders/gl4/pervertextessphongalpha_simple.tes</file>
     </qresource>
 </RCC>

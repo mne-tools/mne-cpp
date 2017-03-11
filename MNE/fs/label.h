@@ -202,4 +202,9 @@ inline bool Label::isEmpty() const
 
 } // NAMESPACE
 
+#ifndef metatype_label
+#define metatype_label
+Q_DECLARE_METATYPE(FSLIB::Label);
+#endif
+
 #endif // LABEL_H
