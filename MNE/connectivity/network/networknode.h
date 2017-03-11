@@ -108,19 +108,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns all edges(undirected gaph).
-    *
-    * @return   Returns the list with all edges beloning to the node.
-    */
-    QList<QSharedPointer<NetworkEdge> > getEdges();
-
-    //=========================================================================================================
-    /**
     * Returns the ingoing edges.
     *
     * @return   Returns the list with all ingoing edges.
     */
-    QList<QSharedPointer<NetworkEdge> > getEdgesIn();
+    const QList<QSharedPointer<NetworkEdge> >& getEdgesIn() const;
 
     //=========================================================================================================
     /**
@@ -128,7 +120,15 @@ public:
     *
     * @return   Returns the list with all outgoing edges.
     */
-    QList<QSharedPointer<NetworkEdge>> getEdgesOut();
+    const QList<QSharedPointer<NetworkEdge>>& getEdgesOut() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the number of all edges.
+    *
+    * @return   Returns the number of all edges.
+    */
+    int getNumberEdges() const;
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ public:
     *
     * @return   Returns the 3D position of the node.
     */
-    const Eigen::RowVectorXf& getVert();
+    const Eigen::RowVectorXf& getVert() const;
 
     //=========================================================================================================
     /**
@@ -144,7 +144,7 @@ public:
     *
     * @return   Returns the node id.
     */
-    qint16 getId();
+    qint16 getId() const;
 
     //=========================================================================================================
     /**
@@ -152,7 +152,7 @@ public:
     *
     * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
     */
-    qint16 getDegree();
+    qint16 getDegree() const;
 
     //=========================================================================================================
     /**
@@ -160,7 +160,7 @@ public:
     *
     * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
     */
-    qint16 getIndegree();
+    qint16 getIndegree() const;
 
     //=========================================================================================================
     /**
@@ -168,7 +168,7 @@ public:
     *
     * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
     */
-    qint16 getOutdegree();
+    qint16 getOutdegree() const;
 
     //=========================================================================================================
     /**
@@ -176,7 +176,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all edges of a node.
     */
-    double getStrength();
+    double getStrength() const;
 
     //=========================================================================================================
     /**
@@ -184,7 +184,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
     */
-    double getInstrength();
+    double getInstrength() const;
 
     //=========================================================================================================
     /**
@@ -192,7 +192,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
     */
-    double getOutstrength();
+    double getOutstrength() const;
 
     //=========================================================================================================
     /**
@@ -208,7 +208,7 @@ public:
     *
     * @return   Whether this node is a hub or not.
     */
-    bool getHubStatus();
+    bool getHubStatus() const;
 
     //=========================================================================================================
     /**

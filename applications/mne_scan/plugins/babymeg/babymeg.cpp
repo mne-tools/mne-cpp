@@ -140,11 +140,17 @@ BabyMEG::BabyMEG()
             this, &BabyMEG::updateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
 
+    //Init HPI
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
     m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
     connect(m_pActionComputeHPI, &QAction::triggered,
             this, &BabyMEG::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
+
+    connect(this, &BabyMEG::started,
+            this, &BabyMEG::sendStatusToHPI);
+    connect(this, &BabyMEG::finished,
+            this, &BabyMEG::sendStatusToHPI);
 
     //Init timers
     if(!m_pRecordTimer) {
@@ -663,6 +669,21 @@ void BabyMEG::sendHPIData()
         // Only use calibration
         //m_pHPIWidget->setData(this->calibrate(m_matValue));
     }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::sendStatusToHPI()
+{
+    if (!m_pHPIWidget) {
+        m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
+
+        connect(m_pHPIWidget.data(), &HPIWidget::needData,
+                this, &BabyMEG::sendHPIData);
+    }
+
+    m_pHPIWidget->setIsRunning(this->isRunning());
 }
 
 
