@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepEval class declaration.
+* @brief    DeepEval class declaration v1.
 *
 */
 
@@ -50,7 +50,6 @@
 //=============================================================================================================
 
 #include <Eval.h>
-#include <CNTKLibrary.h>
 
 
 //*************************************************************************************************************
@@ -79,7 +78,7 @@ namespace DEEPLIB
 
 //=============================================================================================================
 /**
-* DeepEval cntk wrapper descritpion
+* DeepEval cntk v1 wrapper descritpion
 *
 * @brief DeepEval cntk wrapper to evaluate pretrained models
 */
@@ -172,43 +171,11 @@ public:
     size_t outputDimensions();
 
 
-
-    static bool GetVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var);
-
-    inline static bool GetInputVariableByName(CNTK::FunctionPtr evalFunc, std::wstring varName, CNTK::Variable& var);
-
-    inline static bool GetOutputVaraiableByName(CNTK::FunctionPtr evalFunc, std::wstring varName, CNTK::Variable& var);
-
-
-    static void runEvaluation(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue);
-
-    void OutputFunctionInfo(CNTK::FunctionPtr func);
-
-
-
-    /// <summary>
-    /// Shows how to use LoadLegacyModel() and Clone() to share function parameters among multi evaluation threads.
-    /// </summary>
-    /// <description>
-    /// It first loads a model, then spawns multi threads. Each thread uses Clone() to create a new
-    /// instance of function and then use this instance to do evaluation.
-    /// All cloned functions share the same parameters.
-    /// Note: It uses the model trained by Examples\Image\GettingStarted\01_OneHidden.cntk as example. Instructions
-    /// to train the model is described in Examples\Image\GettingStarted\README.md.
-    /// The pre-trained model file 01_OneHidden needs to be in the current directory.
-    /// </description>
-    void loadModel_v2(const CNTK::DeviceDescriptor &device);
-
-    void evalModel_v2(const CNTK::DeviceDescriptor& device, const int threadCount);
-
-    void testEval();
-
 private:
+
     QString m_sModelFilename;       /**< Model filename */
 
     Microsoft::MSR::CNTK::IEvaluateModel<float>* m_pModel_v1;  /**< The loaded model */
-
-    CNTK::FunctionPtr m_pModelFunction_v2;  /**< The loaded v2 model */
 };
 
 //*************************************************************************************************************

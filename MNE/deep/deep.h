@@ -46,6 +46,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // CNTK INCLUDES
 //=============================================================================================================
 
@@ -58,6 +66,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+
 
 
 //*************************************************************************************************************
@@ -105,28 +114,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Whether the GPU should be used
-    *
-    * @param [in] useGPU    Flag if GPU should be used.
-    */
-    void setUseGPU(bool useGPU);
-
-    //=========================================================================================================
-    /**
     * Evaluate the network in several runs
     *
     * @param [in] evalFunc      Function to evaluate
     * @param [in] device        Device to use
     */
     static void RunEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
-
-    //=========================================================================================================
-    /**
-    * Print the ouput function info to stderr stream
-    *
-    * @param [in] func      Function to evaluate
-    */
-    static void OutputFunctionInfo(CNTK::FunctionPtr func);
 
     //=========================================================================================================
     /**
@@ -167,7 +160,82 @@ public:
     void testClone();
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //=========================================================================================================
+    /**
+    * Returns the Input Dimensions
+    *
+    * @return the Input dimensions
+    */
+    size_t inputDimensions();
+
+    //=========================================================================================================
+    /**
+    * Returns the Output Dimensions
+    *
+    * @return the Output dimensions
+    */
+    size_t outputDimensions();
+
+    //=========================================================================================================
+    /**
+    * Run the evaluation CNTK Model
+    *
+    * @param [in] model     Model to evaluate
+    * @param [in] device    Device to use for evaluation
+    * @param [in] input     The inputs (rows = samples, cols = feature inputs)
+    * @param [out] output   The ouptuts (rows = samples, cols = output results)
+    *
+    * @return true when successfully evaluated, false otherwise.
+    */
+    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::DeviceDescriptor& device, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue);
+
+    //=========================================================================================================
+    /**
+    * Loads CNTK Model v2
+    *
+    * @param [in] modelFileName     Model file name
+    * @param [in] device            Device to load the model to
+    *
+    * @return true when successfully loaded, false otherwise.
+    */
+    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device);
+
+    //=========================================================================================================
+    /**
+    * Evaluate the CNTK Model
+    *
+    * @param [in] device    Device to use for evaluation
+    * @param [in] input     The inputs (rows = samples, cols = feature inputs)
+    * @param [out] output   The ouptuts (rows = samples, cols = output results)
+    *
+    * @return true when successfully evaluated, false otherwise.
+    */
+    bool evalModel(const CNTK::DeviceDescriptor& device, const Eigen::MatrixXf& input, Eigen::MatrixXf& output);
+
 protected:
+    //=========================================================================================================
+    /**
+    * Print the ouput function info to stderr stream
+    *
+    * @param [in] model     Function to evaluate
+    */
+    void OutputFunctionInfo(CNTK::FunctionPtr model);
+
     //=========================================================================================================
     /**
     * Searches for a varibale by name. Returns true when variable was found.
@@ -178,36 +246,36 @@ protected:
     *
     * @return true when variable was found, false otherwise.
     */
-    static bool GetVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var)
-    {
-        for (std::vector<CNTK::Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
-        {
-            if (it->Name().compare(varName) == 0)
-            {
-                var = *it;
-                return true;
-            }
-        }
-        return false;
-    }
+    static bool GetVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var);
 
     //=========================================================================================================
     /**
-    * Searches for a input variable by name. Returns true when found
+    * Searches for an input variable by name. Returns true when found.
     *
-    * @param [in] evalFunc          Input function to search for the respective input variable.
+    * @param [in] evalFunc          Model to search for the respective input variable.
     * @param [in] varName           Name of variable to find
     * @param [out] var              The variable, if name was found
     *
     * @return true when variable was found, false otherwise.
     */
-    inline static bool GetInputVariableByName(CNTK::FunctionPtr evalFunc, std::wstring varName, CNTK::Variable& var)
-    {
-        return GetVariableByName(evalFunc->Arguments(), varName, var);
-    }
+    inline static bool GetInputVariableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
+
+    //=========================================================================================================
+    /**
+    * Searches for an output variable by name. Returns true when found.
+    *
+    * @param [in] evalFunc          Model to search for the respective input variable.
+    * @param [in] varName           Name of variable to find
+    * @param [out] var              The variable, if name was found
+    *
+    * @return true when variable was found, false otherwise.
+    */
+    inline static bool GetOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
+
 
 private:
-    bool m_bUseGPU = false;     /**< Should the GPU be used? */
+
+    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
 
 };
 
