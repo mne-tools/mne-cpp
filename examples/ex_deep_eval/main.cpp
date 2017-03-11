@@ -91,6 +91,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    DeepEval deepTest;
+    deepTest.testEval();
+
+
+/*
     DeepEval deepTest(QApplication::applicationDirPath() + "/mne_deep_models/examples/output/models/ex_deep_one_hidden");
 
     //
@@ -147,6 +152,8 @@ int main(int argc, char *argv[])
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->show();
+
+*/
 
     return a.exec();
 }

@@ -67,6 +67,7 @@
 using namespace DEEPLIB;
 using namespace Eigen;
 using namespace Microsoft::MSR::CNTK;
+using namespace CNTK;
 
 
 // Used for retrieving the model appropriate for the element type (float / double)
@@ -84,7 +85,7 @@ typedef std::map<std::wstring, std::vector<float>*> Layer;
 //=============================================================================================================
 
 DeepEval::DeepEval()
-: m_pModel(NULL)
+: m_pModel_v1(NULL)
 {
 }
 
@@ -93,7 +94,7 @@ DeepEval::DeepEval()
 
 DeepEval::DeepEval(const QString &sModelFilename)
 : m_sModelFilename(sModelFilename)
-, m_pModel(NULL)
+, m_pModel_v1(NULL)
 {
     loadModel();
 }
@@ -142,14 +143,14 @@ bool DeepEval::evalModel(const VectorXf &inputs, VectorXf &outputs)
 
 bool DeepEval::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
 {
-    if( !m_pModel )
+    if( !m_pModel_v1 )
         return false;
 
     // get the model's layers dimensions
     std::map<std::wstring, size_t> inDims;
     std::map<std::wstring, size_t> outDims;
-    m_pModel->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-    m_pModel->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
+    m_pModel_v1->GetNodeDimensions(inDims, NodeGroup::nodeInput);
+    m_pModel_v1->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
 
     std::wstring inputLayerName = inDims.begin()->first;
     std::wstring outputLayerName = outDims.begin()->first;
@@ -166,7 +167,7 @@ bool DeepEval::evalModel(std::vector<float>& inputs, std::vector<float>& outputs
     outputLayer.insert(MapEntry(outputLayerName, &outputs));
 
     // We can call the evaluate method and get back the results (single layer)...
-    m_pModel->Evaluate(inputLayer, outputLayer);
+    m_pModel_v1->Evaluate(inputLayer, outputLayer);
 
     // This pattern is used by End2EndTests to check whether the program runs to complete.
     fprintf(stderr, "Evaluation complete.\n");
@@ -189,7 +190,7 @@ bool DeepEval::loadModel()
 
     const std::string modelFile = m_sModelFilename.toUtf8().constData();
 
-    GetEvalF(&m_pModel);
+    GetEvalF(&m_pModel_v1);
 
     // Load model with desired outputs
     std::string networkConfiguration;
@@ -198,7 +199,7 @@ bool DeepEval::loadModel()
     // with the ones specified.
     //networkConfiguration += "outputNodeNames=\"h1.z:ol.z\"\n";
     networkConfiguration += "modelPath=\"" + modelFile + "\"";
-    m_pModel->CreateNetwork(networkConfiguration);
+    m_pModel_v1->CreateNetwork(networkConfiguration);
 
     return true;
 }
@@ -208,9 +209,9 @@ bool DeepEval::loadModel()
 
 size_t DeepEval::inputDimensions()
 {
-    if(m_pModel) {
+    if(m_pModel_v1) {
         std::map<std::wstring, size_t> inDims;
-        m_pModel->GetNodeDimensions(inDims, NodeGroup::nodeInput);
+        m_pModel_v1->GetNodeDimensions(inDims, NodeGroup::nodeInput);
         std::wstring inputLayerName = inDims.begin()->first;
         return inDims[inputLayerName];
     }
@@ -222,11 +223,191 @@ size_t DeepEval::inputDimensions()
 
 size_t DeepEval::outputDimensions()
 {
-    if(m_pModel) {
+    if(m_pModel_v1) {
         std::map<std::wstring, size_t> outDims;
-        m_pModel->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
+        m_pModel_v1->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
         std::wstring outputLayerName = outDims.begin()->first;
         return outDims[outputLayerName];
     }
     return 0;
+}
+
+
+//*************************************************************************************************************
+
+bool DeepEval::GetVariableByName(std::vector<Variable> variableLists, std::wstring varName, Variable &var)
+{
+    for (std::vector<Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
+    {
+        if (it->Name().compare(varName) == 0)
+        {
+            var = *it;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool DeepEval::GetInputVariableByName(FunctionPtr evalFunc, std::wstring varName, Variable &var)
+{
+    return GetVariableByName(evalFunc->Arguments(), varName, var);
+}
+
+
+//*************************************************************************************************************
+
+bool DeepEval::GetOutputVaraiableByName(FunctionPtr evalFunc, std::wstring varName, Variable &var)
+{
+    return GetVariableByName(evalFunc->Outputs(), varName, var);
+}
+
+
+//*************************************************************************************************************
+
+void DeepEval::runEvaluation(FunctionPtr evalFunc, const DeviceDescriptor &device, const CNTK::Variable& inputVar, const ValuePtr& inputValue, const CNTK::Variable& outputVar, ValuePtr& outputValue)
+{
+    std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
+    evalFunc->Forward({{inputVar, inputValue}}, outputs, device);
+    outputValue = outputs[outputVar];
+}
+
+
+//*************************************************************************************************************
+
+void DeepEval::OutputFunctionInfo(FunctionPtr func)
+{
+    auto inputVariables = func->Arguments();
+    fprintf(stderr, "Function '%S': Input Variables (count=%lu)\n", func->Name().c_str(), (unsigned long)inputVariables.size());
+    for_each(inputVariables.begin(), inputVariables.end(), [](const Variable v) {
+        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
+    });
+
+    auto outputVariables = func->Outputs();
+    fprintf(stderr, "Function '%S': Output Variables (count=%lu)\n", func->Name().c_str(), (unsigned long)outputVariables.size());
+    for_each(outputVariables.begin(), outputVariables.end(), [](const Variable v) {
+        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
+    });
+}
+
+
+//*************************************************************************************************************
+
+void DeepEval::loadModel_v2(const DeviceDescriptor &device)
+{
+    QString fileName("./mne_deep_models/examples/output/models/ex_deep_one_hidden");
+    std::wstring file = fileName.toStdWString();
+    m_pModelFunction_v2 = Function::LoadModel(file, device);
+}
+
+
+//*************************************************************************************************************
+
+void DeepEval::evalModel_v2(const DeviceDescriptor &device, const int threadCount)
+{
+    // The model file will be trained and copied to the current runtime directory first.
+
+    OutputFunctionInfo(m_pModelFunction_v2);
+    fprintf(stderr, "MultiThreadsEvaluationWithLoadModel on device=%d\n", device.Id());
+
+//    // Run evaluation in parallel.
+//    std::vector<std::thread> threadList(threadCount);
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th] = std::thread(runEvaluation, m_pModelFunction_v2->Clone(), device,inputVar,inputValue,outputVar,outputValue);
+//    }
+
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th].join();
+//        fprintf(stderr, "thread %d joined.\n", th);
+//        fflush(stderr);
+//    }
+
+
+
+
+    const std::wstring inputNodeName = L"features";
+    const std::wstring outputNodeName = L"out.z";
+
+    Variable inputVar;
+    if (!GetInputVariableByName(m_pModelFunction_v2, inputNodeName, inputVar)) {
+        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+        throw("Input variable not found error.");
+    }
+
+    Variable outputVar;
+    if (!GetOutputVaraiableByName(m_pModelFunction_v2, outputNodeName, outputVar)) {
+        fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
+        throw("Output variable not found error.");
+    }
+
+    // Evaluate the network in several runs
+    size_t numSamples = 3;
+
+    std::vector<float> inputData(inputVar.Shape().TotalSize() * numSamples);
+    for (size_t i = 0; i < inputData.size(); ++i)
+    {
+        inputData[i] = static_cast<float>(i % 255);
+    }
+
+    NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
+
+    ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+
+    ValuePtr outputValue;
+
+
+
+
+
+
+
+    runEvaluation(m_pModelFunction_v2,device,inputVar,inputValue,outputVar,outputValue);
+
+
+
+
+
+
+
+
+
+    NDShape outputShape = outputVar.Shape().AppendShape({1, numSamples});
+    std::vector<float> outputData(outputShape.TotalSize());
+    NDArrayViewPtr cpuArrayOutput = MakeSharedObject<NDArrayView>(outputShape, outputData, false);
+    cpuArrayOutput->CopyFrom(*outputValue->Data());
+
+    assert(outputData.size() == outputVar.Shape()[0] * numSamples);
+    fprintf(stderr, "Evaluation result:\n");
+    size_t dataIndex = 0;
+    auto outputDim = outputVar.Shape()[0];
+    for (size_t i = 0; i < numSamples; i++)
+    {
+        fprintf(stderr, "Sample %lu:\n", (unsigned long)i);
+        fprintf(stderr, "Ouput:");
+        for (size_t j = 0; j < outputDim; j++)
+        {
+            fprintf(stderr, "%f ", outputData[dataIndex++]);
+        }
+        fprintf(stderr, "\n");
+    }
+
+
+
+
+}
+
+//*************************************************************************************************************
+
+void DeepEval::testEval() {
+    // The number of threads running evaluation in parallel.
+    const int numOfThreads = 2;
+
+    // test multi-threads evaluation with loading existing models
+    fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
+    loadModel_v2(DeviceDescriptor::CPUDevice());
+    evalModel_v2(DeviceDescriptor::CPUDevice(), numOfThreads);
 }
