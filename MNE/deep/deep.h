@@ -68,7 +68,6 @@
 #include <QSharedPointer>
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -161,6 +160,20 @@ public:
 
 
 
+    void exampleTrain();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -214,6 +227,16 @@ public:
     * @return true when successfully loaded, false otherwise.
     */
     bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device);
+
+    //=========================================================================================================
+    /**
+    * Save CNTK Model v2 function graph into a model file.
+    *
+    * @param [in] fileName     file name to save the model to
+    *
+    * @return true when successfully saved, false otherwise.
+    */
+    bool saveModel(const QString& fileName);
 
     //=========================================================================================================
     /**

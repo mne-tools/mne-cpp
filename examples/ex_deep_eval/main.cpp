@@ -122,6 +122,10 @@ int main(int argc, char *argv[])
 
         std::cout << "outputs\n" << outputs << std::endl;
 
+
+        deep_v2.saveModel("./mne_deep_models/examples/ex_deep_one_hidden.v2");
+
+
         //
         // Visualize
         //
