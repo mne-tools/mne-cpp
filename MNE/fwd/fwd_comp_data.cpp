@@ -262,7 +262,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set, FwdCoilSet *coi
     chs = MALLOC_60(coils->ncoil,fiffChInfoRec);
     for (k = 0; k < coils->ncoil; k++) {
         coil = coils->coils[k];
-        strcpy(chs[k].ch_name,coil->chname);
+        strcpy(chs[k].ch_name,coil->chname.toUtf8().constData());
         chs[k].chpos.coil_type = coil->type;
         chs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
     }
@@ -271,7 +271,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set, FwdCoilSet *coi
         compchs = MALLOC_60(comp_coils->ncoil,fiffChInfoRec);
         for (k = 0; k < comp_coils->ncoil; k++) {
             coil = comp_coils->coils[k];
-            strcpy(compchs[k].ch_name,coil->chname);
+            strcpy(compchs[k].ch_name,coil->chname.toUtf8().constData());
             compchs[k].chpos.coil_type = coil->type;
             compchs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
         }

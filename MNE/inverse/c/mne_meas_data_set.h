@@ -110,7 +110,7 @@ public:
     /*
     * These are unique to each data set
     */
-    char            *comment;       /* Comment associated with these data */
+    QString         comment;       /* Comment associated with these data */
     float           **data;         /* The measured data */
     float           **data_proj;    /* Some programs maybe interested in keeping the data after SSP separately */
     float           **data_filt;    /* Some programs maybe interested in putting a filtered version here */

@@ -158,7 +158,7 @@ void CommandServer::prepareReply(QString p_sReply, Command p_command)
     qint32 t_iThreadID = m_iCurrentCommandThreadID;
 
     //print
-//    printf("%s",p_sReply.toLatin1().constData());
+//    printf("%s",p_sReply.toUtf8().constData());
 
     emit replyCommand(p_sReply, t_iThreadID);
 

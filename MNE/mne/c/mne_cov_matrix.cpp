@@ -170,55 +170,6 @@ double **mne_dmatrix_30(int nr, int nc)
 
 
 
-
-char *mne_strdup_30(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-char **mne_dup_name_list_30(char **list, int nlist)
-/*
- * Duplicate a name list
- */
-{
-    char **res;
-    int  k;
-    if (list == NULL || nlist == 0)
-        return NULL;
-    res = MALLOC_30(nlist,char *);
-
-    for (k = 0; k < nlist; k++)
-        res[k] = mne_strdup_30(list[k]);
-    return res;
-}
-
-
-void mne_free_name_list_30(char **list, int nlist)
-/*
-* Free a name list array
-*/
-{
-    int k;
-    if (list == NULL || nlist == 0)
-        return;
-    for (k = 0; k < nlist; k++) {
-#ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
-#endif
-        FREE_30(list[k]);
-    }
-    FREE_30(list);
-    return;
-}
-
-
-
 //============================= mne_decompose.c =============================
 
 
@@ -355,7 +306,7 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
 
 MneCovMatrix::MneCovMatrix(int p_kind,
                            int p_ncov,
-                           char **p_names,
+                           const QStringList& p_names,
                            double *p_cov,
                            double *p_cov_diag,
                            FiffSparseMatrix* p_cov_sparse)
@@ -375,7 +326,6 @@ MneCovMatrix::MneCovMatrix(int p_kind,
 ,ch_class(NULL)
 ,proj(NULL)
 ,sss(NULL)
-,bads(NULL)
 ,nbad(0)
 {
 
@@ -390,7 +340,7 @@ MneCovMatrix::~MneCovMatrix()
     FREE_30(cov_diag);
     if(cov_sparse)
         delete cov_sparse;
-    mne_free_name_list_30(names,ncov);
+    names.clear();
     FREE_CMATRIX_30(eigen);
     FREE_30(lambda);
     FREE_30(inv_lambda);
@@ -400,7 +350,7 @@ MneCovMatrix::~MneCovMatrix()
         delete proj;
     if (sss)
         delete sss;
-    mne_free_name_list_30(bads,nbad);
+    bads.clear();
 }
 
 
@@ -422,12 +372,12 @@ MneCovMatrix *MneCovMatrix::mne_dup_cov(MneCovMatrix *c)
     if (c->cov_diag) {
         for (k = 0; k < nval; k++)
             vals[k] = c->cov_diag[k];
-        res = mne_new_cov(c->kind,c->ncov,mne_dup_name_list_30(c->names,c->ncov),NULL,vals);
+        res = mne_new_cov(c->kind,c->ncov,c->names,NULL,vals);
     }
     else {
         for (k = 0; k < nval; k++)
             vals[k] = c->cov[k];
-        res = mne_new_cov(c->kind,c->ncov,mne_dup_name_list_30(c->names,c->ncov),vals,NULL);
+        res = mne_new_cov(c->kind,c->ncov,c->names,vals,NULL);
     }
     /*
         * Duplicate additional items
@@ -437,7 +387,7 @@ MneCovMatrix *MneCovMatrix::mne_dup_cov(MneCovMatrix *c)
         for (k = 0; k < c->ncov; k++)
             res->ch_class[k] = c->ch_class[k];
     }
-    res->bads = mne_dup_name_list_30(c->bads,c->nbad);
+    res->bads = c->bads;
     res->nbad = c->nbad;
     res->proj = MneProjOp::mne_dup_proj_op(c->proj);
     res->sss  = new MneSssData(*(c->sss));

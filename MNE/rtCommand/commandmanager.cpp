@@ -114,7 +114,7 @@ void CommandManager::insert(const QJsonDocument &p_jsonDocument)
         if(!m_qMapCommands.contains(it.key()))
             m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject(), true, this));
         else
-            qWarning("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toLatin1().constData());
+            qWarning("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toUtf8().constData());
     }
 
     emit commandMapChanged();

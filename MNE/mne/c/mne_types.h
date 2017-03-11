@@ -122,6 +122,8 @@
 #include "mne_ctf_comp_data.h"
 #include "mne_ctf_comp_data_set.h"
 
+#include <QStringList>
+
 
 #if defined(__cplusplus) 
 extern "C" {
@@ -310,15 +312,15 @@ typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 typedef struct {		/* Matrix specification with a channel list */
   int   nrow;			/* Number of rows (same as in data) */
   int   ncol;			/* Number of columns (same as in data) */
-  char  **rowlist;		/* Name list for the rows (may be NULL) */
-  char  **collist;		/* Name list for the columns (may be NULL) */
+  QStringList rowlist;		/* Name list for the rows (may be NULL) */
+  QStringList collist;		/* Name list for the columns (may be NULL) */
   FIFFLIB::FiffSparseMatrix* data;		/* The data itself (sparse) */
 } *mneSparseNamedMatrix,mneSparseNamedMatrixRec;
 
-typedef struct {		/* Vector specification with a channel list */
-  int    nvec;			/* Number of elements */
-  char   **names;		/* Name list for the elements */
-  float  *data;			/* The data itself */
+typedef struct {            /* Vector specification with a channel list */
+  int           nvec;       /* Number of elements */
+  QStringList   names;      /* Name list for the elements */
+  float*        data;       /* The data itself */
 } *mneNamedVector,mneNamedVectorRec;
 
 //typedef struct {		/* One linear projection item */
@@ -532,12 +534,12 @@ typedef struct {				     /* Plotter layout */
 #define MNE_CH_SELECTION_USER    2
 
 typedef struct {
-  char *name;			/* Name of this selection */
-  char **chdef;			/* Channel definitions (may contain regular expressions) */
-  int  ndef;			/* How many of them */
-  char **chspick;		/* Translated into channel names using the present data */
-  char **chspick_nospace;	/* The same without spaces */
-  int  *pick;			/* These are the corresponding channels in the raw data 
+  QString name;         /* Name of this selection */
+  QStringList chdef;    /* Channel definitions (may contain regular expressions) */
+  int  ndef;            /* How many of them */
+  QStringList chspick;          /* Translated into channel names using the present data */
+  QStringList chspick_nospace;  /* The same without spaces */
+  int  *pick;           /* These are the corresponding channels in the raw data
 				   (< 0 indicates missing) */
   int  *pick_deriv;		/* These are the corresponding derivations in the raw data */
   int  nderiv;			/* How many derivations in the above */

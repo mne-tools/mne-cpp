@@ -68,21 +68,6 @@
 
 
 
-//============================= misc_util.c =============================
-
-char *mne_strdup_33(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -108,7 +93,7 @@ MneRawInfo::MneRawInfo()
 
 MneRawInfo::~MneRawInfo()
 {
-    FREE_33(this->filename);
+    this->filename.clear();
     FREE_33(this->chInfo);
     FREE_33(this->trans);
 //    FREE_33(this->rawDir);
@@ -404,7 +389,7 @@ bad : {
 
 //*************************************************************************************************************
 
-int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **infop)
+int MneRawInfo::mne_load_raw_info(const QString& name, int allow_maxshield, MneRawInfo **infop)
 /*
           * Load raw data information from a fiff file
           */
@@ -466,7 +451,7 @@ int MneRawInfo::mne_load_raw_info(char *name, int allow_maxshield, MneRawInfo **
        * Ready to put everything together
        */
     info = new MneRawInfo();
-    info->filename       = mne_strdup_33(name);
+    info->filename       = name;
     info->nchan          = nchan;
     info->chInfo         = chs;
     info->coord_frame    = FIFFV_COORD_DEVICE;
