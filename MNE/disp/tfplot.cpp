@@ -66,7 +66,7 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upp
 
     MatrixXd zoomed_tf_matrix = MatrixXd::Zero(upper_px-lower_px, tf_matrix.cols());
     //How to print to console here
-    //printf(("fff   "+QString::number(zoomed_tf_matrix(12,12))).toLatin1().data());// << ";  " << zoomed_tf_matrix.rows(2) << ";   ";
+    //printf(("fff   "+QString::number(zoomed_tf_matrix(12,12))).toUtf8().data());// << ";  " << zoomed_tf_matrix.rows(2) << ";   ";
 
     qint32 pxls = 0;
     for(qint32 it = lower_px; it < upper_px; it++)

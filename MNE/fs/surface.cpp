@@ -271,9 +271,9 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
         nvert = IOUtils::fread3(t_DataStream);
         nquad = IOUtils::fread3(t_DataStream);
         if(magic == QUAD_FILE_MAGIC_NUMBER)
-            printf("\t%s is a quad file (nvert = %d nquad = %d)\n", p_sFile.toLatin1().constData(),nvert,nquad);
+            printf("\t%s is a quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(),nvert,nquad);
         else
-            printf("\t%s is a new quad file (nvert = %d nquad = %d)\n", p_sFile.toLatin1().constData(),nvert,nquad);
+            printf("\t%s is a new quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(),nvert,nquad);
 
         //vertices
         verts.resize(nvert, 3);
@@ -353,8 +353,8 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
         IOUtils::swap_int(nvert);
         IOUtils::swap_int(nface);
 
-        printf("\t%s is a triangle file (nvert = %d ntri = %d)\n", p_sFile.toLatin1().constData(), nvert, nface);
-        printf("\t%s", s.toLatin1().constData());
+        printf("\t%s is a triangle file (nvert = %d ntri = %d)\n", p_sFile.toUtf8().constData(), nvert, nface);
+        printf("\t%s", s.toUtf8().constData());
 
         //vertices
         verts.resize(3, nvert);
@@ -378,7 +378,7 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
     }
     else
     {
-        qWarning("Bad magic number (%d) in surface file %s",magic,p_sFile.toLatin1().constData());
+        qWarning("Bad magic number (%d) in surface file %s",magic,p_sFile.toUtf8().constData());
         return false;
     }
 
@@ -414,7 +414,7 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
     }
 
     t_File.close();
-    printf("\tRead a surface with %d vertices from %s\n[done]\n",nvert,p_sFile.toLatin1().constData());
+    printf("\tRead a surface with %d vertices from %s\n[done]\n",nvert,p_sFile.toUtf8().constData());
 
     return true;
 }

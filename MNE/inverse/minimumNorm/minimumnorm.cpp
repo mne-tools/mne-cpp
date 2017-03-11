@@ -292,7 +292,7 @@ void MinimumNorm::setMethod(QString method)
         setMethod(true, false);
     }
 
-    printf("\tSet minimum norm method to %s.\n", method.toLatin1().constData());
+    printf("\tSet minimum norm method to %s.\n", method.toUtf8().constData());
 }
 
 
