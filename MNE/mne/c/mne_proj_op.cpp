@@ -159,94 +159,24 @@ float mne_dot_vectors_23 (float *v1,
 
 
 
-
-
-
-
-char *mne_strdup_23(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-
 //============================= mne_named_matrix.c =============================
 
-void mne_free_name_list_23(char **list, int nlist)
-/*
-* Free a name list array
-*/
-{
-    int k;
-    if (list == NULL || nlist == 0)
-        return;
-    for (k = 0; k < nlist; k++) {
-#ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
-#endif
-        FREE_23(list[k]);
-    }
-    FREE_23(list);
-    return;
-}
 
 
-
-void mne_string_to_name_list_23(char *s,char ***listp,int *nlistp)
+void mne_string_to_name_list_23(const QString& s, QStringList& listp,int &nlistp)
 /*
       * Convert a colon-separated list into a string array
       */
 {
-    char **list = NULL;
-    int  nlist  = 0;
-    char *one,*now=NULL;
+    QStringList list;
 
-    if (s != NULL && strlen(s) > 0) {
-        s = mne_strdup_23(s);
-        //strtok_r linux variant; strtok_s windows varainat
-#ifdef __linux__
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#elif _WIN32
-        for (one = strtok_s(s,":",&now); one != NULL; one = strtok_s(NULL,":",&now)) {
-#else
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#endif
-            list = REALLOC_23(list,nlist+1,char *);
-            list[nlist++] = mne_strdup_23(one);
-        }
-        FREE_23(s);
+    if (!s.isEmpty() && s.size() > 0) {
+        list = s.split(":");
     }
-    *listp  = list;
-    *nlistp = nlist;
+    listp  = list;
+    nlistp = list.size();
     return;
 }
-
-
-
-
-
-
-static char *add_string_23(char *old,char *add)
-
-{
-    char *news = NULL;
-    if (!old) {
-        if (add || strlen(add) > 0)
-            news = mne_strdup_23(add);
-    }
-    else {
-        old = REALLOC_23(old,strlen(old) + strlen(add) + 1,char);
-        strcat(old,add);
-        news = old;
-    }
-    return news;
-}
-
 
 
 
@@ -263,43 +193,37 @@ void fromFloatEigenMatrix_23(const Eigen::MatrixXf& from_mat, float **& to_mat)
 }
 
 
-char *mne_name_list_to_string_23(char **list,int nlist)
+QString mne_name_list_to_string_23(const QStringList& list)
 /*
 * Convert a string array to a colon-separated string
 */
 {
-    int k,len;
-    char *res;
-    if (nlist == 0 || list == NULL)
-        return NULL;
-    for (k = len = 0; k < nlist; k++)
-        len += strlen(list[k])+1;
-    res = MALLOC_23(len,char);
-    res[0] = '\0';
-    for (k = len = 0; k < nlist-1; k++) {
-        strcat(res,list[k]);
-        strcat(res,":");
+    int nlist = list.size();
+    QString res;
+    if (nlist == 0 || list.isEmpty())
+        return res;
+//    res[0] = '\0';
+    for (int k = 0; k < nlist-1; k++) {
+        res += list[k];
+        res += ":";
     }
-    strcat(res,list[nlist-1]);
+    res += list[nlist-1];
     return res;
 }
 
 
-char *mne_channel_names_to_string_23(FIFFLIB::fiffChInfo chs, int nch)
+QString mne_channel_names_to_string_23(FIFFLIB::fiffChInfo chs, int nch)
 /*
 * Make a colon-separated string out of channel names
 */
 {
-    char **names = MALLOC_23(nch,char *);
-    char *res;
-    int  k;
-
+    QStringList names;
+    QString res;
     if (nch <= 0)
-        return NULL;
-    for (k = 0; k < nch; k++)
-        names[k] = chs[k].ch_name;
-    res = mne_name_list_to_string_23(names,nch);
-    FREE_23(names);
+        return res;
+    for (int k = 0; k < nch; k++)
+        names.append(chs[k].ch_name);
+    res = mne_name_list_to_string_23(names);
     return res;
 }
 
@@ -353,10 +277,9 @@ void MneProjOp::mne_free_proj_op_proj(MneProjOp *op)
     if (op == NULL)
         return;
 
-    mne_free_name_list_23(op->names,op->nch);
     FREE_CMATRIX_23(op->proj_data);
 
-    op->names  = NULL;
+    op->names.clear();
     op->nch  = 0;
     op->nvec = 0;
     op->proj_data = NULL;
@@ -390,7 +313,7 @@ MneProjOp *MneProjOp::mne_proj_op_combine(MneProjOp *to, MneProjOp *from)
 
 //*************************************************************************************************************
 
-void MneProjOp::mne_proj_op_add_item_act(MneProjOp *op, MneNamedMatrix *vecs, int kind, const char *desc, int is_active)
+void MneProjOp::mne_proj_op_add_item_act(MneProjOp *op, MneNamedMatrix *vecs, int kind, const QString& desc, int is_active)
 /*
 * Add a new item to an existing projection operator
 */
@@ -413,9 +336,9 @@ void MneProjOp::mne_proj_op_add_item_act(MneProjOp *op, MneNamedMatrix *vecs, in
     }
     else {
         for (k = 0; k < vecs->ncol; k++) {
-            if (strstr(vecs->collist[k],"EEG") == vecs->collist[k])
+            if (vecs->collist[k].contains("EEG"))//strstr(vecs->collist[k],"EEG") == vecs->collist[k])
                 new_item->has_eeg = TRUE;
-            if (strstr(vecs->collist[k],"MEG") == vecs->collist[k])
+            if (vecs->collist[k].contains("MEG"))//strstr(vecs->collist[k],"MEG") == vecs->collist[k])
                 new_item->has_meg = TRUE;
         }
         if (!new_item->has_meg && !new_item->has_eeg) {
@@ -427,8 +350,8 @@ void MneProjOp::mne_proj_op_add_item_act(MneProjOp *op, MneNamedMatrix *vecs, in
             new_item->has_eeg = FALSE;
         }
     }
-    if (desc != NULL)
-        new_item->desc = mne_strdup_23(desc);
+    if (!desc.isEmpty())
+        new_item->desc = desc;
     new_item->kind = kind;
     new_item->nvec = new_item->vecs->nrow;
 
@@ -441,7 +364,7 @@ void MneProjOp::mne_proj_op_add_item_act(MneProjOp *op, MneNamedMatrix *vecs, in
 
 //*************************************************************************************************************
 
-void MneProjOp::mne_proj_op_add_item(MneProjOp *op, MneNamedMatrix *vecs, int kind, const char *desc)
+void MneProjOp::mne_proj_op_add_item(MneProjOp *op, MneNamedMatrix *vecs, int kind, const QString& desc)
 {
     mne_proj_op_add_item_act(op, vecs, kind, desc, TRUE);
 }
@@ -480,7 +403,7 @@ MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int n
     int eegcount = 0;
     int k;
     float       **vec_data;
-    char        **names;
+    QStringList     names;
     MneNamedMatrix* vecs;
     MneProjOp*      op;
 
@@ -493,16 +416,16 @@ MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int n
     }
 
     vec_data = ALLOC_CMATRIX_23(1,eegcount);
-    names    = MALLOC_23(eegcount,char *);
 
-    for (k = 0, eegcount = 0; k < nch; k++)
+    for (k = 0; k < nch; k++)
         if (chs[k].kind == FIFFV_EEG_CH)
-            names[eegcount++] = mne_strdup_23(chs[k].ch_name);
+            names.append(chs[k].ch_name);
 
     for (k = 0; k < eegcount; k++)
         vec_data[0][k] = 1.0/sqrt((double)eegcount);
 
-    vecs = MneNamedMatrix::build_named_matrix(1,eegcount,NULL,names,vec_data);
+    QStringList emptyList;
+    vecs = MneNamedMatrix::build_named_matrix(1,eegcount,emptyList,names,vec_data);
 
     op = new MneProjOp();
     mne_proj_op_add_item(op,vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
@@ -513,7 +436,7 @@ MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int n
 
 //*************************************************************************************************************
 
-int MneProjOp::mne_proj_op_affect(MneProjOp *op, char **list, int nlist)
+int MneProjOp::mne_proj_op_affect(MneProjOp *op, const QStringList& list, int nlist)
 {
     int k;
     int naff;
@@ -533,19 +456,18 @@ int MneProjOp::mne_proj_op_affect(MneProjOp *op, char **list, int nlist)
 
 int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, fiffChInfo chs, int nch)
 {
-    char *ch_string;
+    QString ch_string;
     int  res;
-    char **list;
+    QStringList list;
     int  nlist;
 
 
     if (nch == 0)
         return FALSE;
     ch_string = mne_channel_names_to_string_23(chs,nch);
-    mne_string_to_name_list_23(ch_string,&list,&nlist);
-    FREE_23(ch_string);
+    mne_string_to_name_list_23(ch_string,list,nlist);
     res = mne_proj_op_affect(op,list,nlist);
-    mne_free_name_list_23(list,nlist);
+    list.clear();
     return res;
 }
 
@@ -611,9 +533,9 @@ MneProjOp *MneProjOp::mne_read_proj_op_from_node(FiffStream::SPtr &stream, const
     QList<FiffDirNode::SPtr> items;
     FiffDirNode::SPtr node;
     int         k;
-    char        *item_desc,*desc_tag,*lf;
+    QString     item_desc,desc_tag;
     int         global_nchan,item_nchan,nlist;
-    char        **item_names;
+    QStringList item_names;
     int         item_kind;
     float       **item_vectors = NULL;
     int         item_nvec;
@@ -657,28 +579,29 @@ MneProjOp *MneProjOp::mne_read_proj_op_from_node(FiffStream::SPtr &stream, const
     for (k = 0; k < items.size(); k++) {
         node = items[k];
         /*
-            * Complicated procedure for getting the description
-            */
-        item_desc = NULL;
+        * Complicated procedure for getting the description
+        */
+        item_desc.clear();
 
         if (node->find_tag(stream, FIFF_NAME, t_pTag)) {
-            item_desc = add_string_23(item_desc,(char *)t_pTag->data());
+            item_desc += t_pTag->toString();
         }
 
         /*
             * Take the first line of description if it exists
             */
         if (node->find_tag(stream, FIFF_DESCRIPTION, t_pTag)) {
-            desc_tag = (char *)t_pTag->data();
-            if ((lf = strchr(desc_tag,'\n')) != NULL)
-                *lf = '\0';
-            printf("###################DEBUG ToDo: item_desc = add_string(item_desc," ");");
-            item_desc = add_string_23(item_desc,(char *)desc_tag);
-            FREE_23(desc_tag);
+            desc_tag = t_pTag->toString();
+            int pos;
+            if((pos = desc_tag.indexOf("\n")) >= 0)
+                desc_tag.truncate(pos);
+            if (!item_desc.isEmpty())
+                item_desc += " ";
+            item_desc += desc_tag;
         }
         /*
-            * Possibility to override number of channels here
-            */
+        * Possibility to override number of channels here
+        */
         if (!node->find_tag(stream, FIFF_NCHAN, t_pTag)) {
             item_nchan = global_nchan;
         }
@@ -695,10 +618,11 @@ MneProjOp *MneProjOp::mne_read_proj_op_from_node(FiffStream::SPtr &stream, const
         if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
             goto bad;
 
-        mne_string_to_name_list_23((char *)(t_pTag->data()),&item_names,&nlist);
-        if (nlist != item_nchan) {
+        item_names = FiffStream::split_name_list(t_pTag->toString());
+
+        if (item_names.size() != item_nchan) {
             printf("Channel name list incorrectly specified for proj item # %d",k+1);
-            mne_free_name_list_23(item_names,nlist);
+            item_names.clear();
             goto bad;
         }
         /*
@@ -732,9 +656,10 @@ MneProjOp *MneProjOp::mne_read_proj_op_from_node(FiffStream::SPtr &stream, const
         else
             item_active = FALSE;
         /*
-            * Ready to add
-            */
-        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,NULL,item_names,item_vectors);
+        * Ready to add
+        */
+        QStringList emptyList;
+        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,emptyList,item_names,item_vectors);
         mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
         delete item;
         op->items[op->nitems-1]->active_file = item_active;
@@ -800,7 +725,7 @@ void MneProjOp::mne_proj_op_report_data(FILE *out, const char *tag, MneProjOp *o
         if (tag)
             fprintf(out,"%s",tag);
         fprintf(out,"# %d : %s : %d vecs : %d chs %s %s\n",
-                k+1,it->desc,it->nvec,it->vecs->ncol,
+                k+1,it->desc.toUtf8().constData(),it->nvec,it->vecs->ncol,
                 it->has_meg ? "MEG" : "EEG",
                 it->active ? "active" : "idle");
         if (list_data && tag)
@@ -809,13 +734,13 @@ void MneProjOp::mne_proj_op_report_data(FILE *out, const char *tag, MneProjOp *o
             vecs = op->items[k]->vecs;
 
             for (q = 0; q < vecs->ncol; q++) {
-                fprintf(out,"%-10s",vecs->collist[q]);
+                fprintf(out,"%-10s",vecs->collist[q].toUtf8().constData());
                 fprintf(out,q < vecs->ncol-1 ? " " : "\n");
             }
             for (p = 0; p < vecs->nrow; p++)
                 for (q = 0; q < vecs->ncol; q++) {
                     for (j = 0, found  = 0; j < nexclude; j++) {
-                        if (strcmp(exclude[j],vecs->collist[q]) == 0) {
+                        if (QString::compare(exclude[j],vecs->collist[q]) == 0) {
                             found = 1;
                             break;
                         }

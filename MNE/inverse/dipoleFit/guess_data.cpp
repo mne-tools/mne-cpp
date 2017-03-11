@@ -234,7 +234,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
             FREE_16(sp);
             goto bad;
         }
-        fprintf(stderr,"Read guesses from %s\n",guessname.toLatin1().constData());
+        fprintf(stderr,"Read guesses from %s\n",guessname.toUtf8().constData());
         guesses = sp[0]; FREE_16(sp);
     }
     else {
@@ -245,12 +245,12 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         VEC_COPY_16(r0,f->r0);
         FiffCoordTransOld::fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
-            fprintf(stderr,"Using inner skull surface from the BEM (%s)...\n",f->bemname);
+            fprintf(stderr,"Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
-            fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
+            fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MneSurfaceOrVolume::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
@@ -334,7 +334,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
             FREE_16(sp);
             goto bad;
         }
-        printf("Read guesses from %s\n",guessname.toLatin1().constData());
+        printf("Read guesses from %s\n",guessname.toUtf8().constData());
         guesses = sp[0]; FREE_16(sp);
     }
     else {
@@ -345,12 +345,12 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         VEC_COPY_16(r0,f->r0);
         FiffCoordTransOld::fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
-            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname);
+            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
-            printf("Reading inner skull surface from %s...\n",guess_surfname.toLatin1().data());
+            printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MneSurfaceOrVolume::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;

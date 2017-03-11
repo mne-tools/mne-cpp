@@ -136,7 +136,7 @@ public:
                               FIFFLIB::fiffTime *start_time);
 
 
-    static int mne_load_raw_info(char *name,int allow_maxshield,MneRawInfo* *infop);
+    static int mne_load_raw_info(const QString& name,int allow_maxshield,MneRawInfo* *infop);
 
 
 
@@ -151,7 +151,7 @@ public:
 
 
 public:
-    char                *filename;      /**< The name of the file this comes from */
+    QString             filename;      /**< The name of the file this comes from */
     FIFFLIB::fiffId     id;             /**< Measurement id from the file */
     int                 nchan;          /**< Number of channels */
     FIFFLIB::fiffChInfo chInfo;         /**< Channel info data  */

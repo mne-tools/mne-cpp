@@ -375,7 +375,7 @@ void MNERTServer::init()
             "    }"
             "}";
 
-    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toLatin1());
+    QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommand.toUtf8());
     m_commandManager.insert(t_jsonDocumentOrigin);
 
     //connect slots

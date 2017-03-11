@@ -164,16 +164,6 @@ void mne_free_cmatrix (float **m)
 
 //============================= misc_util.c =============================
 
-char *mne_strdup(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
 
 
 //============================= mne_named_matrix.c =============================
@@ -207,10 +197,10 @@ static mneChSelection new_ch_selection()
 {
     mneChSelection newsel = MALLOC(1,mneChSelectionRec);
 
-    newsel->name    = NULL;
-    newsel->chdef   = NULL;
-    newsel->chspick = NULL;
-    newsel->chspick_nospace = NULL;
+    newsel->name.clear();
+    newsel->chdef.clear();
+    newsel->chspick.clear();
+    newsel->chspick_nospace.clear();
     newsel->pick    = NULL;
     newsel->pick_deriv = NULL;
     newsel->ch_kind = NULL;
@@ -221,7 +211,7 @@ static mneChSelection new_ch_selection()
 }
 
 
-mneChSelection mne_ch_selection_these(const char *selname, char **names, int nch)
+mneChSelection mne_ch_selection_these(const QString& selname, const QStringList& names, int nch)
 /*
  * Give an explicit list of interesting channels
  */
@@ -230,48 +220,27 @@ mneChSelection mne_ch_selection_these(const char *selname, char **names, int nch
     mneChSelection sel;
 
     sel        = new_ch_selection();
-    sel->name  = mne_strdup(selname);
-    sel->chdef = MALLOC(nch,char *);
+    sel->name  = selname;
+//    sel->chdef;
     sel->ndef  = nch;
     sel->kind  = MNE_CH_SELECTION_USER;
 
     for (c = 0; c < nch; c++)
-        sel->chdef[c]  = mne_strdup(names[c]);
+        sel->chdef.append(names[c]);
 
     return sel;
 }
 
 
 
-char **mne_dup_name_list(char **list, int nlist)
-/*
- * Duplicate a name list
- */
-{
-    char **res;
-    int  k;
-    if (list == NULL || nlist == 0)
-        return NULL;
-    res = MALLOC(nlist,char *);
-
-    for (k = 0; k < nlist; k++)
-        res[k] = mne_strdup(list[k]);
-    return res;
-}
-
-
-
-static void omit_spaces(char **names, int nnames)
+static void omit_spaces(QStringList names, int nnames)
 
 {
     char *c,*cc;
-    int  k;
-
-    for (k = 0; k < nnames; k++) {
-        for (c = cc = names[k]; *c != '\0'; c++)
-            if (*c != ' ')
-                *cc++ = *c;
-        *cc = '\0';
+    for (int k = 0; k < names.size(); k++) {
+        while( names[k].startsWith(" ") ) {
+            names[k].remove(0,1);
+        }
     }
     return;
 }
@@ -289,19 +258,19 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
     int c,rc,d;
     MneRawInfo*  info;
     int nch;
-    char *dash;
+    QString dash;
 
     if (!sel || !data)
         return 0;
 
     info = data->info;
-    mne_free_name_list(sel->chspick,sel->nchan);
-    mne_free_name_list(sel->chspick_nospace,sel->nchan);
+    sel->chspick.clear();
+    sel->chspick_nospace.clear();
     /*
    * Expansion of possible regular expressions must be added eventually
    */
-    sel->chspick         = mne_dup_name_list(sel->chdef,sel->ndef);
-    sel->chspick_nospace = mne_dup_name_list(sel->chdef,sel->ndef);
+    sel->chspick         = sel->chdef;
+    sel->chspick_nospace = sel->chdef;
     omit_spaces(sel->chspick_nospace,sel->ndef);
     sel->nchan           = sel->ndef;
 
@@ -314,8 +283,8 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
         sel->pick_deriv[c] = -1;
         sel->ch_kind[c]    = -1;
         for (rc = 0; rc < info->nchan; rc++) {
-            if (strcasecmp(sel->chspick[c],info->chInfo[rc].ch_name) == 0 ||
-                    strcasecmp(sel->chspick_nospace[c],info->chInfo[rc].ch_name) == 0) {
+            if (QString::compare(sel->chspick[c],info->chInfo[rc].ch_name,Qt::CaseInsensitive) == 0 ||
+                    QString::compare(sel->chspick_nospace[c],info->chInfo[rc].ch_name,Qt::CaseInsensitive) == 0) {
                 sel->pick[c]    = rc;
                 sel->ch_kind[c] = info->chInfo[rc].kind;
                 break;
@@ -323,17 +292,17 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
         }
     }
     /*
-   * Maybe the derivations will help
-   */
+    * Maybe the derivations will help
+    */
     sel->nderiv = 0;
     if (data->deriv_matched) {
-        char **deriv_names = data->deriv_matched->deriv_data->rowlist;
+        QStringList deriv_names = data->deriv_matched->deriv_data->rowlist;
         int  nderiv        = data->deriv_matched->deriv_data->nrow;
 
         for (c = 0; c < sel->nchan; c++) {
             if (sel->pick[c] == -1) {
                 for (d = 0; d < nderiv; d++) {
-                    if (strcasecmp(sel->chspick[c],deriv_names[d]) == 0 &&
+                    if (QString::compare(sel->chspick[c],deriv_names[d],Qt::CaseInsensitive) == 0 &&
                             data->deriv_matched->valid && data->deriv_matched->valid[d]) {
                         sel->pick_deriv[c] = d;
                         sel->ch_kind[c]    = data->deriv_matched->chs[d].kind;
@@ -350,17 +319,17 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
     for (c = 0; c < sel->nchan; c++) {
         if (sel->pick[c] == -1 && sel->pick_deriv[c] == -1) {
             for (rc = 0; rc < info->nchan; rc++) {
-                dash = strchr(info->chInfo[rc].ch_name,'-');
-                if (dash) {
-                    *dash = '\0';
-                    if (strcasecmp(sel->chspick[c],info->chInfo[rc].ch_name) == 0 ||
-                            strcasecmp(sel->chspick_nospace[c],info->chInfo[rc].ch_name) == 0) {
-                        *dash = '-';
+                dash = QString(info->chInfo[rc].ch_name).mid(QString(info->chInfo[rc].ch_name).indexOf("-")+1);// strchr(info->chInfo[rc].ch_name,'-');
+                if (!dash.isNull()) {
+//                    *dash = '\0';
+                    if (QString::compare(sel->chspick[c],info->chInfo[rc].ch_name,Qt::CaseInsensitive) == 0 ||
+                            QString::compare(sel->chspick_nospace[c],info->chInfo[rc].ch_name,Qt::CaseInsensitive) == 0) {
+//                        *dash = '-';
                         sel->pick[c] = rc;
                         sel->ch_kind[c] = info->chInfo[rc].kind;
                         break;
                     }
-                    *dash = '-';
+//                    *dash = '-';
                 }
             }
         }
@@ -370,7 +339,7 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
             nch++;
     }
     if (sel->nderiv > 0)
-        fprintf(stderr,"Selection %c%s%c has %d matched derived channels.\n",'"',sel->name,'"',sel->nderiv);
+        fprintf(stderr,"Selection %c%s%c has %d matched derived channels.\n",'"',sel->name.toUtf8().constData(),'"',sel->nderiv);
     return nch;
 }
 
@@ -659,7 +628,7 @@ ECDSet DipoleFit::calculateFit() const
 
     if ((fit_data = DipoleFitData::setup_dipole_fit_data(   settings->mriname,
                                                             settings->measname,
-                                                            settings->bemname.isEmpty() ? NULL : settings->bemname.toLatin1().data(),
+                                                            settings->bemname.isEmpty() ? NULL : settings->bemname.toUtf8().data(),
                                                             &settings->r0,eeg_model,settings->accurate,
                                                             settings->badname,
                                                             settings->noisename,
@@ -674,7 +643,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = MneRawData::mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toLatin1().data(),TRUE,FALSE,&(settings->filter))) == NULL)
+        if ((raw = MneRawData::mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,&(settings->filter))) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -700,7 +669,7 @@ ECDSet DipoleFit::calculateFit() const
             settings->tstep = 1.0/raw->info->sfreq;
 
         printf("\tOpened raw data file %s : %d MEG and %d EEG \n",
-               settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
+               settings->measname.toUtf8().data(),fit_data->nmeg,fit_data->neeg);
     }
     else {
         printf("\n---- Reading data...\n\n");
@@ -719,7 +688,7 @@ ECDSet DipoleFit::calculateFit() const
             settings->tstep = data->current->tstep;
 
         printf("\tRead data set %d from %s : %d MEG and %d EEG \n",
-               settings->setno,settings->measname.toLatin1().data(),fit_data->nmeg,fit_data->neeg);
+               settings->setno,settings->measname.toUtf8().data(),fit_data->nmeg,fit_data->neeg);
         if (!settings->noisename.isEmpty()) {
             printf("\nScaling the noise covariance...\n");
             if (DipoleFitData::scale_noise_cov(fit_data,data->current->nave) == FAIL)

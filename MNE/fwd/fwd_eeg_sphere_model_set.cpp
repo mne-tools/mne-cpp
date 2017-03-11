@@ -86,17 +86,6 @@ using namespace Eigen;
 #define SEP ":\n\r"
 
 
-char *mne_strdup_2(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -195,12 +184,12 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
 {
     char line[MAXLINE];
     FILE *fp = NULL;
-    char  *name   = NULL;
+    QString name;
     VectorXf rads;
     VectorXf sigmas;
     int   nlayer  = 0;
-    char  *one,*two;
-    char  *tag = NULL;
+    char *one, *two;
+    QString tag;
 
     if (!now)
         now = fwd_add_default_eeg_sphere_model(now);
@@ -213,8 +202,8 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
         return now;
 
 
-    if ((fp = fopen(filename.toLatin1().data(),"r")) == NULL) {
-        printf(filename.toLatin1().data());
+    if ((fp = fopen(filename.toUtf8().data(),"r")) == NULL) {
+        printf(filename.toUtf8().data());
         goto bad;
     }
     while (fgets(line,MAXLINE,fp) != NULL) {
@@ -222,11 +211,10 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
             continue;
         one = strtok(line,SEP);
         if (one != NULL) {
-            if (!tag || strlen(tag) == 0)
-                name = mne_strdup_2(one);
+            if (tag.isEmpty() || tag.size() == 0)
+                name = one;
             else {
-                name = MALLOC_2(strlen(one)+strlen(tag)+10,char);
-                sprintf(name,"%s %s",one,tag);
+                name = QString("%1 %2").arg(one).arg(tag);
             }
             while (1) {
                 one = strtok(NULL,SEP);
@@ -253,7 +241,7 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
         }
     }
     if (ferror(fp)) {
-        printf(filename.toLatin1().data());
+        printf(filename.toUtf8().data());
         goto bad;
     }
     fclose(fp);
@@ -286,11 +274,11 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
 
     for (k = 0; k < this->nmodel(); k++) {
         if (this->models[k]->name.compare(name) == 0) {
-            fprintf(stderr,"Selected model: %s\n",this->models[k]->name.toLatin1().constData());
+            fprintf(stderr,"Selected model: %s\n",this->models[k]->name.toUtf8().constData());
             return new FwdEegSphereModel(*(this->models[k]));
         }
     }
-    printf("EEG sphere model %s not found.",name.toLatin1().constData());
+    printf("EEG sphere model %s not found.",name.toUtf8().constData());
     return NULL;
 }
 
@@ -307,7 +295,7 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
     fprintf(f,"Available EEG sphere models:\n");
     for (k = 0; k < this->nmodel(); k++) {
         this_model = this->models[k];
-        fprintf(f,"\t%s : %d",this_model->name.toLatin1().constData(),this_model->nlayer());
+        fprintf(f,"\t%s : %d",this_model->name.toUtf8().constData(),this_model->nlayer());
         for (p = 0; p < this_model->nlayer(); p++)
             fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
         fprintf(f,"\n");

@@ -121,10 +121,10 @@ public:
     static MneProjOp* mne_proj_op_combine(MneProjOp* to, MneProjOp* from);
 
     // mne_lin_proj.c
-    static void mne_proj_op_add_item_act(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc, int is_active);
+    static void mne_proj_op_add_item_act(MneProjOp* op, MneNamedMatrix* vecs, int kind, const  QString& desc, int is_active);
 
     // mne_lin_proj.c
-    static void mne_proj_op_add_item(MneProjOp* op, MneNamedMatrix* vecs, int kind, const char *desc);
+    static void mne_proj_op_add_item(MneProjOp* op, MneNamedMatrix* vecs, int kind, const QString& desc);
 
     // mne_lin_proj.c
     static MneProjOp* mne_dup_proj_op(MneProjOp* op);
@@ -133,7 +133,7 @@ public:
     static MneProjOp* mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int nch);
 
 
-    static int mne_proj_op_affect(MneProjOp* op, char **list, int nlist);
+    static int mne_proj_op_affect(MneProjOp* op, const QStringList& list, int nlist);
 
 
     static int mne_proj_op_affect_chs(MneProjOp* op, FIFFLIB::fiffChInfo chs, int nch);
@@ -169,11 +169,11 @@ public:
 
 public:
     QList<MNELIB::MneProjItem*> items;  /* The projection items */
-    int     nitems;                 /* Number of items */
-    char    **names;                /* Names of the channels in the final projector */
-    int     nch;                    /* Number of channels in the final projector */
-    int     nvec;                   /* Number of vectors in the final projector */
-    float   **proj_data;            /* The orthogonalized projection vectors picked and orthogonalized from the original data */
+    int         nitems;                 /* Number of items */
+    QStringList names;                /* Names of the channels in the final projector */
+    int         nch;                    /* Number of channels in the final projector */
+    int         nvec;                   /* Number of vectors in the final projector */
+    float**     proj_data;            /* The orthogonalized projection vectors picked and orthogonalized from the original data */
 
 //// ### OLD STRUCT ###
 //typedef struct {                            /* Collection of projection items and the projector itself */
