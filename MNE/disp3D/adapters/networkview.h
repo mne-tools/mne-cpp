@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ecdview.cpp
+* @file     networkview.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ECDView class definition.
+* @brief    NetworkView class declaration.
 *
 */
+
+#ifndef NETWORKVIEW_H
+#define NETWORKVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ecdview.h"
-
-#include "../engine/model/data3Dtreemodel.h"
-
-#include <inverse/dipoleFit/dipole_fit_settings.h>
-#include <inverse/dipoleFit/ecd_set.h>
-#include <mne/mne_bem.h>
+#include "../disp3D_global.h"
+#include "abstractview.h"
 
 
 //*************************************************************************************************************
@@ -52,77 +50,69 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace DISP3DLIB;
-using namespace INVERSELIB;
-using namespace MNELIB;
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, QWidget* parent)
-: AbstractView(parent)
-{
-    //Read mri transform
-    QFile file(dipFitSettings.mriname);
-    ECDSet ecdSetTrans = ecdSet;
+namespace INVERSELIB {
+    class DipoleFitSettings;
+    class ECDSet;
+}
 
-    if(file.exists()) {
-        FiffCoordTrans coordTrans(file);
-
-        for(int i = 0; i < ecdSet.size() ; ++i) {
-            MatrixX3f dipoles(1, 3);
-            //transform location
-            dipoles(0,0) = ecdSet[i].rd(0);
-            dipoles(0,1) = ecdSet[i].rd(1);
-            dipoles(0,2) = ecdSet[i].rd(2);
-
-            dipoles = coordTrans.apply_trans(dipoles);
-
-            ecdSetTrans[i].rd(0) = dipoles(0,0);
-            ecdSetTrans[i].rd(1) = dipoles(0,1);
-            ecdSetTrans[i].rd(2) = dipoles(0,2);
-
-            //transform orientation
-            dipoles(0,0) = ecdSet[i].Q(0);
-            dipoles(0,1) = ecdSet[i].Q(1);
-            dipoles(0,2) = ecdSet[i].Q(2);
-
-            dipoles = coordTrans.apply_trans(dipoles, false);
-
-            ecdSetTrans[i].Q(0) = dipoles(0,0);
-            ecdSetTrans[i].Q(1) = dipoles(0,1);
-            ecdSetTrans[i].Q(2) = dipoles(0,2);
-        }
-    } else {
-        qCritical("ECDView::ECDView - Cannot open FiffCoordTrans file");
-    }
-
-    //Add ECD data
-    m_pData3DModel->addDipoleFitData("sample", QString("Set %1").arg(dipFitSettings.setno), ecdSetTrans);
-
-    //Read and show BEM
-    QFile t_fileBem(dipFitSettings.bemname);
-
-    if(t_fileBem.exists()) {
-        MNEBem t_Bem(t_fileBem);
-        m_pData3DModel->addBemData("sample", "BEM", t_Bem);
-    } else {
-        qCritical("ECDView::ECDView - Cannot open MNEBem file");
-    }
+namespace CONNECTIVITYLIB {
+    class Network;
 }
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
 
-ECDView::~ECDView()
+namespace DISP3DLIB
 {
-}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=============================================================================================================
+/**
+* Adapter which provides visualization for ECD data and a control widget.
+*
+* @brief Visualizes ECD data.
+*/
+class DISP3DNEWSHARED_EXPORT NetworkView : public AbstractView
+{
+    Q_OBJECT
+
+public:
+    typedef QSharedPointer<NetworkView> SPtr;             /**< Shared pointer type for NetworkView class. */
+    typedef QSharedPointer<const NetworkView> ConstSPtr;  /**< Const shared pointer type for NetworkView class. */
+
+    //=========================================================================================================
+    /**
+    * Default constructor
+    *
+    */
+    explicit NetworkView(const CONNECTIVITYLIB::Network& tNetworkData, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~NetworkView();
+
+protected:
+};
+
+} // NAMESPACE
+
+#endif // NETWORKVIEW_H

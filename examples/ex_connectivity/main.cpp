@@ -44,6 +44,7 @@
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/adapters/networkview.h>
 
 #include <disp/imagesc.h>
 
@@ -283,41 +284,8 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-    //########################################################################################
-    //
-    // Create the test view START
-    //
-    //########################################################################################
-
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-    testWindow->setModel(p3DDataModel);
-
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
-
-    NetworkTreeItem* pRTNetworkDataItem= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, tConnect_LA);
-
-    //Add rt source loc data and init some visualization values
-    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
-        pRTDataItem->setLoopState(true);
-        pRTDataItem->setTimeInterval(17);
-        pRTDataItem->setNumberAverages(1);
-        pRTDataItem->setStreamingActive(true);
-        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
-        pRTDataItem->setVisualizationType("Annotation based");
-        pRTDataItem->setColortable("Hot");
-    }
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
-
-    //########################################################################################
-    //
-    // Create the test view END
-    //
-    //########################################################################################
+    NetworkView tNetworkView(tConnect_LA);
+    tNetworkView.show();
 
     return a.exec();
 }
