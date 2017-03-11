@@ -90,7 +90,6 @@ NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<
 
 //*************************************************************************************************************
 
-
 QSharedPointer<NetworkNode> NetworkEdge::getStartNode()
 {
     return m_pStartNode;
@@ -107,7 +106,7 @@ QSharedPointer<NetworkNode> NetworkEdge::getEndNode()
 
 //*************************************************************************************************************
 
-double NetworkEdge::getWeight()
+double NetworkEdge::getWeight() const
 {
     return m_dWeight;
 }

@@ -167,21 +167,23 @@ public:
     *
     * Applies the coordinate transform to given coordinates and returns the transformed coordinates
     *
-    * @param[in] rr     The coordinates
+    * @param[in] rr         The coordinates
+    * @param[in] do_move    Perform translation next to rotation yes/no
     *
     * @return Transformed coordinates
     */
-    MatrixX3f apply_trans (const MatrixX3f& rr) const;
+    MatrixX3f apply_trans(const MatrixX3f& rr, bool do_move = true) const;
 
     //=========================================================================================================
     /**
     * Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates
     *
-    * @param[in] rr     The coordinates
+    * @param[in] rr         The coordinates
+    * @param[in] do_move    Perform translation next to rotation yes/no
     *
     * @return Transformed coordinates
     */
-    MatrixX3f apply_inverse_trans (const MatrixX3f& rr) const;
+    MatrixX3f apply_inverse_trans(const MatrixX3f& rr, bool do_move = true) const;
 
     //=========================================================================================================
     /**

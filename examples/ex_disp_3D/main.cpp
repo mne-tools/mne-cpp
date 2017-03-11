@@ -40,10 +40,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
-#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -253,20 +253,20 @@ int main(int argc, char *argv[])
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-    //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    MNEBem t_Bem(t_fileBem);
-    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+//    //Read and show BEM
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+//    MNEBem t_Bem(t_fileBem);
+//    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-    //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
+//    //Read and show sensor helmets
+//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
 
-    // Read & show digitizer points
-    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffDigPointSet t_Dig(t_fileDig);
-    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+//    // Read & show digitizer points
+//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    FiffDigPointSet t_Dig(t_fileDig);
+//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(true);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
-            pRTDataItem->setVisualizationType("Smoothing based");
+            pRTDataItem->setVisualizationType("Annotation based");
             pRTDataItem->setColortable("Hot");
         }
     }

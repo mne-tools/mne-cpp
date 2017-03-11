@@ -72,6 +72,12 @@ SUBDIRS += \
             ex_read_fwd_disp_3D \
             ex_roi_clustered_inverse_pwl_rap_music \
             ex_st_clustered_inverse_pwl_rap_music
+
+        !isEmpty( CNTK_INCLUDE_DIR ) {
+            SUBDIRS += \
+                ex_deep \
+                ex_deep_eval
+        }
     }
     else {
         message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
