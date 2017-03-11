@@ -40,13 +40,11 @@
 
 #include "ecdview.h"
 
+#include "../engine/model/data3Dtreemodel.h"
+
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/ecd_set.h>
 #include <mne/mne_bem.h>
-
-#include <disp3D/view3D.h>
-#include <disp3D/model/data3Dtreemodel.h>
-#include <disp3D/control/control3dwidget.h>
 
 
 //*************************************************************************************************************
@@ -73,28 +71,14 @@ using namespace MNELIB;
 //=============================================================================================================
 
 ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, QWidget* parent)
-: QWidget(parent)
-, m_p3DView(View3D::SPtr(new View3D()))
-, m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
+: AbstractView(parent)
 {
-    //Init 3D View
-    m_p3DView->setModel(m_pData3DModel);
-
-    QStringList slControlFlags;
-    slControlFlags << "Data" << "View" << "Light";
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
-
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
     //Read mri transform
     QFile file(dipFitSettings.mriname);
     ECDSet ecdSetTrans = ecdSet;
 
     if(file.exists()) {
         FiffCoordTrans coordTrans(file);
-
-        std::cout << std::endl << "coordTrans" << coordTrans.trans;
-        std::cout << std::endl << "coordTransInv" << coordTrans.invtrans;
 
         for(int i = 0; i < ecdSet.size() ; ++i) {
             MatrixX3f dipoles(1, 3);
@@ -114,7 +98,7 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
             dipoles(0,1) = ecdSet[i].Q(1);
             dipoles(0,2) = ecdSet[i].Q(2);
 
-            dipoles = coordTrans.apply_trans(dipoles);
+            dipoles = coordTrans.apply_trans(dipoles, false);
 
             ecdSetTrans[i].Q(0) = dipoles(0,0);
             ecdSetTrans[i].Q(1) = dipoles(0,1);
@@ -125,8 +109,7 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
     }
 
     //Add ECD data
-    ECDSet::SPtr pEcdSetTrans = ECDSet::SPtr(new ECDSet(ecdSetTrans));
-    m_pData3DModel->addDipoleFitData("sample", QString("Set %1").arg(dipFitSettings.setno), pEcdSetTrans);
+    m_pData3DModel->addDipoleFitData("sample", QString("Set %1").arg(dipFitSettings.setno), ecdSetTrans);
 
     //Read and show BEM
     QFile t_fileBem(dipFitSettings.bemname);
@@ -137,15 +120,6 @@ ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, 
     } else {
         qCritical("ECDView::ECDView - Cannot open MNEBem file");
     }
-
-    //Create widget GUI
-    QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    pWidgetContainer->setMinimumSize(400,400);
-    mainLayoutView->addWidget(pWidgetContainer,0,0);
-    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
-
-    this->setLayout(mainLayoutView);
 }
 
 

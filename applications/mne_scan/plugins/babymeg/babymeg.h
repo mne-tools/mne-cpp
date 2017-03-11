@@ -291,6 +291,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Sends the current thread status to the HPI dialog.
+    */
+    void sendStatusToHPI();
+
+    //=========================================================================================================
+    /**
     * Set the recording time in seconds.
     *
     * @param[in] time   the new recording time.

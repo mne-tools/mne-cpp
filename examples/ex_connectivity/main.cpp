@@ -40,10 +40,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/items/sourceactivity/mneestimatetreeitem.h>
-#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <disp/imagesc.h>
 
@@ -274,8 +274,8 @@ int main(int argc, char *argv[])
     matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
     matNodeVertComb << matNodeVertLeft, matNodeVertRight;
 
-    Network::SPtr pConnect_LA = ConnectivityMeasures::pearsonsCorrelationCoeff(sourceEstimate.data, matNodeVertComb);
-//    Network::SPtr pConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate.data, matNodeVertComb);
+    Network tConnect_LA = ConnectivityMeasures::pearsonsCorrelationCoeff(sourceEstimate.data, matNodeVertComb);
+//    Network tConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate.data, matNodeVertComb);
 
     //########################################################################################
     //
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-    NetworkTreeItem* pRTNetworkDataItem= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, pConnect_LA);
+    NetworkTreeItem* pRTNetworkDataItem= p3DDataModel->addConnectivityData(parser.value(subjectOption), evoked.comment, tConnect_LA);
 
     //Add rt source loc data and init some visualization values
     if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {

@@ -43,9 +43,10 @@
 
 #include <fiff/fiff_dig_point_set.h>
 
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-#include <disp3D/model/data3Dtreemodel.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/model/items/bem/bemtreeitem.h>
 
 #include <rtProcessing/rthpis.h>
 
@@ -92,6 +93,7 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
+, m_bIsRunning(false)
 {
     ui->setupUi(this);
 
@@ -128,9 +130,14 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     ui->m_groupBox_3dControl->setLayout(gridLayout);
 
     //Add sensor surface
-    QFile t_fileSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
-    MNEBem t_sensorSurfaceBEM(t_fileSensorSurfaceBEM);
-    m_pData3DModel->addBemData("Device", "BabyMEG", t_sensorSurfaceBEM);
+    QFile t_fileBabyMEGSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
+    MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
+    m_pData3DModel->addBemData("Device", "BabyMEG", t_babyMEGsensorSurfaceBEM);
+
+    QFile t_fileVVSensorSurfaceBEM("./resources/sensorSurfaces/306m.fif");
+    MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
+    BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
+    pVVItem->setCheckState(Qt::Unchecked);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -156,6 +163,14 @@ HPIWidget::~HPIWidget()
 void HPIWidget::setData(const Eigen::MatrixXd& data)
 {
     m_matValue = data;
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::setIsRunning(bool bStatus)
+{
+    m_bIsRunning = bStatus;
 }
 
 
@@ -289,7 +304,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
     QVector<double> vGof;
     vGof << 0.0 << 0.0 << 0.0 << 0.0;
 
-    //this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet(), vGof);
+    this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet(), vGof);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -327,6 +342,13 @@ void HPIWidget::onBtnDoSingleFit()
     if(!this->hpiLoaded()) {
        QMessageBox msgBox;
        msgBox.setText("Please load a digitizer set with at lesat 3 HPI coils first!");
+       msgBox.exec();
+       return;
+    }
+
+    if(!m_bIsRunning) {
+       QMessageBox msgBox;
+       msgBox.setText("Please start the measurement first!");
        msgBox.exec();
        return;
     }
@@ -433,7 +455,7 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
 
             m_matValue.resize(0,0);
 
-            //Set newly calculated transforamtion amtrix to fiff info
+            //Set newly calculated transformation matrix to fiff info
             m_pFiffInfo->dev_head_t = transDevHead;
 
             //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
