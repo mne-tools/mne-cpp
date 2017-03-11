@@ -59,8 +59,8 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/control/control3dwidget.h>
 
 
 //*************************************************************************************************************

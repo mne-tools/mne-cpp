@@ -161,7 +161,12 @@ private:
     * @param[in] amplitude  String which is to be plotted.
     * @param[in] data       Current data for the given row.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPointF &ellipsePos, QString &amplitude, SCDISPLIB::RowVectorPair &data) const;
+    void createPlotPath(const QModelIndex &index,
+                        const QStyleOptionViewItem &option,
+                        QPainterPath& path,
+                        QPointF &ellipsePos,
+                        QString &amplitude,
+                        SCDISPLIB::RowVectorPair &data) const;
 
     //=========================================================================================================
     /**

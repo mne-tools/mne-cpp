@@ -1,7 +1,7 @@
 
 
 #include "dipole_fit.h"
-#include "mne_meas_data_set.h"
+#include "../c/mne_meas_data_set.h"
 #include "guess_data.h"
 
 #include <string.h>
@@ -9,6 +9,9 @@
 
 
 using namespace INVERSELIB;
+using namespace MNELIB;
+using namespace FWDLIB;
+
 
 
 

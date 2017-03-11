@@ -109,7 +109,15 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
 
 //*************************************************************************************************************
 
-void createPaths(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath &path, QPainterPath &lastPath, QPointF &ellipsePos, QPointF &markerPosition, QString &amplitude, const QVector<float> &data, const QVector<float> &lastData)
+void createPaths(const QModelIndex &index,
+                 const QStyleOptionViewItem &option,
+                 QPainterPath &path,
+                 QPainterPath &lastPath,
+                 QPointF &ellipsePos,
+                 QPointF &markerPosition,
+                 QString &amplitude,
+                 const QVector<float> &data,
+                 const QVector<float> &lastData)
 {
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
@@ -465,7 +473,12 @@ void RealTimeMultiSampleArrayDelegate::setSignalColor(const QColor& signalColor)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPointF &ellipsePos, QString &amplitude, RowVectorPair &data) const
+void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index,
+                                                      const QStyleOptionViewItem &option,
+                                                      QPainterPath& path,
+                                                      QPointF &ellipsePos,
+                                                      QString &amplitude,
+                                                      RowVectorPair &data) const
 {
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 

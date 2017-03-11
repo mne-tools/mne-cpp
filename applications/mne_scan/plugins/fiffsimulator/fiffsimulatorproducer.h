@@ -44,12 +44,6 @@
 
 #include <generics/circularbuffer_old.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
 #include <rtClient/rtdataclient.h>
 
 
@@ -64,19 +58,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffSimulatorPlugin
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace FiffSimulatorPlugin
-{
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE FIFFSIMULATORPLUGIN
 //=============================================================================================================
 
-using namespace RTCLIENTLIB;
+namespace FIFFSIMULATORPLUGIN
+{
 
 
 //*************************************************************************************************************
@@ -159,7 +151,7 @@ private:
     FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding MneRtClient.*/
     bool            m_bIsRunning;       /**< Whether MneRtClientProducer is running.*/
 
-    QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
+    QSharedPointer<RTCLIENTLIB::RtDataClient> m_pRtDataClient;   /**< The data client.*/
     bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
 
     qint32 m_iDataClientId;

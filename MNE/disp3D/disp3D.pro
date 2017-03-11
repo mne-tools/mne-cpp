@@ -54,6 +54,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
@@ -65,6 +66,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Disp \
@@ -94,72 +96,74 @@ else {
 }
 
 SOURCES += \
-    view3D.cpp \
-    model/data3Dtreemodel.cpp \
-    model/data3Dtreedelegate.cpp \
-    model/items/subject/subjecttreeitem.cpp \
-    model/items/measurement/measurementtreeitem.cpp \
-    model/items/freesurfer/fssurfacetreeitem.cpp \
-    model/items/freesurfer/fsannotationtreeitem.cpp \
-    model/items/hemisphere/hemispheretreeitem.cpp \
-    model/items/sourcespace/sourcespacetreeitem.cpp \
-    model/items/sourceactivity/mneestimatetreeitem.cpp \
-    model/items/sourceactivity/ecddatatreeitem.cpp \
-    model/items/network/networktreeitem.cpp \
-    model/items/bem/bemtreeitem.cpp \
-    model/items/bem/bemsurfacetreeitem.cpp \
-    model/items/digitizer/digitizertreeitem.cpp \
-    model/items/digitizer/digitizersettreeitem.cpp \
-    model/items/mri/mritreeitem.cpp \
-    model/items/common/abstracttreeitem.cpp \
-    model/items/common/metatreeitem.cpp \
-    model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
-    model/3dhelpers/renderable3Dentity.cpp \
-    model/3dhelpers/custommesh.cpp \
-    model/materials/pervertexphongalphamaterial.cpp \
-    model/materials/pervertextessphongalphamaterial.cpp \
-    model/materials/shadermaterial.cpp \
-    model/materials/shownormalsmaterial.cpp \
-    model/materials/networkmaterial.cpp \
-    control/control3dwidget.cpp \
+    engine/view/view3D.cpp \
+    engine/model/data3Dtreemodel.cpp \
+    engine/model/data3Dtreedelegate.cpp \
+    engine/model/items/subject/subjecttreeitem.cpp \
+    engine/model/items/measurement/measurementtreeitem.cpp \
+    engine/model/items/freesurfer/fssurfacetreeitem.cpp \
+    engine/model/items/freesurfer/fsannotationtreeitem.cpp \
+    engine/model/items/hemisphere/hemispheretreeitem.cpp \
+    engine/model/items/sourcespace/sourcespacetreeitem.cpp \
+    engine/model/items/sourceactivity/mneestimatetreeitem.cpp \
+    engine/model/items/sourceactivity/ecddatatreeitem.cpp \
+    engine/model/items/network/networktreeitem.cpp \
+    engine/model/items/bem/bemtreeitem.cpp \
+    engine/model/items/bem/bemsurfacetreeitem.cpp \
+    engine/model/items/digitizer/digitizertreeitem.cpp \
+    engine/model/items/digitizer/digitizersettreeitem.cpp \
+    engine/model/items/mri/mritreeitem.cpp \
+    engine/model/items/common/abstracttreeitem.cpp \
+    engine/model/items/common/metatreeitem.cpp \
+    engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
+    engine/model/3dhelpers/renderable3Dentity.cpp \
+    engine/model/3dhelpers/custommesh.cpp \
+    engine/model/materials/pervertexphongalphamaterial.cpp \
+    engine/model/materials/pervertextessphongalphamaterial.cpp \
+    engine/model/materials/shadermaterial.cpp \
+    engine/model/materials/shownormalsmaterial.cpp \
+    engine/model/materials/networkmaterial.cpp \
+    engine/control/control3dwidget.cpp \
     adapters/ecdview.cpp \
+    adapters/abstractview.cpp \
 
 HEADERS += \
-    view3D.h \
-    model/data3Dtreemodel.h \
-    model/data3Dtreedelegate.h \
-    model/items/subject/subjecttreeitem.h \
-    model/items/measurement/measurementtreeitem.h \
-    model/items/freesurfer/fssurfacetreeitem.h \
-    model/items/freesurfer/fsannotationtreeitem.h \
-    model/items/hemisphere/hemispheretreeitem.h \
-    model/items/sourcespace/sourcespacetreeitem.h \
-    model/items/sourceactivity/mneestimatetreeitem.h \
-    model/items/sourceactivity/ecddatatreeitem.h \
-    model/items/network/networktreeitem.h \
-    model/items/bem/bemtreeitem.h \
-    model/items/bem/bemsurfacetreeitem.h \
-    model/items/digitizer/digitizertreeitem.h \
-    model/items/digitizer/digitizersettreeitem.h \
-    model/items/mri/mritreeitem.h \
-    model/items/common/abstracttreeitem.h \
-    model/items/common/metatreeitem.h \
-    model/items/common/types.h \
-    model/workers/rtSourceLoc/rtsourcelocdataworker.h \
-    model/3dhelpers/renderable3Dentity.h \
-    model/3dhelpers/custommesh.h \
-    model/items/common/types.h \
-    model/materials/pervertexphongalphamaterial.h \
-    model/materials/pervertextessphongalphamaterial.h \
-    model/materials/shadermaterial.h \
-    model/materials/shownormalsmaterial.h \
-    model/materials/networkmaterial.h \
-    control/control3dwidget.h \
+    engine/view/view3D.h \
+    engine/model/data3Dtreemodel.h \
+    engine/model/data3Dtreedelegate.h \
+    engine/model/items/subject/subjecttreeitem.h \
+    engine/model/items/measurement/measurementtreeitem.h \
+    engine/model/items/freesurfer/fssurfacetreeitem.h \
+    engine/model/items/freesurfer/fsannotationtreeitem.h \
+    engine/model/items/hemisphere/hemispheretreeitem.h \
+    engine/model/items/sourcespace/sourcespacetreeitem.h \
+    engine/model/items/sourceactivity/mneestimatetreeitem.h \
+    engine/model/items/sourceactivity/ecddatatreeitem.h \
+    engine/model/items/network/networktreeitem.h \
+    engine/model/items/bem/bemtreeitem.h \
+    engine/model/items/bem/bemsurfacetreeitem.h \
+    engine/model/items/digitizer/digitizertreeitem.h \
+    engine/model/items/digitizer/digitizersettreeitem.h \
+    engine/model/items/mri/mritreeitem.h \
+    engine/model/items/common/abstracttreeitem.h \
+    engine/model/items/common/metatreeitem.h \
+    engine/model/items/common/types.h \
+    engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
+    engine/model/3dhelpers/renderable3Dentity.h \
+    engine/model/3dhelpers/custommesh.h \
+    engine/model/items/common/types.h \
+    engine/model/materials/pervertexphongalphamaterial.h \
+    engine/model/materials/pervertextessphongalphamaterial.h \
+    engine/model/materials/shadermaterial.h \
+    engine/model/materials/shownormalsmaterial.h \
+    engine/model/materials/networkmaterial.h \
+    engine/control/control3dwidget.h \
     adapters/ecdview.h \
+    adapters/abstractview.h \
     disp3D_global.h \
 
 FORMS += \
-    control/control3dwidget.ui \
+    engine/control/control3dwidget.ui \
 
 RESOURCES += $$PWD/disp3d.qrc \
 
