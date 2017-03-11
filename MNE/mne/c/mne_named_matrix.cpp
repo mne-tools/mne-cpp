@@ -97,36 +97,6 @@ float **mne_cmatrix_14(int nr,int nc)
 
 
 
-char *mne_strdup_14(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-char **mne_dup_name_list_14(char **list, int nlist)
-/*
- * Duplicate a name list
- */
-{
-    char **res;
-    int  k;
-    if (list == NULL || nlist == 0)
-        return NULL;
-    res = MALLOC_14(nlist,char *);
-
-    for (k = 0; k < nlist; k++)
-        res[k] = mne_strdup_14(list[k]);
-    return res;
-}
-
-
-
-
 #define FREE_14(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_14(m) mne_free_cmatrix_14((m))
@@ -139,27 +109,6 @@ void mne_free_cmatrix_14 (float **m)
         FREE_14(m);
     }
 }
-
-
-void free_name_list_14(char **list, int nlist)
-/*
-* Free a name list array
-*/
-{
-    int k;
-    if (list == NULL || nlist == 0)
-        return;
-    for (k = 0; k < nlist; k++) {
-#ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
-#endif
-        FREE_14(list[k]);
-    }
-    FREE_14(list);
-    return;
-}
-
-
 
 
 
@@ -175,55 +124,6 @@ void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat)
     fromFloatEigenMatrix_14(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
-
-void mne_string_to_name_list_14(char *s,char ***listp,int *nlistp)
-/*
-      * Convert a colon-separated list into a string array
-      */
-{
-    char **list = NULL;
-    int  nlist  = 0;
-    char *one,*now=NULL;
-
-    if (s != NULL && strlen(s) > 0) {
-        s = mne_strdup_14(s);
-        //strtok_r linux variant; strtok_s windows varainat
-#ifdef __linux__
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#elif _WIN32
-        for (one = strtok_s(s,":",&now); one != NULL; one = strtok_s(NULL,":",&now)) {
-#else
-        for (one = strtok_r(s,":",&now); one != NULL; one = strtok_r(NULL,":",&now)) {
-#endif
-            list = REALLOC_14(list,nlist+1,char *);
-            list[nlist++] = mne_strdup_14(one);
-        }
-        FREE_14(s);
-    }
-    *listp  = list;
-    *nlistp = nlist;
-    return;
-}
-
-
-
-void mne_free_name_list_14(char **list, int nlist)
-/*
-* Free a name list array
-*/
-{
-    int k;
-    if (list == NULL || nlist == 0)
-        return;
-    for (k = 0; k < nlist; k++) {
-#ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
-#endif
-        FREE_14(list[k]);
-    }
-    FREE_14(list);
-    return;
-}
 
 
 //*************************************************************************************************************
@@ -252,9 +152,7 @@ MneNamedMatrix::MneNamedMatrix(const MneNamedMatrix &p_MneNamedMatrix)
     for (j = 0; j < p_MneNamedMatrix.nrow; j++)
         for (k = 0; k < p_MneNamedMatrix.ncol; k++)
             data[j][k] = p_MneNamedMatrix.data[j][k];
-    MneNamedMatrix* res = build_named_matrix(   p_MneNamedMatrix.nrow,p_MneNamedMatrix.ncol,
-                                                mne_dup_name_list_14(p_MneNamedMatrix.rowlist,p_MneNamedMatrix.nrow),
-                                                mne_dup_name_list_14(p_MneNamedMatrix.collist,p_MneNamedMatrix.ncol),data);
+    MneNamedMatrix* res = build_named_matrix(   p_MneNamedMatrix.nrow,p_MneNamedMatrix.ncol,p_MneNamedMatrix.rowlist,p_MneNamedMatrix.collist,data);
     this->nrow = res->nrow;
     this->ncol = res->ncol;
     this->rowlist = res->rowlist;
@@ -267,15 +165,13 @@ MneNamedMatrix::MneNamedMatrix(const MneNamedMatrix &p_MneNamedMatrix)
 
 MneNamedMatrix::~MneNamedMatrix()
 {
-    free_name_list_14(rowlist,nrow);
-    free_name_list_14(collist,ncol);
     FREE_CMATRIX_14(data);
 }
 
 
 //*************************************************************************************************************
 
-MneNamedMatrix *MneNamedMatrix::build_named_matrix(int nrow, int ncol, char **rowlist, char **collist, float **data)
+MneNamedMatrix *MneNamedMatrix::build_named_matrix(int nrow, int ncol, const QStringList& rowlist, const QStringList& collist, float **data)
 {
     MneNamedMatrix* mat = new MneNamedMatrix;
     mat->nrow    = nrow;
@@ -289,81 +185,81 @@ MneNamedMatrix *MneNamedMatrix::build_named_matrix(int nrow, int ncol, char **ro
 
 //*************************************************************************************************************
 
-MneNamedMatrix *MneNamedMatrix::pick_from_named_matrix(char **pickrowlist, int picknrow, char **pickcollist, int pickncol) const
+MneNamedMatrix *MneNamedMatrix::pick_from_named_matrix(const QStringList& pickrowlist, int picknrow, const QStringList& pickcollist, int pickncol) const
 {
     int *pick_row = NULL;
     int *pick_col = NULL;
-    char **my_pickrowlist = NULL;
-    char **my_pickcollist = NULL;
+    QStringList my_pickrowlist;
+    QStringList my_pickcollist;
     float **pickdata = NULL;
     float **data;
     int   row,j,k;
-    char  *one;
+    QString one;
 
-    if (pickcollist && !this->collist) {
+    if (!pickrowlist.isEmpty() && this->rowlist.isEmpty()) {
+        printf("Cannot pick rows: no names for rows in original.");
+        return NULL;
+    }
+    if (!pickcollist.isEmpty() && this->collist.isEmpty()) {
         printf("Cannot pick columns: no names for columns in original.");
         return NULL;
     }
-    if (pickcollist && !this->collist) {
-        printf("Cannot pick columns: no names for columns in original.");
-        return NULL;
-    }
-    if (!pickrowlist)
+    if (pickrowlist.isEmpty())
         picknrow = this->nrow;
-    if (!pickcollist)
+    if (pickcollist.isEmpty())
         pickncol = this->ncol;
     pick_row = MALLOC_14(picknrow,int);
     pick_col = MALLOC_14(pickncol,int);
     /*
-       * Decide what to pick
-       */
-    if (pickrowlist) {
+    * Decide what to pick
+    */
+    if (!pickrowlist.isEmpty()) {
         for (j = 0; j < picknrow; j++) {
             one = pickrowlist[j];
             pick_row[j] = -1;
             for (k = 0; k < this->nrow; k++) {
-                if (strcmp(one,this->rowlist[k]) == 0) {
+                if (QString::compare(one,this->rowlist[k]) == 0) {
                     pick_row[j] = k;
                     break;
                 }
             }
             if (pick_row[j] == -1) {
-                printf("Row called %s not found in original matrix",one);
+                printf("Row called %s not found in original matrix",one.toUtf8().constData());
                 goto bad;
             }
-            my_pickrowlist = mne_dup_name_list_14(pickrowlist,picknrow);
+            my_pickrowlist = pickrowlist;
         }
     }
     else {
         for (k = 0; k < picknrow; k++)
             pick_row[k] = k;
-        my_pickrowlist = mne_dup_name_list_14(this->rowlist,this->nrow);
+        my_pickrowlist = this->rowlist;
     }
-    if (pickcollist) {
+    if (!pickcollist.isEmpty()) {
         for (j = 0; j < pickncol; j++) {
             one = pickcollist[j];
             pick_col[j] = -1;
             for (k = 0; k < this->ncol; k++) {
-                if (strcmp(one,this->collist[k]) == 0) {
+                if (QString::compare(one,this->collist[k]) == 0) {
                     pick_col[j] = k;
                     break;
                 }
             }
             if (pick_col[j] == -1) {
-                printf("Column called %s not found in original matrix",one);
+                printf("Column called %s not found in original matrix",one.toUtf8().constData());
                 goto bad;
             }
-            my_pickcollist = mne_dup_name_list_14(pickcollist,pickncol);
+            my_pickcollist = pickcollist;
         }
     }
     else {
         for (k = 0; k < pickncol; k++)
             pick_col[k] = k;
-        my_pickcollist = mne_dup_name_list_14(this->collist,this->ncol);
+        my_pickcollist = this->collist;
     }
     /*
-        * Do the picking of the data accordingly
-        */
+    * Do the picking of the data accordingly
+    */
     pickdata = ALLOC_CMATRIX_14(picknrow,pickncol);
 
     data = this->data;
@@ -380,8 +276,6 @@ MneNamedMatrix *MneNamedMatrix::pick_from_named_matrix(char **pickrowlist, int p
 bad : {
         FREE_14(pick_col);
         FREE_14(pick_row);
-        mne_free_name_list_14(my_pickrowlist,picknrow);
-        mne_free_name_list_14(my_pickcollist,pickncol);
         return NULL;
     }
 }
@@ -391,15 +285,14 @@ bad : {
 
 MneNamedMatrix *MneNamedMatrix::read_named_matrix(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node, int kind)
 {
-    char **colnames = NULL;
-    char **rownames = NULL;
+    QStringList colnames;
+    QStringList rownames;
     int  ncol = 0;
     int  nrow = 0;
     qint32 ndim;
     QVector<qint32> dims;
     float **data = NULL;
-    int  val;
-    char *s;
+    QString s;
     FiffTag::SPtr t_pTag;
     int     k;
 
@@ -473,28 +366,26 @@ MneNamedMatrix *MneNamedMatrix::read_named_matrix(FiffStream::SPtr &stream, cons
         }
     }
     if(!tmp_node->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
-        s = (char *)(t_pTag->data());
-        mne_string_to_name_list_14(s,&rownames,&val);
-        if (val != nrow) {
+        s = t_pTag->toString();
+        rownames = FiffStream::split_name_list(s);
+        if (rownames.size() != nrow) {
             qCritical("Incorrect number of entries in the row name list");
-            nrow = val;
+            nrow = rownames.size();
             goto bad;
         }
     }
     if(!tmp_node->find_tag(stream, FIFF_MNE_COL_NAMES, t_pTag)) {
-        s = (char *)(t_pTag->data());
-        mne_string_to_name_list_14(s,&colnames,&val);
-        if (val != ncol) {
+        s = t_pTag->toString();
+        colnames = FiffStream::split_name_list(s);
+        if (colnames.size() != ncol) {
             qCritical("Incorrect number of entries in the column name list");
-            ncol = val;
+            ncol = colnames.size();
             goto bad;
         }
     }
     return build_named_matrix(nrow,ncol,rownames,colnames,data);
 
 bad : {
-        mne_free_name_list_14(rownames,nrow);
-        mne_free_name_list_14(colnames,ncol);
         FREE_CMATRIX_14(data);
         return NULL;
     }

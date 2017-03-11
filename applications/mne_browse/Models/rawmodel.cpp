@@ -429,7 +429,7 @@ bool RawModel::writeFiffData(QIODevice *p_IODevice)
     SparseMatrix<double> mult;
     RowVectorXi sel;
 
-//    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
+//    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toUtf8() << std::endl;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,*m_pFiffInfo,cals);
 
     //Setup reading parameters

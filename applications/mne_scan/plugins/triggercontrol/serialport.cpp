@@ -486,24 +486,24 @@ bool SerialPort::open()
                 && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
         {
             std::cout << "Port opened, with:"
-                      << "Name" << m_currentSettings.name.toLatin1().data()
-                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
-                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
-                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
-                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+                      << "Name" << m_currentSettings.name.toUtf8().data()
+                      << "BaudRat" << m_currentSettings.stringBaudRate.toUtf8().data()
+                      << "Databits" << m_currentSettings.stringDataBits.toUtf8().data()
+                      << "Parity" << m_currentSettings.stringParity.toUtf8().data()
+                      << "FlowControl" << m_currentSettings.stringFlowControl.toUtf8().data()  << std::endl;
 // WARUM 3 MAL??
             std::cout << "geöffnet, mit:"
-                      << "Name" << m_currentSettings.name.toLatin1().data()
-                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
-                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
-                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
-                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+                      << "Name" << m_currentSettings.name.toUtf8().data()
+                      << "BaudRat" << m_currentSettings.stringBaudRate.toUtf8().data()
+                      << "Databits" << m_currentSettings.stringDataBits.toUtf8().data()
+                      << "Parity" << m_currentSettings.stringParity.toUtf8().data()
+                      << "FlowControl" << m_currentSettings.stringFlowControl.toUtf8().data()  << std::endl;
             std::cout << "geöffnet, mit:"
-                      << " Name: " << m_currentSettings.name.toLatin1().data()
-                      << ", BaudRate: " << m_currentSettings.stringBaudRate.toLatin1().data()
-                      << ", Databits: " << m_currentSettings.stringDataBits.toLatin1().data()
-                      << ", Parity: " << m_currentSettings.stringParity.toLatin1().data()
-                      << ", FlowControl: " << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+                      << " Name: " << m_currentSettings.name.toUtf8().data()
+                      << ", BaudRate: " << m_currentSettings.stringBaudRate.toUtf8().data()
+                      << ", Databits: " << m_currentSettings.stringDataBits.toUtf8().data()
+                      << ", Parity: " << m_currentSettings.stringParity.toUtf8().data()
+                      << ", FlowControl: " << m_currentSettings.stringFlowControl.toUtf8().data()  << std::endl;
 
             success = true;
         }

@@ -132,7 +132,7 @@ public:
     *
     * @return   The new named matrix.
     */
-    static MneNamedMatrix* build_named_matrix(int  nrow, int  ncol, char **rowlist, char **collist, float **data);
+    static MneNamedMatrix* build_named_matrix(int  nrow, int  ncol, const QStringList& rowlist, const QStringList& collist, float **data);
 
     //=========================================================================================================
     /**
@@ -159,14 +159,14 @@ public:
     *
     * @return   The read named matrix.
     */
-    MneNamedMatrix* pick_from_named_matrix( char **pickrowlist, int picknrow, char **pickcollist, int pickncol) const;
+    MneNamedMatrix* pick_from_named_matrix( const QStringList& pickrowlist, int picknrow, const QStringList& pickcollist, int pickncol) const;
 
 
 public:
     int   nrow;         /* Number of rows */
     int   ncol;         /* Number of columns */
-    char  **rowlist;    /* Name list for the rows (may be NULL) */
-    char  **collist;    /* Name list for the columns (may be NULL) */
+    QStringList rowlist;    /* Name list for the rows (may be NULL) */
+    QStringList collist;    /* Name list for the columns (may be NULL) */
     float **data;       /* The data itself (dense) */
 
 

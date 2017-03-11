@@ -118,19 +118,19 @@ void DipoleFitSettings::checkIntegrity()
     printf("\n");
 
     if (!bemname.isEmpty())
-        printf("BEM              : %s\n",bemname.toLatin1().data());
+        printf("BEM              : %s\n",bemname.toUtf8().data());
     else {
         printf("Sphere model     : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
                1000*r0[X],1000*r0[Y],1000*r0[Z]);
     }
     printf("Using %s MEG coil definitions.\n",accurate ? "accurate" : "standard");
     if (!mriname.isEmpty())
-        printf("MRI transform    : %s\n",mriname.toLatin1().data());
+        printf("MRI transform    : %s\n",mriname.toUtf8().data());
     if (!guessname.isEmpty())
-        printf("Guesses          : %s\n",guessname.toLatin1().data());
+        printf("Guesses          : %s\n",guessname.toUtf8().data());
     else {
         if (!guess_surfname.isEmpty())
-            fprintf(stderr,"Guess space bounded by %s\n",guess_surfname.toLatin1().data());
+            fprintf(stderr,"Guess space bounded by %s\n",guess_surfname.toUtf8().data());
         else
             fprintf(stderr,"Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
         printf("Guess grid       : %6.1f mm\n",1000*guess_grid);
@@ -139,18 +139,18 @@ void DipoleFitSettings::checkIntegrity()
         if (guess_exclude > 0)
             printf("Guess exclude    : %6.1f mm\n",1000*guess_exclude);
     }
-    printf("Data             : %s\n",measname.toLatin1().data());
+    printf("Data             : %s\n",measname.toUtf8().data());
     if (projnames.size() > 0) {
         printf("SSP sources      :\n");
         for (int k = 0; k < projnames.size(); k++)
-            printf("\t%s\n",projnames[k].toLatin1().data());
+            printf("\t%s\n",projnames[k].toUtf8().data());
     }
     if (badname)
         printf("Bad channels     : %s\n",badname);
     if (do_baseline)
         printf("Baseline         : %10.2f ... %10.2f ms\n", 1000*bmin,1000*bmax);
     if (!noisename.isEmpty()) {
-        printf("Noise covariance : %s\n",noisename.toLatin1().data());
+        printf("Noise covariance : %s\n",noisename.toUtf8().data());
         if (include_meg) {
             if (mag_reg > 0.0)
                 printf("\tNoise-covariange regularization (mag)     : %-5.2f\n",mag_reg);
@@ -163,9 +163,9 @@ void DipoleFitSettings::checkIntegrity()
     if (fit_mag_dipoles)
         printf("Fit data with magnetic dipoles\n");
     if (!dipname.isEmpty())
-        printf("dip output      : %s\n",dipname.toLatin1().data());
+        printf("dip output      : %s\n",dipname.toUtf8().data());
     if (!bdipname.isEmpty())
-        printf("bdip output     : %s\n",bdipname.toLatin1().data());
+        printf("bdip output     : %s\n",bdipname.toUtf8().data());
     printf("\n");
 }
 

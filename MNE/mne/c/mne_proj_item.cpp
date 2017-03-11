@@ -74,7 +74,6 @@ using namespace MNELIB;
 MneProjItem::MneProjItem()
 : vecs (NULL)
 , kind (FIFFV_PROJ_ITEM_NONE)
-, desc (NULL)
 , nvec (0)
 , active (TRUE)
 , active_file (FALSE)
@@ -91,14 +90,14 @@ MneProjItem::~MneProjItem()
 {
     if(vecs)
         delete vecs;
-    FREE_21(desc);
+    desc.clear();
     return;
 }
 
 
 //*************************************************************************************************************
 
-int MneProjItem::mne_proj_item_affect(MneProjItem *it, char **list, int nlist)
+int MneProjItem::mne_proj_item_affect(MneProjItem *it, const QStringList& list, int nlist)
 /*
     * Does this projection item affect this list of channels?
     */
@@ -110,7 +109,7 @@ int MneProjItem::mne_proj_item_affect(MneProjItem *it, char **list, int nlist)
 
     for (k = 0; k < nlist; k++)
         for (p = 0; p < it->vecs->ncol; p++)
-            if (strcmp(it->vecs->collist[p],list[k]) == 0) {
+            if (QString::compare(it->vecs->collist[p],list[k]) == 0) {
                 for (q = 0; q < it->vecs->nrow; q++) {
                     if (it->vecs->data[q][p] != 0.0)
                         return TRUE;
