@@ -1251,7 +1251,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
         {
             printf("\t%d bad channels ( ",bads.size());
             for(qint32 i = 0; i < bads.size(); ++i)
-                printf("\"%s\" ", bads[i].toLatin1().constData());
+                printf("\"%s\" ", bads[i].toUtf8().constData());
             printf(") read\n");
         }
     }

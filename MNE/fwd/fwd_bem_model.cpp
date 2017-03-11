@@ -337,7 +337,7 @@ float **mne_mat_mat_mult_40 (float **m1,float **m2,int d1,int d2,int d3)
 
 static struct {
     int  kind;
-    const char *name;
+    const QString name;
 } surf_expl[] = { { FIFFV_BEM_SURF_ID_BRAIN , "inner skull" },
 { FIFFV_BEM_SURF_ID_SKULL , "outer skull" },
 { FIFFV_BEM_SURF_ID_HEAD  , "scalp" },
@@ -346,7 +346,7 @@ static struct {
 
 static struct {
     int  method;
-    const char *name;
+    const QString name;
 } method_expl[] = { { FWD_BEM_CONSTANT_COLL , "constant collocation" },
 { FWD_BEM_LINEAR_COLL   , "linear collocation" },
 { -1                    , "unknown" } };
@@ -359,86 +359,29 @@ static struct {
 
 //============================= misc_util.c =============================
 
-char *mne_strdup_40(const char *s)
+static QString strip_from(const QString& s, const QString& suffix)
 {
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
+    QString res;
 
-
-/*
-* Some filename utilities follow
-*/
-static char *ends_with(char *s, char *suffix)
-/*
-* Does a string end with the given suffix?
-*/
-{
-    char *p;
-
-    if (!s)
-        return NULL;
-
-    for (p = strstr(s,suffix); p ; s = p + strlen(suffix), p = strstr(s,suffix))
-        if (p == s + strlen(s) - strlen(suffix))
-            return p;
-    return NULL;
-}
-
-
-static char *strip_from(char *s, char *suffix)
-{
-    char *p = ends_with(s,suffix);
-    char c;
-    char *res;
-
-    if (p) {
-        c = *p;
-        *p = '\0';
-        res = mne_strdup_40(s);
-        *p = c;
+    if (s.endsWith(suffix)) {
+        res = s;
+        res.chop(suffix.size());
     }
     else
-        res = mne_strdup_40(s);
+        res = s;
+
     return res;
 }
-
-
-
-char **mne_dup_name_list_40(char **list, int nlist)
-/*
- * Duplicate a name list
- */
-{
-    char **res;
-    int  k;
-    if (list == NULL || nlist == 0)
-        return NULL;
-    res = MALLOC_40(nlist,char *);
-
-    for (k = 0; k < nlist; k++)
-        res[k] = mne_strdup_40(list[k]);
-    return res;
-}
-
-
-
-
-
 
 //============================= mne_coord_transforms.c =============================
 
 typedef struct {
     int frame;
-    const char *name;
+    const QString name;
 } frameNameRec_40;
 
 
-const char *mne_coord_frame_name_40(int frame)
+const QString mne_coord_frame_name_40(int frame)
 
 {
     static frameNameRec_40 frames[] = {
@@ -541,28 +484,24 @@ void FwdBemModel::fwd_bem_free_solution()
 
 //*************************************************************************************************************
 
-char *FwdBemModel::fwd_bem_make_bem_sol_name(char *name)
+QString FwdBemModel::fwd_bem_make_bem_sol_name(const QString& name)
 /*
     * Make a standard BEM solution file name
     */
 {
-    char *s1,*s2;
+    QString s1, s2;
 
-    s1 = strip_from(name,(char*)(".fif"));
-    s2 = strip_from(s1,(char*)("-sol"));
-    FREE_40(s1);
-    s1 = strip_from(s2,(char*)("-bem"));
-    FREE_40(s2);
-    s2 = MALLOC_40(strlen(s1)+strlen(BEM_SOL_SUFFIX)+1,char);
-    sprintf(s2,"%s%s",s1,BEM_SOL_SUFFIX);
-    FREE_40(s1);
+    s1 = strip_from(name,".fif");
+    s2 = strip_from(s1,"-sol");
+    s1 = strip_from(s2,"-bem");
+    s2 = QString("%1%2").arg(s1).arg(BEM_SOL_SUFFIX);
     return s2;
 }
 
 
 //*************************************************************************************************************
 
-const char *FwdBemModel::fwd_bem_explain_surface(int kind)
+const QString& FwdBemModel::fwd_bem_explain_surface(int kind)
 {
     int k;
 
@@ -576,7 +515,7 @@ const char *FwdBemModel::fwd_bem_explain_surface(int kind)
 
 //*************************************************************************************************************
 
-const char *FwdBemModel::fwd_bem_explain_method(int method)
+const QString& FwdBemModel::fwd_bem_explain_method(int method)
 
 {
     int k;
@@ -620,7 +559,7 @@ MneSurfaceOld *FwdBemModel::fwd_bem_find_surface(int kind)
     for (int k = 0; k < this->nsurf; k++)
         if (this->surfs[k]->id == kind)
             return this->surfs[k];
-    printf("Desired surface (%d = %s) not found.", kind,fwd_bem_explain_surface(kind));
+    printf("Desired surface (%d = %s) not found.", kind,fwd_bem_explain_surface(kind).toUtf8().constData());
     return NULL;
 }
 
@@ -639,7 +578,7 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
     int         j,k;
 
     if (nkind <= 0) {
-        printf("No surfaces specified to fwd_bem_load_surfaces");
+        qCritical("No surfaces specified to fwd_bem_load_surfaces");
         return NULL;
     }
 
@@ -655,11 +594,11 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
         if ((surfs[k] = MneSurfaceOld::read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
             goto bad;
         if (sigma[k] < 0.0) {
-            printf("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]));
+            qCritical("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
             goto bad;
         }
         if (surfs[k]->coord_frame != FIFFV_COORD_MRI) { /* We make our life much easier with this */
-            printf("Surface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]));
+            qCritical("Surface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
             goto bad;
         }
     }
@@ -769,7 +708,7 @@ int FwdBemModel::fwd_bem_load_solution(const QString &name, int bem_method, FwdB
         QList<FiffDirNode::SPtr> nodes = stream->dirtree()->dir_tree_find(FIFFB_BEM);
 
         if (nodes.size() == 0) {
-            printf ("No BEM data in %s",name.toLatin1().constData());
+            printf ("No BEM data in %s",name.toUtf8().constData());
             goto not_found;
         }
         bem_node = nodes[0];
@@ -906,8 +845,8 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
             goto out;
         }
 
-        bemname = MALLOC_40(strlen(bemFile.fileName().toLatin1().data())+1,char);
-        strcpy(bemname,bemFile.fileName().toLatin1().data());
+        bemname = MALLOC_40(strlen(bemFile.fileName().toUtf8().data())+1,char);
+        strcpy(bemname,bemFile.fileName().toUtf8().data());
 
         if ((sphere = MneSourceSpaceOld::read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
             goto out;
@@ -924,8 +863,8 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
     }
     else {
         printf("Guess surface (%d = %s) is in %s coordinates\n",
-               guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id),
-               mne_coord_frame_name_40(guess_surf->coord_frame));
+               guess_surf->id,FwdBemModel::fwd_bem_explain_surface(guess_surf->id).toUtf8().constData(),
+               mne_coord_frame_name_40(guess_surf->coord_frame).toUtf8().constData());
     }
     printf("Filtering (grid = %6.f mm)...\n",1000*grid);
     res = (MneSurfaceOld*)MneSurfaceOrVolume::make_volume_source_space(guess_surf,grid,exclude,mindist);
@@ -1178,8 +1117,8 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
             ntri  = surf2->ntri;
 
             fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",
-                    fwd_bem_explain_surface(surf1->id),np1,
-                    fwd_bem_explain_surface(surf2->id),np2);
+                    fwd_bem_explain_surface(surf1->id).toUtf8().constData(),np1,
+                    fwd_bem_explain_surface(surf2->id).toUtf8().constData(),np2);
 
             for (j = 0; j < np1; j++) {
                 for (k = 0; k < np2; k++)
@@ -1364,13 +1303,13 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
     for (s = 0, joff = 0; s < nsurf; s++) {
         fprintf(stderr,"%d3 ",s+1);
         /*
-         * Pick the correct submatrix
-         */
+        * Pick the correct submatrix
+        */
         for (j = 0; j < ntri[s]; j++)
             sub[j] = solution[j+joff]+koff;
         /*
-         * Multiply
-         */
+        * Multiply
+        */
 #ifdef OLD
         for (j = 0; j < ntri[s]; j++) {
             for (k = 0; k < nlast; k++) {
@@ -1395,14 +1334,14 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
 #endif
     fprintf(stderr,"33 ");
     /*
-       * The lower right corner is a special case
-       */
+    * The lower right corner is a special case
+    */
     for (j = 0; j < nlast; j++)
         for (k = 0; k < nlast; k++)
             sub[j][k] = sub[j][k] + mult*ip_solution[j][k];
     /*
-       * Final scaling
-       */
+    * Final scaling
+    */
     fprintf(stderr,"done.\n\t\tScaling...");
     mne_scale_vector_40(ip_mult,solution[0],ntot*ntot);
     fprintf(stderr,"done.\n");
@@ -1415,8 +1354,8 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
 
 int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, float desired)
 /*
-     * Check the angle computations
-     */
+* Check the angle computations
+*/
 {
     float *sums = MALLOC_40(ntri1,float);
     float sum;
@@ -1431,11 +1370,11 @@ int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, floa
     }
     for (j = 0; j < ntri1; j++)
         /*
-         * Three cases:
-         * same surface: sum = 2*pi
-         * to outer:     sum = 4*pi
-         * to inner:     sum = 0*pi;
-         */
+        * Three cases:
+        * same surface: sum = 2*pi
+        * to outer:     sum = 4*pi
+        * to inner:     sum = 0*pi;
+        */
         if (fabs(sums[j]-desired) > 1e-4) {
             printf("solid angle matrix: rowsum[%d] = 2PI*%g",
                    j+1,sums[j]);
@@ -1476,7 +1415,7 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
         for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + ntri2) {
             surf2 = surfs[q];
             ntri2 = surf2->ntri;
-            fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id),ntri1,fwd_bem_explain_surface(surf2->id),ntri2);
+            fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id).toUtf8().constData(),ntri1,fwd_bem_explain_surface(surf2->id).toUtf8().constData(),ntri2);
             for (j = 0; j < ntri1; j++)
                 for (k = 0, tri = surf2->tris; k < ntri2; k++, tri++) {
                     if (p == q && j == k)
@@ -1592,7 +1531,7 @@ int FwdBemModel::fwd_bem_compute_solution(FwdBemModel *m, int bem_method)
 
 //*************************************************************************************************************
 
-int FwdBemModel::fwd_bem_load_recompute_solution(char *name, int bem_method, int force_recompute, FwdBemModel *m)
+int FwdBemModel::fwd_bem_load_recompute_solution(const QString& name, int bem_method, int force_recompute, FwdBemModel *m)
 /*
 * Load or recompute the potential solution matrix
 */
@@ -1609,7 +1548,7 @@ int FwdBemModel::fwd_bem_load_recompute_solution(char *name, int bem_method, int
             m->fwd_bem_free_solution();
         solres = fwd_bem_load_solution(name,bem_method,m);
         if (solres == TRUE) {
-            fprintf(stderr,"\nLoaded %s BEM solution from %s\n",fwd_bem_explain_method(m->bem_method),name);
+            fprintf(stderr,"\nLoaded %s BEM solution from %s\n",fwd_bem_explain_method(m->bem_method).toUtf8().constData(),name.toUtf8().constData());
             return OK;
         }
         else if (solres == FAIL)
@@ -3162,20 +3101,21 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
 * Use either the sphere model or BEM in the calculations
 */
 {
-    float            **res = NULL;	  /* The forward solution matrix */
-    float            **res_grad = NULL;	  /* The gradient with respect to the dipole position */
-    FwdCompData      *comp = NULL;
-    fwdFieldFunc     field;	          /* Computes the field for one dipole orientation */
-    fwdVecFieldFunc  vec_field;		  /* Computes the field for all dipole orientations */
-    fwdFieldGradFunc field_grad;		  /* Computes the field and gradient with respect to dipole position
-                           * for one dipole orientation */
-    int              nmeg = coils->ncoil;	  /* Number of channels */
-    int              nsource;		  /* Total number of sources */
-    int              k,p,q,off;
-    char             **names;		  /* Channel names */
-    void             *client;
-    FwdThreadArg*    one_arg = NULL;
-    int              nproc = QThread::idealThreadCount();
+    float               **res = NULL;       /* The forward solution matrix */
+    float               **res_grad = NULL;  /* The gradient with respect to the dipole position */
+    FwdCompData         *comp = NULL;
+    fwdFieldFunc        field;              /* Computes the field for one dipole orientation */
+    fwdVecFieldFunc     vec_field;          /* Computes the field for all dipole orientations */
+    fwdFieldGradFunc    field_grad;         /* Computes the field and gradient with respect to dipole position
+                                             * for one dipole orientation */
+    int                 nmeg = coils->ncoil;/* Number of channels */
+    int                 nsource;            /* Total number of sources */
+    int                 k,p,q,off;
+    QStringList         names;              /* Channel names */
+    void                *client;
+    FwdThreadArg*       one_arg = NULL;
+    int                 nproc = QThread::idealThreadCount();
+    QStringList         emptyList;
 
     if (bem_model) {
         /*
@@ -3339,21 +3279,20 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
     }
     fprintf(stderr,"done.\n");
     {
-        char **orig_names = MALLOC_40(nmeg,char *);
+        QStringList orig_names;
         for (k = 0; k < nmeg; k++)
-            orig_names[k] = coils->coils[k]->chname;
-        names = mne_dup_name_list_40(orig_names,nmeg);
-        FREE_40(orig_names);
+            orig_names.append(coils->coils[k]->chname);
+        names = orig_names;
     }
     if(one_arg)
         delete one_arg;
     if(comp)
         delete comp;
 
-    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,nmeg,NULL,names,res);
+
+    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,nmeg,emptyList,names,res);
     if (resp_grad && res_grad)
-        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,nmeg,NULL,
-                                            mne_dup_name_list_40(names,nmeg),res_grad);
+        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,nmeg,emptyList,names,res_grad);
     return OK;
 
 bad : {
@@ -3376,19 +3315,20 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
     * Use either the sphere model or BEM in the calculations
     */
 {
-    float            **res = NULL;	  /* The forward solution matrix */
-    float            **res_grad = NULL;	  /* The gradient with respect to the dipole position */
+    float            **res = NULL;          /* The forward solution matrix */
+    float            **res_grad = NULL;     /* The gradient with respect to the dipole position */
     fwdFieldFunc     pot;                   /* Computes the potentials for one dipole orientation */
-    fwdVecFieldFunc  vec_pot;		  /* Computes the potentials for all dipole orientations */
-    fwdFieldGradFunc pot_grad;	          /* Computes the potential and gradient with respect to dipole position
-                           * for one dipole orientation */
-    int             nsource;		  /* Total number of sources */
-    int             neeg = els->ncoil;	  /* Number of channels */
+    fwdVecFieldFunc  vec_pot;               /* Computes the potentials for all dipole orientations */
+    fwdFieldGradFunc pot_grad;              /* Computes the potential and gradient with respect to dipole position
+                                             * for one dipole orientation */
+    int             nsource;                /* Total number of sources */
+    int             neeg = els->ncoil;      /* Number of channels */
     int             k,p,q,off;
-    char            **names;		  /* Channel names */
+    QStringList     names;                  /* Channel names */
     void            *client;
     FwdThreadArg*   one_arg = NULL;
     int             nproc = QThread::idealThreadCount();
+    QStringList     emptyList;
     /*
        * Count the sources
        */
@@ -3521,18 +3461,17 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
     }
     fprintf(stderr,"done.\n");
     {
-        char **orig_names = MALLOC_40(neeg,char *);
+        QStringList orig_names;
         for (k = 0; k < neeg; k++)
-            orig_names[k] = els->coils[k]->chname;
-        names = mne_dup_name_list_40(orig_names,neeg);
-        FREE_40(orig_names);
+            orig_names.append(els->coils[k]->chname);
+        names = orig_names;
     }
     if(one_arg)
         delete one_arg;
-    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,NULL,names,res);
+    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,emptyList,names,res);
     if (resp_grad && res_grad)
-        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,neeg,NULL,
-                                            mne_dup_name_list_40(names,neeg),res_grad);
+        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,neeg,emptyList,
+                                            names,res_grad);
     return OK;
 
 bad : {

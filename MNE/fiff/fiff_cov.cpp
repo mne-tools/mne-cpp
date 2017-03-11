@@ -403,10 +403,10 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
         std::vector<qint32> idx = it.value().second;
 
         if(idx.size() == 0 || reg == 0.0)
-            printf("\tNothing to regularize within %s data.\n", desc.toLatin1().constData());
+            printf("\tNothing to regularize within %s data.\n", desc.toUtf8().constData());
         else
         {
-            printf("\tRegularize %s: %f\n", desc.toLatin1().constData(), reg);
+            printf("\tRegularize %s: %f\n", desc.toUtf8().constData(), reg);
             MatrixXd this_C(idx.size(), idx.size());
             for(quint32 i = 0; i < idx.size(); ++i)
                 for(quint32 j = 0; j < idx.size(); ++j)
@@ -433,7 +433,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
                 if (ncomp > 0)
                 {
-                    printf("\tCreated an SSP operator for %s (dimension = %d).\n", desc.toLatin1().constData(), ncomp);
+                    printf("\tCreated an SSP operator for %s (dimension = %d).\n", desc.toUtf8().constData(), ncomp);
                     this_C = U.transpose() * (this_C * U);
                 }
             }

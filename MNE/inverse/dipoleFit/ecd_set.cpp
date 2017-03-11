@@ -212,10 +212,10 @@ ECDSet ECDSet::read_dipoles_dip(const QString& fileName)
         }
         inputFile.close();
 
-        fprintf(stderr,"Read %d dipoles in dip format from %s\n",set.size(),fileName.toLatin1().data());
+        fprintf(stderr,"Read %d dipoles in dip format from %s\n",set.size(),fileName.toUtf8().data());
     }
     else {
-        printf("Not able to read from: %s\n", fileName.toLatin1().data());
+        printf("Not able to read from: %s\n", fileName.toUtf8().data());
     }
 
     return set;
@@ -238,8 +238,8 @@ bool ECDSet::save_dipoles_bdip(const QString& fileName)
     if (fileName.isEmpty() || this->size() == 0)
         return true;
 
-    if ((out = fopen(fileName.toLatin1().data(),"w")) == NULL) {
-        printf(fileName.toLatin1().data());
+    if ((out = fopen(fileName.toUtf8().data(),"w")) == NULL) {
+        printf(fileName.toUtf8().data());
         return false;
     }
 
@@ -265,16 +265,16 @@ bool ECDSet::save_dipoles_bdip(const QString& fileName)
     }
     if (fclose(out) != 0) {
         out = NULL;
-        printf(fileName.toLatin1().data());
+        printf(fileName.toUtf8().data());
         goto bad;
     }
-    fprintf(stderr,"Save %d dipoles in bdip format to %s\n",nsave,fileName.toLatin1().data());
+    fprintf(stderr,"Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 
 bad : {
         if (out) {
             fclose(out);
-            unlink(fileName.toLatin1().data());
+            unlink(fileName.toUtf8().data());
         }
         return false;
     }
@@ -291,8 +291,8 @@ bool ECDSet::save_dipoles_dip(const QString& fileName) const
 
     if (fileName.isEmpty() || this->size() == 0)
         return true;
-    if ((out = fopen(fileName.toLatin1().data(),"w")) == NULL) {
-        printf(fileName.toLatin1().data());
+    if ((out = fopen(fileName.toUtf8().data(),"w")) == NULL) {
+        printf(fileName.toUtf8().data());
         return false;
     }
     fprintf(out,"# CoordinateSystem \"Head\"\n");
@@ -311,16 +311,16 @@ bool ECDSet::save_dipoles_dip(const QString& fileName) const
     fprintf(out,"## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
     if (fclose(out) != 0) {
         out = NULL;
-        printf(fileName.toLatin1().data());
+        printf(fileName.toUtf8().data());
         goto bad;
     }
-    fprintf(stderr,"Save %d dipoles in dip format to %s\n",nsave,fileName.toLatin1().data());
+    fprintf(stderr,"Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 
 bad : {
         if (out) {
             fclose(out);
-            unlink(fileName.toLatin1().data());
+            unlink(fileName.toUtf8().data());
         }
         return false;
     }

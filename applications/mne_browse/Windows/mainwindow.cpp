@@ -519,12 +519,12 @@ void MainWindow::openFile()
 //    if(!writeFileFutureWatcher.future().result())
 //        qDebug() << "Fiff data file" << filename << "loaded.";
 //    else
-//        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+//        qDebug("ERROR loading fiff data file %s",filename.toUtf8().data());
 
     if(m_pDataWindow->getDataModel()->loadFiffData(&m_qFileRaw))
         qDebug() << "Fiff data file" << filename << "loaded.";
     else
-        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+        qDebug("ERROR loading fiff data file %s",filename.toUtf8().data());
 
     //set position of QScrollArea
     m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
@@ -630,7 +630,7 @@ void MainWindow::loadEvents()
     if(m_pEventWindow->getEventModel()->loadEventData(m_qEventFile))
         qDebug() << "Fiff event data file" << filename << "loaded.";
     else
-        qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
+        qDebug("ERROR loading fiff event data file %s",filename.toUtf8().data());
 
     //Update status bar
     setWindowStatus();
@@ -663,7 +663,7 @@ void MainWindow::saveEvents()
         qDebug() << "Fiff event data file" << filename << "saved.";
     }
     else
-        qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
+        qDebug("ERROR saving fiff event data file %s",filename.toUtf8().data());
 }
 
 
@@ -687,7 +687,7 @@ void MainWindow::loadEvoked()
     if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
         qDebug() << "Fiff evoked data file" << filename << "loaded.";
     else
-        qDebug("ERROR loading evoked data file %s",filename.toLatin1().data());
+        qDebug("ERROR loading evoked data file %s",filename.toUtf8().data());
 
     //Update status bar
     setWindowStatus();

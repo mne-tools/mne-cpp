@@ -234,10 +234,10 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
     {
         qint32 nchan = p_FiffNamedMatrix.row_names.size() > 6 ? 6 : p_FiffNamedMatrix.row_names.size();
         for(qint32 i = 0; i < nchan/2; ++i)
-            out << p_FiffNamedMatrix.row_names[i].toLatin1().constData() << " ";
+            out << p_FiffNamedMatrix.row_names[i].toUtf8().constData() << " ";
         out << "... ";
         for(qint32 i = p_FiffNamedMatrix.row_names.size() - nchan/2; i < p_FiffNamedMatrix.row_names.size(); ++i)
-            out << p_FiffNamedMatrix.row_names[i].toLatin1().constData() << " ";
+            out << p_FiffNamedMatrix.row_names[i].toUtf8().constData() << " ";
         out << std::endl;
     }
 
@@ -246,10 +246,10 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
     {
         qint32 nchan = p_FiffNamedMatrix.col_names.size() > 6 ? 6 : p_FiffNamedMatrix.col_names.size();
         for(qint32 i = 0; i < nchan/2; ++i)
-            out << p_FiffNamedMatrix.col_names[i].toLatin1().constData() << " ";
+            out << p_FiffNamedMatrix.col_names[i].toUtf8().constData() << " ";
         out << "... ";
         for(qint32 i = p_FiffNamedMatrix.col_names.size() - nchan/2; i < p_FiffNamedMatrix.col_names.size(); ++i)
-            out << p_FiffNamedMatrix.col_names[i].toLatin1().constData() << " ";
+            out << p_FiffNamedMatrix.col_names[i].toUtf8().constData() << " ";
         out << std::endl;
     }
 
