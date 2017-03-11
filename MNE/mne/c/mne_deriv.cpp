@@ -74,8 +74,6 @@ void mne_free_sparse_named_matrix_15(mneSparseNamedMatrix mat)
 {
     if (!mat)
         return;
-    mne_free_name_list_15(mat->rowlist,mat->nrow);
-    mne_free_name_list_15(mat->collist,mat->ncol);
     if(mat->data)
         delete mat->data;
     FREE_15(mat);

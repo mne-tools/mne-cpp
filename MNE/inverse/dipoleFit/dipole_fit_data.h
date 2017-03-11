@@ -181,7 +181,7 @@ public:
 
     static DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< This gives the MRI/head transform */
                                             const QString& measname,        /**< This gives the MEG/head transform and sensor locations */
-                                            char  *bemname,                 /**< BEM model */
+                                            const QString& bemname,         /**< BEM model */
                                             Eigen::Vector3f *r0,            /**< Sphere model origin in head coordinates (optional) */
                                             FWDLIB::FwdEegSphereModel* eeg_model,   /**< EEG sphere model definition */
                                             int   accurate_coils,           /**< Use accurate coil definitions? */
@@ -239,12 +239,12 @@ public:
       FIFFLIB::fiffChInfo        chs;       /**< Channels */
       int               nmeg;               /**< How many MEG */
       int               neeg;               /**< How many EEG */
-      char              **ch_names;         /**< List of all channel names */
+      QStringList       ch_names;           /**< List of all channel names */
       FIFFLIB::FiffSparseMatrix* pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in */
       FWDLIB::FwdCoilSet*        meg_coils;         /**< MEG coil definitions */
       FWDLIB::FwdCoilSet*        eeg_els;           /**< EEG electrode definitions */
       float             r0[3];              /**< Sphere model origin */
-      char              *bemname;           /**< Using a BEM? */
+      QString           bemname;           /**< Using a BEM? */
 
       FWDLIB::FwdEegSphereModel *eeg_model;         /**< EEG sphere model definition */
       FWDLIB::FwdBemModel       *bem_model;         /**< BEM model definition */
