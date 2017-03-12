@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
 
         size_t inDim = deep_v2.inputDimensions();
-        int samples = 1;
+        int samples = 4;
 
         fprintf(stderr, "Input Dimension %d\n", (int)inDim);
 

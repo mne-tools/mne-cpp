@@ -115,8 +115,10 @@ void Deep::RunEvaluationClassifier(FunctionPtr evalFunc, const DeviceDescriptor 
         // Create input data shape. Adding sequence length and numSamples as axes.
         // Todo: remove sequence length when only numSamples is supported.
         // Todo: add convenience APIs to simplify data preparation here.
-        NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
-        ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+//        NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
+//        ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+        ValuePtr inputValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
+
 
         // Define output.
         ValuePtr outputValue;
@@ -448,8 +450,11 @@ bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, Matr
         }
     }
 
-    NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
-    ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+//    NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
+//    ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+    ValuePtr inputValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
+
+
 
     //
     // Output
