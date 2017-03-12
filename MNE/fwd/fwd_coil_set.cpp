@@ -111,24 +111,6 @@ using namespace FWDLIB;
     (to)[Z_6] = (from)[Z_6];\
     }
 
-void fiff_coord_trans_6 (float r[3],const FiffCoordTransOld* t,int do_move)
-/*
-      * Apply coordinate transformation
-      */
-{
-    int j,k;
-    float res[3];
-
-    for (j = 0; j < 3; j++) {
-        res[j] = (do_move ? t->move[j] :  0.0);
-        for (k = 0; k < 3; k++)
-            res[j] += t->rot[j][k]*r[k];
-    }
-    for (j = 0; j < 3; j++)
-        r[j] = res[j];
-}
-
-
 
 
 
@@ -387,10 +369,10 @@ FwdCoil *FwdCoilSet::create_meg_coil(fiffChInfo ch, int acc, const FiffCoordTran
         * Apply a coordinate transformation if so desired
         */
     if (t) {
-        fiff_coord_trans_6(res->r0,t,FIFFV_MOVE);
-        fiff_coord_trans_6(res->ex,t,FIFFV_NO_MOVE);
-        fiff_coord_trans_6(res->ey,t,FIFFV_NO_MOVE);
-        fiff_coord_trans_6(res->ez,t,FIFFV_NO_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(res->r0,t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(res->ex,t,FIFFV_NO_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(res->ey,t,FIFFV_NO_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(res->ez,t,FIFFV_NO_MOVE);
         res->coord_frame = t->to;
     }
     else
@@ -577,14 +559,14 @@ FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTransOld* t) const
      * Optional coordinate transformation
      */
         if (t) {
-            fiff_coord_trans_6(coil->r0,t,FIFFV_MOVE);
-            fiff_coord_trans_6(coil->ex,t,FIFFV_NO_MOVE);
-            fiff_coord_trans_6(coil->ey,t,FIFFV_NO_MOVE);
-            fiff_coord_trans_6(coil->ez,t,FIFFV_NO_MOVE);
+            FiffCoordTransOld::fiff_coord_trans(coil->r0,t,FIFFV_MOVE);
+            FiffCoordTransOld::fiff_coord_trans(coil->ex,t,FIFFV_NO_MOVE);
+            FiffCoordTransOld::fiff_coord_trans(coil->ey,t,FIFFV_NO_MOVE);
+            FiffCoordTransOld::fiff_coord_trans(coil->ez,t,FIFFV_NO_MOVE);
 
             for (int p = 0; p < coil->np; p++) {
-                fiff_coord_trans_6(coil->rmag[p],t,FIFFV_MOVE);
-                fiff_coord_trans_6(coil->cosmag[p],t,FIFFV_NO_MOVE);
+                FiffCoordTransOld::fiff_coord_trans(coil->rmag[p],t,FIFFV_MOVE);
+                FiffCoordTransOld::fiff_coord_trans(coil->cosmag[p],t,FIFFV_NO_MOVE);
             }
             coil->coord_frame = t->to;
         }
