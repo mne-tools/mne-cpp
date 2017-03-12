@@ -667,6 +667,20 @@ bool Deep::trainModel()
 
     trainer->TrainMinibatch(inOutValues,device);
 
+
+
+    double training_loss_val = trainer->PreviousMinibatchLossAverage();
+
+    double eval_error_val = trainer->PreviousMinibatchEvaluationAverage();
+
+    size_t minibatch_samples = trainer->PreviousMinibatchSampleCount();
+
+
+    qDebug() << "training_loss_val" << training_loss_val << "; eval_error_val" << eval_error_val << "; minibatch_samples" << minibatch_samples;
+
+
+
+
     qDebug() << "After Training";
 
     return true;
