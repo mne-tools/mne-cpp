@@ -632,52 +632,70 @@ bool Deep::trainModel()
 
 
 
+    //
+    // training 1
+    //
 
-
-
-    size_t batchSize = 1;
+    size_t batchSize = 10;
 
     std::vector<float> inputData(inputDim * batchSize);
     for (size_t i = 0; i < inputData.size(); ++i)
         inputData[i] = (float)rand() / RAND_MAX;
-
 //    for (int m = 0; m < batchSize; ++m) {
 //        for (int n = 0; n < inputDim; ++n) {
 //            printf("%d: %f =? %f\n",dataIndex,input(m,n),static_cast<float>(dataIndex % 255));
 //            inputData[dataIndex++] = input(m,n);
 //        }
 //    }
-
     ValuePtr inputDataValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
 //    std::unordered_map<Variable, ValuePtr> inputValues = { { inputVar, inputDataValue } };
 
-
-    std::vector<float> outputData(numOutputClasses * batchSize, 1);
+    std::vector<float> outputData(numOutputClasses * batchSize);
     for (size_t i = 0; i < outputData.size(); ++i)
         outputData[i] = (float)rand() / RAND_MAX;
-
-//    z->Output().Shape()
-    ValuePtr outputDataValue = Value::CreateBatch(labels.Shape(), outputData, device);
+    ValuePtr outputDataValue = Value::CreateBatch(labels.Shape(), outputData, device);//    z->Output().Shape()
 //    std::unordered_map<Variable, ValuePtr> outputValues = { { labels, outputDataValue } };
 
-
     std::unordered_map<Variable, ValuePtr> inOutValues = { { inputVar, inputDataValue }, { labels, outputDataValue } };
+
 
     qDebug() << "Before Training";
 
     trainer->TrainMinibatch(inOutValues,device);
 
-
-
     double training_loss_val = trainer->PreviousMinibatchLossAverage();
-
     double eval_error_val = trainer->PreviousMinibatchEvaluationAverage();
-
     size_t minibatch_samples = trainer->PreviousMinibatchSampleCount();
 
+    qDebug() << "1 training_loss_val" << training_loss_val << "; eval_error_val" << eval_error_val << "; minibatch_samples" << minibatch_samples;
 
-    qDebug() << "training_loss_val" << training_loss_val << "; eval_error_val" << eval_error_val << "; minibatch_samples" << minibatch_samples;
 
+    //
+    // training 2
+    //
+
+    batchSize = 20;
+
+    std::vector<float> inputData2(inputDim * batchSize);
+    for (size_t i = 0; i < inputData2.size(); ++i)
+        inputData2[i] = (float)rand() / RAND_MAX;
+    inputDataValue = Value::CreateBatch(inputVar.Shape(), inputData2, device);
+
+    std::vector<float> outputData2(numOutputClasses * batchSize);
+    for (size_t i = 0; i < outputData2.size(); ++i)
+        outputData2[i] = (float)rand() / RAND_MAX;
+    outputDataValue = Value::CreateBatch(labels.Shape(), outputData2, device);
+
+    inOutValues = { { inputVar, inputDataValue }, { labels, outputDataValue } };
+
+
+    trainer->TrainMinibatch(inOutValues,device);
+
+    training_loss_val = trainer->PreviousMinibatchLossAverage();
+    eval_error_val = trainer->PreviousMinibatchEvaluationAverage();
+    minibatch_samples = trainer->PreviousMinibatchSampleCount();
+
+    qDebug() << "2 training_loss_val" << training_loss_val << "; eval_error_val" << eval_error_val << "; minibatch_samples" << minibatch_samples;
 
 
 
