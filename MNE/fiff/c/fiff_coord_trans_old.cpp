@@ -283,7 +283,7 @@ int FiffCoordTransOld::add_inverse(FiffCoordTransOld *t)
         m(3,k) = 0.0;
     m(3,3) = 1.0;
 
-    m = m.inverse();
+    m = m.inverse().eval();
 
     for (j = 0; j < 3; j++) {
         for (k = 0; k < 3; k++)
