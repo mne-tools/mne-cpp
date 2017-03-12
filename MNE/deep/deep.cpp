@@ -55,6 +55,7 @@
 //=============================================================================================================
 
 #include <QFile>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -256,61 +257,50 @@ void Deep::exampleTrain()
 
     auto x = InputVariable(NDShape({ inDim }), DataType::Float, { Axis::DefaultBatchAxis() });
 
-//    auto userDefinedTimes = UserTimesFunction::Create(W, x, L"UserDefinedTimes");
+
+    size_t batchSize = 3;
+
+    std::vector<float> inputData(inDim * batchSize);
+
+    for (size_t i = 0; i < inputData.size(); ++i)
+        inputData[i] = (float)rand() / RAND_MAX;
+
+    auto inputDataValue = Value::CreateBatch(x.Shape(), inputData, device);
+
+    std::vector<float> rootGradientData(outDim * batchSize, 1);
 
 
-
-//    size_t batchSize = 3;
-
-//    std::vector<float> inputData(inDim * batchSize);
-
-//    for (size_t i = 0; i < inputData.size(); ++i)
-
-//        inputData[i] = (float)rand() / RAND_MAX;
-
-
-
-//    auto inputDataValue = Value::CreateBatch(x.Shape(), inputData, device);
-
-
-
-//    std::vector<float> rootGradientData(outDim * batchSize, 1);
-
-//    auto rootGradientValue = Value::CreateBatch(userDefinedTimes->Output().Shape(), rootGradientData, device);
-
-
+    //    auto userDefinedTimes = UserTimesFunction::Create(W, x, L"UserDefinedTimes");
+    //    auto rootGradientValue = Value::CreateBatch(userDefinedTimes->Output().Shape(), rootGradientData, device);
 
 //    std::unordered_map<Variable, ValuePtr> outputValues = { { userDefinedTimes->Output(), nullptr } };
-
 //    auto backPropState = userDefinedTimes->Forward({ { x, inputDataValue } }, outputValues, device, { userDefinedTimes->Output() });
-
-
 
 //    std::unordered_map<Variable, ValuePtr> inputGradientValues = { { W, nullptr } };
 
 //    userDefinedTimes->Backward(backPropState, { { userDefinedTimes->Output(), rootGradientValue } }, inputGradientValues);
-
 //    auto userDefinedTimesOutputValue = outputValues[userDefinedTimes->Output()];
-
 //    auto userDefinedTimesInputGradientValue = inputGradientValues[W];
 
 
+    // Compare against the CNTK built-in implementation
 
-//    // Compare against the CNTK built-in implementation
+    auto builtInTimes = Times(W, x, L"BuiltInTimes");
 
-//    auto builtInTimes = Times(W, x, L"BuiltInTimes");
+    auto rootGradientValue = Value::CreateBatch(builtInTimes->Output().Shape(), rootGradientData, device);
 
-//    outputValues = { { builtInTimes->Output(), nullptr } };
 
-//    backPropState = builtInTimes->Forward({ { x, inputDataValue } }, outputValues, device, { builtInTimes->Output() });
+    std::unordered_map<Variable, ValuePtr> outputValues = { { builtInTimes->Output(), nullptr } };
 
-//    inputGradientValues = { { W, nullptr } };
+    auto backPropState = builtInTimes->Forward({ { x, inputDataValue } }, outputValues, device, { builtInTimes->Output() });
 
-//    builtInTimes->Backward(backPropState, { { builtInTimes->Output(), rootGradientValue } }, inputGradientValues);
+    std::unordered_map<Variable, ValuePtr> inputGradientValues = { { W, nullptr } };
 
-//    auto builtInTimesOutputValue = outputValues[builtInTimes->Output()];
+    builtInTimes->Backward(backPropState, { { builtInTimes->Output(), rootGradientValue } }, inputGradientValues);
 
-//    auto builtInTimesInputGradientValue = inputGradientValues[W];
+    auto builtInTimesOutputValue = outputValues[builtInTimes->Output()];
+
+    auto builtInTimesInputGradientValue = inputGradientValues[W];
 
 
 
@@ -385,8 +375,9 @@ bool Deep::loadModel(const QString& modelFileName, const DeviceDescriptor &devic
         return false;
     }
 
-    std::wstring fileName = modelFileName.toStdWString();
-    m_pModel = Function::LoadModel(fileName, device);
+    fprintf(stderr, "Loading model %s.\n",modelFileName.toUtf8().constData());
+
+    m_pModel = Function::LoadModel(modelFileName.toStdWString(), device);
 
     return true;
 }
@@ -502,6 +493,144 @@ bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, Matr
     }
     return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//*************************************************************************************************************
+
+FunctionPtr Deep::FullyConnectedDNNLayerWithSharedParameters(Variable input, const Parameter &timesParam, const Parameter &plusParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
+{
+    assert(input.Shape().Rank() == 1);
+
+    // Todo: assume that timesParam has matched outputDim and inputDim
+    auto timesFunction = Times(timesParam, input);
+
+    // Todo: assume that timesParam has matched outputDim
+    auto plusFunction = Plus(plusParam, timesFunction);
+
+    return nonLinearity(plusFunction);
+}
+
+
+//*************************************************************************************************************
+
+FunctionPtr Deep::FullyConnectedFeedForwardClassifierNetWithSharedParameters(Variable input, size_t numHiddenLayers, const Parameter &inputTimesParam, const Parameter &inputPlusParam, const Parameter hiddenLayerTimesParam[], const Parameter hiddenLayerPlusParam[], const Parameter &outputTimesParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
+{
+    assert(numHiddenLayers >= 1);
+    auto classifierRoot = FullyConnectedDNNLayerWithSharedParameters(input, inputTimesParam, inputPlusParam, nonLinearity);
+
+    for (size_t i = 1; i < numHiddenLayers; ++i)
+    {
+        classifierRoot = FullyConnectedDNNLayerWithSharedParameters(classifierRoot, hiddenLayerTimesParam[i - 1], hiddenLayerPlusParam[i - 1], nonLinearity);
+    }
+
+    // Todo: assume that outputTimesParam has matched output dim and hiddenLayerDim
+    classifierRoot = Times(outputTimesParam, classifierRoot);
+    return classifierRoot;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::trainModel()
+{
+    QString fileName("./mne_deep_models/trainModel.v2");
+
+
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+
+    const size_t inputDim = 937;
+    const size_t numOutputClasses = 9304;
+    const size_t numHiddenLayers = 6;
+    const size_t hiddenLayersDim = 2048;
+
+    // Define model parameters that should be shared among evaluation requests against the same model
+    auto inputTimesParam = Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, inputDim}, -0.5, 0.5, 1, device));
+    auto inputPlusParam = Parameter({hiddenLayersDim}, 0.0f, device);
+    Parameter hiddenLayerTimesParam[numHiddenLayers - 1] = {
+        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
+        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
+        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
+        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
+        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device))
+    };
+    Parameter hiddenLayerPlusParam[numHiddenLayers - 1] = {
+        Parameter({hiddenLayersDim}, 0.0f, device),
+        Parameter({hiddenLayersDim}, 0.0f, device),
+        Parameter({hiddenLayersDim}, 0.0f, device),
+        Parameter({hiddenLayersDim}, 0.0f, device),
+        Parameter({hiddenLayersDim}, 0.0f, device),
+    };
+    auto outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
+
+
+
+
+
+    auto inputVar = InputVariable({inputDim}, DataType::Float, L"Features");
+
+//    if(!loadModel(fileName, device)) {
+        fprintf(stderr, "Constructing model %s.\n",fileName.toUtf8().constData());
+
+        m_pModel = FullyConnectedFeedForwardClassifierNetWithSharedParameters(  inputVar,
+                                                                                numHiddenLayers,
+                                                                                inputTimesParam,
+                                                                                inputPlusParam,
+                                                                                hiddenLayerTimesParam,
+                                                                                hiddenLayerPlusParam,
+                                                                                outputTimesParam,
+                                                                                std::bind(Sigmoid, std::placeholders::_1, L""));
+//    }
+
+    FunctionPtr z = m_pModel;
+
+    Variable labels = InputVariable({numOutputClasses}, DataType::Float, L"Labels");
+    FunctionPtr loss = CrossEntropyWithSoftmax(z,labels);
+    FunctionPtr eval_error = ClassificationError(z, labels);
+
+    double learning_rate = 0.5;
+    LearningRateSchedule lr_schedule = LearningRateSchedule(learning_rate, LearningRateSchedule::UnitType::Minibatch);
+    std::vector<LearnerPtr> learner; learner.push_back(SGDLearner(z->Parameters(),lr_schedule));
+
+    TrainerPtr trainer = CreateTrainer(z,loss,eval_error,learner);
+
+    z->SaveModel(fileName.toStdWString());
+
+    return true;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //*************************************************************************************************************

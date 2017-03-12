@@ -94,24 +94,39 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Deep deepTest;
-
-    deepTest.testClone();
-
-
-
-
+//    Deep deepTest;
+//    deepTest.testClone();
+//    deepTest.exampleTrain();
 
 
     Deep deep;
 
+    deep.trainModel();
+
+
+/*
     if(deep.loadModel("./mne_deep_models/examples/output/models/ex_deep_one_hidden", DeviceDescriptor::CPUDevice())) {
         fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
 
         size_t inDim = deep.inputDimensions();
         int samples = 1;
-
         fprintf(stderr, "Input Dimension %d\n", (int)inDim);
+
+        //
+        // Train
+        //
+
+
+
+
+//        deep.trainModel();
+
+
+
+
+        //
+        // Evaluation
+        //
 
         MatrixXf inputs(samples,inDim);
 
@@ -129,6 +144,8 @@ int main(int argc, char *argv[])
         deep.evalModel(DeviceDescriptor::CPUDevice(), inputs, outputs);
 
         std::cout << "outputs\n" << outputs << std::endl;
+
+
 
         //
         // Visualize
@@ -165,7 +182,7 @@ int main(int argc, char *argv[])
         chartView->setRenderHint(QPainter::Antialiasing);
         chartView->show();
     }
-
+//*/
 
     return a.exec();
 }
