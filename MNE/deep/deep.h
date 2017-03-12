@@ -158,8 +158,6 @@ public:
 
     void testClone();
 
-
-
     void exampleTrain();
 
 
@@ -249,6 +247,37 @@ public:
     * @return true when successfully evaluated, false otherwise.
     */
     bool evalModel(const CNTK::DeviceDescriptor& device, const Eigen::MatrixXf& input, Eigen::MatrixXf& output);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    inline CNTK::FunctionPtr FullyConnectedDNNLayerWithSharedParameters(CNTK::Variable input,
+                                                                  const CNTK::Parameter& timesParam,
+                                                                  const CNTK::Parameter& plusParam,
+                                                                  const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
+
+    inline CNTK::FunctionPtr FullyConnectedFeedForwardClassifierNetWithSharedParameters(CNTK::Variable input,
+                                                                                  size_t numHiddenLayers,
+                                                                                  const CNTK::Parameter& inputTimesParam,
+                                                                                  const CNTK::Parameter& inputPlusParam,
+                                                                                  const CNTK::Parameter hiddenLayerTimesParam[],
+                                                                                  const CNTK::Parameter hiddenLayerPlusParam[],
+                                                                                  const CNTK::Parameter& outputTimesParam,
+                                                                                  const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
+
+    bool trainModel();
 
 protected:
     //=========================================================================================================
