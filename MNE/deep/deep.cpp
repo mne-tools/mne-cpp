@@ -615,6 +615,55 @@ bool Deep::trainModel()
 
     z->SaveModel(fileName.toStdWString());
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    size_t batchSize = 1;
+
+    std::vector<float> inputData(inputDim * batchSize);
+    for (size_t i = 0; i < inputData.size(); ++i)
+        inputData[i] = (float)rand() / RAND_MAX;
+
+//    for (int m = 0; m < batchSize; ++m) {
+//        for (int n = 0; n < inputDim; ++n) {
+//            printf("%d: %f =? %f\n",dataIndex,input(m,n),static_cast<float>(dataIndex % 255));
+//            inputData[dataIndex++] = input(m,n);
+//        }
+//    }
+
+    ValuePtr inputDataValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
+//    std::unordered_map<Variable, ValuePtr> inputValues = { { inputVar, inputDataValue } };
+
+
+    std::vector<float> outputData(numOutputClasses * batchSize, 1);
+    for (size_t i = 0; i < outputData.size(); ++i)
+        outputData[i] = (float)rand() / RAND_MAX;
+
+//    z->Output().Shape()
+    ValuePtr outputDataValue = Value::CreateBatch(labels.Shape(), outputData, device);
+//    std::unordered_map<Variable, ValuePtr> outputValues = { { labels, outputDataValue } };
+
+
+    std::unordered_map<Variable, ValuePtr> inOutValues = { { inputVar, inputDataValue }, { labels, outputDataValue } };
+
+    qDebug() << "Before Training";
+
+    trainer->TrainMinibatch(inOutValues,device);
+
+    qDebug() << "After Training";
+
     return true;
 
 }
