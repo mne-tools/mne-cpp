@@ -160,7 +160,7 @@ int MneCTFCompData::mne_calibrate_ctf_comp(MneCTFCompData *one, fiffChInfo chs, 
 {
     float *col_cals,*row_cals;
     int   j,k,p,found;
-    char  *name;
+    QString name;
     float **data;
 
     if (!one)
@@ -175,13 +175,13 @@ int MneCTFCompData::mne_calibrate_ctf_comp(MneCTFCompData *one, fiffChInfo chs, 
         name = one->data->rowlist[j];
         found = FALSE;
         for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
+            if (QString::compare(name,chs[p].ch_name) == 0) {
                 row_cals[j] = chs[p].range*chs[p].cal;
                 found = TRUE;
                 break;
             }
         if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
+            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
             return FAIL;
         }
     }
@@ -189,13 +189,13 @@ int MneCTFCompData::mne_calibrate_ctf_comp(MneCTFCompData *one, fiffChInfo chs, 
         name = one->data->collist[k];
         found = FALSE;
         for (p = 0; p < nch; p++)
-            if (strcmp(name,chs[p].ch_name) == 0) {
+            if (QString::compare(name,chs[p].ch_name) == 0) {
                 col_cals[k] = chs[p].range*chs[p].cal;
                 found = TRUE;
                 break;
             }
         if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name);
+            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
             return FAIL;
         }
     }

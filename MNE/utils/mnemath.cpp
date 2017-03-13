@@ -149,12 +149,12 @@ void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig
     for(qint32 i = 0; i < eig.size()-rnk; ++i)
         eig(i) = 0;
 
-    printf("Setting small %s eigenvalues to zero.\n", ch_type.toLatin1().constData());
+    printf("Setting small %s eigenvalues to zero.\n", ch_type.toUtf8().constData());
     if (!pca)  // No PCA case.
-        printf("Not doing PCA for %s\n", ch_type.toLatin1().constData());
+        printf("Not doing PCA for %s\n", ch_type.toUtf8().constData());
     else
     {
-        printf("Doing PCA for %s.",ch_type.toLatin1().constData());
+        printf("Doing PCA for %s.",ch_type.toUtf8().constData());
         // This line will reduce the actual number of variables in data
         // and leadfield to the true rank.
         eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
@@ -379,7 +379,7 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
         qWarning() << "\tWarning: mode should be any of : " << valid_modes;
         return data_out;
     }
-    printf("\tApplying baseline correction ... (mode: %s)\n", mode.toLatin1().constData());
+    printf("\tApplying baseline correction ... (mode: %s)\n", mode.toUtf8().constData());
 
     qint32 imin = 0;
     qint32 imax = times.size();

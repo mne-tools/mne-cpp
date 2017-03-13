@@ -126,8 +126,8 @@ void MneEstimateTreeItem::setData(const QVariant& value, int role)
 //*************************************************************************************************************
 
 void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
-                                        const QByteArray& arraySurfaceVertColorLeftHemi,
-                                        const QByteArray& arraySurfaceVertColorRightHemi,
+                                        const MatrixX3f& matSurfaceVertColorLeftHemi,
+                                        const MatrixX3f& matSurfaceVertColorRightHemi,
                                         const VectorXi& vecLabelIdsLeftHemi,
                                         const VectorXi& vecLabelIdsRightHemi,
                                         const QList<FSLIB::Label>& lLabelsLeftHemi,
@@ -270,8 +270,8 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
                                              tForwardSolution.src[0].rr,
                                              tForwardSolution.src[1].rr);
 
-    m_pSourceLocRtDataWorker->setSurfaceColor(arraySurfaceVertColorLeftHemi,
-                                             arraySurfaceVertColorRightHemi);
+    m_pSourceLocRtDataWorker->setSurfaceColor(matSurfaceVertColorLeftHemi,
+                                             matSurfaceVertColorRightHemi);
 
     m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIdsLeftHemi,
                                                 vecLabelIdsRightHemi,
@@ -426,10 +426,10 @@ void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setColorOrigin(const QByteArray& arrayVertColorLeftHemisphere, const QByteArray& arrayVertColorRightHemisphere)
+void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere)
 {
-    m_pSourceLocRtDataWorker->setSurfaceColor(arrayVertColorLeftHemisphere,
-                                             arrayVertColorRightHemisphere);
+    m_pSourceLocRtDataWorker->setSurfaceColor(matVertColorLeftHemisphere,
+                                             matVertColorRightHemisphere);
 }
 
 
@@ -447,7 +447,7 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewRtData(const QPair<QByteArray, QByteArray>& sourceColorSamples)
+void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
 {
     emit rtVertColorChanged(sourceColorSamples);
 }

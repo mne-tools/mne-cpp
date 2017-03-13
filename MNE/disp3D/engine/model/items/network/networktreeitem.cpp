@@ -44,6 +44,9 @@
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/networkmaterial.h"
 
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
+
 #include <fiff/fiff_types.h>
 
 #include <mne/mne_sourceestimate.h>
@@ -115,7 +118,7 @@ NetworkTreeItem::~NetworkTreeItem()
         m_lNodes.at(i)->deleteLater();
     }
 
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 }
@@ -142,7 +145,7 @@ void  NetworkTreeItem::setData(const QVariant& value, int role)
 bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Set shaders
     NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
@@ -195,7 +198,8 @@ bool NetworkTreeItem::addData(const Network& tNetworkData)
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
     //Plot network
-    plotNetwork(tNetworkData, m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
+    plotNetwork(tNetworkData,
+                m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
 
     return true;
 }
@@ -337,18 +341,19 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     }
 
     //Generate colors for Qt3D buffer
-    QByteArray arrayLineColor;
-    arrayLineColor.resize(tMatVert.rows() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(arrayLineColor.data());
-    int idxColor = 0;
+    MatrixX3f matLineColor(tMatVert.rows(),3);
 
-    for(int i = 0; i < tMatVert.rows(); ++i) {
-        rawColorArray[idxColor++] = 0.0f;
-        rawColorArray[idxColor++] = 0.0f;
-        rawColorArray[idxColor++] = 1.0f;
+    for(int i = 0; i < matLineColor.rows(); ++i) {
+        matLineColor(i,0) = 0.0f;
+        matLineColor(i,1) = 0.0f;
+        matLineColor(i,2) = 1.0f;
     }
 
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tMatVert, tMatNorm, tMatLines, arrayLineColor, Qt3DRender::QGeometryRenderer::Lines);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tMatVert,
+                                                        tMatNorm,
+                                                        tMatLines,
+                                                        matLineColor,
+                                                        Qt3DRender::QGeometryRenderer::Lines);
 }
 
 

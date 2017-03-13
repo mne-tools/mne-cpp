@@ -128,9 +128,14 @@ public:
     * @param[in] tMatVert       Vertices in form of a matrix.
     * @param[in] tMatNorm       Normals in form of a matrix.
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tMatColors     The color info of all the vertices.
     * @param[in] parent         The parent of this class.
     */
-    Renderable3DEntity(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, Qt3DCore::QEntity* parent = 0);
+    Renderable3DEntity(const Eigen::MatrixX3f& tMatVert,
+                       const Eigen::MatrixX3f& tMatNorm,
+                       const Eigen::MatrixX3i& tMatTris,
+                       const Eigen::MatrixX3f& tMatColors,
+                       Qt3DCore::QEntity* parent = 0);
 
     //=========================================================================================================
     /**

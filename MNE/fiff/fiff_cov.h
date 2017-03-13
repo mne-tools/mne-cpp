@@ -265,10 +265,10 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
     {
         qint32 nchan = p_FiffCov.names.size() > 6 ? 6 : p_FiffCov.names.size();
         for(qint32 i = 0; i < nchan/2; ++i)
-            out << p_FiffCov.names[i].toLatin1().constData() << " ";
+            out << p_FiffCov.names[i].toUtf8().constData() << " ";
         out << "... ";
         for(qint32 i = p_FiffCov.names.size() - nchan/2; i < p_FiffCov.names.size(); ++i)
-            out << p_FiffCov.names[i].toLatin1().constData() << " ";
+            out << p_FiffCov.names[i].toUtf8().constData() << " ";
         out << std::endl;
     }
 
@@ -306,7 +306,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
     //Bads
     out << "\tbads " << p_FiffCov.bads.size() << ":\n\t";
     for(qint32 i = 0; i < p_FiffCov.bads.size(); ++i)
-        out << p_FiffCov.bads[i].toLatin1().constData() << " ";
+        out << p_FiffCov.bads[i].toUtf8().constData() << " ";
 
     out << "\n\tfree: " << p_FiffCov.nfree << std::endl;
 

@@ -79,7 +79,7 @@ using namespace DISP3DLIB;
 
 DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pRenderable3DEntity(Q_NULLPTR)
+, m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -135,7 +135,7 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
     switch(role) {
     case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
         if(!m_pRenderable3DEntity.isNull()) {
-            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<QByteArray>());
+            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
         }
         break;
     }
@@ -153,7 +153,7 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 //        m_pRenderable3DEntity->deleteLater();
 //    }
 
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Create digitizers as small 3D spheres
     QVector3D pos;

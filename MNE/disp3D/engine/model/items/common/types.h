@@ -241,9 +241,4 @@ Q_DECLARE_METATYPE(Eigen::RowVectorXf);
 Q_DECLARE_METATYPE(Eigen::Vector3f);
 #endif
 
-#ifndef metatype_qbytearray
-#define metatype_qbytearray
-Q_DECLARE_METATYPE(QByteArray);
-#endif
-
 #endif // TYPES_H

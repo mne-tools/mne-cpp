@@ -241,8 +241,8 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
                         if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && pAnnotTreeItemLeft && pAnnotTreeItemRight) {
                             m_pMneEstimateTreeItem->init(tForwardSolution,
-                                                        pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                                        pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                                        pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
+                                                        pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
                                                         pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
                                                         pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
                                                         pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
@@ -359,7 +359,7 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
 
 //*************************************************************************************************************
 
-void MeasurementTreeItem::setColorOrigin(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor)
+void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const MatrixX3f& rightHemiColor)
 {
     if(m_pMneEstimateTreeItem) {
         m_pMneEstimateTreeItem->setColorOrigin(leftHemiColor, rightHemiColor);
@@ -381,7 +381,7 @@ void MeasurementTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void MeasurementTreeItem::onRtVertColorChanged(const QPair<QByteArray, QByteArray>& sourceColorSamples)
+void MeasurementTreeItem::onRtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
 {
     emit rtVertColorChanged(sourceColorSamples);
 }

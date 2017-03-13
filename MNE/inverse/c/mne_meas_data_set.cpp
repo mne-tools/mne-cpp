@@ -87,7 +87,6 @@ MneMeasDataSet::MneMeasDataSet()
 ,np(0)
 ,nave(1)
 ,kind(FIFFV_ASPECT_AVERAGE)
-,comment(NULL)
 ,baselines(NULL)
 ,mne(NULL)
 ,user_data(NULL)
@@ -106,7 +105,7 @@ MneMeasDataSet::~MneMeasDataSet()
     FREE_CMATRIX_8(data_filt);
     FREE_CMATRIX_8(data_white);
     FREE_8(stim14);
-    FREE_8(comment);
+    comment.clear();
     FREE_8(baselines);
     if(mne)
         delete mne;

@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QStringList>
 
 
 
@@ -119,7 +120,7 @@ public:
     * Constructs the MNE Covariance Matrix
     * Refactored: new_cov (mne_cov_matrix.c)
     */
-    MneCovMatrix(int p_kind, int p_ncov, char **p_names, double *p_cov, double *p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
+    MneCovMatrix(int p_kind, int p_ncov, const QStringList& p_names, double *p_cov, double *p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
 
     //=========================================================================================================
     /**
@@ -138,7 +139,7 @@ public:
 
     static MneCovMatrix* mne_new_cov_dense(int    kind,
                                    int    ncov,
-                                   char   **names,
+                                   const QStringList& names,
                                    double *cov)
     {
         return new MneCovMatrix(kind,ncov,names,cov,NULL,NULL);
@@ -147,7 +148,7 @@ public:
 
     static MneCovMatrix* mne_new_cov_diag(int    kind,
                                   int    ncov,
-                                  char   **names,
+                                  const QStringList& names,
                                   double *cov_diag)
     {
         return new MneCovMatrix(kind,ncov,names,NULL,cov_diag,NULL);
@@ -156,7 +157,7 @@ public:
 
     static MneCovMatrix* mne_new_cov_sparse(    int kind,
                                                 int ncov,
-                                                char **names,
+                                                const QStringList& names,
                                                 FIFFLIB::FiffSparseMatrix* cov_sparse)
     {
         return new MneCovMatrix(kind,ncov,names,NULL,NULL,cov_sparse);
@@ -165,7 +166,7 @@ public:
 
     static MneCovMatrix* mne_new_cov(   int kind,
                                         int ncov,
-                                        char    **names,
+                                        const QStringList& names,
                                         double      *cov,
                                         double *cov_diag)
     {
@@ -224,7 +225,7 @@ public:
     int         nfree;                          /* Number of degrees of freedom */
     int         nproj;                          /* Number of dimensions projected out */
     int         nzero;                          /* Number of zero or small eigenvalues */
-    char        **names;                        /* Names of the entries (optional) */
+    QStringList names;                          /* Names of the entries (optional) */
     double      *cov;                           /* Covariance matrix in packed representation (lower triangle) */
     double      *cov_diag;                      /* Diagonal covariance matrix */
     FIFFLIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
@@ -235,7 +236,7 @@ public:
     MneProjOp*  proj;       /* The projection which was active when this matrix was computed */
     MneSssData* sss;        /* The SSS data present in the associated raw data file */
     int         *ch_class;              /* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
-    char        **bads;                 /* Which channels were designated bad when this noise covariance matrix was computed? */
+    QStringList bads;                   /* Which channels were designated bad when this noise covariance matrix was computed? */
     int         nbad;                   /* How many of them */
 
 // ### OLD STRUCT ###

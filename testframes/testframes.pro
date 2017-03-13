@@ -39,9 +39,10 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     test_codecov \
-    test_fiff_rwr \
-	test_fiff_mne_types_io \
     test_dipole_fit \
+    test_fiff_rwr \
+    test_fiff_mne_types_io \
+    test_forward_solution
 
 !contains(MNECPP_CONFIG, minimalVersion) {
 #    SUBDIRS += \

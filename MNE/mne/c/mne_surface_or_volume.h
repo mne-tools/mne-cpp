@@ -347,10 +347,10 @@ public:
 
 
 public:
-    int              type;          /* Is this a volume or a surface */
-    char             *subject;      /* Name (id) of the subject */
-    int              id;            /* Surface id */
-    int              coord_frame;   /* Which coordinate system are the data in now */
+    int             type;          /* Is this a volume or a surface */
+    QString         subject;      /* Name (id) of the subject */
+    int             id;            /* Surface id */
+    int             coord_frame;   /* Which coordinate system are the data in now */
     /*
     * These relate to the FreeSurfer way
     */
@@ -399,13 +399,13 @@ public:
     * These are for volumes only
     */
     FIFFLIB::FiffCoordTransOld*  voxel_surf_RAS_t;   /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
-    int                 vol_dims[3];        /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
-    float               voxel_size[3];      /* Derived from the above */
+    int             vol_dims[3];        /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
+    float           voxel_size[3];      /* Derived from the above */
     FIFFLIB::FiffSparseMatrix*   interpolator;       /* Matrix to interpolate into an MRI volume */
-    char*               MRI_volume;         /* The name of the file the above interpolator is based on */
+    QString         MRI_volume;         /* The name of the file the above interpolator is based on */
     FIFFLIB::FiffCoordTransOld*  MRI_voxel_surf_RAS_t;
     FIFFLIB::FiffCoordTransOld*  MRI_surf_RAS_RAS_t; /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
-    int              MRI_vol_dims[3];       /* Dimensions of the MRI volume (width x height x depth) */
+    int             MRI_vol_dims[3];       /* Dimensions of the MRI volume (width x height x depth) */
     /*
     * Possibility to add user-defined data
     */

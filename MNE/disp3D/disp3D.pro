@@ -125,6 +125,8 @@ SOURCES += \
     engine/model/materials/networkmaterial.cpp \
     engine/control/control3dwidget.cpp \
     adapters/ecdview.cpp \
+    adapters/abstractview.cpp \
+    adapters/networkview.cpp \
 
 HEADERS += \
     engine/view/view3D.h \
@@ -158,6 +160,8 @@ HEADERS += \
     engine/model/materials/networkmaterial.h \
     engine/control/control3dwidget.h \
     adapters/ecdview.h \
+    adapters/abstractview.h \
+    adapters/networkview.h \
     disp3D_global.h \
 
 FORMS += \

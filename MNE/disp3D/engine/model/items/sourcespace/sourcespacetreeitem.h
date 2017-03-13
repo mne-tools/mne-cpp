@@ -166,8 +166,10 @@ private:
     *
     * @param[in] vertices       The vertices information.
     * @param[in] color          The vertex color information.
+    *
+    * @return The colors per vertex.
     */
-    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
+    MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
     QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
 

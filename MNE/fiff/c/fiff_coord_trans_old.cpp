@@ -617,7 +617,7 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_transform(const QString &name, in
     int k;
 
     //    tag.data = NULL;
-    //    if ((in = fiff_open(name.toLatin1().data())) == NULL)
+    //    if ((in = fiff_open(name.toUtf8().data())) == NULL)
     //        goto out;
     if(!stream->open())
         goto out;
@@ -646,7 +646,7 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_transform(const QString &name, in
             res = NULL;
         }
     }
-    qCritical("No suitable coordinate transformation found in %s.",name.toLatin1().data());
+    qCritical("No suitable coordinate transformation found in %s.",name.toUtf8().data());
     goto out;
 
 out : {

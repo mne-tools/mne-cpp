@@ -485,10 +485,10 @@ typedef fiffCoordTransRec fiff_coord_trans_t;
 
 /** Layer descriptor for a layered sphere model */
 
-typedef struct _fiffLayerRec {
- fiff_int_t   id;		/**< Id # of this layer (see below) */
- fiff_float_t rad;		/**< Radius of this layer (m) */
-} *fiffLayer,fiffLayerRec;      /**< Layer descriptor for a layered sphere model */
+//typedef struct _fiffLayerRec {
+// fiff_int_t   id;		/**< Id # of this layer (see below) */
+// fiff_float_t rad;		/**< Radius of this layer (m) */
+//} *fiffLayer,fiffLayerRec;      /**< Layer descriptor for a layered sphere model */
 
 #define FIFFV_LAYER_BRAIN   1
 #define FIFFV_LAYER_CSF     2
@@ -506,39 +506,39 @@ typedef struct _fiffLayerRec {
 
 /** Directory tree structure used by the fiff library routines. */
 
-typedef struct _fiffDirNode {
- int                 type;	 /**< Block type for this directory */
- fiffId              id;        /**< Id of this block if any */
- fiffDirEntry        dir;	 /**< Directory of tags in this node */
- int                 nent;	 /**< Number of entries in this node */
- fiffDirEntry        dir_tree;	 /**< Directory of tags within this node
-				  * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
-				  * included. NOTE: While dir is allocated separately 
-				  * dir_tree is a pointer to the dirtree field 
-				  * in the fiffFile structure. The dir_tree and nent_tree
-				  * fields are only used within the library to facilitate 
-				  * certain operations. */
- int                 nent_tree; /**< Number of entries in the directory tree node */
- struct _fiffDirNode *parent;	 /**< Parent node */
- struct _fiffDirNode **children;/**< Child nodes */
- int                 nchild;	 /**< Number of child nodes */
-} fiffDirNodeRec,*fiffDirNode; 	 /**< Directory tree structure used by the fiff library routines. */
+//typedef struct _fiffDirNode {
+// int                 type;	 /**< Block type for this directory */
+// fiffId              id;        /**< Id of this block if any */
+// fiffDirEntry        dir;	 /**< Directory of tags in this node */
+// int                 nent;	 /**< Number of entries in this node */
+// fiffDirEntry        dir_tree;	 /**< Directory of tags within this node
+//				  * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
+//				  * included. NOTE: While dir is allocated separately
+//				  * dir_tree is a pointer to the dirtree field
+//				  * in the fiffFile structure. The dir_tree and nent_tree
+//				  * fields are only used within the library to facilitate
+//				  * certain operations. */
+// int                 nent_tree; /**< Number of entries in the directory tree node */
+// struct _fiffDirNode *parent;	 /**< Parent node */
+// struct _fiffDirNode **children;/**< Child nodes */
+// int                 nchild;	 /**< Number of child nodes */
+//} fiffDirNodeRec,*fiffDirNode; 	 /**< Directory tree structure used by the fiff library routines. */
 
 
 /** FIFF file handle returned by fiff_open(). */
 
-typedef struct _fiffFileRec {
-  char         *file_name;	/**< Name of the file */
-  FILE         *fd;		/**< The normal file descriptor */
-  fiffId       id;		/**< The file identifier */
-  fiffDirEntry dir;		/**< This is the directory.
-				 * If no directory exists, fiff_open
-				 * automatically scans the file to create one. */
-  int         nent;	        /**< How many entries? */
-  fiffDirNode dirtree;		/**< Directory compiled into a tree */
-  char        *ext_file_name;	/**< Name of the file holding the external data */
-  FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
-} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
+//typedef struct _fiffFileRec {
+//  char         *file_name;	/**< Name of the file */
+//  FILE         *fd;		/**< The normal file descriptor */
+//  fiffId       id;		/**< The file identifier */
+//  fiffDirEntry dir;		/**< This is the directory.
+//				 * If no directory exists, fiff_open
+//				 * automatically scans the file to create one. */
+//  int         nent;	        /**< How many entries? */
+//  fiffDirNode dirtree;		/**< Directory compiled into a tree */
+//  char        *ext_file_name;	/**< Name of the file holding the external data */
+//  FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
+//} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
 
 
 /** Structure for sparse matrices */

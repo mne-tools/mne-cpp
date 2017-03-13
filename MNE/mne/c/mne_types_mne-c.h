@@ -109,7 +109,7 @@
  *    Changed field names in mneMeasDataSet structure
  *
  */
-#include <fiff_types.h>
+#include <fiff/c/fiff_types.h>
 
 #if defined(__cplusplus) 
 extern "C" {

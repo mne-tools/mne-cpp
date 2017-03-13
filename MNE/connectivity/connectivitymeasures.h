@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "connectivity_global.h"
-#include "network/network.h"
 
 
 //*************************************************************************************************************
@@ -82,6 +81,8 @@ namespace CONNECTIVITYLIB {
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class Network;
 
 
 //=============================================================================================================
@@ -147,8 +148,6 @@ protected:
     * @return               The result in form of a QPair. First element represents the index of the maximum. Second element represents the actual correlation value.
     */
     static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
-
-private:
 
 };
 
