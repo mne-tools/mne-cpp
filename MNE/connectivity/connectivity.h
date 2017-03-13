@@ -4,11 +4,11 @@
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -103,6 +103,12 @@ public:
     */
     explicit Connectivity(const ConnectivitySettings& connectivitySettings);
 
+    //=========================================================================================================
+    /**
+    * Computes the network based on the current settings.
+    *
+    * @ return Returns the network.
+    */
     Network& compute();
 
 protected:

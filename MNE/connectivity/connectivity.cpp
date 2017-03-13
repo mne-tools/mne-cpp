@@ -4,11 +4,11 @@
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,25 +43,15 @@
 
 #include "connectivitysettings.h"
 #include "network/network.h"
+#include "connectivitymeasures.h"
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-
-#include "connectivity/connectivitymeasures.h"
-#include "connectivity/connectivitysettings.h"
-#include "connectivity/network/network.h"
-
-#include <mne/mne.h>
-#include <mne/mne_epoch_data_list.h>
 #include <mne/mne_sourceestimate.h>
 
 #include <inverse/minimumNorm/minimumnorm.h>
-
-#include <utils/mnemath.h>
 
 
 //*************************************************************************************************************
