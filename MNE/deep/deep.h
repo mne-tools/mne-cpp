@@ -89,9 +89,9 @@ namespace DEEPLIB
 
 //=============================================================================================================
 /**
-* Deep cntk wrapper descritpion
+* Deep CNTK wrapper descritpion
 *
-* @brief Deep cntk wrapper to train and evaluate models
+* @brief Deep CNTK wrapper to train and evaluate models
 */
 class DEEPSHARED_EXPORT Deep
 {
@@ -111,57 +111,29 @@ public:
     */
     virtual ~Deep();
 
-    //=========================================================================================================
-    /**
-    * Evaluate the network in several runs
-    *
-    * @param [in] evalFunc      Function to evaluate
-    * @param [in] device        Device to use
-    */
-    static void RunEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
+//    //=========================================================================================================
+//    /**
+//    * Evaluate the network in several runs
+//    *
+//    * @param [in] evalFunc      Function to evaluate
+//    * @param [in] device        Device to use
+//    */
+//    static void RunEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
 
-    //=========================================================================================================
-    /**
-    * Setup fully connected linear layer
-    *
-    * @param [in] input
-    * @param [in] outputDim
-    * @param [in] device
-    * @param [in] outputName
-    */
-    inline static CNTK::FunctionPtr SetupFullyConnectedLinearLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor& device, const std::wstring& outputName = L"");
+//    //=========================================================================================================
+//    /**
+//    * Shows how to use Clone() to share function parameters among multi evaluation threads.
+//    *
+//    * It first creates a new function with parameters, then spawns multi threads. Each thread uses Clone() to create a new
+//    * instance of function and then use this instance to do evaluation.
+//    * All cloned functions share the same parameters.
+//    *
+//    * @param [in] device
+//    * @param [in] threadCount   Numbers of threads to use
+//    */
+//    void MultiThreadsEvaluationWithClone(const CNTK::DeviceDescriptor& device, const int threadCount);
 
-    //=========================================================================================================
-    /**
-    * Setup fully connected deep neural network layer
-    *
-    * @param [in] input
-    * @param [in] outputDim
-    * @param [in] device
-    * @param [in] nonLinearity
-    */
-    inline static CNTK::FunctionPtr SetupFullyConnectedDNNLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor& device, const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
-
-    //=========================================================================================================
-    /**
-    * Shows how to use Clone() to share function parameters among multi evaluation threads.
-    *
-    * It first creates a new function with parameters, then spawns multi threads. Each thread uses Clone() to create a new
-    * instance of function and then use this instance to do evaluation.
-    * All cloned functions share the same parameters.
-    *
-    * @param [in] device
-    * @param [in] threadCount   Numbers of threads to use
-    */
-    void MultiThreadsEvaluationWithClone(const CNTK::DeviceDescriptor& device, const int threadCount);
-
-
-    void testClone();
-
-    void exampleTrain();
-
-
-
+//    void testClone();
 
 
 
@@ -217,6 +189,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the CNTK Model v2
+    *
+    * @param [in] model     Model to set
+    */
+    void setModel(CNTK::FunctionPtr& model);
+
+    //=========================================================================================================
+    /**
     * Loads CNTK Model v2
     *
     * @param [in] modelFileName     Model file name
@@ -257,25 +237,6 @@ public:
 
 
 
-
-
-
-
-
-
-    inline CNTK::FunctionPtr FullyConnectedDNNLayerWithSharedParameters(CNTK::Variable input,
-                                                                  const CNTK::Parameter& timesParam,
-                                                                  const CNTK::Parameter& plusParam,
-                                                                  const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
-
-    inline CNTK::FunctionPtr FullyConnectedFeedForwardClassifierNetWithSharedParameters(CNTK::Variable input,
-                                                                                  size_t numHiddenLayers,
-                                                                                  const CNTK::Parameter& inputTimesParam,
-                                                                                  const CNTK::Parameter& inputPlusParam,
-                                                                                  const CNTK::Parameter hiddenLayerTimesParam[],
-                                                                                  const CNTK::Parameter hiddenLayerPlusParam[],
-                                                                                  const CNTK::Parameter& outputTimesParam,
-                                                                                  const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
 
     bool trainModel();
 

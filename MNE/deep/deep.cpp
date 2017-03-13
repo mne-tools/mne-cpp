@@ -40,6 +40,8 @@
 
 #include "deep.h"
 
+#include "deepmodelcreator.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,241 +90,135 @@ Deep::~Deep()
 
 //*************************************************************************************************************
 
-void Deep::RunEvaluationClassifier(FunctionPtr evalFunc, const DeviceDescriptor &device)
-{
-    const std::wstring inputNodeName = L"features";
+//void Deep::RunEvaluationClassifier(FunctionPtr evalFunc, const DeviceDescriptor &device)
+//{
+//    const std::wstring inputNodeName = L"features";
 
-    Variable inputVar;
-    if (!GetInputVariableByName(evalFunc, inputNodeName, inputVar))
-    {
-        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
-        throw("Input variable not found error.");
-    }
+//    Variable inputVar;
+//    if (!GetInputVariableByName(evalFunc, inputNodeName, inputVar))
+//    {
+//        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+//        throw("Input variable not found error.");
+//    }
 
-    // Evaluate the network in several runs
-    size_t iterationCount = 4;
-    unsigned int randSeed = 2;
-    srand(randSeed);
-    size_t numSamples = 3;
-    std::vector<float> inputData(inputVar.Shape().TotalSize() * numSamples);
-    for (size_t t = 0; t < iterationCount; ++t)
-    {
-        for (size_t i = 0; i < inputData.size(); ++i)
-        {
-            inputData[i] = ((float)rand()) / RAND_MAX;
-        }
+//    // Evaluate the network in several runs
+//    size_t iterationCount = 4;
+//    unsigned int randSeed = 2;
+//    srand(randSeed);
+//    size_t numSamples = 3;
+//    std::vector<float> inputData(inputVar.Shape().TotalSize() * numSamples);
+//    for (size_t t = 0; t < iterationCount; ++t) {
+//        for (size_t i = 0; i < inputData.size(); ++i) {
+//            inputData[i] = ((float)rand()) / RAND_MAX;
+//        }
 
-        // Create input data shape. Adding sequence length and numSamples as axes.
-        // Todo: remove sequence length when only numSamples is supported.
-        // Todo: add convenience APIs to simplify data preparation here.
-//        NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
-//        ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
-        ValuePtr inputValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
+//        // Create input data shape. Adding sequence length and numSamples as axes.
+//        // Todo: remove sequence length when only numSamples is supported.
+//        // Todo: add convenience APIs to simplify data preparation here.
+////        NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
+////        ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+//        ValuePtr inputValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
 
 
-        // Define output.
-        ValuePtr outputValue;
-        auto outputVar = evalFunc->Output();
-        std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
+//        // Define output.
+//        ValuePtr outputValue;
+//        auto outputVar = evalFunc->Output();
+//        std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
 
-        // Evaluate the model
-        evalFunc->Forward({{inputVar, inputValue}}, outputs, device);
+//        // Evaluate the model
+//        evalFunc->Forward({{inputVar, inputValue}}, outputs, device);
 
-        // Get output value
-        outputValue = outputs[outputVar];
+//        // Get output value
+//        outputValue = outputs[outputVar];
 
-        // Todo: remove sequence length when only numSamples is supported.
-        // Todo: add convenience APIs to simplify retrieval of output results.
-        NDShape outputShape = outputVar.Shape().AppendShape({1, numSamples});
-        std::vector<float> outputData(outputShape.TotalSize());
-        NDArrayViewPtr cpuArrayOutput = MakeSharedObject<NDArrayView>(outputShape, outputData, false);
-        cpuArrayOutput->CopyFrom(*outputValue->Data());
+//        // Todo: remove sequence length when only numSamples is supported.
+//        // Todo: add convenience APIs to simplify retrieval of output results.
+//        NDShape outputShape = outputVar.Shape().AppendShape({1, numSamples});
+//        std::vector<float> outputData(outputShape.TotalSize());
+//        NDArrayViewPtr cpuArrayOutput = MakeSharedObject<NDArrayView>(outputShape, outputData, false);
+//        cpuArrayOutput->CopyFrom(*outputValue->Data());
 
-        assert(outputData.size() == outputVar.Shape()[0] * numSamples);
-        fprintf(stderr, "Evaluation result:\n");
-        size_t dataIndex = 0;
-        auto outputDim = outputVar.Shape()[0];
-        for (size_t i = 0; i < numSamples; i++)
-        {
-            fprintf(stderr, "Iteration:%lu, Sample %lu:\n", (unsigned long)t, (unsigned long)i);
-            fprintf(stderr, "    ");
-            dataIndex = i * outputDim;
-            for (size_t j = 0; j < std::min((size_t)10, outputDim); j++)
-            {
-                fprintf(stderr, "%f ", outputData[dataIndex++]);
-            }
-            if (outputDim > 10)
-            {
-                fprintf(stderr, "...");
-            }
-            fprintf(stderr, "\n");
-        }
-    }
-}
+//        assert(outputData.size() == outputVar.Shape()[0] * numSamples);
+//        fprintf(stderr, "Evaluation result:\n");
+//        size_t dataIndex = 0;
+//        auto outputDim = outputVar.Shape()[0];
+//        for (size_t i = 0; i < numSamples; i++)
+//        {
+//            fprintf(stderr, "Iteration:%lu, Sample %lu:\n", (unsigned long)t, (unsigned long)i);
+//            fprintf(stderr, "    ");
+//            dataIndex = i * outputDim;
+//            for (size_t j = 0; j < std::min((size_t)10, outputDim); j++)
+//            {
+//                fprintf(stderr, "%f ", outputData[dataIndex++]);
+//            }
+//            if (outputDim > 10)
+//            {
+//                fprintf(stderr, "...");
+//            }
+//            fprintf(stderr, "\n");
+//        }
+//    }
+//}
 
 
 //*************************************************************************************************************
 
-FunctionPtr Deep::SetupFullyConnectedLinearLayer(Variable input, size_t outputDim, const DeviceDescriptor &device, const std::wstring &outputName)
-{
-    assert(input.Shape().Rank() == 1);
-    size_t inputDim = input.Shape()[0];
+//void Deep::MultiThreadsEvaluationWithClone(const DeviceDescriptor &device, const int threadCount)
+//{
+//    using namespace std::placeholders;
 
-    auto timesParam = CNTK::Parameter(CNTK::NDArrayView::RandomUniform<float>({outputDim, inputDim}, -0.05, 0.05, 1, device));
-    auto timesFunction = CNTK::Times(timesParam, input);
+//    const size_t inputDim = 937;
+//    const size_t numOutputClasses = 9304;
+//    const size_t numHiddenLayers = 6;
+//    const size_t hiddenLayersDim = 2048;
 
-    auto plusParam = CNTK::Parameter(CNTK::NDArrayView::RandomUniform<float>({outputDim}, -0.05, 0.05, 1, device));
-    return CNTK::Plus(plusParam, timesFunction, outputName);
-}
+//    auto inputVar = InputVariable({inputDim}, DataType::Float, L"features");
 
+//    assert(numHiddenLayers >= 1);
+//    auto classifierRoot = DeepModelCreator::SetupFullyConnectedDNNLayer(inputVar, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
+//    for (size_t i = 1; i < numHiddenLayers; ++i)
+//    {
+//        classifierRoot = DeepModelCreator::SetupFullyConnectedDNNLayer(classifierRoot, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
+//    }
 
-//*************************************************************************************************************
+//    auto outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
+//    auto classifierFunc = Times(outputTimesParam, classifierRoot, L"classifierOutput");
 
-FunctionPtr Deep::SetupFullyConnectedDNNLayer(Variable input, size_t outputDim, const DeviceDescriptor &device, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
-{
-    return nonLinearity(SetupFullyConnectedLinearLayer(input, outputDim, device));
-}
+//    // Now test the structure
+//    if (classifierFunc->Parameters().size() != ((numHiddenLayers * 2) + 1))
+//    {
+//        throw std::runtime_error("MultiThreadsEvaluationWithClone: Function does not have expected Parameter count");
+//    }
 
+//    OutputFunctionInfo(classifierFunc);
+//    fprintf(stderr, "MultiThreadsEvaluationWithClone on device=%d\n", device.Id());
 
-//*************************************************************************************************************
+//    // Run evaluation in parallel
+//    std::vector<std::thread> threadList(threadCount);
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th] = std::thread(RunEvaluationClassifier, classifierFunc->Clone(), device);
+//    }
 
-void Deep::MultiThreadsEvaluationWithClone(const DeviceDescriptor &device, const int threadCount)
-{
-    using namespace std::placeholders;
-
-    const size_t inputDim = 937;
-    const size_t numOutputClasses = 9304;
-    const size_t numHiddenLayers = 6;
-    const size_t hiddenLayersDim = 2048;
-
-    auto inputVar = InputVariable({inputDim}, DataType::Float, L"features");
-
-    assert(numHiddenLayers >= 1);
-    auto classifierRoot = SetupFullyConnectedDNNLayer(inputVar, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
-    for (size_t i = 1; i < numHiddenLayers; ++i)
-    {
-        classifierRoot = SetupFullyConnectedDNNLayer(classifierRoot, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
-    }
-
-    auto outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
-    auto classifierFunc = Times(outputTimesParam, classifierRoot, L"classifierOutput");
-
-    // Now test the structure
-    if (classifierFunc->Parameters().size() != ((numHiddenLayers * 2) + 1))
-    {
-        throw std::runtime_error("MultiThreadsEvaluationWithClone: Function does not have expected Parameter count");
-    }
-
-    OutputFunctionInfo(classifierFunc);
-    fprintf(stderr, "MultiThreadsEvaluationWithClone on device=%d\n", device.Id());
-
-    // Run evaluation in parallel
-    std::vector<std::thread> threadList(threadCount);
-    for (int th = 0; th < threadCount; ++th)
-    {
-        threadList[th] = std::thread(RunEvaluationClassifier, classifierFunc->Clone(), device);
-    }
-
-    for (int th = 0; th < threadCount; ++th)
-    {
-        threadList[th].join();
-        fprintf(stderr, "thread %d joined.\n", th);
-        fflush(stderr);
-    }
-}
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th].join();
+//        fprintf(stderr, "thread %d joined.\n", th);
+//        fflush(stderr);
+//    }
+//}
 
 
 //*************************************************************************************************************
 
-void Deep::testClone()
-{
-    int numOfThreads = 2;
+//void Deep::testClone()
+//{
+//    int numOfThreads = 2;
 
-    // Test multi-threads evaluation using clone.
-    fprintf(stderr, "\n##### Run evaluation using clone function on CPU. #####\n");
-    MultiThreadsEvaluationWithClone(DeviceDescriptor::CPUDevice(), numOfThreads);
-}
-
-
-//*************************************************************************************************************
-
-void Deep::exampleTrain()
-{
-
-    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-
-    size_t outDim = 15;
-
-    size_t inDim = 10;
-
-    auto W = Parameter(NDShape({ outDim, inDim }), DataType::Float, GlorotUniformInitializer(), device);
-
-    auto x = InputVariable(NDShape({ inDim }), DataType::Float, { Axis::DefaultBatchAxis() });
-
-
-    size_t batchSize = 3;
-
-    std::vector<float> inputData(inDim * batchSize);
-
-    for (size_t i = 0; i < inputData.size(); ++i)
-        inputData[i] = (float)rand() / RAND_MAX;
-
-    auto inputDataValue = Value::CreateBatch(x.Shape(), inputData, device);
-
-    std::vector<float> rootGradientData(outDim * batchSize, 1);
-
-
-    //    auto userDefinedTimes = UserTimesFunction::Create(W, x, L"UserDefinedTimes");
-    //    auto rootGradientValue = Value::CreateBatch(userDefinedTimes->Output().Shape(), rootGradientData, device);
-
-//    std::unordered_map<Variable, ValuePtr> outputValues = { { userDefinedTimes->Output(), nullptr } };
-//    auto backPropState = userDefinedTimes->Forward({ { x, inputDataValue } }, outputValues, device, { userDefinedTimes->Output() });
-
-//    std::unordered_map<Variable, ValuePtr> inputGradientValues = { { W, nullptr } };
-
-//    userDefinedTimes->Backward(backPropState, { { userDefinedTimes->Output(), rootGradientValue } }, inputGradientValues);
-//    auto userDefinedTimesOutputValue = outputValues[userDefinedTimes->Output()];
-//    auto userDefinedTimesInputGradientValue = inputGradientValues[W];
-
-
-    // Compare against the CNTK built-in implementation
-
-    auto builtInTimes = Times(W, x, L"BuiltInTimes");
-
-    auto rootGradientValue = Value::CreateBatch(builtInTimes->Output().Shape(), rootGradientData, device);
-
-
-    std::unordered_map<Variable, ValuePtr> outputValues = { { builtInTimes->Output(), nullptr } };
-
-    auto backPropState = builtInTimes->Forward({ { x, inputDataValue } }, outputValues, device, { builtInTimes->Output() });
-
-    std::unordered_map<Variable, ValuePtr> inputGradientValues = { { W, nullptr } };
-
-    builtInTimes->Backward(backPropState, { { builtInTimes->Output(), rootGradientValue } }, inputGradientValues);
-
-    auto builtInTimesOutputValue = outputValues[builtInTimes->Output()];
-
-    auto builtInTimesInputGradientValue = inputGradientValues[W];
-
-
-
-//    const double relativeTolerance = 0.001f;
-
-//    const double absoluteTolerance = 0.000001f;
-
-
-
-//    if (!Internal::AreEqual(*userDefinedTimesOutputValue, *builtInTimesOutputValue, relativeTolerance, absoluteTolerance))
-
-//        std::runtime_error("UserTimesOp's Forward result does not match built-in result");
-
-
-
-//    if (!Internal::AreEqual(*userDefinedTimesInputGradientValue, *builtInTimesInputGradientValue, relativeTolerance, absoluteTolerance))
-
-//        std::runtime_error("UserTimesOp's Forward result does not match built-in result");
-
-}
+//    // Test multi-threads evaluation using clone.
+//    fprintf(stderr, "\n##### Run evaluation using clone function on CPU. #####\n");
+//    MultiThreadsEvaluationWithClone(DeviceDescriptor::CPUDevice(), numOfThreads);
+//}
 
 
 //*************************************************************************************************************
@@ -369,6 +265,14 @@ void Deep::runEvaluation(FunctionPtr model, const DeviceDescriptor &device, cons
 
 //*************************************************************************************************************
 
+void Deep::setModel(FunctionPtr &model)
+{
+    m_pModel = model;
+}
+
+
+//*************************************************************************************************************
+
 bool Deep::loadModel(const QString& modelFileName, const DeviceDescriptor &device)
 {
     QFile file(modelFileName);
@@ -406,11 +310,11 @@ bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, Matr
 
     fprintf(stderr, "Evaluate model on device=%d\n", device.Id());
 
-    //    // Run evaluation in parallel.
-    //    std::vector<std::thread> threadList(threadCount);
-    //    for (int th = 0; th < threadCount; ++th)
-    //    {
-    //        threadList[th] = std::thread(runEvaluation, m_pModelFunction_v2->Clone(), device,inputVar,inputValue,outputVar,outputValue);
+    // Run evaluation in parallel.
+//    std::vector<std::thread> threadList(threadCount);
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th] = std::thread(runEvaluation, m_pModelFunction_v2->Clone(), device,inputVar,inputValue,outputVar,outputValue);
 //    }
 
 //    for (int th = 0; th < threadCount; ++th)
@@ -520,39 +424,6 @@ bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, Matr
 
 
 
-//*************************************************************************************************************
-
-FunctionPtr Deep::FullyConnectedDNNLayerWithSharedParameters(Variable input, const Parameter &timesParam, const Parameter &plusParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
-{
-    assert(input.Shape().Rank() == 1);
-
-    // Todo: assume that timesParam has matched outputDim and inputDim
-    auto timesFunction = Times(timesParam, input);
-
-    // Todo: assume that timesParam has matched outputDim
-    auto plusFunction = Plus(plusParam, timesFunction);
-
-    return nonLinearity(plusFunction);
-}
-
-
-//*************************************************************************************************************
-
-FunctionPtr Deep::FullyConnectedFeedForwardClassifierNetWithSharedParameters(Variable input, size_t numHiddenLayers, const Parameter &inputTimesParam, const Parameter &inputPlusParam, const Parameter hiddenLayerTimesParam[], const Parameter hiddenLayerPlusParam[], const Parameter &outputTimesParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
-{
-    assert(numHiddenLayers >= 1);
-    auto classifierRoot = FullyConnectedDNNLayerWithSharedParameters(input, inputTimesParam, inputPlusParam, nonLinearity);
-
-    for (size_t i = 1; i < numHiddenLayers; ++i)
-    {
-        classifierRoot = FullyConnectedDNNLayerWithSharedParameters(classifierRoot, hiddenLayerTimesParam[i - 1], hiddenLayerPlusParam[i - 1], nonLinearity);
-    }
-
-    // Todo: assume that outputTimesParam has matched output dim and hiddenLayerDim
-    classifierRoot = Times(outputTimesParam, classifierRoot);
-    return classifierRoot;
-}
-
 
 //*************************************************************************************************************
 
@@ -565,48 +436,25 @@ bool Deep::trainModel()
 
     const size_t inputDim = 937;
     const size_t numOutputClasses = 9304;
-    const size_t numHiddenLayers = 6;
-    const size_t hiddenLayersDim = 2048;
-
-    // Define model parameters that should be shared among evaluation requests against the same model
-    auto inputTimesParam = Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, inputDim}, -0.5, 0.5, 1, device));
-    auto inputPlusParam = Parameter({hiddenLayersDim}, 0.0f, device);
-    Parameter hiddenLayerTimesParam[numHiddenLayers - 1] = {
-        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
-        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
-        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
-        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device)),
-        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device))
-    };
-    Parameter hiddenLayerPlusParam[numHiddenLayers - 1] = {
-        Parameter({hiddenLayersDim}, 0.0f, device),
-        Parameter({hiddenLayersDim}, 0.0f, device),
-        Parameter({hiddenLayersDim}, 0.0f, device),
-        Parameter({hiddenLayersDim}, 0.0f, device),
-        Parameter({hiddenLayersDim}, 0.0f, device),
-    };
-    auto outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
-
-
-
-
-
-    auto inputVar = InputVariable({inputDim}, DataType::Float, L"Features");
 
 //    if(!loadModel(fileName, device)) {
-        fprintf(stderr, "Constructing model %s.\n",fileName.toUtf8().constData());
+        fprintf(stderr, "Constructing model.\n");
 
-        m_pModel = FullyConnectedFeedForwardClassifierNetWithSharedParameters(  inputVar,
-                                                                                numHiddenLayers,
-                                                                                inputTimesParam,
-                                                                                inputPlusParam,
-                                                                                hiddenLayerTimesParam,
-                                                                                hiddenLayerPlusParam,
-                                                                                outputTimesParam,
-                                                                                std::bind(Sigmoid, std::placeholders::_1, L""));
+        m_pModel = DeepModelCreator::DNN_1(inputDim,numOutputClasses,device);
 //    }
 
     FunctionPtr z = m_pModel;
+
+    //
+    // Input
+    //
+    const std::wstring inputNodeName = L"Features";
+    Variable inputVar;
+    if (!GetInputVariableByName(z, inputNodeName, inputVar)) {
+        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+        throw("Input variable not found error.");
+    }
+
 
     Variable labels = InputVariable({numOutputClasses}, DataType::Float, L"Labels");
     FunctionPtr loss = CrossEntropyWithSoftmax(z,labels);
@@ -619,16 +467,6 @@ bool Deep::trainModel()
     TrainerPtr trainer = CreateTrainer(z,loss,eval_error,learner);
 
     z->SaveModel(fileName.toStdWString());
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -697,26 +535,10 @@ bool Deep::trainModel()
 
     qDebug() << "2 training_loss_val" << training_loss_val << "; eval_error_val" << eval_error_val << "; minibatch_samples" << minibatch_samples;
 
-
-
     qDebug() << "After Training";
 
     return true;
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //*************************************************************************************************************

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepeval.h
+* @file     deepmodelcreator.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepEval class declaration v1.
+* @brief    DeepModelCreator class declaration.
 *
 */
 
-#ifndef DEEPEVAL_H
-#define DEEPEVAL_H
+#ifndef DEEPMODELCREATOR_H
+#define DEEPMODELCREATOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -46,18 +46,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CNTK INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eval.h>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// EIGEN INCLUDES
+// CNTK INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <CNTKLibrary.h>
 
 
 //*************************************************************************************************************
@@ -70,112 +70,109 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE DEEPLIB
 //=============================================================================================================
 
 namespace DEEPLIB
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 //=============================================================================================================
 /**
-* DeepEval CNTK v1 wrapper descritpion
+* CNTK Model Creator
 *
-* @brief DeepEval CNTK v1 wrapper to evaluate pretrained models
+* @brief CNTK Model Creator
 */
-class DEEPSHARED_EXPORT DeepEval
+class DEEPSHARED_EXPORT DeepModelCreator
 {
 public:
-    typedef QSharedPointer<DeepEval> SPtr;            /**< Shared pointer type for DeepEval. */
-    typedef QSharedPointer<const DeepEval> ConstSPtr; /**< Const shared pointer type for DeepEval. */
+    typedef QSharedPointer<DeepModelCreator> SPtr;            /**< Shared pointer type for DeepModelCreator. */
+    typedef QSharedPointer<const DeepModelCreator> ConstSPtr; /**< Const shared pointer type for DeepModelCreator. */
 
     //=========================================================================================================
     /**
     * Default constructor
     */
-    DeepEval();
+    DeepModelCreator();
 
     //=========================================================================================================
     /**
-    * Constructor
-    *
-    * @param [in] sModelFilename    The model filename to set
+    * Destructs DeepModelCreator
     */
-    DeepEval(const QString &sModelFilename);
+    virtual ~DeepModelCreator();
 
-    //=========================================================================================================
-    /**
-    * Destructs DeepEval
-    */
-    virtual ~DeepEval();
 
-    //=========================================================================================================
-    /**
-    * Returns the current set model file name
-    *
-    * @return the current model file name
-    */
-    const QString& getModelFilename() const;
+//    //=========================================================================================================
+//    /**
+//    * Setup fully connected linear layer
+//    *
+//    * @param [in] input
+//    * @param [in] outputDim
+//    * @param [in] device
+//    * @param [in] outputName
+//    */
+//    static CNTK::FunctionPtr SetupFullyConnectedLinearLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor &device, const std::wstring &outputName = L"")
+//    {
+//        assert(input.Shape().Rank() == 1);
+//        size_t inputDim = input.Shape()[0];
 
-    //=========================================================================================================
-    /**
-    * Set the model filename
-    *
-    * @param [in] sModelFilename    The model filename to set
-    */
-    void setModelFilename(const QString &sModelFilename);
+//        auto timesParam = CNTK::Parameter(CNTK::NDArrayView::RandomUniform<float>({outputDim, inputDim}, -0.05, 0.05, 1, device));
+//        auto timesFunction = CNTK::Times(timesParam, input);
 
-    //=========================================================================================================
-    /**
-    * Evaluate the MNE Deep Model specified by the model file name
-    *
-    * @param [in] inputs    The input vector
-    * @param [in] outputs   The ouptut vector
-    *
-    * @return true when MNE Deep model was sucessfully evaluated.
-    */
-    bool evalModel(const Eigen::VectorXf& inputs, Eigen::VectorXf& outputs);
+//        auto plusParam = CNTK::Parameter(CNTK::NDArrayView::RandomUniform<float>({outputDim}, -0.05, 0.05, 1, device));
+//        return CNTK::Plus(plusParam, timesFunction, outputName);
+//    }
 
-    //=========================================================================================================
-    /**
-    * Evaluate the MNE Deep Model specified by the model file name
-    *
-    * @param [in] inputs    The input vector
-    * @param [in] outputs   The ouptut vector
-    *
-    * @return true when MNE Deep model was sucessfully evaluated.
-    */
-    bool evalModel(std::vector<float>& inputs, std::vector<float>& outputs);
 
-    //=========================================================================================================
-    /**
-    * Loads the Deep Model set by the model file name
-    *
-    * @return true when MNE Deep model was sucessfully loaded.
-    */
-    bool loadModel();
+//    //=========================================================================================================
+//    /**
+//    * Setup fully connected deep neural network layer
+//    *
+//    * @param [in] input
+//    * @param [in] outputDim
+//    * @param [in] device
+//    * @param [in] nonLinearity
+//    */
+//    static CNTK::FunctionPtr SetupFullyConnectedDNNLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor &device, const std::function<CNTK::FunctionPtr (const CNTK::FunctionPtr &)> &nonLinearity)
+//    {
+//        return nonLinearity(SetupFullyConnectedLinearLayer(input, outputDim, device));
+//    }
 
-    //=========================================================================================================
-    /**
-    * Returns the Input Dimensions
-    *
-    * @return the Input dimensions
-    */
-    size_t inputDimensions();
 
-    //=========================================================================================================
-    /**
-    * Returns the Output Dimensions
-    *
-    * @return the Output dimensions
-    */
-    size_t outputDimensions();
+
+
+    static CNTK::FunctionPtr FullyConnectedFeedForwardClassifierNet(CNTK::Variable input,
+                                                                    size_t numHiddenLayers,
+                                                                    const CNTK::Parameter& inputTimesParam,
+                                                                    const CNTK::Parameter& inputPlusParam,
+                                                                    const CNTK::Parameter hiddenLayerTimesParam[],
+                                                                    const CNTK::Parameter hiddenLayerPlusParam[],
+                                                                    const CNTK::Parameter& outputTimesParam,
+                                                                    const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
 
 
 private:
+    static CNTK::FunctionPtr FullyConnectedDNNLayer(CNTK::Variable input,
+                                                    const CNTK::Parameter& timesParam,
+                                                    const CNTK::Parameter& plusParam,
+                                                    const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);
 
-    QString m_sModelFilename;       /**< Model filename */
 
-    Microsoft::MSR::CNTK::IEvaluateModel<float>* m_pModel_v1;  /**< The loaded model */
+// Pre-Configured networks
+public:
+    static CNTK::FunctionPtr DNN_1( const size_t inputDim, const size_t numOutputClasses, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+
+
 };
 
 //*************************************************************************************************************
@@ -186,4 +183,4 @@ private:
 
 } // NAMESPACE
 
-#endif // DEEPEVAL_H
+#endif // DEEPMODELCREATOR_H
