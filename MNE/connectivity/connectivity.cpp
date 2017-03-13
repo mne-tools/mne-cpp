@@ -120,7 +120,50 @@ Network Connectivity::calculateConnectivity()
 
 void Connectivity::generateSensorLevelData(MatrixXd& matData, MatrixX3f& matNodePos)
 {
+    matData.resize(0,0);
+    matData.resize(0,0);
 
+    // Load data
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    QFile t_fileEvoked(m_pConnectivitySettings->m_sMeas);
+    FiffEvoked evoked(t_fileEvoked, m_pConnectivitySettings->m_iAveIdx, baseline);
+
+    bool bPick = false;
+    qint32 unit;
+    int counter = 0;
+
+    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+        unit = evoked.info.chs.at(i).unit;
+
+        if(unit == FIFF_UNIT_T_M &&
+            m_pConnectivitySettings->m_sChType == "meg" &&
+            m_pConnectivitySettings->m_sCoilType == "grad") {
+            bPick = true;
+        } else if(unit == FIFF_UNIT_T &&
+                    m_pConnectivitySettings->m_sChType == "meg" &&
+                    m_pConnectivitySettings->m_sCoilType == "mag") {
+            bPick = true;
+        } else if (unit == FIFF_UNIT_V &&
+                    m_pConnectivitySettings->m_sChType == "eeg") {
+            bPick = true;
+        }
+
+        if(bPick) {
+            //Get the data
+            matData.conservativeResize(matData.rows()+1, evoked.data.cols());
+            matData.row(counter) = evoked.data.row(i);
+
+            //Get the positions
+            matNodePos.conservativeResize(matNodePos.rows()+1, 3);
+            matNodePos(counter,0) = evoked.info.chs.at(i).chpos.r0(0);
+            matNodePos(counter,1) = evoked.info.chs.at(i).chpos.r0(1);
+            matNodePos(counter,2) = evoked.info.chs.at(i).chpos.r0(2);
+
+            counter++;
+        }
+
+        bPick = false;
+    }
 }
 
 
@@ -129,7 +172,7 @@ void Connectivity::generateSensorLevelData(MatrixXd& matData, MatrixX3f& matNode
 void Connectivity::generateSourceLevelData(MatrixXd& matData, MatrixX3f& matNodePos)
 {
     AnnotationSet tAnnotSet(m_pConnectivitySettings->m_sSubj,
-                             m_pConnectivitySettings->m_iHemi,
+                             2,
                              m_pConnectivitySettings->m_sAnnotType,
                              m_pConnectivitySettings->m_sSubjDir);
 

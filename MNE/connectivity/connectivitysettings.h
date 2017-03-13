@@ -100,21 +100,22 @@ public:
     */
     explicit ConnectivitySettings();
 
-    QString m_sConnectivityMethod = QString("COR");                                         /**< Data file */
-    QString m_sAnnotType = "aparc.a2009s";
-    QString m_sSubj = "sample";
-    QString m_sSubjDir = "./MNE-sample-data/subjects";
-    QString m_sFwd = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    QString m_sCov = "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif";
-    QString m_sSourceLocMethod = "dSPM";
-    QString m_sMeas = "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
+    QString m_sConnectivityMethod = QString("COR");                                         /**< The connectivity method. */
+    QString m_sAnnotType = "aparc.a2009s";                                                  /**< The annotation type. */
+    QString m_sSubj = "sample";                                                             /**< The subject name. */
+    QString m_sSubjDir = "./MNE-sample-data/subjects";                                      /**< The subject's folder. */
+    QString m_sFwd = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";    /**< The path to the forward solution. */
+    QString m_sCov = "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif";                  /**< The path to the covariance matrix. */
+    QString m_sSourceLocMethod = "dSPM";                                                    /**< The source localization method. */
+    QString m_sMeas = "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif";                 /**< The path to the averaged data. */
+    QString m_sCoilType = "grad";                                                           /**< The coil type. Only used if channel type is set to meg. */
+    QString m_sChType = "meg";                                                              /**< The channel type. */
 
-    bool m_bDoSourceLoc = true;
-    bool m_bDoClust = true;
+    bool m_bDoSourceLoc = false;            /**< Whether to perform source localization before the connectivity estimation. */
+    bool m_bDoClust = true;                 /**< Whether to cluster the source space for source localization. */
 
-    double m_dSnr = 3.0;
-    int m_iAveIdx = 0;
-    int m_iHemi = 2;
+    double m_dSnr = 3.0;                    /**< The SNR. */
+    int m_iAveIdx = 0;                      /**< The The average index to take from the input data. */
 
 protected:
 };
