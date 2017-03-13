@@ -109,10 +109,12 @@ public:
     *
     * @ return Returns the network.
     */
-    Network& compute();
+    Network calculateConnectivity();
 
-protected:
-     QSharedPointer<ConnectivitySettings> m_pConnectivitySettings;
+protected:    
+    void Connectivity::generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos);
+
+    QSharedPointer<ConnectivitySettings> m_pConnectivitySettings;
 
 };
 

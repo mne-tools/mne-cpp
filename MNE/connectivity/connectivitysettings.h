@@ -107,7 +107,7 @@ public:
     QString m_sSubjDir = "./MNE-sample-data/subjects";
     QString m_sFwd = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
     QString m_sCov = "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif";
-    QString m_sMethod = "dSPM";
+    QString m_sSourceLocMethod = "dSPM";
     QString m_sMeas = "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
 
     bool m_bDoSourceLoc = true;

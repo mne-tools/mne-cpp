@@ -55,6 +55,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -130,7 +131,7 @@ int main(int argc, char *argv[])
     ConnectivitySettings settings;
 
     Connectivity tConnectivity(settings);
-    Network tNetwork = tConnectivity.compute();
+    Network tNetwork = tConnectivity.calculateConnectivity();
 
     NetworkView tNetworkView(tNetwork);
     tNetworkView.show();
