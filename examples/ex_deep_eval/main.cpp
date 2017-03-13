@@ -95,9 +95,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+
     Deep deep_v2;
 
-    if(deep_v2.loadModel("./mne_deep_models/examples/output/models/ex_deep_one_hidden", DeviceDescriptor::CPUDevice())) {
+    if(deep_v2.loadModel("./mne_deep_models/examples/output/models/ex_deep_one_hidden", device)) {
         fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
 
         size_t inDim = deep_v2.inputDimensions();
@@ -118,7 +120,7 @@ int main(int argc, char *argv[])
         std::cout << "inputs\n" << inputs << std::endl;
 
         MatrixXf outputs;
-        deep_v2.evalModel(DeviceDescriptor::CPUDevice(), inputs, outputs);
+        deep_v2.evalModel(inputs, outputs, device);
 
         std::cout << "outputs\n" << outputs << std::endl;
 

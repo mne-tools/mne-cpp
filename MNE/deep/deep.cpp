@@ -223,10 +223,8 @@ Deep::~Deep()
 
 //*************************************************************************************************************
 
-size_t Deep::inputDimensions()
+size_t Deep::inputDimensions(const std::wstring inputNodeName)
 {
-    const std::wstring inputNodeName = L"features";
-
     Variable inputVar;
     if (!GetInputVariableByName(m_pModel, inputNodeName, inputVar)) {
         fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
@@ -239,10 +237,8 @@ size_t Deep::inputDimensions()
 
 //*************************************************************************************************************
 
-size_t Deep::outputDimensions()
+size_t Deep::outputDimensions(const std::wstring outputNodeName)
 {
-    const std::wstring outputNodeName = L"out.z";
-
     Variable outputVar;
     if (!GetOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
         fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
@@ -255,7 +251,7 @@ size_t Deep::outputDimensions()
 
 //*************************************************************************************************************
 
-void Deep::runEvaluation(FunctionPtr model, const DeviceDescriptor &device, const CNTK::Variable& inputVar, const ValuePtr& inputValue, const CNTK::Variable& outputVar, ValuePtr& outputValue)
+void Deep::runEvaluation(FunctionPtr model, const CNTK::Variable& inputVar, const ValuePtr& inputValue, const CNTK::Variable& outputVar, ValuePtr& outputValue, const DeviceDescriptor &device)
 {
     std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
     model->Forward({{inputVar, inputValue}}, outputs, device);
@@ -304,7 +300,7 @@ bool Deep::saveModel(const QString &fileName)
 
 //*************************************************************************************************************
 
-bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, MatrixXf& output)
+bool Deep::evalModel(const MatrixXf& input, MatrixXf& output, const DeviceDescriptor &device)
 {
     OutputFunctionInfo(m_pModel);
 
@@ -363,7 +359,7 @@ bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, Matr
     //
     // Output
     //
-    const std::wstring outputNodeName = L"out.z";
+    const std::wstring outputNodeName = L"labels";//L"out.z";
 
     Variable outputVar;
     if (!GetOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
@@ -376,7 +372,7 @@ bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, Matr
     //
     // Evaluate
     //
-    runEvaluation(m_pModel,device,inputVar,inputValue,outputVar,outputValue);
+    runEvaluation(m_pModel,inputVar,inputValue,outputVar,outputValue,device);
 
     //
     // Put the output together
@@ -427,115 +423,106 @@ bool Deep::evalModel(const DeviceDescriptor &device, const MatrixXf& input, Matr
 
 //*************************************************************************************************************
 
-bool Deep::trainModel()
+bool Deep::trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device)
 {
-    QString fileName("./mne_deep_models/trainModel.v2");
 
-
-    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-
-    const size_t inputDim = 937;
-    const size_t numOutputClasses = 9304;
-
-//    if(!loadModel(fileName, device)) {
-        fprintf(stderr, "Constructing model.\n");
-
-        m_pModel = DeepModelCreator::DNN_1(inputDim,numOutputClasses,device);
-//    }
+    if(!m_pModel) {
+        return false;
+    }
 
     FunctionPtr z = m_pModel;
 
     //
     // Input
     //
-    const std::wstring inputNodeName = L"Features";
-    Variable inputVar;
-    if (!GetInputVariableByName(z, inputNodeName, inputVar)) {
+    const std::wstring inputNodeName = L"features";
+    Variable inputFeatures;
+    if (!GetInputVariableByName(z, inputNodeName, inputFeatures)) {
         fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
         throw("Input variable not found error.");
     }
 
+    //
+    // Output
+    //
+    Variable outputLabels = InputVariable({z->Output().Shape().TotalSize()}, DataType::Float, L"labels"); //z->Output();
 
-    Variable labels = InputVariable({numOutputClasses}, DataType::Float, L"Labels");
-    FunctionPtr loss = CrossEntropyWithSoftmax(z,labels);
-    FunctionPtr eval_error = ClassificationError(z, labels);
+    FunctionPtr fctLoss = CrossEntropyWithSoftmax(z,outputLabels);
+    FunctionPtr fctEvalError = ClassificationError(z, outputLabels);
 
     double learning_rate = 0.5;
     LearningRateSchedule lr_schedule = LearningRateSchedule(learning_rate, LearningRateSchedule::UnitType::Minibatch);
     std::vector<LearnerPtr> learner; learner.push_back(SGDLearner(z->Parameters(),lr_schedule));
 
-    TrainerPtr trainer = CreateTrainer(z,loss,eval_error,learner);
-
-    z->SaveModel(fileName.toStdWString());
-
-
+    TrainerPtr trainer = CreateTrainer(z,fctLoss,fctEvalError,learner);
 
     //
-    // training 1
+    // Consistency Checks
     //
+    size_t batchSize = 0;
 
-    size_t batchSize = 10;
+    if(input.rows() == targets.rows() && input.rows() > 0) {
+        batchSize = input.rows();
+    }
+    else {
+        fprintf(stderr, "Sample size of features (%d) and targets (%d) do not match or are 0.\n", static_cast<int>(input.rows()), static_cast<int>(input.rows()));
+        throw("Sample size do not match.");
+    }
+
+    if(input.cols() != inputFeatures.Shape().TotalSize()) {
+        fprintf(stderr, "Input feature size (%d) do not match model feature size (%d).\n", static_cast<int>(input.cols()), static_cast<int>(inputFeatures.Shape().TotalSize()));
+        throw("Sample size do not match.");
+    }
+
+    if(targets.cols() != outputLabels.Shape().TotalSize()) {
+        fprintf(stderr, "Target size (%d) do not match model label size (%d).\n", static_cast<int>(targets.cols()), static_cast<int>(outputLabels.Shape().TotalSize()));
+        throw("Target size do not match.");
+    }
+
+    //
+    // Prepare data
+    //
+//    qDebug() << "inputFeatures.IsInput()" << inputFeatures.IsInput() << "inputFeatures.Shape().TotalSize()" << inputFeatures.Shape().TotalSize();
+//    qDebug() << "outputLabels.IsOutput()" << outputLabels.IsOutput() << "outputLabels.Shape().TotalSize()" << outputLabels.Shape().TotalSize();
+
+    size_t inputDim = inputFeatures.Shape().TotalSize();
+    size_t numOutputClasses = outputLabels.Shape().TotalSize();
 
     std::vector<float> inputData(inputDim * batchSize);
-    for (size_t i = 0; i < inputData.size(); ++i)
-        inputData[i] = (float)rand() / RAND_MAX;
-//    for (int m = 0; m < batchSize; ++m) {
-//        for (int n = 0; n < inputDim; ++n) {
-//            printf("%d: %f =? %f\n",dataIndex,input(m,n),static_cast<float>(dataIndex % 255));
-//            inputData[dataIndex++] = input(m,n);
-//        }
-//    }
-    ValuePtr inputDataValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
-//    std::unordered_map<Variable, ValuePtr> inputValues = { { inputVar, inputDataValue } };
+    //    for (size_t i = 0; i < inputData.size(); ++i)
+    //        inputData[i] = (float)rand() / RAND_MAX;
+    size_t dataIndex = 0;
+    for (int m = 0; m < batchSize; ++m) {
+        for (int n = 0; n < inputDim; ++n) {
+            inputData[dataIndex++] = input(m,n);
+        }
+    }
+    ValuePtr inputDataValue = Value::CreateBatch(inputFeatures.Shape(), inputData, device);
+    //    std::unordered_map<Variable, ValuePtr> inputValues = { { inputVar, inputDataValue } };
 
     std::vector<float> outputData(numOutputClasses * batchSize);
-    for (size_t i = 0; i < outputData.size(); ++i)
-        outputData[i] = (float)rand() / RAND_MAX;
-    ValuePtr outputDataValue = Value::CreateBatch(labels.Shape(), outputData, device);//    z->Output().Shape()
-//    std::unordered_map<Variable, ValuePtr> outputValues = { { labels, outputDataValue } };
+    //    for (size_t i = 0; i < outputData.size(); ++i)
+    //        outputData[i] = (float)rand() / RAND_MAX;
+    dataIndex = 0;
+    for (int m = 0; m < batchSize; ++m) {
+        for (int n = 0; n < numOutputClasses; ++n) {
+            outputData[dataIndex++] = targets(m,n);
+        }
+    }
+    ValuePtr outputDataValue = Value::CreateBatch(outputLabels.Shape(), outputData, device);//    z->Output().Shape()
+    //    std::unordered_map<Variable, ValuePtr> outputValues = { { outputLabels, outputDataValue } };
 
-    std::unordered_map<Variable, ValuePtr> inOutValues = { { inputVar, inputDataValue }, { labels, outputDataValue } };
-
-
-    qDebug() << "Before Training";
-
-    trainer->TrainMinibatch(inOutValues,device);
-
-    double training_loss_val = trainer->PreviousMinibatchLossAverage();
-    double eval_error_val = trainer->PreviousMinibatchEvaluationAverage();
-    size_t minibatch_samples = trainer->PreviousMinibatchSampleCount();
-
-    qDebug() << "1 training_loss_val" << training_loss_val << "; eval_error_val" << eval_error_val << "; minibatch_samples" << minibatch_samples;
-
+    std::unordered_map<Variable, ValuePtr> inOutValues = { { inputFeatures, inputDataValue }, { outputLabels, outputDataValue } };
 
     //
-    // training 2
+    // Train the minibatch
     //
-
-    batchSize = 20;
-
-    std::vector<float> inputData2(inputDim * batchSize);
-    for (size_t i = 0; i < inputData2.size(); ++i)
-        inputData2[i] = (float)rand() / RAND_MAX;
-    inputDataValue = Value::CreateBatch(inputVar.Shape(), inputData2, device);
-
-    std::vector<float> outputData2(numOutputClasses * batchSize);
-    for (size_t i = 0; i < outputData2.size(); ++i)
-        outputData2[i] = (float)rand() / RAND_MAX;
-    outputDataValue = Value::CreateBatch(labels.Shape(), outputData2, device);
-
-    inOutValues = { { inputVar, inputDataValue }, { labels, outputDataValue } };
-
-
     trainer->TrainMinibatch(inOutValues,device);
 
-    training_loss_val = trainer->PreviousMinibatchLossAverage();
-    eval_error_val = trainer->PreviousMinibatchEvaluationAverage();
-    minibatch_samples = trainer->PreviousMinibatchSampleCount();
-
-    qDebug() << "2 training_loss_val" << training_loss_val << "; eval_error_val" << eval_error_val << "; minibatch_samples" << minibatch_samples;
-
-    qDebug() << "After Training";
+    loss = trainer->PreviousMinibatchLossAverage();
+    error = trainer->PreviousMinibatchEvaluationAverage();
+//    size_t minibatch_samples = trainer->PreviousMinibatchSampleCount();
+//    qDebug() << "Finished minibatch training: loss" << loss << "; error" << error << "; samples" << minibatch_samples;
 
     return true;
 }

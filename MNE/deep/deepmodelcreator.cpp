@@ -98,7 +98,7 @@ FunctionPtr DeepModelCreator::FullyConnectedFeedForwardClassifierNet(Variable in
     }
 
     // Todo: assume that outputTimesParam has matched output dim and hiddenLayerDim
-    classifierRoot = Times(outputTimesParam, classifierRoot);
+    classifierRoot = Times(outputTimesParam, classifierRoot, L"labels");// Output
     return classifierRoot;
 }
 
@@ -124,7 +124,7 @@ FunctionPtr DeepModelCreator::FullyConnectedDNNLayer(Variable input, const Param
 FunctionPtr DeepModelCreator::DNN_1(const size_t inputDim, const size_t numOutputClasses, const DeviceDescriptor& device)
 {
     const size_t numHiddenLayers = 6;
-    const size_t hiddenLayersDim = 2048;
+    const size_t hiddenLayersDim = 10;
 
     // Define model parameters that should be shared among evaluation requests against the same model
     auto inputTimesParam = Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, inputDim}, -0.5, 0.5, 1, device));
@@ -141,12 +141,13 @@ FunctionPtr DeepModelCreator::DNN_1(const size_t inputDim, const size_t numOutpu
         Parameter({hiddenLayersDim}, 0.0f, device),
         Parameter({hiddenLayersDim}, 0.0f, device),
         Parameter({hiddenLayersDim}, 0.0f, device),
-        Parameter({hiddenLayersDim}, 0.0f, device),
+        Parameter({hiddenLayersDim}, 0.0f, device)
     };
     Parameter outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
 
 
-    Variable inputVar = InputVariable({inputDim}, DataType::Float, L"Features");
+    Variable inputVar = InputVariable({inputDim}, DataType::Float, L"features");
+
 
     return FullyConnectedFeedForwardClassifierNet(  inputVar,
                                                     numHiddenLayers,
@@ -156,4 +157,5 @@ FunctionPtr DeepModelCreator::DNN_1(const size_t inputDim, const size_t numOutpu
                                                     hiddenLayerPlusParam,
                                                     outputTimesParam,
                                                     std::bind(Sigmoid, std::placeholders::_1, L""));
+
 }

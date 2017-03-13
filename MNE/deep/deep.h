@@ -164,7 +164,7 @@ public:
     *
     * @return the Input dimensions
     */
-    size_t inputDimensions();
+    size_t inputDimensions(const std::wstring inputNodeName = L"features");
 
     //=========================================================================================================
     /**
@@ -172,20 +172,20 @@ public:
     *
     * @return the Output dimensions
     */
-    size_t outputDimensions();
+    size_t outputDimensions(const std::wstring outputNodeName = L"labels");//out.z
 
     //=========================================================================================================
     /**
     * Run the evaluation CNTK Model
     *
     * @param [in] model     Model to evaluate
-    * @param [in] device    Device to use for evaluation
     * @param [in] input     The inputs (rows = samples, cols = feature inputs)
     * @param [out] output   The ouptuts (rows = samples, cols = output results)
+    * @param [in] device    Device to use for evaluation
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::DeviceDescriptor& device, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue);
+    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
     //=========================================================================================================
     /**
@@ -204,7 +204,7 @@ public:
     *
     * @return true when successfully loaded, false otherwise.
     */
-    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device);
+    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
     //=========================================================================================================
     /**
@@ -220,25 +220,27 @@ public:
     /**
     * Evaluate the CNTK Model
     *
-    * @param [in] device    Device to use for evaluation
     * @param [in] input     The inputs (rows = samples, cols = feature inputs)
     * @param [out] output   The ouptuts (rows = samples, cols = output results)
+    * @param [in] device    Device to use for evaluation
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    bool evalModel(const CNTK::DeviceDescriptor& device, const Eigen::MatrixXf& input, Eigen::MatrixXf& output);
+    bool evalModel(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
-
-
-
-
-
-
-
-
-
-
-    bool trainModel();
+    //=========================================================================================================
+    /**
+    * Train the CNTK Model
+    *
+    * @param [in] input     The inputs (rows = samples (batchsize), cols = feature inputs)
+    * @param [in] targets   The targets (rows = samples (batchsize), cols = output results)
+    * @param [out] loss     The training loss
+    * @param [out] error    The training error
+    * @param [in] device    Device to use for evaluation
+    *
+    * @return true when successfully evaluated, false otherwise.
+    */
+    bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
 protected:
     //=========================================================================================================
