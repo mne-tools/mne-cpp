@@ -109,7 +109,7 @@ public:
     *
     * @return Returns the network.
     */
-    Network calculateConnectivity();
+    Network calculateConnectivity() const;
 
 protected:
     //=========================================================================================================
@@ -119,7 +119,7 @@ protected:
     * @param [out] matData      The source level data.
     * @param [out] matNodePos   The nodes position in 3D space.
     */
-    void Connectivity::generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos);
+    void Connectivity::generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
 
     //=========================================================================================================
     /**
@@ -128,9 +128,9 @@ protected:
     * @param [out] matData      The source level data.
     * @param [out] matNodePos   The nodes position in 3D space.
     */
-    void Connectivity::generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos);
+    void Connectivity::generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
 
-    QSharedPointer<ConnectivitySettings> m_pConnectivitySettings;           /**< Teh current connectivity settings. */
+    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
 };
 
 
