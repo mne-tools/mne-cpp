@@ -118,15 +118,8 @@ int main(int argc, char *argv[])
     parser.addOption(evokedIndexOption);
     parser.process(a);
 
-    bool bDoClustering = false;
-    if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
-        bDoClustering = false;
-    } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
-        bDoClustering = true;
-    }
-
     //Do connectivity estimation and visualize results
-    ConnectivitySettings settings;
+    ConnectivitySettings settings(QApplication::arguments());
 
     Connectivity tConnectivity(settings);
     Network tNetwork = tConnectivity.calculateConnectivity();
