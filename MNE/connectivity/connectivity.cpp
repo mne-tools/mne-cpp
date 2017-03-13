@@ -96,15 +96,36 @@ Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
 
 //*************************************************************************************************************
 
-Network& Connectivity::compute()
+Network Connectivity::calculateConnectivity()
+{
+    MatrixXd matData;
+    MatrixX3f matNodePos;
+
+    if(m_pConnectivitySettings->m_bDoSourceLoc) {
+        generateSourceLevelData(matData, matNodePos);
+    }
+
+    if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
+        return ConnectivityMeasures::pearsonsCorrelationCoeff(matData, matNodePos);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
+        return ConnectivityMeasures::crossCorrelation(matData, matNodePos);
+    }
+
+    return Network();
+}
+
+
+//*************************************************************************************************************
+
+void Connectivity::generateSourceLevelData(MatrixXd& matData, MatrixX3f& matNodePos)
 {
     //Inits
-    SurfaceSet tSurfSet (m_pConnectivitySettings->m_sSubj,
+    SurfaceSet tSurfSet(m_pConnectivitySettings->m_sSubj,
                          m_pConnectivitySettings->m_iHemi,
                          m_pConnectivitySettings->m_sSurfType,
                          m_pConnectivitySettings->m_sSubjDir);
 
-    AnnotationSet tAnnotSet (m_pConnectivitySettings->m_sSubj,
+    AnnotationSet tAnnotSet(m_pConnectivitySettings->m_sSubj,
                              m_pConnectivitySettings->m_iHemi,
                              m_pConnectivitySettings->m_sAnnotType,
                              m_pConnectivitySettings->m_sSubjDir);
@@ -123,15 +144,13 @@ Network& Connectivity::compute()
 
     double snr = m_pConnectivitySettings->m_dSnr;
     double lambda2 = 1.0 / pow(snr, 2);
-    QString method(m_pConnectivitySettings->m_sMethod);
+    QString method(m_pConnectivitySettings->m_sSourceLocMethod);
 
     t_fileEvoked.close();
 
-    if(evoked.isEmpty())
-        return Network();
-
-    if(t_Fwd.isEmpty())
-        return Network();
+    if(evoked.isEmpty() || t_Fwd.isEmpty()) {
+        return;
+    }
 
     FiffCov noise_cov(t_fileCov);
 
@@ -154,12 +173,16 @@ Network& Connectivity::compute()
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
     sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-    if(sourceEstimate.isEmpty())
-        return Network();
+    if(sourceEstimate.isEmpty()) {
+        return;
+    }
+
+    matData = sourceEstimate.data;
 
     //Generate node vertices
-    MatrixX3f matNodeVertLeft, matNodeVertRight, matNodeVertComb;
+    MatrixX3f matNodeVertLeft, matNodeVertRight;
 
+    qDebug() << "t_clusteredFwd.src[0].rr.rows()" << t_clusteredFwd.src[0].rr.rows();
     if(m_pConnectivitySettings->m_bDoClust) {
         matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
 
@@ -183,14 +206,6 @@ Network& Connectivity::compute()
         }
     }
 
-    matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
-    matNodeVertComb << matNodeVertLeft, matNodeVertRight;
-
-    if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
-        return ConnectivityMeasures::pearsonsCorrelationCoeff(sourceEstimate.data, matNodeVertComb);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
-        return ConnectivityMeasures::crossCorrelation(sourceEstimate.data, matNodeVertComb);
-    }
-
-    return Network();
+    matNodePos.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
+    matNodePos << matNodeVertLeft, matNodeVertRight;
 }
