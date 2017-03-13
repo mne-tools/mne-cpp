@@ -47,6 +47,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineParser>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,7 +75,74 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ConnectivitySettings::ConnectivitySettings()
+ConnectivitySettings::ConnectivitySettings(const QStringList& arguments)
 {
+    parseArguments(arguments);
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettings::parseArguments(const QStringList& arguments)
+{
+    QCommandLineParser parser;
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subj", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjDir", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization.", "doSourceLoc", "true");
+    QCommandLineOption clustOption("doClust", "Path to clustered inverse operator.", "doClust", "true");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "sourceLocMethod", "dSPM");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "connectMethod", "COR");
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
+    QCommandLineOption coilTypeOption("coilType", "The coil type <type>, i.e. 'grad' or 'mag'.", "coilType", "grad");
+    QCommandLineOption chTypeOption("chType", "The channel type <type>, i.e. 'eeg' or 'meg'.", "coilType", "meg");
+
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(fwdOption);
+    parser.addOption(sourceLocOption);
+    parser.addOption(clustOption);
+    parser.addOption(covFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(connectMethodOption);
+    parser.addOption(sourceLocMethodOption);
+    parser.addOption(snrOption);
+    parser.addOption(evokedIndexOption);
+    parser.addOption(coilTypeOption);
+    parser.addOption(chTypeOption);
+
+    parser.process(arguments);
+
+    // Init members from arguments
+    m_sConnectivityMethod = parser.value(connectMethodOption);
+    m_sAnnotType = parser.value(annotOption);
+    m_sSubj = parser.value(subjectOption);
+    m_sSubjDir = parser.value(subjectPathOption);
+    m_sFwd = parser.value(fwdOption);
+    m_sCov = parser.value(covFileOption);
+    m_sSourceLocMethod = parser.value(sourceLocMethodOption);
+    m_sMeas = parser.value(evokedFileOption);
+    m_sCoilType = parser.value(coilTypeOption);
+    m_sChType = parser.value(chTypeOption);
+
+    if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
+        m_bDoSourceLoc =false;
+    } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
+        m_bDoSourceLoc = true;
+    }
+
+    if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
+        m_bDoClust =false;
+    } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
+        m_bDoClust = true;
+    }
+
+    m_dSnr = parser.value(snrOption).toDouble();
+    m_iAveIdx = parser.value(evokedIndexOption).toInt();
 }
 
