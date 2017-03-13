@@ -111,19 +111,6 @@ using namespace FWDLIB;
     (to)[Z_6] = (from)[Z_6];\
     }
 
-
-char *mne_strdup_6(const char *s)
-{
-    char *res;
-    if (s == NULL)
-        return NULL;
-    res = (char*) malloc(strlen(s)+1);
-    strcpy(res,s);
-    return res;
-}
-
-
-
 void fiff_coord_trans_6 (float r[3],const FiffCoordTransOld* t,int do_move)
 /*
       * Apply coordinate transformation
@@ -271,7 +258,7 @@ static void normalize(float *rr)
 }
 
 static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
-                                   int type, int coil_class, int acc, int np, float size, float base, char *desc)
+                                   int type, int coil_class, int acc, int np, float size, float base, const QString& desc)
 
 {
     FwdCoil* def;
@@ -307,8 +294,8 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
     def->np         = np;
     def->base       = size;
     def->base       = base;
-    if (desc)
-        def->desc = mne_strdup_6(desc);
+    if (!desc.isEmpty())
+        def->desc = desc;
     return def;
 }
 
@@ -383,9 +370,9 @@ FwdCoil *FwdCoilSet::create_meg_coil(fiffChInfo ch, int acc, const FiffCoordTran
         */
     res = new FwdCoil(def->np);
 
-    res->chname   = mne_strdup_6(ch->ch_name);
-    if (def->desc)
-        res->desc   = mne_strdup_6(def->desc);
+    res->chname   = ch->ch_name;
+    if (!def->desc.isEmpty())
+        res->desc   = def->desc;
     res->coil_class = def->coil_class;
     res->accuracy   = def->accuracy;
     res->base       = def->base;
@@ -481,7 +468,7 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
           * Read a coil definition file
           */
 {
-    FILE    *in = fopen(name.toLatin1().constData(),"r");
+    FILE    *in = fopen(name.toUtf8().constData(),"r");
     char    *desc = NULL;
     int     type,coil_class,acc,np;
     int     p;

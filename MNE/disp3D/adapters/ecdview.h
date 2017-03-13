@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
+#include "abstractview.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +51,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QWidget>
 
 
 //*************************************************************************************************************
@@ -78,10 +78,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class View3D;
-class Control3DWidget;
-class Data3DTreeModel;
-
 
 //=============================================================================================================
 /**
@@ -89,7 +85,7 @@ class Data3DTreeModel;
 *
 * @brief Visualizes ECD data.
 */
-class DISP3DNEWSHARED_EXPORT ECDView : public QWidget
+class DISP3DNEWSHARED_EXPORT ECDView : public AbstractView
 {
     Q_OBJECT
 
@@ -111,9 +107,6 @@ public:
     ~ECDView();
 
 protected:
-    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;          /**< The Disp3D view. */
-    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;     /**< The Disp3D model. */
 };
 
 } // NAMESPACE

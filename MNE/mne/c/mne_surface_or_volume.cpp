@@ -500,7 +500,7 @@ MneSurfaceOrVolume::~MneSurfaceOrVolume()
     FREE_17(this->MRI_surf_RAS_RAS_t);
     if(this->interpolator)
         delete this->interpolator;
-    FREE_17(this->MRI_volume);
+    this->MRI_volume.clear();
 
     if(this->vol_geom)
         delete this->vol_geom;
@@ -1224,7 +1224,7 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_new_source_space(int np)
 
     res->coord_frame = FIFFV_COORD_MRI;
     res->id          = FIFFV_MNE_SURF_UNKNOWN;
-    res->subject     = NULL;
+    res->subject.clear();
     res->type        = FIFFV_MNE_SPACE_SURFACE;
 
     res->nearest = NULL;
@@ -1237,7 +1237,7 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_new_source_space(int np)
     res->voxel_surf_RAS_t     = NULL;
     res->vol_dims[0] = res->vol_dims[1] = res->vol_dims[2] = 0;
 
-    res->MRI_volume           = NULL;
+    res->MRI_volume.clear();
     res->MRI_surf_RAS_RAS_t   = NULL;
     res->MRI_voxel_surf_RAS_t = NULL;
     res->MRI_vol_dims[0] = res->MRI_vol_dims[1] = res->MRI_vol_dims[2] = 0;
@@ -1303,7 +1303,7 @@ MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int whi
     }
     surfs = stream->dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
-        printf ("No BEM surfaces found in %s",name.toLatin1().constData());
+        printf ("No BEM surfaces found in %s",name.toUtf8().constData());
         goto bad;
     }
     if (which >= 0) {
@@ -1319,7 +1319,7 @@ MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int whi
             }
         }
         if (id != which) {
-            printf("Desired surface not found in %s",name.toLatin1().constData());
+            printf("Desired surface not found in %s",name.toUtf8().constData());
             goto bad;
         }
     }
@@ -2154,7 +2154,7 @@ int MneSurfaceOrVolume::restrict_sources_to_labels(MneSourceSpaceOld* *spaces, i
             inuse = rh_inuse;
         }
         else {
-            printf("\tWarning: cannot assign label file %s to a hemisphere.\n",labels[k].toLatin1().constData());
+            printf("\tWarning: cannot assign label file %s to a hemisphere.\n",labels[k].toUtf8().constData());
             continue;
         }
         if (sp) {
@@ -2165,10 +2165,10 @@ int MneSurfaceOrVolume::restrict_sources_to_labels(MneSourceSpaceOld* *spaces, i
                     inuse[sel[p]] = sp->inuse[sel[p]];
                 else
                     printf("vertex number out of range in %s (%d vs %d)\n",
-                           labels[k].toLatin1().constData(),sel[p],sp->np);
+                           labels[k].toUtf8().constData(),sel[p],sp->np);
             }
             FREE_17(sel); sel = NULL;
-            printf("Processed label file %s\n",labels[k].toLatin1().constData());
+            printf("Processed label file %s\n",labels[k].toUtf8().constData());
         }
     }
     mne_source_space_update_inuse(lh,lh_inuse);
@@ -2279,7 +2279,7 @@ int MneSurfaceOrVolume::mne_read_label(const QString& label, char **commentp, in
     /*
        * Read the label file
        */
-    if ((in = fopen(label.toLatin1().constData(),"r")) == NULL) {
+    if ((in = fopen(label.toUtf8().constData(),"r")) == NULL) {
         qCritical() << label;//err_set_sys_error(label);
         goto out;
     }

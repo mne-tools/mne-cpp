@@ -164,15 +164,15 @@ public:
 //}
 
 
-    static char *fwd_bem_make_bem_sol_name(char *name);
+    static QString fwd_bem_make_bem_sol_name(const QString& name);
 
 
 
     //============================= fwd_bem_model.c =============================
 
-    static const char *fwd_bem_explain_surface(int kind);
+    static const QString& fwd_bem_explain_surface(int kind);
 
-    static const char *fwd_bem_explain_method(int method);
+    static const QString& fwd_bem_explain_method(int method);
 
 
 
@@ -278,7 +278,7 @@ public:
     static int fwd_bem_compute_solution(FwdBemModel* m,
                                  int         bem_method);
 
-    static int fwd_bem_load_recompute_solution(char        *name,
+    static int fwd_bem_load_recompute_solution(const QString& name,
                                         int         bem_method,
                                         int         force_recompute,
                                         FwdBemModel* m);

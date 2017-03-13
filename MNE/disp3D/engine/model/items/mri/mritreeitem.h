@@ -163,7 +163,7 @@ public:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void setRtVertColor(const QPair<QByteArray, QByteArray>& sourceColorSamples);
+    void setRtVertColor(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
 
 private:
     //=========================================================================================================
@@ -188,7 +188,7 @@ signals:
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void colorOriginChanged(const QByteArray& leftHemiColor, const QByteArray& rightHemiColor);
+    void colorOriginChanged(const MatrixX3f& leftHemiColor, const MatrixX3f& rightHemiColor);
 };
 
 } //NAMESPACE DISP3DLIB

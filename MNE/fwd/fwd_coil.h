@@ -174,9 +174,9 @@ public:
     bool is_eeg_electrode() const;
 
 public:
-    char    *chname;        /**< Name of this channel */
+    QString chname;         /**< Name of this channel */
     int     coord_frame;    /**< Which coordinate frame are we in? */
-    char    *desc;	        /**< Description for this type of a coil */
+    QString desc;           /**< Description for this type of a coil */
     int     coil_class;     /**< Coil class */
     int     type;           /**< Coil type */
     int     accuracy;       /**< Accuracy */

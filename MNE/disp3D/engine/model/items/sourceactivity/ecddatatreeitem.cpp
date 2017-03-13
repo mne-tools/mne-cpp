@@ -109,7 +109,7 @@ EcdDataTreeItem::~EcdDataTreeItem()
         m_lDipoles.at(i)->deleteLater();
     }
 
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 }
@@ -231,11 +231,13 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
         Qt3DExtras::QConeMesh* dipoleCone = new Qt3DExtras::QConeMesh();
         dipoleCone->setBottomRadius(0.001f);
 
-        //Calculate cone length based on norm 0.1mm -> 1nAm
-        double cm = 0.001;
-        double scale = (pow(10,-9))/(cm*0.01);
-        dipoleCone->setLength(norm/scale);
-//        qDebug()<<"setLength"<<norm/scale;
+//        //Calculate cone length based on norm 0.1mm -> 1nAm
+//        double cm = 0.001;
+//        double scale = (pow(10,-9))/(cm*0.01);
+//        dipoleCone->setLength(norm/scale);
+////        qDebug()<<"setLength"<<norm/scale;
+
+        dipoleCone->setLength(0.003f);
 
         dipoleEntity->addComponent(dipoleCone);
 

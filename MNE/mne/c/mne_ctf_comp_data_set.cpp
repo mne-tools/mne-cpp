@@ -830,13 +830,15 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs,
     int first_comp;
     MneCTFCompData* this_comp;
     int  *comp_sel = NULL;
-    char **names   = NULL;
-    char *name;
+    QStringList names;
+    QString name;
     int  j,k,p;
 
     FiffSparseMatrix* presel  = NULL;
     FiffSparseMatrix* postsel = NULL;
     MneNamedMatrix*  data    = NULL;
+
+    QStringList emptyList;
 
     if (!compchs) {
         compchs = chs;
@@ -902,12 +904,12 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs,
         comp_sel[k] = -1;
         name = this_comp->data->collist[k];
         for (p = 0; p < ncomp; p++)
-            if (strcmp(name,compchs[p].ch_name) == 0) {
+            if (QString::compare(name,compchs[p].ch_name) == 0) {
                 comp_sel[k] = p;
                 break;
             }
         if (comp_sel[k] < 0) {
-            printf("Compensation channel %s not found",name);
+            printf("Compensation channel %s not found",name.toUtf8().constData());
             goto bad;
         }
     }
@@ -930,14 +932,14 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs,
         fprintf(stderr,"\tPreselector created.\n");
     }
     /*
-        * Pick the desired channels
-        */
-    names = MALLOC_32(need_comp,char *);
-    for (k = 0, p = 0; k < nch; k++) {
+    * Pick the desired channels
+    */
+    for (k = 0; k < nch; k++) {
         if (comps[k] != MNE_CTFV_COMP_NONE)
-            names[p++] = chs[k].ch_name;
+            names.append(chs[k].ch_name);
     }
-    if ((data = this_comp->data->pick_from_named_matrix(names,need_comp,NULL,0)) == NULL)
+
+    if ((data = this_comp->data->pick_from_named_matrix(names,need_comp,emptyList,0)) == NULL)
         goto bad;
     fprintf(stderr,"\tCompensation data matrix created.\n");
     /*
@@ -967,7 +969,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs,
 
     fprintf(stderr,"\tCompensation set up.\n");
 
-    FREE_32(names);
+    names.clear();
     FREE_32(comps);
     FREE_32(comp_sel);
 
@@ -980,7 +982,7 @@ bad : {
             delete postsel;
         if(data)
             delete data;
-        FREE_32(names);
+        names.clear();
         FREE_32(comps);
         FREE_32(comp_sel);
         return FAIL;

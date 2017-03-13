@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef CONNECTIVITYLIB_NETWORKEDGE_H
-#define CONNECTIVITYLIB_NETWORKEDGE_H
+#ifndef NETWORKEDGE_H
+#define NETWORKEDGE_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../connectivity_global.h"
-#include "networknode.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +50,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <QSharedPointer>
 
 
@@ -90,9 +88,8 @@ class NetworkNode;
 * @brief This class holds an object to describe the edge of a network.
 */
 
-class CONNECTIVITYSHARED_EXPORT NetworkEdge : public QObject
+class CONNECTIVITYSHARED_EXPORT NetworkEdge
 {
-    Q_OBJECT
 
 public:
     typedef QSharedPointer<NetworkEdge> SPtr;            /**< Shared pointer type for NetworkEdge. */
@@ -101,18 +98,26 @@ public:
     //=========================================================================================================
     /**
     * Constructs a NetworkEdge object.
+    *
+    * @param[in]  pStartNode        The start node of the edge.
+    * @param[in]  pEndNode          The end node of the edge.
+    * @param[in]  dWeight           The edge weight.
     */
-    explicit NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight, QObject *parent = 0);
+    explicit NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight);
 
     //=========================================================================================================
     /**
     * Returns the start node of this edge.
+    *
+    * @return The start node of the edge.
     */
     QSharedPointer<NetworkNode> getStartNode();
 
     //=========================================================================================================
     /**
     * Returns the end node of this edge.
+    *
+    * @return The end node of the edge.
     */
     QSharedPointer<NetworkNode> getEndNode();
 
@@ -123,14 +128,10 @@ public:
     double getWeight() const;
 
 protected:
-
-private:
     QSharedPointer<NetworkNode>     m_pStartNode;       /**< The start node of the edge.*/
     QSharedPointer<NetworkNode>     m_pEndNode;         /**< The end node of the edge.*/
 
     double                          m_dWeight;          /**< The weight of the edge.*/
-
-signals:
 
 };
 
@@ -144,4 +145,4 @@ signals:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITYLIB_NETWORKEDGE_H
+#endif // NETWORKEDGE_H

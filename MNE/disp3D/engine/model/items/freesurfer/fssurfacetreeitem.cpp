@@ -105,11 +105,11 @@ FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
 FsSurfaceTreeItem::~FsSurfaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    if(!m_pRenderable3DEntity) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 
-    if(!m_pRenderable3DEntityNormals) {
+    if(m_pRenderable3DEntityNormals) {
         m_pRenderable3DEntityNormals->deleteLater();
     }
 }
@@ -131,7 +131,7 @@ void FsSurfaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<QByteArray>());
+            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
             break;
 
         default: // do nothing;
@@ -145,16 +145,16 @@ void FsSurfaceTreeItem::setData(const QVariant& value, int role)
 void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity->setParent(parent);
 
     //Initial transformation also regarding the surface offset
     m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     //Create color from curvature information with default gyri and sulcus colors
-    QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
+    MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), matCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
@@ -181,7 +181,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     //Add data which is held by this FsSurfaceTreeItem
     QVariant data;
 
-    data.setValue(arrayCurvatureColor);
+    data.setValue(matCurvatureColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
 
@@ -314,7 +314,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
 
 //*************************************************************************************************************
 
-void FsSurfaceTreeItem::setRtVertColor(const QByteArray& sourceColorSamples)
+void FsSurfaceTreeItem::setRtVertColor(const MatrixX3f& sourceColorSamples)
 {
     //Set new data.
     //In setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
@@ -353,16 +353,16 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 {
     if(this->hasChildren()) {
         QVariant data;
-        QByteArray arrayNewVertColor;
+        MatrixX3f matNewVertColor;
 
         if(m_sColorInfoOrigin.contains("Color from curvature")) {
             //Create color from curvature information with default gyri and sulcus colors
             QColor colorSulci = m_pItemSurfColSulci->data(MetaTreeItemRoles::SurfaceColorSulci).value<QColor>();
             QColor colorGyri = m_pItemSurfColGyri->data(MetaTreeItemRoles::SurfaceColorGyri).value<QColor>();
 
-            arrayNewVertColor = createCurvatureVertColor(this->data(Data3DTreeModelItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
+            matNewVertColor = createCurvatureVertColor(this->data(Data3DTreeModelItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
 
-            data.setValue(arrayNewVertColor);
+            data.setValue(matNewVertColor);
             this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
             this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
@@ -377,10 +377,10 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             //Find the FsAnnotationTreeItem
             for(int i = 0; i < this->QStandardItem::parent()->rowCount(); ++i) {
                 if(this->QStandardItem::parent()->child(i,0)->type() == Data3DTreeModelItemTypes::AnnotationItem) {
-                    arrayNewVertColor = this->QStandardItem::parent()->child(i,0)->data(Data3DTreeModelItemRoles::AnnotColors).value<QByteArray>();
+                    matNewVertColor = this->QStandardItem::parent()->child(i,0)->data(Data3DTreeModelItemRoles::AnnotColors).value<MatrixX3f>();
 
                     //Set renderable 3D entity mesh and color data
-                    data.setValue(arrayNewVertColor);
+                    data.setValue(matNewVertColor);
                     this->setData(data, Data3DTreeModelItemRoles::SurfaceAnnotationColorVert);
                     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
@@ -472,25 +472,22 @@ void FsSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
 
 //*************************************************************************************************************
 
-QByteArray FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
+MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
 {
-    QByteArray arrayCurvatureColor;
-    arrayCurvatureColor.resize(curvature.rows() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
-    int idxColor = 0;
+    MatrixX3f colors(curvature.rows(), 3);
 
-    for(int i = 0; i < curvature.rows(); ++i) {
+    for(int i = 0; i < colors.rows(); ++i) {
         //Color (this is the default color and will be used until the updateVertColor function was called)
         if(curvature[i] >= 0) {
-            rawColorArray[idxColor++] = colSulci.redF();
-            rawColorArray[idxColor++] = colSulci.greenF();
-            rawColorArray[idxColor++] = colSulci.blueF();
+            colors(i,0) = colSulci.redF();
+            colors(i,1) = colSulci.greenF();
+            colors(i,2) = colSulci.blueF();
         } else {
-            rawColorArray[idxColor++] = colGyri.redF();
-            rawColorArray[idxColor++] = colGyri.greenF();
-            rawColorArray[idxColor++] = colGyri.blueF();
+            colors(i,0) = colGyri.redF();
+            colors(i,1) = colGyri.greenF();
+            colors(i,2) = colGyri.blueF();
         }
     }
 
-    return arrayCurvatureColor;
+    return colors;
 }
