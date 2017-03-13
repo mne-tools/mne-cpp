@@ -95,7 +95,7 @@ Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
 
 //*************************************************************************************************************
 
-Network Connectivity::calculateConnectivity()
+Network Connectivity::calculateConnectivity() const
 {
     MatrixXd matData;
     MatrixX3f matNodePos;
@@ -118,7 +118,7 @@ Network Connectivity::calculateConnectivity()
 
 //*************************************************************************************************************
 
-void Connectivity::generateSensorLevelData(MatrixXd& matData, MatrixX3f& matNodePos)
+void Connectivity::generateSensorLevelData(MatrixXd& matData, MatrixX3f& matNodePos) const
 {
     matData.resize(0,0);
     matData.resize(0,0);
@@ -169,7 +169,7 @@ void Connectivity::generateSensorLevelData(MatrixXd& matData, MatrixX3f& matNode
 
 //*************************************************************************************************************
 
-void Connectivity::generateSourceLevelData(MatrixXd& matData, MatrixX3f& matNodePos)
+void Connectivity::generateSourceLevelData(MatrixXd& matData, MatrixX3f& matNodePos) const
 {
     AnnotationSet tAnnotSet(m_pConnectivitySettings->m_sSubj,
                              2,
@@ -228,7 +228,6 @@ void Connectivity::generateSourceLevelData(MatrixXd& matData, MatrixX3f& matNode
     //Generate node vertices
     MatrixX3f matNodeVertLeft, matNodeVertRight;
 
-    qDebug() << "t_clusteredFwd.src[0].rr.rows()" << t_clusteredFwd.src[0].rr.rows();
     if(m_pConnectivitySettings->m_bDoClust) {
         matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
 
