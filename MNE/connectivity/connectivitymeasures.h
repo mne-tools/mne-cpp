@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef CONNECTLIB_CONNECTIVITYMEASURES_H
-#define CONNECTLIB_CONNECTIVITYMEASURES_H
+#ifndef CONNECTIVITYMEASURES_H
+#define CONNECTIVITYMEASURES_H
 
 
 //*************************************************************************************************************
@@ -161,4 +161,4 @@ private:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTLIB_CONNECTIVITYMEASURES_H
+#endif // CONNECTIVITYMEASURES_H
