@@ -101,7 +101,6 @@ public:
     explicit ConnectivitySettings();
 
     QString m_sConnectivityMethod = QString("COR");                                         /**< Data file */
-    QString m_sSurfType = "orig";
     QString m_sAnnotType = "aparc.a2009s";
     QString m_sSubj = "sample";
     QString m_sSubjDir = "./MNE-sample-data/subjects";

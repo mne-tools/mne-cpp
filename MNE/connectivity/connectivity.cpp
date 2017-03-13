@@ -46,7 +46,6 @@
 #include "connectivitymeasures.h"
 
 #include <fs/label.h>
-#include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
 #include <mne/mne_sourceestimate.h>
@@ -103,6 +102,8 @@ Network Connectivity::calculateConnectivity()
 
     if(m_pConnectivitySettings->m_bDoSourceLoc) {
         generateSourceLevelData(matData, matNodePos);
+    } else {
+        generateSensorLevelData(matData, matNodePos);
     }
 
     if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
@@ -117,14 +118,16 @@ Network Connectivity::calculateConnectivity()
 
 //*************************************************************************************************************
 
+void Connectivity::generateSensorLevelData(MatrixXd& matData, MatrixX3f& matNodePos)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void Connectivity::generateSourceLevelData(MatrixXd& matData, MatrixX3f& matNodePos)
 {
-    //Inits
-    SurfaceSet tSurfSet(m_pConnectivitySettings->m_sSubj,
-                         m_pConnectivitySettings->m_iHemi,
-                         m_pConnectivitySettings->m_sSurfType,
-                         m_pConnectivitySettings->m_sSubjDir);
-
     AnnotationSet tAnnotSet(m_pConnectivitySettings->m_sSubj,
                              m_pConnectivitySettings->m_iHemi,
                              m_pConnectivitySettings->m_sAnnotType,
@@ -187,22 +190,22 @@ void Connectivity::generateSourceLevelData(MatrixXd& matData, MatrixX3f& matNode
         matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
 
         for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j)) - tSurfSet[0].offset().transpose();
+            matNodeVertLeft.row(j) = t_clusteredFwd.src[0].rr.row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j));
         }
 
         matNodeVertRight.resize(t_clusteredFwd.src[1].cluster_info.centroidVertno.size(),3);
         for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j)) - tSurfSet[1].offset().transpose();
+            matNodeVertRight.row(j) = t_clusteredFwd.src[1].rr.row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j));
         }
     } else {
         matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
         for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].vertno(j)) - tSurfSet[0].offset().transpose();
+            matNodeVertLeft.row(j) = t_clusteredFwd.src[0].rr.row(t_Fwd.src[0].vertno(j));
         }
 
         matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
         for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].vertno(j)) - tSurfSet[1].offset().transpose();
+            matNodeVertRight.row(j) = t_clusteredFwd.src[1].rr.row(t_Fwd.src[1].vertno(j));
         }
     }
 
