@@ -42,28 +42,9 @@
 
 #include <disp3D/adapters/networkview.h>
 
-#include <disp/imagesc.h>
-
-#include <fs/label.h>
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
-
-#include <mne/mne.h>
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne_sourceestimate.h>
-
-#include <inverse/minimumNorm/minimumnorm.h>
-
-#include <utils/mnemath.h>
-
-#include <iostream>
 
 
 //*************************************************************************************************************
@@ -81,13 +62,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
 using namespace DISP3DLIB;
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace UTILSLIB;
 using namespace CONNECTIVITYLIB;
 
 
@@ -150,145 +126,13 @@ int main(int argc, char *argv[])
         bDoClustering = true;
     }
 
-    //Calculate connectivity
+    //Do connectivity estimation and visualize results
     ConnectivitySettings settings;
+
     Connectivity tConnectivity(settings);
-    Network tNetwork = Connectivity.compute();
+    Network tNetwork = tConnectivity.compute();
 
-
-    //Inits
-    SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    AnnotationSet tAnnotSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
-
-    QFile t_fileFwd(parser.value(fwdOption));
-    MNEForwardSolution t_Fwd(t_fileFwd);
-    MNEForwardSolution t_clusteredFwd;
-
-    QString t_sFileClusteredInverse(parser.value(invOpOption));
-
-    QFile t_fileCov(parser.value(covFileOption));
-    QFile t_fileEvoked(parser.value(evokedFileOption));
-
-    //########################################################################################
-    //
-    // Source Estimate START
-    //
-    //########################################################################################
-
-    // Load data
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    MNESourceEstimate sourceEstimate;
-    FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
-
-    double snr = parser.value(snrOption).toDouble();
-    double lambda2 = 1.0 / pow(snr, 2);
-    QString method(parser.value(methodOption));
-
-    t_fileEvoked.close();
-
-    if(evoked.isEmpty())
-        return 1;
-
-    std::cout << std::endl;
-    std::cout << "Evoked description: " << evoked.comment.toUtf8().constData() << std::endl;
-
-    if(t_Fwd.isEmpty())
-        return 1;
-
-    FiffCov noise_cov(t_fileCov);
-
-    // regularize noise covariance
-    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
-
-    //
-    // Cluster forward solution;
-    //
-    if(bDoClustering) {
-        t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
-    } else {
-        t_clusteredFwd = t_Fwd;
-    }
-
-    //
-    // make an inverse operators
-    //
-    FiffInfo info = evoked.info;
-
-    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
-
-    if(!t_sFileClusteredInverse.isEmpty())
-    {
-        QFile t_fileClusteredInverse(t_sFileClusteredInverse);
-        inverse_operator.write(t_fileClusteredInverse);
-    }
-
-    //
-    // Compute inverse solution
-    //
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    sourceEstimate = minimumNorm.calculateInverse(evoked);
-
-    if(sourceEstimate.isEmpty())
-        return 1;
-
-    // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
-
-    //########################################################################################
-    //
-    // Source Estimate END
-    //
-    //########################################################################################
-
-    //########################################################################################
-    //
-    // Do connectivity analysis START
-    //
-    //########################################################################################
-
-    //Generate node vertices
-    MatrixX3f matNodeVertLeft, matNodeVertRight, matNodeVertComb;
-
-    if(bDoClustering) {
-        matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
-
-        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j)) - tSurfSet[0].offset().transpose();
-        }
-
-        matNodeVertRight.resize(t_clusteredFwd.src[1].cluster_info.centroidVertno.size(),3);
-        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j)) - tSurfSet[1].offset().transpose();
-        }
-    } else {
-        matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
-        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-            matNodeVertLeft.row(j) = tSurfSet[0].rr().row(t_Fwd.src[0].vertno(j)) - tSurfSet[0].offset().transpose();
-        }
-
-        matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
-        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-            matNodeVertRight.row(j) = tSurfSet[1].rr().row(t_Fwd.src[1].vertno(j)) - tSurfSet[1].offset().transpose();
-        }
-    }
-
-    matNodeVertComb.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
-    matNodeVertComb << matNodeVertLeft, matNodeVertRight;
-
-    Network tConnect_LA = ConnectivityMeasures::pearsonsCorrelationCoeff(sourceEstimate.data, matNodeVertComb);
-//    Network tConnect_LA = ConnectivityMeasures::crossCorrelation(sourceEstimate.data, matNodeVertComb);
-
-    //########################################################################################
-    //
-    // Do connectivity analysis END
-    //
-    //########################################################################################
-
-    NetworkView tNetworkView(tConnect_LA);
+    NetworkView tNetworkView(tNetwork);
     tNetworkView.show();
 
     return a.exec();
