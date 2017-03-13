@@ -114,6 +114,8 @@ public:
 protected:    
     void Connectivity::generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos);
 
+    void Connectivity::generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos);
+
     QSharedPointer<ConnectivitySettings> m_pConnectivitySettings;
 
 };
