@@ -85,21 +85,24 @@ ConnectivitySettings::ConnectivitySettings(const QStringList& arguments)
 
 void ConnectivitySettings::parseArguments(const QStringList& arguments)
 {
+    // Command Line Parser
     QCommandLineParser parser;
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
-    QCommandLineOption subjectOption("subj", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjDir", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    parser.addHelpOption();
+
+    QCommandLineOption annotOption("annotType", "Annotation <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization.", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization.", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator.", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "sourceLocMethod", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "connectMethod", "COR");
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation.", "value", "3.0");//3.0f;//0.1f;//3.0f;
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
-    QCommandLineOption coilTypeOption("coilType", "The coil type <type>, i.e. 'grad' or 'mag'.", "coilType", "grad");
-    QCommandLineOption chTypeOption("chType", "The channel type <type>, i.e. 'eeg' or 'meg'.", "coilType", "meg");
+    QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "mag");
+    QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);

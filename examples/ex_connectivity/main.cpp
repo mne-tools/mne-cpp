@@ -87,37 +87,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Connectivity Example");
-    parser.addHelpOption();
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
-    QCommandLineOption subjectOption("subj", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjDir", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization.", "doSourceLoc", "true");
-    QCommandLineOption clustOption("doClust", "Path to clustered inverse operator.", "doClust", "true");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "sourceLocMethod", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "connectMethod", "COR");
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
-
-    parser.addOption(annotOption);
-    parser.addOption(subjectOption);
-    parser.addOption(subjectPathOption);
-    parser.addOption(fwdOption);
-    parser.addOption(sourceLocOption);
-    parser.addOption(clustOption);
-    parser.addOption(covFileOption);
-    parser.addOption(evokedFileOption);
-    parser.addOption(connectMethodOption);
-    parser.addOption(sourceLocMethodOption);
-    parser.addOption(snrOption);
-    parser.addOption(evokedIndexOption);
-    parser.process(a);
-
     //Do connectivity estimation and visualize results
     ConnectivitySettings settings(QApplication::arguments());
 

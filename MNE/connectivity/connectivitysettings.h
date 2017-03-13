@@ -114,7 +114,7 @@ public:
     bool m_bDoSourceLoc;                    /**< Whether to perform source localization before the connectivity estimation. */
     bool m_bDoClust;                        /**< Whether to cluster the source space for source localization. */
 
-    double m_dSnr;                          /**< The SNR. */
+    double m_dSnr;                          /**< The SNR value. */
     int m_iAveIdx;                          /**< The The average index to take from the input data. */
 
 protected:
