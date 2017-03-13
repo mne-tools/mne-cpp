@@ -45,8 +45,10 @@
 #include <QCategoryAxis>
 
 #include <deep/deep.h>
+#include <deep/deepmodelcreator.h>
 
 #include <iostream>
+#include <random>
 
 
 //*************************************************************************************************************
@@ -63,6 +65,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -98,14 +101,104 @@ int main(int argc, char *argv[])
 //    deepTest.testClone();
 //    deepTest.exampleTrain();
 
+    QString fileName("./mne_deep_models/trainModel.v2");
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+
+    const size_t inputDim = 2;
+    const size_t numOutputClasses = 1;
 
     Deep deep;
 
-    deep.trainModel();
+    // if(!deep.loadModel(fileName, device)) {
+        fprintf(stderr, "Constructing model.\n");
+        deep.setModel(DeepModelCreator::DNN_1(inputDim, numOutputClasses, device));
+    // }
+
+
+
+    qDebug() << "InDim" << static_cast<int>(deep.inputDimensions());
+    qDebug() << "OutDim" << static_cast<int>(deep.outputDimensions());
+
+
+    int iterations = 20;
+    int batchSize = 50;
+
+    // Train a circle
+    float radius = 2.5;
+    float current_rad;
+    float x_m = 4;
+    float y_m = 3;
+    float x,y;
+
+    double loss, error;
+
+    Eigen::MatrixXf trainFeatures(batchSize,deep.inputDimensions());
+    Eigen::MatrixXf trainTarget(batchSize,deep.outputDimensions());
+
+
+    std::random_device rd;  // obtain a random number from hardware
+    std::mt19937 eng(rd()); // seed the generator
+    std::uniform_int_distribution<> distr(0, 6); // define the range
+
+    for(int it = 0; it < iterations; ++it) {
+        //
+        // Data Generation
+        //
+        for(int i = 0; i < batchSize; ++i) {
+
+            x = distr(eng); y = distr(eng);
+            current_rad = sqrt(pow(x - x_m,2) + pow(y - y_m,2));
+
+            trainFeatures(i,0) = x;
+            trainFeatures(i,1) = y;
+            trainTarget(i,0) = static_cast<float>(current_rad < radius);
+        }
+
+        //
+        // Training Generation
+        //
+        deep.trainMinibatch(trainFeatures, trainTarget, loss, error, device);
+
+        qDebug() << "Iteration:" << it+1 << "; loss" << loss << "; error" << error;
+    }
+
+
+    //
+    // Evaluation
+    //
+
+    int eval_size = 10;
+
+    Eigen::MatrixXf inputs(eval_size,deep.inputDimensions());
+    Eigen::MatrixXf desired(eval_size,deep.outputDimensions());
+
+    for(int i = 0; i < eval_size; ++i) {
+        //
+        // Data Generation
+        //
+        x = distr(eng); y = distr(eng);
+        current_rad = sqrt(pow(x - x_m,2) + pow(y - y_m,2));
+
+        inputs(i,0) = x;
+        inputs(i,1) = y;
+        desired(i,0) = static_cast<float>(current_rad < radius);
+    }
+
+    std::cout << "inputs\n" << inputs << std::endl;
+
+    MatrixXf outputs;
+    deep.evalModel(inputs, outputs, device);
+
+    std::cout << "desired\n" << desired << std::endl;
+
+    std::cout << "outputs\n" << outputs << std::endl;
+
+
+    deep.saveModel(fileName);
 
 
 /*
-    if(deep.loadModel("./mne_deep_models/examples/output/models/ex_deep_one_hidden", DeviceDescriptor::CPUDevice())) {
+    if(deep.loadModel("./mne_deep_models/examples/output/models/ex_deep_one_hidden", device)) {
         fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
 
         size_t inDim = deep.inputDimensions();
@@ -141,7 +234,7 @@ int main(int argc, char *argv[])
         std::cout << "inputs\n" << inputs << std::endl;
 
         MatrixXf outputs;
-        deep.evalModel(DeviceDescriptor::CPUDevice(), inputs, outputs);
+        deep.evalModel(inputs, outputs, device);
 
         std::cout << "outputs\n" << outputs << std::endl;
 
