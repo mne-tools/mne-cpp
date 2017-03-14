@@ -54,6 +54,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -61,6 +63,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -89,14 +93,18 @@ SOURCES += \
     connectivitymeasures.cpp \
     network/network.cpp \
     network/networknode.cpp \
-    network/networkedge.cpp
+    network/networkedge.cpp \
+    connectivitysettings.cpp \
+    connectivity.cpp \
 
 HEADERS += \
     connectivity_global.h \
     connectivitymeasures.h \
     network/network.h \
     network/networknode.h \
-    network/networkedge.h
+    network/networkedge.h \
+    connectivitysettings.h \
+    connectivity.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

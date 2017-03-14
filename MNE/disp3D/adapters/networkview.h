@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     networkedge.cpp
+* @file     networkview.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    NetworkEdge class definition.
+* @brief    NetworkView class declaration.
 *
 */
 
+#ifndef NETWORKVIEW_H
+#define NETWORKVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "networkedge.h"
-
-#include "networknode.h"
+#include "../disp3D_global.h"
+#include "abstractview.h"
 
 
 //*************************************************************************************************************
@@ -49,62 +50,69 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+namespace INVERSELIB {
+    class DipoleFitSettings;
+    class ECDSet;
+}
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight)
-: m_pStartNode(pStartNode)
-, m_pEndNode(pEndNode)
-, m_dWeight(dWeight)
-{
+namespace CONNECTIVITYLIB {
+    class Network;
 }
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
 
-QSharedPointer<NetworkNode> NetworkEdge::getStartNode()
+namespace DISP3DLIB
 {
-    return m_pStartNode;
-}
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-QSharedPointer<NetworkNode> NetworkEdge::getEndNode()
+
+//=============================================================================================================
+/**
+* Adapter which provides visualization for ECD data and a control widget.
+*
+* @brief Visualizes ECD data.
+*/
+class DISP3DNEWSHARED_EXPORT NetworkView : public AbstractView
 {
-    return m_pEndNode;
-}
+    Q_OBJECT
 
+public:
+    typedef QSharedPointer<NetworkView> SPtr;             /**< Shared pointer type for NetworkView class. */
+    typedef QSharedPointer<const NetworkView> ConstSPtr;  /**< Const shared pointer type for NetworkView class. */
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Default constructor
+    *
+    */
+    explicit NetworkView(const CONNECTIVITYLIB::Network& tNetworkData, QWidget *parent = 0);
 
-double NetworkEdge::getWeight() const
-{
-    return m_dWeight;
-}
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~NetworkView();
 
+protected:
+};
 
+} // NAMESPACE
 
+#endif // NETWORKVIEW_H
