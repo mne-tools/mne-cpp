@@ -119,7 +119,7 @@ protected:
     * @param [out] matData      The source level data.
     * @param [out] matNodePos   The nodes position in 3D space.
     */
-    void Connectivity::generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
+    void generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ protected:
     * @param [out] matData      The source level data.
     * @param [out] matNodePos   The nodes position in 3D space.
     */
-    void Connectivity::generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
+    void generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
 
     QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
 };
