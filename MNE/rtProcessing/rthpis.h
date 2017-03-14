@@ -74,8 +74,6 @@
 
 namespace FIFFLIB{
     class FiffInfo;
-    class FiffCoordTrans;
-    class FiffDigPointSet;
 }
 
 
@@ -88,55 +86,11 @@ namespace RTPROCESSINGLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// Declare all structures to be used
-//=============================================================================================================
-//=========================================================================================================
-/**
-* The strucut specifing the coil parameters.
-*/
-struct coilParam {
-    Eigen::MatrixXd pos;
-    Eigen::MatrixXd mom;
-    Eigen::VectorXd dpfiterror;
-    Eigen::VectorXd dpfitnumitr;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the dipole error.
-*/
-struct dipError {
-    double error;
-    Eigen::MatrixXd moment;
-    int numIterations;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the sensor parameters.
-*/
-struct sens {
-    Eigen::MatrixXd coilpos;
-    Eigen::MatrixXd coilori;
-    Eigen::MatrixXd tra;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the sorting parameters.
-*/
-struct sortStruct {
-    double base_arr;
-    int idx;
-};
-
 //=============================================================================================================
 /**
-* Real-time Head Coil Positions estimation
+* Real-time Head Coil Positions estimation.
 *
-* @brief Real-time HPI estimation
+* @brief Real-time Head Coil Positions estimation.
 */
 class RTPROCESSINGSHARED_EXPORT RtHPIS : public QThread
 {
@@ -150,7 +104,6 @@ public:
     /**
     * Creates the real-time HPIS estimation object.
     *
-    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
@@ -160,23 +113,7 @@ public:
     /**
     * Destroys the Real-time HPI estimation object.
     */
-    ~RtHPIS();
-
-    //=========================================================================================================
-    /**
-    * Inits the rt HPI processing and performs one single fit.
-    *
-    * @param[in] t_mat           Data to estimate the HPI positions from
-    * @param[out] transDevHead   The final dev head transformation matrix
-    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
-    * @param[in] vFreqs          The frequencies for each coil.
-    * @param[in] fittedPointSet  The final fitted positions in form of a digitizer set.
-    */
-    void singleHPIFit(const Eigen::MatrixXd& t_mat,
-                      FIFFLIB::FiffCoordTrans &transDevHead,
-                      const QVector<int>& vFreqs,
-                      QVector<double> &vGof,
-                      FIFFLIB::FiffDigPointSet& fittedPointSet);
+    ~RtHPIS();    
 
     //=========================================================================================================
     /**
@@ -213,30 +150,6 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Fits dipoles for the given coils and a given data set.
-    *
-    * @param[in] coilParam      The coil parameters.
-    * @param[in] sensors        The sensor information.
-    * @param[in] data           The data which used to fit the coils.
-    * @param[in] numCoils       The number of coils.
-    *
-    * @return Returns the coil parameters.
-    */
-    coilParam dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils);
-
-    //=========================================================================================================
-    /**
-    * Computes the transformation matrix between two sets of 3D points.
-    *
-    * @param[in] NH     The first set of input 3D points (row-wise order).
-    * @param[in] BT     The second set of input 3D points (row-wise order).
-    *
-    * @return Returns the transformation matrix.
-    */
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
-
-    //=========================================================================================================
-    /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
     * Returning from this method will end the execution of the thread.
     * Pure virtual method inherited by QThread.
@@ -249,8 +162,6 @@ protected:
     QMutex              m_mutex;                /**< The global mutex to provide thread safety.*/
 
     bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
-
-    QString             m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
 
 //*************************************************************************************************************

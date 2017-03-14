@@ -49,6 +49,7 @@
 #include <disp3D/engine/model/items/bem/bemtreeitem.h>
 
 #include <rtProcessing/rthpis.h>
+#include <inverse/hpiFit/hpifit.h>
 
 #include <mne/mne_bem.h>
 
@@ -80,6 +81,7 @@ using namespace FIFFLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace RTPROCESSINGLIB;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -442,16 +444,16 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
             //Perform actual fitting
             QVector<double> vGof;
             FiffDigPointSet t_fittedSet;
-            RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
             FiffCoordTrans transDevHead;
             transDevHead.from = 1;
             transDevHead.to = 4;
 
-            pRtHpis->singleHPIFit(m_matValue,
+            HPIFit::fitHPI(m_matValue,
                                   transDevHead,
                                   vFreqs,
                                   vGof,
-                                  t_fittedSet);
+                                  t_fittedSet,
+                                  m_pFiffInfo);
 
             m_matValue.resize(0,0);
 
