@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef CONNECTIVITYLIB_NETWORK_H
-#define CONNECTIVITYLIB_NETWORK_H
+#ifndef NETWORK_H
+#define NETWORK_H
 
 
 //*************************************************************************************************************
@@ -43,8 +43,6 @@
 //=============================================================================================================
 
 #include "../connectivity_global.h"
-#include "networknode.h"
-#include "networkedge.h"
 
 
 //*************************************************************************************************************
@@ -52,7 +50,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <QSharedPointer>
 
 
@@ -82,6 +79,9 @@ namespace CONNECTIVITYLIB {
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class NetworkEdge;
+class NetworkNode;
 
 
 //=============================================================================================================
@@ -120,7 +120,7 @@ public:
     *
     * @return Returns the network edges.
     */
-    const QList<NetworkEdge::SPtr>& getEdges() const;
+    const QList<QSharedPointer<NetworkEdge> >& getEdges() const;
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
     *
     * @return Returns the network nodes.
     */
-    const QList<NetworkNode::SPtr>& getNodes() const;
+    const QList<QSharedPointer<NetworkNode> >& getNodes() const;
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ public:
     *
     * @return Returns the network edge.
     */
-    NetworkEdge::SPtr getEdgeAt(int i);
+    QSharedPointer<NetworkEdge> getEdgeAt(int i);
 
     //=========================================================================================================
     /**
@@ -148,7 +148,7 @@ public:
     *
     * @return Returns the network node.
     */
-    NetworkNode::SPtr getNodeAt(int i);
+    QSharedPointer<NetworkNode> getNodeAt(int i);
 
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ public:
     *
     * @param[in] newEdge    The new edge item as a reference.
     */
-    Network &operator<<(NetworkEdge::SPtr newEdge);
+    Network &operator<<(QSharedPointer<NetworkEdge> newEdge);
 
     //=========================================================================================================
     /**
@@ -188,15 +188,15 @@ public:
     *
     * @param[in] newNode    The new node item as a reference.
     */
-    Network &operator<<(NetworkNode::SPtr newNode);
+    Network &operator<<(QSharedPointer<NetworkNode> newNode);
 
 protected:
-    QList<NetworkEdge::SPtr>    m_lEdges;                   /**< List with all edges of the network.*/
-    QList<NetworkNode::SPtr>    m_lNodes;                   /**< List with all nodes of the network.*/
+    QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/
+    QList<QSharedPointer<NetworkNode> >     m_lNodes;                   /**< List with all nodes of the network.*/
 
-    Eigen::MatrixXd             m_matDistMatrix;            /**< The distance matrix.*/
+    Eigen::MatrixXd                         m_matDistMatrix;            /**< The distance matrix.*/
 
-    QString                     m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
+    QString                                 m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
 
     //=========================================================================================================
     /**
@@ -217,4 +217,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITYLIB_NETWORK_H
+#endif // NETWORK_H

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivitymeasures.h
+* @file     connectivitysettings.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ConnectivityMeasures class declaration.
+* @brief     ConnectivitySettings class declaration.
 *
 */
 
-#ifndef CONNECTIVITYMEASURES_H
-#define CONNECTIVITYMEASURES_H
+#ifndef CONNECTIVITYSETTINGS_H
+#define CONNECTIVITYSETTINGS_H
 
 
 //*************************************************************************************************************
@@ -51,8 +51,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QPair>
-#include <QString>
 
 
 //*************************************************************************************************************
@@ -82,72 +80,51 @@ namespace CONNECTIVITYLIB {
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Network;
-
 
 //=============================================================================================================
 /**
-* This class computes basic (functional) connectivity measures.
+* This class is a container for connectivity settings.
 *
-* @brief This class computes basic (functional) connectivity measures.
+* @brief This class is a container for connectivity settings.
 */
-class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
-{    
+class CONNECTIVITYSHARED_EXPORT ConnectivitySettings
+{
 
 public:
-    typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
-    typedef QSharedPointer<const ConnectivityMeasures> ConstSPtr; /**< Const shared pointer type for ConnectivityMeasures. */
+    typedef QSharedPointer<ConnectivitySettings> SPtr;            /**< Shared pointer type for ConnectivitySettings. */
+    typedef QSharedPointer<const ConnectivitySettings> ConstSPtr; /**< Const shared pointer type for ConnectivitySettings. */
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectivityMeasures object.
+    * Constructs a ConnectivitySettings object.
     */
-    explicit ConnectivityMeasures();
+    explicit ConnectivitySettings(const QStringList &arguments);
 
-    //=========================================================================================================
-    /**
-    * Calculates the Pearson's correlation coefficient between the rows of the data matrix.
-    *
-    * @param[in] matData    The input data for whicht the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
-    *
-    * @return               The connectivity information in form of a network structure.
-    */
-    static Network pearsonsCorrelationCoeff(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    QString m_sConnectivityMethod;          /**< The connectivity method. */
+    QString m_sAnnotType;                   /**< The annotation type. */
+    QString m_sSubj;                        /**< The subject name. */
+    QString m_sSubjDir;                     /**< The subject's folder. */
+    QString m_sFwd;                         /**< The path to the forward solution. */
+    QString m_sCov;                         /**< The path to the covariance matrix. */
+    QString m_sSourceLocMethod;             /**< The source localization method. */
+    QString m_sMeas;                        /**< The path to the averaged data. */
+    QString m_sCoilType;                    /**< The coil type. Only used if channel type is set to meg. */
+    QString m_sChType;                      /**< The channel type. */
 
-    //=========================================================================================================
-    /**
-    * Calculates the cross correlation between the rows of the data matrix.
-    *
-    * @param[in] matData    The input data for which the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
-    *
-    * @return               The connectivity information in form of a network structure.
-    */
-    static Network crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    bool m_bDoSourceLoc;                    /**< Whether to perform source localization before the connectivity estimation. */
+    bool m_bDoClust;                        /**< Whether to cluster the source space for source localization. */
+
+    double m_dSnr;                          /**< The SNR value. */
+    int m_iAveIdx;                          /**< The The average index to take from the input data. */
 
 protected:
     //=========================================================================================================
     /**
-    * Calculates the actual Pearson's correlation coefficient between two data vectors.
+    * Parses the input arguments.
     *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return               The Pearson's correlation coefficient.
+    * @param [in] arguments     List of all the arguments.
     */
-    static double calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
-
-    //=========================================================================================================
-    /**
-    * Calculates the actual cross correlation between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return               The result in form of a QPair. First element represents the index of the maximum. Second element represents the actual correlation value.
-    */
-    static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+    void parseArguments(const QStringList& arguments);
 
 };
 
@@ -160,4 +137,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITYMEASURES_H
+#endif // CONNECTIVITYSETTINGS_H

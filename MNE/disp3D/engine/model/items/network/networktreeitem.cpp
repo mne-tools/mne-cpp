@@ -44,6 +44,9 @@
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/networkmaterial.h"
 
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
+
 #include <fiff/fiff_types.h>
 
 #include <mne/mne_sourceestimate.h>

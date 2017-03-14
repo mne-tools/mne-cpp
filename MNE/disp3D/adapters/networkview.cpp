@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     networkedge.cpp
+* @file     networkview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    NetworkEdge class definition.
+* @brief    NetworkView class definition.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "networkedge.h"
+#include "networkview.h"
 
-#include "networknode.h"
+#include "../engine/model/data3Dtreemodel.h"
+
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
@@ -52,22 +53,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISP3DLIB;
 using namespace CONNECTIVITYLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -75,36 +65,16 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight)
-: m_pStartNode(pStartNode)
-, m_pEndNode(pEndNode)
-, m_dWeight(dWeight)
+NetworkView::NetworkView(const Network& tNetworkData, QWidget* parent)
+: AbstractView(parent)
 {
+    //Add network data
+    m_pData3DModel->addConnectivityData("sample", tNetworkData.getConnectivityMethod(), tNetworkData);
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<NetworkNode> NetworkEdge::getStartNode()
+NetworkView::~NetworkView()
 {
-    return m_pStartNode;
 }
-
-
-//*************************************************************************************************************
-
-QSharedPointer<NetworkNode> NetworkEdge::getEndNode()
-{
-    return m_pEndNode;
-}
-
-
-//*************************************************************************************************************
-
-double NetworkEdge::getWeight() const
-{
-    return m_dWeight;
-}
-
-
-

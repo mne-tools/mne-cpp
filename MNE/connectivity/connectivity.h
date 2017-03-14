@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivitymeasures.h
+* @file     connectivity.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ConnectivityMeasures class declaration.
+* @brief     Connectivity class declaration.
 *
 */
 
-#ifndef CONNECTIVITYMEASURES_H
-#define CONNECTIVITYMEASURES_H
+#ifndef CONNECTIVITY_H
+#define CONNECTIVITY_H
 
 
 //*************************************************************************************************************
@@ -51,8 +51,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QPair>
-#include <QString>
 
 
 //*************************************************************************************************************
@@ -82,73 +80,57 @@ namespace CONNECTIVITYLIB {
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class ConnectivitySettings;
 class Network;
 
 
 //=============================================================================================================
 /**
-* This class computes basic (functional) connectivity measures.
+* This class handles the incoming settings and computes the actual connectivity estimation.
 *
-* @brief This class computes basic (functional) connectivity measures.
+* @brief This class is a container for connectivity settings.
 */
-class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
-{    
+class CONNECTIVITYSHARED_EXPORT Connectivity
+{
 
 public:
-    typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
-    typedef QSharedPointer<const ConnectivityMeasures> ConstSPtr; /**< Const shared pointer type for ConnectivityMeasures. */
+    typedef QSharedPointer<Connectivity> SPtr;            /**< Shared pointer type for Connectivity. */
+    typedef QSharedPointer<const Connectivity> ConstSPtr; /**< Const shared pointer type for Connectivity. */
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectivityMeasures object.
+    * Constructs a Connectivity object.
     */
-    explicit ConnectivityMeasures();
+    explicit Connectivity(const ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
-    * Calculates the Pearson's correlation coefficient between the rows of the data matrix.
+    * Computes the network based on the current settings.
     *
-    * @param[in] matData    The input data for whicht the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
-    *
-    * @return               The connectivity information in form of a network structure.
+    * @return Returns the network.
     */
-    static Network pearsonsCorrelationCoeff(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
-
-    //=========================================================================================================
-    /**
-    * Calculates the cross correlation between the rows of the data matrix.
-    *
-    * @param[in] matData    The input data for which the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
-    *
-    * @return               The connectivity information in form of a network structure.
-    */
-    static Network crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    Network calculateConnectivity() const;
 
 protected:
     //=========================================================================================================
     /**
-    * Calculates the actual Pearson's correlation coefficient between two data vectors.
+    * Generate the source level data based on the current settings.
     *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return               The Pearson's correlation coefficient.
+    * @param [out] matData      The source level data.
+    * @param [out] matNodePos   The nodes position in 3D space.
     */
-    static double calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+    void generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
 
     //=========================================================================================================
     /**
-    * Calculates the actual cross correlation between two data vectors.
+    * Generate the sensor level data based on the current settings.
     *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return               The result in form of a QPair. First element represents the index of the maximum. Second element represents the actual correlation value.
+    * @param [out] matData      The source level data.
+    * @param [out] matNodePos   The nodes position in 3D space.
     */
-    static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+    void generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
 
+    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
 };
 
 
@@ -160,4 +142,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITYMEASURES_H
+#endif // CONNECTIVITY_H

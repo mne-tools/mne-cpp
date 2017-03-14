@@ -42,6 +42,7 @@
 #include "connectivitymeasures.h"
 #include "network/networknode.h"
 #include "network/networkedge.h"
+#include "network/network.h"
 
 #include <iostream>
 
