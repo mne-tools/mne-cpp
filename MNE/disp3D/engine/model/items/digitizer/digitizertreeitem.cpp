@@ -90,16 +90,16 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
     QVariant data;
     QList<QStandardItem*> list;
 
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::PointColor, "Point color");
-    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
+    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
+    connect(pItemColor, &MetaTreeItem::colorChanged,
             this, &DigitizerTreeItem::onSurfaceColorChanged);
     list.clear();
-    list << pItemSurfCol;
-    list << new QStandardItem(pItemSurfCol->toolTip());
+    list << pItemColor;
+    list << new QStandardItem(pItemColor->toolTip());
     this->appendRow(list);
-    data.setValue(Qt::blue);
-    pItemSurfCol->setData(data, MetaTreeItemRoles::PointColor);
-    pItemSurfCol->setData(data, Qt::DecorationRole);
+    data.setValue(QColor(100,100,100));
+    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
+    pItemColor->setData(data, Qt::DecorationRole);
 }
 
 
@@ -141,10 +141,6 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     //Clear all data
     m_lSpheres.clear();
 
-//    if(!m_pRenderable3DEntity.isNull()) {
-//        m_pRenderable3DEntity->deleteLater();
-//    }
-
     m_pRenderable3DEntity->setParent(parent);
 
     //Create digitizers as small 3D spheres
@@ -171,62 +167,58 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
 
         switch (tDigitizer[i].kind) {
-        case FIFFV_POINT_CARDINAL:
-            switch (tDigitizer[i].ident) {
-            case 1:
-            colDefault = Qt::green;
-            material->setAmbient(colDefault);
-            break;
-            case 2:
-            colDefault = Qt::yellow;
-            material->setAmbient(colDefault);
-            break;
-            case 3:
-            colDefault = Qt::darkGreen;
-            material->setAmbient(colDefault);
-            break;
+            case FIFFV_POINT_CARDINAL:
+                switch (tDigitizer[i].ident) {
+                    case 1:
+                    colDefault = Qt::green;
+                    material->setAmbient(colDefault);
+                    break;
+                    case 2:
+                    colDefault = Qt::yellow;
+                    material->setAmbient(colDefault);
+                    break;
+                    case 3:
+                    colDefault = Qt::darkGreen;
+                    material->setAmbient(colDefault);
+                    break;
+                    default:
+                    colDefault = Qt::white;
+                    material->setAmbient(colDefault);
+                    break;
+                }
+                break;
+            case FIFFV_POINT_HPI:
+                colDefault = Qt::red;
+                material->setAmbient(colDefault);
+                break;
+            case FIFFV_POINT_EEG:
+                colDefault = Qt::cyan;
+                material->setAmbient(colDefault);
+                break;
+            case FIFFV_POINT_EXTRA:
+                colDefault = Qt::magenta;
+                material->setAmbient(colDefault);
+                break;
             default:
-            colDefault = Qt::white;
-            material->setAmbient(colDefault);
-            break;
-            }
-            break;
-
-//            colDefault = Qt::yellow;
-//            material->setAmbient(colDefault);
-//            break;
-        case FIFFV_POINT_HPI:
-            colDefault = Qt::red;
-            material->setAmbient(colDefault);
-            break;
-        case FIFFV_POINT_EEG:
-            colDefault = Qt::cyan;
-            material->setAmbient(colDefault);
-            break;
-        case FIFFV_POINT_EXTRA:
-            colDefault = Qt::magenta;
-            material->setAmbient(colDefault);
-            break;
-        default:
-            colDefault = Qt::white;
-            material->setAmbient(colDefault);
-            break;
+                colDefault = Qt::white;
+                material->setAmbient(colDefault);
+                break;
         }
 
         pSourceSphereEntity->addComponent(material);
 
-        pSourceSphereEntity->setParent(m_pRenderable3DEntity);
-
         m_lSpheres.append(pSourceSphereEntity);
     }
 
-    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::PointColor);
+    //Update colors in color item
+    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
 
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
             data.setValue(colDefault);
-            item->setData(data, MetaTreeItemRoles::PointColor);
+            item->setData(data, MetaTreeItemRoles::PointColor);            
+            item->setData(data, Qt::DecorationRole);
         }
     }
 

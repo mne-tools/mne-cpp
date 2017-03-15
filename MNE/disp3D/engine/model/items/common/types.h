@@ -118,18 +118,17 @@ namespace MetaTreeItemTypes
                     NumberAverages = QStandardItem::UserType + 112,
                     DistributedSourceLocThreshold = QStandardItem::UserType + 113,
                     VisualizationType = QStandardItem::UserType + 114,
-                    SurfaceColor = QStandardItem::UserType + 115,
+                    Color = QStandardItem::UserType + 115,
                     UnknownItem = QStandardItem::UserType + 116,
                     SurfaceTranslateX = QStandardItem::UserType + 117,
                     SurfaceTranslateY = QStandardItem::UserType + 118,
                     SurfaceTranslateZ = QStandardItem::UserType + 119,
-                    PointColor = QStandardItem::UserType + 120,
-                    NetworkThreshold = QStandardItem::UserType + 121,
-                    NetworkMatrix = QStandardItem::UserType + 122,
-                    SurfaceTessInner = QStandardItem::UserType + 123,
-                    SurfaceTessOuter = QStandardItem::UserType + 124,
-                    SurfaceTriangleScale = QStandardItem::UserType + 125,
-                    NumberDipoles = QStandardItem::UserType + 126};
+                    NetworkThreshold = QStandardItem::UserType + 120,
+                    NetworkMatrix = QStandardItem::UserType + 121,
+                    SurfaceTessInner = QStandardItem::UserType + 122,
+                    SurfaceTessOuter = QStandardItem::UserType + 123,
+                    SurfaceTriangleScale = QStandardItem::UserType + 124,
+                    NumberDipoles = QStandardItem::UserType + 125};
 }
 
 // Model item roles
@@ -189,7 +188,7 @@ namespace MetaTreeItemRoles
                     NumberAverages = Qt::UserRole + 14,
                     DistributedSourceLocThreshold = Qt::UserRole + 15,
                     VisualizationType = Qt::UserRole + 16,
-                    SurfaceColor = Qt::UserRole + 17,
+                    Color = Qt::UserRole + 17,
                     SurfaceTranslateX = Qt::UserRole + 18,
                     SurfaceTranslateY = Qt::UserRole + 19,
                     SurfaceTranslateZ = Qt::UserRole + 20,

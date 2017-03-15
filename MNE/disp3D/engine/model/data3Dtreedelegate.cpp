@@ -174,21 +174,13 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pComboBox;
         }
 
-        case MetaTreeItemTypes::SurfaceColor: {
+        case MetaTreeItemTypes::Color: {
             QColorDialog *pColorDialog = new QColorDialog();
             connect(pColorDialog, &QColorDialog::currentColorChanged,
                     this, &Data3DTreeDelegate::onEditorEdited);
-            pColorDialog->setWindowTitle("Select Surface Color");
+            pColorDialog->setWindowTitle("Select Color");
             pColorDialog->show();
-            return pColorDialog;
-        }
-
-        case MetaTreeItemTypes::PointColor: {
-            QColorDialog *pColorDialog = new QColorDialog();
-            connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &Data3DTreeDelegate::onEditorEdited);
-            pColorDialog->setWindowTitle("Select Point Color");
-            pColorDialog->show();
+            pColorDialog->setCurrentColor(index.model()->data(index, MetaTreeItemRoles::Color).value<QColor>());
             return pColorDialog;
         }
 
@@ -409,15 +401,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceColor: {
-            QColor color = index.model()->data(index, MetaTreeItemRoles::SurfaceColor).value<QColor>();
-            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-            pColorDialog->setCurrentColor(color);
-            break;
-        }
-
-        case MetaTreeItemTypes::PointColor: {
-            QColor color = index.model()->data(index, MetaTreeItemRoles::PointColor).value<QColor>();
+        case MetaTreeItemTypes::Color: {
+            QColor color = index.model()->data(index, MetaTreeItemRoles::Color).value<QColor>();
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             pColorDialog->setCurrentColor(color);
             break;
@@ -599,24 +584,13 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             return;
         }
 
-        case MetaTreeItemTypes::SurfaceColor: {
+        case MetaTreeItemTypes::Color: {
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             QColor color = pColorDialog->currentColor();
             QVariant data;
             data.setValue(color);
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceColor);
-            model->setData(index, data, Qt::DecorationRole);
-            return;
-        }
-
-        case MetaTreeItemTypes::PointColor: {
-            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-            QColor color = pColorDialog->currentColor();
-            QVariant data;
-            data.setValue(color);
-
-            model->setData(index, data, MetaTreeItemRoles::PointColor);
+            model->setData(index, data, MetaTreeItemRoles::Color);
             model->setData(index, data, Qt::DecorationRole);
             return;
         }

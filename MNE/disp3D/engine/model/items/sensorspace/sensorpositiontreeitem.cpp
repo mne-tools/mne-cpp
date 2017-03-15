@@ -52,7 +52,7 @@
 //=============================================================================================================
 
 #include <QMatrix4x4>
-#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DExtras/QCuboidMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
 #include <Qt3DCore/QEntity>
@@ -90,16 +90,16 @@ SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
     QVariant data;
     QList<QStandardItem*> list;
 
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::PointColor, "Point color");
-    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
+    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
+    connect(pItemColor, &MetaTreeItem::colorChanged,
             this, &SensorPositionTreeItem::onSurfaceColorChanged);
     list.clear();
-    list << pItemSurfCol;
-    list << new QStandardItem(pItemSurfCol->toolTip());
+    list << pItemColor;
+    list << new QStandardItem(pItemColor->toolTip());
     this->appendRow(list);
-    data.setValue(Qt::blue);
-    pItemSurfCol->setData(data, MetaTreeItemRoles::PointColor);
-    pItemSurfCol->setData(data, Qt::DecorationRole);
+    data.setValue(QColor(100,100,100));
+    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
+    pItemColor->setData(data, Qt::DecorationRole);
 }
 
 
@@ -141,49 +141,58 @@ bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
     //Clear all data
     m_lSpheres.clear();
 
-//    if(!m_pRenderable3DEntity.isNull()) {
-//        m_pRenderable3DEntity->deleteLater();
-//    }
-
     m_pRenderable3DEntity->setParent(parent);
 
     //Create digitizers as small 3D spheres
     QVector3D pos;
     QColor colDefault(100,100,100);
 
-    qDebug() << "lChInfo.size()" << lChInfo.size();
-
     for(int i = 0; i < lChInfo.size(); ++i) {
-        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
-
         pos.setX(lChInfo[i].chpos.r0(0));
         pos.setY(lChInfo[i].chpos.r0(1));
         pos.setZ(lChInfo[i].chpos.r0(2));
 
-        Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-        sourceSphere->setRadius(0.002f);
+        //Create plane mesh
+        Renderable3DEntity* pSensorRectEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+        Qt3DExtras::QCuboidMesh* pSensorRect = new Qt3DExtras::QCuboidMesh();
+        pSensorRect->setXExtent(0.01f);
+        pSensorRect->setYExtent(0.001f);
+        pSensorRect->setZExtent(0.01f);
+        pSensorRectEntity->addComponent(pSensorRect);
 
-        pSourceSphereEntity->addComponent(sourceSphere);
-        pSourceSphereEntity->setPosition(pos);
+        //Set plane position and orientation
+        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
+        QMatrix4x4 m;
+
+        for(int j = 0; j < 4; ++j) {
+            QVector4D row(lChInfo[i].coil_trans.row(j)(0),
+                      lChInfo[i].coil_trans.row(j)(1),
+                      lChInfo[i].coil_trans.row(j)(2),
+                      lChInfo[i].coil_trans.row(j)(3));
+
+            m.setRow(j, row);
+        }
+        m.rotate(90,0.0, 1.0, 0.0);
+
+        transform->setMatrix(m);
+        pSensorRectEntity->addComponent(transform);
 
         Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+        material->setAmbient(colDefault);
+        pSensorRectEntity->addComponent(material);
 
-        colDefault = Qt::green;
-
-        pSourceSphereEntity->addComponent(material);
-
-        pSourceSphereEntity->setParent(m_pRenderable3DEntity);
-
-        m_lSpheres.append(pSourceSphereEntity);
+        m_lSpheres.append(pSensorRectEntity);
     }
 
-    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::PointColor);
+    //Update colors in color item
+    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
 
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
             data.setValue(colDefault);
             item->setData(data, MetaTreeItemRoles::PointColor);
+            item->setData(data, Qt::DecorationRole);
         }
     }
 

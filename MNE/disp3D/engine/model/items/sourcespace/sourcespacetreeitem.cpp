@@ -212,14 +212,14 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
-    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
+    connect(pItemSurfCol, &MetaTreeItem::colorChanged,
             this, &SourceSpaceTreeItem::onSurfaceColorChanged);
     list << pItemSurfCol;
     list << new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
     data.setValue(QColor(100,100,100));
-    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
+    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
     pItemSurfCol->setData(data, Qt::DecorationRole);
 }
 
