@@ -203,8 +203,30 @@ protected:
     */
     virtual void onSurfaceTranslationZChanged(float fTransZ);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever the surface color was changed.
+    *
+    * @param[in] color        The new surface color.
+    */
+    virtual void onSurfaceColorChanged(const QColor &color);
+
+    //=========================================================================================================
+    /**
+    * Creates a QByteArray of colors for given color for the input vertices.
+    *
+    * @param[in] vertices       The vertices information.
+    * @param[in] color          The vertex color information.
+    *
+    * @return The colors per vertex
+    */
+    virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
+
     QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
     QPointer<Renderable3DEntity>    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
+
+    bool        m_bUseTesselation;      /**< Whether to use tesselation. */
+    bool        m_bRenderNormals;       /**< Whether to render normals. */
 };
 
 } //NAMESPACE DISP3DLIB
