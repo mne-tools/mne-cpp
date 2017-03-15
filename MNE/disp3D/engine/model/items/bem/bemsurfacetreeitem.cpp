@@ -109,6 +109,15 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
                                                         matVertColor,
                                                         Qt3DRender::QGeometryRenderer::Triangles);
 
+    //Render normals
+    if(m_bRenderNormals) {
+        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tBemSurface.rr,
+                                                                      tBemSurface.nn,
+                                                                      tBemSurface.tris,
+                                                                      matVertColor,
+                                                                      Qt3DRender::QGeometryRenderer::Triangles);
+    }
+
     //Find out BEM layer type and change items name
     this->setText(MNEBemSurface::id_name(tBemSurface.id));
 
