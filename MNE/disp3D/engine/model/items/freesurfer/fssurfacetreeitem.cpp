@@ -154,6 +154,9 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(tSurface.curv());
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
 
+    data.setValue(tSurface.rr());
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+
      //Add data which is held by this FsSurfaceTreeItem
     QList<QStandardItem*> list;
 
@@ -210,18 +213,6 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
     this->appendRow(list);
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::setRtVertColor(const MatrixX3f& sourceColorSamples)
-{
-    //Set new data.
-    //In setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
-    QVariant data;
-    data.setValue(sourceColorSamples);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 
