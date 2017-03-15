@@ -81,6 +81,43 @@ using namespace CNTK;
 
 //*************************************************************************************************************
 //=============================================================================================================
+// STATIC FUNCTIONS
+//=============================================================================================================
+
+// Helper function to generate a random data sample
+void generate_random_data_samples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
+{
+    qDebug() << "generate_random_data_sample";
+
+    MatrixXi t_Y = MatrixXi::Zero(sample_size, 1);
+    for(int i = 0; i < t_Y.rows(); ++i) {
+        t_Y(i,0) = rand() % num_classes;
+    }
+
+    std::default_random_engine generator;
+    std::normal_distribution<float> distribution(0.0,1.0);
+
+    X = MatrixXf::Zero(sample_size, feature_dim);
+    for(int i = 0; i < X.rows(); ++i) {
+        for(int j = 0; j < X.cols(); ++j) {
+            float number = distribution(generator);
+            X(i,j) = (number + 3) * (t_Y(i) + 1);
+        }
+    }
+
+    Y = MatrixXf::Zero(sample_size, num_classes);
+
+    for(int i = 0; i < Y.rows(); ++i) {
+        Y(i,t_Y(i)) = 1;
+    }
+
+    std::cout << "Y\n" << Y << std::endl;
+    std::cout << "X\n" << X << std::endl;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // MAIN
 //=============================================================================================================
 
@@ -105,13 +142,28 @@ int main(int argc, char *argv[])
     DeviceDescriptor device = DeviceDescriptor::CPUDevice();
 
     const size_t inputDim = 2;
-    const size_t numOutputClasses = 1;
+    const size_t numOutputClasses = 2;//1;
 
     Deep deep;
 
+
+
+
+    int mysamplesize = 32;
+
+    MatrixXf X, Y;
+
+    generate_random_data_samples(mysamplesize, inputDim, numOutputClasses, X, Y);
+
+
+
+
+
+
     // if(!deep.loadModel(fileName, device)) {
         fprintf(stderr, "Constructing model.\n");
-        deep.setModel(DeepModelCreator::DNN_1(inputDim, numOutputClasses, device));
+        FunctionPtr model = DeepModelCreator::DNN_1(inputDim, numOutputClasses, device);
+        deep.setModel(model);
     // }
 
 
