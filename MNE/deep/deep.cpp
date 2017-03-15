@@ -445,7 +445,7 @@ bool Deep::trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& t
     //
     // Output
     //
-    Variable outputLabels = InputVariable({z->Output().Shape().TotalSize()}, DataType::Float, L"labels"); //z->Output();
+    Variable outputLabels = z->Output();//InputVariable({z->Output().Shape().TotalSize()}, DataType::Float, L"labels"); //z->Output();
 
     FunctionPtr fctLoss = CrossEntropyWithSoftmax(z,outputLabels);
     FunctionPtr fctEvalError = ClassificationError(z, outputLabels);
