@@ -400,25 +400,30 @@ bool Deep::evalModel(const MatrixXf& input, MatrixXf& output, const DeviceDescri
 }
 
 
+//*************************************************************************************************************
 
+bool Deep::trainModel(const MatrixXf &input, const MatrixXf &targets, QVector<double> &loss, QVector<double> &error, int minibatch_size, const DeviceDescriptor &device)
+{
+    int num_samples = input.rows();
+    int num_minibatches_to_train = floor(num_samples / minibatch_size);
 
+    double loss_val, error_val;
 
+    for(int i = 0; i < num_minibatches_to_train; ++i) {
 
+        trainMinibatch(input.block(i * minibatch_size, 0, minibatch_size, input.cols()),
+                       targets.block(i * minibatch_size, 0, minibatch_size, targets.cols()),
+                       loss_val, error_val);
 
+        if(i % 9 == 0)
+            qDebug() << "Iteration:" << i+1 << "; loss" << loss_val << "; error" << error_val;
 
+        loss.append(loss_val);
+        error.append(error_val);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    return true;
+}
 
 
 //*************************************************************************************************************

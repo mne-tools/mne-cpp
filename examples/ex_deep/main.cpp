@@ -41,6 +41,7 @@
 #include <QLabel>
 #include <QChart>
 #include <QChartView>
+#include <QLineSeries>
 #include <QScatterSeries>
 #include <QCategoryAxis>
 
@@ -190,19 +191,40 @@ int main(int argc, char *argv[])
     // Initialize the parameters for the trainer
     int minibatch_size = 25;
     int num_samples = 20000;
-    int num_minibatches_to_train = num_samples / minibatch_size;
 
-    for(int i = 0; i < num_minibatches_to_train; ++i) {
-        generate_random_data_samples(minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-
-        // Specify the input variables mapping in the model to actual minibatch data for training
-        deep_1.trainMinibatch(features, labels, loss, error, device);
-
-        if(i % 9 == 0)
-            qDebug() << "Iteration:" << i+1 << "; loss" << loss << "; error" << error;
-    }
+    QVector<double> vecLoss, vecError;
+    generate_random_data_samples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    deep_1.trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
 
     qDebug() << "\n Finished training \n";
+
+    //Plot error
+    QLineSeries *error_series = new QLineSeries();
+    for(int i = 0; i < vecError.size(); ++i) {
+        error_series->append(i, vecError[i]);
+    }
+    QChart *error_chart = new QChart();
+    error_chart->legend()->hide();
+    error_chart->addSeries(error_series);
+    error_chart->createDefaultAxes();
+    error_chart->setTitle("Training Error");
+    QChartView *error_chartView = new QChartView(error_chart);
+    error_chartView->setRenderHint(QPainter::Antialiasing);
+    error_chartView->show();
+
+    //Plot loss
+    QLineSeries *loss_series = new QLineSeries();
+    for(int i = 0; i < vecError.size(); ++i) {
+        loss_series->append(i, vecLoss[i]);
+    }
+    QChart *loss_chart = new QChart();
+    loss_chart->legend()->hide();
+    loss_chart->addSeries(loss_series);
+    loss_chart->createDefaultAxes();
+    loss_chart->setTitle("Loss Error");
+    QChartView *loss_chartView = new QChartView(loss_chart);
+    loss_chartView->setRenderHint(QPainter::Antialiasing);
+    loss_chartView->show();
 
     //
     // Evaluation / Testing
