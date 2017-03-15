@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     bemsurfacetreeitem.h
+* @file     sensortreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BemSurfaceTreeItem class declaration.
+* @brief     SensorTreeItem class declaration.
 *
 */
 
-#ifndef BEMSURFACETREEITEM_H
-#define BEMSURFACETREEITEM_H
+#ifndef SENSORTREEITEM_H
+#define SENSORTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,23 +44,18 @@
 #include "../../../../disp3D_global.h"
 
 #include "../common/abstracttreeitem.h"
-#include "../common/types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <QPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -69,7 +64,7 @@
 //=============================================================================================================
 
 namespace MNELIB {
-    class MNEBemSurface;
+    class MNEBem;
 }
 
 namespace Qt3DCore {
@@ -91,22 +86,20 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Renderable3DEntity;
-
 
 //=============================================================================================================
 /**
-* BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
+* SensorTreeItem provides a tree item to hold BEM models.
 *
-* @brief BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
+* @brief Provides a generic SensorTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SensorTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BemSurfaceTreeItem> SPtr;             /**< Shared pointer type for BemSurfaceTreeItem class. */
-    typedef QSharedPointer<const BemSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BemSurfaceTreeItem class. */
+    typedef QSharedPointer<SensorTreeItem> SPtr;             /**< Shared pointer type for SensorTreeItem class. */
+    typedef QSharedPointer<const SensorTreeItem> ConstSPtr;  /**< Const shared pointer type for SensorTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -115,13 +108,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BemSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::BemSurfaceItem, const QString& text = "BEM Surface");
+    explicit SensorTreeItem(int iType = Data3DTreeModelItemTypes::BemItem, const QString& text = "");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BemSurfaceTreeItem();
+    ~SensorTreeItem();
 
     //=========================================================================================================
     /**
@@ -132,38 +125,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds BEM model data.
+    * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
-    * @param[in] tBemSurface        The bem data.
-    * @param[in] parent             The Qt3D entity parent of the new item.
+    * @param[in] tBem               The BEM data.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEBemSurface &tBemSurface, Qt3DCore::QEntity* parent);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
+    void addData(const MNELIB::MNEBem& tBem, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
-    //=========================================================================================================
-    /**
-    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    void onSurfaceAlphaChanged(float fAlpha);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onSurfaceColorChanged(const QColor &color);
-
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.
@@ -171,54 +140,8 @@ private:
     * @param[in] checkState        The current checkstate.
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation x of this item changed.
-    *
-    * @param[in] fTransX        The current x translation.
-    */
-    void onSurfaceTranslationXChanged(float fTransX);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation y of this item changed.
-    *
-    * @param[in] fTransY        The current y translation.
-    */
-    void onSurfaceTranslationYChanged(float fTransY);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation z of this item changed.
-    *
-    * @param[in] fTransZ        The current z translation.
-    */
-    void onSurfaceTranslationZChanged(float fTransZ);
-
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given color for the input vertices.
-    *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
-    *
-    * @return The colors per vertex
-    */
-    MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
-
-    QPointer<Renderable3DEntity>        m_pRenderable3DEntity;          /**< The renderable 3D entity. */
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
-    */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BEMSURFACETREEITEM_H
+#endif // SENSORTREEITEM_H

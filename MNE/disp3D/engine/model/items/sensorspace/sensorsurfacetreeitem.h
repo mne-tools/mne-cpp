@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     bemsurfacetreeitem.h
+* @file     sensorsurfacetreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BemSurfaceTreeItem class declaration.
+* @brief     SensorSurfaceTreeItem class declaration.
 *
 */
 
-#ifndef BEMSURFACETREEITEM_H
-#define BEMSURFACETREEITEM_H
+#ifndef SENSORSURFACETREEITEM_H
+#define SENSORSURFACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,17 +96,17 @@ class Renderable3DEntity;
 
 //=============================================================================================================
 /**
-* BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
+* SensorSurfaceTreeItem provides a generic brain tree item to hold sensor surfaces.
 *
-* @brief BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
+* @brief SensorSurfaceTreeItem provides a generic brain tree item to hold sensor surfaces.
 */
-class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SensorSurfaceTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BemSurfaceTreeItem> SPtr;             /**< Shared pointer type for BemSurfaceTreeItem class. */
-    typedef QSharedPointer<const BemSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BemSurfaceTreeItem class. */
+    typedef QSharedPointer<SensorSurfaceTreeItem> SPtr;             /**< Shared pointer type for SensorSurfaceTreeItem class. */
+    typedef QSharedPointer<const SensorSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for SensorSurfaceTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -115,13 +115,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BemSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::BemSurfaceItem, const QString& text = "BEM Surface");
+    explicit SensorSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SensorSurfaceItem, const QString& text = "Sensor Surface");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BemSurfaceTreeItem();
+    ~SensorSurfaceTreeItem();
 
     //=========================================================================================================
     /**
@@ -221,4 +221,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BEMSURFACETREEITEM_H
+#endif // SENSORSURFACETREEITEM_H
