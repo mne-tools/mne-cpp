@@ -89,12 +89,7 @@ SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
 
 SensorPositionTreeItem::~SensorPositionTreeItem()
 {
-    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    for(int i = 0; i < m_lRects.size(); ++i) {
-        m_lRects.at(i)->deleteLater();
-    }
-
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
 }

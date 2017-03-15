@@ -89,11 +89,6 @@ SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
 
 SourceSpaceTreeItem::~SourceSpaceTreeItem()
 {
-    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        m_lSpheres.at(i)->deleteLater();
-    }
-
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
         m_pRenderable3DEntityNormals->deleteLater();
