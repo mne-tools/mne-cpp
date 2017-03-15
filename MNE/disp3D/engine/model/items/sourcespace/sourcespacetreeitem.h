@@ -121,7 +121,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
+    * Adds source space data.
     *
     * @param[in] tHemisphere        The hemisphere data of the source space.
     * @param[in] parent             The Qt3D entity parent of the new item.
