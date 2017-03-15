@@ -79,10 +79,7 @@ using namespace FIFFLIB;
 SensorSetTreeItem::SensorSetTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Sensor item");
+    initItem();
 }
 
 
@@ -90,6 +87,17 @@ SensorSetTreeItem::SensorSetTreeItem(int iType, const QString& text)
 
 SensorSetTreeItem::~SensorSetTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void SensorSetTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Sensor item");
 }
 
 

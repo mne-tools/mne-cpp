@@ -147,7 +147,13 @@ public:
     */
     void setVisible(bool state);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.

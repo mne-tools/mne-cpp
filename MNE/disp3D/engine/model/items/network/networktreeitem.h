@@ -140,20 +140,16 @@ public:
     * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
     * @param[in] parent                 The Qt3D entity parent of the new item.
-    *
-    * @return                           Returns true if successful.
     */
-    bool init(Qt3DCore::QEntity *parent);
+    void initData(Qt3DCore::QEntity *parent);
 
     //=========================================================================================================
     /**
     * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
     * @param[in] tNetworkData       The new connectivity data.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const CONNECTIVITYLIB::Network& tNetworkData);
+    void addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
     //=========================================================================================================
     /**
@@ -161,9 +157,15 @@ public:
     *
     * @return                       Returns true if this item is initialized.
     */
-    inline bool isInit() const;
+    inline bool isDataInit() const;
 
 private:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.
@@ -197,7 +199,7 @@ private:
     */
     void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData, const QVector3D& vecThreshold);
 
-    bool                                        m_bIsInit;                      /**< The init flag. */
+    bool                                        m_bDataIsInit;                  /**< The data init flag. */
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
     MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
@@ -215,9 +217,9 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool NetworkTreeItem::isInit() const
+inline bool NetworkTreeItem::isDataInit() const
 {
-    return m_bIsInit;
+    return m_bDataIsInit;
 }
 
 } //NAMESPACE DISP3DLIB

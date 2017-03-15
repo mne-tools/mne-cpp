@@ -54,18 +54,9 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QMatrix4x4>
-
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
-#include <QUrl>
 
 
 //*************************************************************************************************************
@@ -95,10 +86,7 @@ SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Source space item");
+    initItem();
 }
 
 
@@ -115,6 +103,31 @@ SourceSpaceTreeItem::~SourceSpaceTreeItem()
 
 //*************************************************************************************************************
 
+void SourceSpaceTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Source space item");
+
+    //Add surface meta information as item children
+    QList<QStandardItem*> list;
+    QVariant data;
+
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
+    connect(pItemSurfCol, &MetaTreeItem::colorChanged,
+            this, &SourceSpaceTreeItem::onSurfaceColorChanged);
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
+    this->appendRow(list);
+    data.setValue(QColor(100,100,100));
+    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
+    pItemSurfCol->setData(data, Qt::DecorationRole);
+}
+
+
+//*************************************************************************************************************
+
 QVariant SourceSpaceTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
@@ -123,7 +136,7 @@ QVariant SourceSpaceTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  SourceSpaceTreeItem::setData(const QVariant& value, int role)
+void SourceSpaceTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
@@ -196,7 +209,7 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     //Set renderable 3D entity mesh and color data
     m_pRenderable3DEntity->getCustomMesh()->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, matVertColor, Qt3DRender::QGeometryRenderer::Triangles);
 
-    //Set shaders
+    //Set material
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
     m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
@@ -208,19 +221,6 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
 
     data.setValue(tHemisphere.rr);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
-
-    //Add surface meta information as item children
-    QList<QStandardItem*> list;
-
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
-    connect(pItemSurfCol, &MetaTreeItem::colorChanged,
-            this, &SourceSpaceTreeItem::onSurfaceColorChanged);
-    list << pItemSurfCol;
-    list << new QStandardItem(pItemSurfCol->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
-    pItemSurfCol->setData(data, Qt::DecorationRole);
 }
 
 

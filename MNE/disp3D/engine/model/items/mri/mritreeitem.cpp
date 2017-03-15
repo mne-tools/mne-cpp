@@ -76,10 +76,7 @@ using namespace DISP3DLIB;
 MriTreeItem::MriTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("MRI item");
+    initItem();
 }
 
 
@@ -87,6 +84,17 @@ MriTreeItem::MriTreeItem(int iType, const QString& text)
 
 MriTreeItem::~MriTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void MriTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("MRI item");
 }
 
 

@@ -134,7 +134,15 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, Qt3DCore::QEntity* parent);
+    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, Qt3DCore::QEntity* parent);
+
+    //=========================================================================================================
+    /**
+    * Plots the sensors.
+    *
+    * @param[in] lChInfo            The channel information used to plot the MEG channels.
+    */
+    void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo);
 
     //=========================================================================================================
     /**
@@ -144,7 +152,13 @@ public:
     */
     void setVisible(bool state);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.

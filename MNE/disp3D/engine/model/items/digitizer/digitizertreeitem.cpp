@@ -51,11 +51,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QMatrix4x4>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DCore/QTransform>
-#include <Qt3DCore/QEntity>
 
 
 //*************************************************************************************************************
@@ -81,25 +78,7 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip(text);
-
-    //Add color picker item as meta information item
-    QVariant data;
-    QList<QStandardItem*> list;
-
-    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
-    connect(pItemColor, &MetaTreeItem::colorChanged,
-            this, &DigitizerTreeItem::onSurfaceColorChanged);
-    list.clear();
-    list << pItemColor;
-    list << new QStandardItem(pItemColor->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
-    pItemColor->setData(data, Qt::DecorationRole);
+    initItem();
 }
 
 
@@ -115,6 +94,32 @@ DigitizerTreeItem::~DigitizerTreeItem()
     if(!m_pRenderable3DEntity.isNull()) {
         m_pRenderable3DEntity->deleteLater();
     }
+}
+
+
+//*************************************************************************************************************
+
+void DigitizerTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip(this->text());
+
+    //Add color picker item as meta information item
+    QVariant data;
+    QList<QStandardItem*> list;
+
+    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
+    connect(pItemColor, &MetaTreeItem::colorChanged,
+            this, &DigitizerTreeItem::onSurfaceColorChanged);
+    list.clear();
+    list << pItemColor;
+    list << new QStandardItem(pItemColor->toolTip());
+    this->appendRow(list);
+    data.setValue(QColor(100,100,100));
+    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
+    pItemColor->setData(data, Qt::DecorationRole);
 }
 
 
@@ -136,7 +141,7 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
+void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
 {
     //Clear all data
     m_lSpheres.clear();
@@ -221,8 +226,6 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
             item->setData(data, Qt::DecorationRole);
         }
     }
-
-    return true;
 }
 
 

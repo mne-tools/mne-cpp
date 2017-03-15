@@ -57,13 +57,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -94,10 +87,7 @@ HemisphereTreeItem::HemisphereTreeItem(int iType, const QString& text)
 , m_pSurfaceItem(Q_NULLPTR)
 , m_pAnnotItem(Q_NULLPTR)
 {
-    this->setEditable(false);    
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Brain hemisphere item");
+    initItem();
 }
 
 
@@ -105,6 +95,17 @@ HemisphereTreeItem::HemisphereTreeItem(int iType, const QString& text)
 
 HemisphereTreeItem::~HemisphereTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void HemisphereTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Brain hemisphere item");
 }
 
 

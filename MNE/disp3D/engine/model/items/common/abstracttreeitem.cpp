@@ -177,6 +177,14 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
 
 //*************************************************************************************************************
 
+void AbstractTreeItem::initItem()
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void AbstractTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i<this->rowCount(); i++) {

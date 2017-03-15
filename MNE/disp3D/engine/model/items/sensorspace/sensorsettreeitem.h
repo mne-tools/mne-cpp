@@ -137,7 +137,13 @@ public:
     */
     void addData(const MNELIB::MNEBem& tSensor, const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.

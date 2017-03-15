@@ -52,14 +52,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QUrl>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,10 +79,7 @@ BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM surface item");
+    initItem();
 }
 
 
@@ -105,68 +94,26 @@ BemSurfaceTreeItem::~BemSurfaceTreeItem()
 
 //*************************************************************************************************************
 
-QVariant BemSurfaceTreeItem::data(int role) const
+void BemSurfaceTreeItem::initItem()
 {
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  BemSurfaceTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-
-    switch(role) {
-        case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
-            break;
-        default: // do nothing;
-            break;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
-{
-    //Create renderable 3D entity
-    m_pRenderable3DEntity->setParent(parent);
-
-    //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
-
-    //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, matVertColor, Qt3DRender::QGeometryRenderer::Triangles);
-
-    //Set shaders
-    PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
-    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
-
-    //Find out BEM layer type and change items name
-    this->setText(MNEBemSurface::id_name(tBemSurface.id));
-
-    //Add data which is held by this BemSurfaceTreeItem
-    QVariant data;
-
-    data.setValue(matVertColor);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-
-    data.setValue(tBemSurface.rr);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("BEM surface item");
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
+    QVariant data;
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, "1.0");
+    float fAlpha = 0.5;
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString::number(fAlpha));
     connect(itemAlpha, &MetaTreeItem::alphaChanged,
             this, &BemSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
-    data.setValue(0.5);
+    data.setValue(fAlpha);
     itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 
     MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
@@ -206,6 +153,61 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
     this->appendRow(list);
+}
+
+
+//*************************************************************************************************************
+
+QVariant BemSurfaceTreeItem::data(int role) const
+{
+    return AbstractTreeItem::data(role);
+}
+
+
+//*************************************************************************************************************
+
+void BemSurfaceTreeItem::setData(const QVariant& value, int role)
+{
+    AbstractTreeItem::setData(value, role);
+
+    switch(role) {
+        case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
+            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
+            break;
+        default: // do nothing;
+            break;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
+{
+    //Create renderable 3D entity
+    m_pRenderable3DEntity->setParent(parent);
+
+    //Create color from curvature information with default gyri and sulcus colors
+    MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
+
+    //Set renderable 3D entity mesh and color data
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, matVertColor, Qt3DRender::QGeometryRenderer::Triangles);
+
+    //Set material
+    PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
+    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
+
+    //Find out BEM layer type and change items name
+    this->setText(MNEBemSurface::id_name(tBemSurface.id));
+
+    //Add data which is held by this BemSurfaceTreeItem
+    QVariant data;
+
+    data.setValue(matVertColor);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+
+    data.setValue(tBemSurface.rr);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 }
 
 

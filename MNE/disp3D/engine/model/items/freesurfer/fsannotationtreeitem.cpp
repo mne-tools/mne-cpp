@@ -51,13 +51,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,10 +75,7 @@ using namespace FSLIB;
 FsAnnotationTreeItem::FsAnnotationTreeItem(int iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Unchecked);
-    this->setToolTip("Freesurfer annotation item");
+    initItem();
 }
 
 
@@ -93,6 +83,17 @@ FsAnnotationTreeItem::FsAnnotationTreeItem(int iType, const QString & text)
 
 FsAnnotationTreeItem::~FsAnnotationTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void FsAnnotationTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Unchecked);
+    this->setToolTip("Freesurfer annotation item");
 }
 
 

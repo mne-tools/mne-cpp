@@ -53,14 +53,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QUrl>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,10 +85,7 @@ FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
 , m_pItemSurfColGyri(new MetaTreeItem())
 , m_pItemSurfColSulci(new MetaTreeItem())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Freesurfer Surface item");
+    initItem();
 }
 
 
@@ -112,6 +101,86 @@ FsSurfaceTreeItem::~FsSurfaceTreeItem()
     if(m_pRenderable3DEntityNormals) {
         m_pRenderable3DEntityNormals->deleteLater();
     }
+}
+
+
+//*************************************************************************************************************
+
+void FsSurfaceTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Freesurfer Surface item");
+
+    //Add surface meta information as item children
+    QList<QStandardItem*> list;
+    QVariant data;
+
+    m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
+    connect(m_pItemSurfColSulci, &MetaTreeItem::curvColorsChanged,
+            this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
+    list << m_pItemSurfColSulci;
+    list << new QStandardItem(m_pItemSurfColSulci->toolTip());
+    this->appendRow(list);
+    data.setValue(QColor(50,50,50));
+    m_pItemSurfColSulci->setData(data, MetaTreeItemRoles::SurfaceColorSulci);
+    m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
+
+    m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
+    connect(m_pItemSurfColGyri, &MetaTreeItem::curvColorsChanged,
+            this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
+    list.clear();
+    list << m_pItemSurfColGyri;
+    list << new QStandardItem(m_pItemSurfColGyri->toolTip());
+    this->appendRow(list);
+    data.setValue(QColor(125,125,125));
+    m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
+    m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
+
+    float fAlpha = 0.35f;
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
+    connect(itemAlpha, &MetaTreeItem::alphaChanged,
+            this, &FsSurfaceTreeItem::onSurfaceAlphaChanged);
+    list.clear();
+    list << itemAlpha;
+    list << new QStandardItem(itemAlpha->toolTip());
+    this->appendRow(list);
+    data.setValue(fAlpha);
+    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
+
+//    float fTessInner = 1.0;
+//    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
+//    connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
+//            this, &FsSurfaceTreeItem::onSurfaceTessInnerChanged);
+//    list.clear();
+//    list << itemTessInner;
+//    list << new QStandardItem(itemTessInner->toolTip());
+//    this->appendRow(list);
+//    data.setValue(fTessInner);
+//    itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
+
+//    float fTessOuter = 1.0;
+//    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
+//    connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
+//            this, &FsSurfaceTreeItem::onSurfaceTessOuterChanged);
+//    list.clear();
+//    list << itemTessOuter;
+//    list << new QStandardItem(itemTessOuter->toolTip());
+//    this->appendRow(list);
+//    data.setValue(fTessOuter);
+//    itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
+
+//    float fTriangleScale = 1.0;
+//    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
+//    connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
+//            this, &FsSurfaceTreeItem::onSurfaceTriangleScaleChanged);
+//    list.clear();
+//    list << itemTriangleScale;
+//    list << new QStandardItem(itemTriangleScale->toolTip());
+//    this->appendRow(list);
+//    data.setValue(fTriangleScale);
+//    itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 }
 
 
@@ -188,73 +257,8 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(tSurface.curv());
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
 
-    //Add surface meta information as item children
+     //Add data which is held by this FsSurfaceTreeItem
     QList<QStandardItem*> list;
-
-    m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
-    connect(m_pItemSurfColSulci, &MetaTreeItem::curvColorsChanged,
-            this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
-    list << m_pItemSurfColSulci;
-    list << new QStandardItem(m_pItemSurfColSulci->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(50,50,50));
-    m_pItemSurfColSulci->setData(data, MetaTreeItemRoles::SurfaceColorSulci);
-    m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
-
-    m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
-    connect(m_pItemSurfColGyri, &MetaTreeItem::curvColorsChanged,
-            this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
-    list.clear();
-    list << m_pItemSurfColGyri;
-    list << new QStandardItem(m_pItemSurfColGyri->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(125,125,125));
-    m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
-    m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
-
-    float fAlpha = 0.35f;
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::alphaChanged,
-            this, &FsSurfaceTreeItem::onSurfaceAlphaChanged);
-    list.clear();
-    list << itemAlpha;
-    list << new QStandardItem(itemAlpha->toolTip());
-    this->appendRow(list);
-    data.setValue(fAlpha);
-    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
-
-//    float fTessInner = 1.0;
-//    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
-//    connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
-//            this, &FsSurfaceTreeItem::onSurfaceTessInnerChanged);
-//    list.clear();
-//    list << itemTessInner;
-//    list << new QStandardItem(itemTessInner->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTessInner);
-//    itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
-
-//    float fTessOuter = 1.0;
-//    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
-//    connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
-//            this, &FsSurfaceTreeItem::onSurfaceTessOuterChanged);
-//    list.clear();
-//    list << itemTessOuter;
-//    list << new QStandardItem(itemTessOuter->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTessOuter);
-//    itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
-
-//    float fTriangleScale = 1.0;
-//    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
-//    connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
-//            this, &FsSurfaceTreeItem::onSurfaceTriangleScaleChanged);
-//    list.clear();
-//    list << itemTriangleScale;
-//    list << new QStandardItem(itemTriangleScale->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTriangleScale);
-//    itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 
     MetaTreeItem *itemSurfFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tSurface.fileName());
     itemSurfFileName->setEditable(false);
