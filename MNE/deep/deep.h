@@ -230,13 +230,28 @@ public:
 
     //=========================================================================================================
     /**
-    * Train the CNTK Model
+    * Train the CNTK Model with one Minibatch
+    *
+    * @param [in] input             The inputs (rows = samples (batchsize), cols = feature inputs)
+    * @param [in] targets           The targets (rows = samples (batchsize), cols = output results)
+    * @param [out] loss             The training loss
+    * @param [out] error            The training error
+    * @param [in] minibatch_size    The size of one minibatch (Default 25)
+    * @param [in] device            Device to use for evaluation
+    *
+    * @return true when successfully evaluated, false otherwise.
+    */
+    bool trainModel(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, QVector<double>& loss, QVector<double>& error, int minibatch_size = 25, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Train the CNTK Model with one Minibatch
     *
     * @param [in] input     The inputs (rows = samples (batchsize), cols = feature inputs)
     * @param [in] targets   The targets (rows = samples (batchsize), cols = output results)
     * @param [out] loss     The training loss
     * @param [out] error    The training error
-    * @param [in] device    Device to use for evaluation
+    * @param [in] device    Device to use for training
     *
     * @return true when successfully evaluated, false otherwise.
     */
