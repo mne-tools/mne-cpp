@@ -239,14 +239,6 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-    //########################################################################################
-    //
-    // Create the test view START
-    //
-    //########################################################################################
-
-    std::cout<<"Creating BrainView"<<std::endl;
-
     //Create 3D data model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
@@ -289,12 +281,6 @@ int main(int argc, char *argv[])
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
-
-    //########################################################################################
-    //
-    // Create the test view END
-    //
-    //########################################################################################
 
     return a.exec();
 }
