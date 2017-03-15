@@ -165,7 +165,13 @@ public:
     */
     void setRtVertColor(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.

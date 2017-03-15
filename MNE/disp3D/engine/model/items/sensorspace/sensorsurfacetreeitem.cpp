@@ -79,10 +79,7 @@ SensorSurfaceTreeItem::SensorSurfaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Sensor surface item");
+    initItem();
 }
 
 
@@ -92,6 +89,70 @@ SensorSurfaceTreeItem::~SensorSurfaceTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     m_pRenderable3DEntity->deleteLater();
+}
+
+
+//*************************************************************************************************************
+
+void SensorSurfaceTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Sensor surface item");
+
+    //Add surface meta information as item children
+    QList<QStandardItem*> list;
+    QVariant data;
+
+    float fAlpha = 0.6;
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString::number(fAlpha));
+    connect(itemAlpha, &MetaTreeItem::alphaChanged,
+            this, &SensorSurfaceTreeItem::onSurfaceAlphaChanged);
+    list.clear();
+    list << itemAlpha;
+    list << new QStandardItem(itemAlpha->toolTip());
+    this->appendRow(list);
+    data.setValue(fAlpha);
+    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
+
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
+    connect(pItemSurfCol, &MetaTreeItem::colorChanged,
+            this, &SensorSurfaceTreeItem::onSurfaceColorChanged);
+    list.clear();
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
+    this->appendRow(list);
+    data.setValue(QColor(100,100,100));
+    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
+    pItemSurfCol->setData(data, Qt::DecorationRole);
+
+    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
+    itemXTrans->setEditable(true);
+    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
+            this, &SensorSurfaceTreeItem::onSurfaceTranslationXChanged);
+    list.clear();
+    list << itemXTrans;
+    list << new QStandardItem(itemXTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
+    itemYTrans->setEditable(true);
+    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
+            this, &SensorSurfaceTreeItem::onSurfaceTranslationYChanged);
+    list.clear();
+    list << itemYTrans;
+    list << new QStandardItem(itemYTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
+    itemZTrans->setEditable(true);
+    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
+            this, &SensorSurfaceTreeItem::onSurfaceTranslationZChanged);
+    list.clear();
+    list << itemZTrans;
+    list << new QStandardItem(itemZTrans->toolTip());
+    this->appendRow(list);
 }
 
 
@@ -144,58 +205,6 @@ void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCor
 
     data.setValue(tSensorSurface.rr);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
-
-    //Add surface meta information as item children
-    QList<QStandardItem*> list;
-
-    float fAlpha = 0.6;
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString::number(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::alphaChanged,
-            this, &SensorSurfaceTreeItem::onSurfaceAlphaChanged);
-    list.clear();
-    list << itemAlpha;
-    list << new QStandardItem(itemAlpha->toolTip());
-    this->appendRow(list);
-    data.setValue(fAlpha);
-    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
-
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
-    connect(pItemSurfCol, &MetaTreeItem::colorChanged,
-            this, &SensorSurfaceTreeItem::onSurfaceColorChanged);
-    list.clear();
-    list << pItemSurfCol;
-    list << new QStandardItem(pItemSurfCol->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
-    pItemSurfCol->setData(data, Qt::DecorationRole);
-
-    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
-    itemXTrans->setEditable(true);
-    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
-            this, &SensorSurfaceTreeItem::onSurfaceTranslationXChanged);
-    list.clear();
-    list << itemXTrans;
-    list << new QStandardItem(itemXTrans->toolTip());
-    this->appendRow(list);
-
-    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
-    itemYTrans->setEditable(true);
-    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
-            this, &SensorSurfaceTreeItem::onSurfaceTranslationYChanged);
-    list.clear();
-    list << itemYTrans;
-    list << new QStandardItem(itemYTrans->toolTip());
-    this->appendRow(list);
-
-    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
-    itemZTrans->setEditable(true);
-    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
-            this, &SensorSurfaceTreeItem::onSurfaceTranslationZChanged);
-    list.clear();
-    list << itemZTrans;
-    list << new QStandardItem(itemZTrans->toolTip());
-    this->appendRow(list);
 }
 
 

@@ -90,13 +90,10 @@ using namespace DISP3DLIB;
 
 EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
-, m_bIsInit(false)
+, m_bIsDataInit(false)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Dipole fit data");
+    initItem();
 }
 
 
@@ -112,6 +109,17 @@ EcdDataTreeItem::~EcdDataTreeItem()
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
+}
+
+
+//*************************************************************************************************************
+
+void EcdDataTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Dipole fit data");
 }
 
 
@@ -133,28 +141,22 @@ void EcdDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool EcdDataTreeItem::init(Qt3DCore::QEntity* parent)
+void EcdDataTreeItem::initData(Qt3DCore::QEntity* parent)
 {      
     //Create renderable 3D entity
     m_pRenderable3DEntity->setParent(parent);
 
-    //Add meta information as item children
-    QList<QStandardItem*> list;
-    QVariant data;
-
-    m_bIsInit = true;
-
-    return true;
+    m_bIsDataInit = true;
 }
 
 
 //*************************************************************************************************************
 
-bool EcdDataTreeItem::addData(const ECDSet& pECDSet)
+void EcdDataTreeItem::addData(const ECDSet& pECDSet)
 {
-    if(!m_bIsInit) {
-        qDebug() << "EcdDataTreeItem::addData - EcdDataTreeItem has not been initialized yet!";
-        return false;
+    if(!m_bIsDataInit) {
+        qDebug() << "EcdDataTreeItem::addData - EcdDataTreeItem data has not been initialized yet!";
+        return;
     }
 
     //Add further infos as children
@@ -174,8 +176,6 @@ bool EcdDataTreeItem::addData(const ECDSet& pECDSet)
 
     //Plot dipole moment
     plotDipoles(pECDSet);
-
-    return true;
 }
 
 

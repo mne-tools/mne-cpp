@@ -46,12 +46,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
 #include <QVector3D>
 
 
@@ -78,6 +72,21 @@ using namespace DISP3DLIB;
 
 MetaTreeItem::MetaTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
+{
+    initItem();
+}
+
+
+//*************************************************************************************************************
+
+MetaTreeItem::~MetaTreeItem()
+{
+}
+
+
+//*************************************************************************************************************
+
+void MetaTreeItem::initItem()
 {
     QString sToolTip;
 
@@ -159,13 +168,6 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
     }
 
     this->setToolTip(sToolTip);
-}
-
-
-//*************************************************************************************************************
-
-MetaTreeItem::~MetaTreeItem()
-{
 }
 
 

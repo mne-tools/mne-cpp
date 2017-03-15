@@ -76,10 +76,7 @@ using namespace DISP3DLIB;
 BemTreeItem::BemTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM item");
+    initItem();
 }
 
 
@@ -87,6 +84,17 @@ BemTreeItem::BemTreeItem(int iType, const QString& text)
 
 BemTreeItem::~BemTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void BemTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("BEM item");
 }
 
 

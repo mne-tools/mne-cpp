@@ -81,10 +81,33 @@ SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
+    initItem();
+}
+
+
+//*************************************************************************************************************
+
+SensorPositionTreeItem::~SensorPositionTreeItem()
+{
+    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
+    for(int i = 0; i < m_lRects.size(); ++i) {
+        m_lRects.at(i)->deleteLater();
+    }
+
+    if(!m_pRenderable3DEntity.isNull()) {
+        m_pRenderable3DEntity->deleteLater();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorPositionTreeItem::initItem()
+{
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip(text);
+    this->setToolTip(this->text());
 
     //Add color picker item as meta information item
     QVariant data;
@@ -116,21 +139,6 @@ SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-SensorPositionTreeItem::~SensorPositionTreeItem()
-{
-    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    for(int i = 0; i < m_lRects.size(); ++i) {
-        m_lRects.at(i)->deleteLater();
-    }
-
-    if(!m_pRenderable3DEntity.isNull()) {
-        m_pRenderable3DEntity->deleteLater();
-    }
-}
-
-
-//*************************************************************************************************************
-
 QVariant SensorPositionTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
@@ -147,13 +155,21 @@ void SensorPositionTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* parent)
+void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* parent)
 {
     //Clear all data
     m_lRects.clear();
 
     m_pRenderable3DEntity->setParent(parent);
 
+    plotSensors(lChInfo);
+}
+
+
+//*************************************************************************************************************
+
+void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo)
+{
     //Create digitizers as small 3D spheres
     QVector3D pos;
     QColor colDefault(100,100,100);
@@ -206,10 +222,7 @@ bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
             item->setData(data, Qt::DecorationRole);
         }
     }
-
-    return true;
 }
-
 
 //*************************************************************************************************************
 
