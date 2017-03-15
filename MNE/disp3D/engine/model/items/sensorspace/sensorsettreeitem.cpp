@@ -123,8 +123,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
     for(int i = 0; i < tSensor.size(); ++i) {
         QString sSensorSurfName;
         sSensorSurfName = QString("%1").arg(tSensor[i].id);
-        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], lChInfo, p3DEntityParent);
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem, sSensorSurfName);
+        pSurfItem->addData(tSensor[i], p3DEntityParent);
 
         QList<QStandardItem*> list;
         list << pSurfItem;

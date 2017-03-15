@@ -113,7 +113,7 @@ class EcdDataTreeItem;
 class FsSurfaceTreeItem;
 class SourceSpaceTreeItem;
 class BemTreeItem;
-class SensorTreeItem;
+class SensorSetTreeItem;
 class DigitizerSetTreeItem;
 class SubjectTreeItem;
 class MeasurementTreeItem;
@@ -269,7 +269,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorTreeItem* addMegSensorData(const QString& subject,
+    SensorSetTreeItem* addMegSensorData(const QString& subject,
                                         const QString& sBemSetName,
                                         const MNELIB::MNEBem& tSensor,
                                         const QList<FIFFLIB::FiffChInfo>& lChInfo);
