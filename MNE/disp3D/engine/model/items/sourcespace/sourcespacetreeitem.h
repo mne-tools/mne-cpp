@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
+#include "../common/abstractsurfacetreeitem.h"
 #include "../common/types.h"
 
 
@@ -96,7 +96,7 @@ class Renderable3DEntity;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT SourceSpaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SourceSpaceTreeItem : public AbstractSurfaceTreeItem
 {
     Q_OBJECT
 
@@ -121,13 +121,6 @@ public:
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] tHemisphere        The hemisphere data of the source space.
@@ -135,60 +128,23 @@ public:
     */
     void addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
 
+protected:
     //=========================================================================================================
     /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
+    * Plots the sources a spheres.
     *
-    * @param[in] state     The visiblity flag.
+    * @param[in] tHemisphere        The hemisphere data of the source space.
     */
-    void setVisible(bool state);
+    void plotSources(const MNELIB::MNEHemisphere& tHemisphere);
 
-protected:
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     void initItem();
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onSurfaceColorChanged(const QColor &color);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given color for the input vertices.
-    *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
-    *
-    * @return The colors per vertex.
-    */
-    MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
-
-    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
-
     QList<QPointer<Renderable3DEntity> >        m_lSpheres;                 /**< The currently displayed source points as 3D spheres. */
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
-    */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DLIB
