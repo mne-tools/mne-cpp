@@ -118,6 +118,7 @@ SOURCES += \
     engine/model/items/mri/mritreeitem.cpp \
     engine/model/items/common/abstracttreeitem.cpp \
     engine/model/items/common/metatreeitem.cpp \
+    engine/model/items/common/abstractsurfacetreeitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     engine/model/3dhelpers/renderable3Dentity.cpp \
     engine/model/3dhelpers/custommesh.cpp \
@@ -154,6 +155,7 @@ HEADERS += \
     engine/model/items/mri/mritreeitem.h \
     engine/model/items/common/abstracttreeitem.h \
     engine/model/items/common/metatreeitem.h \
+    engine/model/items/common/abstractsurfacetreeitem.h \
     engine/model/items/common/types.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     engine/model/3dhelpers/renderable3Dentity.h \
