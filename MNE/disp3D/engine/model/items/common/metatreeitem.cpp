@@ -121,11 +121,8 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::VisualizationType:
             sToolTip = "The visualization type";
             break;
-        case MetaTreeItemTypes::SurfaceColor:
-            sToolTip = "Surface color item";
-            break;
-        case MetaTreeItemTypes::PointColor:
-            sToolTip = "Point color item";
+        case MetaTreeItemTypes::Color:
+            sToolTip = "Color item";
             break;
         case MetaTreeItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
@@ -218,13 +215,8 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case MetaTreeItemRoles::SurfaceColor: {
-            emit surfaceColorChanged(value.value<QColor>());
-            break;
-        }
-
-        case MetaTreeItemRoles::PointColor: {
-            emit surfaceColorChanged(value.value<QColor>());
+        case MetaTreeItemRoles::Color: {
+            emit colorChanged(value.value<QColor>());
             break;
         }
 

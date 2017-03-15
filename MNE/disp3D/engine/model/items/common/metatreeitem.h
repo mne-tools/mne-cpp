@@ -149,11 +149,11 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the surface color changed.
+    * Emit this signal whenever the color changed.
     *
-    * @param[in] color     The new surface color.
+    * @param[in] color     The new color.
     */
-    void surfaceColorChanged(const QColor& color);
+    void colorChanged(const QColor& color);
 
     //=========================================================================================================
     /**

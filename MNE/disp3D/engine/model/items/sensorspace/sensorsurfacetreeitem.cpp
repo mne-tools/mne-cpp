@@ -158,15 +158,15 @@ void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCor
     data.setValue(0.5);
     itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
 
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
-    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
+    connect(pItemSurfCol, &MetaTreeItem::colorChanged,
             this, &SensorSurfaceTreeItem::onSurfaceColorChanged);
     list.clear();
     list << pItemSurfCol;
     list << new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
     data.setValue(QColor(100,100,100));
-    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
+    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
     pItemSurfCol->setData(data, Qt::DecorationRole);
 
     MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
