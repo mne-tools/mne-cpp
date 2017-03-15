@@ -190,33 +190,6 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     this->appendRow(list);
     data.setValue(tSurface.filePath());
     itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
-
-    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(tSurface.offset()(0)));
-    itemXTrans->setEditable(true);
-    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
-            this, &FsSurfaceTreeItem::onSurfaceTranslationXChanged);
-    list.clear();
-    list << itemXTrans;
-    list << new QStandardItem(itemXTrans->toolTip());
-    this->appendRow(list);
-
-    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(tSurface.offset()(1)));
-    itemYTrans->setEditable(true);
-    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
-            this, &FsSurfaceTreeItem::onSurfaceTranslationYChanged);
-    list.clear();
-    list << itemYTrans;
-    list << new QStandardItem(itemYTrans->toolTip());
-    this->appendRow(list);
-
-    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(tSurface.offset()(2)));
-    itemZTrans->setEditable(true);
-    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
-            this, &FsSurfaceTreeItem::onSurfaceTranslationZChanged);
-    list.clear();
-    list << itemZTrans;
-    list << new QStandardItem(itemZTrans->toolTip());
-    this->appendRow(list);
 }
 
 
