@@ -110,7 +110,7 @@ SOURCES += \
     engine/model/items/network/networktreeitem.cpp \
     engine/model/items/bem/bemtreeitem.cpp \
     engine/model/items/bem/bemsurfacetreeitem.cpp \
-    engine/model/items/sensorspace/sensortreeitem.cpp \
+    engine/model/items/sensorspace/sensorsettreeitem.cpp \
     engine/model/items/sensorspace/sensorsurfacetreeitem.cpp \
     engine/model/items/digitizer/digitizertreeitem.cpp \
     engine/model/items/digitizer/digitizersettreeitem.cpp \
@@ -145,7 +145,7 @@ HEADERS += \
     engine/model/items/network/networktreeitem.h \
     engine/model/items/bem/bemtreeitem.h \
     engine/model/items/bem/bemsurfacetreeitem.h \
-    engine/model/items/sensorspace/sensortreeitem.h \
+    engine/model/items/sensorspace/sensorsettreeitem.h \
     engine/model/items/sensorspace/sensorsurfacetreeitem.h \
     engine/model/items/digitizer/digitizertreeitem.h \
     engine/model/items/digitizer/digitizersettreeitem.h \
