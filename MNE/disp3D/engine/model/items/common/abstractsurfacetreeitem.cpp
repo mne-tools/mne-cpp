@@ -42,6 +42,7 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
+#include "../../materials/pervertextessphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"
 
 
@@ -76,6 +77,8 @@ AbstractSurfaceTreeItem::AbstractSurfaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pRenderable3DEntityNormals(new Renderable3DEntity())
+, m_bUseTesselation(false)
+, m_bRenderNormals(false)
 {
     initItem();
 }
@@ -106,26 +109,36 @@ void AbstractSurfaceTreeItem::initItem()
     this->setToolTip("Abstract Surface item");
 
     //Set shaders
-    PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
-    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
+    if(!m_bUseTesselation) {
+        PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
+        m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
+    } else {
+        PerVertexTessPhongAlphaMaterial* pPerVertexTessPhongAlphaMaterial = new PerVertexTessPhongAlphaMaterial();
+        m_pRenderable3DEntity->addComponent(pPerVertexTessPhongAlphaMaterial);
+    }
 
-//    //Render normals
-//    m_pRenderable3DEntityNormals = new Renderable3DEntity(parent);
-//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
-//    m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-//    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
-//    m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
+//    if(m_bRenderNormals) {
+//        //Render normals
+//        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSurface.rr(),
+//                                                      tSurface.nn(),
+//                                                      tSurface.tris(),
+//                                                      arrayCurvatureColor,
+//                                                      Qt3DRender::QGeometryRenderer::Triangles);
 
-//    //Generate activation overlay surface
-//    MatrixX3f overlayAdds = tSurface.rr();
-//    for(int i = 0; i<tSurface.nn().rows(); i++) {
-//        RowVector3f direction = tSurface.nn().row(i);
-//        direction.normalize();
+//        ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
+//        m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
 
-//        overlayAdds.row(i) = direction*0.0001;
+//        //Generate activation overlay surface
+//        MatrixX3f overlayAdds = tSurface.rr();
+//        for(int i = 0; i<tSurface.nn().rows(); i++) {
+//            RowVector3f direction = tSurface.nn().row(i);
+//            direction.normalize();
+
+//            overlayAdds.row(i) = direction*0.0001;
+//        }
+
+//        m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
 //    }
-
-//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
@@ -142,38 +155,40 @@ void AbstractSurfaceTreeItem::initItem()
     data.setValue(fAlpha);
     itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 
-//    float fTessInner = 1.0;
-//    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
-//    connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
-//            this, &AbstractSurfaceTreeItem::onSurfaceTessInnerChanged);
-//    list.clear();
-//    list << itemTessInner;
-//    list << new QStandardItem(itemTessInner->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTessInner);
-//    itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
+    if(m_bUseTesselation) {
+        float fTessInner = 1.0;
+        MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
+        connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
+                this, &AbstractSurfaceTreeItem::onSurfaceTessInnerChanged);
+        list.clear();
+        list << itemTessInner;
+        list << new QStandardItem(itemTessInner->toolTip());
+        this->appendRow(list);
+        data.setValue(fTessInner);
+        itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
 
-//    float fTessOuter = 1.0;
-//    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
-//    connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
-//            this, &AbstractSurfaceTreeItem::onSurfaceTessOuterChanged);
-//    list.clear();
-//    list << itemTessOuter;
-//    list << new QStandardItem(itemTessOuter->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTessOuter);
-//    itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
+        float fTessOuter = 1.0;
+        MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
+        connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
+                this, &AbstractSurfaceTreeItem::onSurfaceTessOuterChanged);
+        list.clear();
+        list << itemTessOuter;
+        list << new QStandardItem(itemTessOuter->toolTip());
+        this->appendRow(list);
+        data.setValue(fTessOuter);
+        itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
 
-//    float fTriangleScale = 1.0;
-//    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
-//    connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
-//            this, &AbstractSurfaceTreeItem::onSurfaceTriangleScaleChanged);
-//    list.clear();
-//    list << itemTriangleScale;
-//    list << new QStandardItem(itemTriangleScale->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTriangleScale);
-//    itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
+        float fTriangleScale = 1.0;
+        MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
+        connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
+                this, &AbstractSurfaceTreeItem::onSurfaceTriangleScaleChanged);
+        list.clear();
+        list << itemTriangleScale;
+        list << new QStandardItem(itemTriangleScale->toolTip());
+        this->appendRow(list);
+        data.setValue(fTriangleScale);
+        itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
+    }
 }
 
 
@@ -282,4 +297,32 @@ void AbstractSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
     position.setZ(fTransZ);
     m_pRenderable3DEntity->setPosition(position);
     m_pRenderable3DEntityNormals->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void AbstractSurfaceTreeItem::onSurfaceColorChanged(const QColor& color)
+{
+    QVariant data;
+    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
+
+    data.setValue(matNewVertColor);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+}
+
+
+//*************************************************************************************************************
+
+MatrixX3f AbstractSurfaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
+{
+    MatrixX3f matColor(vertices.rows(),3);
+
+    for(int i = 0; i < matColor.rows(); ++i) {
+        matColor(i,0) = color.redF();
+        matColor(i,1) = color.greenF();
+        matColor(i,2) = color.blueF();
+    }
+
+    return matColor;
 }
