@@ -98,7 +98,8 @@ namespace Data3DTreeModelItemTypes
                     MriItem = QStandardItem::UserType + 14,
                     SensorSetItem = QStandardItem::UserType + 15,
                     SensorSurfaceItem = QStandardItem::UserType + 16,
-                    SensorPositionItem = QStandardItem::UserType + 17};
+                    SensorPositionItem = QStandardItem::UserType + 17,
+                    AbstractSurfaceItem = QStandardItem::UserType + 18};
 }
 
 namespace MetaTreeItemTypes
