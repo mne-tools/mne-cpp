@@ -131,14 +131,38 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
         this->appendRow(list);
     }
 
-    //Generate sensor locations as child item
-    SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem);
-    pSensorPosItem->addData(lChInfo, p3DEntityParent);
+    //Sort MEG channel types
+    QList<FiffChInfo> lChInfoGrad;
+    QList<FiffChInfo> lChInfoMag;
 
-    QList<QStandardItem*> list;
-    list << pSensorPosItem;
-    list << new QStandardItem(pSensorPosItem->toolTip());
-    this->appendRow(list);
+    for(int i = 0; i < lChInfo.size(); ++i) {
+        if(lChInfo.at(i).unit == FIFF_UNIT_T_M) {
+            lChInfoGrad << lChInfo.at(i);
+        } else if(lChInfo.at(i).unit == FIFF_UNIT_T) {
+            lChInfoMag << lChInfo.at(i);
+        }
+    }
+
+    //Add sensor locations as child items
+    if(!lChInfoGrad.isEmpty()) {
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
+        pSensorPosItem->addData(lChInfoGrad, p3DEntityParent);
+
+        QList<QStandardItem*> list;
+        list << pSensorPosItem;
+        list << new QStandardItem(pSensorPosItem->toolTip());
+        this->appendRow(list);
+    }
+
+    if(!lChInfoMag.isEmpty()) {
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
+        pSensorPosItem->addData(lChInfoMag, p3DEntityParent);
+
+        QList<QStandardItem*> list;
+        list << pSensorPosItem;
+        list << new QStandardItem(pSensorPosItem->toolTip());
+        this->appendRow(list);
+    }
 }
 
 
