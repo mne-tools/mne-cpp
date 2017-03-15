@@ -105,30 +105,31 @@ void AbstractSurfaceTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Abstract Surface item");
 
+    //Set shaders
+    PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
+    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
+
+//    //Render normals
+//    m_pRenderable3DEntityNormals = new Renderable3DEntity(parent);
+//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
+//    m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+//    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
+//    m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
+
+//    //Generate activation overlay surface
+//    MatrixX3f overlayAdds = tSurface.rr();
+//    for(int i = 0; i<tSurface.nn().rows(); i++) {
+//        RowVector3f direction = tSurface.nn().row(i);
+//        direction.normalize();
+
+//        overlayAdds.row(i) = direction*0.0001;
+//    }
+
+//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
+
     //Add surface meta information as item children
     QList<QStandardItem*> list;
     QVariant data;
-
-    m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
-    connect(m_pItemSurfColSulci, &MetaTreeItem::curvColorsChanged,
-            this, &AbstractSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
-    list << m_pItemSurfColSulci;
-    list << new QStandardItem(m_pItemSurfColSulci->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(50,50,50));
-    m_pItemSurfColSulci->setData(data, MetaTreeItemRoles::SurfaceColorSulci);
-    m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
-
-    m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
-    connect(m_pItemSurfColGyri, &MetaTreeItem::curvColorsChanged,
-            this, &AbstractSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
-    list.clear();
-    list << m_pItemSurfColGyri;
-    list << new QStandardItem(m_pItemSurfColGyri->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(125,125,125));
-    m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
-    m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
     float fAlpha = 0.35f;
     MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));

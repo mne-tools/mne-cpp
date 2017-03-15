@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "true");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -250,36 +250,36 @@ int main(int argc, char *argv[])
     //Create 3D data model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-//    //Add fressurfer surface set including both hemispheres
-//    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
+    //Add fressurfer surface set including both hemispheres
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-//    //Read and show BEM
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bem(t_fileBem);
-//    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+    //Read and show BEM
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem(t_fileBem);
+    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     p3DDataModel->addMegSensorData("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
 
-//    // Read & show digitizer points
-//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    FiffDigPointSet t_Dig(t_fileDig);
-//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    // Read & show digitizer points
+    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    FiffDigPointSet t_Dig(t_fileDig);
+    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
-//    if(bAddRtSourceLoc) {
-//        //Add rt source loc data and init some visualization values
-//        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
-//            pRTDataItem->setLoopState(true);
-//            pRTDataItem->setTimeInterval(17);
-//            pRTDataItem->setNumberAverages(1);
-//            pRTDataItem->setStreamingActive(true);
-//            pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
-//            pRTDataItem->setVisualizationType("Annotation based");
-//            pRTDataItem->setColortable("Hot");
-//        }
-//    }
+    if(bAddRtSourceLoc) {
+        //Add rt source loc data and init some visualization values
+        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+            pRTDataItem->setLoopState(true);
+            pRTDataItem->setTimeInterval(17);
+            pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setStreamingActive(true);
+            pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
+            pRTDataItem->setVisualizationType("Annotation based");
+            pRTDataItem->setColortable("Hot");
+        }
+    }
 
     //Create the 3D view
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
