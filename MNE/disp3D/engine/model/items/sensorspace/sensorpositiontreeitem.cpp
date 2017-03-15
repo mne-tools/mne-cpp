@@ -151,6 +151,8 @@ bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
     QVector3D pos;
     QColor colDefault(100,100,100);
 
+    qDebug() << "lChInfo.size()" << lChInfo.size();
+
     for(int i = 0; i < lChInfo.size(); ++i) {
         Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
@@ -159,6 +161,7 @@ bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
         pos.setZ(lChInfo[i].chpos.r0(2));
 
         Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
+        sourceSphere->setRadius(0.002f);
 
         pSourceSphereEntity->addComponent(sourceSphere);
         pSourceSphereEntity->setPosition(pos);

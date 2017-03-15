@@ -136,9 +136,6 @@ void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCor
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
     m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
-    //Find out BEM layer type and change items name
-    this->setText(MNEBemSurface::id_name(tSensorSurface.id));
-
     //Add data which is held by this SensorSurfaceTreeItem
     QVariant data;
 
