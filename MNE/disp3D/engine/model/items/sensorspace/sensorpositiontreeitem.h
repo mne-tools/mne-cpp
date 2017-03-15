@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     digitizertreeitem.h
-* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+* @file     sensorpositiontreeitem.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lroenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     DigitizerTreeItem class declaration.
+* @brief     SensorPositionTreeItem class declaration.
 *
 */
 
-#ifndef DIGITIZERTREEITEM_H
-#define DIGITIZERTREEITEM_H
+#ifndef SENSORPOSITIONTREEITEM_H
+#define SENSORPOSITIONTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,8 +64,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffDigPoint;
+namespace FIFFLIB {
+    class FiffChInfo;
 }
 
 namespace Qt3DCore {
@@ -91,17 +91,17 @@ class Renderable3DEntity;
 
 //=============================================================================================================
 /**
-* DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
+* SensorPositionTreeItem provides a tree item to visualize sensor position data.
 *
-* @brief DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
+* @brief SensorPositionTreeItem provides a tree item to visualize sensor position data.
 */
-class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SensorPositionTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DigitizerTreeItem> SPtr;             /**< Shared pointer type for DigitizerTreeItem class. */
-    typedef QSharedPointer<const DigitizerTreeItem> ConstSPtr;  /**< Const shared pointer type for DigitizerTreeItem class. */
+    typedef QSharedPointer<SensorPositionTreeItem> SPtr;             /**< Shared pointer type for SensorPositionTreeItem class. */
+    typedef QSharedPointer<const SensorPositionTreeItem> ConstSPtr;  /**< Const shared pointer type for SensorPositionTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -110,13 +110,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit DigitizerTreeItem(int iType = Data3DTreeModelItemTypes::DigitizerItem, const QString& text = "Digitizer");
+    explicit SensorPositionTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Sensor Position");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~DigitizerTreeItem();
+    ~SensorPositionTreeItem();
 
     //=========================================================================================================
     /**
@@ -129,12 +129,12 @@ public:
     /**
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
-    * @param[in] tDigitizer         The digitizer data.
+    * @param[in] lChInfo            The channel information used to plot the MEG channels.
     * @param[in] parent             The Qt3D entity parent of the new item.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
+    bool addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
@@ -168,4 +168,4 @@ private:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // DIGITIZERTREEITEM_H
+#endif // SENSORPOSITIONTREEITEM_H

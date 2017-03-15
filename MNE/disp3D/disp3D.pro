@@ -112,6 +112,7 @@ SOURCES += \
     engine/model/items/bem/bemsurfacetreeitem.cpp \
     engine/model/items/sensorspace/sensorsettreeitem.cpp \
     engine/model/items/sensorspace/sensorsurfacetreeitem.cpp \
+    engine/model/items/sensorspace/sensorpositiontreeitem.cpp \
     engine/model/items/digitizer/digitizertreeitem.cpp \
     engine/model/items/digitizer/digitizersettreeitem.cpp \
     engine/model/items/mri/mritreeitem.cpp \
@@ -147,6 +148,7 @@ HEADERS += \
     engine/model/items/bem/bemsurfacetreeitem.h \
     engine/model/items/sensorspace/sensorsettreeitem.h \
     engine/model/items/sensorspace/sensorsurfacetreeitem.h \
+    engine/model/items/sensorspace/sensorpositiontreeitem.h \
     engine/model/items/digitizer/digitizertreeitem.h \
     engine/model/items/digitizer/digitizersettreeitem.h \
     engine/model/items/mri/mritreeitem.h \
