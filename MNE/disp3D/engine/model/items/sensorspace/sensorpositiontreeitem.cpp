@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     digitizertreeitem.cpp
-* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+* @file     sensorpositiontreeitem.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lroenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DigitizerTreeItem class definition.
+* @brief    SensorPositionTreeItem class definition.
 *
 */
 
@@ -38,12 +38,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "digitizertreeitem.h"
+#include "sensorpositiontreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../common/metatreeitem.h"
 
 #include <fiff/fiff_constants.h>
-#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_ch_info.h>
 
 
 //*************************************************************************************************************
@@ -77,7 +77,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
+SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
@@ -92,7 +92,7 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 
     MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::PointColor, "Point color");
     connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
-            this, &DigitizerTreeItem::onSurfaceColorChanged);
+            this, &SensorPositionTreeItem::onSurfaceColorChanged);
     list.clear();
     list << pItemSurfCol;
     list << new QStandardItem(pItemSurfCol->toolTip());
@@ -105,7 +105,7 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-DigitizerTreeItem::~DigitizerTreeItem()
+SensorPositionTreeItem::~SensorPositionTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     for(int i = 0; i < m_lSpheres.size(); ++i) {
@@ -120,7 +120,7 @@ DigitizerTreeItem::~DigitizerTreeItem()
 
 //*************************************************************************************************************
 
-QVariant DigitizerTreeItem::data(int role) const
+QVariant SensorPositionTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -128,7 +128,7 @@ QVariant DigitizerTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  DigitizerTreeItem::setData(const QVariant& value, int role)
+void SensorPositionTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -136,7 +136,7 @@ void  DigitizerTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
+bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* parent)
 {
     //Clear all data
     m_lSpheres.clear();
@@ -151,67 +151,21 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     QVector3D pos;
     QColor colDefault(100,100,100);
 
-    for(int i = 0; i < tDigitizer.size(); ++i) {
+    for(int i = 0; i < lChInfo.size(); ++i) {
         Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
 
-        pos.setX(tDigitizer[i].r[0]);
-        pos.setY(tDigitizer[i].r[1]);
-        pos.setZ(tDigitizer[i].r[2]);
+        pos.setX(lChInfo[i].chpos.r0(0));
+        pos.setY(lChInfo[i].chpos.r0(1));
+        pos.setZ(lChInfo[i].chpos.r0(2));
 
         Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
 
-        if (tDigitizer[i].kind == FIFFV_POINT_CARDINAL) {
-            sourceSphere->setRadius(0.002f);
-        } else {
-            sourceSphere->setRadius(0.001f);
-        }
         pSourceSphereEntity->addComponent(sourceSphere);
         pSourceSphereEntity->setPosition(pos);
 
         Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
 
-        switch (tDigitizer[i].kind) {
-        case FIFFV_POINT_CARDINAL:
-            switch (tDigitizer[i].ident) {
-            case 1:
-            colDefault = Qt::green;
-            material->setAmbient(colDefault);
-            break;
-            case 2:
-            colDefault = Qt::yellow;
-            material->setAmbient(colDefault);
-            break;
-            case 3:
-            colDefault = Qt::darkGreen;
-            material->setAmbient(colDefault);
-            break;
-            default:
-            colDefault = Qt::white;
-            material->setAmbient(colDefault);
-            break;
-            }
-            break;
-
-//            colDefault = Qt::yellow;
-//            material->setAmbient(colDefault);
-//            break;
-        case FIFFV_POINT_HPI:
-            colDefault = Qt::red;
-            material->setAmbient(colDefault);
-            break;
-        case FIFFV_POINT_EEG:
-            colDefault = Qt::cyan;
-            material->setAmbient(colDefault);
-            break;
-        case FIFFV_POINT_EXTRA:
-            colDefault = Qt::magenta;
-            material->setAmbient(colDefault);
-            break;
-        default:
-            colDefault = Qt::white;
-            material->setAmbient(colDefault);
-            break;
-        }
+        colDefault = Qt::green;
 
         pSourceSphereEntity->addComponent(material);
 
@@ -236,7 +190,7 @@ bool DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::setVisible(bool state)
+void SensorPositionTreeItem::setVisible(bool state)
 {
     if(!m_pRenderable3DEntity.isNull()) {
         for(int i = 0; i < m_lSpheres.size(); ++i) {
@@ -250,7 +204,7 @@ void DigitizerTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void SensorPositionTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState == Qt::Unchecked ? false : true);
 }
@@ -258,7 +212,7 @@ void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
+void SensorPositionTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     for(int i = 0; i < m_lSpheres.size(); ++i) {
         for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {

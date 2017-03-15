@@ -40,6 +40,7 @@
 
 #include "sensorsettreeitem.h"
 #include "sensorsurfacetreeitem.h"
+#include "sensorpositiontreeitem.h"
 
 #include <mne/mne_bem.h>
 #include <fiff/fiff_ch_info.h>
@@ -119,11 +120,9 @@ void  SensorSetTreeItem::setData(const QVariant& value, int role)
 
 void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent)
 {
-    //Generate child items based on BEM input parameters
+    //Generate sensor surfaces as childs
     for(int i = 0; i < tSensor.size(); ++i) {
-        QString sSensorSurfName;
-        sSensorSurfName = QString("%1").arg(tSensor[i].id);
-        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem, sSensorSurfName);
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem);
         pSurfItem->addData(tSensor[i], p3DEntityParent);
 
         QList<QStandardItem*> list;
@@ -131,6 +130,15 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
         list << new QStandardItem(pSurfItem->toolTip());
         this->appendRow(list);
     }
+
+    //Generate sensor locations as child item
+    SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem);
+    pSensorPosItem->addData(lChInfo, p3DEntityParent);
+
+    QList<QStandardItem*> list;
+    list << pSensorPosItem;
+    list << new QStandardItem(pSensorPosItem->toolTip());
+    this->appendRow(list);
 }
 
 
