@@ -101,11 +101,6 @@ EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
 
 EcdDataTreeItem::~EcdDataTreeItem()
 {
-    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    for(int i = 0; i < m_lDipoles.size(); ++i) {
-        m_lDipoles.at(i)->deleteLater();
-    }
-
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }

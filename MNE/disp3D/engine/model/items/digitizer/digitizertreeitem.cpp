@@ -86,11 +86,6 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 
 DigitizerTreeItem::~DigitizerTreeItem()
 {
-//    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-//    for(int i = 0; i < m_lSpheres.size(); ++i) {
-//        m_lSpheres.at(i)->deleteLater();
-//    }
-
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
@@ -233,7 +228,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
 void DigitizerTreeItem::setVisible(bool state)
 {
-    if(!m_pRenderable3DEntity.isNull()) {
+    if(m_pRenderable3DEntity) {
         for(int i = 0; i < m_lSpheres.size(); ++i) {
             m_lSpheres.at(i)->setEnabled(state);
         }

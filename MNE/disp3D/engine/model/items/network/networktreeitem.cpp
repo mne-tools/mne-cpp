@@ -102,11 +102,6 @@ NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
 
 NetworkTreeItem::~NetworkTreeItem()
 {
-    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        m_lNodes.at(i)->deleteLater();
-    }
-
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
