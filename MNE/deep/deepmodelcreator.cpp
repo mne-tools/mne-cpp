@@ -91,15 +91,15 @@ DeepModelCreator::~DeepModelCreator()
 FunctionPtr DeepModelCreator::FullyConnectedFeedForwardClassifierNet(Variable input, size_t numHiddenLayers, const Parameter &inputTimesParam, const Parameter &inputPlusParam, const Parameter hiddenLayerTimesParam[], const Parameter hiddenLayerPlusParam[], const Parameter &outputTimesParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
 {
     assert(numHiddenLayers >= 1);
-    auto classifierRoot = FullyConnectedDNNLayer(input, inputTimesParam, inputPlusParam, nonLinearity);
+    FunctionPtr h = FullyConnectedDNNLayer(input, inputTimesParam, inputPlusParam, nonLinearity);
 
     for (size_t i = 1; i < numHiddenLayers; ++i) {
-        classifierRoot = FullyConnectedDNNLayer(classifierRoot, hiddenLayerTimesParam[i - 1], hiddenLayerPlusParam[i - 1], nonLinearity);
+        h = FullyConnectedDNNLayer(h, hiddenLayerTimesParam[i - 1], hiddenLayerPlusParam[i - 1], nonLinearity);
     }
 
     // Todo: assume that outputTimesParam has matched output dim and hiddenLayerDim
-    classifierRoot = Times(outputTimesParam, classifierRoot, L"labels");// Output
-    return classifierRoot;
+    h = Times(outputTimesParam, h, L"labels");// Output
+    return h;
 }
 
 
@@ -116,6 +116,42 @@ FunctionPtr DeepModelCreator::FullyConnectedDNNLayer(Variable input, const Param
     auto plusFunction = Plus(plusParam, timesFunction);
 
     return nonLinearity(plusFunction);
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Network definitions
+//=============================================================================================================
+
+FunctionPtr DeepModelCreator::FFN_1(const size_t inputDim, const size_t numOutputClasses, const DeviceDescriptor &device)
+{
+    const size_t numHiddenLayers = 2;
+    const size_t hiddenLayersDim = 50;
+
+    // Define model parameters that should be shared among evaluation requests against the same model
+    auto inputTimesParam = Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, inputDim}, -0.5, 0.5, 1, device));
+    auto inputPlusParam = Parameter({hiddenLayersDim}, 0.0f, device);
+    Parameter hiddenLayerTimesParam[numHiddenLayers - 1] = {
+        Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device))
+    };
+    Parameter hiddenLayerPlusParam[numHiddenLayers - 1] = {
+        Parameter({hiddenLayersDim}, 0.0f, device)
+    };
+    Parameter outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
+
+
+    Variable inputVar = InputVariable({inputDim}, DataType::Float, L"features");
+
+
+    return FullyConnectedFeedForwardClassifierNet(  inputVar,
+                                                    numHiddenLayers,
+                                                    inputTimesParam,
+                                                    inputPlusParam,
+                                                    hiddenLayerTimesParam,
+                                                    hiddenLayerPlusParam,
+                                                    outputTimesParam,
+                                                    std::bind(Sigmoid, std::placeholders::_1, L""));
 }
 
 

@@ -87,8 +87,6 @@ using namespace CNTK;
 // Helper function to generate a random data sample
 void generate_random_data_samples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
 {
-    qDebug() << "generate_random_data_sample";
-
     MatrixXi t_Y = MatrixXi::Zero(sample_size, 1);
     for(int i = 0; i < t_Y.rows(); ++i) {
         t_Y(i,0) = rand() % num_classes;
@@ -110,9 +108,6 @@ void generate_random_data_samples(int sample_size, int feature_dim, int num_clas
     for(int i = 0; i < Y.rows(); ++i) {
         Y(i,t_Y(i)) = 1;
     }
-
-    std::cout << "Y\n" << Y << std::endl;
-    std::cout << "X\n" << X << std::endl;
 }
 
 
@@ -138,78 +133,139 @@ int main(int argc, char *argv[])
 //    deepTest.testClone();
 //    deepTest.exampleTrain();
 
-    QString fileName("./mne_deep_models/trainModel.v2");
     DeviceDescriptor device = DeviceDescriptor::CPUDevice();
 
-    const size_t inputDim = 2;
-    const size_t numOutputClasses = 2;//1;
+    double loss, error;
 
-    Deep deep;
+    //
+    // Example 1
+    //
 
+    std::cout  << std::endl << "<<< Example 1 >>>" << std::endl << std::endl;
 
+    size_t input_dim = 2;
+    size_t num_output_classes = 2;
 
+    Deep deep_1;
 
     int mysamplesize = 32;
+    MatrixXf features, labels, outputs;;
 
-    MatrixXf X, Y;
+    generate_random_data_samples(mysamplesize, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
 
-    generate_random_data_samples(mysamplesize, inputDim, numOutputClasses, X, Y);
+    std::cout << "\nfeatures\n" << features << std::endl;
+    std::cout << "\nlabels\n" << labels << std::endl;
+
+    FunctionPtr model_1 = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
+    deep_1.setModel(model_1);
 
 
+    //
+    // Evaluation / Testing beforehand
+    //
+
+    qDebug() << "\n Evaluation before training \n";
+
+    // Generate new data
+    int test_minibatch_size = 25;
+    generate_random_data_samples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+
+    deep_1.evalModel(features, outputs, device);
+
+    for(int i = 0; i < labels.rows(); ++i) {
+        std::cout << "desired " << labels.row(i) << "; output ";
+        for(int j = 0; j < labels.cols(); ++j) {
+            std::cout << (outputs(i,j) <= 0 ? 0 : 1) << " ";
+        }
+        std::cout << "; (real " << outputs.row(i) << ")" << std::endl;
+    }
 
 
+    //
+    // Training
+    //
 
+    qDebug() << "\n Start training \n";
+
+    // Initialize the parameters for the trainer
+    int minibatch_size = 25;
+    int num_samples = 20000;
+    int num_minibatches_to_train = num_samples / minibatch_size;
+
+    for(int i = 0; i < num_minibatches_to_train; ++i) {
+        generate_random_data_samples(minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+
+        // Specify the input variables mapping in the model to actual minibatch data for training
+        deep_1.trainMinibatch(features, labels, loss, error, device);
+
+        if(i % 9 == 0)
+            qDebug() << "Iteration:" << i+1 << "; loss" << loss << "; error" << error;
+    }
+
+    qDebug() << "\n Finished training \n";
+
+    //
+    // Evaluation / Testing
+    //
+
+    qDebug() << "\n Evaluation after training \n";
+
+    // Generate new data
+
+    test_minibatch_size = 25;
+    generate_random_data_samples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+
+    deep_1.evalModel(features, outputs, device);
+
+    for(int i = 0; i < labels.rows(); ++i) {
+        std::cout << "desired " << labels.row(i) << "; output ";
+        for(int j = 0; j < labels.cols(); ++j) {
+            std::cout << (outputs(i,j) <= 0 ? 0 : 1) << " ";
+        }
+        std::cout << "; (real " << outputs.row(i) << ")" << std::endl;
+    }
+
+
+    //===================================================================================
+    //
+    // Example 2
+    //
+
+    std::cout  << std::endl << "<<< Example 2 >>>" << std::endl << std::endl;
+
+    QString fileName("./mne_deep_models/trainModel.v2");
+
+    Deep deep_2;
+
+    size_t inputDim = 2;
+    size_t numOutputClasses = 2;
 
     // if(!deep.loadModel(fileName, device)) {
         fprintf(stderr, "Constructing model.\n");
         FunctionPtr model = DeepModelCreator::DNN_1(inputDim, numOutputClasses, device);
-        deep.setModel(model);
+        deep_2.setModel(model);
     // }
 
 
-
-    qDebug() << "InDim" << static_cast<int>(deep.inputDimensions());
-    qDebug() << "OutDim" << static_cast<int>(deep.outputDimensions());
-
+    qDebug() << "InDim" << static_cast<int>(deep_2.inputDimensions());
+    qDebug() << "OutDim" << static_cast<int>(deep_2.outputDimensions());
 
     int iterations = 20;
     int batchSize = 50;
 
-    // Train a circle
-    float radius = 2.5;
-    float current_rad;
-    float x_m = 4;
-    float y_m = 3;
-    float x,y;
-
-    double loss, error;
-
-    Eigen::MatrixXf trainFeatures(batchSize,deep.inputDimensions());
-    Eigen::MatrixXf trainTarget(batchSize,deep.outputDimensions());
-
-
-    std::random_device rd;  // obtain a random number from hardware
-    std::mt19937 eng(rd()); // seed the generator
-    std::uniform_int_distribution<> distr(0, 6); // define the range
+    Eigen::MatrixXf trainFeatures(batchSize,deep_2.inputDimensions());
+    Eigen::MatrixXf trainTarget(batchSize,deep_2.outputDimensions());
 
     for(int it = 0; it < iterations; ++it) {
         //
         // Data Generation
         //
-        for(int i = 0; i < batchSize; ++i) {
-
-            x = distr(eng); y = distr(eng);
-            current_rad = sqrt(pow(x - x_m,2) + pow(y - y_m,2));
-
-            trainFeatures(i,0) = x;
-            trainFeatures(i,1) = y;
-            trainTarget(i,0) = static_cast<float>(current_rad < radius);
-        }
+        generate_random_data_samples(batchSize, static_cast<int>(deep_2.inputDimensions()), static_cast<int>(deep_2.outputDimensions()), trainFeatures, trainTarget);
 
         //
         // Training Generation
         //
-        deep.trainMinibatch(trainFeatures, trainTarget, loss, error, device);
+        deep_2.trainMinibatch(trainFeatures, trainTarget, loss, error, device);
 
         qDebug() << "Iteration:" << it+1 << "; loss" << loss << "; error" << error;
     }
@@ -221,32 +277,24 @@ int main(int argc, char *argv[])
 
     int eval_size = 10;
 
-    Eigen::MatrixXf inputs(eval_size,deep.inputDimensions());
-    Eigen::MatrixXf desired(eval_size,deep.outputDimensions());
+    Eigen::MatrixXf inputs(eval_size,deep_2.inputDimensions());
+    Eigen::MatrixXf desired(eval_size,deep_2.outputDimensions());
 
-    for(int i = 0; i < eval_size; ++i) {
-        //
-        // Data Generation
-        //
-        x = distr(eng); y = distr(eng);
-        current_rad = sqrt(pow(x - x_m,2) + pow(y - y_m,2));
-
-        inputs(i,0) = x;
-        inputs(i,1) = y;
-        desired(i,0) = static_cast<float>(current_rad < radius);
-    }
+    //
+    // Data Generation
+    //
+    generate_random_data_samples(eval_size, static_cast<int>(deep_2.inputDimensions()), static_cast<int>(deep_2.outputDimensions()), inputs, desired);
 
     std::cout << "inputs\n" << inputs << std::endl;
 
-    MatrixXf outputs;
-    deep.evalModel(inputs, outputs, device);
+    deep_2.evalModel(inputs, outputs, device);
 
     std::cout << "desired\n" << desired << std::endl;
 
     std::cout << "outputs\n" << outputs << std::endl;
 
 
-    deep.saveModel(fileName);
+    deep_2.saveModel(fileName);
 
 
 /*
