@@ -172,7 +172,7 @@ private:
     *
     * @param[in] checkState        The current checkstate.
     */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+    void onCheckStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**

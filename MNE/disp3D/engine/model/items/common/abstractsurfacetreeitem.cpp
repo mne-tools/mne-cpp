@@ -241,7 +241,14 @@ void AbstractSurfaceTreeItem::setData(const QVariant& value, int role)
 
 void AbstractSurfaceTreeItem::setVisible(bool state)
 {
+    for(int i = 0; i < m_pRenderable3DEntity->childNodes().size(); ++i) {
+        m_pRenderable3DEntity->childNodes()[i]->setEnabled(state);
+    }
     m_pRenderable3DEntity->setEnabled(state);
+
+    for(int i = 0; i < m_pRenderable3DEntityNormals->childNodes().size(); ++i) {
+        m_pRenderable3DEntityNormals->childNodes()[i]->setEnabled(state);
+    }
     m_pRenderable3DEntityNormals->setEnabled(state);
 }
 
