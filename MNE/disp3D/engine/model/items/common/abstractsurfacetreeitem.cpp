@@ -155,6 +155,17 @@ void AbstractSurfaceTreeItem::initItem()
     data.setValue(fAlpha);
     itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
+    connect(pItemSurfCol, &MetaTreeItem::colorChanged,
+            this, &AbstractSurfaceTreeItem::onSurfaceColorChanged);
+    list.clear();
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
+    this->appendRow(list);
+    data.setValue(QColor(100,100,100));
+    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
+    pItemSurfCol->setData(data, Qt::DecorationRole);
+
     if(m_bUseTesselation) {
         float fTessInner = 1.0;
         MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));

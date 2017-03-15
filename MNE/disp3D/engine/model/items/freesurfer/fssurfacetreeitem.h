@@ -122,14 +122,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Call this function whenever new colors for the activation data plotting are available.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
-    */
-    void setRtVertColor(const MatrixX3f &sourceColorSamples);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever visibilty of teh annoation has changed.
     *
     * @param[in] isVisible     The visibility flag.
