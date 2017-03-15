@@ -166,9 +166,9 @@ bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
         //Create plane mesh
         Renderable3DEntity* pSensorRectEntity = new Renderable3DEntity(m_pRenderable3DEntity);
         Qt3DExtras::QCuboidMesh* pSensorRect = new Qt3DExtras::QCuboidMesh();
-        pSensorRect->setXExtent(0.001f);
+        pSensorRect->setXExtent(0.01f);
         pSensorRect->setYExtent(0.01f);
-        pSensorRect->setZExtent(0.01f);
+        pSensorRect->setZExtent(0.001f);
         pSensorRectEntity->addComponent(pSensorRect);
 
         //Set plane position and orientation

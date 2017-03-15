@@ -120,6 +120,17 @@ void  SensorSetTreeItem::setData(const QVariant& value, int role)
 
 void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent)
 {
+    //Generate sensor surfaces as childs
+    for(int i = 0; i < tSensor.size(); ++i) {
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem);
+        pSurfItem->addData(tSensor[i], p3DEntityParent);
+
+        QList<QStandardItem*> list;
+        list << pSurfItem;
+        list << new QStandardItem(pSurfItem->toolTip());
+        this->appendRow(list);
+    }
+
     //Sort MEG channel types
     QList<FiffChInfo> lChInfoGrad;
     QList<FiffChInfo> lChInfoMag;
@@ -150,17 +161,6 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
         list << new QStandardItem(pSensorPosItem->toolTip());
-        this->appendRow(list);
-    }
-
-    //Generate sensor surfaces as childs
-    for(int i = 0; i < tSensor.size(); ++i) {
-        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem);
-        pSurfItem->addData(tSensor[i], p3DEntityParent);
-
-        QList<QStandardItem*> list;
-        list << pSurfItem;
-        list << new QStandardItem(pSurfItem->toolTip());
         this->appendRow(list);
     }
 }
