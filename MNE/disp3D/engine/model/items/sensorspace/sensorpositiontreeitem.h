@@ -161,9 +161,17 @@ private:
     */
     void onSurfaceColorChanged(const QColor &color);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever the alpha value changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    void onSurfaceAlphaChanged(float fAlpha);
+
     QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
 
-    QList<QPointer<Renderable3DEntity> >        m_lSpheres;                 /**< The currently displayed digitizer points as 3D spheres. */
+    QList<QPointer<Renderable3DEntity> >        m_lRects;                   /**< The currently displayed sensors points as 3D rectangles. */
 };
 
 } //NAMESPACE DISP3DLIB

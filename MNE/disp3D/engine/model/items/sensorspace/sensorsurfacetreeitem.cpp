@@ -148,15 +148,16 @@ void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCor
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "1.0");
-    connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
+    float fAlpha = 0.6;
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString::number(fAlpha));
+    connect(itemAlpha, &MetaTreeItem::alphaChanged,
             this, &SensorSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
-    data.setValue(0.5);
-    itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
+    data.setValue(fAlpha);
+    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 
     MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
     connect(pItemSurfCol, &MetaTreeItem::colorChanged,

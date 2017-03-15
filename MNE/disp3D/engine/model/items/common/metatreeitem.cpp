@@ -124,8 +124,8 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::Color:
             sToolTip = "Color item";
             break;
-        case MetaTreeItemTypes::SurfaceAlpha:
-            sToolTip = "Surface alpha value";
+        case MetaTreeItemTypes::AlphaValue:
+            sToolTip = "The alpha value";
             break;
         case MetaTreeItemTypes::SurfaceTessInner:
             sToolTip = "Surface inner tesselation value";
@@ -225,8 +225,8 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case MetaTreeItemRoles::SurfaceAlpha: {
-            emit surfaceAlphaChanged(value.toFloat());
+        case MetaTreeItemRoles::AlphaValue: {
+            emit alphaChanged(value.toFloat());
             break;
         }
 
