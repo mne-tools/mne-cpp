@@ -126,11 +126,9 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     m_pRenderable3DEntity->setParent(parent);
     m_pRenderable3DEntityNormals->setParent(parent);
 
-    //Initial transformation also regarding the surface offset
-    m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
+
 
     //Set renderable 3D entity mesh and color data
     m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(),
@@ -138,11 +136,17 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
                                                         tSurface.tris(),
                                                         matCurvatureColor,
                                                         Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
-    //Set offset for normals
-    m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0),
-                                                        -tSurface.offset()(1),
-                                                        -tSurface.offset()(2)));
+    //Render normals
+    if(m_bRenderNormals) {
+        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSurface.rr(),
+                                                      tSurface.nn(),
+                                                      tSurface.tris(),
+                                                      matCurvatureColor,
+                                                      Qt3DRender::QGeometryRenderer::Triangles);
+        m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+    }
 
     //Add data which is held by this FsSurfaceTreeItem
     QVariant data;

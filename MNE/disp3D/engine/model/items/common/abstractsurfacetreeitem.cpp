@@ -78,7 +78,7 @@ AbstractSurfaceTreeItem::AbstractSurfaceTreeItem(int iType, const QString& text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pRenderable3DEntityNormals(new Renderable3DEntity())
 , m_bUseTesselation(false)
-, m_bRenderNormals(false)
+, m_bRenderNormals(true)
 {
     initItem();
 }
@@ -117,28 +117,10 @@ void AbstractSurfaceTreeItem::initItem()
         m_pRenderable3DEntity->addComponent(pPerVertexTessPhongAlphaMaterial);
     }
 
-//    if(m_bRenderNormals) {
-//        //Render normals
-//        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSurface.rr(),
-//                                                      tSurface.nn(),
-//                                                      tSurface.tris(),
-//                                                      arrayCurvatureColor,
-//                                                      Qt3DRender::QGeometryRenderer::Triangles);
-
-//        ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
-//        m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
-
-//        //Generate activation overlay surface
-//        MatrixX3f overlayAdds = tSurface.rr();
-//        for(int i = 0; i<tSurface.nn().rows(); i++) {
-//            RowVector3f direction = tSurface.nn().row(i);
-//            direction.normalize();
-
-//            overlayAdds.row(i) = direction*0.0001;
-//        }
-
-//        m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
-//    }
+    if(m_bRenderNormals) {
+        ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
+        m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
+    }
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
