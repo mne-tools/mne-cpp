@@ -170,6 +170,8 @@ private:
 
 // Pre-Configured networks
 public:
+    static CNTK::FunctionPtr FFN_1( const size_t inputDim, const size_t numOutputClasses, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+
     static CNTK::FunctionPtr DNN_1( const size_t inputDim, const size_t numOutputClasses, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
 
