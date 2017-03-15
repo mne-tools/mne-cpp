@@ -121,8 +121,8 @@ public:
     /**
     * AbstractTreeItem functions
     */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    virtual QVariant data(int role = Qt::UserRole + 1) const;
+    virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
@@ -130,14 +130,14 @@ public:
     *
     * @param[in] state     The visiblity flag.
     */
-    void setVisible(bool state);
+    virtual void setVisible(bool state);
 
 protected:
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
-    void initItem();
+    virtual void initItem();
 
     //=========================================================================================================
     /**
@@ -145,7 +145,7 @@ protected:
     *
     * @param[in] fAlpha     The new alpha value.
     */
-    void onSurfaceAlphaChanged(float fAlpha);
+    virtual void onSurfaceAlphaChanged(float fAlpha);
 
     //=========================================================================================================
     /**
@@ -153,7 +153,7 @@ protected:
     *
     * @param[in] fTessInner     The new inner tesselation value.
     */
-    void onSurfaceTessInnerChanged(float fTessInner);
+    virtual void onSurfaceTessInnerChanged(float fTessInner);
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ protected:
     *
     * @param[in] fTessOuter     The new outer tesselation value.
     */
-    void onSurfaceTessOuterChanged(float fTessOuter);
+    virtual void onSurfaceTessOuterChanged(float fTessOuter);
 
     //=========================================================================================================
     /**
@@ -169,7 +169,7 @@ protected:
     *
     * @param[in] fTriangleScale     The triangle scale value.
     */
-    void onSurfaceTriangleScaleChanged(float fTriangleScale);
+    virtual void onSurfaceTriangleScaleChanged(float fTriangleScale);
 
     //=========================================================================================================
     /**
@@ -185,7 +185,7 @@ protected:
     *
     * @param[in] fTransX        The current x translation.
     */
-    void onSurfaceTranslationXChanged(float fTransX);
+    virtual void onSurfaceTranslationXChanged(float fTransX);
 
     //=========================================================================================================
     /**
@@ -193,7 +193,7 @@ protected:
     *
     * @param[in] fTransY        The current y translation.
     */
-    void onSurfaceTranslationYChanged(float fTransY);
+    virtual void onSurfaceTranslationYChanged(float fTransY);
 
     //=========================================================================================================
     /**
@@ -201,7 +201,7 @@ protected:
     *
     * @param[in] fTransZ        The current z translation.
     */
-    void onSurfaceTranslationZChanged(float fTransZ);
+    virtual void onSurfaceTranslationZChanged(float fTransZ);
 
     QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
     QPointer<Renderable3DEntity>    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
