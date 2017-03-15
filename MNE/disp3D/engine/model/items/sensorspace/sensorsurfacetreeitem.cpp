@@ -52,14 +52,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QUrl>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,7 +82,7 @@ SensorSurfaceTreeItem::SensorSurfaceTreeItem(int iType, const QString& text)
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM surface item");
+    this->setToolTip("Sensor surface item");
 }
 
 
@@ -129,23 +121,23 @@ void  SensorSurfaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void SensorSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
+void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pRenderable3DEntity->setParent(parent);
 
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
+    MatrixX3f matVertColor = createVertColor(tSensorSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, matVertColor, Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSensorSurface.rr, tSensorSurface.nn, tSensorSurface.tris, matVertColor, Qt3DRender::QGeometryRenderer::Triangles);
 
     //Set shaders
     PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
     m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
 
     //Find out BEM layer type and change items name
-    this->setText(MNEBemSurface::id_name(tBemSurface.id));
+    this->setText(MNEBemSurface::id_name(tSensorSurface.id));
 
     //Add data which is held by this SensorSurfaceTreeItem
     QVariant data;
@@ -153,7 +145,7 @@ void SensorSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::
     data.setValue(matVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
-    data.setValue(tBemSurface.rr);
+    data.setValue(tSensorSurface.rr);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 
     //Add surface meta information as item children

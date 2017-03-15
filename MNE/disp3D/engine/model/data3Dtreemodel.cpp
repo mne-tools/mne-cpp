@@ -40,6 +40,7 @@
 
 #include "data3Dtreemodel.h"
 #include "items/bem/bemtreeitem.h"
+#include "items/sensorspace/sensortreeitem.h"
 #include "items/subject/subjecttreeitem.h"
 #include "items/freesurfer/fssurfacetreeitem.h"
 #include "items/sourcespace/sourcespacetreeitem.h"
@@ -349,6 +350,34 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& subject, const QString& 
         pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, sBemSetName);
         addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(tBem, m_pModelEntity);
+    }
+
+    return pReturnItem;
+}
+
+
+//*************************************************************************************************************
+
+SensorTreeItem* Data3DTreeModel::addMegSensorData(const QString& subject,
+                                                   const QString& sSensorSetName,
+                                                   const MNELIB::MNEBem& tSensor,
+                                                   const QList<FIFFLIB::FiffChInfo>& lChInfo)
+{
+    SensorTreeItem* pReturnItem = Q_NULLPTR;
+
+    //Handle subject item
+    SubjectTreeItem* pSubjectItem = addSubject(subject);
+
+    //Find already existing surface items and add the new data to the first search result
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sSensorSetName);
+
+    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::SensorItem)) {
+        pReturnItem = dynamic_cast<SensorTreeItem*>(itemList.first());
+        pReturnItem->addData(tSensor, lChInfo, m_pModelEntity);
+    } else {
+        pReturnItem = new SensorTreeItem(Data3DTreeModelItemTypes::SensorItem, sSensorSetName);
+        addItemWithDescription(pSubjectItem, pReturnItem);
+        pReturnItem->addData(tSensor, lChInfo, m_pModelEntity);
     }
 
     return pReturnItem;

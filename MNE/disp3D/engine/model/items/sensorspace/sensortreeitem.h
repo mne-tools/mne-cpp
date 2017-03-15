@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sensortreeitem.h
+* @file     sensorsettreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     SensorTreeItem class declaration.
+* @brief     SensorSetTreeItem class declaration.
 *
 */
 
-#ifndef SENSORTREEITEM_H
-#define SENSORTREEITEM_H
+#ifndef SENSORSETTREEITEM_H
+#define SENSORSETTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,6 +67,10 @@ namespace MNELIB {
     class MNEBem;
 }
 
+namespace FIFFLIB {
+    class FiffChInfo;
+}
+
 namespace Qt3DCore {
     class QEntity;
 }
@@ -89,17 +93,17 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* SensorTreeItem provides a tree item to hold BEM models.
+* SensorSetTreeItem provides a tree item to sensor information: surface, sensor locations, etc.
 *
-* @brief Provides a generic SensorTreeItem.
+* @brief Provides a generic SensorSetTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT SensorTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SensorSetTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SensorTreeItem> SPtr;             /**< Shared pointer type for SensorTreeItem class. */
-    typedef QSharedPointer<const SensorTreeItem> ConstSPtr;  /**< Const shared pointer type for SensorTreeItem class. */
+    typedef QSharedPointer<SensorSetTreeItem> SPtr;             /**< Shared pointer type for SensorSetTreeItem class. */
+    typedef QSharedPointer<const SensorSetTreeItem> ConstSPtr;  /**< Const shared pointer type for SensorSetTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -108,13 +112,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit SensorTreeItem(int iType = Data3DTreeModelItemTypes::BemItem, const QString& text = "");
+    explicit SensorSetTreeItem(int iType = Data3DTreeModelItemTypes::BemItem, const QString& text = "");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~SensorTreeItem();
+    ~SensorSetTreeItem();
 
     //=========================================================================================================
     /**
@@ -127,10 +131,11 @@ public:
     /**
     * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
-    * @param[in] tBem               The BEM data.
+    * @param[in] tSensor            The BEM data.
+    * @param[in] lChInfo            The channel information used to plot the MEG channels.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEBem& tBem, Qt3DCore::QEntity* p3DEntityParent = 0);
+    void addData(const MNELIB::MNEBem& tSensor, const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
     //=========================================================================================================
@@ -144,4 +149,4 @@ private:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // SENSORTREEITEM_H
+#endif // SENSORSETTREEITEM_H

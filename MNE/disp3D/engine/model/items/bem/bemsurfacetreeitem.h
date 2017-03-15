@@ -209,14 +209,6 @@ private:
 
     QPointer<Renderable3DEntity>        m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
-    */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DLIB
