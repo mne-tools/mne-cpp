@@ -78,7 +78,7 @@ AbstractSurfaceTreeItem::AbstractSurfaceTreeItem(int iType, const QString& text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pRenderable3DEntityNormals(new Renderable3DEntity())
 , m_bUseTesselation(false)
-, m_bRenderNormals(true)
+, m_bRenderNormals(false)
 {
     initItem();
 }
@@ -182,6 +182,33 @@ void AbstractSurfaceTreeItem::initItem()
         data.setValue(fTriangleScale);
         itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
     }
+
+    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
+    itemXTrans->setEditable(true);
+    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
+            this, &AbstractSurfaceTreeItem::onSurfaceTranslationXChanged);
+    list.clear();
+    list << itemXTrans;
+    list << new QStandardItem(itemXTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
+    itemYTrans->setEditable(true);
+    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
+            this, &AbstractSurfaceTreeItem::onSurfaceTranslationYChanged);
+    list.clear();
+    list << itemYTrans;
+    list << new QStandardItem(itemYTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
+    itemZTrans->setEditable(true);
+    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
+            this, &AbstractSurfaceTreeItem::onSurfaceTranslationZChanged);
+    list.clear();
+    list << itemZTrans;
+    list << new QStandardItem(itemZTrans->toolTip());
+    this->appendRow(list);
 }
 
 

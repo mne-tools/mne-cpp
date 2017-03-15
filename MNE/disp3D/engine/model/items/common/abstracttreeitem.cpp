@@ -69,11 +69,7 @@ AbstractTreeItem::AbstractTreeItem(int iType, const QString& text)
 : QStandardItem(text)
 , m_iType(iType)
 {
-    this->setToolTip("Unknown");
-
-    //Do the connects
-    connect(this, &AbstractTreeItem::checkStateChanged,
-            this, &AbstractTreeItem::onCheckStateChanged);
+    initItem();
 }
 
 
@@ -81,6 +77,18 @@ AbstractTreeItem::AbstractTreeItem(int iType, const QString& text)
 
 AbstractTreeItem::~AbstractTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void AbstractTreeItem::initItem()
+{
+    this->setToolTip("Abstract Tree Item");
+
+     //Do the connects
+     connect(this, &AbstractTreeItem::checkStateChanged,
+             this, &AbstractTreeItem::onCheckStateChanged);
 }
 
 
@@ -172,14 +180,6 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
     this->appendRow(&newItem);
 
     return *this;
-}
-
-
-//*************************************************************************************************************
-
-void AbstractTreeItem::initItem()
-{
-
 }
 
 
