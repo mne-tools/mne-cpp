@@ -64,7 +64,6 @@
 
 using namespace DISP3DLIB;
 using namespace Eigen;
-using namespace FSLIB;
 using namespace MNELIB;
 
 
