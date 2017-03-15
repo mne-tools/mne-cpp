@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     bemtreeitem.cpp
+* @file     sensortreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BemTreeItem class definition.
+* @brief    SensorTreeItem class definition.
 *
 */
 
@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "bemtreeitem.h"
-#include "bemsurfacetreeitem.h"
+#include "sensortreeitem.h"
+#include "sensorsurfacetreeitem.h"
 
 #include <mne/mne_bem.h>
 
@@ -73,26 +73,26 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BemTreeItem::BemTreeItem(int iType, const QString& text)
+SensorTreeItem::SensorTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM item");
+    this->setToolTip("Sensor item");
 }
 
 
 //*************************************************************************************************************
 
-BemTreeItem::~BemTreeItem()
+SensorTreeItem::~SensorTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-QVariant BemTreeItem::data(int role) const
+QVariant SensorTreeItem::data(int role) const
 {
     switch(role) {
         case Data3DTreeModelItemRoles::BemName:
@@ -107,7 +107,7 @@ QVariant BemTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BemTreeItem::setData(const QVariant& value, int role)
+void  SensorTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -115,13 +115,13 @@ void  BemTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
+void SensorTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on BEM input parameters
     for(int i = 0; i < tBem.size(); ++i) {
         QString sBemSurfName;
         sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem, sBemSurfName);
         pSurfItem->addData(tBem[i], p3DEntityParent);
 
         QList<QStandardItem*> list;
@@ -134,7 +134,7 @@ void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent
 
 //*************************************************************************************************************
 
-void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void SensorTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i < this->rowCount(); ++i) {
         if(this->child(i)->isCheckable()) {

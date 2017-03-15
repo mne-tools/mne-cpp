@@ -95,7 +95,8 @@ namespace Data3DTreeModelItemTypes
                     DigitizerSetItem = QStandardItem::UserType + 11,
                     DigitizerItem = QStandardItem::UserType + 12,
                     ECDDataItem = QStandardItem::UserType + 13,
-                    MriItem = QStandardItem::UserType + 14};
+                    MriItem = QStandardItem::UserType + 14,
+                    SensorSurfaceItem = QStandardItem::UserType + 15};
 }
 
 namespace MetaTreeItemTypes
