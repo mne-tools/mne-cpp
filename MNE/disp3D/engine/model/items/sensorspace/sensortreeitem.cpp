@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sensortreeitem.cpp
+* @file     sensorsettreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    SensorTreeItem class definition.
+* @brief    SensorSetTreeItem class definition.
 *
 */
 
@@ -38,10 +38,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "sensortreeitem.h"
+#include "sensorsettreeitem.h"
 #include "sensorsurfacetreeitem.h"
 
 #include <mne/mne_bem.h>
+#include <fiff/fiff_ch_info.h>
 
 
 //*************************************************************************************************************
@@ -66,6 +67,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -73,7 +75,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorTreeItem::SensorTreeItem(int iType, const QString& text)
+SensorSetTreeItem::SensorSetTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
@@ -85,14 +87,14 @@ SensorTreeItem::SensorTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-SensorTreeItem::~SensorTreeItem()
+SensorSetTreeItem::~SensorSetTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-QVariant SensorTreeItem::data(int role) const
+QVariant SensorSetTreeItem::data(int role) const
 {
     switch(role) {
         case Data3DTreeModelItemRoles::BemName:
@@ -107,7 +109,7 @@ QVariant SensorTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  SensorTreeItem::setData(const QVariant& value, int role)
+void  SensorSetTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -115,14 +117,14 @@ void  SensorTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void SensorTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
+void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on BEM input parameters
-    for(int i = 0; i < tBem.size(); ++i) {
-        QString sBemSurfName;
-        sBemSurfName = QString("%1").arg(tBem[i].id);
+    for(int i = 0; i < tSensor.size(); ++i) {
+        QString sSensorSurfName;
+        sSensorSurfName = QString("%1").arg(tSensor[i].id);
         SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], p3DEntityParent);
+        pSurfItem->addData(tBem[i], lChInfo, p3DEntityParent);
 
         QList<QStandardItem*> list;
         list << pSurfItem;
@@ -134,7 +136,7 @@ void SensorTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityPar
 
 //*************************************************************************************************************
 
-void SensorTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void SensorSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i < this->rowCount(); ++i) {
         if(this->child(i)->isCheckable()) {

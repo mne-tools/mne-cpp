@@ -134,10 +134,10 @@ public:
     /**
     * Adds BEM model data.
     *
-    * @param[in] tBemSurface        The bem data.
+    * @param[in] tSensorSurface     The bem data.
     * @param[in] parent             The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEBemSurface &tBemSurface, Qt3DCore::QEntity* parent);
+    void addData(const MNELIB::MNEBemSurface &tSensorSurface, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
@@ -209,14 +209,6 @@ private:
 
     QPointer<Renderable3DEntity>        m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
-    */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DLIB
