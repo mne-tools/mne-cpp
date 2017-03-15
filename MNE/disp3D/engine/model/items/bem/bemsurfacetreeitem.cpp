@@ -159,15 +159,15 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "1.0");
-    connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, "1.0");
+    connect(itemAlpha, &MetaTreeItem::alphaChanged,
             this, &BemSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
     data.setValue(0.5);
-    itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
+    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 
     MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
     connect(pItemSurfCol, &MetaTreeItem::colorChanged,

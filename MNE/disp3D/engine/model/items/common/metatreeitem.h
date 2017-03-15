@@ -165,11 +165,11 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the surface alpha value has changed.
+    * Emit this signal whenever the alpha value has changed.
     *
     * @param[in] fAlpha     The new alpha value.
     */
-    void surfaceAlphaChanged(float fAlpha);
+    void alphaChanged(float fAlpha);
 
     //=========================================================================================================
     /**

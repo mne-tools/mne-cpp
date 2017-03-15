@@ -213,15 +213,15 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
     float fAlpha = 0.35f;
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, QString("%1").arg(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
+    connect(itemAlpha, &MetaTreeItem::alphaChanged,
             this, &FsSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
     data.setValue(fAlpha);
-    itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
+    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 
 //    float fTessInner = 1.0;
 //    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));

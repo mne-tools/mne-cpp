@@ -53,7 +53,7 @@
 
 #include <QMatrix4x4>
 #include <Qt3DExtras/QCuboidMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DCore/QTransform>
 #include <Qt3DCore/QEntity>
 
@@ -100,6 +100,17 @@ SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
     data.setValue(QColor(100,100,100));
     pItemColor->setData(data, MetaTreeItemRoles::PointColor);
     pItemColor->setData(data, Qt::DecorationRole);
+
+    float fAlpha = 1.0f;
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
+    connect(itemAlpha, &MetaTreeItem::alphaChanged,
+            this, &SensorPositionTreeItem::onSurfaceAlphaChanged);
+    list.clear();
+    list << itemAlpha;
+    list << new QStandardItem(itemAlpha->toolTip());
+    this->appendRow(list);
+    data.setValue(fAlpha);
+    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 }
 
 
@@ -108,8 +119,8 @@ SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
 SensorPositionTreeItem::~SensorPositionTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        m_lSpheres.at(i)->deleteLater();
+    for(int i = 0; i < m_lRects.size(); ++i) {
+        m_lRects.at(i)->deleteLater();
     }
 
     if(!m_pRenderable3DEntity.isNull()) {
@@ -139,7 +150,7 @@ void SensorPositionTreeItem::setData(const QVariant& value, int role)
 bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* parent)
 {
     //Clear all data
-    m_lSpheres.clear();
+    m_lRects.clear();
 
     m_pRenderable3DEntity->setParent(parent);
 
@@ -172,16 +183,16 @@ bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
 
             m.setRow(j, row);
         }
-        m.rotate(90,0.0, 1.0, 0.0);
 
         transform->setMatrix(m);
         pSensorRectEntity->addComponent(transform);
 
-        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+        Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
         material->setAmbient(colDefault);
+        material->setAlpha(1.0);
         pSensorRectEntity->addComponent(material);
 
-        m_lSpheres.append(pSensorRectEntity);
+        m_lRects.append(pSensorRectEntity);
     }
 
     //Update colors in color item
@@ -205,8 +216,8 @@ bool SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
 void SensorPositionTreeItem::setVisible(bool state)
 {
     if(!m_pRenderable3DEntity.isNull()) {
-        for(int i = 0; i < m_lSpheres.size(); ++i) {
-            m_lSpheres.at(i)->setEnabled(state);
+        for(int i = 0; i < m_lRects.size(); ++i) {
+            m_lRects.at(i)->setEnabled(state);
         }
 
         m_pRenderable3DEntity->setEnabled(state);
@@ -226,12 +237,28 @@ void SensorPositionTreeItem::onCheckStateChanged(const Qt::CheckState& checkStat
 
 void SensorPositionTreeItem::onSurfaceColorChanged(const QColor& color)
 {
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {
-            Qt3DCore::QComponent* pComponent = m_lSpheres.at(i)->components().at(j);
+    for(int i = 0; i < m_lRects.size(); ++i) {
+        for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
+            Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
 
-            if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
+            if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
                 pMaterial->setAmbient(color);
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorPositionTreeItem::onSurfaceAlphaChanged(float fAlpha)
+{
+    for(int i = 0; i < m_lRects.size(); ++i) {
+        for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
+            Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
+
+            if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
+                pMaterial->setAlpha(fAlpha);
             }
         }
     }

@@ -195,14 +195,14 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceAlpha: {
+        case MetaTreeItemTypes::AlphaValue: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(0.01);
             pDoubleSpinBox->setMaximum(1.0);
             pDoubleSpinBox->setSingleStep(0.01);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::AlphaValue).toDouble());
             return pDoubleSpinBox;
         }
 
@@ -415,8 +415,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceAlpha: {
-            int value = index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble();
+        case MetaTreeItemTypes::AlphaValue: {
+            int value = index.model()->data(index, MetaTreeItemRoles::AlphaValue).toDouble();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
@@ -606,12 +606,12 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceAlpha: {
+        case MetaTreeItemTypes::AlphaValue: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceAlpha);
+            model->setData(index, data, MetaTreeItemRoles::AlphaValue);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
