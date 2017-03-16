@@ -413,7 +413,7 @@ bool Deep::trainModel(const MatrixXf &input, const MatrixXf &targets, QVector<do
 
         trainMinibatch(input.block(i * minibatch_size, 0, minibatch_size, input.cols()),
                        targets.block(i * minibatch_size, 0, minibatch_size, targets.cols()),
-                       loss_val, error_val);
+                       loss_val, error_val,device);
 
         if(i % 9 == 0)
             qDebug() << "Iteration:" << i+1 << "; loss" << loss_val << "; error" << error_val;
