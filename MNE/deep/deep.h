@@ -257,6 +257,9 @@ public:
     */
     bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
+
+    void print();
+
 protected:
     //=========================================================================================================
     /**

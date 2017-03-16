@@ -535,6 +535,50 @@ bool Deep::trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& t
 
 //*************************************************************************************************************
 
+void Deep::print()
+{
+    if(!m_pModel) {
+        fprintf(stderr, "No model defined.");
+        return;
+    }
+
+
+    fprintf(stderr,"Model structure\n\n");
+
+
+//    qDebug() << "Parameter Size" << m_pModel->Parameters().size();
+
+//    for (int i = 0; i < m_pModel->Parameters().size(); ++i)
+//    {
+
+//        qDebug() << "\n>> Level" << i << "<<";
+
+//        qDebug() << "Input" << m_pModel->Parameters()[i].IsInput();
+//        qDebug() << "Output" << m_pModel->Parameters()[i].IsOutput();
+
+//        qDebug() << "Dim:" << QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
+
+//        qDebug() << "Kind:" << QString::fromStdWString(VariableKindName( m_pModel->Parameters()[i].Kind()) );
+
+//    }
+
+
+    qDebug() << "Outputs" << m_pModel->Outputs()[0].IsOutput();
+
+
+//    for (std::vector<Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
+//    {
+//        if (it->Name().compare(varName) == 0)
+//        {
+//            var = *it;
+//            return true;
+//        }
+//    }
+}
+
+
+//*************************************************************************************************************
+
 void Deep::OutputFunctionInfo(FunctionPtr model)
 {
     auto inputVariables = model->Arguments();
