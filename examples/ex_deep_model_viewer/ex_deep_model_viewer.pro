@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     deep.pro
+# @file     ex_deep_model_viewer.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,27 +29,22 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the deep library.
+# @brief    This project file generates the makefile to build the MNE deep model viewer example.
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = app
 
-#QT       -= gui
+VERSION = $${MNE_CPP_VERSION}
+
 QT += widgets charts
 
-# Deep Model Viewer
-qtHaveModule(opengl) {
-    DEFINES += QT_OPENGL_SUPPORT
-    QT += opengl
-}
+CONFIG   += console
 
-DEFINES += DEEP_LIBRARY
+TARGET = ex_deep_model_viewer
 
-TARGET = Deep
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -62,6 +57,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Deepd \
             -lEvalDll \
             -lCNTKLibrary-2.0
 }
@@ -71,87 +68,23 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Deep \
             -lEvalDll \
             -lCNTKLibrary-2.0
 }
 
-# OpenMP
-win32 {
-    QMAKE_CXXFLAGS  +=  -openmp
-    #QMAKE_LFLAGS    +=  -openmp
-}
-unix:!macx {
-    QMAKE_CXXFLAGS  +=  -fopenmp
-    QMAKE_LFLAGS    +=  -fopenmp
-}
+DESTDIR = $${MNE_BINARY_DIR}
 
-DESTDIR = $${MNE_LIBRARY_DIR}
+SOURCES += main.cpp
 
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
-    CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
-}
-else {
-    CONFIG += dll
+HEADERS  +=
 
-    #
-    # win32: copy dll's to bin dir
-    # unix: add lib folder to LD_LIBRARY_PATH
-    #
-    win32 {
-        FILE = $${DESTDIR}/$${TARGET}.dll
-        BINDIR = $${DESTDIR}/../bin
-        FILE ~= s,/,\\,g
-        BINDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-    }
-}
-
-SOURCES += \
-    deep.cpp \
-    deepeval.cpp \
-    deepmodelcreator.cpp \
-    deepviewer.cpp \
-    deepmodelviewer/arthurwidgets.cpp \
-    deepmodelviewer/deepmodelviewer.cpp
-
-HEADERS +=\
-    deep_global.h \
-    deep.h \
-    deepeval.h \
-    deepmodelcreator.h \
-    deepviewer.h \
-    deepmodelviewer/arthurwidgets.h \
-    deepmodelviewer/deepmodelviewer.h
+FORMS    +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/deep
-
-INSTALLS += header_files
-
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
-# Deploy Qt Dependencies
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
-}
-
-RESOURCES += \
-    deepmodelviewer/deepmodelviewer.qrc
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
