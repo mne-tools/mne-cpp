@@ -46,7 +46,9 @@
 #include <QCategoryAxis>
 
 #include <deep/deep.h>
+#include <deep/deepviewer.h>
 #include <deep/deepmodelcreator.h>
+#include <deep/deepviewer.h>
 
 #include <iostream>
 #include <random>
@@ -135,13 +137,11 @@ int main(int argc, char *argv[])
 //    deepTest.exampleTrain();
 
     DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-
     double loss, error;
 
     //
     // Example 1
     //
-
     std::cout  << std::endl << "<<< Example 1 >>>" << std::endl << std::endl;
 
     size_t input_dim = 2;
@@ -164,7 +164,6 @@ int main(int argc, char *argv[])
     //
     // Evaluation / Testing beforehand
     //
-
     qDebug() << "\n Evaluation before training \n";
 
     // Generate new data
@@ -181,11 +180,9 @@ int main(int argc, char *argv[])
         std::cout << "; (real " << outputs.row(i) << ")" << std::endl;
     }
 
-
     //
     // Training
     //
-
     qDebug() << "\n Start training \n";
 
     // Initialize the parameters for the trainer
@@ -199,31 +196,11 @@ int main(int argc, char *argv[])
     qDebug() << "\n Finished training \n";
 
     //Plot error
-    QLineSeries *error_series = new QLineSeries();
-    for(int i = 0; i < vecError.size(); ++i) {
-        error_series->append(i, vecError[i]);
-    }
-    QChart *error_chart = new QChart();
-    error_chart->legend()->hide();
-    error_chart->addSeries(error_series);
-    error_chart->createDefaultAxes();
-    error_chart->setTitle("Training Error");
-    QChartView *error_chartView = new QChartView(error_chart);
-    error_chartView->setRenderHint(QPainter::Antialiasing);
+    QChartView *error_chartView = DeepViewer::linePlot(vecError,"Training Error");
     error_chartView->show();
 
     //Plot loss
-    QLineSeries *loss_series = new QLineSeries();
-    for(int i = 0; i < vecError.size(); ++i) {
-        loss_series->append(i, vecLoss[i]);
-    }
-    QChart *loss_chart = new QChart();
-    loss_chart->legend()->hide();
-    loss_chart->addSeries(loss_series);
-    loss_chart->createDefaultAxes();
-    loss_chart->setTitle("Loss Error");
-    QChartView *loss_chartView = new QChartView(loss_chart);
-    loss_chartView->setRenderHint(QPainter::Antialiasing);
+    QChartView *loss_chartView = DeepViewer::linePlot(vecLoss,"Loss Error");
     loss_chartView->show();
 
     //
@@ -246,6 +223,10 @@ int main(int argc, char *argv[])
         }
         std::cout << "; (real " << outputs.row(i) << ")" << std::endl;
     }
+
+
+
+
 
 
     //===================================================================================

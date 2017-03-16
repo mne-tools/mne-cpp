@@ -37,7 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+#QT       -= gui
+QT += widgets charts
 
 DEFINES += DEEP_LIBRARY
 
@@ -103,13 +104,15 @@ else {
 SOURCES += \
     deep.cpp \
     deepeval.cpp \
-    deepmodelcreator.cpp
+    deepmodelcreator.cpp \
+    deepviewer.cpp
 
 HEADERS +=\
     deep_global.h \
     deep.h \
     deepeval.h \
-    deepmodelcreator.h
+    deepmodelcreator.h \
+    deepviewer.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
