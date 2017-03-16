@@ -41,6 +41,7 @@
 #include "bemsurfacetreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 
 #include <mne/mne_bem.h>
 
@@ -97,6 +98,9 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     //Set parents
     m_pRenderable3DEntity->setParent(parent);
     m_pRenderable3DEntityNormals->setParent(parent);
+
+    QPointer<Qt3DRender::QMaterial> pMaterial = new PerVertexPhongAlphaMaterial(true);
+    this->setMaterial(pMaterial);
 
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tBemSurface.rr);

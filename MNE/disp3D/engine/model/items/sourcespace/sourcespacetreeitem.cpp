@@ -123,6 +123,8 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     m_pRenderable3DEntity->setParent(parent);
     m_pRenderable3DEntityNormals->setParent(parent);
 
+    m_pRenderable3DEntity->setRotX(40);
+
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tHemisphere.rr);
 
@@ -159,6 +161,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
     //Create sources as small 3D spheres
     RowVector3f sourcePos;
     QVector3D pos;
+    QColor defaultColor(255,0,0);
 
     if(tHemisphere.isClustered()) {
         for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++) {
@@ -170,13 +173,13 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
             pos.setZ(sourcePos(2));
 
             Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.001f);
+            sourceSphere->setRadius(0.0015f);
             pSourceSphereEntity->addComponent(sourceSphere);
 
             pSourceSphereEntity->setPosition(pos);
 
             Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
-            material->setAmbient(Qt::yellow);
+            material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
 
             m_lSpheres.append(pSourceSphereEntity);
@@ -197,7 +200,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
             pSourceSphereEntity->setPosition(pos);
 
             Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
-            material->setAmbient(Qt::yellow);
+            material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
 
             m_lSpheres.append(pSourceSphereEntity);

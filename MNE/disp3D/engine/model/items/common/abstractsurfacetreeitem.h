@@ -69,6 +69,10 @@ namespace Qt3DCore {
     class QEntity;
 }
 
+namespace Qt3DRender {
+    class QMaterial;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -131,6 +135,14 @@ public:
     * @param[in] state     The visiblity flag.
     */
     virtual void setVisible(bool state);
+
+    //=========================================================================================================
+    /**
+    * Removes the old material and sets the new material.
+    *
+    * @param[in] pMaterial     The new material.
+    */
+    void setMaterial(QPointer<Qt3DRender::QMaterial> pMaterial);
 
 protected:
     //=========================================================================================================
@@ -222,8 +234,10 @@ protected:
     */
     virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
-    QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
-    QPointer<Renderable3DEntity>    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
+    QPointer<Renderable3DEntity>        m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
+    QPointer<Renderable3DEntity>        m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
+
+    QPointer<Qt3DRender::QMaterial>     m_pMaterial;                                /**< The material. Ownership belongs to RenderableEntity. */
 
     bool        m_bUseTesselation;      /**< Whether to use tesselation. */
     bool        m_bRenderNormals;       /**< Whether to render normals. */

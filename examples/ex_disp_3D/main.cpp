@@ -245,9 +245,6 @@ int main(int argc, char *argv[])
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-    //Show fwd solution
-    p3DDataModel->addForwardSolution(parser.value(subjectOption), "Fwd", t_clusteredFwd);
-
     //Read and show BEM
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bem(t_fileBem);

@@ -99,6 +99,9 @@ void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCor
     m_pRenderable3DEntity->setParent(parent);
     m_pRenderable3DEntityNormals->setParent(parent);
 
+    QPointer<Qt3DRender::QMaterial> pMaterial = new PerVertexPhongAlphaMaterial(true);
+    this->setMaterial(pMaterial);
+
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tSensorSurface.rr);
 
