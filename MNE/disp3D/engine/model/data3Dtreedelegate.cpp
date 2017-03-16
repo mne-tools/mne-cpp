@@ -245,7 +245,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(-10000.0);
             pDoubleSpinBox->setMaximum(10000.0);
-            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSingleStep(0.001);
+            pDoubleSpinBox->setDecimals(5);
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateX).toDouble());
             return pDoubleSpinBox;
         }
@@ -256,7 +257,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(-10000.0);
             pDoubleSpinBox->setMaximum(10000.0);
-            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSingleStep(0.001);
+            pDoubleSpinBox->setDecimals(5);
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateY).toDouble());
             return pDoubleSpinBox;
         }
@@ -267,7 +269,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(-10000.0);
             pDoubleSpinBox->setMaximum(10000.0);
-            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSingleStep(0.001);
+            pDoubleSpinBox->setDecimals(5);
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateZ).toDouble());
             return pDoubleSpinBox;
         }

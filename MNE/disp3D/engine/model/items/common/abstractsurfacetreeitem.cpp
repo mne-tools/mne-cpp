@@ -101,6 +101,16 @@ AbstractSurfaceTreeItem::~AbstractSurfaceTreeItem()
 
 //*************************************************************************************************************
 
+void AbstractSurfaceTreeItem::setMaterial(QPointer<Qt3DRender::QMaterial> pMaterial)
+{
+    m_pRenderable3DEntity->removeComponent(m_pMaterial);
+    m_pMaterial = pMaterial;
+    m_pRenderable3DEntity->addComponent(pMaterial);
+}
+
+
+//*************************************************************************************************************
+
 void AbstractSurfaceTreeItem::initItem()
 {
     this->setEditable(false);
@@ -110,11 +120,11 @@ void AbstractSurfaceTreeItem::initItem()
 
     //Set shaders
     if(!m_bUseTesselation) {
-        PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
-        m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
+        m_pMaterial = new PerVertexPhongAlphaMaterial();
+        m_pRenderable3DEntity->addComponent(m_pMaterial);
     } else {
-        PerVertexTessPhongAlphaMaterial* pPerVertexTessPhongAlphaMaterial = new PerVertexTessPhongAlphaMaterial();
-        m_pRenderable3DEntity->addComponent(pPerVertexTessPhongAlphaMaterial);
+        m_pMaterial = new PerVertexTessPhongAlphaMaterial();
+        m_pRenderable3DEntity->addComponent(m_pMaterial);
     }
 
     if(m_bRenderNormals) {
