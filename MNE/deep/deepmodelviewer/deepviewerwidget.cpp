@@ -60,7 +60,7 @@ DeepViewerWidget::DeepViewerWidget()
     // Widget construction and property setting
     m_renderer = new DeepViewerRenderer(this);
 
-    m_controls = new DeepModelViewerControls(0, m_renderer);
+    m_controls = new DeepViewerControls(0, m_renderer);
 
     // Layouting
     QHBoxLayout *viewLayout = new QHBoxLayout(this);
