@@ -46,12 +46,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
 #include <QVector3D>
 
 
@@ -78,6 +72,21 @@ using namespace DISP3DLIB;
 
 MetaTreeItem::MetaTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
+{
+    initItem();
+}
+
+
+//*************************************************************************************************************
+
+MetaTreeItem::~MetaTreeItem()
+{
+}
+
+
+//*************************************************************************************************************
+
+void MetaTreeItem::initItem()
 {
     QString sToolTip;
 
@@ -121,14 +130,11 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::VisualizationType:
             sToolTip = "The visualization type";
             break;
-        case MetaTreeItemTypes::SurfaceColor:
-            sToolTip = "Surface color item";
+        case MetaTreeItemTypes::Color:
+            sToolTip = "Color item";
             break;
-        case MetaTreeItemTypes::PointColor:
-            sToolTip = "Point color item";
-            break;
-        case MetaTreeItemTypes::SurfaceAlpha:
-            sToolTip = "Surface alpha value";
+        case MetaTreeItemTypes::AlphaValue:
+            sToolTip = "The alpha value";
             break;
         case MetaTreeItemTypes::SurfaceTessInner:
             sToolTip = "Surface inner tesselation value";
@@ -162,13 +168,6 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
     }
 
     this->setToolTip(sToolTip);
-}
-
-
-//*************************************************************************************************************
-
-MetaTreeItem::~MetaTreeItem()
-{
 }
 
 
@@ -218,13 +217,8 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case MetaTreeItemRoles::SurfaceColor: {
-            emit surfaceColorChanged(value.value<QColor>());
-            break;
-        }
-
-        case MetaTreeItemRoles::PointColor: {
-            emit surfaceColorChanged(value.value<QColor>());
+        case MetaTreeItemRoles::Color: {
+            emit colorChanged(value.value<QColor>());
             break;
         }
 
@@ -233,8 +227,8 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case MetaTreeItemRoles::SurfaceAlpha: {
-            emit surfaceAlphaChanged(value.toFloat());
+        case MetaTreeItemRoles::AlphaValue: {
+            emit alphaChanged(value.toFloat());
             break;
         }
 

@@ -149,7 +149,7 @@ public:
     *
     * @param[in] pTransform     The new entity's transform.
     */
-    void setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
+    void setTransform(QPointer<Qt3DCore::QTransform> pTransform);
 
     //=========================================================================================================
     /**

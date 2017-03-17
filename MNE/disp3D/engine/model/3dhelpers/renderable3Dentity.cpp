@@ -123,11 +123,11 @@ Renderable3DEntity::~Renderable3DEntity()
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
+void Renderable3DEntity::setTransform(QPointer<Qt3DCore::QTransform> pTransform)
 {
-    if(!m_pTransform.isNull()) {
+    if(m_pTransform) {
         this->removeComponent(m_pTransform);
-        m_pTransform = pTransform.data();
+        m_pTransform = pTransform;
         this->addComponent(m_pTransform);
     }
 }

@@ -108,6 +108,13 @@ public:
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
 signals:
     //=========================================================================================================
     /**
@@ -149,11 +156,11 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the surface color changed.
+    * Emit this signal whenever the color changed.
     *
-    * @param[in] color     The new surface color.
+    * @param[in] color     The new color.
     */
-    void surfaceColorChanged(const QColor& color);
+    void colorChanged(const QColor& color);
 
     //=========================================================================================================
     /**
@@ -165,11 +172,11 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the surface alpha value has changed.
+    * Emit this signal whenever the alpha value has changed.
     *
     * @param[in] fAlpha     The new alpha value.
     */
-    void surfaceAlphaChanged(float fAlpha);
+    void alphaChanged(float fAlpha);
 
     //=========================================================================================================
     /**

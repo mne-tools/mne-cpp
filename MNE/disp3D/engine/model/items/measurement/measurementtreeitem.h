@@ -148,6 +148,7 @@ public:
     */
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    void init();
 
     //=========================================================================================================
     /**
@@ -214,7 +215,13 @@ public:
     */
     void setColorOrigin(const MatrixX3f &leftHemiColor, const MatrixX3f &rightHemiColor);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.
