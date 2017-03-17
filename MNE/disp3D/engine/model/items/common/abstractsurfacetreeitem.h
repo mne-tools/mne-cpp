@@ -142,7 +142,7 @@ public:
     *
     * @param[in] pMaterial     The new material.
     */
-    void setMaterial(QPointer<Qt3DRender::QMaterial> pMaterial);
+    virtual void setMaterial(QPointer<Qt3DRender::QMaterial> pMaterial);
 
 protected:
     //=========================================================================================================
