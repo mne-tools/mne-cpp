@@ -110,9 +110,10 @@ public:
     /**
     * Default constructor.
     *
+    * @param[in] bUseAlpha      Whether to use alpha/transparency.
     * @param[in] parent         The parent of this class.
     */
-    explicit PerVertexPhongAlphaMaterial(Qt3DCore::QNode *parent = 0);
+    explicit PerVertexPhongAlphaMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
@@ -165,6 +166,8 @@ private:
     QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
     QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
     QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;
+
+    bool        m_bUseAlpha;
 };
 
 } // namespace DISP3DLIB

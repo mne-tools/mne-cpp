@@ -131,20 +131,16 @@ public:
     * Initializes the rt data item with neccessary information for visualization computations.
     *
     * @param[in] parent                 The Qt3D entity parent of the new item.
-    *
-    * @return   Returns true if successful.
     */
-    bool init(Qt3DCore::QEntity *parent);
+    void initData(Qt3DCore::QEntity *parent);
 
     //=========================================================================================================
     /**
     * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
     * @param[in] pECDSet        The ECDSet dipole fit data.
-    *
-    * @return   Returns true if successful.
     */
-    bool addData(const INVERSELIB::ECDSet& pECDSet);
+    void addData(const INVERSELIB::ECDSet& pECDSet);
 
     //=========================================================================================================
     /**
@@ -152,9 +148,15 @@ public:
     *
     * @return                       Returns true if this item is initialized.
     */
-    inline bool isInit() const;
+    inline bool isDataInit() const;
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.
@@ -179,7 +181,7 @@ private:
     */
     void plotDipoles(const INVERSELIB::ECDSet& tECDSet);
 
-    bool                                    m_bIsInit;                      /**< The init flag. */
+    bool                                    m_bIsDataInit;                  /**< The init flag. */
 
     QPointer<Renderable3DEntity>            m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
@@ -194,9 +196,9 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool EcdDataTreeItem::isInit() const
+inline bool EcdDataTreeItem::isDataInit() const
 {
-    return m_bIsInit;
+    return m_bIsDataInit;
 }
 
 } //NAMESPACE DISP3DLIB

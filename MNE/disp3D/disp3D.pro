@@ -110,11 +110,15 @@ SOURCES += \
     engine/model/items/network/networktreeitem.cpp \
     engine/model/items/bem/bemtreeitem.cpp \
     engine/model/items/bem/bemsurfacetreeitem.cpp \
+    engine/model/items/sensorspace/sensorsettreeitem.cpp \
+    engine/model/items/sensorspace/sensorsurfacetreeitem.cpp \
+    engine/model/items/sensorspace/sensorpositiontreeitem.cpp \
     engine/model/items/digitizer/digitizertreeitem.cpp \
     engine/model/items/digitizer/digitizersettreeitem.cpp \
     engine/model/items/mri/mritreeitem.cpp \
     engine/model/items/common/abstracttreeitem.cpp \
     engine/model/items/common/metatreeitem.cpp \
+    engine/model/items/common/abstractsurfacetreeitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     engine/model/3dhelpers/renderable3Dentity.cpp \
     engine/model/3dhelpers/custommesh.cpp \
@@ -143,11 +147,15 @@ HEADERS += \
     engine/model/items/network/networktreeitem.h \
     engine/model/items/bem/bemtreeitem.h \
     engine/model/items/bem/bemsurfacetreeitem.h \
+    engine/model/items/sensorspace/sensorsettreeitem.h \
+    engine/model/items/sensorspace/sensorsurfacetreeitem.h \
+    engine/model/items/sensorspace/sensorpositiontreeitem.h \
     engine/model/items/digitizer/digitizertreeitem.h \
     engine/model/items/digitizer/digitizersettreeitem.h \
     engine/model/items/mri/mritreeitem.h \
     engine/model/items/common/abstracttreeitem.h \
     engine/model/items/common/metatreeitem.h \
+    engine/model/items/common/abstractsurfacetreeitem.h \
     engine/model/items/common/types.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     engine/model/3dhelpers/renderable3Dentity.h \

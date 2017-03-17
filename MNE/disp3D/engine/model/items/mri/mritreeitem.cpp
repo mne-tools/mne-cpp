@@ -76,10 +76,7 @@ using namespace DISP3DLIB;
 MriTreeItem::MriTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("MRI item");
+    initItem();
 }
 
 
@@ -87,6 +84,17 @@ MriTreeItem::MriTreeItem(int iType, const QString& text)
 
 MriTreeItem::~MriTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void MriTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("MRI item");
 }
 
 
@@ -180,13 +188,16 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
 void MriTreeItem::setRtVertColor(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
 {
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
+    QVariant data;
 
     for(int j = 0; j < itemList.size(); ++j) {
         if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                pHemiItem->setRtVertColor(sourceColorSamples.first);
+                data.setValue(sourceColorSamples.first);
+                pHemiItem->getSurfaceItem()->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
             } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                pHemiItem->setRtVertColor(sourceColorSamples.second);
+                data.setValue(sourceColorSamples.second);
+                pHemiItem->getSurfaceItem()->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
             }
         }
     }
