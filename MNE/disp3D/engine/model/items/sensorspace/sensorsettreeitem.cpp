@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     bemtreeitem.cpp
+* @file     sensorsettreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BemTreeItem class definition.
+* @brief    SensorSetTreeItem class definition.
 *
 */
 
@@ -38,10 +38,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "bemtreeitem.h"
-#include "bemsurfacetreeitem.h"
+#include "sensorsettreeitem.h"
+#include "sensorsurfacetreeitem.h"
+#include "sensorpositiontreeitem.h"
 
 #include <mne/mne_bem.h>
+#include <fiff/fiff_ch_info.h>
 
 
 //*************************************************************************************************************
@@ -66,6 +68,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -73,7 +76,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BemTreeItem::BemTreeItem(int iType, const QString& text)
+SensorSetTreeItem::SensorSetTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     initItem();
@@ -82,25 +85,25 @@ BemTreeItem::BemTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-BemTreeItem::~BemTreeItem()
+SensorSetTreeItem::~SensorSetTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-void BemTreeItem::initItem()
+void SensorSetTreeItem::initItem()
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM item");
+    this->setToolTip("Sensor item");
 }
 
 
 //*************************************************************************************************************
 
-QVariant BemTreeItem::data(int role) const
+QVariant SensorSetTreeItem::data(int role) const
 {
     switch(role) {
         case Data3DTreeModelItemRoles::BemName:
@@ -115,7 +118,7 @@ QVariant BemTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BemTreeItem::setData(const QVariant& value, int role)
+void  SensorSetTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }
@@ -123,18 +126,49 @@ void  BemTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
+void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent)
 {
-    //Generate child items based on BEM input parameters
-    for(int i = 0; i < tBem.size(); ++i) {
-        QString sBemSurfName;
-        sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], p3DEntityParent);
+    //Generate sensor surfaces as childs
+    for(int i = 0; i < tSensor.size(); ++i) {
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem);
+        pSurfItem->addData(tSensor[i], p3DEntityParent);
 
         QList<QStandardItem*> list;
         list << pSurfItem;
         list << new QStandardItem(pSurfItem->toolTip());
+        this->appendRow(list);
+    }
+
+    //Sort MEG channel types
+    QList<FiffChInfo> lChInfoGrad;
+    QList<FiffChInfo> lChInfoMag;
+
+    for(int i = 0; i < lChInfo.size(); ++i) {
+        if(lChInfo.at(i).unit == FIFF_UNIT_T_M) {
+            lChInfoGrad << lChInfo.at(i);
+        } else if(lChInfo.at(i).unit == FIFF_UNIT_T) {
+            lChInfoMag << lChInfo.at(i);
+        }
+    }
+
+    //Add sensor locations as child items
+    if(!lChInfoGrad.isEmpty()) {
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
+        pSensorPosItem->addData(lChInfoGrad, p3DEntityParent);
+
+        QList<QStandardItem*> list;
+        list << pSensorPosItem;
+        list << new QStandardItem(pSensorPosItem->toolTip());
+        this->appendRow(list);
+    }
+
+    if(!lChInfoMag.isEmpty()) {
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
+        pSensorPosItem->addData(lChInfoMag, p3DEntityParent);
+
+        QList<QStandardItem*> list;
+        list << pSensorPosItem;
+        list << new QStandardItem(pSensorPosItem->toolTip());
         this->appendRow(list);
     }
 }
@@ -142,7 +176,7 @@ void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent
 
 //*************************************************************************************************************
 
-void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void SensorSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i < this->rowCount(); ++i) {
         if(this->child(i)->isCheckable()) {

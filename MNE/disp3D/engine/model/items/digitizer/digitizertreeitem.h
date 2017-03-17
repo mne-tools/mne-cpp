@@ -91,9 +91,9 @@ class Renderable3DEntity;
 
 //=============================================================================================================
 /**
-* DigitizerTreeItem provides a generic tree item to hold digitizer data.
+* DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
 *
-* @brief Provides a generic digitizer tree item.
+* @brief DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
 */
 class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public AbstractTreeItem
 {
@@ -110,7 +110,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit DigitizerTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    explicit DigitizerTreeItem(int iType = Data3DTreeModelItemTypes::DigitizerItem, const QString& text = "Digitizer");
 
     //=========================================================================================================
     /**
@@ -131,10 +131,8 @@ public:
     *
     * @param[in] tDigitizer         The digitizer data.
     * @param[in] parent             The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
+    void addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
@@ -144,7 +142,13 @@ public:
     */
     void setVisible(bool state);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.

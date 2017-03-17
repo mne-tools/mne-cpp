@@ -174,21 +174,13 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pComboBox;
         }
 
-        case MetaTreeItemTypes::SurfaceColor: {
+        case MetaTreeItemTypes::Color: {
             QColorDialog *pColorDialog = new QColorDialog();
             connect(pColorDialog, &QColorDialog::currentColorChanged,
                     this, &Data3DTreeDelegate::onEditorEdited);
-            pColorDialog->setWindowTitle("Select Surface Color");
+            pColorDialog->setWindowTitle("Select Color");
             pColorDialog->show();
-            return pColorDialog;
-        }
-
-        case MetaTreeItemTypes::PointColor: {
-            QColorDialog *pColorDialog = new QColorDialog();
-            connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &Data3DTreeDelegate::onEditorEdited);
-            pColorDialog->setWindowTitle("Select Point Color");
-            pColorDialog->show();
+            pColorDialog->setCurrentColor(index.model()->data(index, MetaTreeItemRoles::Color).value<QColor>());
             return pColorDialog;
         }
 
@@ -203,14 +195,14 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceAlpha: {
+        case MetaTreeItemTypes::AlphaValue: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(0.01);
             pDoubleSpinBox->setMaximum(1.0);
             pDoubleSpinBox->setSingleStep(0.01);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::AlphaValue).toDouble());
             return pDoubleSpinBox;
         }
 
@@ -253,7 +245,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(-10000.0);
             pDoubleSpinBox->setMaximum(10000.0);
-            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSingleStep(0.001);
+            pDoubleSpinBox->setDecimals(5);
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateX).toDouble());
             return pDoubleSpinBox;
         }
@@ -264,7 +257,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(-10000.0);
             pDoubleSpinBox->setMaximum(10000.0);
-            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSingleStep(0.001);
+            pDoubleSpinBox->setDecimals(5);
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateY).toDouble());
             return pDoubleSpinBox;
         }
@@ -275,7 +269,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(-10000.0);
             pDoubleSpinBox->setMaximum(10000.0);
-            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSingleStep(0.001);
+            pDoubleSpinBox->setDecimals(5);
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateZ).toDouble());
             return pDoubleSpinBox;
         }
@@ -409,15 +404,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceColor: {
-            QColor color = index.model()->data(index, MetaTreeItemRoles::SurfaceColor).value<QColor>();
-            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-            pColorDialog->setCurrentColor(color);
-            break;
-        }
-
-        case MetaTreeItemTypes::PointColor: {
-            QColor color = index.model()->data(index, MetaTreeItemRoles::PointColor).value<QColor>();
+        case MetaTreeItemTypes::Color: {
+            QColor color = index.model()->data(index, MetaTreeItemRoles::Color).value<QColor>();
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             pColorDialog->setCurrentColor(color);
             break;
@@ -430,8 +418,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceAlpha: {
-            int value = index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble();
+        case MetaTreeItemTypes::AlphaValue: {
+            int value = index.model()->data(index, MetaTreeItemRoles::AlphaValue).toDouble();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
@@ -599,24 +587,13 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             return;
         }
 
-        case MetaTreeItemTypes::SurfaceColor: {
+        case MetaTreeItemTypes::Color: {
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             QColor color = pColorDialog->currentColor();
             QVariant data;
             data.setValue(color);
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceColor);
-            model->setData(index, data, Qt::DecorationRole);
-            return;
-        }
-
-        case MetaTreeItemTypes::PointColor: {
-            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-            QColor color = pColorDialog->currentColor();
-            QVariant data;
-            data.setValue(color);
-
-            model->setData(index, data, MetaTreeItemRoles::PointColor);
+            model->setData(index, data, MetaTreeItemRoles::Color);
             model->setData(index, data, Qt::DecorationRole);
             return;
         }
@@ -632,12 +609,12 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceAlpha: {
+        case MetaTreeItemTypes::AlphaValue: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceAlpha);
+            model->setData(index, data, MetaTreeItemRoles::AlphaValue);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
