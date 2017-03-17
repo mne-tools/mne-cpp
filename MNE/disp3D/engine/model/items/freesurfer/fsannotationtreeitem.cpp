@@ -51,13 +51,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,10 +75,7 @@ using namespace FSLIB;
 FsAnnotationTreeItem::FsAnnotationTreeItem(int iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Unchecked);
-    this->setToolTip("Freesurfer annotation item");
+    initItem();
 }
 
 
@@ -93,6 +83,17 @@ FsAnnotationTreeItem::FsAnnotationTreeItem(int iType, const QString & text)
 
 FsAnnotationTreeItem::~FsAnnotationTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void FsAnnotationTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Unchecked);
+    this->setToolTip("Freesurfer annotation item");
 }
 
 
@@ -118,9 +119,7 @@ void FsAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tA
 {
     //Create color from annotation data if annotation is not empty
     if(!tAnnotation.isEmpty()) {
-        QByteArray arrayColorsAnnot;
-        arrayColorsAnnot.resize(tAnnotation.getVertices().rows() * 3 * (int)sizeof(float));
-        float *rawArrayColors = reinterpret_cast<float *>(arrayColorsAnnot.data());
+        MatrixX3f matAnnotColors(tAnnotation.getVertices().rows(), 3);
 
         QList<FSLIB::Label> qListLabels;
         QList<RowVector4i> qListLabelRGBAs;
@@ -137,15 +136,17 @@ void FsAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tA
 
                 patchColor = patchColor.darker(200);
 
-                rawArrayColors[label.vertices(j)*3+0] = patchColor.redF();
-                rawArrayColors[label.vertices(j)*3+1] = patchColor.greenF();
-                rawArrayColors[label.vertices(j)*3+2] = patchColor.blueF();
+                if(label.vertices(j) < matAnnotColors.rows()) {
+                    matAnnotColors(label.vertices(j),0) = patchColor.redF();
+                    matAnnotColors(label.vertices(j),1) = patchColor.greenF();
+                    matAnnotColors(label.vertices(j),2) = patchColor.blueF();
+                }
             }
         }
 
         //Add data which is held by this FsAnnotationTreeItem
         QVariant data;
-        data.setValue(arrayColorsAnnot);
+        data.setValue(matAnnotColors);
         this->setData(data, Data3DTreeModelItemRoles::AnnotColors);
 
         data.setValue(qListLabels);

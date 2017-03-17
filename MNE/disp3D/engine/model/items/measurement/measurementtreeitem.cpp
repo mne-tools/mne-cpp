@@ -68,13 +68,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,10 +99,7 @@ MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 , m_pMneEstimateTreeItem(new MneEstimateTreeItem())
 , m_pNetworkTreeItem(new NetworkTreeItem())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Measurement item");
+    initItem();
 }
 
 
@@ -117,6 +107,17 @@ MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 
 MeasurementTreeItem::~MeasurementTreeItem()
 {
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Measurement item");
 }
 
 
@@ -283,7 +284,7 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::Q
             list << new QStandardItem(m_EcdDataTreeItem->toolTip());
             this->appendRow(list);
 
-            m_EcdDataTreeItem->init(p3DEntityParent);
+            m_EcdDataTreeItem->initData(p3DEntityParent);
             m_EcdDataTreeItem->addData(pECDSet);
 
         } else {
@@ -342,7 +343,7 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
             list << new QStandardItem(m_pNetworkTreeItem->toolTip());
             this->appendRow(list);
 
-            m_pNetworkTreeItem->init(p3DEntityParent);
+            m_pNetworkTreeItem->initData(p3DEntityParent);
             m_pNetworkTreeItem->addData(tNetworkData);
         } else {
             m_pNetworkTreeItem->addData(tNetworkData);

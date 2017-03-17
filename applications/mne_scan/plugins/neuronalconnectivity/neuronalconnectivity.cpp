@@ -41,6 +41,7 @@
 #include "neuronalconnectivity.h"
 
 #include <connectivity/connectivitymeasures.h>
+#include <connectivity/network/network.h>
 
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>

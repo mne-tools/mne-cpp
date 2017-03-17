@@ -149,10 +149,8 @@ public:
     * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
     * @param[in] tSourceEstimate    The MNESourceEstimate data.
-    *
-    * @return                       Returns true if successful.
     */
-    bool addData(const MNELIB::MNESourceEstimate& tSourceEstimate);
+    void addData(const MNELIB::MNESourceEstimate& tSourceEstimate);
 
     //=========================================================================================================
     /**
@@ -160,7 +158,7 @@ public:
     *
     * @return                       Returns true if this item is initialized.
     */
-    inline bool isInit() const;
+    inline bool isDataInit() const;
 
     //=========================================================================================================
     /**
@@ -227,7 +225,13 @@ public:
     */
     void setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * This function gets called whenever the check/actiation state of the rt data worker changed.
@@ -292,7 +296,7 @@ private:
     */
     void onNumberAveragesChanged(int iNumAvr);
 
-    bool                                m_bIsInit;                      /**< The init flag. */
+    bool                                m_bIsDataInit;                      /**< The init flag. */
 
     QPointer<RtSourceLocDataWorker>     m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
 
@@ -311,9 +315,9 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MneEstimateTreeItem::isInit() const
+inline bool MneEstimateTreeItem::isDataInit() const
 {
-    return m_bIsInit;
+    return m_bIsDataInit;
 }
 
 } //NAMESPACE DISP3DLIB
