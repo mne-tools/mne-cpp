@@ -1,100 +1,157 @@
-//=============================================================================================================
-/**
-* @file     deepviewerwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     January, 2017
-*
-* @section  LICENSE
-*
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    DeepViewerWidget class implementation.
-*
-*/
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "arthurwidgets.h"
-
 #include "deepviewerwidget.h"
-#include "deepviewerrenderer.h"
-#include "deepviewercontrol.h"
+#include "edge.h"
+#include "node.h"
 
-
-#include <stdio.h>
+#include <math.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// QT INCLUDES
 //=============================================================================================================
 
-DeepViewerWidget::DeepViewerWidget()
+#include <QKeyEvent>
+
+
+#ifndef QT_NO_OPENGL
+#include <QtOpenGL>
+#else
+#include <QtWidgets>
+#endif
+
+
+DeepViewerWidget::DeepViewerWidget(QWidget *parent)
+: QGraphicsView(parent)
 {
-    setWindowTitle(tr("Path Stroking"));
+//#ifndef QT_NO_OPENGL
+//    this->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+//#else
+//#endif
 
-    // Widget construction and property setting
-    m_renderer = new DeepViewerRenderer(this);
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    scene->setSceneRect(-200, -200, 400, 400);
+    setScene(scene);
+    setCacheMode(CacheBackground);
+    setViewportUpdateMode(BoundingRectViewportUpdate);
+    setRenderHint(QPainter::Antialiasing);
+    setTransformationAnchor(AnchorUnderMouse);
+    scale(qreal(0.8), qreal(0.8));
+    setMinimumSize(400, 400);
+    setWindowTitle(tr("Deep Viewer"));
 
-    m_controls = new DeepViewerControls(0, m_renderer);
+    QVector<int> layerDim;
+    layerDim.append(4); //Inputs
+    layerDim.append(20); // First hidden
+    layerDim.append(10); // Second hidden
+    layerDim.append(10); // Third hidden
+    layerDim.append(2); // Output
 
-    // Layouting
-    QHBoxLayout *viewLayout = new QHBoxLayout(this);
-    viewLayout->addWidget(m_renderer);
+    int numLayers = layerDim.size();
 
-    viewLayout->addWidget(m_controls);
+    double layerDist = 400.0;
+    double nodeDist = 50.0;
 
-    m_renderer->loadDescription(":res/deepmodelviewer/deepmodelviewer.html");
+    double x_root = -((numLayers-1.0)*layerDist) / 2.0;
 
-    connect(m_renderer, SIGNAL(clicked()), this, SLOT(showControls()));
-    connect(m_controls, SIGNAL(okPressed()), this, SLOT(hideControls()));
-    connect(m_controls, SIGNAL(quitPressed()), QApplication::instance(), SLOT(quit()));
+
+    QList<Node*> currentLayer;
+    QPointF layerRoot, currentPos;
+
+    for(int layer = 0; layer < layerDim.size(); ++layer) {
+        layerRoot = QPointF( x_root + layer*layerDist, - (layerDim[layer]/2) * nodeDist);
+
+        // Create Nodes
+        for(int i = 0; i < layerDim[layer]; ++i ) {
+            currentLayer.append(new Node(this));
+            scene->addItem(currentLayer[i]);
+
+            currentPos = layerRoot + QPointF(0,nodeDist * i);
+            currentLayer[i]->setPos(currentPos);
+        }
+        layersList.append(currentLayer);
+        currentLayer.clear();
+
+        // Create Edges
+        if(layer - 1 >= 0) {
+            for(int i = 0; i < layersList[layer-1].size(); ++i ) {
+                for(int j = 0; j < layersList[layer].size(); ++j ) {
+                    scene->addItem(new Edge(layersList[layer-1][i], layersList[layer][j]));
+                }
+            }
+        }
+    }
 }
 
 
 //*************************************************************************************************************
 
-void DeepViewerWidget::setModel(CNTK::FunctionPtr &model)
+void DeepViewerWidget::keyPressEvent(QKeyEvent *event)
 {
-    m_pModel = model;
+    switch (event->key()) {
+    case Qt::Key_Plus:
+        zoomIn();
+        break;
+    case Qt::Key_Minus:
+        zoomOut();
+        break;
+    default:
+        QGraphicsView::keyPressEvent(event);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void DeepViewerWidget::showControls()
+void DeepViewerWidget::timerEvent(QTimerEvent *event)
 {
-    m_controls->showFullScreen();
+    Q_UNUSED(event);
 }
 
 
 //*************************************************************************************************************
 
-void DeepViewerWidget::hideControls()
+#ifndef QT_NO_WHEELEVENT
+void DeepViewerWidget::wheelEvent(QWheelEvent *event)
 {
-    m_controls->hide();
+    scaleView(pow((double)2, -event->delta() / 240.0));
+}
+#endif
+
+
+//*************************************************************************************************************
+
+void DeepViewerWidget::drawBackground(QPainter *painter, const QRectF &rect)
+{
+    Q_UNUSED(painter);
+    Q_UNUSED(rect);
+//    QRectF sceneRect = this->sceneRect();
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewerWidget::scaleView(qreal scaleFactor)
+{
+    qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+    if (factor < 0.07 || factor > 100)
+        return;
+
+    scale(scaleFactor, scaleFactor);
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewerWidget::zoomIn()
+{
+    scaleView(qreal(1.2));
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewerWidget::zoomOut()
+{
+    scaleView(1 / qreal(1.2));
 }

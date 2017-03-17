@@ -68,6 +68,8 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QTime>
+#include <QMainWindow>
 #include <QDebug>
 
 
@@ -144,16 +146,13 @@ int main(int argc, char *argv[])
     deep.print();
 
     // Create the viewer
-    DeepViewerWidget deepModelViewer;
-    QList<QWidget *> widgets = deepModelViewer.findChildren<QWidget *>();
-    foreach (QWidget *w, widgets) {
-        w->setAttribute(Qt::WA_AcceptTouchEvents);
-    }
-    deepModelViewer.show();
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+    DeepViewerWidget *widget = new DeepViewerWidget;
 
-#ifdef QT_KEYPAD_NAVIGATION
-    QApplication::setNavigationMode(Qt::NavigationModeCursorAuto);
-#endif
+    QMainWindow mainWindow;
+    mainWindow.setCentralWidget(widget);
+
+    mainWindow.show();
 
     return a.exec();
 }
