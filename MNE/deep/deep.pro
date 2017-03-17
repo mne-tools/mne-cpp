@@ -113,7 +113,9 @@ SOURCES += \
     deepmodelcreator.cpp \
     deepviewer.cpp \
     deepmodelviewer/arthurwidgets.cpp \
-    deepmodelviewer/deepmodelviewer.cpp
+    deepmodelviewer/deepmodelviewerwidget.cpp \
+    deepmodelviewer/deepmodelviewercontrol.cpp \
+    deepmodelviewer/deepmodelviewerrenderer.cpp
 
 HEADERS +=\
     deep_global.h \
@@ -122,7 +124,9 @@ HEADERS +=\
     deepmodelcreator.h \
     deepviewer.h \
     deepmodelviewer/arthurwidgets.h \
-    deepmodelviewer/deepmodelviewer.h
+    deepmodelviewer/deepmodelviewerwidget.h \
+    deepmodelviewer/deepmodelviewercontrol.h \
+    deepmodelviewer/deepmodelviewerrenderer.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
