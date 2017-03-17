@@ -68,7 +68,6 @@
 //=============================================================================================================
 
 #include <QApplication>
-#include <QTime>
 #include <QMainWindow>
 #include <QDebug>
 
@@ -132,27 +131,22 @@ void generate_random_data_samples(int sample_size, int feature_dim, int num_clas
 */
 int main(int argc, char *argv[])
 {
-//    Q_INIT_RESOURCE(deepmodelviewer.qrc);
+//    Q_INIT_RESOURCE(images.qrc);
 
     QApplication a(argc, argv);
 
     // Create a deep model
     DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-    size_t input_dim = 2;
-    size_t num_output_classes = 2;
+    size_t input_dim = 4;
+    size_t num_output_classes = 3;
     Deep deep;
     FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
     deep.setModel(model);
     deep.print();
 
     // Create the viewer
-    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
-    DeepViewerWidget *widget = new DeepViewerWidget;
-
-    QMainWindow mainWindow;
-    mainWindow.setCentralWidget(widget);
-
-    mainWindow.show();
+    DeepViewerWidget window(model);
+    window.show();
 
     return a.exec();
 }

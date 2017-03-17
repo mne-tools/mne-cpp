@@ -1,50 +1,50 @@
-#ifndef GRAPHWIDGET_H
-#define GRAPHWIDGET_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
+#include <QWidget>
 
 #include "../deep_global.h"
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// CNTK INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsView>
+#include <CNTKLibrary.h>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+QT_BEGIN_NAMESPACE
+class QGraphicsScene;
+class QSplitter;
+QT_END_NAMESPACE
 
 class Node;
 
 
-//! [0]
-class DEEPSHARED_EXPORT DeepViewerWidget : public QGraphicsView
+class DEEPSHARED_EXPORT DeepViewerWidget : public QWidget
 {
     Q_OBJECT
-
 public:
-    DeepViewerWidget(QWidget *parent = 0);
-
-public slots:
-    void zoomIn();
-    void zoomOut();
-
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
-    void timerEvent(QTimerEvent *event) override;
-#ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QWheelEvent *event) override;
-#endif
-    void drawBackground(QPainter *painter, const QRectF &rect) override;
-
-    void scaleView(qreal scaleFactor);
+    DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent = 0);
 
 private:
+    void populateScene();
+
+    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
+
+    QGraphicsScene* m_pScene;
+
+    QSplitter* m_pSplitter;
+
     QList< QList<Node*> > layersList;
 };
-//! [0]
 
-#endif // GRAPHWIDGET_H
+#endif // MAINWINDOW_H

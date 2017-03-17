@@ -41,10 +41,8 @@ TEMPLATE = lib
 QT += widgets charts
 
 # Deep Model Viewer
-qtHaveModule(opengl) {
-    DEFINES += QT_OPENGL_SUPPORT
-    QT += opengl
-}
+qtHaveModule(printsupport): QT += printsupport
+qtHaveModule(opengl): QT += opengl
 
 DEFINES += DEEP_LIBRARY
 
@@ -114,6 +112,8 @@ SOURCES += \
     deepviewer.cpp \
     deepmodelviewer/edge.cpp \
     deepmodelviewer/node.cpp \
+#    deepmodelviewer/deepviewerwidget.cpp \
+    deepmodelviewer/view.cpp \
     deepmodelviewer/deepviewerwidget.cpp
 
 HEADERS +=\
@@ -124,6 +124,8 @@ HEADERS +=\
     deepviewer.h \
     deepmodelviewer/edge.h \
     deepmodelviewer/node.h \
+#    deepmodelviewer/deepviewerwidget.h \
+    deepmodelviewer/view.h \
     deepmodelviewer/deepviewerwidget.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -154,3 +156,6 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
+
+RESOURCES += \
+    deepmodelviewer/images.qrc
