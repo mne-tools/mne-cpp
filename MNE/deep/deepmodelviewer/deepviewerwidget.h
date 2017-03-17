@@ -75,7 +75,7 @@
 //=============================================================================================================
 
 class DeepViewerRenderer;
-class DeepModelViewerControls;
+class DeepViewerControls;
 
 
 //=============================================================================================================
@@ -94,7 +94,7 @@ public:
 
 private:
     DeepViewerRenderer *m_renderer;
-    DeepModelViewerControls *m_controls;
+    DeepViewerControls *m_controls;
 
     CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
 
