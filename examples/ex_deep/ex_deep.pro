@@ -40,6 +40,7 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 QT += widgets charts
+qtHaveModule(opengl): QT += opengl
 
 CONFIG   += console
 

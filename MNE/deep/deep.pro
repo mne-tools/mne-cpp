@@ -112,10 +112,9 @@ SOURCES += \
     deepeval.cpp \
     deepmodelcreator.cpp \
     deepviewer.cpp \
-    deepmodelviewer/arthurwidgets.cpp \
-    deepmodelviewer/deepviewercontrol.cpp \
-    deepmodelviewer/deepviewerwidget.cpp \
-    deepmodelviewer/deepviewerrenderer.cpp
+    deepmodelviewer/edge.cpp \
+    deepmodelviewer/node.cpp \
+    deepmodelviewer/deepviewerwidget.cpp
 
 HEADERS +=\
     deep_global.h \
@@ -123,10 +122,9 @@ HEADERS +=\
     deepeval.h \
     deepmodelcreator.h \
     deepviewer.h \
-    deepmodelviewer/arthurwidgets.h \
-    deepmodelviewer/deepviewerwidget.h \
-    deepmodelviewer/deepviewerrenderer.h \
-    deepmodelviewer/deepviewercontrol.h
+    deepmodelviewer/edge.h \
+    deepmodelviewer/node.h \
+    deepmodelviewer/deepviewerwidget.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -156,6 +154,3 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
-
-RESOURCES += \
-    deepmodelviewer/deepmodelviewer.qrc
