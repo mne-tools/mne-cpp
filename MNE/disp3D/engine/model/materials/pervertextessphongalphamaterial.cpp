@@ -78,7 +78,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(QNode *parent)
+PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(bool bUseAlpha, QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
@@ -95,6 +95,7 @@ PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(QNode *parent)
 , m_pNoDepthMask(new QNoDepthMask())
 , m_pBlendState(new QBlendEquationArguments())
 , m_pBlendEquation(new QBlendEquation())
+, m_bUseAlpha(bUseAlpha)
 {
     this->init();
 }
@@ -127,14 +128,16 @@ void PerVertexTessPhongAlphaMaterial::init()
     m_pVertexGL4Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL4Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
-//    //Setup transparency
-//    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-//    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-//    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+    //If wanted setup transparency
+    if(m_bUseAlpha) {
+        m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+        m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+        m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
 
-//    m_pVertexGL4RenderPass->addRenderState(m_pBlendEquation);
-//    m_pVertexGL4RenderPass->addRenderState(m_pNoDepthMask);
-//    m_pVertexGL4RenderPass->addRenderState(m_pBlendState);
+        m_pVertexGL4RenderPass->addRenderState(m_pBlendEquation);
+        m_pVertexGL4RenderPass->addRenderState(m_pNoDepthMask);
+        m_pVertexGL4RenderPass->addRenderState(m_pBlendState);
+    }
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));
