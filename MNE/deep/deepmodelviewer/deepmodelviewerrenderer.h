@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepmodelviewer.h
+* @file     deepmodelviewerrenderer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,11 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepModelViewer class declaration.
+* @brief    DeepModelViewerWidget class declaration.
 *
 */
-#ifndef DEEPMODELVIEWER_H
-#define DEEPMODELVIEWER_H
+#ifndef DEEPMODELVIEWERRENDERER_H
+#define DEEPMODELVIEWERRENDERER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -152,65 +152,4 @@ private:
     QHash<int, int> m_fingerPointMapping;
 };
 
-
-//=============================================================================================================
-/**
-* Deep Model Viewer Controls
-*
-* @brief Deep Model Viewer Controls
-*/
-class DeepModelViewerControls : public QWidget
-{
-    Q_OBJECT
-
-public:
-    DeepModelViewerControls(QWidget* parent, DeepModelViewerRenderer* renderer);
-
-signals:
-    void okPressed();
-    void quitPressed();
-
-private:
-    DeepModelViewerRenderer* m_renderer;
-
-    QGroupBox *m_capGroup;
-    QGroupBox *m_joinGroup;
-    QGroupBox *m_styleGroup;
-    QGroupBox *m_pathModeGroup;
-
-    void createCommonControls(QWidget* parent);
-    void createLayout();
-
-private slots:
-    void emitQuitSignal();
-    void emitOkSignal();
-
-};
-
-
-//=============================================================================================================
-/**
-* Deep Model Viewer Widget
-*
-* @brief Deep Model Viewer Widget
-*/
-class DEEPSHARED_EXPORT DeepModelViewerWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    DeepModelViewerWidget();
-    void setModel( CNTK::FunctionPtr& model );
-
-private:
-    DeepModelViewerRenderer *m_renderer;
-    DeepModelViewerControls *m_controls;
-
-    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
-
-private slots:
-    void showControls();
-    void hideControls();
-};
-
-#endif // DEEPMODELVIEWER_H
+#endif // DEEPMODELVIEWERRENDERER_H

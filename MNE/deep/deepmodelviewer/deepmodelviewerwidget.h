@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     deepmodelviewerwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,34 +29,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    DeepModelViewerWidget class declaration.
 *
 */
+#ifndef DEEPMODELVIEWERWIDGET_H
+#define DEEPMODELVIEWERWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QChart>
-#include <QChartView>
-#include <QLineSeries>
-#include <QScatterSeries>
-#include <QCategoryAxis>
+#include "arthurwidgets.h"
 
-#include <deep/deep.h>
-#include <deep/deepviewer.h>
-#include <deep/deepmodelcreator.h>
-#include <deep/deepmodelviewer/deepmodelviewerwidget.h>
-
-#include <iostream>
-#include <random>
+#include "../deep_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen
+// Eigen INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -64,96 +55,52 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// CNTK INCLUDES
+//=============================================================================================================
+
+#include <CNTKLibrary.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QDebug>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace DEEPLIB;
-using namespace QtCharts;
-using namespace CNTK;
+class DeepModelViewerRenderer;
+class DeepModelViewerControls;
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC FUNCTIONS
-//=============================================================================================================
-
-// Helper function to generate a random data sample
-void generate_random_data_samples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
-{
-    MatrixXi t_Y = MatrixXi::Zero(sample_size, 1);
-    for(int i = 0; i < t_Y.rows(); ++i) {
-        t_Y(i,0) = rand() % num_classes;
-    }
-
-    std::default_random_engine generator;
-    std::normal_distribution<float> distribution(0.0,1.0);
-
-    X = MatrixXf::Zero(sample_size, feature_dim);
-    for(int i = 0; i < X.rows(); ++i) {
-        for(int j = 0; j < X.cols(); ++j) {
-            float number = distribution(generator);
-            X(i,j) = (number + 3) * (t_Y(i) + 1);
-        }
-    }
-
-    Y = MatrixXf::Zero(sample_size, num_classes);
-
-    for(int i = 0; i < Y.rows(); ++i) {
-        Y(i,t_Y(i)) = 1;
-    }
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Deep Model Viewer Widget
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Deep Model Viewer Widget
 */
-int main(int argc, char *argv[])
+class DEEPSHARED_EXPORT DeepModelViewerWidget : public QWidget
 {
-//    Q_INIT_RESOURCE(deepmodelviewer.qrc);
+    Q_OBJECT
 
-    QApplication a(argc, argv);
+public:
+    DeepModelViewerWidget();
+    void setModel( CNTK::FunctionPtr& model );
 
-    // Create a deep model
-    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-    size_t input_dim = 2;
-    size_t num_output_classes = 2;
-    Deep deep;
-    FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
-    deep.setModel(model);
-    deep.print();
+private:
+    DeepModelViewerRenderer *m_renderer;
+    DeepModelViewerControls *m_controls;
 
-    // Create the viewer
-    DeepModelViewerWidget deepModelViewer;
-    QList<QWidget *> widgets = deepModelViewer.findChildren<QWidget *>();
-    foreach (QWidget *w, widgets) {
-        w->setAttribute(Qt::WA_AcceptTouchEvents);
-    }
-    deepModelViewer.show();
+    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
 
-#ifdef QT_KEYPAD_NAVIGATION
-    QApplication::setNavigationMode(Qt::NavigationModeCursorAuto);
-#endif
+private slots:
+    void showControls();
+    void hideControls();
+};
 
-    return a.exec();
-}
+#endif // DEEPMODELVIEWERWIDGET_H
