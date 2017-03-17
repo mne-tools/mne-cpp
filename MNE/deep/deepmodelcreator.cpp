@@ -181,9 +181,7 @@ FunctionPtr DeepModelCreator::DNN_1(const size_t inputDim, const size_t numOutpu
     };
     Parameter outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
 
-
     Variable inputVar = InputVariable({inputDim}, DataType::Float, L"features");
-
 
     return FullyConnectedFeedForwardClassifierNet(  inputVar,
                                                     numHiddenLayers,
