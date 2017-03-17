@@ -130,118 +130,30 @@ void generate_random_data_samples(int sample_size, int feature_dim, int num_clas
 */
 int main(int argc, char *argv[])
 {
-//    Q_INIT_RESOURCE(pathstroke);
+//    Q_INIT_RESOURCE(deepmodelviewer.qrc);
 
     QApplication a(argc, argv);
 
-    bool smallScreen = QApplication::arguments().contains("-small-screen");
+    // Create a deep model
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+    size_t input_dim = 2;
+    size_t num_output_classes = 2;
+    Deep deep;
+    FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
+    deep.setModel(model);
+    deep.print();
 
-    DeepModelViewerWidget deepModelViewer(smallScreen);
+    // Create the viewer
+    DeepModelViewerWidget deepModelViewer;
     QList<QWidget *> widgets = deepModelViewer.findChildren<QWidget *>();
     foreach (QWidget *w, widgets) {
         w->setAttribute(Qt::WA_AcceptTouchEvents);
     }
-
-    if (smallScreen)
-        deepModelViewer.showFullScreen();
-    else
-        deepModelViewer.show();
+    deepModelViewer.show();
 
 #ifdef QT_KEYPAD_NAVIGATION
     QApplication::setNavigationMode(Qt::NavigationModeCursorAuto);
 #endif
+
     return a.exec();
-
-
-
-//    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-
-
-//    //
-//    // Example 1
-//    //
-//    std::cout  << std::endl << "<<< Example 1 >>>" << std::endl << std::endl;
-
-//    size_t input_dim = 2;
-//    size_t num_output_classes = 2;
-
-//    Deep deep;
-
-//    int mysamplesize = 32;
-//    MatrixXf features, labels, outputs;;
-
-//    generate_random_data_samples(mysamplesize, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-
-//    std::cout << "\nfeatures\n" << features << std::endl;
-//    std::cout << "\nlabels\n" << labels << std::endl;
-
-//    FunctionPtr model_1 = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
-//    deep.setModel(model_1);
-
-
-//    //
-//    // Evaluation / Testing beforehand
-//    //
-//    qDebug() << "\n Evaluation before training \n";
-
-//    // Generate new data
-//    int test_minibatch_size = 25;
-//    generate_random_data_samples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-
-//    deep.evalModel(features, outputs, device);
-
-//    for(int i = 0; i < labels.rows(); ++i) {
-//        std::cout << "desired " << labels.row(i) << "; output ";
-//        for(int j = 0; j < labels.cols(); ++j) {
-//            std::cout << (outputs(i,j) <= 0 ? 0 : 1) << " ";
-//        }
-//        std::cout << "; (real " << outputs.row(i) << ")" << std::endl;
-//    }
-
-//    //
-//    // Training
-//    //
-//    qDebug() << "\n Start training \n";
-
-//    // Initialize the parameters for the trainer
-//    int minibatch_size = 25;
-//    int num_samples = 20000;
-
-//    QVector<double> vecLoss, vecError;
-//    generate_random_data_samples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-//    deep.trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
-
-//    qDebug() << "\n Finished training \n";
-
-//    //Plot error
-//    QChartView *error_chartView = DeepViewer::linePlot(vecError,"Training Error");
-//    error_chartView->show();
-
-//    //Plot loss
-//    QChartView *loss_chartView = DeepViewer::linePlot(vecLoss,"Loss Error");
-//    loss_chartView->show();
-
-//    //
-//    // Evaluation / Testing
-//    //
-
-//    qDebug() << "\n Evaluation after training \n";
-
-//    // Generate new data
-
-//    test_minibatch_size = 25;
-//    generate_random_data_samples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-
-//    deep.evalModel(features, outputs, device);
-
-//    for(int i = 0; i < labels.rows(); ++i) {
-//        std::cout << "desired " << labels.row(i) << "; output ";
-//        for(int j = 0; j < labels.cols(); ++j) {
-//            std::cout << (outputs(i,j) <= 0 ? 0 : 1) << " ";
-//        }
-//        std::cout << "; (real " << outputs.row(i) << ")" << std::endl;
-//    }
-
-
-//    return a.exec();
 }

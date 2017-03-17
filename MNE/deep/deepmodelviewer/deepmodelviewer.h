@@ -1,14 +1,81 @@
-#ifndef PATHSTROKE_H
-#define PATHSTROKE_H
+//=============================================================================================================
+/**
+* @file     deepmodelviewer.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     January, 2017
+*
+* @section  LICENSE
+*
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    DeepModelViewer class declaration.
+*
+*/
+#ifndef DEEPMODELVIEWER_H
+#define DEEPMODELVIEWER_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "arthurwidgets.h"
 
 #include "../deep_global.h"
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CNTK INCLUDES
+//=============================================================================================================
+
+#include <CNTKLibrary.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QtWidgets>
 
-class DeppModelViewerRenderer : public ArthurFrame
+
+//=============================================================================================================
+/**
+* Deep Model Viewer Renderer
+*
+* @brief Deep Model Viewer Renderer
+*/
+class DeepModelViewerRenderer : public ArthurFrame
 {
     Q_OBJECT
     Q_PROPERTY(bool animation READ animation WRITE setAnimation)
@@ -16,7 +83,7 @@ class DeppModelViewerRenderer : public ArthurFrame
 public:
     enum PathMode { CurveMode, LineMode };
 
-    explicit DeppModelViewerRenderer(QWidget *parent, bool smallScreen = false);
+    explicit DeepModelViewerRenderer(QWidget *parent);
 
     void paint(QPainter *) override;
     void mousePressEvent(QMouseEvent *e) override;
@@ -79,26 +146,32 @@ private:
 
     Qt::PenStyle m_penStyle;
 
-    bool m_smallScreen;
     QPoint m_mousePress;
     bool m_mouseDrag;
 
     QHash<int, int> m_fingerPointMapping;
 };
 
+
+//=============================================================================================================
+/**
+* Deep Model Viewer Controls
+*
+* @brief Deep Model Viewer Controls
+*/
 class DeepModelViewerControls : public QWidget
 {
     Q_OBJECT
 
 public:
-    DeepModelViewerControls(QWidget* parent, DeppModelViewerRenderer* renderer, bool smallScreen);
+    DeepModelViewerControls(QWidget* parent, DeepModelViewerRenderer* renderer);
 
 signals:
     void okPressed();
     void quitPressed();
 
 private:
-    DeppModelViewerRenderer* m_renderer;
+    DeepModelViewerRenderer* m_renderer;
 
     QGroupBox *m_capGroup;
     QGroupBox *m_joinGroup;
@@ -106,8 +179,7 @@ private:
     QGroupBox *m_pathModeGroup;
 
     void createCommonControls(QWidget* parent);
-    void layoutForDesktop();
-    void layoutForSmallScreens();
+    void createLayout();
 
 private slots:
     void emitQuitSignal();
@@ -115,21 +187,30 @@ private slots:
 
 };
 
+
+//=============================================================================================================
+/**
+* Deep Model Viewer Widget
+*
+* @brief Deep Model Viewer Widget
+*/
 class DEEPSHARED_EXPORT DeepModelViewerWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    DeepModelViewerWidget(bool smallScreen);
-    void setStyle ( QStyle * style );
+    DeepModelViewerWidget();
+    void setModel( CNTK::FunctionPtr& model );
 
 private:
-    DeppModelViewerRenderer *m_renderer;
+    DeepModelViewerRenderer *m_renderer;
     DeepModelViewerControls *m_controls;
+
+    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
 
 private slots:
     void showControls();
     void hideControls();
 };
 
-#endif // PATHSTROKE_H
+#endif // DEEPMODELVIEWER_H

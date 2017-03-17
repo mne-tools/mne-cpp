@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     //
     std::cout  << std::endl << "<<< Example 1 >>>" << std::endl << std::endl;
 
-    size_t input_dim = 2;
+    size_t input_dim = 4;//2;
     size_t num_output_classes = 2;
 
     Deep deep_1;
@@ -154,16 +154,11 @@ int main(int argc, char *argv[])
 
     generate_random_data_samples(mysamplesize, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
 
-//    std::cout << "\nfeatures\n" << features << std::endl;
-//    std::cout << "\nlabels\n" << labels << std::endl;
+    std::cout << "\nfeatures\n" << features << std::endl;
+    std::cout << "\nlabels\n" << labels << std::endl;
 
     FunctionPtr model_1 = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
     deep_1.setModel(model_1);
-
-    deep_1.print();
-
-    return 0;
-
 
     //
     // Evaluation / Testing beforehand
