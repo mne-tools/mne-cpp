@@ -74,6 +74,9 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 }
 #endif
 
+
+//*************************************************************************************************************
+
 View::View(const QString &name, QWidget *parent)
     : QFrame(parent)
 {
@@ -120,9 +123,10 @@ View::View(const QString &name, QWidget *parent)
     rotateRightIcon->setIconSize(iconSize);
     rotateSlider = new QSlider;
     rotateSlider->setOrientation(Qt::Horizontal);
-    rotateSlider->setMinimum(-360);
-    rotateSlider->setMaximum(360);
+    rotateSlider->setMinimum(-180);
+    rotateSlider->setMaximum(180);
     rotateSlider->setValue(0);
+    rotateSlider->setTickInterval(90);
     rotateSlider->setTickPosition(QSlider::TicksBelow);
 
     // Rotate slider layout
@@ -205,10 +209,16 @@ View::View(const QString &name, QWidget *parent)
     setupMatrix();
 }
 
+
+//*************************************************************************************************************
+
 QGraphicsView *View::view() const
 {
     return static_cast<QGraphicsView *>(graphicsView);
 }
+
+
+//*************************************************************************************************************
 
 void View::resetView()
 {
@@ -220,10 +230,16 @@ void View::resetView()
     resetButton->setEnabled(false);
 }
 
+
+//*************************************************************************************************************
+
 void View::setResetButtonEnabled()
 {
     resetButton->setEnabled(true);
 }
+
+
+//*************************************************************************************************************
 
 void View::setupMatrix()
 {
@@ -237,6 +253,9 @@ void View::setupMatrix()
     setResetButtonEnabled();
 }
 
+
+//*************************************************************************************************************
+
 void View::togglePointerMode()
 {
     graphicsView->setDragMode(selectModeButton->isChecked()
@@ -245,6 +264,9 @@ void View::togglePointerMode()
     graphicsView->setInteractive(selectModeButton->isChecked());
 }
 
+
+//*************************************************************************************************************
+
 void View::toggleOpenGL()
 {
 #ifndef QT_NO_OPENGL
@@ -252,10 +274,16 @@ void View::toggleOpenGL()
 #endif
 }
 
+
+//*************************************************************************************************************
+
 void View::toggleAntialiasing()
 {
     graphicsView->setRenderHint(QPainter::Antialiasing, antialiasButton->isChecked());
 }
+
+
+//*************************************************************************************************************
 
 void View::print()
 {
@@ -269,22 +297,34 @@ void View::print()
 #endif
 }
 
+
+//*************************************************************************************************************
+
 void View::zoomIn(int level)
 {
     zoomSlider->setValue(zoomSlider->value() + level);
 }
+
+
+//*************************************************************************************************************
 
 void View::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
 }
 
+
+//*************************************************************************************************************
+
 void View::rotateLeft()
 {
-    rotateSlider->setValue(rotateSlider->value() - 10);
+    rotateSlider->setValue(rotateSlider->value() - 90);
 }
+
+
+//*************************************************************************************************************
 
 void View::rotateRight()
 {
-    rotateSlider->setValue(rotateSlider->value() + 10);
+    rotateSlider->setValue(rotateSlider->value() + 90);
 }

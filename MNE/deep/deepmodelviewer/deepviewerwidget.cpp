@@ -41,11 +41,12 @@ void DeepViewerWidget::populateScene()
     if(!m_pModel)
         return;
 
+    //
+    // Analyze CNTK Model Structure
+    //
     QVector<int> layerDim;
-
     int inDim = 0;
     int outDim = 0;
-
     for (int i = static_cast<int>(m_pModel->Parameters().size()) - 1; i >= 0 ; --i) {
         fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
         fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
@@ -63,13 +64,15 @@ void DeepViewerWidget::populateScene()
     }
     layerDim.append(outDim);
 
+    //
+    // Create items according to the dimensions
+    //
     int numLayers = layerDim.size();
 
     double layerDist = 400.0;
     double nodeDist = 50.0;
 
     double x_root = -((numLayers-1.0)*layerDist) / 2.0;
-
 
     QList<Node*> currentLayer;
     QPointF layerRoot, currentPos;

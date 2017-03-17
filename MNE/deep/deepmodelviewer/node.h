@@ -32,6 +32,8 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
+    float m_diameter;
+    float m_radius; //half diameter -> for drawing speed already calculated beforehand
     QList<Edge *> edgeList;
     QPointF newPos;
     DeepViewerWidget *graph;

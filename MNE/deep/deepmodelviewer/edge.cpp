@@ -14,7 +14,7 @@ static double TwoPi = 2.0 * Pi;
 
 //! [0]
 Edge::Edge(Node *sourceNode, Node *destNode)
-    : m_arrowSize(10)
+: m_arrowSize(10)
 {
     setAcceptedMouseButtons(0);
     source = sourceNode;
@@ -23,21 +23,26 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     dest->addEdge(this);
     adjust();
 }
-//! [0]
 
-//! [1]
+
+//*************************************************************************************************************
+
 Node *Edge::sourceNode() const
 {
     return source;
 }
 
+
+//*************************************************************************************************************
+
 Node *Edge::destNode() const
 {
     return dest;
 }
-//! [1]
 
-//! [2]
+
+//*************************************************************************************************************
+
 void Edge::adjust()
 {
     if (!source || !dest)
@@ -55,10 +60,10 @@ void Edge::adjust()
 //        edgeOffset = QPointF ((line.dx() * 10) / length, (line.dy() * 10) / length);
         // In 90 degree steps
 //        if(abs(line.dx()) > abs(line.dy())) {
-            edgeOffset = QPointF(line.dx() < 0 ? -10 : 10, 0);
+            edgeOffset = QPointF(line.dx() < 0 ? -11 : 11, 0);
 //        }
 //        else {
-//            edgeOffset = QPointF(0, line.dy() < 0 ? -10 : 10);
+//            edgeOffset = QPointF(0, line.dy() < 0 ? -11 : 11);
 //        }
         m_sourcePoint = line.p1() + edgeOffset;
         m_destPoint = line.p2() - edgeOffset;
@@ -66,9 +71,10 @@ void Edge::adjust()
         m_sourcePoint = m_destPoint = line.p1();
     }
 }
-//! [2]
 
-//! [3]
+
+//*************************************************************************************************************
+
 QRectF Edge::boundingRect() const
 {
     if (!source || !dest)
@@ -82,9 +88,10 @@ QRectF Edge::boundingRect() const
         .normalized()
         .adjusted(-extra, -extra, extra, extra);
 }
-//! [3]
 
-//! [4]
+
+//*************************************************************************************************************
+
 void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     if (!source || !dest)
@@ -94,9 +101,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     QLineF line(m_sourcePoint, m_destPoint);
     if (qFuzzyCompare(line.length(), qreal(0.)))
         return;
-//! [4]
 
-//! [5]
     //
     // Draw the line itself
     //
@@ -128,9 +133,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     QPen pen(lg, 1);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
     painter->strokePath(path, pen);
 
-//! [5]
 
-//! [6]
     //
     // Draw the arrows
     //
@@ -162,4 +165,3 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 //    painter->drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
     painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
 }
-//! [6]
