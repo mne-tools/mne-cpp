@@ -14,8 +14,8 @@
 extern QPixmap cached(const QString &img);
 
 ArthurFrame::ArthurFrame(QWidget *parent)
-    : QWidget(parent)
-    , m_prefer_image(false)
+: QWidget(parent)
+, m_prefer_image(false)
 {
 #ifdef QT_OPENGL_SUPPORT
     glw = 0;
@@ -115,7 +115,7 @@ void ArthurFrame::paintEvent(QPaintEvent *e)
     qreal top = r.y() + 1;
     qreal right = r.right();
     qreal bottom = r.bottom();
-    qreal radius2 = 8 * 2;
+    qreal radius2 = 1;
 
     clipPath.moveTo(right - radius2, top);
     clipPath.arcTo(right - radius2, top, radius2, radius2, 90, -90);
@@ -127,7 +127,7 @@ void ArthurFrame::paintEvent(QPaintEvent *e)
     painter.save();
     painter.setClipPath(clipPath, Qt::IntersectClip);
 
-    painter.drawTiledPixmap(rect(), m_tile);
+    painter.fillRect(rect(),QColor(255,255,255));
 
     // client painting
 
