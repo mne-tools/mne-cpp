@@ -1,51 +1,67 @@
 #include "deepviewerwidget.h"
-#include "edge.h"
+#include "view.h"
+
 #include "node.h"
+#include "edge.h"
 
-#include <math.h>
+#include <QHBoxLayout>
+#include <QSplitter>
 
+#include <QDebug>
 
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QKeyEvent>
-
-
-#ifndef QT_NO_OPENGL
-#include <QtOpenGL>
-#else
-#include <QtWidgets>
-#endif
-
-
-DeepViewerWidget::DeepViewerWidget(QWidget *parent)
-: QGraphicsView(parent)
+DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
+: QWidget(parent)
+, m_pModel(model)
 {
-//#ifndef QT_NO_OPENGL
-//    this->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-//#else
-//#endif
+    populateScene();
 
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(-200, -200, 400, 400);
-    setScene(scene);
-    setCacheMode(CacheBackground);
-    setViewportUpdateMode(BoundingRectViewportUpdate);
-    setRenderHint(QPainter::Antialiasing);
-    setTransformationAnchor(AnchorUnderMouse);
-    scale(qreal(0.8), qreal(0.8));
-    setMinimumSize(400, 400);
-    setWindowTitle(tr("Deep Viewer"));
+    m_pSplitter = new QSplitter;
+
+    View *view = new View("");
+    view->view()->setScene(m_pScene);
+    m_pSplitter->addWidget(view);
+
+//    view = new View("Top right view");
+//    view->view()->setScene(scene);
+//    h1Splitter->addWidget(view);
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(m_pSplitter);
+    setLayout(layout);
+
+
+
+    setWindowTitle(tr("Deep Model Viewer"));
+}
+
+void DeepViewerWidget::populateScene()
+{
+    m_pScene = new QGraphicsScene(this);
+
+    if(!m_pModel)
+        return;
 
     QVector<int> layerDim;
-    layerDim.append(4); //Inputs
-    layerDim.append(20); // First hidden
-    layerDim.append(10); // Second hidden
-    layerDim.append(10); // Third hidden
-    layerDim.append(2); // Output
+
+    int inDim = 0;
+    int outDim = 0;
+
+    for (int i = static_cast<int>(m_pModel->Parameters().size()) - 1; i >= 0 ; --i) {
+        fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
+        fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
+
+        QString param = QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
+
+        if(param.contains(" x ")) {
+            param.replace(QString("["), QString(""));param.replace(QString("]"), QString(""));
+            QStringList dimensions = param.split(" x ");
+            outDim = dimensions[0].toInt();
+            inDim = dimensions[1].toInt();
+
+            layerDim.append(inDim);
+        }
+    }
+    layerDim.append(outDim);
 
     int numLayers = layerDim.size();
 
@@ -64,7 +80,7 @@ DeepViewerWidget::DeepViewerWidget(QWidget *parent)
         // Create Nodes
         for(int i = 0; i < layerDim[layer]; ++i ) {
             currentLayer.append(new Node(this));
-            scene->addItem(currentLayer[i]);
+            m_pScene->addItem(currentLayer[i]);
 
             currentPos = layerRoot + QPointF(0,nodeDist * i);
             currentLayer[i]->setPos(currentPos);
@@ -76,82 +92,10 @@ DeepViewerWidget::DeepViewerWidget(QWidget *parent)
         if(layer - 1 >= 0) {
             for(int i = 0; i < layersList[layer-1].size(); ++i ) {
                 for(int j = 0; j < layersList[layer].size(); ++j ) {
-                    scene->addItem(new Edge(layersList[layer-1][i], layersList[layer][j]));
+                    m_pScene->addItem(new Edge(layersList[layer-1][i], layersList[layer][j]));
                 }
             }
         }
     }
-}
 
-
-//*************************************************************************************************************
-
-void DeepViewerWidget::keyPressEvent(QKeyEvent *event)
-{
-    switch (event->key()) {
-    case Qt::Key_Plus:
-        zoomIn();
-        break;
-    case Qt::Key_Minus:
-        zoomOut();
-        break;
-    default:
-        QGraphicsView::keyPressEvent(event);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void DeepViewerWidget::timerEvent(QTimerEvent *event)
-{
-    Q_UNUSED(event);
-}
-
-
-//*************************************************************************************************************
-
-#ifndef QT_NO_WHEELEVENT
-void DeepViewerWidget::wheelEvent(QWheelEvent *event)
-{
-    scaleView(pow((double)2, -event->delta() / 240.0));
-}
-#endif
-
-
-//*************************************************************************************************************
-
-void DeepViewerWidget::drawBackground(QPainter *painter, const QRectF &rect)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(rect);
-//    QRectF sceneRect = this->sceneRect();
-}
-
-
-//*************************************************************************************************************
-
-void DeepViewerWidget::scaleView(qreal scaleFactor)
-{
-    qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
-    if (factor < 0.07 || factor > 100)
-        return;
-
-    scale(scaleFactor, scaleFactor);
-}
-
-
-//*************************************************************************************************************
-
-void DeepViewerWidget::zoomIn()
-{
-    scaleView(qreal(1.2));
-}
-
-
-//*************************************************************************************************************
-
-void DeepViewerWidget::zoomOut()
-{
-    scaleView(1 / qreal(1.2));
 }

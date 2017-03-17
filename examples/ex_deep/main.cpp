@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     //
     std::cout  << std::endl << "<<< Example 1 >>>" << std::endl << std::endl;
 
-    size_t input_dim = 4;//2;
+    size_t input_dim = 2;
     size_t num_output_classes = 2;
 
     Deep deep_1;
