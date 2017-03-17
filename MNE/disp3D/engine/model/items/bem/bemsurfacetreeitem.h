@@ -43,7 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 
-#include "../common/abstracttreeitem.h"
+#include "../common/abstractsurfacetreeitem.h"
 #include "../common/types.h"
 
 
@@ -98,9 +98,9 @@ class Renderable3DEntity;
 /**
 * BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
 *
-* @brief Provides a generic brain tree item.
+* @brief BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
 */
-class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractSurfaceTreeItem
 {
     Q_OBJECT
 
@@ -119,19 +119,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~BemSurfaceTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds BEM model data.
     *
     * @param[in] tBemSurface        The bem data.
@@ -139,84 +126,13 @@ public:
     */
     void addData(const MNELIB::MNEBemSurface &tBemSurface, Qt3DCore::QEntity* parent);
 
+protected:
     //=========================================================================================================
     /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
+    * AbstractTreeItem functions
     */
-    void setVisible(bool state);
+    void initItem();
 
-private:
-    //=========================================================================================================
-    /**
-    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    void onSurfaceAlphaChanged(float fAlpha);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onSurfaceColorChanged(const QColor &color);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation x of this item changed.
-    *
-    * @param[in] fTransX        The current x translation.
-    */
-    void onSurfaceTranslationXChanged(float fTransX);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation y of this item changed.
-    *
-    * @param[in] fTransY        The current y translation.
-    */
-    void onSurfaceTranslationYChanged(float fTransY);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation z of this item changed.
-    *
-    * @param[in] fTransZ        The current z translation.
-    */
-    void onSurfaceTranslationZChanged(float fTransZ);
-
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given color for the input vertices.
-    *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
-    *
-    * @return The colors per vertex
-    */
-    MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
-
-    QPointer<Renderable3DEntity>        m_pRenderable3DEntity;          /**< The renderable 3D entity. */
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    *
-    * @param[in] arrayVertColor      The new vertex colors.
-    */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DLIB

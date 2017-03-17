@@ -58,17 +58,9 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
-#include <QUrl>
 
 
 //*************************************************************************************************************
@@ -97,15 +89,12 @@ using namespace CONNECTIVITYLIB;
 
 NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
-, m_bIsInit(false)
+, m_bDataIsInit(false)
 , m_bNodesPlotted(false)
 , m_pItemNetworkThreshold(new MetaTreeItem())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Network item");
+    initItem();
 }
 
 
@@ -113,14 +102,40 @@ NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
 
 NetworkTreeItem::~NetworkTreeItem()
 {
-    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        m_lNodes.at(i)->deleteLater();
-    }
-
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
     }
+}
+
+
+//*************************************************************************************************************
+
+void NetworkTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Network item");
+
+    //Add meta information as item children
+    QList<QStandardItem*> list;
+    QVariant data;
+
+    QVector3D vecEdgeTrehshold(0,5,10);
+    m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
+    list << m_pItemNetworkThreshold;
+    list << new QStandardItem(m_pItemNetworkThreshold->toolTip());
+    this->appendRow(list);
+    data.setValue(vecEdgeTrehshold);
+    m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
+    connect(m_pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
+            this, &NetworkTreeItem::onNetworkThresholdChanged);
+
+    list.clear();
+    MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
+    list << pItemNetworkMatrix;
+    list << new QStandardItem(pItemNetworkMatrix->toolTip());
+    this->appendRow(list);
 }
 
 
@@ -142,7 +157,7 @@ void  NetworkTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
+void NetworkTreeItem::initData(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pRenderable3DEntity->setParent(parent);
@@ -151,40 +166,17 @@ bool NetworkTreeItem::init(Qt3DCore::QEntity* parent)
     NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
     m_pRenderable3DEntity->addComponent(pNetworkMaterial);
 
-    //Add meta information as item children
-    QList<QStandardItem*> list;
-
-    QVariant data;
-
-    QVector3D vecEdgeTrehshold(0,5,10);
-    m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, "0.0,5.0,10.0");
-    list << m_pItemNetworkThreshold;
-    list << new QStandardItem(m_pItemNetworkThreshold->toolTip());
-    this->appendRow(list);
-    data.setValue(vecEdgeTrehshold);
-    m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
-    connect(m_pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
-            this, &NetworkTreeItem::onNetworkThresholdChanged);
-
-    list.clear();
-    MetaTreeItem* pItemNetworkMatrix = new MetaTreeItem(MetaTreeItemTypes::NetworkMatrix, "Show network matrix");
-    list << pItemNetworkMatrix;
-    list << new QStandardItem(pItemNetworkMatrix->toolTip());
-    this->appendRow(list);
-
-    m_bIsInit = true;
-
-    return true;
+    m_bDataIsInit = true;
 }
 
 
 //*************************************************************************************************************
 
-bool NetworkTreeItem::addData(const Network& tNetworkData)
+void NetworkTreeItem::addData(const Network& tNetworkData)
 {
-    if(!m_bIsInit) {
-        qDebug() << "NetworkTreeItem::updateData - NetworkTreeItem has not been initialized yet!";
-        return false;
+    if(!m_bDataIsInit) {
+        qDebug() << "NetworkTreeItem::addData - NetworkTreeItem data has not been initialized yet!";
+        return;
     }
 
     //Add data which is held by this NetworkTreeItem
@@ -200,8 +192,6 @@ bool NetworkTreeItem::addData(const Network& tNetworkData)
     //Plot network
     plotNetwork(tNetworkData,
                 m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
-
-    return true;
 }
 
 

@@ -239,14 +239,6 @@ int main(int argc, char *argv[])
     //
     //########################################################################################
 
-    //########################################################################################
-    //
-    // Create the test view START
-    //
-    //########################################################################################
-
-    std::cout<<"Creating BrainView"<<std::endl;
-
     //Create 3D data model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
@@ -261,7 +253,7 @@ int main(int argc, char *argv[])
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    p3DDataModel->addBemData("Sensors", "VectorView", t_sensorSurfaceVV);
+    p3DDataModel->addMegSensorData("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
 
     // Read & show digitizer points
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
@@ -289,12 +281,6 @@ int main(int argc, char *argv[])
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->init(p3DDataModel, testWindow);
     control3DWidget->show();
-
-    //########################################################################################
-    //
-    // Create the test view END
-    //
-    //########################################################################################
 
     return a.exec();
 }
