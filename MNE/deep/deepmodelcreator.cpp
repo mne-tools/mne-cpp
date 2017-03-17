@@ -130,19 +130,19 @@ FunctionPtr DeepModelCreator::FFN_1(const size_t inputDim, const size_t numOutpu
     const size_t hiddenLayersDim = 50;
 
     // Define model parameters that should be shared among evaluation requests against the same model
-    auto inputTimesParam = Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, inputDim}, -0.5, 0.5, 1, device));
-    auto inputPlusParam = Parameter({hiddenLayersDim}, 0.0f, device);
+    Parameter inputTimesParam = Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, inputDim}, -0.5, 0.5, 1, device));
+    Parameter inputPlusParam = Parameter({hiddenLayersDim}, 0.0f, device);
     Parameter hiddenLayerTimesParam[numHiddenLayers - 1] = {
         Parameter(NDArrayView::RandomUniform<float>({hiddenLayersDim, hiddenLayersDim}, -0.5, 0.5, 1, device))
     };
+
     Parameter hiddenLayerPlusParam[numHiddenLayers - 1] = {
         Parameter({hiddenLayersDim}, 0.0f, device)
     };
+
     Parameter outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
 
-
     Variable inputVar = InputVariable({inputDim}, DataType::Float, L"features");
-
 
     return FullyConnectedFeedForwardClassifierNet(  inputVar,
                                                     numHiddenLayers,

@@ -1,3 +1,43 @@
+//=============================================================================================================
+/**
+* @file     deepmodelviewer.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     January, 2017
+*
+* @section  LICENSE
+*
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    DeepModelViewer class implementation.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "arthurwidgets.h"
 #include "deepmodelviewer.h"
 
@@ -6,16 +46,345 @@
 extern void draw_round_rect(QPainter *p, const QRect &bounds, int radius);
 
 
-DeepModelViewerControls::DeepModelViewerControls(QWidget* parent, DeppModelViewerRenderer* renderer, bool smallScreen)
-      : QWidget(parent)
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+
+
+//*************************************************************************************************************
+
+DeepModelViewerRenderer::DeepModelViewerRenderer(QWidget *parent)
+    : ArthurFrame(parent)
+{
+    m_pointSize = 10;
+    m_activePoint = -1;
+    m_capStyle = Qt::FlatCap;
+    m_joinStyle = Qt::BevelJoin;
+    m_pathMode = CurveMode;
+    m_penWidth = 1;
+    m_penStyle = Qt::SolidLine;
+    m_wasAnimated = true;
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setAttribute(Qt::WA_AcceptTouchEvents);
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::paint(QPainter *painter)
+{
+    if (m_points.isEmpty())
+        initializePoints();
+
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    QPalette pal = palette();
+    painter->setPen(Qt::NoPen);
+
+    // Construct the path
+    QPainterPath path;
+    path.moveTo(m_points.at(0));
+
+    if (m_pathMode == LineMode) {
+        for (int i=1; i<m_points.size(); ++i)
+            path.lineTo(m_points.at(i));
+    } else {
+        int i=1;
+        while (i + 2 < m_points.size()) {
+            path.cubicTo(m_points.at(i), m_points.at(i+1), m_points.at(i+2));
+            i += 3;
+        }
+        while (i < m_points.size()) {
+            path.lineTo(m_points.at(i));
+            ++i;
+        }
+    }
+
+    // Draw the path
+    {
+        QColor lg = Qt::red;
+
+        // The "custom" pen
+        if (m_penStyle == Qt::NoPen) {
+            QPainterPathStroker stroker;
+            stroker.setWidth(m_penWidth);
+            stroker.setJoinStyle(m_joinStyle);
+            stroker.setCapStyle(m_capStyle);
+
+            QVector<qreal> dashes;
+            qreal space = 4;
+            dashes << 1 << space
+                   << 3 << space
+                   << 9 << space
+                   << 27 << space
+                   << 9 << space
+                   << 3 << space;
+            stroker.setDashPattern(dashes);
+            QPainterPath stroke = stroker.createStroke(path);
+            painter->fillPath(stroke, lg);
+
+        } else {
+            QPen pen(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
+            painter->strokePath(path, pen);
+        }
+    }
+
+    if (1) {
+        // Draw the control points
+        painter->setPen(QColor(50, 100, 120, 200));
+        painter->setBrush(QColor(200, 200, 210, 120));
+        for (int i=0; i<m_points.size(); ++i) {
+            QPointF pos = m_points.at(i);
+            painter->drawEllipse(QRectF(pos.x() - m_pointSize,
+                                       pos.y() - m_pointSize,
+                                       m_pointSize*2, m_pointSize*2));
+        }
+        painter->setPen(QPen(Qt::lightGray, 0, Qt::SolidLine));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPolyline(m_points);
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::initializePoints()
+{
+    const int count = 7;
+    m_points.clear();
+    m_vectors.clear();
+
+    QMatrix m;
+    qreal rot = 360.0 / count;
+    QPointF center(width() / 2, height() / 2);
+    QMatrix vm;
+    vm.shear(2, -1);
+    vm.scale(3, 3);
+
+    for (int i=0; i<count; ++i) {
+        m_vectors << QPointF(.1f, .25f) * (m * vm);
+        m_points << QPointF(0, 100) * m + center;
+        m.rotate(rot);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::updatePoints()
+{
+    qreal pad = 10;
+    qreal left = pad;
+    qreal right = width() - pad;
+    qreal top = pad;
+    qreal bottom = height() - pad;
+
+    Q_ASSERT(m_points.size() == m_vectors.size());
+    for (int i=0; i<m_points.size(); ++i) {
+        QPointF pos = m_points.at(i);
+        QPointF vec = m_vectors.at(i);
+        pos += vec;
+        if (pos.x() < left || pos.x() > right) {
+            vec.setX(-vec.x());
+            pos.setX(pos.x() < left ? left : right);
+        } if (pos.y() < top || pos.y() > bottom) {
+            vec.setY(-vec.y());
+            pos.setY(pos.y() < top ? top : bottom);
+        }
+        m_points[i] = pos;
+        m_vectors[i] = vec;
+    }
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::mousePressEvent(QMouseEvent *e)
+{
+    if (!m_fingerPointMapping.isEmpty())
+        return;
+    setDescriptionEnabled(false);
+    m_activePoint = -1;
+    qreal distance = -1;
+    for (int i=0; i<m_points.size(); ++i) {
+        qreal d = QLineF(e->pos(), m_points.at(i)).length();
+        if ((distance < 0 && d < 8 * m_pointSize) || d < distance) {
+            distance = d;
+            m_activePoint = i;
+        }
+    }
+
+    if (m_activePoint != -1) {
+        m_wasAnimated = m_timer.isActive();
+        setAnimation(false);
+        mouseMoveEvent(e);
+    }
+
+    // If we're not running in small screen mode, always assume we're dragging
+    m_mouseDrag = true;
+    m_mousePress = e->pos();
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::mouseMoveEvent(QMouseEvent *e)
+{
+    if (!m_fingerPointMapping.isEmpty())
+        return;
+    // If we've moved more then 25 pixels, assume user is dragging
+    if (!m_mouseDrag && QPoint(m_mousePress - e->pos()).manhattanLength() > 25)
+        m_mouseDrag = true;
+
+    if (m_mouseDrag && m_activePoint >= 0 && m_activePoint < m_points.size()) {
+        m_points[m_activePoint] = e->pos();
+        update();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::mouseReleaseEvent(QMouseEvent *)
+{
+    if (!m_fingerPointMapping.isEmpty())
+        return;
+    m_activePoint = -1;
+    setAnimation(m_wasAnimated);
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::timerEvent(QTimerEvent *e)
+{
+    if (e->timerId() == m_timer.timerId()) {
+        updatePoints();
+    } // else if (e->timerId() == m_fpsTimer.timerId()) {
+//         emit frameRate(m_frameCount);
+//         m_frameCount = 0;
+//     }
+}
+
+
+//*************************************************************************************************************
+
+bool DeepModelViewerRenderer::event(QEvent *e)
+{
+    bool touchBegin = false;
+    switch (e->type()) {
+    case QEvent::TouchBegin:
+        touchBegin = true;
+    case QEvent::TouchUpdate:
+    {
+        const QTouchEvent *const event = static_cast<const QTouchEvent*>(e);
+        const QList<QTouchEvent::TouchPoint> points = event->touchPoints();
+        foreach (const QTouchEvent::TouchPoint &touchPoint, points) {
+            const int id = touchPoint.id();
+            switch (touchPoint.state()) {
+            case Qt::TouchPointPressed:
+            {
+                // find the point, move it
+                QSet<int> activePoints = QSet<int>::fromList(m_fingerPointMapping.values());
+                int activePoint = -1;
+                qreal distance = -1;
+                const int pointsCount = m_points.size();
+                for (int i=0; i<pointsCount; ++i) {
+                    if (activePoints.contains(i))
+                        continue;
+
+                    qreal d = QLineF(touchPoint.pos(), m_points.at(i)).length();
+                    if ((distance < 0 && d < 12 * m_pointSize) || d < distance) {
+                        distance = d;
+                        activePoint = i;
+                    }
+                }
+                if (activePoint != -1) {
+                    m_fingerPointMapping.insert(touchPoint.id(), activePoint);
+                    m_points[activePoint] = touchPoint.pos();
+                }
+                break;
+            }
+            case Qt::TouchPointReleased:
+            {
+                // move the point and release
+                QHash<int,int>::iterator it = m_fingerPointMapping.find(id);
+                m_points[it.value()] = touchPoint.pos();
+                m_fingerPointMapping.erase(it);
+                break;
+            }
+            case Qt::TouchPointMoved:
+            {
+                // move the point
+                const int pointIdx = m_fingerPointMapping.value(id, -1);
+                if (pointIdx >= 0)
+                    m_points[pointIdx] = touchPoint.pos();
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        if (m_fingerPointMapping.isEmpty()) {
+            e->ignore();
+            return false;
+        } else {
+            if (touchBegin) {
+                m_wasAnimated = m_timer.isActive();
+                setAnimation(false);
+            }
+            update();
+            return true;
+        }
+    }
+        break;
+    case QEvent::TouchEnd:
+        if (m_fingerPointMapping.isEmpty()) {
+            e->ignore();
+            return false;
+        }
+        m_fingerPointMapping.clear();
+        setAnimation(m_wasAnimated);
+        return true;
+        break;
+    default:
+        break;
+    }
+    return QWidget::event(e);
+}
+
+
+//*************************************************************************************************************
+
+void DeepModelViewerRenderer::setAnimation(bool animation)
+{
+    m_timer.stop();
+//     m_fpsTimer.stop();
+
+    if (animation) {
+        m_timer.start(25, this);
+//         m_fpsTimer.start(1000, this);
+//         m_frameCount = 0;
+    }
+}
+
+
+//*************************************************************************************************************
+
+DeepModelViewerControls::DeepModelViewerControls(QWidget* parent, DeepModelViewerRenderer* renderer)
+: QWidget(parent)
 {
     m_renderer = renderer;
 
-    if (smallScreen)
-        layoutForSmallScreens();
-    else
-        layoutForDesktop();
+    createLayout();
 }
+
+
+//*************************************************************************************************************
 
 void DeepModelViewerControls::createCommonControls(QWidget* parent)
 {
@@ -136,7 +505,9 @@ void DeepModelViewerControls::createCommonControls(QWidget* parent)
 }
 
 
-void DeepModelViewerControls::layoutForDesktop()
+//*************************************************************************************************************
+
+void DeepModelViewerControls::createLayout()
 {
     QGroupBox *mainGroup = new QGroupBox(this);
     mainGroup->setFixedWidth(180);
@@ -208,84 +579,16 @@ void DeepModelViewerControls::layoutForDesktop()
 
 }
 
-void DeepModelViewerControls::layoutForSmallScreens()
-{
-    createCommonControls(this);
 
-    m_capGroup->layout()->setMargin(0);
-    m_joinGroup->layout()->setMargin(0);
-    m_styleGroup->layout()->setMargin(0);
-    m_pathModeGroup->layout()->setMargin(0);
-
-    QPushButton* okBtn = new QPushButton(tr("OK"), this);
-    okBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    okBtn->setMinimumSize(100,okBtn->minimumSize().height());
-
-    QPushButton* quitBtn = new QPushButton(tr("Quit"), this);
-    quitBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    quitBtn->setMinimumSize(100, okBtn->minimumSize().height());
-
-    QLabel *penWidthLabel = new QLabel(tr(" Width:"));
-    QSlider *penWidth = new QSlider(Qt::Horizontal, this);
-    penWidth->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    penWidth->setRange(0, 500);
-
-#ifdef QT_OPENGL_SUPPORT
-    QPushButton *enableOpenGLButton = new QPushButton(this);
-    enableOpenGLButton->setText(tr("Use OpenGL"));
-    enableOpenGLButton->setCheckable(true);
-    enableOpenGLButton->setChecked(m_renderer->usesOpenGL());
-    if (!QGLFormat::hasOpenGL())
-        enableOpenGLButton->hide();
-#endif
-
-    // Layouts:
-    QHBoxLayout *penWidthLayout = new QHBoxLayout(0);
-    penWidthLayout->addWidget(penWidthLabel, 0, Qt::AlignRight);
-    penWidthLayout->addWidget(penWidth);
-
-    QVBoxLayout *leftLayout = new QVBoxLayout(0);
-    leftLayout->addWidget(m_capGroup);
-    leftLayout->addWidget(m_joinGroup);
-#ifdef QT_OPENGL_SUPPORT
-    leftLayout->addWidget(enableOpenGLButton);
-#endif
-    leftLayout->addLayout(penWidthLayout);
-
-    QVBoxLayout *rightLayout = new QVBoxLayout(0);
-    rightLayout->addWidget(m_styleGroup);
-    rightLayout->addWidget(m_pathModeGroup);
-
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setMargin(0);
-
-    // Add spacers around the form items so we don't look stupid at higher resolutions
-    mainLayout->addItem(new QSpacerItem(0,0), 0, 0, 1, 4);
-    mainLayout->addItem(new QSpacerItem(0,0), 1, 0, 2, 1);
-    mainLayout->addItem(new QSpacerItem(0,0), 1, 3, 2, 1);
-    mainLayout->addItem(new QSpacerItem(0,0), 3, 0, 1, 4);
-
-    mainLayout->addLayout(leftLayout, 1, 1);
-    mainLayout->addLayout(rightLayout, 1, 2);
-    mainLayout->addWidget(quitBtn, 2, 1, Qt::AlignHCenter | Qt::AlignTop);
-    mainLayout->addWidget(okBtn, 2, 2, Qt::AlignHCenter | Qt::AlignTop);
-
-#ifdef QT_OPENGL_SUPPORT
-    connect(enableOpenGLButton, SIGNAL(clicked(bool)), m_renderer, SLOT(enableOpenGL(bool)));
-#endif
-
-    connect(penWidth, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
-    connect(quitBtn, SIGNAL(clicked()), this, SLOT(emitQuitSignal()));
-    connect(okBtn, SIGNAL(clicked()), this, SLOT(emitOkSignal()));
-
-    m_renderer->setAnimation(true);
-    penWidth->setValue(50);
-}
+//*************************************************************************************************************
 
 void DeepModelViewerControls::emitQuitSignal()
 {
     emit quitPressed();
 }
+
+
+//*************************************************************************************************************
 
 void DeepModelViewerControls::emitOkSignal()
 {
@@ -293,21 +596,22 @@ void DeepModelViewerControls::emitOkSignal()
 }
 
 
-DeepModelViewerWidget::DeepModelViewerWidget(bool smallScreen)
+//*************************************************************************************************************
+
+DeepModelViewerWidget::DeepModelViewerWidget()
 {
     setWindowTitle(tr("Path Stroking"));
 
     // Widget construction and property setting
-    m_renderer = new DeppModelViewerRenderer(this, smallScreen);
+    m_renderer = new DeepModelViewerRenderer(this);
 
-    m_controls = new DeepModelViewerControls(0, m_renderer, smallScreen);
+    m_controls = new DeepModelViewerControls(0, m_renderer);
 
     // Layouting
     QHBoxLayout *viewLayout = new QHBoxLayout(this);
     viewLayout->addWidget(m_renderer);
 
-    if (!smallScreen)
-        viewLayout->addWidget(m_controls);
+    viewLayout->addWidget(m_controls);
 
     m_renderer->loadDescription(":res/deepmodelviewer/deepmodelviewer.html");
 
@@ -316,319 +620,26 @@ DeepModelViewerWidget::DeepModelViewerWidget(bool smallScreen)
     connect(m_controls, SIGNAL(quitPressed()), QApplication::instance(), SLOT(quit()));
 }
 
+
+//*************************************************************************************************************
+
+void DeepModelViewerWidget::setModel(CNTK::FunctionPtr &model)
+{
+    m_pModel = model;
+}
+
+
+//*************************************************************************************************************
+
 void DeepModelViewerWidget::showControls()
 {
     m_controls->showFullScreen();
 }
 
+
+//*************************************************************************************************************
+
 void DeepModelViewerWidget::hideControls()
 {
     m_controls->hide();
-}
-
-void DeepModelViewerWidget::setStyle( QStyle * style )
-{
-    QWidget::setStyle(style);
-    if (m_controls != 0)
-    {
-        m_controls->setStyle(style);
-
-        QList<QWidget *> widgets = m_controls->findChildren<QWidget *>();
-        foreach (QWidget *w, widgets)
-            w->setStyle(style);
-    }
-}
-
-DeppModelViewerRenderer::DeppModelViewerRenderer(QWidget *parent, bool smallScreen)
-    : ArthurFrame(parent)
-{
-    m_smallScreen = smallScreen;
-    m_pointSize = 10;
-    m_activePoint = -1;
-    m_capStyle = Qt::FlatCap;
-    m_joinStyle = Qt::BevelJoin;
-    m_pathMode = CurveMode;
-    m_penWidth = 1;
-    m_penStyle = Qt::SolidLine;
-    m_wasAnimated = true;
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setAttribute(Qt::WA_AcceptTouchEvents);
-}
-
-void DeppModelViewerRenderer::paint(QPainter *painter)
-{
-    if (m_points.isEmpty())
-        initializePoints();
-
-    painter->setRenderHint(QPainter::Antialiasing);
-
-    QPalette pal = palette();
-    painter->setPen(Qt::NoPen);
-
-    // Construct the path
-    QPainterPath path;
-    path.moveTo(m_points.at(0));
-
-    if (m_pathMode == LineMode) {
-        for (int i=1; i<m_points.size(); ++i)
-            path.lineTo(m_points.at(i));
-    } else {
-        int i=1;
-        while (i + 2 < m_points.size()) {
-            path.cubicTo(m_points.at(i), m_points.at(i+1), m_points.at(i+2));
-            i += 3;
-        }
-        while (i < m_points.size()) {
-            path.lineTo(m_points.at(i));
-            ++i;
-        }
-    }
-
-    // Draw the path
-    {
-        QColor lg = Qt::red;
-
-        // The "custom" pen
-        if (m_penStyle == Qt::NoPen) {
-            QPainterPathStroker stroker;
-            stroker.setWidth(m_penWidth);
-            stroker.setJoinStyle(m_joinStyle);
-            stroker.setCapStyle(m_capStyle);
-
-            QVector<qreal> dashes;
-            qreal space = 4;
-            dashes << 1 << space
-                   << 3 << space
-                   << 9 << space
-                   << 27 << space
-                   << 9 << space
-                   << 3 << space;
-            stroker.setDashPattern(dashes);
-            QPainterPath stroke = stroker.createStroke(path);
-            painter->fillPath(stroke, lg);
-
-        } else {
-            QPen pen(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
-            painter->strokePath(path, pen);
-        }
-    }
-
-    if (1) {
-        // Draw the control points
-        painter->setPen(QColor(50, 100, 120, 200));
-        painter->setBrush(QColor(200, 200, 210, 120));
-        for (int i=0; i<m_points.size(); ++i) {
-            QPointF pos = m_points.at(i);
-            painter->drawEllipse(QRectF(pos.x() - m_pointSize,
-                                       pos.y() - m_pointSize,
-                                       m_pointSize*2, m_pointSize*2));
-        }
-        painter->setPen(QPen(Qt::lightGray, 0, Qt::SolidLine));
-        painter->setBrush(Qt::NoBrush);
-        painter->drawPolyline(m_points);
-    }
-
-}
-
-void DeppModelViewerRenderer::initializePoints()
-{
-    const int count = 7;
-    m_points.clear();
-    m_vectors.clear();
-
-    QMatrix m;
-    qreal rot = 360.0 / count;
-    QPointF center(width() / 2, height() / 2);
-    QMatrix vm;
-    vm.shear(2, -1);
-    vm.scale(3, 3);
-
-    for (int i=0; i<count; ++i) {
-        m_vectors << QPointF(.1f, .25f) * (m * vm);
-        m_points << QPointF(0, 100) * m + center;
-        m.rotate(rot);
-    }
-}
-
-void DeppModelViewerRenderer::updatePoints()
-{
-    qreal pad = 10;
-    qreal left = pad;
-    qreal right = width() - pad;
-    qreal top = pad;
-    qreal bottom = height() - pad;
-
-    Q_ASSERT(m_points.size() == m_vectors.size());
-    for (int i=0; i<m_points.size(); ++i) {
-        QPointF pos = m_points.at(i);
-        QPointF vec = m_vectors.at(i);
-        pos += vec;
-        if (pos.x() < left || pos.x() > right) {
-            vec.setX(-vec.x());
-            pos.setX(pos.x() < left ? left : right);
-        } if (pos.y() < top || pos.y() > bottom) {
-            vec.setY(-vec.y());
-            pos.setY(pos.y() < top ? top : bottom);
-        }
-        m_points[i] = pos;
-        m_vectors[i] = vec;
-    }
-    update();
-}
-
-void DeppModelViewerRenderer::mousePressEvent(QMouseEvent *e)
-{
-    if (!m_fingerPointMapping.isEmpty())
-        return;
-    setDescriptionEnabled(false);
-    m_activePoint = -1;
-    qreal distance = -1;
-    for (int i=0; i<m_points.size(); ++i) {
-        qreal d = QLineF(e->pos(), m_points.at(i)).length();
-        if ((distance < 0 && d < 8 * m_pointSize) || d < distance) {
-            distance = d;
-            m_activePoint = i;
-        }
-    }
-
-    if (m_activePoint != -1) {
-        m_wasAnimated = m_timer.isActive();
-        setAnimation(false);
-        mouseMoveEvent(e);
-    }
-
-    // If we're not running in small screen mode, always assume we're dragging
-    m_mouseDrag = !m_smallScreen;
-    m_mousePress = e->pos();
-}
-
-void DeppModelViewerRenderer::mouseMoveEvent(QMouseEvent *e)
-{
-    if (!m_fingerPointMapping.isEmpty())
-        return;
-    // If we've moved more then 25 pixels, assume user is dragging
-    if (!m_mouseDrag && QPoint(m_mousePress - e->pos()).manhattanLength() > 25)
-        m_mouseDrag = true;
-
-    if (m_mouseDrag && m_activePoint >= 0 && m_activePoint < m_points.size()) {
-        m_points[m_activePoint] = e->pos();
-        update();
-    }
-}
-
-void DeppModelViewerRenderer::mouseReleaseEvent(QMouseEvent *)
-{
-    if (!m_fingerPointMapping.isEmpty())
-        return;
-    m_activePoint = -1;
-    setAnimation(m_wasAnimated);
-
-    if (!m_mouseDrag && m_smallScreen)
-        emit clicked();
-}
-
-void DeppModelViewerRenderer::timerEvent(QTimerEvent *e)
-{
-    if (e->timerId() == m_timer.timerId()) {
-        updatePoints();
-    } // else if (e->timerId() == m_fpsTimer.timerId()) {
-//         emit frameRate(m_frameCount);
-//         m_frameCount = 0;
-//     }
-}
-
-bool DeppModelViewerRenderer::event(QEvent *e)
-{
-    bool touchBegin = false;
-    switch (e->type()) {
-    case QEvent::TouchBegin:
-        touchBegin = true;
-    case QEvent::TouchUpdate:
-    {
-        const QTouchEvent *const event = static_cast<const QTouchEvent*>(e);
-        const QList<QTouchEvent::TouchPoint> points = event->touchPoints();
-        foreach (const QTouchEvent::TouchPoint &touchPoint, points) {
-            const int id = touchPoint.id();
-            switch (touchPoint.state()) {
-            case Qt::TouchPointPressed:
-            {
-                // find the point, move it
-                QSet<int> activePoints = QSet<int>::fromList(m_fingerPointMapping.values());
-                int activePoint = -1;
-                qreal distance = -1;
-                const int pointsCount = m_points.size();
-                for (int i=0; i<pointsCount; ++i) {
-                    if (activePoints.contains(i))
-                        continue;
-
-                    qreal d = QLineF(touchPoint.pos(), m_points.at(i)).length();
-                    if ((distance < 0 && d < 12 * m_pointSize) || d < distance) {
-                        distance = d;
-                        activePoint = i;
-                    }
-                }
-                if (activePoint != -1) {
-                    m_fingerPointMapping.insert(touchPoint.id(), activePoint);
-                    m_points[activePoint] = touchPoint.pos();
-                }
-                break;
-            }
-            case Qt::TouchPointReleased:
-            {
-                // move the point and release
-                QHash<int,int>::iterator it = m_fingerPointMapping.find(id);
-                m_points[it.value()] = touchPoint.pos();
-                m_fingerPointMapping.erase(it);
-                break;
-            }
-            case Qt::TouchPointMoved:
-            {
-                // move the point
-                const int pointIdx = m_fingerPointMapping.value(id, -1);
-                if (pointIdx >= 0)
-                    m_points[pointIdx] = touchPoint.pos();
-                break;
-            }
-            default:
-                break;
-            }
-        }
-        if (m_fingerPointMapping.isEmpty()) {
-            e->ignore();
-            return false;
-        } else {
-            if (touchBegin) {
-                m_wasAnimated = m_timer.isActive();
-                setAnimation(false);
-            }
-            update();
-            return true;
-        }
-    }
-        break;
-    case QEvent::TouchEnd:
-        if (m_fingerPointMapping.isEmpty()) {
-            e->ignore();
-            return false;
-        }
-        m_fingerPointMapping.clear();
-        setAnimation(m_wasAnimated);
-        return true;
-        break;
-    default:
-        break;
-    }
-    return QWidget::event(e);
-}
-
-void DeppModelViewerRenderer::setAnimation(bool animation)
-{
-    m_timer.stop();
-//     m_fpsTimer.stop();
-
-    if (animation) {
-        m_timer.start(25, this);
-//         m_fpsTimer.start(1000, this);
-//         m_frameCount = 0;
-    }
 }
