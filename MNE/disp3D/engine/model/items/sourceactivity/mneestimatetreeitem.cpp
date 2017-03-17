@@ -51,14 +51,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <Qt3DRender/qshaderprogram.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,14 +77,10 @@ using namespace DISP3DLIB;
 
 MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
-, m_bIsInit(false)
+, m_bIsDataInit(false)
 , m_pSourceLocRtDataWorker(new RtSourceLocDataWorker(this))
 {
-    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
-            this, &MneEstimateTreeItem::onNewRtData);
-
-    this->setEditable(false);
-    this->setToolTip("MNE Estimate item");
+    initItem();
 }
 
 
@@ -109,76 +97,17 @@ MneEstimateTreeItem::~MneEstimateTreeItem()
 
 //*************************************************************************************************************
 
-QVariant MneEstimateTreeItem::data(int role) const
+void MneEstimateTreeItem::initItem()
 {
-    return AbstractTreeItem::data(role);
-}
+    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
+            this, &MneEstimateTreeItem::onNewRtData);
 
+    this->setEditable(false);
+    this->setToolTip("MNE Estimate item");
 
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
-                                        const MatrixX3f& matSurfaceVertColorLeftHemi,
-                                        const MatrixX3f& matSurfaceVertColorRightHemi,
-                                        const VectorXi& vecLabelIdsLeftHemi,
-                                        const VectorXi& vecLabelIdsRightHemi,
-                                        const QList<FSLIB::Label>& lLabelsLeftHemi,
-                                        const QList<FSLIB::Label>& lLabelsRightHemi)
-{   
-    if(tForwardSolution.src.size() < 2) {
-        return;
-    }
-
-    //Set data based on clusterd or full source space
-    bool isClustered = tForwardSolution.src[0].isClustered();
-
-    if(isClustered) {
-        //Source Space IS clustered        
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
-
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    } else {
-        //Source Space is NOT clustered
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
-
-        this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    }
-
-    QVariant data;
-
-    for(int i = 0; i < tForwardSolution.src.size(); ++i) {
-        if(isClustered) {
-            //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
-            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
-            for(int j = 0; j < clustVertNo.rows(); ++j) {
-                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
-            }
-            data.setValue(clustVertNo);
-        } else {
-            data.setValue(tForwardSolution.src[i].vertno);
-        }
-
-        if(i == 0) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
-        } else if (i == 1) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
-        }
-    }
-
-    //Add meta information as item children
+    //Add items
     QList<QStandardItem*> list;
+    QVariant data;
 
     MetaTreeItem* pItemStreamStatus = new MetaTreeItem(MetaTreeItemTypes::StreamStatus, "Stream data on/off");
     connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
@@ -201,16 +130,6 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     this->appendRow(list);
     data.setValue(QString("Vertex based"));
     pItemVisuaizationType->setData(data, MetaTreeItemRoles::VisualizationType);
-
-    QString sIsClustered = isClustered ? "Clustered" : "Full";
-    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::SourceSpaceType, sIsClustered);
-    pItemSourceSpaceType->setEditable(false);
-    list.clear();
-    list << pItemSourceSpaceType;
-    list << new QStandardItem(pItemSourceSpaceType->toolTip());
-    this->appendRow(list);
-    data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
     MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot Negative 2");
     connect(pItemColormapType, &MetaTreeItem::rtDataColormapTypeChanged,
@@ -261,6 +180,91 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     this->appendRow(list);
     data.setValue(1);
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
+}
+
+
+//*************************************************************************************************************
+
+QVariant MneEstimateTreeItem::data(int role) const
+{
+    return AbstractTreeItem::data(role);
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::setData(const QVariant& value, int role)
+{
+    AbstractTreeItem::setData(value, role);
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
+                                const MatrixX3f& matSurfaceVertColorLeftHemi,
+                                const MatrixX3f& matSurfaceVertColorRightHemi,
+                                const VectorXi& vecLabelIdsLeftHemi,
+                                const VectorXi& vecLabelIdsRightHemi,
+                                const QList<FSLIB::Label>& lLabelsLeftHemi,
+                                const QList<FSLIB::Label>& lLabelsRightHemi)
+{   
+    if(tForwardSolution.src.size() < 2) {
+        return;
+    }
+
+    //Set data based on clusterd or full source space
+    bool isClustered = tForwardSolution.src[0].isClustered();
+
+    if(isClustered) {
+        //Source Space IS clustered        
+        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
+        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
+
+        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
+        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
+    } else {
+        //Source Space is NOT clustered
+        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
+        this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
+
+        this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdxRightHemi);
+        this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
+    }
+
+    QVariant data;
+
+    for(int i = 0; i < tForwardSolution.src.size(); ++i) {
+        if(isClustered) {
+            //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
+            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
+            for(int j = 0; j < clustVertNo.rows(); ++j) {
+                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
+            }
+            data.setValue(clustVertNo);
+        } else {
+            data.setValue(tForwardSolution.src[i].vertno);
+        }
+
+        if(i == 0) {
+            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
+        } else if (i == 1) {
+            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
+        }
+    }
+
+    //Add meta information as item children
+    QList<QStandardItem*> list;
+
+    QString sIsClustered = isClustered ? "Clustered" : "Full";
+    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::SourceSpaceType, sIsClustered);
+    pItemSourceSpaceType->setEditable(false);
+    list.clear();
+    list << pItemSourceSpaceType;
+    list << new QStandardItem(pItemSourceSpaceType->toolTip());
+    this->appendRow(list);
+    data.setValue(sIsClustered);
+    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
     //set rt data corresponding to the hemisphere
     m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
@@ -278,17 +282,17 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
                                                 lLabelsLeftHemi,
                                                 lLabelsRightHemi);
 
-    m_bIsInit = true;
+    m_bIsDataInit = true;
 }
 
 
 //*************************************************************************************************************
 
-bool MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
+void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 {
-    if(!m_bIsInit) {
+    if(!m_bIsDataInit) {
         qDebug() << "MneEstimateTreeItem::addData - Rt source loc item has not been initialized yet!";
-        return false;
+        return;
     }
 
     //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
@@ -297,8 +301,6 @@ bool MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
     this->setData(data, Data3DTreeModelItemRoles::RTData);
 
     m_pSourceLocRtDataWorker->addData(tSourceEstimate.data);
-
-    return true;
 }
 
 

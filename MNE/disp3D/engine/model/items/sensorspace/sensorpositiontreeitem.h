@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     hemispheretreeitem.h
+* @file     sensorpositiontreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lroenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     HemisphereTreeItem class declaration.
+* @brief     SensorPositionTreeItem class declaration.
 *
 */
 
-#ifndef HEMISPHERETREEITEM_H
-#define HEMISPHERETREEITEM_H
+#ifndef SENSORPOSITIONTREEITEM_H
+#define SENSORPOSITIONTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,6 +50,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,16 +64,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB {
-    class Annotation;
-
-}
-
-namespace MNELIB {
-    class MNEHemisphere;
-    class MNESourceSpace;
-    class MNESourceEstimate;
-    class MNEForwardSolution;
+namespace FIFFLIB {
+    class FiffChInfo;
 }
 
 namespace Qt3DCore {
@@ -92,40 +86,37 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneEstimateTreeItem;
-class FsSurfaceTreeItem;
-class FsAnnotationTreeItem;
-class SourceSpaceTreeItem;
+class Renderable3DEntity;
 
 
 //=============================================================================================================
 /**
-* HemisphereTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* SensorPositionTreeItem provides a tree item to visualize sensor position data.
 *
-* @brief Provides a generic brain tree item.
+* @brief SensorPositionTreeItem provides a tree item to visualize sensor position data.
 */
-class DISP3DNEWSHARED_EXPORT HemisphereTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SensorPositionTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<HemisphereTreeItem> SPtr;             /**< Shared pointer type for HemisphereTreeItem class. */
-    typedef QSharedPointer<const HemisphereTreeItem> ConstSPtr;  /**< Const shared pointer type for HemisphereTreeItem class. */
+    typedef QSharedPointer<SensorPositionTreeItem> SPtr;             /**< Shared pointer type for SensorPositionTreeItem class. */
+    typedef QSharedPointer<const SensorPositionTreeItem> ConstSPtr;  /**< Const shared pointer type for SensorPositionTreeItem class. */
 
     //=========================================================================================================
     /**
-    * Default constructor from single surface.
+    * Default constructor.
     *
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
+    explicit SensorPositionTreeItem(int iType = Data3DTreeModelItemTypes::SensorPositionItem, const QString& text = "Sensor Position");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~HemisphereTreeItem();
+    ~SensorPositionTreeItem();
 
     //=========================================================================================================
     /**
@@ -133,46 +124,33 @@ public:
     */
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
-    int	columnCount() const;
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation data to this item.
+    * Adds FreeSurfer data based on surface and annotation data to this item.
     *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    * @param[in] lChInfo            The channel information used to plot the MEG channels.
+    * @param[in] parent             The Qt3D entity parent of the new item.
     *
-    * @return                       Returns a pointer to the added tree item.
+    * @return                       Returns true if successful.
     */
-    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
-    * Adds source space information.
+    * Plots the sensors.
     *
-    * @param[in] tHemisphere        The MNEHemisphere.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    * @param[in] lChInfo            The channel information used to plot the MEG channels.
     */
-    SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
+    void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo);
 
     //=========================================================================================================
     /**
-    * Returns the surface tree item.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
-    * @return The current surface tree item.
+    * @param[in] state     The visiblity flag.
     */
-    FsSurfaceTreeItem* getSurfaceItem();
-
-    //=========================================================================================================
-    /**
-    * Returns the annotation tree item.
-    *
-    * @return The current annotation tree item.
-    */
-    FsAnnotationTreeItem* getAnnotItem();
+    void setVisible(bool state);
 
 protected:
     //=========================================================================================================
@@ -189,10 +167,27 @@ protected:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    FsSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    FsAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever the surface color was changed.
+    *
+    * @param[in] color        The new surface color.
+    */
+    void onSurfaceColorChanged(const QColor &color);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the alpha value changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    void onSurfaceAlphaChanged(float fAlpha);
+
+    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
+
+    QList<QPointer<Renderable3DEntity> >        m_lRects;                   /**< The currently displayed sensors points as 3D rectangles. */
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // HEMISPHERETREEITEM_H
+#endif // SENSORPOSITIONTREEITEM_H

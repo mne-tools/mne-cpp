@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
+#include "../common/abstractsurfacetreeitem.h"
 #include "../common/types.h"
 
 
@@ -94,7 +94,7 @@ class Renderable3DEntity;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractSurfaceTreeItem
 {
     Q_OBJECT
 
@@ -113,19 +113,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~FsSurfaceTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] tSurface           FreeSurfer surface.
@@ -135,98 +122,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Call this function whenever new colors for the activation data plotting are available.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
-    */
-    void setRtVertColor(const MatrixX3f &sourceColorSamples);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever visibilty of teh annoation has changed.
     *
     * @param[in] isVisible     The visibility flag.
     */
     void onAnnotationVisibilityChanged(bool isVisible);
 
+protected:
     //=========================================================================================================
     /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
+    * AbstractTreeItem functions
     */
-    void setVisible(bool state);
+    void initItem();
 
-private:
     //=========================================================================================================
     /**
     * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
     */
     void onColorInfoOriginOrCurvColorChanged();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the alpha value changed.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    void onSurfaceAlphaChanged(float fAlpha);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the inner tesselation value changed.
-    *
-    * @param[in] fTessInner     The new inner tesselation value.
-    */
-    void onSurfaceTessInnerChanged(float fTessInner);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the outer tesselation value changed.
-    *
-    * @param[in] fTessOuter     The new outer tesselation value.
-    */
-    void onSurfaceTessOuterChanged(float fTessOuter);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the triangle scale value changed.
-    *
-    * @param[in] fTriangleScale     The triangle scale value.
-    */
-    void onSurfaceTriangleScaleChanged(float fTriangleScale);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation x of this item changed.
-    *
-    * @param[in] fTransX        The current x translation.
-    */
-    void onSurfaceTranslationXChanged(float fTransX);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation y of this item changed.
-    *
-    * @param[in] fTransY        The current y translation.
-    */
-    void onSurfaceTranslationYChanged(float fTransY);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation z of this item changed.
-    *
-    * @param[in] fTransZ        The current z translation.
-    */
-    void onSurfaceTranslationZChanged(float fTransZ);
 
     //=========================================================================================================
     /**
@@ -241,8 +154,6 @@ private:
     MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
-    QPointer<Renderable3DEntity>    m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
-    QPointer<Renderable3DEntity>    m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
 
     //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
     MetaTreeItem*                   m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */

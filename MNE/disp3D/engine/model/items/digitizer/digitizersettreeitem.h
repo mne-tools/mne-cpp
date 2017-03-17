@@ -93,9 +93,9 @@ class Renderable3DEntity;
 
 //=============================================================================================================
 /**
-* DigitizerSetTreeItem provides a generic tree item to hold the set of digitizer data.
+* DigitizerSetTreeItem provides a tree item to hold the set of digitizer data.
 *
-* @brief Provides a generic digitizer set tree item.
+* @brief DigitizerSetTreeItem provides a tree item to hold the set of digitizer data.
 */
 class DISP3DNEWSHARED_EXPORT DigitizerSetTreeItem : public AbstractTreeItem
 {
@@ -112,7 +112,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit DigitizerSetTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    explicit DigitizerSetTreeItem(int iType = Data3DTreeModelItemTypes::DigitizerSetItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
@@ -136,7 +136,13 @@ public:
     */
     void addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.

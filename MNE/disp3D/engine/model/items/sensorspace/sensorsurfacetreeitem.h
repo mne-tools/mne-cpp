@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     bemtreeitem.cpp
+* @file     sensorsurfacetreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,25 +29,30 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BemTreeItem class definition.
+* @brief     SensorSurfaceTreeItem class declaration.
 *
 */
+
+#ifndef SENSORSURFACETREEITEM_H
+#define SENSORSURFACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "bemtreeitem.h"
-#include "bemsurfacetreeitem.h"
+#include "../../../../disp3D_global.h"
 
-#include <mne/mne_bem.h>
+#include "../common/abstractsurfacetreeitem.h"
+#include "../common/types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -60,96 +65,76 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace DISP3DLIB;
+namespace MNELIB {
+    class MNEBemSurface;
+}
+
+namespace Qt3DCore {
+    class QEntity;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-BemTreeItem::BemTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
+namespace DISP3DLIB
 {
-    initItem();
-}
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-BemTreeItem::~BemTreeItem()
+class Renderable3DEntity;
+
+
+//=============================================================================================================
+/**
+* SensorSurfaceTreeItem provides a generic brain tree item to hold sensor surfaces.
+*
+* @brief SensorSurfaceTreeItem provides a generic brain tree item to hold sensor surfaces.
+*/
+class DISP3DNEWSHARED_EXPORT SensorSurfaceTreeItem : public AbstractSurfaceTreeItem
 {
-}
+    Q_OBJECT
 
+public:
+    typedef QSharedPointer<SensorSurfaceTreeItem> SPtr;             /**< Shared pointer type for SensorSurfaceTreeItem class. */
+    typedef QSharedPointer<const SensorSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for SensorSurfaceTreeItem class. */
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    */
+    explicit SensorSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SensorSurfaceItem, const QString& text = "Sensor Surface");
 
-void BemTreeItem::initItem()
-{
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM item");
-}
+    //=========================================================================================================
+    /**
+    * Adds BEM model data.
+    *
+    * @param[in] tSensorSurface     The bem data.
+    * @param[in] parent             The Qt3D entity parent of the new item.
+    */
+    void addData(const MNELIB::MNEBemSurface &tSensorSurface, Qt3DCore::QEntity* parent);
 
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
 
-//*************************************************************************************************************
+};
 
-QVariant BemTreeItem::data(int role) const
-{
-    switch(role) {
-        case Data3DTreeModelItemRoles::BemName:
-            return QVariant();
-        default: // do nothing;
-            break;
-    }
+} //NAMESPACE DISP3DLIB
 
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  BemTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
-{
-    //Generate child items based on BEM input parameters
-    for(int i = 0; i < tBem.size(); ++i) {
-        QString sBemSurfName;
-        sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], p3DEntityParent);
-
-        QList<QStandardItem*> list;
-        list << pSurfItem;
-        list << new QStandardItem(pSurfItem->toolTip());
-        this->appendRow(list);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-
-
-
+#endif // SENSORSURFACETREEITEM_H

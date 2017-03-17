@@ -78,7 +78,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(QNode *parent)
+PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseAlpha, QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
@@ -97,6 +97,7 @@ PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(QNode *parent)
 , m_pNoDepthMask(new QNoDepthMask())
 , m_pBlendState(new QBlendEquationArguments())
 , m_pBlendEquation(new QBlendEquation())
+, m_bUseAlpha(bUseAlpha)
 {
     this->init();
 }
@@ -140,22 +141,24 @@ void PerVertexPhongAlphaMaterial::init()
     m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
-    //Setup transparency
-    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+    //If wanted setup transparency
+    if(m_bUseAlpha) {
+        m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+        m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+        m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
 
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-    m_pVertexGL2RenderPass->addRenderState(m_pBlendEquation);
-    m_pVertexES2RenderPass->addRenderState(m_pBlendEquation);
+        m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
+        m_pVertexGL2RenderPass->addRenderState(m_pBlendEquation);
+        m_pVertexES2RenderPass->addRenderState(m_pBlendEquation);
 
-    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-    m_pVertexGL2RenderPass->addRenderState(m_pNoDepthMask);
-    m_pVertexES2RenderPass->addRenderState(m_pNoDepthMask);
+        m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
+        m_pVertexGL2RenderPass->addRenderState(m_pNoDepthMask);
+        m_pVertexES2RenderPass->addRenderState(m_pNoDepthMask);
 
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
-    m_pVertexGL2RenderPass->addRenderState(m_pBlendState);
-    m_pVertexES2RenderPass->addRenderState(m_pBlendState);
+        m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
+        m_pVertexGL2RenderPass->addRenderState(m_pBlendState);
+        m_pVertexES2RenderPass->addRenderState(m_pBlendState);
+    }
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
     m_pFilterKey->setValue(QStringLiteral("forward"));
