@@ -5,7 +5,6 @@
 
 class Node;
 
-//! [0]
 class Edge : public QGraphicsItem
 {
 public:
@@ -30,6 +29,5 @@ private:
     QPointF m_destPoint;
     qreal   m_arrowSize;
 };
-//! [0]
 
 #endif // EDGE_H
