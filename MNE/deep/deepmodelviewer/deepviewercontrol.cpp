@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepmodelviewercontrol.cpp
+* @file     deepviewercontrol.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepModelViewerControl class implementation.
+* @brief    DeepViewerControl class implementation.
 *
 */
 
@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "arthurwidgets.h"
-#include "deepmodelviewercontrol.h"
-#include "deepmodelviewerrenderer.h"
+#include "deepviewercontrol.h"
+#include "deepviewerrenderer.h"
 
 #include <stdio.h>
 
@@ -50,7 +50,7 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DeepModelViewerControls::DeepModelViewerControls(QWidget* parent, DeepModelViewerRenderer* renderer)
+DeepViewerControls::DeepViewerControls(QWidget* parent, DeepViewerRenderer* renderer)
 : QWidget(parent)
 {
     m_renderer = renderer;
@@ -61,7 +61,7 @@ DeepModelViewerControls::DeepModelViewerControls(QWidget* parent, DeepModelViewe
 
 //*************************************************************************************************************
 
-void DeepModelViewerControls::createCommonControls(QWidget* parent)
+void DeepViewerControls::createCommonControls(QWidget* parent)
 {
     m_capGroup = new QGroupBox(parent);
     m_capGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
@@ -182,7 +182,7 @@ void DeepModelViewerControls::createCommonControls(QWidget* parent)
 
 //*************************************************************************************************************
 
-void DeepModelViewerControls::createLayout()
+void DeepViewerControls::createLayout()
 {
     QGroupBox *mainGroup = new QGroupBox(this);
     mainGroup->setFixedWidth(180);
@@ -257,7 +257,7 @@ void DeepModelViewerControls::createLayout()
 
 //*************************************************************************************************************
 
-void DeepModelViewerControls::emitQuitSignal()
+void DeepViewerControls::emitQuitSignal()
 {
     emit quitPressed();
 }
@@ -265,7 +265,7 @@ void DeepModelViewerControls::emitQuitSignal()
 
 //*************************************************************************************************************
 
-void DeepModelViewerControls::emitOkSignal()
+void DeepViewerControls::emitOkSignal()
 {
     emit okPressed();
 }
