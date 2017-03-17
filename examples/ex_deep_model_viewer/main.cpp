@@ -48,7 +48,7 @@
 #include <deep/deep.h>
 #include <deep/deepviewer.h>
 #include <deep/deepmodelcreator.h>
-#include <deep/deepmodelviewer/deepmodelviewerwidget.h>
+#include <deep/deepmodelviewer/deepviewerwidget.h>
 
 #include <iostream>
 #include <random>
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     deep.print();
 
     // Create the viewer
-    DeepModelViewerWidget deepModelViewer;
+    DeepViewerWidget deepModelViewer;
     QList<QWidget *> widgets = deepModelViewer.findChildren<QWidget *>();
     foreach (QWidget *w, widgets) {
         w->setAttribute(Qt::WA_AcceptTouchEvents);

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepmodelviewercontrol.h
+* @file     deepviewercontrol.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,11 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepModelViewerControl class declaration.
+* @brief    DeepViewerControl class declaration.
 *
 */
-#ifndef DEEPMODELVIEWERCONTROL_H
-#define DEEPMODELVIEWERCONTROL_H
+#ifndef DEEPVIEWERCONTROL_H
+#define DEEPVIEWERCONTROL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,7 +74,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DeepModelViewerRenderer;
+class DeepViewerRenderer;
 
 
 //=============================================================================================================
@@ -83,19 +83,19 @@ class DeepModelViewerRenderer;
 *
 * @brief Deep Model Viewer Controls
 */
-class DeepModelViewerControls : public QWidget
+class DeepViewerControls : public QWidget
 {
     Q_OBJECT
 
 public:
-    DeepModelViewerControls(QWidget* parent, DeepModelViewerRenderer* renderer);
+    DeepViewerControls(QWidget* parent, DeepViewerRenderer* renderer);
 
 signals:
     void okPressed();
     void quitPressed();
 
 private:
-    DeepModelViewerRenderer* m_renderer;
+    DeepViewerRenderer* m_renderer;
 
     QGroupBox *m_capGroup;
     QGroupBox *m_joinGroup;
@@ -111,4 +111,4 @@ private slots:
 
 };
 
-#endif // DEEPMODELVIEWERCONTROL_H
+#endif // DEEPVIEWERCONTROL_H

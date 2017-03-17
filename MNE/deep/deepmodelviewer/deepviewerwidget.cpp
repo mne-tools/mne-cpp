@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepmodelviewerwidget.cpp
+* @file     deepviewerwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepModelViewerWidget class implementation.
+* @brief    DeepViewerWidget class implementation.
 *
 */
 
@@ -40,9 +40,9 @@
 
 #include "arthurwidgets.h"
 
-#include "deepmodelviewerwidget.h"
-#include "deepmodelviewerrenderer.h"
-#include "deepmodelviewercontrol.h"
+#include "deepviewerwidget.h"
+#include "deepviewerrenderer.h"
+#include "deepviewercontrol.h"
 
 
 #include <stdio.h>
@@ -53,12 +53,12 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DeepModelViewerWidget::DeepModelViewerWidget()
+DeepViewerWidget::DeepViewerWidget()
 {
     setWindowTitle(tr("Path Stroking"));
 
     // Widget construction and property setting
-    m_renderer = new DeepModelViewerRenderer(this);
+    m_renderer = new DeepViewerRenderer(this);
 
     m_controls = new DeepModelViewerControls(0, m_renderer);
 
@@ -78,7 +78,7 @@ DeepModelViewerWidget::DeepModelViewerWidget()
 
 //*************************************************************************************************************
 
-void DeepModelViewerWidget::setModel(CNTK::FunctionPtr &model)
+void DeepViewerWidget::setModel(CNTK::FunctionPtr &model)
 {
     m_pModel = model;
 }
@@ -86,7 +86,7 @@ void DeepModelViewerWidget::setModel(CNTK::FunctionPtr &model)
 
 //*************************************************************************************************************
 
-void DeepModelViewerWidget::showControls()
+void DeepViewerWidget::showControls()
 {
     m_controls->showFullScreen();
 }
@@ -94,7 +94,7 @@ void DeepModelViewerWidget::showControls()
 
 //*************************************************************************************************************
 
-void DeepModelViewerWidget::hideControls()
+void DeepViewerWidget::hideControls()
 {
     m_controls->hide();
 }

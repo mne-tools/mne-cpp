@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepmodelviewerrenderer.cpp
+* @file     deepviewerrenderer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepModelViewerWidget class implementation.
+* @brief    DeepViewerWidget class implementation.
 *
 */
 
@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "arthurwidgets.h"
-#include "deepmodelviewerrenderer.h"
+#include "deepviewerrenderer.h"
 
 #include <stdio.h>
 
@@ -49,7 +49,7 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DeepModelViewerRenderer::DeepModelViewerRenderer(QWidget *parent)
+DeepViewerRenderer::DeepViewerRenderer(QWidget *parent)
 : ArthurFrame(parent)
 {
     m_pointSize = 10;
@@ -67,7 +67,7 @@ DeepModelViewerRenderer::DeepModelViewerRenderer(QWidget *parent)
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::paint(QPainter *painter)
+void DeepViewerRenderer::paint(QPainter *painter)
 {
     if (m_points.isEmpty())
         initializePoints();
@@ -145,7 +145,7 @@ void DeepModelViewerRenderer::paint(QPainter *painter)
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::initializePoints()
+void DeepViewerRenderer::initializePoints()
 {
     const int count = 7;
     m_points.clear();
@@ -168,7 +168,7 @@ void DeepModelViewerRenderer::initializePoints()
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::updatePoints()
+void DeepViewerRenderer::updatePoints()
 {
     qreal pad = 10;
     qreal left = pad;
@@ -197,7 +197,7 @@ void DeepModelViewerRenderer::updatePoints()
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::mousePressEvent(QMouseEvent *e)
+void DeepViewerRenderer::mousePressEvent(QMouseEvent *e)
 {
     if (!m_fingerPointMapping.isEmpty())
         return;
@@ -226,7 +226,7 @@ void DeepModelViewerRenderer::mousePressEvent(QMouseEvent *e)
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::mouseMoveEvent(QMouseEvent *e)
+void DeepViewerRenderer::mouseMoveEvent(QMouseEvent *e)
 {
     if (!m_fingerPointMapping.isEmpty())
         return;
@@ -243,7 +243,7 @@ void DeepModelViewerRenderer::mouseMoveEvent(QMouseEvent *e)
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::mouseReleaseEvent(QMouseEvent *)
+void DeepViewerRenderer::mouseReleaseEvent(QMouseEvent *)
 {
     if (!m_fingerPointMapping.isEmpty())
         return;
@@ -254,7 +254,7 @@ void DeepModelViewerRenderer::mouseReleaseEvent(QMouseEvent *)
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::timerEvent(QTimerEvent *e)
+void DeepViewerRenderer::timerEvent(QTimerEvent *e)
 {
     if (e->timerId() == m_timer.timerId()) {
         updatePoints();
@@ -264,7 +264,7 @@ void DeepModelViewerRenderer::timerEvent(QTimerEvent *e)
 
 //*************************************************************************************************************
 
-bool DeepModelViewerRenderer::event(QEvent *e)
+bool DeepViewerRenderer::event(QEvent *e)
 {
     bool touchBegin = false;
     switch (e->type()) {
@@ -351,7 +351,7 @@ bool DeepModelViewerRenderer::event(QEvent *e)
 
 //*************************************************************************************************************
 
-void DeepModelViewerRenderer::setAnimation(bool animation)
+void DeepViewerRenderer::setAnimation(bool animation)
 {
     m_timer.stop();
 
