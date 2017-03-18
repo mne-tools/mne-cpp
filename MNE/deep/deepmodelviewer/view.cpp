@@ -9,6 +9,12 @@
 #endif
 #include <qmath.h>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
 #ifndef QT_NO_WHEELEVENT
 void GraphicsView::wheelEvent(QWheelEvent *e)
 {
@@ -28,11 +34,14 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 //*************************************************************************************************************
 
 View::View(const QString &name, QWidget *parent)
-    : QFrame(parent)
+: QWidget(parent)
+, m_use_antialiasing(false)
+#ifndef QT_NO_OPENGL
+, m_use_opengl(true)
+#endif
 {
-//    setFrameStyle(Sunken | StyledPanel);
     graphicsView = new GraphicsView(this);
-    graphicsView->setRenderHint(QPainter::Antialiasing, false);
+    graphicsView->setRenderHint(QPainter::Antialiasing, m_use_antialiasing);
     graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
@@ -86,14 +95,12 @@ View::View(const QString &name, QWidget *parent)
     rotateSliderLayout->addWidget(rotateRightIcon);
 
     resetButton = new QToolButton;
-    resetButton->setText(tr("0"));
+    resetButton->setText(tr("Reset"));
     resetButton->setEnabled(false);
 
     // Label layout
     QHBoxLayout *labelLayout = new QHBoxLayout;
-    label = new QLabel(name);
-    label2 = new QLabel(tr("Pointer Mode"));
-    selectModeButton = new QToolButton;
+    selectModeButton = new QToolButton;//Pointer Mode
     selectModeButton->setText(tr("Select"));
     selectModeButton->setCheckable(true);
     selectModeButton->setChecked(true);
@@ -101,18 +108,6 @@ View::View(const QString &name, QWidget *parent)
     dragModeButton->setText(tr("Drag"));
     dragModeButton->setCheckable(true);
     dragModeButton->setChecked(false);
-    antialiasButton = new QToolButton;
-    antialiasButton->setText(tr("Antialiasing"));
-    antialiasButton->setCheckable(true);
-    antialiasButton->setChecked(false);
-    openGlButton = new QToolButton;
-    openGlButton->setText(tr("OpenGL"));
-    openGlButton->setCheckable(true);
-#ifndef QT_NO_OPENGL
-    openGlButton->setEnabled(QGLFormat::hasOpenGL());
-#else
-    openGlButton->setEnabled(false);
-#endif
     printButton = new QToolButton;
     printButton->setIcon(QIcon(QPixmap(":/fileprint.png")));
 
@@ -121,14 +116,10 @@ View::View(const QString &name, QWidget *parent)
     pointerModeGroup->addButton(selectModeButton);
     pointerModeGroup->addButton(dragModeButton);
 
-    labelLayout->addWidget(label);
     labelLayout->addStretch();
-    labelLayout->addWidget(label2);
     labelLayout->addWidget(selectModeButton);
     labelLayout->addWidget(dragModeButton);
     labelLayout->addStretch();
-    labelLayout->addWidget(antialiasButton);
-    labelLayout->addWidget(openGlButton);
     labelLayout->addWidget(printButton);
 
     QGridLayout *topLayout = new QGridLayout;
@@ -148,8 +139,6 @@ View::View(const QString &name, QWidget *parent)
             this, SLOT(setResetButtonEnabled()));
     connect(selectModeButton, SIGNAL(toggled(bool)), this, SLOT(togglePointerMode()));
     connect(dragModeButton, SIGNAL(toggled(bool)), this, SLOT(togglePointerMode()));
-    connect(antialiasButton, SIGNAL(toggled(bool)), this, SLOT(toggleAntialiasing()));
-    connect(openGlButton, SIGNAL(toggled(bool)), this, SLOT(toggleOpenGL()));
     connect(rotateLeftIcon, SIGNAL(clicked()), this, SLOT(rotateLeft()));
     connect(rotateRightIcon, SIGNAL(clicked()), this, SLOT(rotateRight()));
     connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
@@ -157,6 +146,8 @@ View::View(const QString &name, QWidget *parent)
     connect(printButton, SIGNAL(clicked()), this, SLOT(print()));
 
     setupMatrix();
+
+    enableOpenGL(m_use_opengl);
 }
 
 
@@ -217,19 +208,22 @@ void View::togglePointerMode()
 
 //*************************************************************************************************************
 
-void View::toggleOpenGL()
-{
 #ifndef QT_NO_OPENGL
-    graphicsView->setViewport(openGlButton->isChecked() ? new QGLWidget(QGLFormat(QGL::SampleBuffers)) : new QWidget);
-#endif
+void View::enableOpenGL(bool use_opengl)
+{
+    graphicsView->setViewport(use_opengl ? new QGLWidget(QGLFormat(QGL::SampleBuffers)) : new QWidget);
+    m_use_opengl = use_opengl;
 }
+#endif
 
 
 //*************************************************************************************************************
 
-void View::toggleAntialiasing()
+void View::enableAntialiasing(bool use_antialiasing)
 {
-    graphicsView->setRenderHint(QPainter::Antialiasing, antialiasButton->isChecked());
+    qDebug() << "enableAntialiasing(bool use_antialiasing)" << use_antialiasing;
+    graphicsView->setRenderHint(QPainter::Antialiasing, use_antialiasing);
+    m_use_antialiasing = use_antialiasing;
 }
 
 
