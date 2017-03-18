@@ -3,6 +3,7 @@
 
 #include "deepviewerwidget.h"
 #include "view.h"
+#include "controls.h"
 
 #include "node.h"
 #include "edge.h"
@@ -22,21 +23,17 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
 {
     populateScene();
 
-    m_pSplitter = new QSplitter;
-
     View *view = new View("");
     view->view()->setScene(m_pScene);
-    m_pSplitter->addWidget(view);
+    Controls *controls = new Controls(view, this);
 
-//    view = new View("Top right view");
-//    view->view()->setScene(scene);
-//    h1Splitter->addWidget(view);
+    m_pSplitter = new QSplitter;
+    m_pSplitter->addWidget(view);
+    m_pSplitter->addWidget(controls);
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(m_pSplitter);
     setLayout(layout);
-
-
 
     setWindowTitle(tr("Deep Model Viewer"));
 }

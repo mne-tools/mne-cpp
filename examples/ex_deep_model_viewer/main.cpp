@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     // Create the viewer
     //
     DeepViewerWidget window(model);
-    window.show();
+    window.showMaximized();
 
     return a.exec();
 }
