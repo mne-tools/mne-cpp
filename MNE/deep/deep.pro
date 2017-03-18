@@ -60,6 +60,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Dispd \ # Remove dependency -> put all dependent in disp itself
             -lEvalDll \
             -lCNTKLibrary-2.0
 }
@@ -69,6 +70,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Disp \ # Remove dependency -> put all dependent in disp itself
             -lEvalDll \
             -lCNTKLibrary-2.0
 }
@@ -114,7 +116,8 @@ SOURCES += \
     deepmodelviewer/node.cpp \
 #    deepmodelviewer/deepviewerwidget.cpp \
     deepmodelviewer/view.cpp \
-    deepmodelviewer/deepviewerwidget.cpp
+    deepmodelviewer/deepviewerwidget.cpp \
+#    deepmodelviewer/control.cpp
 
 HEADERS +=\
     deep_global.h \
@@ -126,7 +129,8 @@ HEADERS +=\
     deepmodelviewer/node.h \
 #    deepmodelviewer/deepviewerwidget.h \
     deepmodelviewer/view.h \
-    deepmodelviewer/deepviewerwidget.h
+    deepmodelviewer/deepviewerwidget.h \
+#    deepmodelviewer/control.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

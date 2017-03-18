@@ -144,7 +144,24 @@ int main(int argc, char *argv[])
     deep.setModel(model);
     deep.print();
 
+    //
+    // Training
+    //
+    qDebug() << "\n Start training \n";
+
+    // Initialize the parameters for the trainer
+    int minibatch_size = 25;
+    int num_samples = 20000;
+
+    MatrixXf features, labels;
+
+    QVector<double> vecLoss, vecError;
+    generate_random_data_samples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    deep.trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+
+    //
     // Create the viewer
+    //
     DeepViewerWidget window(model);
     window.show();
 
