@@ -27,6 +27,7 @@ class QSplitter;
 QT_END_NAMESPACE
 
 class Node;
+class Edge;
 
 
 class DEEPSHARED_EXPORT DeepViewerWidget : public QWidget
@@ -44,7 +45,8 @@ private:
 
     QSplitter* m_pSplitter;
 
-    QList< QList<Node*> > layersList;
+    QList< QList<Node*> > m_listLayers;
+    QList< QList<Edge*> > m_listEdges;
 };
 
 #endif // MAINWINDOW_H

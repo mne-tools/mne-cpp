@@ -1,3 +1,4 @@
+
 #include "view.h"
 
 #include <QPrinter>

@@ -1,3 +1,6 @@
+
+#include <Eigen/Core>
+
 #include "deepviewerwidget.h"
 #include "view.h"
 
@@ -8,6 +11,10 @@
 #include <QSplitter>
 
 #include <QDebug>
+
+
+using namespace Eigen;
+
 
 DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
 : QWidget(parent)
@@ -45,11 +52,20 @@ void DeepViewerWidget::populateScene()
     // Analyze CNTK Model Structure
     //
     QVector<int> layerDim;
+    QVector<MatrixXf> vecWeights;
     int inDim = 0;
     int outDim = 0;
+
+    MatrixXf weights;
+    VectorXf bias;
+    int bufferCount;
+
     for (int i = static_cast<int>(m_pModel->Parameters().size()) - 1; i >= 0 ; --i) {
         fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
         fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
+
+
+        fprintf(stderr,"Value Dim: %ls\n",m_pModel->Parameters()[i].Value()->Shape().AsString().c_str());
 
         QString param = QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
 
@@ -59,7 +75,18 @@ void DeepViewerWidget::populateScene()
             outDim = dimensions[0].toInt();
             inDim = dimensions[1].toInt();
 
+            weights.resize(outDim,inDim);
+            bufferCount = 0;
+            for(int m = 0; m < outDim; ++m) {
+                for(int n = 0; n < inDim; ++n) {
+                    weights(m,n) = m_pModel->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
+                    ++bufferCount;
+                }
+            }
+
+            // ToDo put in one class
             layerDim.append(inDim);
+            vecWeights.append(weights);
         }
     }
     layerDim.append(outDim);
@@ -74,7 +101,8 @@ void DeepViewerWidget::populateScene()
 
     double x_root = -((numLayers-1.0)*layerDist) / 2.0;
 
-    QList<Node*> currentLayer;
+    QList<Node*> listCurrentLayer;
+    QList<Edge*> listCurrentEdges;
     QPointF layerRoot, currentPos;
 
     for(int layer = 0; layer < layerDim.size(); ++layer) {
@@ -82,22 +110,36 @@ void DeepViewerWidget::populateScene()
 
         // Create Nodes
         for(int i = 0; i < layerDim[layer]; ++i ) {
-            currentLayer.append(new Node(this));
-            m_pScene->addItem(currentLayer[i]);
+            listCurrentLayer.append(new Node(this));
+            m_pScene->addItem(listCurrentLayer[i]);
 
             currentPos = layerRoot + QPointF(0,nodeDist * i);
-            currentLayer[i]->setPos(currentPos);
+            listCurrentLayer[i]->setPos(currentPos);
         }
-        layersList.append(currentLayer);
-        currentLayer.clear();
+        m_listLayers.append(listCurrentLayer);
+        listCurrentLayer.clear();
 
         // Create Edges
         if(layer - 1 >= 0) {
-            for(int i = 0; i < layersList[layer-1].size(); ++i ) {
-                for(int j = 0; j < layersList[layer].size(); ++j ) {
-                    m_pScene->addItem(new Edge(layersList[layer-1][i], layersList[layer][j]));
+
+            // Dimension check
+            if(vecWeights[layer-1].rows() != m_listLayers[layer].size() && vecWeights[layer-1].cols() != m_listLayers[layer-1].size()) {
+                qCritical("Dimensions do not match.\n");
+                return;
+//                qDebug() << "Dimension Check" << vecWeights[layer-1].rows() << "x" << vecWeights[layer-1].cols();
+//                qDebug() << "Check" << m_listLayers[layer].size() << "x" << m_listLayers[layer-1].size();
+            }
+
+            for(int i = 0; i < m_listLayers[layer-1].size(); ++i ) {
+                for(int j = 0; j < m_listLayers[layer].size(); ++j ) {
+                    listCurrentEdges.append(new Edge(m_listLayers[layer-1][i], m_listLayers[layer][j]));
+
+                    listCurrentEdges.last()->setWeight(vecWeights[layer-1](j,i));
+
+                    m_pScene->addItem(listCurrentEdges.last());
                 }
             }
+            m_listEdges.append(listCurrentEdges);
         }
     }
 

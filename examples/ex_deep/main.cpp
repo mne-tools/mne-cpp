@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     Deep deep_1;
 
     int mysamplesize = 32;
-    MatrixXf features, labels, outputs;;
+    MatrixXf features, labels, outputs;
 
     generate_random_data_samples(mysamplesize, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
 

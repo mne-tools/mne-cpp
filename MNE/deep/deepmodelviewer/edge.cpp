@@ -2,6 +2,8 @@
 #include "edge.h"
 #include "node.h"
 
+#include <disp/helpers/colormap.h>
+
 #include <math.h>
 
 #include <QPainter>
@@ -15,6 +17,9 @@ static double TwoPi = 2.0 * Pi;
 //! [0]
 Edge::Edge(Node *sourceNode, Node *destNode)
 : m_arrowSize(10)
+, m_color(Qt::lightGray)
+, m_penWidth(1)
+, m_weight(0)
 {
     setAcceptedMouseButtons(0);
     source = sourceNode;
@@ -75,6 +80,16 @@ void Edge::adjust()
 
 //*************************************************************************************************************
 
+void Edge::setWeight(float weight)
+{
+    m_weight = weight;
+    updateLineWidth();
+    updateColor();
+}
+
+
+//*************************************************************************************************************
+
 QRectF Edge::boundingRect() const
 {
     if (!source || !dest)
@@ -97,7 +112,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     if (!source || !dest)
         return;
 
-    QLineF center_line(mapFromItem(source, 0, 0), mapFromItem(dest, 0, 0));
+//    QLineF center_line(mapFromItem(source, 0, 0), mapFromItem(dest, 0, 0));
     QLineF line(m_sourcePoint, m_destPoint);
     if (qFuzzyCompare(line.length(), qreal(0.)))
         return;
@@ -129,8 +144,8 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 //        c2.setY(m_destPoint.y() - line.dy() / 2);
 //    }
     path.cubicTo(c1, c2, m_destPoint);
-    QColor lg = Qt::lightGray;
-    QPen pen(lg, 1);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
+    QColor lg = m_color;
+    QPen pen(lg, m_penWidth);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
     painter->strokePath(path, pen);
 
 
@@ -164,4 +179,21 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->setBrush(Qt::lightGray);
 //    painter->drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
     painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
+}
+
+
+//*************************************************************************************************************
+
+void Edge::updateLineWidth()
+{
+    m_penWidth = abs(m_weight*5);
+}
+
+
+//*************************************************************************************************************
+
+void Edge::updateColor()
+{
+    m_color = QColor(DISPLIB::ColorMap::valueToRedBlue(m_weight));
+    m_color.setAlpha(abs(m_weight*255));
 }
