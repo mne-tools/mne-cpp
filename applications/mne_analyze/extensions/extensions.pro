@@ -38,3 +38,5 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+#    cntk \
+#    surfer \

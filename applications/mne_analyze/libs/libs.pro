@@ -38,5 +38,6 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    anShared \
 
 CONFIG += ordered
