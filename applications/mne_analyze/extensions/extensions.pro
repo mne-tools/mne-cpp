@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_analyze.pro
+# @file     extensions.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,17 +29,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the MNE Analyze project.
+# @brief    This project file builds the extensions for MNE Analyze project.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    libs \
-    mne_analyze \
-    extensions
-
-CONFIG += ordered

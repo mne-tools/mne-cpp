@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_analyze.pro
+# @file     libs.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     February, 2017
+# @date     July, 2017
 #
 # @section  LICENSE
 #
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,17 +29,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the MNE Analyze project.
+# @brief    This project file builds all mne_analyze libraries.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    libs \
-    mne_analyze \
-    extensions
 
 CONFIG += ordered
