@@ -72,6 +72,8 @@ namespace ANSHAREDLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class AnalyzeData;
+class AnalyzeSettings;
 
 
 //=========================================================================================================
@@ -91,7 +93,7 @@ public:
     /**
     * Destroys the IExtension.
     */
-    virtual ~IExtension() {};
+    virtual ~IExtension() {}
 
     //=========================================================================================================
     /**
@@ -120,9 +122,29 @@ public:
     */
     virtual QString getName() const = 0;
 
+
+    virtual bool hasControl() const;
+
+    virtual QWidget* getControl() const = 0;
+
+    virtual bool hasView() const;
+
+    virtual QWidget* getView() const = 0;
+
+
+    virtual inline void setData(QSharedPointer<AnalyzeData>& data);
+
+    virtual inline QSharedPointer<AnalyzeData>& data();
+
+    virtual inline void setSettings(QSharedPointer<AnalyzeSettings>& settings);
+
+    virtual inline QSharedPointer<AnalyzeSettings>& settings();
+
 protected:
 
 private:
+    QSharedPointer<AnalyzeData> m_analyzeData;
+    QSharedPointer<AnalyzeSettings> m_analyzeSettings;
 
 };
 
@@ -130,6 +152,51 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+bool IExtension::hasControl() const
+{
+    return getControl() != Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+bool IExtension::hasView() const
+{
+    return getView() != Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+void IExtension::setData(QSharedPointer<AnalyzeData> &data)
+{
+    m_analyzeData = data;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<AnalyzeData> &IExtension::data()
+{
+    return m_analyzeData;
+}
+
+
+//*************************************************************************************************************
+
+inline void IExtension::setSettings(QSharedPointer<AnalyzeSettings> &settings)
+{
+    m_analyzeSettings = settings;
+}
+
+
+//*************************************************************************************************************
+
+inline QSharedPointer<AnalyzeSettings> &IExtension::settings()
+{
+    return m_analyzeSettings;
+}
 
 } //Namespace
 
