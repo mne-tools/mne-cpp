@@ -41,6 +41,7 @@
 #include "info.h"
 #include "mainwindow.h"
 #include "mdiview.h"
+#include "../libs/anShared/Management/extensionmanager.h"
 
 
 //*************************************************************************************************************
@@ -48,6 +49,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMenu>
+#include <QMenuBar>
+#include <QDockWidget>
+#include <QAction>
 #include <QLabel>
 #include <QTextEdit>
 #include <QFileDialog>
@@ -60,6 +65,15 @@
 //=============================================================================================================
 
 using namespace MNEANALYZE;
+using namespace ANSHAREDLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CONST
+//=============================================================================================================
+
+const char* extensionDir = "/mne_analyze_extensions";        /**< holds path to the extensions.*/
 
 
 //*************************************************************************************************************
@@ -69,6 +83,7 @@ using namespace MNEANALYZE;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
+, m_pExtensionManager(new ANSHAREDLIB::ExtensionManager(this))
 {
     fprintf(stderr, "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),

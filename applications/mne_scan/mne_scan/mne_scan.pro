@@ -93,23 +93,23 @@ SOURCES += \
     main.cpp \
     startupwidget.cpp \
     runwidget.cpp \
-    mainwindow.cpp \
     mainsplashscreen.cpp \
     pluginscene.cpp \
     pluginitem.cpp \
     plugingui.cpp \
-    arrow.cpp
+    arrow.cpp \
+    mainwindow.cpp
 
 HEADERS += \
     info.h \
     startupwidget.h \
     runwidget.h \
-    mainwindow.h \
     mainsplashscreen.h \
     pluginscene.h \
     pluginitem.h \
     plugingui.h \
-    arrow.h
+    arrow.h \
+    mainwindow.h
 
 FORMS +=
 

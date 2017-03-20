@@ -65,6 +65,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+QT_BEGIN_NAMESPACE
 class QAction;
 class QActionGroup;//switch between log levels
 class QMenu;
@@ -74,6 +75,7 @@ class QTimer;
 class QTime;
 class QDockWidget;
 class QTextBrowser;
+QT_END_NAMESPACE
 
 namespace SCSHAREDLIB
 {
