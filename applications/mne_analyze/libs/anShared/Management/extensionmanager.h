@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     referencetoolbarwidget.h
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     extensionmanager.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,23 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ReferenceToolbarWidget class.
+* @brief    Contains the declaration of the ExtensionManager class.
 *
 */
 
-#ifndef REFERENCETOOLBARWIDGET_H
-#define REFERENCETOOLBARWIDGET_H
+#ifndef EXTENSIONMANAGER_H
+#define EXTENSIONMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "reference_global.h"
-#include "../reference.h"
-#include "../ui_referencetoolbar.h"
-
-#include <fiff/fiff_info.h>
+#include "../anshared_global.h"
 
 
 //*************************************************************************************************************
@@ -54,15 +49,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QVector>
+#include <QPluginLoader>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE REFERENCEPLUGIN
+// DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace REFERENCEPLUGIN
+namespace ANSHAREDLIB
 {
 
 
@@ -71,49 +67,80 @@ namespace REFERENCEPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Reference;
+class IExtension;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ReferenceToolbarWidget
+* DECLARE CLASS ExtensionManager
 *
-* @brief The ReferenceToolbarWidget class provides a dummy toolbar widget structure.
+* @brief The ExtensionManager class provides a dynamic plugin loader. As well as the handling of the loaded extensions.
 */
-
-class REFERENCESHARED_EXPORT ReferenceToolbarWidget : public QWidget
+class ANSHAREDSHARED_EXPORT ExtensionManager : public QPluginLoader
 {
     Q_OBJECT
 
+    friend class MainWindow;
+
 public:
-    typedef QSharedPointer<ReferenceToolbarWidget> SPtr;         /**< Shared pointer type for ReferenceToolbarWidget object. */
-    typedef QSharedPointer<ReferenceToolbarWidget> ConstSPtr;    /**< Const shared pointer type for ReferenceToolbarWidget object. */
+    typedef QSharedPointer<ExtensionManager> SPtr;               /**< Shared pointer type for ExtensionManager. */
+    typedef QSharedPointer<const ExtensionManager> ConstSPtr;    /**< Const shared pointer type for ExtensionManager. */
 
     //=========================================================================================================
     /**
-    * Constructs a ReferenceToolbarWidget.
+    * Constructs a ExtensionManager with the given parent.
+    *
+    * @param[in] parent pointer to parent Object. (It's normally the default value.)
     */
-    explicit ReferenceToolbarWidget(REFERENCEPLUGIN::Reference *pRef, QWidget *parent = 0);
+    ExtensionManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ReferenceToolbarWidget.
+    * Destroys the ExtensionManager.
     */
-    ~ReferenceToolbarWidget();
+    virtual ~ExtensionManager();
 
-public slots:
     //=========================================================================================================
     /**
-    * updates the channels and sets them to the QListWidget
+    * Loads extensions from given directory.
+    *
+    * @param dir the plugin directory.
     */
-    void updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo);
+    void loadExtension(const QString& dir);
+
+    //=========================================================================================================
+    /**
+    * Finds index of extension by name.
+    *
+    * @return index of extension.
+    * @param name the extension name.
+    */
+    int findByName(const QString& name);
+
+    //=========================================================================================================
+    /**
+    * Returns vector containing all plugins.
+    *
+    * @return reference to vector containing all plugins.
+    */
+    inline const QVector<IExtension*>& getExtensions();
+
 
 private:
-    Ui::ReferenceToolbarWidget*         ui;     /**< The UI class specified in the designer. */
-
-    Reference*                      m_pRef;     /**< pointer to the Reference object */
+    QVector<IExtension*>    m_qVecExtensions;       /**< Vector containing all extensions. */
 };
 
-} //REFERENCEPLUGIN
 
-#endif // REFERENCETOOLBARWIDGET_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline const QVector<IExtension*>& ExtensionManager::getExtensions()
+{
+    return m_qVecExtensions;
+}
+
+} // NAMESPACE
+
+#endif // EXTENSIONMANAGER_H

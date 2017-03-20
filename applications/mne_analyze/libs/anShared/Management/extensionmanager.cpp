@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     referencetoolbarwidget.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     extensionmanager.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Viktor Klüber, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ReferenceToolbarWidget class.
+* @brief    Contains the implementation of the ExtensionManager class.
 *
 */
 
@@ -39,7 +38,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "referencetoolbarwidget.h"
+#include "extensionmanager.h"
+
+#include "../Interfaces/IExtension.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDir>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -47,7 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REFERENCEPLUGIN;
+using namespace ANSHAREDLIB;
 
 
 //*************************************************************************************************************
@@ -55,31 +65,52 @@ using namespace REFERENCEPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ReferenceToolbarWidget::ReferenceToolbarWidget(REFERENCEPLUGIN::Reference *pRef, QWidget *parent)
-: ui(new Ui::ReferenceToolbarWidget)
-, m_pRef(pRef)
+ExtensionManager::ExtensionManager(QObject *parent)
+: QPluginLoader(parent)
 {
-    ui->setupUi(this);
+
 }
 
 
 //*************************************************************************************************************
 
-ReferenceToolbarWidget::~ReferenceToolbarWidget()
+ExtensionManager::~ExtensionManager()
 {
-    delete ui;
 }
 
 
 //*************************************************************************************************************
 
-void ReferenceToolbarWidget::updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo)
+void ExtensionManager::loadExtension(const QString& dir)
 {
-    ui->m_listWidget_ChannelList->clear();
+    QDir extensionsDir(dir);
 
-    for(int i = 0; i < pFiffInfo->chs.size(); i++){
-        if(pFiffInfo->chs.at(i).ch_name.contains("EEG")){
-            ui->m_listWidget_ChannelList->addItem(pFiffInfo->chs.at(i).ch_name);
+    foreach(QString file, extensionsDir.entryList(QDir::Files))
+    {
+        this->setFileName(extensionsDir.absoluteFilePath(file));
+        QObject *pExtension = this->instance();
+
+        // IExtension
+        if(pExtension) {
+            fprintf(stderr,"Loading Extension %s\n",file.toUtf8().constData());
+            m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
+        }
+        else {
+            fprintf(stderr,"Extension %s could not be instantiated!\n",file.toUtf8().constData());
         }
     }
+
+}
+
+
+//*************************************************************************************************************
+
+int ExtensionManager::findByName(const QString& name)
+{
+    QVector<IExtension*>::const_iterator it = m_qVecExtensions.begin();
+    for(int i = 0; it != m_qVecExtensions.end(); ++i, ++it)
+        if((*it)->getName() == name)
+            return i;
+
+    return -1;
 }
