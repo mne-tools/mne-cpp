@@ -209,7 +209,23 @@ protected:
     *
     * @param [in] matData   The new data block.
     */
-    void updateHPI(const Eigen::MatrixXf &matData);
+    void updateHPI(const Eigen::MatrixXf &matData);    
+
+    //=========================================================================================================
+    /**
+    * Sends the current data block to the HPI dialog and performs a fit.
+    *
+    * @param [in] matData   The data block to which the HPI information is to be written.
+    */
+    void doContinousHPI(Eigen::MatrixXf& matData);
+
+    //=========================================================================================================
+    /**
+    * Toggles teh continous HPI flag.
+    *
+    * @param [in] bDoContinousHPI   Whether to do continous HPI.
+    */
+    void onContinousHPIToggled(bool bDoContinousHPI);
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
@@ -223,6 +239,7 @@ protected:
 
     bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
     bool                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
+    bool                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
 
     QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
     QString                 m_sFiffSimulatorClientAlias;    /**< The rt server client alias.*/
