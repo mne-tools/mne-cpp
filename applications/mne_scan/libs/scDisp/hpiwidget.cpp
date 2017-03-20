@@ -95,6 +95,7 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
+, m_dMaxHPIFitError(0.01)
 {
     ui->setupUi(this);
 
@@ -116,6 +117,9 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 
     connect(ui->m_checkBox_continousHPI, &QCheckBox::clicked,
             this, &HPIWidget::onDoContinousHPI);
+
+    connect(ui->m_doubleSpinBox_maxHPIContinousDist, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &HPIWidget::onContinousHPIMaxDistChanged);
 
     //Setup View3D
     m_pView3D->setModel(m_pData3DModel);
@@ -388,7 +392,15 @@ void HPIWidget::onDoContinousHPI()
 
 //*************************************************************************************************************
 
-void HPIWidget::performHPIFitting()
+void HPIWidget::onContinousHPIMaxDistChanged()
+{
+    m_dMaxHPIFitError = ui->m_doubleSpinBox_maxHPIContinousDist->value() * 0.001;
+}
+
+
+//*************************************************************************************************************
+
+bool HPIWidget::performHPIFitting()
 {
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
     //rt head motion correction will be performed using the rtHPI plugin.
@@ -406,6 +418,16 @@ void HPIWidget::performHPIFitting()
                               m_vGof,
                               t_fittedSet,
                               m_pFiffInfo);
+
+            //Check if git meets distance requirement (GOF)
+            double meanErrorDist = 0;
+            for(int i = 0; i < m_vGof.size(); ++i) {
+                meanErrorDist += m_vGof.at(i);
+            }
+            meanErrorDist = meanErrorDist/m_vGof.size();
+            if(meanErrorDist > m_dMaxHPIFitError) {
+                return false;
+            }
 
             //Set newly calculated transformation matrix to fiff info
             m_pFiffInfo->dev_head_t = transDevHead;
@@ -478,4 +500,6 @@ void HPIWidget::performHPIFitting()
             }
         }        
     }
+
+     return true;
 }
