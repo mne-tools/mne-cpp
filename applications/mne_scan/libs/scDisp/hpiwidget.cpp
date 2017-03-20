@@ -426,8 +426,13 @@ bool HPIWidget::performHPIFitting()
             }
             meanErrorDist = meanErrorDist/m_vGof.size();
             if(meanErrorDist > m_dMaxHPIFitError) {
+                ui->m_label_fitFeedback->setText("Bad Fit");
+                ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : red;}");
                 return false;
             }
+
+            ui->m_label_fitFeedback->setText("Good Fit");
+            ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : green;}");
 
             //Set newly calculated transformation matrix to fiff info
             m_pFiffInfo->dev_head_t = transDevHead;
