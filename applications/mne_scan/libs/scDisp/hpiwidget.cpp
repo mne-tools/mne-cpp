@@ -425,6 +425,8 @@ bool HPIWidget::performHPIFitting()
                 meanErrorDist += m_vGof.at(i);
             }
             meanErrorDist = meanErrorDist/m_vGof.size();
+
+            ui->m_label_averagedFitError->setText(QString::number(meanErrorDist*1000,'f',2)+QString("mm"));
             if(meanErrorDist > m_dMaxHPIFitError) {
                 ui->m_label_fitFeedback->setText("Bad Fit");
                 ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : red;}");
@@ -462,45 +464,45 @@ bool HPIWidget::performHPIFitting()
             //Update labels with new dev/trans amtrix
             FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
 
-            ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
-            ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
-            ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
-            ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
+            ui->m_label_mat00->setText(QString::number(devHeadTrans.trans(0,0),'f',4));
+            ui->m_label_mat01->setText(QString::number(devHeadTrans.trans(0,1),'f',4));
+            ui->m_label_mat02->setText(QString::number(devHeadTrans.trans(0,2),'f',4));
+            ui->m_label_mat03->setText(QString::number(devHeadTrans.trans(0,3),'f',4));
 
-            ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
-            ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
-            ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
-            ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
+            ui->m_label_mat10->setText(QString::number(devHeadTrans.trans(1,0),'f',4));
+            ui->m_label_mat11->setText(QString::number(devHeadTrans.trans(1,1),'f',4));
+            ui->m_label_mat12->setText(QString::number(devHeadTrans.trans(1,2),'f',4));
+            ui->m_label_mat13->setText(QString::number(devHeadTrans.trans(1,3),'f',4));
 
-            ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
-            ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
-            ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
-            ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
+            ui->m_label_mat20->setText(QString::number(devHeadTrans.trans(2,0),'f',4));
+            ui->m_label_mat21->setText(QString::number(devHeadTrans.trans(2,1),'f',4));
+            ui->m_label_mat22->setText(QString::number(devHeadTrans.trans(2,2),'f',4));
+            ui->m_label_mat23->setText(QString::number(devHeadTrans.trans(2,3),'f',4));
 
-            ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
-            ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
-            ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
-            ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+            ui->m_label_mat30->setText(QString::number(devHeadTrans.trans(3,0),'f',4));
+            ui->m_label_mat31->setText(QString::number(devHeadTrans.trans(3,1),'f',4));
+            ui->m_label_mat32->setText(QString::number(devHeadTrans.trans(3,2),'f',4));
+            ui->m_label_mat33->setText(QString::number(devHeadTrans.trans(3,3),'f',4));
 
             //Update gof labels and transform from m to mm
             QString sGof("0mm");
             if(m_vGof.size() > 0) {
-                sGof = QString("%1mm").arg(1000*m_vGof[0]);
+                sGof = QString::number(m_vGof[0]*1000,'f',2)+QString("mm");
                 ui->m_label_gofCoil1->setText(sGof);
             }
 
             if(m_vGof.size() > 1) {
-                sGof = QString("%1mm").arg(1000*m_vGof[1]);
+                sGof = QString::number(m_vGof[1]*1000,'f',2)+QString("mm");
                 ui->m_label_gofCoil2->setText(sGof);
             }
 
             if(m_vGof.size() > 2) {
-                sGof = QString("%1mm").arg(1000*m_vGof[2]);
+                sGof = QString::number(m_vGof[2]*1000,'f',2)+QString("mm");
                 ui->m_label_gofCoil3->setText(sGof);
             }
 
             if(m_vGof.size() > 3) {
-                sGof = QString("%1mm").arg(1000*m_vGof[3]);
+                sGof = QString::number(m_vGof[3]*1000,'f',2)+QString("mm");
                 ui->m_label_gofCoil4->setText(sGof);
             }
         }        
