@@ -1,17 +1,15 @@
 //=============================================================================================================
 /**
-* @file     mainwindow.h
-* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
-*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     viewerwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2015
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -34,97 +32,82 @@
 *
 * @brief
 *
-*
-*@file
-*       mainwindow.cpp
-*       mainwindow.ui
 */
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include "viewerwidget.h"
-#include "aboutwindow.h"
+
+#include "mdiview.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QMainWindow>
-#include <QString>
-#include <QFileDialog>
-#include <QDockWidget>
-#include <QtWidgets/QGridLayout>
+using namespace MNEANALYZE;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DECLARE NAMESPACE Ui
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace Ui {
-class MainWindow;
+MdiView::MdiView(QWidget *parent)
+: QWidget(parent)
+{
+    //QGridLayout is used so the viewer and MdiArea can fit always the size of MainWindow
+    m_gridLayout = new QGridLayout(this);
+    //Multiple Display Area, created inside ViewerWidget
+    m_MdiArea = new QMdiArea(this);
+    m_gridLayout->addWidget(m_MdiArea);
+
+    //=============================================================================================================
+    //
+    //Pial surface
+    //
+    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+    m_view3d_pial = new View3DAnalyze(1);
+    //A new subwindow is created
+    m_MdiArea->addSubWindow(m_view3d_pial);
+    m_view3d_pial->setWindowTitle("Pial surface");
+
+    //Cascade subwindows
+    this->m_MdiArea->cascadeSubWindows();
 }
 
+
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
 
-class MainWindow : public QMainWindow
+void MdiView::CascadeSubWindows()
 {
-    Q_OBJECT
+    //Arrange subwindows in a Tile mode    //Arrange subwindows in a Tile mode
+    this->m_MdiArea->cascadeSubWindows();
+}
 
-//=============================================================================================================
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+//*************************************************************************************************************
 
-//=============================================================================================================
+void MdiView::TileSubWindows()
+{
+    //Arrange subwindows in a Tile mode
+    this->m_MdiArea->tileSubWindows();
+}
 
-private slots:
 
-    //AboutWindow
-    void on_actionAbout_triggered();
+//*************************************************************************************************************
 
-    //MdiArea subwindows
-    void on_actionCascade_triggered();
-    void on_actionTile_triggered();
+void MdiView::ReloadSurfaces()
+{
+//    //Not working at the time
+//    m_MdiArea->addSubWindow(m_view3d_pial);
+//    m_view3d_pial->setWindowTitle("Pial surface");
+}
 
-    //Open a FIFF file
-    void on_actionOpen_data_file_triggered();
 
-    //Docks
-    void CreateDockWindows();
-    void on_actionReload_surfaces_triggered();
+//*************************************************************************************************************
 
-//=============================================================================================================
-
-private:
-
-    //Ui setup
-    Ui::MainWindow          *ui;
-
-    //ViewerWIdget
-    ViewerWidget            *m_viewerWidget;
-
-    //AboutWindow
-    AboutWindow             *m_about;
-
-    //FIFF File management
-    QString                 m_fiffFileName;
-
-    //QFile m_fiffFile;
-
-    //Dock Widgets
-    QDockWidget             *m_layersDock;
-    QDockWidget             *m_informationDock;
-
-};
-
-#endif // MAINWINDOW_H
+MdiView::~MdiView()
+{
+}
