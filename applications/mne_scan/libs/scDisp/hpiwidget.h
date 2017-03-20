@@ -127,6 +127,13 @@ public:
     */
     void setData(const Eigen::MatrixXd& data);
 
+    //=========================================================================================================
+    /**
+    * Perform a single HPI fit.
+    *
+    */
+    void onBtnDoSingleFit();
+
 protected:
      virtual void closeEvent( QCloseEvent * event );
 
@@ -155,30 +162,26 @@ protected:
     //=========================================================================================================
     /**
     * Read Polhemus data from fif file.
-    *
     */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(QString fileName);
 
     //=========================================================================================================
     /**
-    * Perform a single HPI fit.
-    *
-    */
-    void onBtnDoSingleFit();
-
-    //=========================================================================================================
-    /**
     * Load a Polhemus file name.
-    *
     */
     void onBtnLoadPolhemusFile();
 
     //=========================================================================================================
     /**
     * Load a Polhemus file name.
-    *
     */
     void onFreqsChanged();
+
+    //=========================================================================================================
+    /**
+    * Load a Polhemus file name.
+    */
+    void onDoContinousHPI();
 
     //=========================================================================================================
     /**
@@ -199,6 +202,14 @@ protected:
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;     /**< The Disp3D model. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The FiffInfo. */
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user toggled the do HPI check box.
+    *
+    * @param[in] state    Whether to do continous HPI.
+    */
+    void continousHPIToggled(bool state);
 };
 } //NAMESPACE
 #endif // HPIWIDGET_H
