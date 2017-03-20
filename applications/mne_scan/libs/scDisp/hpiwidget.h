@@ -130,8 +130,10 @@ public:
     //=========================================================================================================
     /**
     * Perform a HPI fitting procedure.
+    *
+    * @return Returns true if fit was succesfull and meets the distance requirement.
     */
-    void performHPIFitting();
+    bool performHPIFitting();
 
     //=========================================================================================================
     /**
@@ -190,6 +192,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * The max distance value for continous HPI fitting changed.
+    */
+    void onContinousHPIMaxDistChanged();
+
+    //=========================================================================================================
+    /**
     * Perform a single HPI fit.
     *
     */
@@ -207,6 +215,7 @@ protected:
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;     /**< The Disp3D model. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The FiffInfo. */
 
+    double                                      m_dMaxHPIFitError;  /**< The maximum HPI fitting error allowed.*/
 signals:
     //=========================================================================================================
     /**

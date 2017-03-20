@@ -386,7 +386,9 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorData(const QString& subject,
 
 //*************************************************************************************************************
 
-DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject, const QString& sMeasurementSetName, const FIFFLIB::FiffDigPointSet& tDigitizer)
+DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& subject,
+                                                        const QString& sMeasurementSetName,
+                                                        const FIFFLIB::FiffDigPointSet& tDigitizer)
 {
     DigitizerSetTreeItem* pReturnItem = Q_NULLPTR;
 

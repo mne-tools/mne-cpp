@@ -112,7 +112,7 @@ BabyMEG::BabyMEG()
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/babymeg/both.bad")
 , m_iRecordingMSeconds(5*60*1000)
 , m_iSplitCount(0)
-, m_dMaxHPIFitError(0.01)
+, m_bDoContinousHPI(false)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -676,16 +676,7 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
 //    qz = qz / norm2;
 
     if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
-        m_pHPIWidget->performHPIFitting();
-
-        QVector<double> vGof = m_pHPIWidget->getGOF();
-        double meanErrorDist = 0;
-        for(int i = 0; i < vGof.size(); ++i) {
-            meanErrorDist += vGof.at(i);
-        }
-        meanErrorDist = meanErrorDist/vGof.size();
-
-        if(meanErrorDist <= m_dMaxHPIFitError) {
+        if(m_pHPIWidget->performHPIFitting()) {
             // Load device to head transformation matrix from Fiff info
             QMatrix3x3 rot;
 

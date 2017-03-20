@@ -284,7 +284,9 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    DigitizerSetTreeItem* addDigitizerData(const QString& subject, const QString& sMeasurementSetName, const FIFFLIB::FiffDigPointSet &tDigitizer);
+    DigitizerSetTreeItem* addDigitizerData(const QString& subject,
+                                           const QString& sMeasurementSetName,
+                                           const FIFFLIB::FiffDigPointSet &tDigitizer);
 
     //=========================================================================================================
     /**
