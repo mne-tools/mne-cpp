@@ -512,6 +512,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                           FiffInfo::SPtr pFiffInfo,
                           const QString& sHPIResourceDir)
 {
+    //Check if data was passed
+    if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
+        qDebug()<< "HPIFit::fitHPI - No data passed. Returning.";
+    }
+
     vGof.clear();
 
     struct sens sensors;
