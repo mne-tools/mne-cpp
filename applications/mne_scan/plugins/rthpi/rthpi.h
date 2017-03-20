@@ -86,34 +86,12 @@ using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace RTPROCESSINGLIB;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// Declare all structures to be used
-//=============================================================================================================
-
-struct coilParam {
-    Eigen::MatrixXd pos;
-    Eigen::MatrixXd mom;
-};
-
-struct dipError {
-    double error;
-    Eigen::MatrixXd moment;
-};
-
-struct sens {
-    Eigen::MatrixXd coilpos;
-    Eigen::MatrixXd coilori;
-    Eigen::MatrixXd tra;
-};
-
-
 
 //=============================================================================================================
 /**
 * DECLARE CLASS RTHPI
 *
-* @brief The RtHpi class provides a RtHpi algorithm structure.
+* @brieCoilParampi class provides a RtHpi algorithm structure.
 */
 class RTHPISHARED_EXPORT RtHpi : public IAlgorithm
 {

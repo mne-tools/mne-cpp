@@ -147,8 +147,8 @@ bool RtHPIS::stop()
 
 void RtHPIS::run()
 {
-//    struct sens sensors;
-//    struct coilParam coil;
+//    struct SensorInfo sensors;
+//    struct CoilParam coil;
 //    int numCoils = 4;
 //    int numCh = m_pFiffInfo->nchan;
 //    int samF = m_pFiffInfo->sfreq;
