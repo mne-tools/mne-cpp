@@ -349,31 +349,7 @@ void HPIWidget::onBtnDoSingleFit()
        return;
     }
 
-    this->performHPIFitting(m_vCoilFreqs);
-
-    if(m_pFiffInfo) {
-        FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
-
-        ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
-        ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
-        ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
-        ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
-
-        ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
-        ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
-        ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
-        ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
-
-        ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
-        ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
-        ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
-        ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
-
-        ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
-        ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
-        ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
-        ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
-    }
+    this->performHPIFitting();
 }
 
 
@@ -430,7 +406,7 @@ void HPIWidget::onDoContinousHPI()
 
 //*************************************************************************************************************
 
-void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
+void HPIWidget::performHPIFitting()
 {
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
     //rt head motion correction will be performed using the rtHPI plugin.
@@ -445,7 +421,7 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
 
             HPIFit::fitHPI(m_matValue,
                               transDevHead,
-                              vFreqs,
+                              m_vCoilFreqs,
                               vGof,
                               t_fittedSet,
                               m_pFiffInfo);
@@ -474,6 +450,29 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
             }
 
             this->setDigitizerDataToView3D(t_digSet, t_fittedSet, vGof);
-        }
+
+            //Update labels with new dev/trans amtrix
+            FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
+
+            ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
+            ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
+            ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
+            ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
+
+            ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
+            ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
+            ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
+            ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
+
+            ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
+            ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
+            ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
+            ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
+
+            ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
+            ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
+            ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
+            ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+        }        
     }
 }

@@ -129,10 +129,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Perform a single HPI fit.
-    *
+    * Perform a HPI fitting procedure.
     */
-    void onBtnDoSingleFit();
+    void performHPIFitting();
 
 protected:
      virtual void closeEvent( QCloseEvent * event );
@@ -185,11 +184,10 @@ protected:
 
     //=========================================================================================================
     /**
-    * Perform a HPI fitting procedure.
+    * Perform a single HPI fit.
     *
-    * @param[in] vFreqs    the frequencies for each coil.
     */
-    void performHPIFitting(const QVector<int>& vFreqs);
+    void onBtnDoSingleFit();
 
     Ui::HPIWidget*                              ui;                 /**< The HPI dialog. */
 
