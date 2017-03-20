@@ -184,50 +184,250 @@
         <string>2 - HPI fitting</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="13" column="1">
-         <widget class="QLabel" name="m_label_gofCoil2Description">
+        <item row="10" column="1">
+         <widget class="QLabel" name="m_label_mat21">
           <property name="text">
-           <string>Coil 2</string>
+           <string>0</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="13" column="0">
-         <widget class="QLabel" name="m_label_gofCoil1Description">
+        <item row="7" column="0" colspan="4">
+         <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Coil 1</string>
+           <string>Computed dev/head transformation matrix:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="4">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Coil frequencies (as set in LabView):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QLabel" name="m_label_mat10">
+          <property name="text">
+           <string>0</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="13" column="3">
-         <widget class="QLabel" name="m_label_gofCoil4Description">
+        <item row="2" column="3">
+         <widget class="QSpinBox" name="m_spinBox_freqCoil4">
+          <property name="suffix">
+           <string>Hz</string>
+          </property>
+          <property name="maximum">
+           <number>500</number>
+          </property>
+          <property name="value">
+           <number>220</number>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QLabel" name="m_label_mat20">
           <property name="text">
-           <string>Coil 4</string>
+           <string>0</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="13" column="2">
-         <widget class="QLabel" name="m_label_gofCoil3Description">
+        <item row="9" column="1">
+         <widget class="QLabel" name="m_label_mat11">
           <property name="text">
-           <string>Coil 3</string>
+           <string>1</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="12" column="0" colspan="4">
-         <widget class="QLabel" name="label_11">
+        <item row="11" column="0">
+         <widget class="QLabel" name="m_label_mat30">
           <property name="text">
-           <string>Fitting error:</string>
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="2">
+         <widget class="QLabel" name="m_label_mat32">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="QLabel" name="m_label_mat31">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="2">
+         <widget class="QLabel" name="m_label_mat22">
+          <property name="text">
+           <string>1</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="2">
+         <widget class="QLabel" name="m_label_mat12">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="3">
+         <widget class="QLabel" name="m_label_mat23">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="m_label_freqCoil4">
+          <property name="text">
+           <string>Coil 4:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="3">
+         <widget class="QLabel" name="m_label_mat03">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="2">
+         <widget class="QLabel" name="m_label_mat02">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="3">
+         <widget class="QLabel" name="m_label_mat13">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="0">
+         <widget class="QLabel" name="m_label_gofCoil1">
+          <property name="text">
+           <string>0mm</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="3">
+         <widget class="QLabel" name="m_label_mat33">
+          <property name="text">
+           <string>1</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QSpinBox" name="m_spinBox_freqCoil2">
+          <property name="suffix">
+           <string>Hz</string>
+          </property>
+          <property name="maximum">
+           <number>500</number>
+          </property>
+          <property name="value">
+           <number>165</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="m_label_freqCoil3">
+          <property name="text">
+           <string>Coil 3:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="m_spinBox_freqCoil3">
+          <property name="suffix">
+           <string>Hz</string>
+          </property>
+          <property name="maximum">
+           <number>500</number>
+          </property>
+          <property name="value">
+           <number>190</number>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="1">
+         <widget class="QLabel" name="m_label_gofCoil2">
+          <property name="text">
+           <string>0mm</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="3">
+         <widget class="QLabel" name="m_label_gofCoil4">
+          <property name="text">
+           <string>0mm</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="2">
+         <widget class="QLabel" name="m_label_gofCoil3">
+          <property name="text">
+           <string>0mm</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -286,16 +486,6 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
-         <widget class="QLabel" name="m_label_mat01">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="8" column="0">
          <widget class="QLabel" name="m_label_mat00">
           <property name="text">
@@ -306,22 +496,8 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="0" colspan="4">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Computed dev/head transformation matrix:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="4">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Coil frequencies (as set in LabView):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <widget class="QLabel" name="m_label_mat10">
+        <item row="8" column="1">
+         <widget class="QLabel" name="m_label_mat01">
           <property name="text">
            <string>0</string>
           </property>
@@ -330,226 +506,57 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="1">
-         <widget class="QLabel" name="m_label_mat21">
+        <item row="13" column="1">
+         <widget class="QLabel" name="m_label_gofCoil2Description">
           <property name="text">
-           <string>0</string>
+           <string>Coil 2</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="9" column="1">
-         <widget class="QLabel" name="m_label_mat11">
+        <item row="13" column="3">
+         <widget class="QLabel" name="m_label_gofCoil4Description">
           <property name="text">
-           <string>1</string>
+           <string>Coil 4</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="10" column="0">
-         <widget class="QLabel" name="m_label_mat20">
+        <item row="13" column="2">
+         <widget class="QLabel" name="m_label_gofCoil3Description">
           <property name="text">
-           <string>0</string>
+           <string>Coil 3</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
-         <widget class="QLabel" name="m_label_mat30">
+        <item row="12" column="0" colspan="4">
+         <widget class="QLabel" name="label_11">
           <property name="text">
-           <string>0</string>
+           <string>Fitting error:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0">
+         <widget class="QLabel" name="m_label_gofCoil1Description">
+          <property name="text">
+           <string>Coil 1</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="2" column="3">
-         <widget class="QSpinBox" name="m_spinBox_freqCoil4">
-          <property name="suffix">
-           <string>Hz</string>
-          </property>
-          <property name="maximum">
-           <number>500</number>
-          </property>
-          <property name="value">
-           <number>220</number>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="2">
-         <widget class="QLabel" name="m_label_mat22">
+        <item row="15" column="0" colspan="4">
+         <widget class="QCheckBox" name="m_checkBox_continousHPI">
           <property name="text">
-           <string>1</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="3">
-         <widget class="QLabel" name="m_label_mat23">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="2">
-         <widget class="QLabel" name="m_label_mat32">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="1">
-         <widget class="QLabel" name="m_label_mat31">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="2">
-         <widget class="QLabel" name="m_label_mat12">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="m_label_freqCoil4">
-          <property name="text">
-           <string>Coil 4:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="3">
-         <widget class="QLabel" name="m_label_mat03">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="2">
-         <widget class="QLabel" name="m_label_mat02">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="3">
-         <widget class="QLabel" name="m_label_mat13">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="m_label_freqCoil3">
-          <property name="text">
-           <string>Coil 3:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="3">
-         <widget class="QLabel" name="m_label_mat33">
-          <property name="text">
-           <string>1</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QSpinBox" name="m_spinBox_freqCoil2">
-          <property name="suffix">
-           <string>Hz</string>
-          </property>
-          <property name="maximum">
-           <number>500</number>
-          </property>
-          <property name="value">
-           <number>165</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="m_spinBox_freqCoil3">
-          <property name="suffix">
-           <string>Hz</string>
-          </property>
-          <property name="maximum">
-           <number>500</number>
-          </property>
-          <property name="value">
-           <number>190</number>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="0">
-         <widget class="QLabel" name="m_label_gofCoil1">
-          <property name="text">
-           <string>0mm</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="1">
-         <widget class="QLabel" name="m_label_gofCoil2">
-          <property name="text">
-           <string>0mm</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="2">
-         <widget class="QLabel" name="m_label_gofCoil3">
-          <property name="text">
-           <string>0mm</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="3">
-         <widget class="QLabel" name="m_label_gofCoil4">
-          <property name="text">
-           <string>0mm</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Do continous HPI fitting</string>
           </property>
          </widget>
         </item>

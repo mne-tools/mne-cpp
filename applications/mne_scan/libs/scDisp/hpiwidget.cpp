@@ -114,6 +114,9 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     connect(ui->m_spinBox_freqCoil4, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
             this, &HPIWidget::onFreqsChanged);
 
+    connect(ui->m_checkBox_continousHPI, &QCheckBox::clicked,
+            this, &HPIWidget::onDoContinousHPI);
+
     //Setup View3D
     m_pView3D->setModel(m_pData3DModel);
 
@@ -334,7 +337,7 @@ void HPIWidget::onBtnDoSingleFit()
 {    
     if(!this->hpiLoaded()) {
        QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at lesat 3 HPI coils first!");
+       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first!");
        msgBox.exec();
        return;
     }
@@ -419,6 +422,14 @@ void HPIWidget::onFreqsChanged()
 
 //*************************************************************************************************************
 
+void HPIWidget::onDoContinousHPI()
+{
+    emit continousHPIToggled(ui->m_checkBox_continousHPI->isChecked());
+}
+
+
+//*************************************************************************************************************
+
 void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
 {
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
@@ -438,8 +449,6 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
                               vGof,
                               t_fittedSet,
                               m_pFiffInfo);
-
-            m_matValue.resize(0,0);
 
             //Set newly calculated transformation matrix to fiff info
             m_pFiffInfo->dev_head_t = transDevHead;
