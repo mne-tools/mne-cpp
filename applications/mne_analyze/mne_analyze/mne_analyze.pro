@@ -88,25 +88,20 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-    main.cpp \   
-    Windows/mainwindow.cpp \
-    Windows/aboutwindow.cpp \
-    Windows/viewerwidget.cpp \
+    main.cpp \
     Views/baseview.cpp \
-    Views/view3danalyze.cpp
+    Views/view3danalyze.cpp \
+    mainwindow.cpp \
+    mdiview.cpp
 
 HEADERS += \
     info.h \
-    Windows/mainwindow.h \
-    Windows/aboutwindow.h \
-    Windows/viewerwidget.h \
     Views/baseview.h \
-    Views/view3danalyze.h
+    Views/view3danalyze.h \
+    mainwindow.h \
+    mdiview.h
 
-FORMS += \
-    Windows/mainwindow.ui \
-    Windows/aboutwindow.ui \
-    Windows/viewerwidget.ui
+FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

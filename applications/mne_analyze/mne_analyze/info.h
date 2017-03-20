@@ -96,7 +96,7 @@ public:
     */
     const static QString AppNameShort()
     {
-        return QObject::tr("MNE_ANALYZE");
+        return QObject::tr("MNE Analyze");
     }
 
     //=========================================================================================================
@@ -107,7 +107,7 @@ public:
     */
     const static QString AppName()
     {
-        return QObject::tr("Co-Registration and Source Localization.");
+        return QObject::tr("Data Analysis and Machine Learning.");
     }
 
     //=========================================================================================================
@@ -138,7 +138,7 @@ public:
     */
     static int MinorVersion()
     {
-        return 2;
+        return 0;
     }
 
     //=========================================================================================================

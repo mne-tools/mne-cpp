@@ -1,17 +1,15 @@
 //=============================================================================================================
 /**
-* @file     viewerwidget.h
-* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
-*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     mainwindow.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2015
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -32,86 +30,111 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief
+* @brief    Contains the declaration of the MainWindow class.
 *
-*
-* @file
-*           viewerwidget.cpp
-*           viewerwidget.ui
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE
-//=============================================================================================================
-
-#ifndef VIEWERWIDGET_H
-#define VIEWERWIDGET_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QMdiArea>
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Views/view3danalyze.h"
+#include "mdiview.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE
+// Qt INCLUDES
 //=============================================================================================================
 
-namespace Ui {
-class ViewerWidget;
-}
+#include <QMainWindow>
+#include <QMenuBar>
+#include <QDockWidget>
+#include <QAction>
+#include <QString>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEANALYZE
+//=============================================================================================================
+
+namespace MNEANALYZE
+{
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ViewerWidget : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
-//=============================================================================================================
 public:
-    //Constructor
-    explicit ViewerWidget(QWidget *parent = 0);
-    //Cascade subwindows
-    void CascadeSubWindows();
-    //Tile subwindows
-    void TileSubWindows();
-    //Reload demo surfaces
-    void ReloadSurfaces();
-    //Destructor
-    ~ViewerWidget();
+    typedef QSharedPointer<MainWindow> SPtr;               /**< Shared pointer type for MainWindow. */
+    typedef QSharedPointer<const MainWindow> ConstSPtr;    /**< Const shared pointer type for MainWindow. */
 
-//=============================================================================================================
+    MainWindow(QWidget *parent = 0);
+
+    ~MainWindow();
+
+
 private:
 
-    //Ui settings
-    Ui::ViewerWidget        *ui;
+    void createActions();       /**< Creates all actions for user interface of MainWindow class. */
+    void createMenus();         /**< Creates all menus for user interface of MainWindow class. */
+    void createDockWindow();
 
-    //Layout
-    QGridLayout             *m_gridLayout;
+    QAction*                            m_pActionOpenDataFile;      /**< open data file action */
+    QAction*                            m_pActionExit;              /**< exit application action */
 
-    //ViewD object
-    View3DAnalyze           *m_view3d_test,
-                            *m_view3d_pial,
-                            *m_view3d_inflated,
-                            *m_view3d_original,
-                            *m_vie3d_white;
+    QAction*                            m_pActionCascade;           /**< view cascade action */
+    QAction*                            m_pActionTile;              /**< view tile action */
 
-    //Multiple Display Area
-    QMdiArea                *m_MdiArea;
+    QAction*                            m_pActionAbout;             /**< show about dialog action */
+
+    //Main Window Menu
+    QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
+    QMenu*                              m_pMenuView;    /**< Holds the view menu.*/
+    QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
+
+
+
+    QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
+
+
+private:
+
+    //MdiArea subwindows
+    void viewCascade();
+    void viewTile();
+
+    //Open a FIFF file
+    void openFiffFile();            /**< Implements open fiff action.*/
+    void about();                   /**< Implements about action.*/
+
+
+private:
+
+
+
+
+    //MDI Central View
+    MdiView            *m_mdiView;
+
+    //FIFF File management
+    QString                 m_fiffFileName;
+
+    //Dock Widgets
+    QDockWidget             *m_layersDock;
+    QDockWidget             *m_informationDock;
+
 };
 
-#endif // VIEWERWIDGET_H
+}// NAMESPACE
+
+#endif // MAINWINDOW_H

@@ -1,17 +1,15 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2015
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,7 +41,7 @@
 
 #include <stdio.h>
 #include "info.h"
-#include "Windows/mainwindow.h"
+#include "mainwindow.h"
 
 
 //*************************************************************************************************************

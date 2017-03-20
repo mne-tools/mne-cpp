@@ -47,8 +47,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
+#include <QMenu>
+#include <QDockWidget>
 #include <QSharedPointer>
-#include <QAction>
 
 
 //*************************************************************************************************************
@@ -84,34 +86,33 @@ class AnalyzeSettings;
 */
 class IExtension
 {
-//    Q_OBJECT
 public:
     typedef QSharedPointer<IExtension> SPtr;               /**< Shared pointer type for IExtension. */
     typedef QSharedPointer<const IExtension> ConstSPtr;    /**< Const shared pointer type for IExtension. */
 
     //=========================================================================================================
     /**
-    * Destroys the IExtension.
+    * Destroys the extension.
     */
     virtual ~IExtension() {}
 
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * Clone the extension
     */
     virtual QSharedPointer<IExtension> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Initializes the plugin.
+    * Initializes the extension.
     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    * Is called when extension unloaded.
     */
-    virtual void unload() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+    virtual void unload() = 0;
 
     //=========================================================================================================
     /**
@@ -123,22 +124,26 @@ public:
     virtual QString getName() const = 0;
 
 
+    virtual bool hasMenu() const;
+
+    virtual QMenu* getMenu() const = 0;
+
     virtual bool hasControl() const;
 
-    virtual QWidget* getControl() const = 0;
+    virtual QDockWidget* getControl() const = 0;
 
     virtual bool hasView() const;
 
     virtual QWidget* getView() const = 0;
 
 
-    virtual inline void setData(QSharedPointer<AnalyzeData>& data);
+    virtual inline void setGlobalData(QSharedPointer<AnalyzeData>& globalData);
 
-    virtual inline QSharedPointer<AnalyzeData>& data();
+    virtual inline QSharedPointer<AnalyzeData>& globalData();
 
-    virtual inline void setSettings(QSharedPointer<AnalyzeSettings>& settings);
+    virtual inline void setGlobalSettings(QSharedPointer<AnalyzeSettings>& globalSettings);
 
-    virtual inline QSharedPointer<AnalyzeSettings>& settings();
+    virtual inline QSharedPointer<AnalyzeSettings>& globalSettings();
 
 protected:
 
@@ -152,6 +157,14 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+bool IExtension::hasMenu() const
+{
+    return getMenu() != Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
 
 bool IExtension::hasControl() const
 {
@@ -169,7 +182,7 @@ bool IExtension::hasView() const
 
 //*************************************************************************************************************
 
-void IExtension::setData(QSharedPointer<AnalyzeData> &data)
+void IExtension::setGlobalData(QSharedPointer<AnalyzeData> &data)
 {
     m_analyzeData = data;
 }
@@ -177,7 +190,7 @@ void IExtension::setData(QSharedPointer<AnalyzeData> &data)
 
 //*************************************************************************************************************
 
-QSharedPointer<AnalyzeData> &IExtension::data()
+QSharedPointer<AnalyzeData> &IExtension::globalData()
 {
     return m_analyzeData;
 }
@@ -185,7 +198,7 @@ QSharedPointer<AnalyzeData> &IExtension::data()
 
 //*************************************************************************************************************
 
-inline void IExtension::setSettings(QSharedPointer<AnalyzeSettings> &settings)
+void IExtension::setGlobalSettings(QSharedPointer<AnalyzeSettings> &settings)
 {
     m_analyzeSettings = settings;
 }
@@ -193,7 +206,7 @@ inline void IExtension::setSettings(QSharedPointer<AnalyzeSettings> &settings)
 
 //*************************************************************************************************************
 
-inline QSharedPointer<AnalyzeSettings> &IExtension::settings()
+QSharedPointer<AnalyzeSettings> &IExtension::globalSettings()
 {
     return m_analyzeSettings;
 }

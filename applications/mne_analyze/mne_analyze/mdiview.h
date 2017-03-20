@@ -1,17 +1,15 @@
 //=============================================================================================================
 /**
-* @file     aboutwindow.cpp
-* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
-*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     viewerwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2015
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -34,33 +32,68 @@
 *
 * @brief
 *
-* @file
-*       aboutwindow.h
-*       aboutwindow.ui
 */
+
+#ifndef MDIVIEW_H
+#define MDIVIEW_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QMdiArea>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "aboutwindow.h"
-#include "ui_aboutwindow.h"
+#include "Views/view3danalyze.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE MNEANALYZE
 //=============================================================================================================
 
-AboutWindow::AboutWindow(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::AboutWindow)
+namespace MNEANALYZE
 {
-    ui->setupUi(this);
-}
+
 
 //*************************************************************************************************************
-AboutWindow::~AboutWindow()
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MdiView : public QWidget
 {
-    delete ui;
-}
+    Q_OBJECT
+public:
+    //Constructor
+    explicit MdiView(QWidget *parent = 0);
+    //Cascade subwindows
+    void CascadeSubWindows();
+    //Tile subwindows
+    void TileSubWindows();
+    //Reload demo surfaces
+    void ReloadSurfaces();
+    //Destructor
+    ~MdiView();
+
+private:
+    //Layout
+    QGridLayout             *m_gridLayout;
+
+    //ViewD object
+    View3DAnalyze           *m_view3d_pial;
+
+    //Multiple Display Area
+    QMdiArea                *m_MdiArea;
+};
+
+}// NAMESPACE
+
+#endif // MDIVIEW_H
