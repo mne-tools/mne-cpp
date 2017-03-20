@@ -675,7 +675,7 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
 //    qz = qz / norm2;
 
     if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
-        m_pHPIWidget->onBtnDoSingleFit();
+        m_pHPIWidget->performHPIFitting();
 
         // Load device to head transformation matrix from Fiff info
         QMatrix3x3 rot;
