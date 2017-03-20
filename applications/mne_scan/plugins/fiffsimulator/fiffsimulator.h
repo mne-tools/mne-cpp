@@ -206,14 +206,10 @@ protected:
     //=========================================================================================================
     /**
     * Sends the current data block to the HPI dialog.
+    *
+    * @param [in] matData   The new data block.
     */
-    void sendHPIData();
-
-    //=========================================================================================================
-    /**
-    * Sends the current thread status to the HPI dialog.
-    */
-    void sendStatusToHPI();
+    void updateHPI(const Eigen::MatrixXf &matData);
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
@@ -233,8 +229,6 @@ protected:
 
     qint32                  m_iActiveConnectorId;           /**< The active connector.*/
     qint32                  m_iBufferSize;                  /**< The raw data buffer size.*/
-
-    Eigen::MatrixXf         m_matValue;                     /**< The current data block.*/
 
     QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
 

@@ -95,7 +95,6 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
-, m_bIsRunning(false)
 {
     ui->setupUi(this);
 
@@ -165,14 +164,6 @@ HPIWidget::~HPIWidget()
 void HPIWidget::setData(const Eigen::MatrixXd& data)
 {
     m_matValue = data;
-}
-
-
-//*************************************************************************************************************
-
-void HPIWidget::setIsRunning(bool bStatus)
-{
-    m_bIsRunning = bStatus;
 }
 
 
@@ -348,9 +339,9 @@ void HPIWidget::onBtnDoSingleFit()
        return;
     }
 
-    if(!m_bIsRunning) {
+    if(m_matValue.rows() == 0 || m_matValue.cols() == 0) {
        QMessageBox msgBox;
-       msgBox.setText("Please start the measurement first!");
+       msgBox.setText("No data has been received yet! Please start the measurement first!");
        msgBox.exec();
        return;
     }
@@ -434,13 +425,6 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
     //rt head motion correction will be performed using the rtHPI plugin.
     if(m_pFiffInfo) {
         if(this->hpiLoaded()) {
-            // Wait for data
-            emit needData();
-
-            while(m_matValue.rows() == 0 && m_matValue.cols() == 0) {
-                //Wait unti ldata was received
-            }
-
             //Perform actual fitting
             QVector<double> vGof;
             FiffDigPointSet t_fittedSet;
@@ -449,11 +433,11 @@ void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
             transDevHead.to = 4;
 
             HPIFit::fitHPI(m_matValue,
-                                  transDevHead,
-                                  vFreqs,
-                                  vGof,
-                                  t_fittedSet,
-                                  m_pFiffInfo);
+                              transDevHead,
+                              vFreqs,
+                              vGof,
+                              t_fittedSet,
+                              m_pFiffInfo);
 
             m_matValue.resize(0,0);
 
