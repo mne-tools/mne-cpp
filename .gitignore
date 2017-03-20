@@ -222,3 +222,5 @@ Makefile
 .DS_Store
 
 lib
+/bin/printsupport
+/bin/mne_deep_models/examples/datasets/MNIST/*.txt
