@@ -80,13 +80,15 @@ win32 {
 
 SOURCES += \
     Management/analyzedata.cpp \
-    Management/analyzesettings.cpp
+    Management/analyzesettings.cpp \
+    Management/extensionmanager.cpp
 
 HEADERS += \
     anshared_global.h \
     Interfaces/IExtension.h \
     Management/analyzedata.h \
-    Management/analyzesettings.h
+    Management/analyzesettings.h \
+    Management/extensionmanager.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

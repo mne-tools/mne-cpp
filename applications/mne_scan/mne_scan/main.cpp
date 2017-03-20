@@ -190,28 +190,5 @@ int main(int argc, char *argv[])
 
 //    qInstallMessageHandler(customMessageHandler);
 
-
-//    //DEBUG
-//    NewRealTimeMultiSampleArray RTSATest;
-//    NewNumeric NumericTest;
-
-//    IPlugin* pluginInterface = NULL;
-
-//    QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > pluginOutputData(new PluginOutputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin"), QString("No Descr")));
-//    QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > pluginInputData(new PluginInputData<NewRealTimeMultiSampleArray>(pluginInterface, QString("TestPlugin2"), QString("No Descr2")));
-//    pluginInputData->setCallbackMethod(&debugTest);
-
-//    PluginConnectorConnection outInConnection(pluginOutputData, pluginInputData);
-
-//    pluginOutputData->data()->init(2);
-//    pluginOutputData->data()->setMultiArraySize(2);
-
-//    VectorXd v = VectorXd::Zero(2);
-//    v[0] = 2.3;
-//    pluginOutputData->data()->setValue(v);
-//    v[0] = 4.1;
-//    pluginOutputData->data()->setValue(v);
-//    //DEBUG
-
     return app.exec();
 }
