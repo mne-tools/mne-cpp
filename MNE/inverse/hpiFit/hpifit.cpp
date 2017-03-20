@@ -103,20 +103,22 @@ Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen:
 
     double u0 = 1e-7;
     int nchan;
-    Eigen::MatrixXd r, r2, r5, x, y, z, mx, my, mz, Tx, Ty, Tz, lf, temp;
+    Eigen::MatrixXd r, r2, r5, x, y, z, mx, my, mz, Tx, Ty, Tz, lf;
 
     nchan = pnt.rows();
 
     // Shift the magnetometers so that the dipole is in the origin
-    pnt.array().col(0) -= pos(0);pnt.array().col(1) -= pos(1);pnt.array().col(2) -= pos(2);
+    pnt.array().col(0) -= pos(0);
+    pnt.array().col(1) -= pos(1);
+    pnt.array().col(2) -= pos(2);
 
     r = pnt.array().square().rowwise().sum().sqrt();
 
-   r2 = r5 = x = y = z = mx = my = mz = Tx = Ty = Tz = lf = Eigen::MatrixXd::Zero(nchan,3);
+    r2 = r5 = x = y = z = mx = my = mz = Tx = Ty = Tz = lf = Eigen::MatrixXd::Zero(nchan,3);
 
     for(int i = 0;i < nchan;i++) {
-            r2.row(i).array().fill(pow(r(i),2));
-            r5.row(i).array().fill(pow(r(i),5));
+        r2.row(i).array().fill(pow(r(i),2));
+        r5.row(i).array().fill(pow(r(i),5));
     }
 
     for(int i = 0;i < nchan;i++) {
@@ -124,7 +126,10 @@ Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen:
         y.row(i).array().fill(pnt(i,1));
         z.row(i).array().fill(pnt(i,2));
     }
-    mx.col(0).array().fill(1);my.col(1).array().fill(1);mz.col(2).array().fill(1);
+
+    mx.col(0).array().fill(1);
+    my.col(1).array().fill(1);
+    mz.col(2).array().fill(1);
 
     Tx = 3 * x.cwiseProduct(pnt) - mx.cwiseProduct(r2);
     Ty = 3 * y.cwiseProduct(pnt) - my.cwiseProduct(r2);
@@ -141,12 +146,13 @@ Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen:
             lf(i,j) = u0 * lf(i,j)/(4 * M_PI * r5(i,j));
         }
     }
+
     return lf;
 }
 
 
 /*********************************************************************************
- * ft_compute_leadfield computes a forward solution for a dipole in a a volume
+ * compute_leadfield computes a forward solution for a dipole in a a volume
  * conductor model. The forward solution is expressed as the leadfield
  * matrix (Nchan*3), where each column corresponds with the potential or field
  * distributions on all sensors for one of the x,y,z-orientations of the dipole.
@@ -154,7 +160,7 @@ Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen:
  * same output
  *********************************************************************************/
 
-Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd pos, struct sens sensors)
+Eigen::MatrixXd compute_leadfield(Eigen::MatrixXd pos, struct SensorInfo sensors)
 {
 
     Eigen::MatrixXd pnt, ori, lf;
@@ -177,14 +183,14 @@ Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd pos, struct sens sensors)
  * same output
  *********************************************************************************/
 
-dipError dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct sens sensors)
+DipFitError dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct SensorInfo sensors)
 {
     // Variable Declaration
-    struct dipError e;
+    struct DipFitError e;
     Eigen::MatrixXd lf, dif;
 
     // Compute lead field for a magnetic dipole in infinite vacuum
-    lf = ft_compute_leadfield(pos, sensors);
+    lf = compute_leadfield(pos, sensors);
 
     e.moment = pinv(lf) * data;
 
@@ -202,7 +208,7 @@ dipError dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct sens sens
  * Compare function for sorting
  *********************************************************************************/
 
-bool compare(sortStruct a, sortStruct b)
+bool compare(HPISortStruct a, HPISortStruct b)
 {
     return (a.base_arr < b.base_arr);
 }
@@ -219,7 +225,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
                            int maxfun,
                            int display,
                            Eigen::MatrixXd data,
-                           struct sens sensors,
+                           struct SensorInfo sensors,
                            int &simplex_numitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
@@ -229,7 +235,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
     std::vector <double> fv, fv1;
     std::vector <int> idx;
 
-    dipError tempdip, fxr, fxe, fxc, fxcc;
+    DipFitError tempdip, fxr, fxe, fxc, fxcc;
 
     //tolx = tolf = 1e-4;
     // Seok
@@ -295,10 +301,10 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
     }
 
     // Sort elements of fv
-    std::vector<sortStruct> vecSortStruct;
+    std::vector<HPISortStruct> vecSortStruct;
 
     for (int i = 0; i < fv.size(); i++) {
-        sortStruct structTemp;
+        HPISortStruct structTemp;
         structTemp.base_arr = fv[i];
         structTemp.idx = i;
         vecSortStruct.push_back(structTemp);
@@ -430,7 +436,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
         vecSortStruct.clear();
 
         for (int i = 0; i < fv.size(); i++) {
-            sortStruct structTemp;
+            HPISortStruct structTemp;
             structTemp.base_arr = fv[i];
             structTemp.idx = i;
             vecSortStruct.push_back(structTemp);
@@ -467,18 +473,18 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
  * heavily edited for use with MNE Scan Software
  *********************************************************************************/
 
-void doDipfitConcurrent(QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens>> &lCoilData)
+void doDipfitConcurrent(FittingCoilData &lCoilData)
 {
     // Initialize variables
-    Eigen::RowVectorXd currentCoil = lCoilData.first.first;
-    Eigen::VectorXd currentData = lCoilData.first.second;
-    sens currentSensors = lCoilData.second.second;
+    Eigen::RowVectorXd currentCoil = lCoilData.coilPos;
+    Eigen::VectorXd currentData = lCoilData.sensorData;
+    SensorInfo currentSensors = lCoilData.sensorPos;
 
     int display = 0;
     int maxiter = 500;
     int simplex_numitr = 0;
 
-    lCoilData.first.first = fminsearch(currentCoil,
+    lCoilData.coilPos = fminsearch(currentCoil,
                                        maxiter,
                                        2 * maxiter * currentCoil.cols(),
                                        display,
@@ -486,8 +492,8 @@ void doDipfitConcurrent(QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<
                                        currentSensors,
                                        simplex_numitr);
 
-    lCoilData.second.first = dipfitError(currentCoil, currentData, currentSensors);
-    lCoilData.second.first.numIterations = simplex_numitr;
+    lCoilData.errorInfo = dipfitError(currentCoil, currentData, currentSensors);
+    lCoilData.errorInfo.numIterations = simplex_numitr;
 }
 
 
@@ -519,8 +525,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     vGof.clear();
 
-    struct sens sensors;
-    struct coilParam coil;
+    struct SensorInfo sensors;
+    struct CoilParam coil;
     int numCh = pFiffInfo->nchan;
     int samF = pFiffInfo->sfreq;
     int samLoc = t_mat.cols(); // minimum samples required to localize numLoc times in a second
@@ -586,20 +592,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             headHPI(i,1) = 0;
             headHPI(i,2) = 0;
         }
-
-        qDebug() << "\n \n \n";
-        qDebug()<< "    **********************************************************";
-        qDebug()<< "   *************************************************************";
-        qDebug()<< "  ***************************************************************";
-        qDebug()<< "******************************************************************";
-        qDebug()<< "********    You forget to load polhemus HPI information!   *********";
-        qDebug()<< "***********  Please stop running and load it properly!   **********";
-        qDebug()<< "******************************************************************";
-        qDebug()<< " ****************************************************************";
-        qDebug()<< "  **************************************************************";
-        qDebug()<< "   ************************************************************";
-        qDebug()<< "    **********************************************************";
-        qDebug() << "\n \n \n";
     }
 
     // Get the indices of inner layer channels and exclude bad channels.
@@ -649,17 +641,18 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     amp  = topo.leftCols(numCoils); // amp: # of good inner channel x 4
     ampC = topo.rightCols(numCoils);
 
-    for (int j = 0; j < numCoils; ++j) {
+    for(int j = 0; j < numCoils; ++j) {
        float nS = 0.0;
        float nC = 0.0;
-       for (int i = 0; i < innerind.size(); i++) {
+       for(int i = 0; i < innerind.size(); ++i) {
            nS += amp(i,j)*amp(i,j);
            nC += ampC(i,j)*ampC(i,j);
        }
 
-       if (nC > nS) {
-         for (int i = 0; i < innerind.size(); i++)
+       if(nC > nS) {
+         for(int i = 0; i < innerind.size(); ++i) {
            amp(i,j) = ampC(i,j);
+         }
        }
     }
 
@@ -749,14 +742,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     // DEBUG HPI fitting and write debug results
+    std::cout << std::endl << std::endl << "HPIFit::fitHPI - dpfiterror" << coil.dpfiterror << std::endl << coil.pos << std::endl;
 //    std::cout << std::endl << std::endl << "HPIFit::fitHPI - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
-
 //    std::cout << std::endl << std::endl << "HPIFit::fitHPI - temp" << std::endl << temp << std::endl;
-
 //    std::cout << std::endl << std::endl << "HPIFit::fitHPI - testPos" << std::endl << testPos << std::endl;
-
 //    std::cout << std::endl << std::endl << "HPIFit::fitHPI - Diff fitted - original" << std::endl << diffPos << std::endl;
-
 //    std::cout << std::endl << std::endl << "HPIFit::fitHPI - dev/head trans" << std::endl << trans << std::endl;
 
     QString sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
@@ -790,37 +780,39 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 //*************************************************************************************************************
 
-coilParam HPIFit::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)
+CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, Eigen::MatrixXd data, int numCoils)
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> > > lCoilData;
+    QList<FittingCoilData> lCoilData;
 
     for(qint32 i = 0; i < numCoils; ++i) {
-        QPair<QPair<Eigen::RowVectorXd, Eigen::VectorXd>, QPair<dipError, sens> >  coilPair;
-        coilPair.first.first = coil.pos.row(i);
-        coilPair.first.second = data.col(i);
-        coilPair.second.second = sensors;
+        FittingCoilData coilData;
+        coilData.coilPos = coil.pos.row(i);
+        coilData.sensorData = data.col(i);
+        coilData.sensorPos = sensors;
 
-        lCoilData.append(coilPair);
+        lCoilData.append(coilData);
     }
 
     //Do the concurrent filtering
     if(!lCoilData.isEmpty()) {
+        //Do sequential
 //        for(int l = 0; l < lCoilData.size(); ++l) {
 //            doDipfitConcurrent(lCoilData[l]);
 //        }
 
+        //Do concurrent
         QFuture<void> future = QtConcurrent::map(lCoilData,
                                              doDipfitConcurrent);
         future.waitForFinished();
 
         //Transform results to final coil information
         for(qint32 i = 0; i < lCoilData.size(); ++i) {
-            coil.pos.row(i) = lCoilData.at(i).first.first;
-            coil.mom = lCoilData.at(i).second.first.moment.transpose();
-            coil.dpfiterror(i) = lCoilData.at(i).second.first.error;
-            coil.dpfitnumitr(i) = lCoilData.at(i).second.first.numIterations;
+            coil.pos.row(i) = lCoilData.at(i).coilPos;
+            coil.mom = lCoilData.at(i).errorInfo.moment.transpose();
+            coil.dpfiterror(i) = lCoilData.at(i).errorInfo.error;
+            coil.dpfitnumitr(i) = lCoilData.at(i).errorInfo.numIterations;
 
             qDebug()<< "HPIFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
         }

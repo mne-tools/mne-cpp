@@ -88,7 +88,7 @@ namespace INVERSELIB
 /**
 * The strucut specifing the coil parameters.
 */
-struct coilParam {
+struct CoilParam {
     Eigen::MatrixXd pos;
     Eigen::MatrixXd mom;
     Eigen::VectorXd dpfiterror;
@@ -99,7 +99,7 @@ struct coilParam {
 /**
 * The strucut specifing the dipole error.
 */
-struct dipError {
+struct DipFitError {
     double error;
     Eigen::MatrixXd moment;
     int numIterations;
@@ -109,7 +109,7 @@ struct dipError {
 /**
 * The strucut specifing the sensor parameters.
 */
-struct sens {
+struct SensorInfo {
     Eigen::MatrixXd coilpos;
     Eigen::MatrixXd coilori;
     Eigen::MatrixXd tra;
@@ -119,9 +119,20 @@ struct sens {
 /**
 * The strucut specifing the sorting parameters.
 */
-struct sortStruct {
+struct HPISortStruct {
     double base_arr;
     int idx;
+};
+
+//=========================================================================================================
+/**
+* The strucut specifing all data needed to perform coil-wise fitting.
+*/
+struct FittingCoilData {
+    Eigen::RowVectorXd coilPos;
+    Eigen::RowVectorXd sensorData;
+    DipFitError errorInfo;
+    SensorInfo sensorPos;
 };
 
 
@@ -175,14 +186,14 @@ protected:
     /**
     * Fits dipoles for the given coils and a given data set.
     *
-    * @param[in] coilParam      The coil parameters.
+    * @param[in] CoilParam      The coil parameters.
     * @param[in] sensors        The sensor information.
     * @param[in] data           The data which used to fit the coils.
     * @param[in] numCoils       The number of coils.
     *
     * @return Returns the coil parameters.
     */
-    static coilParam dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils);
+    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, Eigen::MatrixXd data, int numCoils);
 
     //=========================================================================================================
     /**
