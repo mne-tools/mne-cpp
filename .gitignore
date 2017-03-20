@@ -224,3 +224,8 @@ Makefile
 lib
 /bin/printsupport
 /bin/mne_deep_models/examples/datasets/MNIST/*.txt
+/bin/mne_analyze_extensions/*.dll
+/bin/mne_analyze_extensions/*.exp
+/bin/mne_analyze_extensions/*.ilk
+/bin/mne_analyze_extensions/*.lib
+/bin/mne_analyze_extensions/*.pdb

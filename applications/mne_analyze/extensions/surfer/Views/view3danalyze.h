@@ -1,14 +1,17 @@
 //=============================================================================================================
 /**
-* @file     extensionmanager.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     view3danalyze.h
+* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     February, 2017
+* @date     January, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,101 +32,73 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ExtensionManager class.
+* @brief
 *
+* @file
+*       view3danalyze.cpp
 */
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE
+//=============================================================================================================
+
+#ifndef VIEW3DANALYZE_H
+#define VIEW3DANALYZE_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QPushButton>
+
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
+
+#include <fs/surfaceset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "extensionmanager.h"
-#include "../Interfaces/IExtension.h"
+#include "baseview.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// NAMESPACES
+//=============================================================================================================
+
+using namespace FSLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#include <QDir>
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace ANSHAREDLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-ExtensionManager::ExtensionManager(QObject *parent)
-: QPluginLoader(parent)
+class View3DAnalyze : public BaseView
 {
+//=============================================================================================================
+public:
+    //int surface_type is only for testing purposes, to show every surface
+    View3DAnalyze(int surface_type);
+    ~View3DAnalyze();
 
-}
+//=============================================================================================================
 
+private:
+    //Layout
+    QWidget *m_view3d_container;
+    QGridLayout *m_view3d_gridlayout;
+    //Surface
+    View3D* m_BrainView;
+    Data3DTreeModel::SPtr m_p3DDataModel;
+};
 
-//*************************************************************************************************************
-
-ExtensionManager::~ExtensionManager()
-{
-}
-
-
-//*************************************************************************************************************
-
-void ExtensionManager::loadExtension(const QString& dir)
-{
-    QDir extensionsDir(dir);
-
-    foreach(QString file, extensionsDir.entryList(QDir::Files))
-    {
-        fprintf(stderr,"Loading Extension %s... ",file.toUtf8().constData());
-
-        this->setFileName(extensionsDir.absoluteFilePath(file));
-        QObject *pExtension = this->instance();
-
-        // IExtension
-        if(pExtension) {
-            fprintf(stderr,"Extension %s loaded.\n",file.toUtf8().constData());
-            m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
-        }
-        else {
-            fprintf(stderr,"Extension %s could not be instantiated!\n",file.toUtf8().constData());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void ExtensionManager::initExtensions(QSharedPointer<AnalyzeSettings>& settings, QSharedPointer<AnalyzeData>& data)
-{
-    foreach(IExtension* extension, m_qVecExtensions)
-    {
-        extension->setGlobalSettings(settings);
-        extension->setGlobalData(data);
-        extension->init();
-    }
-}
-
-
-//*************************************************************************************************************
-
-int ExtensionManager::findByName(const QString& name)
-{
-    QVector<IExtension*>::const_iterator it = m_qVecExtensions.begin();
-    for(int i = 0; it != m_qVecExtensions.end(); ++i, ++it)
-        if((*it)->getName() == name)
-            return i;
-
-    return -1;
-}
+#endif // VIEW3DANALYZE_H

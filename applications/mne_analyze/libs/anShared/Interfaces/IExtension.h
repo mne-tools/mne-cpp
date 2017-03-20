@@ -41,6 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../anshared_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,8 +86,9 @@ class AnalyzeSettings;
 *
 * @brief The IExtension class is the base interface class for all extensions.
 */
-class IExtension
+class ANSHAREDSHARED_EXPORT IExtension : public QObject
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<IExtension> SPtr;               /**< Shared pointer type for IExtension. */
     typedef QSharedPointer<const IExtension> ConstSPtr;    /**< Const shared pointer type for IExtension. */
@@ -124,25 +127,20 @@ public:
     virtual QString getName() const = 0;
 
 
-    virtual bool hasMenu() const;
+    virtual bool hasMenu() const = 0;
+    virtual QMenu* getMenu() = 0;
 
-    virtual QMenu* getMenu() const = 0;
+    virtual bool hasControl() const = 0;
+    virtual QDockWidget* getControl() = 0;
 
-    virtual bool hasControl() const;
-
-    virtual QDockWidget* getControl() const = 0;
-
-    virtual bool hasView() const;
-
-    virtual QWidget* getView() const = 0;
+    virtual bool hasView() const = 0;
+    virtual QWidget* getView() = 0;
 
 
     virtual inline void setGlobalData(QSharedPointer<AnalyzeData>& globalData);
-
     virtual inline QSharedPointer<AnalyzeData>& globalData();
 
     virtual inline void setGlobalSettings(QSharedPointer<AnalyzeSettings>& globalSettings);
-
     virtual inline QSharedPointer<AnalyzeSettings>& globalSettings();
 
 protected:
@@ -157,30 +155,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-bool IExtension::hasMenu() const
-{
-    return getMenu() != Q_NULLPTR;
-}
-
-
-//*************************************************************************************************************
-
-bool IExtension::hasControl() const
-{
-    return getControl() != Q_NULLPTR;
-}
-
-
-//*************************************************************************************************************
-
-bool IExtension::hasView() const
-{
-    return getView() != Q_NULLPTR;
-}
-
-
-//*************************************************************************************************************
 
 void IExtension::setGlobalData(QSharedPointer<AnalyzeData> &data)
 {

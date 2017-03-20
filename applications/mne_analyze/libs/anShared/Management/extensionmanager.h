@@ -68,6 +68,8 @@ namespace ANSHAREDLIB
 //=============================================================================================================
 
 class IExtension;
+class AnalyzeSettings;
+class AnalyzeData;
 
 
 //=============================================================================================================
@@ -104,16 +106,26 @@ public:
     /**
     * Loads extensions from given directory.
     *
-    * @param dir the plugin directory.
+    * @param [in] dir    the plugin directory.
     */
     void loadExtension(const QString& dir);
 
     //=========================================================================================================
     /**
+    * Initializes the extensions.
+    *
+    * @param [in] settings      the global mne analyze settings
+    * @param [in] data          the global mne analyze data
+    */
+    void initExtensions(QSharedPointer<AnalyzeSettings>& settings, QSharedPointer<AnalyzeData>& data);
+
+    //=========================================================================================================
+    /**
     * Finds index of extension by name.
     *
+    * @param [in] name  the extension name.
+    *
     * @return index of extension.
-    * @param name the extension name.
     */
     int findByName(const QString& name);
 
@@ -124,7 +136,6 @@ public:
     * @return reference to vector containing all plugins.
     */
     inline const QVector<IExtension*>& getExtensions();
-
 
 private:
     QVector<IExtension*>    m_qVecExtensions;       /**< Vector containing all extensions. */

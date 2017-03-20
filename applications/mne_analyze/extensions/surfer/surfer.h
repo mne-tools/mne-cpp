@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     extensionmanager.cpp
+* @file     surfer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,17 +29,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ExtensionManager class.
+* @brief    Contains the declaration of the Surfer class.
 *
 */
+
+#ifndef SURFER_H
+#define SURFER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "extensionmanager.h"
-#include "../Interfaces/IExtension.h"
+#include "surfer_global.h"
+
+#include "Views/view3danalyze.h"
+
+#include <anShared/Interfaces/IExtension.h>
+
 
 
 //*************************************************************************************************************
@@ -47,8 +55,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDir>
+#include <QtWidgets>
+#include <QtCore/QtPlugin>
 #include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE SURFEREXTENSION
+//=============================================================================================================
+
+namespace SURFEREXTENSION
+{
 
 
 //*************************************************************************************************************
@@ -61,69 +79,66 @@ using namespace ANSHAREDLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-ExtensionManager::ExtensionManager(QObject *parent)
-: QPluginLoader(parent)
+
+//=============================================================================================================
+/**
+* Surfer Extension
+*
+* @brief The Surfer class provides a Disp3D Views.
+*/
+class SURFERSHARED_EXPORT Surfer : public IExtension
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "surfer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(ANSHAREDLIB::IExtension)
 
-}
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a Surfer.
+    */
+    Surfer();
 
+    //=========================================================================================================
+    /**
+    * Destroys the Surfer.
+    */
+    ~Surfer();
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * IAlgorithm functions
+    */
+    virtual QSharedPointer<IExtension> clone() const;
+    virtual void init();
+    virtual void unload();
+    virtual QString getName() const;
 
-ExtensionManager::~ExtensionManager()
-{
-}
+    virtual bool hasMenu() const;
+    virtual QMenu* getMenu();
 
+    virtual bool hasControl() const;
+    virtual QDockWidget* getControl();
 
-//*************************************************************************************************************
+    virtual bool hasView() const;
+    virtual QWidget* getView();
 
-void ExtensionManager::loadExtension(const QString& dir)
-{
-    QDir extensionsDir(dir);
+protected:
 
-    foreach(QString file, extensionsDir.entryList(QDir::Files))
-    {
-        fprintf(stderr,"Loading Extension %s... ",file.toUtf8().constData());
+private:
 
-        this->setFileName(extensionsDir.absoluteFilePath(file));
-        QObject *pExtension = this->instance();
+    // Control
+    QDockWidget*        m_control;
 
-        // IExtension
-        if(pExtension) {
-            fprintf(stderr,"Extension %s loaded.\n",file.toUtf8().constData());
-            m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
-        }
-        else {
-            fprintf(stderr,"Extension %s could not be instantiated!\n",file.toUtf8().constData());
-        }
-    }
-}
+    // View
+    View3DAnalyze*      m_view;
 
+};
 
-//*************************************************************************************************************
+} // NAMESPACE
 
-void ExtensionManager::initExtensions(QSharedPointer<AnalyzeSettings>& settings, QSharedPointer<AnalyzeData>& data)
-{
-    foreach(IExtension* extension, m_qVecExtensions)
-    {
-        extension->setGlobalSettings(settings);
-        extension->setGlobalData(data);
-        extension->init();
-    }
-}
-
-
-//*************************************************************************************************************
-
-int ExtensionManager::findByName(const QString& name)
-{
-    QVector<IExtension*>::const_iterator it = m_qVecExtensions.begin();
-    for(int i = 0; it != m_qVecExtensions.end(); ++i, ++it)
-        if((*it)->getName() == name)
-            return i;
-
-    return -1;
-}
+#endif // SURFER_H

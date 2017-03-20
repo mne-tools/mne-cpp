@@ -1,15 +1,17 @@
 //=============================================================================================================
 /**
-* @file     viewerwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     baseview.cpp
+* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2017
+* @date     January, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017 Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -32,86 +34,29 @@
 *
 * @brief
 *
+* @file
+*       baseview.cpp
 */
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mdiview.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QGridLayout>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEANALYZE;
-
+#include "baseview.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MdiView::MdiView(QWidget *parent)
-: QWidget(parent)
+BaseView::BaseView()
 {
-    //QGridLayout is used so the viewer and MdiArea can fit always the size of MainWindow
-    m_gridLayout = new QGridLayout(this);
-    //Multiple Display Area, created inside ViewerWidget
-    m_mdiArea = new QMdiArea(this);
-    m_gridLayout->addWidget(m_mdiArea);
+
 }
-
-
 //*************************************************************************************************************
-
-MdiView::~MdiView()
+BaseView::~BaseView()
 {
-}
 
-
-//*************************************************************************************************************
-
-QMdiSubWindow *MdiView::addSubWindow(QWidget *widget, Qt::WindowFlags flags)
-{
-    return m_mdiArea->addSubWindow(widget, flags);
-}
-
-
-//*************************************************************************************************************
-
-void MdiView::removeSubWindow(QWidget *widget)
-{
-    m_mdiArea->removeSubWindow(widget);
-}
-
-
-//*************************************************************************************************************
-
-void MdiView::cascadeSubWindows()
-{
-    //Arrange subwindows in a Tile mode    //Arrange subwindows in a Tile mode
-    this->m_mdiArea->cascadeSubWindows();
-}
-
-
-//*************************************************************************************************************
-
-void MdiView::tileSubWindows()
-{
-    //Arrange subwindows in a Tile mode
-    this->m_mdiArea->tileSubWindows();
 }
 

@@ -39,4 +39,4 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
 #    cntk \
-#    surfer \
+    surfer
