@@ -648,7 +648,7 @@ void BabyMEG::updateHPI(const MatrixXf& matData)
         m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
         Eigen::MatrixXd matComp = newComp.data->data;
 
-        m_pHPIWidget->setData(matProj * matComp * this->calibrate(matData));
+        m_pHPIWidget->setData(matProj /** matComp*/ * this->calibrate(matData));
 
         // Only use calibration
         //m_pHPIWidget->setData(this->calibrate(matData));
