@@ -286,14 +286,18 @@ protected:
     //=========================================================================================================
     /**
     * Sends the current data block to the HPI dialog.
+    *
+    * @param [in] matData   The new data block.
     */
-    void sendHPIData();
+    void updateHPI(const Eigen::MatrixXf &matData);
 
     //=========================================================================================================
     /**
-    * Sends the current thread status to the HPI dialog.
+    * Write HPI to the channels.
+    *
+    * @param [in] matData   The data block to which the HPI information is to be written.
     */
-    void sendStatusToHPI();
+    void writeHPI(Eigen::MatrixXf& matData);
 
     //=========================================================================================================
     /**
@@ -334,12 +338,6 @@ protected:
     * Starts or stops a file recording depending on the current recording state.
     */
     void toggleRecordingFile();
-
-    //=========================================================================================================
-    /**
-    * Update HPI.
-    */
-    void updateHPI();
 
     //=========================================================================================================
     /**
@@ -435,7 +433,6 @@ protected:
 
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
-    Eigen::MatrixXf                         m_matValue;                     /**< The current data block.*/
 
     QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
     QAction*                m_pActionRecordFile;            /**< start recording action */

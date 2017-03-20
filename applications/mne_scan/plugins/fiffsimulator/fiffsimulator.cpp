@@ -99,11 +99,6 @@ FiffSimulator::FiffSimulator()
     connect(m_pActionComputeHPI, &QAction::triggered,
             this, &FiffSimulator::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
-
-    connect(this, &FiffSimulator::started,
-            this, &FiffSimulator::sendStatusToHPI);
-    connect(this, &FiffSimulator::finished,
-            this, &FiffSimulator::sendStatusToHPI);
 }
 
 
@@ -259,6 +254,8 @@ QWidget* FiffSimulator::setupWidget()
 
 void FiffSimulator::run()
 {
+    MatrixXf matValue;
+
     while(true)
     {
         {
@@ -267,10 +264,13 @@ void FiffSimulator::run()
                 break;
         }
         //pop matrix
-        m_matValue = m_pRawMatrixBuffer_In->pop();
+        matValue = m_pRawMatrixBuffer_In->pop();
+
+        //Update the HPI data
+        updateHPI(matValue);
 
         //emit values
-        m_pRTMSA_FiffSimulator->data()->setValue(m_matValue.cast<double>());
+        m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
     }
 }
 
@@ -436,9 +436,6 @@ void FiffSimulator::showHPIDialog()
     } else {
         if (!m_pHPIWidget) {
             m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-
-            connect(m_pHPIWidget.data(), &HPIWidget::needData,
-                    this, &FiffSimulator::sendHPIData);
         }
 
         if (!m_pHPIWidget->isVisible()) {
@@ -451,8 +448,9 @@ void FiffSimulator::showHPIDialog()
 
 //*************************************************************************************************************
 
-void FiffSimulator::sendHPIData()
+void FiffSimulator::updateHPI(const MatrixXf& matData)
 {
+    //Update HPI data
     if(m_pFiffInfo && m_pHPIWidget) {
         Eigen::MatrixXd matProj;
         m_pFiffInfo->make_projector(matProj);
@@ -467,24 +465,8 @@ void FiffSimulator::sendHPIData()
         m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
         Eigen::MatrixXd matComp = newComp.data->data;
 
-        m_pHPIWidget->setData(matProj * matComp * m_matValue.cast<double>());
+        m_pHPIWidget->setData(matProj * matComp * matData.cast<double>());
 
-        //m_pHPIWidget->setData(m_matValue.cast<double>());
+        //m_pHPIWidget->setData(matData.cast<double>());
     }
 }
-
-
-//*************************************************************************************************************
-
-void FiffSimulator::sendStatusToHPI()
-{
-    if (!m_pHPIWidget) {
-        m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-
-        connect(m_pHPIWidget.data(), &HPIWidget::needData,
-                this, &FiffSimulator::sendHPIData);
-    }
-
-    m_pHPIWidget->setIsRunning(this->isRunning());
-}
-
