@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     extensionmanager.cpp
+* @file     surfer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ExtensionManager class.
+* @brief    Contains the implementation of the Surfer class.
 *
 */
 
@@ -38,17 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "extensionmanager.h"
-#include "../Interfaces/IExtension.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDir>
-#include <QDebug>
+#include "surfer.h"
 
 
 //*************************************************************************************************************
@@ -56,6 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace SURFEREXTENSION;
 using namespace ANSHAREDLIB;
 
 
@@ -64,8 +55,9 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ExtensionManager::ExtensionManager(QObject *parent)
-: QPluginLoader(parent)
+Surfer::Surfer()
+: m_control(NULL)
+, m_view(NULL)
 {
 
 }
@@ -73,57 +65,103 @@ ExtensionManager::ExtensionManager(QObject *parent)
 
 //*************************************************************************************************************
 
-ExtensionManager::~ExtensionManager()
+Surfer::~Surfer()
 {
+
 }
 
 
 //*************************************************************************************************************
 
-void ExtensionManager::loadExtension(const QString& dir)
+QSharedPointer<IExtension> Surfer::clone() const
 {
-    QDir extensionsDir(dir);
+    QSharedPointer<Surfer> pSurferClone(new Surfer);
+    return pSurferClone;
+}
 
-    foreach(QString file, extensionsDir.entryList(QDir::Files))
-    {
-        fprintf(stderr,"Loading Extension %s... ",file.toUtf8().constData());
 
-        this->setFileName(extensionsDir.absoluteFilePath(file));
-        QObject *pExtension = this->instance();
+//*************************************************************************************************************
 
-        // IExtension
-        if(pExtension) {
-            fprintf(stderr,"Extension %s loaded.\n",file.toUtf8().constData());
-            m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
-        }
-        else {
-            fprintf(stderr,"Extension %s could not be instantiated!\n",file.toUtf8().constData());
-        }
+void Surfer::init()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void Surfer::unload()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+QString Surfer::getName() const
+{
+    return "Surfer";
+}
+
+
+//*************************************************************************************************************
+
+bool Surfer::hasMenu() const
+{
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+QMenu *Surfer::getMenu()
+{
+    return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+bool Surfer::hasControl() const
+{
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+QDockWidget *Surfer::getControl()
+{
+    if(!m_control) {
+        m_control = new QDockWidget(tr("Surfer Control"));
+        m_control->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+        m_control->setMinimumWidth(180);
     }
+
+    return m_control;
 }
 
 
 //*************************************************************************************************************
 
-void ExtensionManager::initExtensions(QSharedPointer<AnalyzeSettings>& settings, QSharedPointer<AnalyzeData>& data)
+bool Surfer::hasView() const
 {
-    foreach(IExtension* extension, m_qVecExtensions)
-    {
-        extension->setGlobalSettings(settings);
-        extension->setGlobalData(data);
-        extension->init();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+// check with owner ship and mdi area for garbage collection
+QWidget *Surfer::getView()
+{
+    if(!m_view) {
+        //
+        //Pial surface
+        //
+        m_view = new View3DAnalyze(1);
+        m_view->setWindowTitle("Pial surface");
     }
-}
 
-
-//*************************************************************************************************************
-
-int ExtensionManager::findByName(const QString& name)
-{
-    QVector<IExtension*>::const_iterator it = m_qVecExtensions.begin();
-    for(int i = 0; it != m_qVecExtensions.end(); ++i, ++it)
-        if((*it)->getName() == name)
-            return i;
-
-    return -1;
+    return m_view;
 }

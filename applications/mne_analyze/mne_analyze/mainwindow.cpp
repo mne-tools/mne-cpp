@@ -41,6 +41,9 @@
 #include "info.h"
 #include "mainwindow.h"
 #include "mdiview.h"
+#include "../libs/anShared/Interfaces/IExtension.h"
+#include "../libs/anShared/Management/analyzesettings.h"
+#include "../libs/anShared/Management/analyzedata.h"
 #include "../libs/anShared/Management/extensionmanager.h"
 
 
@@ -49,6 +52,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QtWidgets>
 #include <QMenu>
 #include <QMenuBar>
 #include <QDockWidget>
@@ -57,6 +61,7 @@
 #include <QTextEdit>
 #include <QFileDialog>
 #include <QtWidgets/QGridLayout>
+#include <QStandardPaths>
 
 
 //*************************************************************************************************************
@@ -73,7 +78,7 @@ using namespace ANSHAREDLIB;
 // CONST
 //=============================================================================================================
 
-const char* extensionDir = "/mne_analyze_extensions";        /**< holds path to the extensions.*/
+const char* extensionsDir = "/mne_analyze_extensions";        /**< holds path to the extensions.*/
 
 
 //*************************************************************************************************************
@@ -84,23 +89,26 @@ const char* extensionDir = "/mne_analyze_extensions";        /**< holds path to 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pExtensionManager(new ANSHAREDLIB::ExtensionManager(this))
+, m_mdiView(Q_NULLPTR)
 {
     fprintf(stderr, "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
             CInfo::AppVersion().toUtf8().constData());
 
     setWindowState(Qt::WindowMaximized);
-
+    setMinimumSize(400, 400);
     setWindowTitle(CInfo::AppNameShort());
 
-    //Instance of ViewerWIdget
-    m_mdiView = new MdiView(this);
-
-    setCentralWidget(m_mdiView);
+    initGlobalSettings();
+    initGlobalData();
+    m_pExtensionManager->loadExtension(qApp->applicationDirPath()+extensionsDir);
+    m_pExtensionManager->initExtensions(m_analyzeSettings, m_analyzeData);
 
     createActions();
     createMenus();
-    createDockWindow();
+    createDockWindows();
+
+    createMdiView();
 }
 
 
@@ -114,10 +122,24 @@ MainWindow::~MainWindow()
 
 //*************************************************************************************************************
 
+void MainWindow::initGlobalSettings()
+{
+    m_analyzeSettings = AnalyzeSettings::SPtr(new AnalyzeSettings);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::initGlobalData()
+{
+    m_analyzeData = AnalyzeData::SPtr(new AnalyzeData);
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::createActions()
 {
-    qDebug() << "[1]";
-
     //File QMenu
     m_pActionOpenDataFile = new QAction(tr("&Open Fiff File"), this);
     m_pActionOpenDataFile->setShortcuts(QKeySequence::New);
@@ -132,11 +154,11 @@ void MainWindow::createActions()
     //View QMenu
     m_pActionCascade = new QAction(tr("&Cascade"), this);
     m_pActionCascade->setStatusTip(tr("Cascade the windows in the mdi window"));
-    connect(m_pActionCascade, &QAction::triggered, this, &MainWindow::viewCascade);
+    connect(m_pActionCascade, &QAction::triggered, this, &MainWindow::mdiViewCascade);
 
     m_pActionTile = new QAction(tr("&Tile"), this);
     m_pActionTile->setStatusTip(tr("Tile the windows in the mdi window"));
-    connect(m_pActionTile, &QAction::triggered, this, &MainWindow::viewTile);
+    connect(m_pActionTile, &QAction::triggered, this, &MainWindow::mdiViewTile);
 
     //Help QMenu
     m_pActionAbout = new QAction(tr("&About"), this);
@@ -167,42 +189,52 @@ void MainWindow::createMenus()
 
 //*************************************************************************************************************
 
-void MainWindow::createDockWindow()
+void MainWindow::createDockWindows()
 {
-    //
-    //Layers DockWidget
-    //
-    m_layersDock = new QDockWidget(tr("Layers"), this);
-    m_layersDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    addDockWidget(Qt::LeftDockWidgetArea,m_layersDock);
-    m_layersDock->setMinimumWidth(180);
-
-    //
-    //Information DockWidget
-    //
-    m_informationDock = new QDockWidget(tr("Information"), this);
-    m_informationDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    addDockWidget(Qt::LeftDockWidgetArea,m_informationDock);
-    m_informationDock->setMinimumWidth(180);
-
+    //Add Extension views to mdi
+    for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
+        IExtension* extension = m_pExtensionManager->getExtensions()[i];
+        if(extension->hasControl() && extension->getControl()) {
+            addDockWidget(Qt::LeftDockWidgetArea,extension->getControl());
+        }
+    }
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::viewCascade()
+void MainWindow::createMdiView()
 {
-    this->m_mdiView->CascadeSubWindows();
+    m_mdiView = new MdiView(this);
+    setCentralWidget(m_mdiView);
+
+    //Add Extension views to mdi
+    for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
+        IExtension* extension = m_pExtensionManager->getExtensions()[i];
+        if(extension->hasView() && extension->getView()) {
+            m_mdiView->addSubWindow(extension->getView());
+        }
+    }
+
+    m_mdiView->cascadeSubWindows();
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::viewTile()
+void MainWindow::mdiViewCascade()
+{
+    this->m_mdiView->cascadeSubWindows();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::mdiViewTile()
 {
     //Since we need to acces some private attributes from ViewerWIdget, we need a method to do it
     //Used to arrange the subwindows that contains the surfaces and 2D plots, in a Tile mode
-    this->m_mdiView->TileSubWindows();
+    this->m_mdiView->tileSubWindows();
 }
 
 

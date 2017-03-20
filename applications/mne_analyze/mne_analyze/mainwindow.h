@@ -68,6 +68,8 @@ namespace ANSHAREDLIB
 {
 class IExtension;
 class ExtensionManager;
+class AnalyzeData;
+class AnalyzeSettings;
 }
 
 
@@ -97,11 +99,17 @@ public:
     ~MainWindow();
 
 
+    void initGlobalSettings();
+    void initGlobalData();
+
+
+
 private:
 
     void createActions();       /**< Creates all actions for user interface of MainWindow class. */
     void createMenus();         /**< Creates all menus for user interface of MainWindow class. */
-    void createDockWindow();
+    void createDockWindows();
+    void createMdiView();
 
     QAction*                            m_pActionOpenDataFile;      /**< open data file action */
     QAction*                            m_pActionExit;              /**< exit application action */
@@ -112,24 +120,20 @@ private:
     QAction*                            m_pActionAbout;             /**< show about dialog action */
 
     //Main Window Menu
-    QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
-    QMenu*                              m_pMenuView;    /**< Holds the view menu.*/
-    QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
+    QMenu*                              m_pMenuFile;        /**< Holds the file menu.*/
+    QMenu*                              m_pMenuView;        /**< Holds the view menu.*/
+    QMenu*                              m_pMenuHelp;        /**< Holds the help menu.*/
 
-    QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
-
+    QSharedPointer<QWidget>             m_pAboutWindow;     /**< Holds the widget containing the about information.*/
 
     QSharedPointer<ANSHAREDLIB::ExtensionManager>   m_pExtensionManager;    /**< Holds extension manager.*/
 
 
-
-
-
 private:
 
-    //MdiArea subwindows
-    void viewCascade();
-    void viewTile();
+    //mdi area subwindows
+    void mdiViewCascade();
+    void mdiViewTile();
 
     //Open a FIFF file
     void openFiffFile();            /**< Implements open fiff action.*/
@@ -138,18 +142,14 @@ private:
 
 private:
 
-
-
-
     //MDI Central View
     MdiView            *m_mdiView;
 
     //FIFF File management
     QString                 m_fiffFileName;
 
-    //Dock Widgets
-    QDockWidget             *m_layersDock;
-    QDockWidget             *m_informationDock;
+    QSharedPointer<ANSHAREDLIB::AnalyzeSettings> m_analyzeSettings;
+    QSharedPointer<ANSHAREDLIB::AnalyzeData> m_analyzeData;
 
 };
 
