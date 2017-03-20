@@ -51,10 +51,24 @@
 //=============================================================================================================
 
 #include <QMainWindow>
-#include <QMenuBar>
-#include <QDockWidget>
-#include <QAction>
 #include <QString>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+QT_BEGIN_NAMESPACE
+class QAction;
+class QMenu;
+class QDockWidget;
+QT_END_NAMESPACE
+
+namespace ANSHAREDLIB
+{
+class IExtension;
+class ExtensionManager;
+}
 
 
 //*************************************************************************************************************
@@ -102,9 +116,13 @@ private:
     QMenu*                              m_pMenuView;    /**< Holds the view menu.*/
     QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
 
-
-
     QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
+
+
+    QSharedPointer<ANSHAREDLIB::ExtensionManager>   m_pExtensionManager;    /**< Holds extension manager.*/
+
+
+
 
 
 private:
@@ -137,4 +155,4 @@ private:
 
 }// NAMESPACE
 
-#endif // MAINWINDOW_H
+#endif // ANMAINWINDOW_H

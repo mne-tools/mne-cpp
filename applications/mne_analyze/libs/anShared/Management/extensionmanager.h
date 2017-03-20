@@ -80,7 +80,7 @@ class ANSHAREDSHARED_EXPORT ExtensionManager : public QPluginLoader
 {
     Q_OBJECT
 
-    friend class MainWindow;
+//    friend class MainWindow;
 
 public:
     typedef QSharedPointer<ExtensionManager> SPtr;               /**< Shared pointer type for ExtensionManager. */

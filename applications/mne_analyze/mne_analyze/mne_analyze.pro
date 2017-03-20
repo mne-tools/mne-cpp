@@ -69,7 +69,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
-            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
+            -lanSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -82,7 +83,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
-            -lMNE$${MNE_LIB_VERSION}Disp3D
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
+            -lanShared
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -91,8 +93,8 @@ SOURCES += \
     main.cpp \
     Views/baseview.cpp \
     Views/view3danalyze.cpp \
-    mainwindow.cpp \
-    mdiview.cpp
+    mdiview.cpp \
+    mainwindow.cpp
 
 HEADERS += \
     info.h \
