@@ -112,6 +112,7 @@ BabyMEG::BabyMEG()
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/babymeg/both.bad")
 , m_iRecordingMSeconds(5*60*1000)
 , m_iSplitCount(0)
+, m_dMaxHPIFitError(0.01)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -677,33 +678,42 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
     if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
         m_pHPIWidget->performHPIFitting();
 
-        // Load device to head transformation matrix from Fiff info
-        QMatrix3x3 rot;
-
-        for(int ir = 0; ir < 3; ir++) {
-            for(int ic = 0; ic < 3; ic++) {
-                rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
-            }
+        QVector<double> vGof = m_pHPIWidget->getGOF();
+        double meanErrorDist = 0;
+        for(int i = 0; i < vGof.size(); ++i) {
+            meanErrorDist += vGof.at(i);
         }
+        meanErrorDist = meanErrorDist/vGof.size();
 
-        QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+        if(meanErrorDist <= m_dMaxHPIFitError) {
+            // Load device to head transformation matrix from Fiff info
+            QMatrix3x3 rot;
 
-        // Write goodness of fit (GOF)to HPI Ch #7
-        float dpfitError = 0.0;
-        float GOF = 1 - dpfitError;
+            for(int ir = 0; ir < 3; ir++) {
+                for(int ic = 0; ic < 3; ic++) {
+                    rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
+                }
+            }
 
-        // Write rotation quaternion to HPI Ch #1~3
-        matData.row(401) = MatrixXf::Constant(1,matData.cols(), quatHPI.x());
-        matData.row(402) = MatrixXf::Constant(1,matData.cols(), quatHPI.y());
-        matData.row(403) = MatrixXf::Constant(1,matData.cols(), quatHPI.z());
+            QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
-        // Write translation vector to HPI Ch #4~6
-        matData.row(404) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(0,3));
-        matData.row(405) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(1,3));
-        matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
+            // Write goodness of fit (GOF)to HPI Ch #7
+            float dpfitError = 0.0;
+            float GOF = 1 - dpfitError;
 
-        // Write GOF to HPI Ch #7
-        matData.row(407) = MatrixXf::Constant(1,matData.cols(), GOF);
+            // Write rotation quaternion to HPI Ch #1~3
+            matData.row(401) = MatrixXf::Constant(1,matData.cols(), quatHPI.x());
+            matData.row(402) = MatrixXf::Constant(1,matData.cols(), quatHPI.y());
+            matData.row(403) = MatrixXf::Constant(1,matData.cols(), quatHPI.z());
+
+            // Write translation vector to HPI Ch #4~6
+            matData.row(404) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(0,3));
+            matData.row(405) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(1,3));
+            matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
+
+            // Write GOF to HPI Ch #7
+            matData.row(407) = MatrixXf::Constant(1,matData.cols(), GOF);
+        }
     }
 }
 

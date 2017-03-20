@@ -172,6 +172,14 @@ void HPIWidget::setData(const Eigen::MatrixXd& data)
 
 //*************************************************************************************************************
 
+QVector<double> HPIWidget::getGOF()
+{
+    return m_vGof;
+}
+
+
+//*************************************************************************************************************
+
 void HPIWidget::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
@@ -182,7 +190,6 @@ void HPIWidget::closeEvent(QCloseEvent *event)
 
 void HPIWidget::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
                                              const FiffDigPointSet& fittedPointSet,
-                                             const QVector<double>& vGof,
                                              bool bSortOutAdditionalDigitizer)
 {
     if(bSortOutAdditionalDigitizer) {
@@ -218,28 +225,6 @@ void HPIWidget::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
         }
 
         m_pData3DModel->addDigitizerData("Head", "Fitted", t_digSetWithoutAdditional);
-
-        //Update gof labels and transform from m to mm
-        QString sGof("0mm");
-        if(vGof.size() > 0) {
-            sGof = QString("%1mm").arg(1000*vGof[0]);
-            ui->m_label_gofCoil1->setText(sGof);
-        }
-
-        if(vGof.size() > 1) {
-            sGof = QString("%1mm").arg(1000*vGof[1]);
-            ui->m_label_gofCoil2->setText(sGof);
-        }
-
-        if(vGof.size() > 2) {
-            sGof = QString("%1mm").arg(1000*vGof[2]);
-            ui->m_label_gofCoil3->setText(sGof);
-        }
-
-        if(vGof.size() > 3) {
-            sGof = QString("%1mm").arg(1000*vGof[3]);
-            ui->m_label_gofCoil4->setText(sGof);
-        }
     } else {
         m_pData3DModel->addDigitizerData("Head", "Transformed", digPointSet);
         m_pData3DModel->addDigitizerData("Head", "Fitted", fittedPointSet);
@@ -297,10 +282,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
     }
 
     //Add all digitizer but additional points to View3D
-    QVector<double> vGof;
-    vGof << 0.0 << 0.0 << 0.0 << 0.0;
-
-    this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet(), vGof);
+    this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet());
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -413,7 +395,6 @@ void HPIWidget::performHPIFitting()
     if(m_pFiffInfo) {
         if(this->hpiLoaded()) {
             //Perform actual fitting
-            QVector<double> vGof;
             FiffDigPointSet t_fittedSet;
             FiffCoordTrans transDevHead;
             transDevHead.from = 1;
@@ -422,7 +403,7 @@ void HPIWidget::performHPIFitting()
             HPIFit::fitHPI(m_matValue,
                               transDevHead,
                               m_vCoilFreqs,
-                              vGof,
+                              m_vGof,
                               t_fittedSet,
                               m_pFiffInfo);
 
@@ -449,7 +430,7 @@ void HPIWidget::performHPIFitting()
                 t_digSet << digPoint;
             }
 
-            this->setDigitizerDataToView3D(t_digSet, t_fittedSet, vGof);
+            this->setDigitizerDataToView3D(t_digSet, t_fittedSet);
 
             //Update labels with new dev/trans amtrix
             FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
@@ -473,6 +454,28 @@ void HPIWidget::performHPIFitting()
             ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
             ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
             ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+
+            //Update gof labels and transform from m to mm
+            QString sGof("0mm");
+            if(m_vGof.size() > 0) {
+                sGof = QString("%1mm").arg(1000*m_vGof[0]);
+                ui->m_label_gofCoil1->setText(sGof);
+            }
+
+            if(m_vGof.size() > 1) {
+                sGof = QString("%1mm").arg(1000*m_vGof[1]);
+                ui->m_label_gofCoil2->setText(sGof);
+            }
+
+            if(m_vGof.size() > 2) {
+                sGof = QString("%1mm").arg(1000*m_vGof[2]);
+                ui->m_label_gofCoil3->setText(sGof);
+            }
+
+            if(m_vGof.size() > 3) {
+                sGof = QString("%1mm").arg(1000*m_vGof[3]);
+                ui->m_label_gofCoil4->setText(sGof);
+            }
         }        
     }
 }

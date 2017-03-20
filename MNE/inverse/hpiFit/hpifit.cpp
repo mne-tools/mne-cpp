@@ -374,8 +374,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
                 v.col(v.cols()-1) = xe;
                 fv[n] = fxe.error;
                 how = "expand";
-            }
-            else {
+            } else {
                 v.col(v.cols()-1) = xr;
                 fv[n] = fxr.error;
                 how = "reflect";
@@ -386,8 +385,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
                 v.col(v.cols()-1) = xr;
                 fv[n] = fxr.error;
                 how = "reflect";
-            }
-            else { // fxr.error >= fv[:,n-1]
+            } else { // fxr.error >= fv[:,n-1]
                 // Perform contraction
                 if(fxr.error < fv[n]) {
                     // Perform an outside contraction
@@ -400,13 +398,11 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
                         v.col(v.cols()-1) = xc;
                         fv[n] = fxc.error;
                         how = "contract outside";
-                    }
-                    else {
+                    } else {
                         // perform a shrink
                         how = "shrink";
                     }
-                }
-                else {
+                } else {
                     xcc = (1 - psi) * xbar + psi * v.col(v.cols()-1);
                     x = xcc.transpose();
                     fxcc = dipfitError(x, data, sensors);
@@ -415,12 +411,12 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
                         v.col(v.cols()-1) = xcc;
                         fv[n] = fxcc.error;
                         how = "contract inside";
-                    }
-                    else {
+                    } else {
                         // perform a shrink
                         how = "shrink";
                     }
                 }
+
                 if(how.compare("shrink") == 0) {
                     for(int j = 1;j < n+1;j++) {
                         v.col(j).array() = v.col(0).array() + sigma * (v.col(j).array() - v.col(0).array());
@@ -456,8 +452,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
         v = v1;
         fv = fv1;
         itercount = itercount + 1;
-    } // end of while loop
-//    }while(dipfitError(x, data, sensors).error > 0.1);
+    }
 
     x = v.col(0).transpose();
 
