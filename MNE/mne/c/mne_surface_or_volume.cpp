@@ -292,84 +292,7 @@ void fromIntEigenMatrix_17(const Eigen::MatrixXi& from_mat, int **&to_mat)
 }
 
 
-//============================= mne_matop.c =============================
-
-float **mne_lu_invert_17(float **mat,int dim)
-/*
-      * Invert a matrix using the LU decomposition from
-      * LAPACK
-      */
-{
-    Eigen::MatrixXf eigen_mat = toFloatEigenMatrix_17(mat, dim, dim);
-    Eigen::MatrixXf eigen_mat_inv = eigen_mat.inverse();
-    fromFloatEigenMatrix_17(eigen_mat_inv, mat);
-    return mat;
-}
-
-
 //============================= make_volume_source_space.c =============================
-
-static int add_inverse_17(FiffCoordTransOld* t)
-/*
-      * Add inverse transform to an existing one
-      */
-{
-    int   j,k;
-    float **m = ALLOC_CMATRIX_17(4,4);
-
-    for (j = 0; j < 3; j++) {
-        for (k = 0; k < 3; k++)
-            m[j][k] = t->rot[j][k];
-        m[j][3] = t->move[j];
-    }
-    for (k = 0; k < 3; k++)
-        m[3][k] = 0.0;
-    m[3][3] = 1.0;
-    if (mne_lu_invert_17(m,4) == NULL) {
-        FREE_CMATRIX_17(m);
-        return FAIL;
-    }
-    for (j = 0; j < 3; j++) {
-        for (k = 0; k < 3; k++)
-            t->invrot[j][k] = m[j][k];
-        t->invmove[j] = m[j][3];
-    }
-    FREE_CMATRIX_17(m);
-    return OK;
-}
-
-
-
-
-
-//============================= make_volume_source_space.c =============================
-
-static FiffCoordTransOld* fiff_make_transform2 (int from,int to,float rot[3][3],float move[3])
-/*
-      * Compose the coordinate transformation structure
-      * from a known forward transform
-      */
-{
-    FiffCoordTransOld* t = new FiffCoordTransOld;
-    int j,k;
-
-    t->from = from;
-    t->to   = to;
-
-    for (j = 0; j < 3; j++) {
-        t->move[j] = move[j];
-        for (k = 0; k < 3; k++)
-            t->rot[j][k] = rot[j][k];
-    }
-
-    if (add_inverse_17(t) == FAIL) {
-        printf("Failed to add the inverse coordinate transformation");
-        FREE_17(t);
-        return NULL;
-    }
-
-    return (t);
-}
 
 static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
                                                float *x_ras,
@@ -394,7 +317,7 @@ static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
         for (k = 0; k < 3; k++)
             rot[j][k]    = voxel_size[k]*rot[j][k];
 
-    t = fiff_make_transform2(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,rot,move);
+    t = new FiffCoordTransOld(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,rot,move);
 
     return t;
 }

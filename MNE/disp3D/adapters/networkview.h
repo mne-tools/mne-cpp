@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     abstracttreeitem.h
+* @file     networkview.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,33 +29,43 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     AbstractTreeItem class declaration.
+* @brief    NetworkView class declaration.
 *
 */
 
-#ifndef ABSTRACTTREEITEM_H
-#define ABSTRACTTREEITEM_H
+#ifndef NETWORKVIEW_H
+#define NETWORKVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "types.h"
+#include "../disp3D_global.h"
+#include "abstractview.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QStandardItem>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace INVERSELIB {
+    class DipoleFitSettings;
+    class ECDSet;
+}
+
+namespace CONNECTIVITYLIB {
+    class Network;
+}
 
 
 //*************************************************************************************************************
@@ -75,96 +85,34 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* AbstractTreeItem provides AbstractTreeItem provides the basic tree item. This item should be used as a base class for all tree items throughout the disp3D library.
+* Adapter which provides visualization for ECD data and a control widget.
 *
-* @brief Provides the basic tree item.
+* @brief Visualizes ECD data.
 */
-class AbstractTreeItem : public QObject, public QStandardItem
+class DISP3DNEWSHARED_EXPORT NetworkView : public AbstractView
 {
     Q_OBJECT
 
-public :
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
-    AbstractTreeItem(int iType, const QString& text = "");
-    virtual ~AbstractTreeItem();
+public:
+    typedef QSharedPointer<NetworkView> SPtr;             /**< Shared pointer type for NetworkView class. */
+    typedef QSharedPointer<const NetworkView> ConstSPtr;  /**< Const shared pointer type for NetworkView class. */
 
     //=========================================================================================================
     /**
-    * QStandardItem functions
+    * Default constructor
+    *
     */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-    int type() const;
+    explicit NetworkView(const CONNECTIVITYLIB::Network& tNetworkData, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns all children of this item based on their type.
-    *
-    * @param[in] type    The type of the child items which should be looked for.
-    *
-    * @return           List with all found items.
+    * Default destructor
     */
-    QList<QStandardItem*> findChildren(int type);
-
-    //=========================================================================================================
-    /**
-    * Returns all children of this item based on their text.
-    *
-    * @param[in] text    The text of the child items which should be looked for.
-    *
-    * @return           List with all found items.
-    */
-    QList<QStandardItem*> findChildren(const QString& text);
-
-    //=========================================================================================================
-    /**
-    * Overloaded stream operator to add a child to this item based on a pointer.
-    *
-    * @param[in] newItem    The new item as a pointer.
-    */
-    AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
-
-    //=========================================================================================================
-    /**
-    * Overloaded stream operator to add a child to this item based on a reference.
-    *
-    * @param[in] newItem    The new item as a reference.
-    */
-    AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
+    ~NetworkView();
 
 protected:
-    //=========================================================================================================
-    /**
-    * Init this item.
-    */
-    virtual void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    int     m_iType;        /**< This item's type. */
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever this item's check state changed.
-    *
-    * @param[in] checkState     The current check state.
-    */
-    void checkStateChanged(const Qt::CheckState& checkState);
 };
 
-} //NAMESPACE DISP3DLIB
+} // NAMESPACE
 
-#endif // ABSTRACTTREEITEM_H
+#endif // NETWORKVIEW_H

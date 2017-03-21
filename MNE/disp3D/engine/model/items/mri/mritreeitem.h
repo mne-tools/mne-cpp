@@ -165,7 +165,13 @@ public:
     */
     void setRtVertColor(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    void initItem();
+
     //=========================================================================================================
     /**
     * Call this function whenever the check box of this item was checked.
@@ -176,7 +182,7 @@ private:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
+    * This function gets called whenever the origin of the vertex color changed to curvature or annotation mode.
     */
     void onColorOriginChanged();
 

@@ -46,13 +46,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,10 +72,7 @@ using namespace DISP3DLIB;
 SubjectTreeItem::SubjectTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Subject");
+    initItem();
 }
 
 
@@ -95,20 +85,26 @@ SubjectTreeItem::~SubjectTreeItem()
 
 //*************************************************************************************************************
 
+void SubjectTreeItem::initItem()
+{
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Subject");
+}
+
+
+//*************************************************************************************************************
+
 QVariant SubjectTreeItem::data(int role) const
 {
-//    switch(role) {
-//        case SubjectTreeItemRoles::SurfaceSetName:
-//            return QVariant();
-//    }
-
     return AbstractTreeItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-void  SubjectTreeItem::setData(const QVariant& value, int role)
+void SubjectTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 }

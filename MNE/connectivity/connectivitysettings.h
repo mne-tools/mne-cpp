@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     bemtreeitem.cpp
+* @file     connectivitysettings.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,25 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BemTreeItem class definition.
+* @brief     ConnectivitySettings class declaration.
 *
 */
+
+#ifndef CONNECTIVITYSETTINGS_H
+#define CONNECTIVITYSETTINGS_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "bemtreeitem.h"
-#include "bemsurfacetreeitem.h"
-
-#include <mne/mne_bem.h>
+#include "connectivity_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -60,96 +63,78 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-BemTreeItem::BemTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
-{
-    initItem();
-}
+namespace CONNECTIVITYLIB {
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// CONNECTIVITYLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
-BemTreeItem::~BemTreeItem()
+
+//=============================================================================================================
+/**
+* This class is a container for connectivity settings.
+*
+* @brief This class is a container for connectivity settings.
+*/
+class CONNECTIVITYSHARED_EXPORT ConnectivitySettings
 {
-}
+
+public:
+    typedef QSharedPointer<ConnectivitySettings> SPtr;            /**< Shared pointer type for ConnectivitySettings. */
+    typedef QSharedPointer<const ConnectivitySettings> ConstSPtr; /**< Const shared pointer type for ConnectivitySettings. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a ConnectivitySettings object.
+    */
+    explicit ConnectivitySettings(const QStringList &arguments);
+
+    QString m_sConnectivityMethod;          /**< The connectivity method. */
+    QString m_sAnnotType;                   /**< The annotation type. */
+    QString m_sSubj;                        /**< The subject name. */
+    QString m_sSubjDir;                     /**< The subject's folder. */
+    QString m_sFwd;                         /**< The path to the forward solution. */
+    QString m_sCov;                         /**< The path to the covariance matrix. */
+    QString m_sSourceLocMethod;             /**< The source localization method. */
+    QString m_sMeas;                        /**< The path to the averaged data. */
+    QString m_sCoilType;                    /**< The coil type. Only used if channel type is set to meg. */
+    QString m_sChType;                      /**< The channel type. */
+
+    bool m_bDoSourceLoc;                    /**< Whether to perform source localization before the connectivity estimation. */
+    bool m_bDoClust;                        /**< Whether to cluster the source space for source localization. */
+
+    double m_dSnr;                          /**< The SNR value. */
+    int m_iAveIdx;                          /**< The The average index to take from the input data. */
+
+protected:
+    //=========================================================================================================
+    /**
+    * Parses the input arguments.
+    *
+    * @param [in] arguments     List of all the arguments.
+    */
+    void parseArguments(const QStringList& arguments);
+
+};
 
 
 //*************************************************************************************************************
-
-void BemTreeItem::initItem()
-{
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM item");
-}
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
 
-//*************************************************************************************************************
+} // namespace CONNECTIVITYLIB
 
-QVariant BemTreeItem::data(int role) const
-{
-    switch(role) {
-        case Data3DTreeModelItemRoles::BemName:
-            return QVariant();
-        default: // do nothing;
-            break;
-    }
-
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  BemTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
-{
-    //Generate child items based on BEM input parameters
-    for(int i = 0; i < tBem.size(); ++i) {
-        QString sBemSurfName;
-        sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], p3DEntityParent);
-
-        QList<QStandardItem*> list;
-        list << pSurfItem;
-        list << new QStandardItem(pSurfItem->toolTip());
-        this->appendRow(list);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-
-
-
+#endif // CONNECTIVITYSETTINGS_H

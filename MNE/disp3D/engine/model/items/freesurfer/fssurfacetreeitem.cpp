@@ -53,14 +53,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QUrl>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,110 +78,22 @@ using namespace FSLIB;
 //=============================================================================================================
 
 FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
+: AbstractSurfaceTreeItem(iType, text)
 , m_sColorInfoOrigin("Color from curvature")
-, m_pRenderable3DEntity(new Renderable3DEntity())
-, m_pRenderable3DEntityNormals(new Renderable3DEntity())
 , m_pItemSurfColGyri(new MetaTreeItem())
 , m_pItemSurfColSulci(new MetaTreeItem())
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("Freesurfer Surface item");
+    initItem();
 }
 
 
 //*************************************************************************************************************
 
-FsSurfaceTreeItem::~FsSurfaceTreeItem()
+void FsSurfaceTreeItem::initItem()
 {
-    //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-    }
-
-    if(m_pRenderable3DEntityNormals) {
-        m_pRenderable3DEntityNormals->deleteLater();
-    }
-}
-
-
-//*************************************************************************************************************
-
-QVariant FsSurfaceTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-
-    switch(role) {
-        case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
-            break;
-
-        default: // do nothing;
-            break;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
-{
-    //Create renderable 3D entity
-    m_pRenderable3DEntity->setParent(parent);
-
-    //Initial transformation also regarding the surface offset
-    m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-
-    //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
-
-    //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), matCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
-
-    //Set shaders
-    PerVertexPhongAlphaMaterial* pPerVertexPhongAlphaMaterial = new PerVertexPhongAlphaMaterial();
-    m_pRenderable3DEntity->addComponent(pPerVertexPhongAlphaMaterial);
-
-//    //Render normals
-//    m_pRenderable3DEntityNormals = new Renderable3DEntity(parent);
-//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor, Qt3DRender::QGeometryRenderer::Triangles);
-//    m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-//    ShowNormalsMaterial* pShowNormalsMaterial = new ShowNormalsMaterial();
-//    m_pRenderable3DEntityNormals->addComponent(pShowNormalsMaterial);
-
-//    //Generate activation overlay surface
-//    MatrixX3f overlayAdds = tSurface.rr();
-//    for(int i = 0; i<tSurface.nn().rows(); i++) {
-//        RowVector3f direction = tSurface.nn().row(i);
-//        direction.normalize();
-
-//        overlayAdds.row(i) = direction*0.0001;
-//    }
-
-//    m_pRenderable3DEntityNormals->setMeshData(tSurface.rr()+overlayAdds, tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
-
-    //Add data which is held by this FsSurfaceTreeItem
-    QVariant data;
-
-    data.setValue(matCurvatureColor);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
-
-    data.setValue(tSurface.curv());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
-
     //Add surface meta information as item children
     QList<QStandardItem*> list;
+    QVariant data;
 
     m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
     connect(m_pItemSurfColSulci, &MetaTreeItem::curvColorsChanged,
@@ -211,50 +115,54 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
+}
 
-    float fAlpha = 0.35f;
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, QString("%1").arg(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
-            this, &FsSurfaceTreeItem::onSurfaceAlphaChanged);
-    list.clear();
-    list << itemAlpha;
-    list << new QStandardItem(itemAlpha->toolTip());
-    this->appendRow(list);
-    data.setValue(fAlpha);
-    itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
 
-//    float fTessInner = 1.0;
-//    MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
-//    connect(itemTessInner, &MetaTreeItem::surfaceTessInnerChanged,
-//            this, &FsSurfaceTreeItem::onSurfaceTessInnerChanged);
-//    list.clear();
-//    list << itemTessInner;
-//    list << new QStandardItem(itemTessInner->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTessInner);
-//    itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
+//*************************************************************************************************************
 
-//    float fTessOuter = 1.0;
-//    MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
-//    connect(itemTessOuter, &MetaTreeItem::surfaceTessOuterChanged,
-//            this, &FsSurfaceTreeItem::onSurfaceTessOuterChanged);
-//    list.clear();
-//    list << itemTessOuter;
-//    list << new QStandardItem(itemTessOuter->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTessOuter);
-//    itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
+void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
+{
+    //Set parents
+    m_pRenderable3DEntity->setParent(parent);
+    m_pRenderable3DEntityNormals->setParent(parent);
 
-//    float fTriangleScale = 1.0;
-//    MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
-//    connect(itemTriangleScale, &MetaTreeItem::surfaceTriangleScaleChanged,
-//            this, &FsSurfaceTreeItem::onSurfaceTriangleScaleChanged);
-//    list.clear();
-//    list << itemTriangleScale;
-//    list << new QStandardItem(itemTriangleScale->toolTip());
-//    this->appendRow(list);
-//    data.setValue(fTriangleScale);
-//    itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
+    //Create color from curvature information with default gyri and sulcus colors
+    MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
+
+
+    //Set renderable 3D entity mesh and color data
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(),
+                                                        tSurface.nn(),
+                                                        tSurface.tris(),
+                                                        matCurvatureColor,
+                                                        Qt3DRender::QGeometryRenderer::Triangles);
+    m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+
+    //Render normals
+    if(m_bRenderNormals) {
+        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSurface.rr(),
+                                                      tSurface.nn(),
+                                                      tSurface.tris(),
+                                                      matCurvatureColor,
+                                                      Qt3DRender::QGeometryRenderer::Triangles);
+        m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+    }
+
+    //Add data which is held by this FsSurfaceTreeItem
+    QVariant data;
+
+    data.setValue(matCurvatureColor);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
+
+    data.setValue(tSurface.curv());
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
+
+    data.setValue(tSurface.rr());
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+
+     //Add data which is held by this FsSurfaceTreeItem
+    QList<QStandardItem*> list;
 
     MetaTreeItem *itemSurfFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tSurface.fileName());
     itemSurfFileName->setEditable(false);
@@ -282,45 +190,6 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     this->appendRow(list);
     data.setValue(tSurface.filePath());
     itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
-
-    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(tSurface.offset()(0)));
-    itemXTrans->setEditable(true);
-    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
-            this, &FsSurfaceTreeItem::onSurfaceTranslationXChanged);
-    list.clear();
-    list << itemXTrans;
-    list << new QStandardItem(itemXTrans->toolTip());
-    this->appendRow(list);
-
-    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(tSurface.offset()(1)));
-    itemYTrans->setEditable(true);
-    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
-            this, &FsSurfaceTreeItem::onSurfaceTranslationYChanged);
-    list.clear();
-    list << itemYTrans;
-    list << new QStandardItem(itemYTrans->toolTip());
-    this->appendRow(list);
-
-    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(tSurface.offset()(2)));
-    itemZTrans->setEditable(true);
-    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
-            this, &FsSurfaceTreeItem::onSurfaceTranslationZChanged);
-    list.clear();
-    list << itemZTrans;
-    list << new QStandardItem(itemZTrans->toolTip());
-    this->appendRow(list);
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::setRtVertColor(const MatrixX3f& sourceColorSamples)
-{
-    //Set new data.
-    //In setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
-    QVariant data;
-    data.setValue(sourceColorSamples);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 
@@ -335,15 +204,6 @@ void FsSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
     }
 
     onColorInfoOriginOrCurvColorChanged();
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::setVisible(bool state)
-{
-    m_pRenderable3DEntity->setEnabled(state);
-    m_pRenderable3DEntityNormals->setEnabled(state);
 }
 
 
@@ -393,80 +253,6 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             }
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
-{
-    m_pRenderable3DEntity->setMaterialParameter(fAlpha, "alpha");
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onSurfaceTessInnerChanged(float fTessInner)
-{
-    m_pRenderable3DEntity->setMaterialParameter(fTessInner, "innerTess");
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onSurfaceTessOuterChanged(float fTessOuter)
-{
-    m_pRenderable3DEntity->setMaterialParameter(fTessOuter, "outerTess");
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onSurfaceTriangleScaleChanged(float fTriangleScale)
-{
-    m_pRenderable3DEntity->setMaterialParameter(fTriangleScale, "triangleScale");
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{    
-    m_pRenderable3DEntity->setEnabled(checkState == Qt::Unchecked ? false : true);
-    m_pRenderable3DEntityNormals->setEnabled(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onSurfaceTranslationXChanged(float fTransX)
-{
-    QVector3D position = m_pRenderable3DEntity->position();
-    position.setX(fTransX);
-    m_pRenderable3DEntity->setPosition(position);
-    m_pRenderable3DEntityNormals->setPosition(position);
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onSurfaceTranslationYChanged(float fTransY)
-{
-    QVector3D position = m_pRenderable3DEntity->position();
-    position.setY(fTransY);
-    m_pRenderable3DEntity->setPosition(position);
-    m_pRenderable3DEntityNormals->setPosition(position);
-}
-
-
-//*************************************************************************************************************
-
-void FsSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
-{
-    QVector3D position = m_pRenderable3DEntity->position();
-    position.setZ(fTransZ);
-    m_pRenderable3DEntity->setPosition(position);
-    m_pRenderable3DEntityNormals->setPosition(position);
 }
 
 
