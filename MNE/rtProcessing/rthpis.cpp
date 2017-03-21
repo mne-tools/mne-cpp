@@ -84,6 +84,7 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 {
+    qRegisterMetaType<RTPROCESSINGLIB::FittingResult>("RTPROCESSINGLIB::FittingResult");
 }
 
 
@@ -166,9 +167,9 @@ void RtHPIS::run()
         {
             timer.start();
 
-            m_mutex.lock();
+            //m_mutex.lock();
             matData = m_pRawMatrixBuffer->pop();
-            m_mutex.unlock();
+            //m_mutex.unlock();
 
             //Perform actual fitting
             FittingResult fitResult;

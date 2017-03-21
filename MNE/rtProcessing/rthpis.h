@@ -193,7 +193,7 @@ protected:
     QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
 
 signals:
-    void newFittingResultAvailable(FittingResult fitResult);
+    void newFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);
 };
 
 //*************************************************************************************************************
@@ -207,5 +207,10 @@ inline bool RtHPIS::isRunning()
 }
 
 } // NAMESPACE
+
+#ifndef metatype_rthpisfittingresult
+#define metatype_rthpisfittingresult
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FittingResult)
+#endif
 
 #endif // RTHPIS_H
