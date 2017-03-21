@@ -225,6 +225,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the current scale.
+    *
+    * @param[in] scale     The new scaling value.
+    */
+    void setScale(float scale);
+
+    //=========================================================================================================
+    /**
     * Sets the value of a specific paramater of the materials for this entity.
     *
     * @param[in] fValue             The value to be set.
