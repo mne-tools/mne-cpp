@@ -38,5 +38,9 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-#    cntk \
     surfer
+
+!isEmpty( CNTK_INCLUDE_DIR ) {
+    SUBDIRS += \
+        cntk
+}
