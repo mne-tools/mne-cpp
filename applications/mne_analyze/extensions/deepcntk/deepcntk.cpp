@@ -40,6 +40,8 @@
 
 #include "deepcntk.h"
 
+#include <deep/deepmodelviewer/deepviewerwidget.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -159,7 +161,7 @@ QWidget *DeepCNTK::getView()
         //
         //Pial surface
         //
-        m_view = new QWidget;
+        m_view = new DeepViewerWidget(m_pModel);
         m_view->setWindowTitle("Deep CNTK");
     }
 

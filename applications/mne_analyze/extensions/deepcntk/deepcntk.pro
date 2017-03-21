@@ -43,12 +43,13 @@ DEFINES += DEEPCNTK_LIBRARY
 
 QT += gui widgets 3dextras
 
-TARGET = cntk
+TARGET = deepcntk
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
+LIBS += -L$${CNTK_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -60,7 +61,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}Deepd \
-            -lanSharedd
+            -lanSharedd \
+            -lCNTKLibrary-2.0
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -73,7 +75,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}Deep \
-            -lanShared
+            -lanShared \
+            -lCNTKLibrary-2.0
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
@@ -87,6 +90,7 @@ HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 OTHER_FILES += deepcntk.json
@@ -98,4 +102,3 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
-
