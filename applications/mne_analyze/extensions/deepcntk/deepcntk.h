@@ -70,8 +70,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace DISPLIB
+{
 class DeepViewerWidget;
 class Controls;
+}
 
 namespace DEEPLIB
 {
@@ -155,13 +158,13 @@ private:
     CNTK::FunctionPtr               m_pModel;
 
 
-    Controls*                       m_controlPanel;
+    DISPLIB::Controls*              m_controlPanel;
 
     // Control
     QDockWidget*                    m_control;
 
     // View
-    DeepViewerWidget*               m_view;
+    DISPLIB::DeepViewerWidget*      m_view;
 
 };
 

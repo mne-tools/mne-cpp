@@ -126,7 +126,7 @@ SOURCES += \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
     helpers/roundededgeswidget.cpp \
-    deepviewer.cpp
+    lineplot.cpp
 
 HEADERS += \
     disp_global.h \
@@ -149,7 +149,7 @@ HEADERS += \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
     helpers/roundededgeswidget.h \
-    deepviewer.h
+    lineplot.h
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {
