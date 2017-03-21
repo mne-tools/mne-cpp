@@ -41,6 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../../../../disp3D_global.h"
 #include "types.h"
 
 
@@ -79,7 +80,7 @@ namespace DISP3DLIB
 *
 * @brief Provides the basic tree item.
 */
-class AbstractTreeItem : public QObject, public QStandardItem
+class DISP3DNEWSHARED_EXPORT AbstractTreeItem : public QObject, public QStandardItem
 {
     Q_OBJECT
 

@@ -47,6 +47,8 @@
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/bem/bemtreeitem.h>
+#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
+#include <disp3D/engine/model/3dhelpers/renderable3Dentity.h>
 
 #include <inverse/hpiFit/hpifit.h>
 
@@ -62,6 +64,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -160,6 +163,10 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
+
+    QFile t_fileHead("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_BemHead(t_fileHead);
+    m_pBemHead = m_pData3DModel->addBemData("Head", "Model kid", t_BemHead);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -315,7 +322,7 @@ bool HPIWidget::hpiLoaded()
 
 //*************************************************************************************************************
 
-QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
+QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
 {
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
@@ -626,6 +633,34 @@ void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPo
     }
 
     this->setDigitizerDataToView3D(transformedCoils, fittedCoils);
+
+    updateHeadModel();
 }
 
+
+//*************************************************************************************************************
+
+void HPIWidget::updateHeadModel()
+{
+    if(m_pBemHead) {
+        QList<QStandardItem*> itemList = m_pBemHead->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+
+        for(int j = 0; j < itemList.size(); ++j) {
+            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                QPointer<Renderable3DEntity> pEntity = pBemItem->getRenderableEntity();
+                QPointer<Qt3DCore::QTransform> pTransform = new Qt3DCore::QTransform();
+
+                QMatrix4x4 mat;
+                for(int r = 0; r < 3; ++r) {
+                    for(int c = 0; c < 3; ++c) {
+                        mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
+                    }
+                }
+
+                pTransform->setMatrix(mat);
+                pEntity->setTransform(pTransform);
+            }
+        }
+    }
+}
 

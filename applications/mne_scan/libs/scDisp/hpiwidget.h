@@ -76,6 +76,7 @@ namespace Ui {
 namespace DISP3DLIB {
     class View3D;
     class Data3DTreeModel;
+    class BemTreeItem;
 }
 
 namespace FIFFLIB {
@@ -178,7 +179,7 @@ protected:
     /**
     * Read Polhemus data from fif file.
     */
-    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(QString fileName);
+    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
 
     //=========================================================================================================
     /**
@@ -232,7 +233,7 @@ protected:
 
     //=========================================================================================================
     /**
-    * Updates the transforamtion related labels.
+    * Updates the transformation related labels.
     */
     void updateTransLabels();
 
@@ -244,6 +245,12 @@ protected:
     * @param[in] fittedCoils    The fitted coils to be stored.
     */
     void storeResults(const FIFFLIB::FiffCoordTrans& devHeadTrans, const FIFFLIB::FiffDigPointSet& fittedCoils);
+
+    //=========================================================================================================
+    /**
+    * Updates the head model based on the current head/device transformation.
+    */
+    void updateHeadModel();
 
     Ui::HPIWidget*                              ui;                     /**< The HPI dialog. */
 
@@ -265,6 +272,8 @@ protected:
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The FiffInfo. */
     QSharedPointer<RTPROCESSINGLIB::RtHPIS>     m_pRtHPI;               /**< The real-time HPI object. */
+
+    DISP3DLIB::BemTreeItem*                     m_pBemHead;             /**< The BEM head model. */
 
     double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
 signals:

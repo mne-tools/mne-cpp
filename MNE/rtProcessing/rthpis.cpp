@@ -102,15 +102,11 @@ RtHPIS::~RtHPIS()
 
 void RtHPIS::append(const MatrixXd &p_DataSegment)
 {
-    m_mutex.lock();
-
     if(!m_pRawMatrixBuffer) {
-        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, p_DataSegment.rows(), p_DataSegment.cols()));
+        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(20, p_DataSegment.rows(), p_DataSegment.cols()));
     }
 
     m_pRawMatrixBuffer->push(&p_DataSegment);
-
-    m_mutex.unlock();
 }
 
 
@@ -159,17 +155,12 @@ void RtHPIS::setCoilFrequencies(const QVector<int>& vCoilFreqs)
 void RtHPIS::run()
 {
     MatrixXd matData;
-    QElapsedTimer timer;
 
     while(m_bIsRunning)
     {
         if(m_pRawMatrixBuffer)
         {
-            timer.start();
-
-            //m_mutex.lock();
             matData = m_pRawMatrixBuffer->pop();
-            //m_mutex.unlock();
 
             //Perform actual fitting
             FittingResult fitResult;
@@ -184,9 +175,6 @@ void RtHPIS::run()
                               m_pFiffInfo);
 
             emit newFittingResultAvailable(fitResult);
-
-//            qDebug() << "RtHPIS::run() - timer.elapsed()" << timer.elapsed();
-//            qDebug() << "RtHPIS::run() - m_pRawMatrixBuffer.size()" << m_pRawMatrixBuffer->size();
         }
     }
 }
