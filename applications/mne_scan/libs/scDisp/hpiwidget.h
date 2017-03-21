@@ -144,7 +144,13 @@ public:
     QVector<double> getGOF();
 
 protected:
-     virtual void closeEvent( QCloseEvent * event );
+    virtual void closeEvent( QCloseEvent * event );
+
+    //=========================================================================================================
+    /**
+    * Update the projectors for SSP and Comps.
+    */
+    void updateProjections();
 
     //=========================================================================================================
     /**
@@ -195,6 +201,12 @@ protected:
     * The max distance value for continous HPI fitting changed.
     */
     void onContinousHPIMaxDistChanged();
+
+    //=========================================================================================================
+    /**
+    * Toggle SSP's and Comp's.
+    */
+    void onSSPCompUsageChanged();
 
     //=========================================================================================================
     /**
