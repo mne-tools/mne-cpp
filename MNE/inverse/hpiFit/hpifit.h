@@ -171,6 +171,7 @@ public:
     * @param[in] vFreqs          The frequencies for each coil.
     * @param[in] fittedPointSet  The final fitted positions in form of a digitizer set.
     * @param[in] p_pFiffInfo     Associated Fiff Information.
+    * @param[in] bDoDebug        Print debug info to cmd line and write debug info to file.
     * @param[in] sHPIResourceDir The path to the debug file which is to be written.
     */
     static void fitHPI(const Eigen::MatrixXd& t_mat,
@@ -179,6 +180,7 @@ public:
                               QVector<double> &vGof,
                               FIFFLIB::FiffDigPointSet& fittedPointSet,
                               QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                              bool bDoDebug = false,
                               const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
 protected:

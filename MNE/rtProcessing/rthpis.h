@@ -47,6 +47,9 @@
 #include "rtprocessing_global.h"
 
 #include <generics/circularmatrixbuffer.h>
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_coord_trans.h>
 
 
 //*************************************************************************************************************
@@ -65,6 +68,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QSharedPointer>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -84,6 +88,21 @@ namespace FIFFLIB{
 
 namespace RTPROCESSINGLIB
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Declare all structures to be used
+//=============================================================================================================
+//=========================================================================================================
+/**
+* The strucut specifing all data needed to perform coil-wise fitting.
+*/
+struct FittingResult {
+    FIFFLIB::FiffDigPointSet fittedCoils;
+    FIFFLIB::FiffCoordTrans devHeadTrans;
+    QVector<double> errorDistances;
+};
 
 
 //=============================================================================================================
@@ -147,6 +166,14 @@ public:
     */
     virtual bool stop();
 
+    //=========================================================================================================
+    /**
+    * Set the coil frequencies.
+    *
+    * @param[in] vCoilFreqs  The coil frequencies.
+    */
+    void setCoilFrequencies(const QVector<int>& vCoilFreqs);
+
 protected:
     //=========================================================================================================
     /**
@@ -162,6 +189,11 @@ protected:
     QMutex              m_mutex;                /**< The global mutex to provide thread safety.*/
 
     bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+
+    QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+
+signals:
+    void newFittingResultAvailable(FittingResult fitResult);
 };
 
 //*************************************************************************************************************

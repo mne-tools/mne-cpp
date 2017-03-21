@@ -510,6 +510,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                           QVector<double>& vGof,
                           FiffDigPointSet& fittedPointSet,
                           FiffInfo::SPtr pFiffInfo,
+                          bool bDoDebug,
                           const QString& sHPIResourceDir)
 {
     //Check if data was passed
@@ -735,40 +736,42 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         fittedPointSet << digPoint;
     }
 
-//    // DEBUG HPI fitting and write debug results
-//    std::cout << std::endl << std::endl << "HPIFit::fitHPI - dpfiterror" << coil.dpfiterror << std::endl << coil.pos << std::endl;
-//    std::cout << std::endl << std::endl << "HPIFit::fitHPI - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
-//    std::cout << std::endl << std::endl << "HPIFit::fitHPI - temp" << std::endl << temp << std::endl;
-//    std::cout << std::endl << std::endl << "HPIFit::fitHPI - testPos" << std::endl << testPos << std::endl;
-//    std::cout << std::endl << std::endl << "HPIFit::fitHPI - Diff fitted - original" << std::endl << diffPos << std::endl;
-//    std::cout << std::endl << std::endl << "HPIFit::fitHPI - dev/head trans" << std::endl << trans << std::endl;
+    if(bDoDebug) {
+        // DEBUG HPI fitting and write debug results
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - dpfiterror" << coil.dpfiterror << std::endl << coil.pos << std::endl;
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - temp" << std::endl << temp << std::endl;
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - testPos" << std::endl << testPos << std::endl;
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - Diff fitted - original" << std::endl << diffPos << std::endl;
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - dev/head trans" << std::endl << trans << std::endl;
 
-//    QString sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+        QString sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
 
-//    if(!QDir(sHPIResourceDir).exists()) {
-//        QDir().mkdir(sHPIResourceDir);
-//    }
+        if(!QDir(sHPIResourceDir).exists()) {
+            QDir().mkdir(sHPIResourceDir);
+        }
 
-//    UTILSLIB::IOUtils::write_eigen_matrix(coilPos, QString("%1/%2_coilPosSeed_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        UTILSLIB::IOUtils::write_eigen_matrix(coilPos, QString("%1/%2_coilPosSeed_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
-//    UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("%1/%2_coilPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("%1/%2_coilPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
-//    UTILSLIB::IOUtils::write_eigen_matrix(headHPI, QString("%1/%2_headHPI_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        UTILSLIB::IOUtils::write_eigen_matrix(headHPI, QString("%1/%2_headHPI_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
-//    MatrixXd testPosCut = testPos.transpose();//block(0,0,3,4);
-//    UTILSLIB::IOUtils::write_eigen_matrix(testPosCut, QString("%1/%2_testPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        MatrixXd testPosCut = testPos.transpose();//block(0,0,3,4);
+        UTILSLIB::IOUtils::write_eigen_matrix(testPosCut, QString("%1/%2_testPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
-//    MatrixXi idx_mat(chIdcs.rows(),1);
-//    idx_mat.col(0) = chIdcs;
-//    UTILSLIB::IOUtils::write_eigen_matrix(idx_mat, QString("%1/%2_idx_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        MatrixXi idx_mat(chIdcs.rows(),1);
+        idx_mat.col(0) = chIdcs;
+        UTILSLIB::IOUtils::write_eigen_matrix(idx_mat, QString("%1/%2_idx_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
-//    MatrixXd coilFreq_mat(coilfreq.rows(),1);
-//    coilFreq_mat.col(0) = coilfreq;
-//    UTILSLIB::IOUtils::write_eigen_matrix(coilFreq_mat, QString("%1/%2_coilFreq_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        MatrixXd coilFreq_mat(coilfreq.rows(),1);
+        coilFreq_mat.col(0) = coilfreq;
+        UTILSLIB::IOUtils::write_eigen_matrix(coilFreq_mat, QString("%1/%2_coilFreq_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
-//    UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("%1/%2_diffPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        UTILSLIB::IOUtils::write_eigen_matrix(diffPos, QString("%1/%2_diffPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
-//    UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("%1/%2_amp_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+        UTILSLIB::IOUtils::write_eigen_matrix(amp, QString("%1/%2_amp_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+    }
 }
 
 

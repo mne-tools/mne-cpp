@@ -468,24 +468,9 @@ void FiffSimulator::updateHPI(const MatrixXf& matData)
 
 void FiffSimulator::doContinousHPI(MatrixXf& matData)
 {
-//    // Convert rotation matrix to quaternion (from Wikipedia)
-//    t =rot(0,0) + rot(1,1) + rot(2,2);
-//    r = sqrt(1 + t);
-//    s = 0.5 / r;
-//    qw = 0.5 * r;
-//    qx = ( (rot(2,1) - rot(1,2)) / s );
-//    qy = ( (rot(0,2) - rot(2,0)) / s );
-//    qz = ( (rot(1,0) - rot(0,1)) / s );
-
-//    // Normalize quaternion vectors
-//    norm2 = sqrt(qx*qx + qy*qy + qz*qz);
-//    qx = qx / norm2;
-//    qy = qy / norm2;
-//    qz = qz / norm2;
-
     //This only works with babyMEG HPI channels 400 ... 407
     if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
-        if(m_pHPIWidget->performHPIFitting()) {
+        if(m_pHPIWidget->wasLastFitOk()) {
             // Load device to head transformation matrix from Fiff info
             QMatrix3x3 rot;
 

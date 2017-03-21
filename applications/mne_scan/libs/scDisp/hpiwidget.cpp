@@ -48,7 +48,6 @@
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/bem/bemtreeitem.h>
 
-#include <rtProcessing/rthpis.h>
 #include <inverse/hpiFit/hpifit.h>
 
 #include <mne/mne_bem.h>
@@ -95,11 +94,13 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
+, m_pRtHPI(RtHPIS::SPtr(new RtHPIS(m_pFiffInfo)))
 , m_dMaxHPIFitError(0.01)
 , m_dMeanErrorDist(0.0)
 , m_iNubmerBadChannels(0)
 , m_bUseSSP(true)
 , m_bUseComp(false)
+, m_bLastFitGood(false)
 {
     ui->setupUi(this);
 
@@ -153,7 +154,7 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     //Add sensor surface
     QFile t_fileBabyMEGSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
     MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
-    m_pData3DModel->addBemData("Device", "BabyMEG", t_babyMEGsensorSurfaceBEM);
+    m_pData3DModel->addMegSensorData("Device", "BabyMEG", t_babyMEGsensorSurfaceBEM);
 
     QFile t_fileVVSensorSurfaceBEM("./resources/sensorSurfaces/306m.fif");
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
@@ -168,6 +169,11 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 
     //Init data
     m_matValue.resize(0,0);
+
+    //Init RtHPIs
+    m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
+    connect(m_pRtHPI.data(), &RtHPIS::newFittingResultAvailable,
+            this, &HPIWidget::onNewFittingResultAvailable);
 }
 
 
@@ -190,6 +196,11 @@ void HPIWidget::setData(const Eigen::MatrixXd& matData)
     }
 
     m_matValue = m_matProjectors * matData;
+
+    //Do continous HPI if wanted
+    if(ui->m_checkBox_continousHPI->isChecked()) {
+        m_pRtHPI->append(m_matValue);
+    }
 }
 
 
@@ -198,6 +209,14 @@ void HPIWidget::setData(const Eigen::MatrixXd& matData)
 QVector<double> HPIWidget::getGOF()
 {
     return m_vGof;
+}
+
+
+//*************************************************************************************************************
+
+bool HPIWidget::wasLastFitOk()
+{
+    return m_bLastFitGood;
 }
 
 
@@ -213,7 +232,6 @@ void HPIWidget::closeEvent(QCloseEvent *event)
 
 void HPIWidget::updateProjections()
 {
-    qDebug()<<"HPIWidget::updateProjections()";
     Eigen::MatrixXd matProj = Eigen::MatrixXd::Identity(m_matValue.rows(), m_matValue.rows());
     Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_matValue.rows(), m_matValue.rows());
 
@@ -366,6 +384,18 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
 
 //*************************************************************************************************************
 
+void HPIWidget::onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult)
+{
+    qDebug()<<"HPIWidget::onNewFittingResultAvailable";
+
+    m_vGof = fitResult.errorDistances;
+
+    storeResults(fitResult.devHeadTrans, fitResult.fittedCoils);
+}
+
+
+//*************************************************************************************************************
+
 void HPIWidget::onBtnDoSingleFit()
 {    
     if(!this->hpiLoaded()) {
@@ -382,7 +412,24 @@ void HPIWidget::onBtnDoSingleFit()
        return;
     }
 
-    this->performHPIFitting();
+    //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
+    //rt head motion correction will be performed using the rtHPI plugin.
+    if(m_pFiffInfo) {
+        //Perform actual fitting
+        FiffDigPointSet fittedCoils;
+        FiffCoordTrans devHeadTrans;
+        devHeadTrans.from = 1;
+        devHeadTrans.to = 4;
+
+        HPIFit::fitHPI(m_matValue,
+                          devHeadTrans,
+                          m_vCoilFreqs,
+                          m_vGof,
+                          fittedCoils,
+                          m_pFiffInfo);
+
+        storeResults(devHeadTrans, fittedCoils);
+    }
 }
 
 
@@ -434,6 +481,12 @@ void HPIWidget::onFreqsChanged()
 void HPIWidget::onDoContinousHPI()
 {
     emit continousHPIToggled(ui->m_checkBox_continousHPI->isChecked());
+
+    if(ui->m_checkBox_continousHPI->isChecked()) {
+        m_pRtHPI->start();
+    } else {
+        m_pRtHPI->stop();
+    }
 }
 
 
@@ -458,96 +511,8 @@ void HPIWidget::onSSPCompUsageChanged()
 
 //*************************************************************************************************************
 
-bool HPIWidget::performHPIFitting()
+void HPIWidget::updateErrorLabels()
 {
-    //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
-    //rt head motion correction will be performed using the rtHPI plugin.
-    if(m_pFiffInfo) {
-        if(this->hpiLoaded()) {
-            //Perform actual fitting
-            FiffDigPointSet t_fittedSet;
-            FiffCoordTrans transDevHead;
-            transDevHead.from = 1;
-            transDevHead.to = 4;
-
-            HPIFit::fitHPI(m_matValue,
-                              transDevHead,
-                              m_vCoilFreqs,
-                              m_vGof,
-                              t_fittedSet,
-                              m_pFiffInfo);
-
-            //Check if git meets distance requirement (GOF)
-            m_dMeanErrorDist = 0;
-            for(int i = 0; i < m_vGof.size(); ++i) {
-                m_dMeanErrorDist += m_vGof.at(i);
-            }
-            m_dMeanErrorDist = m_dMeanErrorDist/m_vGof.size();
-
-            updateLabels();
-
-            if(m_dMeanErrorDist > m_dMaxHPIFitError) {
-                return false;
-            }
-
-            //If fit was good, set newly calculated transformation matrix to fiff info
-            m_pFiffInfo->dev_head_t = transDevHead;
-
-            //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
-            FiffDigPointSet t_digSet;
-
-            for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
-                FiffDigPoint digPoint = m_pFiffInfo->dig.at(i);
-
-                MatrixX3f matPos(1,3);
-                matPos(0,0) = digPoint.r[0];
-                matPos(0,1) = digPoint.r[1];
-                matPos(0,2) = digPoint.r[2];
-
-                MatrixX3f matPosTrans = m_pFiffInfo->dev_head_t.apply_inverse_trans(matPos);
-
-                digPoint.r[0] = matPosTrans(0,0);
-                digPoint.r[1] = matPosTrans(0,1);
-                digPoint.r[2] = matPosTrans(0,2);
-
-                t_digSet << digPoint;
-            }
-
-            this->setDigitizerDataToView3D(t_digSet, t_fittedSet);
-        }        
-    }
-
-     return true;
-}
-
-
-//*************************************************************************************************************
-
-void HPIWidget::updateLabels()
-{
-    //Update labels with new dev/trans amtrix
-    FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
-
-    ui->m_label_mat00->setText(QString::number(devHeadTrans.trans(0,0),'f',4));
-    ui->m_label_mat01->setText(QString::number(devHeadTrans.trans(0,1),'f',4));
-    ui->m_label_mat02->setText(QString::number(devHeadTrans.trans(0,2),'f',4));
-    ui->m_label_mat03->setText(QString::number(devHeadTrans.trans(0,3),'f',4));
-
-    ui->m_label_mat10->setText(QString::number(devHeadTrans.trans(1,0),'f',4));
-    ui->m_label_mat11->setText(QString::number(devHeadTrans.trans(1,1),'f',4));
-    ui->m_label_mat12->setText(QString::number(devHeadTrans.trans(1,2),'f',4));
-    ui->m_label_mat13->setText(QString::number(devHeadTrans.trans(1,3),'f',4));
-
-    ui->m_label_mat20->setText(QString::number(devHeadTrans.trans(2,0),'f',4));
-    ui->m_label_mat21->setText(QString::number(devHeadTrans.trans(2,1),'f',4));
-    ui->m_label_mat22->setText(QString::number(devHeadTrans.trans(2,2),'f',4));
-    ui->m_label_mat23->setText(QString::number(devHeadTrans.trans(2,3),'f',4));
-
-    ui->m_label_mat30->setText(QString::number(devHeadTrans.trans(3,0),'f',4));
-    ui->m_label_mat31->setText(QString::number(devHeadTrans.trans(3,1),'f',4));
-    ui->m_label_mat32->setText(QString::number(devHeadTrans.trans(3,2),'f',4));
-    ui->m_label_mat33->setText(QString::number(devHeadTrans.trans(3,3),'f',4));
-
     //Update gof labels and transform from m to mm
     QString sGof("0mm");
     if(m_vGof.size() > 0) {
@@ -581,4 +546,88 @@ void HPIWidget::updateLabels()
         ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : green;}");
     }
 }
+
+
+//*************************************************************************************************************
+
+void HPIWidget::updateTransLabels()
+{
+    //Update labels with new dev/trans matrix
+    FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
+
+    ui->m_label_mat00->setText(QString::number(devHeadTrans.trans(0,0),'f',4));
+    ui->m_label_mat01->setText(QString::number(devHeadTrans.trans(0,1),'f',4));
+    ui->m_label_mat02->setText(QString::number(devHeadTrans.trans(0,2),'f',4));
+    ui->m_label_mat03->setText(QString::number(devHeadTrans.trans(0,3),'f',4));
+
+    ui->m_label_mat10->setText(QString::number(devHeadTrans.trans(1,0),'f',4));
+    ui->m_label_mat11->setText(QString::number(devHeadTrans.trans(1,1),'f',4));
+    ui->m_label_mat12->setText(QString::number(devHeadTrans.trans(1,2),'f',4));
+    ui->m_label_mat13->setText(QString::number(devHeadTrans.trans(1,3),'f',4));
+
+    ui->m_label_mat20->setText(QString::number(devHeadTrans.trans(2,0),'f',4));
+    ui->m_label_mat21->setText(QString::number(devHeadTrans.trans(2,1),'f',4));
+    ui->m_label_mat22->setText(QString::number(devHeadTrans.trans(2,2),'f',4));
+    ui->m_label_mat23->setText(QString::number(devHeadTrans.trans(2,3),'f',4));
+
+    ui->m_label_mat30->setText(QString::number(devHeadTrans.trans(3,0),'f',4));
+    ui->m_label_mat31->setText(QString::number(devHeadTrans.trans(3,1),'f',4));
+    ui->m_label_mat32->setText(QString::number(devHeadTrans.trans(3,2),'f',4));
+    ui->m_label_mat33->setText(QString::number(devHeadTrans.trans(3,3),'f',4));
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPointSet& fittedCoils)
+{
+    //Check if git meets distance requirement (GOF)
+    if(m_vGof.size() > 0) {
+        m_dMeanErrorDist = 0;
+        for(int i = 0; i < m_vGof.size(); ++i) {
+            m_dMeanErrorDist += m_vGof.at(i);
+        }
+        m_dMeanErrorDist = m_dMeanErrorDist/m_vGof.size();
+    }
+
+    //Update error labels
+    updateErrorLabels();
+
+    //If distance is to big, do not store results
+    if(m_dMeanErrorDist > m_dMaxHPIFitError) {
+        m_bLastFitGood = false;
+        return;
+    }
+
+    //Update transformation labels
+    updateTransLabels();
+
+    m_bLastFitGood = true;
+
+    //If fit was good, set newly calculated transformation matrix to fiff info
+    m_pFiffInfo->dev_head_t = devHeadTrans;
+
+    //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
+    FiffDigPointSet transformedCoils;
+
+    for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
+        FiffDigPoint digPoint = m_pFiffInfo->dig.at(i);
+
+        MatrixX3f matPos(1,3);
+        matPos(0,0) = digPoint.r[0];
+        matPos(0,1) = digPoint.r[1];
+        matPos(0,2) = digPoint.r[2];
+
+        MatrixX3f matPosTrans = m_pFiffInfo->dev_head_t.apply_inverse_trans(matPos);
+
+        digPoint.r[0] = matPosTrans(0,0);
+        digPoint.r[1] = matPosTrans(0,1);
+        digPoint.r[2] = matPosTrans(0,2);
+
+        transformedCoils << digPoint;
+    }
+
+    this->setDigitizerDataToView3D(transformedCoils, fittedCoils);
+}
+
 

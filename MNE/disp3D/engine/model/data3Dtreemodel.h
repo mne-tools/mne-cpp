@@ -169,7 +169,10 @@ public:
     *                               of the list hereby corresponds to the ordering of the input surface set.
     *                               The list is empty if no item was added.
     */
-    QList<FsSurfaceTreeItem*> addSurfaceSet(const QString& subject, const QString& sMriSetName, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+    QList<FsSurfaceTreeItem*> addSurfaceSet(const QString& subject,
+                                            const QString& sMriSetName,
+                                            const FSLIB::SurfaceSet& tSurfaceSet,
+                                            const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -182,7 +185,10 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    FsSurfaceTreeItem* addSurface(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    FsSurfaceTreeItem* addSurface(const QString& subject,
+                                  const QString& set,
+                                  const FSLIB::Surface& tSurface,
+                                  const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -194,7 +200,9 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addSourceSpace(const QString& subject, const QString& sMeasurementSetName, const MNELIB::MNESourceSpace& tSourceSpace);
+    SourceSpaceTreeItem* addSourceSpace(const QString& subject,
+                                        const QString& sMeasurementSetName,
+                                        const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -206,7 +214,9 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addForwardSolution(const QString& subject, const QString& sMeasurementSetName, const MNELIB::MNEForwardSolution& tForwardSolution);
+    SourceSpaceTreeItem* addForwardSolution(const QString& subject,
+                                            const QString& sMeasurementSetName,
+                                            const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
@@ -219,7 +229,10 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    MneEstimateTreeItem* addSourceData(const QString& subject, const QString& sMeasurementSetName, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    MneEstimateTreeItem* addSourceData(const QString& subject,
+                                       const QString& sMeasurementSetName,
+                                       const MNELIB::MNESourceEstimate& tSourceEstimate,
+                                       const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
@@ -231,7 +244,9 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    EcdDataTreeItem* addDipoleFitData(const QString& subject, const QString& set, const INVERSELIB::ECDSet& tECDSet);
+    EcdDataTreeItem* addDipoleFitData(const QString& subject,
+                                      const QString& set,
+                                      const INVERSELIB::ECDSet& tECDSet);
 
     //=========================================================================================================
     /**
@@ -243,7 +258,9 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    NetworkTreeItem* addConnectivityData(const QString& subject, const QString& sMeasurementSetName, const CONNECTIVITYLIB::Network& tNetworkData);
+    NetworkTreeItem* addConnectivityData(const QString& subject,
+                                         const QString& sMeasurementSetName,
+                                         const CONNECTIVITYLIB::Network& tNetworkData);
 
     //=========================================================================================================
     /**
@@ -255,7 +272,9 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BemTreeItem* addBemData(const QString& subject, const QString& sBemSetName, const MNELIB::MNEBem& tBem);
+    BemTreeItem* addBemData(const QString& subject,
+                            const QString& sBemSetName,
+                            const MNELIB::MNEBem& tBem);
 
 
     //=========================================================================================================
@@ -270,9 +289,9 @@ public:
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     SensorSetTreeItem* addMegSensorData(const QString& subject,
-                                        const QString& sBemSetName,
+                                        const QString& sSensorSetName,
                                         const MNELIB::MNEBem& tSensor,
-                                        const QList<FIFFLIB::FiffChInfo>& lChInfo);
+                                        const QList<FIFFLIB::FiffChInfo>& lChInfo = QList<FIFFLIB::FiffChInfo>());
 
     //=========================================================================================================
     /**
