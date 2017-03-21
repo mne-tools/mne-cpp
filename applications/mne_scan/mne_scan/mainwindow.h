@@ -234,7 +234,7 @@ private:
     QMenu*                              m_pMenuLgLv;    /**< Holds the log level sub menu.*/
     QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
 
-    // Tool bar
+    // Tool Bar
     QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
     QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
     QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/

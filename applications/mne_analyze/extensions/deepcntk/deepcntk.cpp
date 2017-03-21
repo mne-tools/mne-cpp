@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cntk.cpp
+* @file     deepcntk.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the CNTK class.
+* @brief    Contains the implementation of the DeepCNTK class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "cntk.h"
+#include "deepcntk.h"
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SURFEREXTENSION;
+using namespace DEEPCNTKEXTENSION;
 using namespace ANSHAREDLIB;
 
 
@@ -55,7 +55,7 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Surfer::Surfer()
+DeepCNTK::DeepCNTK()
 : m_control(NULL)
 , m_view(NULL)
 {
@@ -65,7 +65,7 @@ Surfer::Surfer()
 
 //*************************************************************************************************************
 
-Surfer::~Surfer()
+DeepCNTK::~DeepCNTK()
 {
 
 }
@@ -73,24 +73,16 @@ Surfer::~Surfer()
 
 //*************************************************************************************************************
 
-QSharedPointer<IExtension> Surfer::clone() const
+QSharedPointer<IExtension> DeepCNTK::clone() const
 {
-    QSharedPointer<Surfer> pSurferClone(new Surfer);
-    return pSurferClone;
+    QSharedPointer<DeepCNTK> pDeepCNTKClone(new DeepCNTK);
+    return pDeepCNTKClone;
 }
 
 
 //*************************************************************************************************************
 
-void Surfer::init()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void Surfer::unload()
+void DeepCNTK::init()
 {
 
 }
@@ -98,15 +90,23 @@ void Surfer::unload()
 
 //*************************************************************************************************************
 
-QString Surfer::getName() const
+void DeepCNTK::unload()
 {
-    return "Surfer";
+
 }
 
 
 //*************************************************************************************************************
 
-bool Surfer::hasMenu() const
+QString DeepCNTK::getName() const
+{
+    return "Deep CNTK";
+}
+
+
+//*************************************************************************************************************
+
+bool DeepCNTK::hasMenu() const
 {
     return true;
 }
@@ -114,7 +114,7 @@ bool Surfer::hasMenu() const
 
 //*************************************************************************************************************
 
-QMenu *Surfer::getMenu()
+QMenu *DeepCNTK::getMenu()
 {
     return Q_NULLPTR;
 }
@@ -122,7 +122,7 @@ QMenu *Surfer::getMenu()
 
 //*************************************************************************************************************
 
-bool Surfer::hasControl() const
+bool DeepCNTK::hasControl() const
 {
     return true;
 }
@@ -130,10 +130,10 @@ bool Surfer::hasControl() const
 
 //*************************************************************************************************************
 
-QDockWidget *Surfer::getControl()
+QDockWidget *DeepCNTK::getControl()
 {
     if(!m_control) {
-        m_control = new QDockWidget(tr("Surfer Control"));
+        m_control = new QDockWidget(tr("Deep CNTK"));
         m_control->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_control->setMinimumWidth(180);
     }
@@ -144,7 +144,7 @@ QDockWidget *Surfer::getControl()
 
 //*************************************************************************************************************
 
-bool Surfer::hasView() const
+bool DeepCNTK::hasView() const
 {
     return true;
 }
@@ -153,14 +153,14 @@ bool Surfer::hasView() const
 //*************************************************************************************************************
 
 // check with owner ship and mdi area for garbage collection
-QWidget *Surfer::getView()
+QWidget *DeepCNTK::getView()
 {
     if(!m_view) {
         //
         //Pial surface
         //
-        m_view = new View3DAnalyze(1);
-        m_view->setWindowTitle("Pial surface");
+        m_view = new QWidget;
+        m_view->setWindowTitle("Deep CNTK");
     }
 
     return m_view;

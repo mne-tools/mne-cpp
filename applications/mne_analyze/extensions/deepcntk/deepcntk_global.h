@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cntk_global.h
+* @file     deepcntk_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the CNTK library export/import macros.
+* @brief    Contains the DeepCNTK library export/import macros.
 *
 */
 
-#ifndef CNTK_GLOBAL_H
-#define CNTK_GLOBAL_H
+#ifndef DEEPCNTK_GLOBAL_H
+#define DEEPCNTK_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -50,10 +50,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(CNTK_LIBRARY)
-#  define SURFERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(DEEPCNTK_LIBRARY)
+#  define DEEPCNTKSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define SURFERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define DEEPCNTKSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // CNTK_GLOBAL_H
+#endif // DEEPCNTK_GLOBAL_H
