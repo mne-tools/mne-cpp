@@ -44,6 +44,7 @@
 #include <deep/deepviewer.h>
 #include <deep/deepmodelcreator.h>
 #include <deep/deepmodelviewer/deepviewerwidget.h>
+#include <deep/deepmodelviewer/controls.h>
 
 #include <iostream>
 #include <random>
@@ -100,8 +101,9 @@ void generate_random_data_samples(int sample_size, int feature_dim, int num_clas
 //=============================================================================================================
 
 DeepCNTK::DeepCNTK()
-: m_control(NULL)
-, m_view(NULL)
+: m_controlPanel(Q_NULLPTR)
+, m_control(Q_NULLPTR)
+, m_view(Q_NULLPTR)
 {
 
 }
@@ -152,6 +154,24 @@ void DeepCNTK::init()
     generate_random_data_samples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
     m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
 
+
+
+
+
+
+    // Init view
+
+    if(!m_controlPanel) {
+        m_controlPanel = new Controls();
+    }
+
+    //
+    // Create the viewer
+    //
+    if(!m_view) {
+        m_view = new DeepViewerWidget(m_pModel, m_controlPanel);
+        m_view->setWindowTitle("Deep CNTK");
+    }
 }
 
 
@@ -203,6 +223,8 @@ QDockWidget *DeepCNTK::getControl()
         m_control = new QDockWidget(tr("Deep CNTK"));
         m_control->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_control->setMinimumWidth(180);
+
+        m_control->setWidget(m_controlPanel);
     }
 
     return m_control;

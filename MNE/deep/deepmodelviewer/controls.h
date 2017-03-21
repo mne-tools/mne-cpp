@@ -1,6 +1,9 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+
+#include "../deep_global.h"
+
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -10,12 +13,16 @@ QT_END_NAMESPACE
 class View;
 
 
-class Controls : public QWidget
+class DEEPSHARED_EXPORT Controls : public QWidget
 {
     Q_OBJECT
 
 public:
-    Controls(View* v, QWidget *parent = 0);
+    Controls(QWidget *parent = Q_NULLPTR);
+
+    Controls(View* v, QWidget *parent = Q_NULLPTR);
+
+    void setView(View* v);
 
 signals:
     void okPressed();
