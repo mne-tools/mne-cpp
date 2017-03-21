@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -62,14 +62,6 @@
 
 namespace ANSHAREDLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -126,28 +118,89 @@ public:
     */
     virtual QString getName() const = 0;
 
-
+    //=========================================================================================================
+    /**
+    * Returns if extension provides its own menu
+    *
+    * @return true if provides menu, false otherwise
+    */
     virtual bool hasMenu() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
+    *
+    * @return the menu
+    */
     virtual QMenu* getMenu() = 0;
 
+    //=========================================================================================================
+    /**
+    * Returns if extension provides its own control
+    *
+    * @return true if provides control, false otherwise
+    */
     virtual bool hasControl() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Provides the control, in case no control is provided it returns a Q_NULLPTR
+    *
+    * @return the control
+    */
     virtual QDockWidget* getControl() = 0;
 
+    //=========================================================================================================
+    /**
+    * Returns if extension provides its own view
+    *
+    * @return true if provides control, false otherwise
+    */
     virtual bool hasView() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Provides the view, in case no view is provided it returns a Q_NULLPTR
+    *
+    * @return the view
+    */
     virtual QWidget* getView() = 0;
 
-
+    //=========================================================================================================
+    /**
+    * Sets the global data, which provides the central database
+    *
+    * @param [in] globalData  the global data
+    */
     virtual inline void setGlobalData(QSharedPointer<AnalyzeData>& globalData);
+
+    //=========================================================================================================
+    /**
+    * Returns the global data base
+    *
+    * @return the global data
+    */
     virtual inline QSharedPointer<AnalyzeData>& globalData();
 
+    //=========================================================================================================
+    /**
+    * Sets the global settings, which provides the mne analyze settings
+    *
+    * @param [in] globalSettings  the global settings
+    */
     virtual inline void setGlobalSettings(QSharedPointer<AnalyzeSettings>& globalSettings);
+
+    //=========================================================================================================
+    /**
+    * Returns the global settings base
+    *
+    * @return the global settings
+    */
     virtual inline QSharedPointer<AnalyzeSettings>& globalSettings();
 
-protected:
-
 private:
-    QSharedPointer<AnalyzeData> m_analyzeData;
-    QSharedPointer<AnalyzeSettings> m_analyzeSettings;
+    QSharedPointer<AnalyzeData> m_analyzeData;              /**< Pointer to the global data base */
+    QSharedPointer<AnalyzeSettings> m_analyzeSettings;      /**< Pointer to the global analyze settings */
 
 };
 

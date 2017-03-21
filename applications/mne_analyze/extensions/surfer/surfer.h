@@ -111,7 +111,7 @@ public:
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
+    * IExtension functions
     */
     virtual QSharedPointer<IExtension> clone() const;
     virtual void init();

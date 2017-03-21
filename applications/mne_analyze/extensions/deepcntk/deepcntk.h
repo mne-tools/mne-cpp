@@ -133,7 +133,7 @@ public:
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
+    * IExtension functions
     */
     virtual QSharedPointer<IExtension> clone() const;
     virtual void init();
@@ -154,17 +154,16 @@ protected:
 private:
 
     // Deep Model
-    QSharedPointer<DEEPLIB::Deep>   m_pDeep;
-    CNTK::FunctionPtr               m_pModel;
+    QSharedPointer<DEEPLIB::Deep>   m_pDeep;            /**< CNTK Wrapper */
+    CNTK::FunctionPtr               m_pModel;           /**< CNTK Model */
 
-
-    DISPLIB::Controls*              m_controlPanel;
+    DISPLIB::Controls*              m_controlPanel;     /**< View Control Panel */
 
     // Control
-    QDockWidget*                    m_control;
+    QDockWidget*                    m_control;          /**< Control Widget */
 
     // View
-    DISPLIB::DeepViewerWidget*      m_view;
+    DISPLIB::DeepViewerWidget*      m_view;             /**< Control View */
 
 };
 

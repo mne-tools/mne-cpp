@@ -95,25 +95,27 @@ public:
 
     void setView(View* v);
 
-signals:
-    void okPressed();
-    void quitPressed();
-
 private:
-    View* m_view;
+    View* m_view;                   /**< The view which this control is connected to */
 
     QGroupBox *m_capGroup;
     QGroupBox *m_joinGroup;
     QGroupBox *m_styleGroup;
     QGroupBox *m_pathModeGroup;
 
+    //=========================================================================================================
+    /**
+    * Create the common controls
+    *
+    * @param [in] parent    the group box where the controls should be attached to
+    */
     void createCommonControls(QWidget* parent);
-    void layoutForDesktop();
 
-private slots:
-    void emitQuitSignal();
-    void emitOkSignal();
-
+    //=========================================================================================================
+    /**
+    * Creates the layout
+    */
+    void createLayout();
 };
 
 //*************************************************************************************************************
