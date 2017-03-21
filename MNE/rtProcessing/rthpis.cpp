@@ -185,8 +185,8 @@ void RtHPIS::run()
 
             emit newFittingResultAvailable(fitResult);
 
-            qDebug() << "RtHPIS::run() - timer.elapsed()" << timer.elapsed();
-            qDebug() << "RtHPIS::run() - m_pRawMatrixBuffer.size()" << m_pRawMatrixBuffer->size();
+//            qDebug() << "RtHPIS::run() - timer.elapsed()" << timer.elapsed();
+//            qDebug() << "RtHPIS::run() - m_pRawMatrixBuffer.size()" << m_pRawMatrixBuffer->size();
         }
     }
 }

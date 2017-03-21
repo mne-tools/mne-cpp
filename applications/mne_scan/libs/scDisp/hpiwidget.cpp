@@ -386,8 +386,6 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
 
 void HPIWidget::onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult)
 {
-    qDebug()<<"HPIWidget::onNewFittingResultAvailable";
-
     m_vGof = fitResult.errorDistances;
 
     storeResults(fitResult.devHeadTrans, fitResult.fittedCoils);
