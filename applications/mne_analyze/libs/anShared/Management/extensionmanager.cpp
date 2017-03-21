@@ -75,6 +75,9 @@ ExtensionManager::ExtensionManager(QObject *parent)
 
 ExtensionManager::~ExtensionManager()
 {
+    for(int i = 0; i < m_qVecExtensions.size(); ++i) {
+        delete m_qVecExtensions[i];
+    }
 }
 
 

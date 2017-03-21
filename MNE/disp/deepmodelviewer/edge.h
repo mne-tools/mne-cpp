@@ -69,13 +69,44 @@ class Node;
 class Edge : public QGraphicsItem
 {
 public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a Edge representing a weight
+    *
+    * @param [in] sourceNode    The Source Node of this Edge
+    * @param [in] destNode      The Destination Node of this Edge
+    */
     Edge(Node *sourceNode, Node *destNode);
 
+    //=========================================================================================================
+    /**
+    * Returns the source node
+    *
+    * @return the source node
+    */
     Node *sourceNode() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the destination node
+    *
+    * @return the destination node
+    */
     Node *destNode() const;
 
+    //=========================================================================================================
+    /**
+    * Recalculates the edge coordinates after one of its connected nodes was moved
+    */
     void adjust();
 
+    //=========================================================================================================
+    /**
+    * Sets the weight to the node
+    *
+    * @param [in] weight    The weight to set
+    */
     void setWeight(float weight);
 
     enum { Type = UserType + 2 };
@@ -89,15 +120,16 @@ protected:
     void updateColor();
 
 private:
-    Node *source, *dest;
+    Node *m_pSource;            /**< The Edges Source Node */
+    Node *m_pDest;              /**< The Edges Destination Node */
 
-    QPointF m_sourcePoint;
-    QPointF m_destPoint;
-    qreal   m_arrowSize;
-    QColor  m_color;
-    qreal   m_penWidth;
+    QPointF m_sourcePoint;      /**< The calculated Source Point */
+    QPointF m_destPoint;        /**< The calculated Destination Point */
+    qreal   m_arrowSize;        /**< The Arrow Size */
+    QColor  m_color;            /**< The Color derived from the weight */
+    qreal   m_penWidth;         /**< The Edges width derived from the weight */
 
-    float   m_weight;
+    float   m_weight;           /**< The Weight related to the edge */
 };
 
 //*************************************************************************************************************

@@ -82,8 +82,8 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
 {
     populateScene();
 
-    View *view = new View("");
-    view->view()->setScene(m_pScene);
+    View *view = new View;
+    view->getView()->setScene(m_pScene);
 
     Controls *controls = new Controls(view, this);
 
@@ -104,8 +104,8 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, Controls *controls, 
 {
     populateScene();
 
-    View *view = new View("");
-    view->view()->setScene(m_pScene);
+    View *view = new View;
+    view->getView()->setScene(m_pScene);
 
     controls->setView(view);
 

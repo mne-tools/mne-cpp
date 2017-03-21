@@ -75,7 +75,7 @@ using namespace DISPLIB;
 
 Controls::Controls(QWidget* parent)
 : QWidget(parent)
-, m_view(Q_NULLPTR)
+, m_pView(Q_NULLPTR)
 {
 
 }
@@ -85,7 +85,7 @@ Controls::Controls(QWidget* parent)
 
 Controls::Controls(View* v, QWidget* parent)
 : QWidget(parent)
-, m_view(v)
+, m_pView(v)
 {
     createLayout();
 }
@@ -95,7 +95,11 @@ Controls::Controls(View* v, QWidget* parent)
 
 void Controls::setView(View *v)
 {
-    m_view = v;
+    if(m_pView) {
+        qDebug() << "TODO Make sure that the old view is dosconnected and destroyed later on.";
+    }
+
+    m_pView = v;
     createLayout();
 }
 
@@ -104,12 +108,12 @@ void Controls::setView(View *v)
 
 void Controls::createCommonControls(QWidget* parent)
 {
-    m_capGroup = new QGroupBox(parent);
-    m_capGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *flatCap = new QRadioButton(m_capGroup);
-    QRadioButton *squareCap = new QRadioButton(m_capGroup);
-    QRadioButton *roundCap = new QRadioButton(m_capGroup);
-    m_capGroup->setTitle(tr("Cap Style"));
+    m_pCapGroup = new QGroupBox(parent);
+    m_pCapGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    QRadioButton *flatCap = new QRadioButton(m_pCapGroup);
+    QRadioButton *squareCap = new QRadioButton(m_pCapGroup);
+    QRadioButton *roundCap = new QRadioButton(m_pCapGroup);
+    m_pCapGroup->setTitle(tr("Cap Style"));
     flatCap->setText(tr("Flat"));
     squareCap->setText(tr("Square"));
     roundCap->setText(tr("Round"));
@@ -117,25 +121,25 @@ void Controls::createCommonControls(QWidget* parent)
     squareCap->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     roundCap->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    m_joinGroup = new QGroupBox(parent);
-    m_joinGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *bevelJoin = new QRadioButton(m_joinGroup);
-    QRadioButton *miterJoin = new QRadioButton(m_joinGroup);
-    QRadioButton *roundJoin = new QRadioButton(m_joinGroup);
-    m_joinGroup->setTitle(tr("Join Style"));
+    m_pJoinGroup = new QGroupBox(parent);
+    m_pJoinGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    QRadioButton *bevelJoin = new QRadioButton(m_pJoinGroup);
+    QRadioButton *miterJoin = new QRadioButton(m_pJoinGroup);
+    QRadioButton *roundJoin = new QRadioButton(m_pJoinGroup);
+    m_pJoinGroup->setTitle(tr("Join Style"));
     bevelJoin->setText(tr("Bevel"));
     miterJoin->setText(tr("Miter"));
     roundJoin->setText(tr("Round"));
 
-    m_styleGroup = new QGroupBox(parent);
-    m_styleGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *solidLine = new QRadioButton(m_styleGroup);
-    QRadioButton *dashLine = new QRadioButton(m_styleGroup);
-    QRadioButton *dotLine = new QRadioButton(m_styleGroup);
-    QRadioButton *dashDotLine = new QRadioButton(m_styleGroup);
-    QRadioButton *dashDotDotLine = new QRadioButton(m_styleGroup);
-    QRadioButton *customDashLine = new QRadioButton(m_styleGroup);
-    m_styleGroup->setTitle(tr("Pen Style"));
+    m_pStyleGroup = new QGroupBox(parent);
+    m_pStyleGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    QRadioButton *solidLine = new QRadioButton(m_pStyleGroup);
+    QRadioButton *dashLine = new QRadioButton(m_pStyleGroup);
+    QRadioButton *dotLine = new QRadioButton(m_pStyleGroup);
+    QRadioButton *dashDotLine = new QRadioButton(m_pStyleGroup);
+    QRadioButton *dashDotDotLine = new QRadioButton(m_pStyleGroup);
+    QRadioButton *customDashLine = new QRadioButton(m_pStyleGroup);
+    m_pStyleGroup->setTitle(tr("Pen Style"));
 
     QPixmap line_solid(":res/images/line_solid.png");
     solidLine->setIcon(line_solid);
@@ -161,27 +165,27 @@ void Controls::createCommonControls(QWidget* parent)
     dashDotLine->setFixedHeight(fixedHeight);
     dashDotDotLine->setFixedHeight(fixedHeight);
 
-    m_pathModeGroup = new QGroupBox(parent);
-    m_pathModeGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *curveMode = new QRadioButton(m_pathModeGroup);
-    QRadioButton *lineMode = new QRadioButton(m_pathModeGroup);
-    m_pathModeGroup->setTitle(tr("Line Style"));
+    m_pPathModeGroup = new QGroupBox(parent);
+    m_pPathModeGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    QRadioButton *curveMode = new QRadioButton(m_pPathModeGroup);
+    QRadioButton *lineMode = new QRadioButton(m_pPathModeGroup);
+    m_pPathModeGroup->setTitle(tr("Line Style"));
     curveMode->setText(tr("Curves"));
     lineMode->setText(tr("Lines"));
 
 
     // Layouts
-    QVBoxLayout *capGroupLayout = new QVBoxLayout(m_capGroup);
+    QVBoxLayout *capGroupLayout = new QVBoxLayout(m_pCapGroup);
     capGroupLayout->addWidget(flatCap);
     capGroupLayout->addWidget(squareCap);
     capGroupLayout->addWidget(roundCap);
 
-    QVBoxLayout *joinGroupLayout = new QVBoxLayout(m_joinGroup);
+    QVBoxLayout *joinGroupLayout = new QVBoxLayout(m_pJoinGroup);
     joinGroupLayout->addWidget(bevelJoin);
     joinGroupLayout->addWidget(miterJoin);
     joinGroupLayout->addWidget(roundJoin);
 
-    QVBoxLayout *styleGroupLayout = new QVBoxLayout(m_styleGroup);
+    QVBoxLayout *styleGroupLayout = new QVBoxLayout(m_pStyleGroup);
     styleGroupLayout->addWidget(solidLine);
     styleGroupLayout->addWidget(dashLine);
     styleGroupLayout->addWidget(dotLine);
@@ -189,7 +193,7 @@ void Controls::createCommonControls(QWidget* parent)
     styleGroupLayout->addWidget(dashDotDotLine);
     styleGroupLayout->addWidget(customDashLine);
 
-    QVBoxLayout *pathModeGroupLayout = new QVBoxLayout(m_pathModeGroup);
+    QVBoxLayout *pathModeGroupLayout = new QVBoxLayout(m_pPathModeGroup);
     pathModeGroupLayout->addWidget(curveMode);
     pathModeGroupLayout->addWidget(lineMode);
 
@@ -267,11 +271,11 @@ void Controls::createLayout()
 
     QVBoxLayout *mainGroupLayout = new QVBoxLayout(mainGroup);
     mainGroupLayout->setMargin(3);
-    mainGroupLayout->addWidget(m_capGroup);
-    mainGroupLayout->addWidget(m_joinGroup);
-    mainGroupLayout->addWidget(m_styleGroup);
+    mainGroupLayout->addWidget(m_pCapGroup);
+    mainGroupLayout->addWidget(m_pJoinGroup);
+    mainGroupLayout->addWidget(m_pStyleGroup);
     mainGroupLayout->addWidget(penWidthGroup);
-    mainGroupLayout->addWidget(m_pathModeGroup);
+    mainGroupLayout->addWidget(m_pPathModeGroup);
     mainGroupLayout->addWidget(antialiasButton);
 #ifndef QT_NO_OPENGL
     mainGroupLayout->addWidget(openGlButton);
@@ -281,12 +285,12 @@ void Controls::createLayout()
 
 
     // Set up connections
-    connect(antialiasButton, SIGNAL(toggled(bool)), m_view, SLOT(enableAntialiasing(bool)));
+    connect(antialiasButton, SIGNAL(toggled(bool)), m_pView, SLOT(enableAntialiasing(bool)));
 
 //    connect(penWidth, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
 
 #ifndef QT_NO_OPENGL
-    connect(openGlButton, SIGNAL(clicked(bool)), m_view, SLOT(enableOpenGL(bool)));
+    connect(openGlButton, SIGNAL(clicked(bool)), m_pView, SLOT(enableOpenGL(bool)));
 #endif
 //    connect(aboutButton, SIGNAL(clicked(bool)), m_renderer, SLOT(setDescriptionEnabled(bool)));
 //    connect(m_renderer, SIGNAL(descriptionEnabledChanged(bool)),
@@ -294,9 +298,9 @@ void Controls::createLayout()
 
 
     // Set the defaults
-    antialiasButton->setChecked(m_view->usesAntialiasing());
+    antialiasButton->setChecked(m_pView->usesAntialiasing());
 #ifndef QT_NO_OPENGL
-    openGlButton->setChecked(m_view->usesOpenGL());
+    openGlButton->setChecked(m_pView->usesOpenGL());
 #endif
     penWidth->setValue(50);
 }

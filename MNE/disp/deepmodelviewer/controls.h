@@ -70,6 +70,7 @@ QT_END_NAMESPACE
 namespace DISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -89,20 +90,32 @@ class DISPSHARED_EXPORT Controls : public QWidget
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructs the Controls Widget without an attached view which is a child of parent
+    *
+    * @param [in] parent    The parent widget
+    */
     Controls(QWidget *parent = Q_NULLPTR);
 
+    //=========================================================================================================
+    /**
+    * Constructs the Controls Widget with an attached view which is a child of parent
+    *
+    * @param [in] v         The view which should be controled by this
+    * @param [in] parent    The parent widgetarent widget
+    */
     Controls(View* v, QWidget *parent = Q_NULLPTR);
 
+    //=========================================================================================================
+    /**
+    * Sets the associated view if none was set before
+    *
+    * @param [in] v     The view to set
+    */
     void setView(View* v);
 
 private:
-    View* m_view;                   /**< The view which this control is connected to */
-
-    QGroupBox *m_capGroup;
-    QGroupBox *m_joinGroup;
-    QGroupBox *m_styleGroup;
-    QGroupBox *m_pathModeGroup;
-
     //=========================================================================================================
     /**
     * Create the common controls
@@ -116,6 +129,14 @@ private:
     * Creates the layout
     */
     void createLayout();
+
+private:
+    View* m_pView;                  /**< The view which this control is connected to */
+
+    QGroupBox *m_pCapGroup;         /**< The Cap Group */
+    QGroupBox *m_pJoinGroup;        /**< The Join Group */
+    QGroupBox *m_pStyleGroup;       /**< The Style Group */
+    QGroupBox *m_pPathModeGroup;    /**< The Path Mode Group */
 };
 
 //*************************************************************************************************************

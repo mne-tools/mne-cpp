@@ -130,11 +130,6 @@ private:
 
 
 private:
-
-    //mdi area subwindows
-    void mdiViewCascade();
-    void mdiViewTile();
-
     //Open a FIFF file
     void openFiffFile();            /**< Implements open fiff action.*/
     void about();                   /**< Implements about action.*/
@@ -143,13 +138,13 @@ private:
 private:
 
     //MDI Central View
-    MdiView            *m_mdiView;
+    MdiView *m_pMdiView;            /**< The Central MDI View.*/
 
     //FIFF File management
     QString                 m_fiffFileName;
 
-    QSharedPointer<ANSHAREDLIB::AnalyzeSettings> m_analyzeSettings;
-    QSharedPointer<ANSHAREDLIB::AnalyzeData> m_analyzeData;
+    QSharedPointer<ANSHAREDLIB::AnalyzeSettings>    m_analyzeSettings;
+    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;
 
 };
 

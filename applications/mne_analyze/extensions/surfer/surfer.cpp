@@ -56,8 +56,8 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 Surfer::Surfer()
-: m_control(NULL)
-, m_view(NULL)
+: m_pControl(NULL)
+, m_pView(NULL)
 {
 
 }
@@ -132,13 +132,13 @@ bool Surfer::hasControl() const
 
 QDockWidget *Surfer::getControl()
 {
-    if(!m_control) {
-        m_control = new QDockWidget(tr("Surfer Control"));
-        m_control->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-        m_control->setMinimumWidth(180);
+    if(!m_pControl) {
+        m_pControl = new QDockWidget(tr("Surfer Control"));
+        m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+        m_pControl->setMinimumWidth(180);
     }
 
-    return m_control;
+    return m_pControl;
 }
 
 
@@ -155,13 +155,13 @@ bool Surfer::hasView() const
 // check with owner ship and mdi area for garbage collection
 QWidget *Surfer::getView()
 {
-    if(!m_view) {
+    if(!m_pView) {
         //
         //Pial surface
         //
-        m_view = new View3DAnalyze(1);
-        m_view->setWindowTitle("Pial surface");
+        m_pView = new View3DAnalyze(1);
+        m_pView->setWindowTitle("Pial surface");
     }
 
-    return m_view;
+    return m_pView;
 }

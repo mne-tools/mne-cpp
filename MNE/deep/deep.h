@@ -118,7 +118,7 @@ public:
 //    * @param [in] evalFunc      Function to evaluate
 //    * @param [in] device        Device to use
 //    */
-//    static void RunEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
+//    static void runEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
 
 //    //=========================================================================================================
 //    /**
@@ -131,36 +131,15 @@ public:
 //    * @param [in] device
 //    * @param [in] threadCount   Numbers of threads to use
 //    */
-//    void MultiThreadsEvaluationWithClone(const CNTK::DeviceDescriptor& device, const int threadCount);
+//    void multiThreadsEvaluationWithClone(const CNTK::DeviceDescriptor& device, const int threadCount);
 
 //    void testClone();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //=========================================================================================================
     /**
     * Returns the Input Dimensions
+    *
+    * @param [in] inputNodeName     input node name of which the dimension should be get from
     *
     * @return the Input dimensions
     */
@@ -169,6 +148,8 @@ public:
     //=========================================================================================================
     /**
     * Returns the Output Dimensions
+    *
+    * @param [in] outputNodeName    output node name of which the dimension should be get from
     *
     * @return the Output dimensions
     */
@@ -182,8 +163,6 @@ public:
     * @param [in] input     The inputs (rows = samples, cols = feature inputs)
     * @param [out] output   The ouptuts (rows = samples, cols = output results)
     * @param [in] device    Device to use for evaluation
-    *
-    * @return true when successfully evaluated, false otherwise.
     */
     static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
@@ -257,7 +236,10 @@ public:
     */
     bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
-
+    //=========================================================================================================
+    /**
+    * Print the model structure
+    */
     void print();
 
 protected:
@@ -267,7 +249,7 @@ protected:
     *
     * @param [in] model     Function to evaluate
     */
-    void OutputFunctionInfo(CNTK::FunctionPtr model);
+    void outputFunctionInfo(CNTK::FunctionPtr model);
 
     //=========================================================================================================
     /**
@@ -279,7 +261,7 @@ protected:
     *
     * @return true when variable was found, false otherwise.
     */
-    static bool GetVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var);
+    static bool getVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var);
 
     //=========================================================================================================
     /**
@@ -291,7 +273,7 @@ protected:
     *
     * @return true when variable was found, false otherwise.
     */
-    inline static bool GetInputVariableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
+    inline static bool getInputVariableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
 
     //=========================================================================================================
     /**
@@ -303,7 +285,7 @@ protected:
     *
     * @return true when variable was found, false otherwise.
     */
-    inline static bool GetOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
+    inline static bool getOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
 
 
 private:
