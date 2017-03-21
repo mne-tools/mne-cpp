@@ -91,10 +91,10 @@ Edge::Edge(Node *sourceNode, Node *destNode)
 , m_weight(0)
 {
     setAcceptedMouseButtons(0);
-    source = sourceNode;
-    dest = destNode;
-    source->addEdge(this);
-    dest->addEdge(this);
+    m_pSource = sourceNode;
+    m_pDest = destNode;
+    m_pSource->addEdge(this);
+    m_pDest->addEdge(this);
     adjust();
 }
 
@@ -103,7 +103,7 @@ Edge::Edge(Node *sourceNode, Node *destNode)
 
 Node *Edge::sourceNode() const
 {
-    return source;
+    return m_pSource;
 }
 
 
@@ -111,7 +111,7 @@ Node *Edge::sourceNode() const
 
 Node *Edge::destNode() const
 {
-    return dest;
+    return m_pDest;
 }
 
 
@@ -119,10 +119,10 @@ Node *Edge::destNode() const
 
 void Edge::adjust()
 {
-    if (!source || !dest)
+    if (!m_pSource || !m_pDest)
         return;
 
-    QLineF line(mapFromItem(source, 0, 0), mapFromItem(dest, 0, 0));
+    QLineF line(mapFromItem(m_pSource, 0, 0), mapFromItem(m_pDest, 0, 0));
     qreal length = line.length();
 
     prepareGeometryChange();
@@ -161,7 +161,7 @@ void Edge::setWeight(float weight)
 
 QRectF Edge::boundingRect() const
 {
-    if (!source || !dest)
+    if (!m_pSource || !m_pDest)
         return QRectF();
 
     qreal penWidth = 1;
@@ -178,7 +178,7 @@ QRectF Edge::boundingRect() const
 
 void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    if (!source || !dest)
+    if (!m_pSource || !m_pDest)
         return;
 
 //    QLineF center_line(mapFromItem(source, 0, 0), mapFromItem(dest, 0, 0));

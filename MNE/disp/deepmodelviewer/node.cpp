@@ -78,9 +78,9 @@ static double TwoPi = 2.0 * Pi;
 //=============================================================================================================
 
 Node::Node(DeepViewerWidget *graphWidget)
-: graph(graphWidget)
-, m_diameter(20)
-, m_radius(m_diameter/2)
+: m_pGraph(graphWidget)
+, m_fDiameter(20)
+, m_fRadius(m_fDiameter/2)
 {
 
 
@@ -95,7 +95,7 @@ Node::Node(DeepViewerWidget *graphWidget)
 
 void Node::addEdge(Edge *edge)
 {
-    edgeList << edge;
+    m_qListEdges << edge;
     edge->adjust();
 }
 
@@ -104,7 +104,7 @@ void Node::addEdge(Edge *edge)
 
 QList<Edge *> Node::edges() const
 {
-    return edgeList;
+    return m_qListEdges;
 }
 
 
@@ -113,7 +113,7 @@ QList<Edge *> Node::edges() const
 QRectF Node::boundingRect() const
 {
     qreal adjust = 2;
-    return QRectF( -m_radius - adjust, -m_radius - adjust, m_diameter + 3 + adjust, m_diameter + 3 + adjust);
+    return QRectF( -m_fRadius - adjust, -m_fRadius - adjust, m_fDiameter + 3 + adjust, m_fDiameter + 3 + adjust);
 }
 
 
@@ -135,7 +135,7 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->setPen(QColor(50, 100, 120, 200));
     painter->setBrush(QColor(200, 200, 210, 120));
 
-    painter->drawEllipse(-m_radius, -m_radius, m_diameter, m_diameter);
+    painter->drawEllipse(-m_fRadius, -m_fRadius, m_fDiameter, m_fDiameter);
 }
 
 
@@ -145,7 +145,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {
     case ItemPositionHasChanged:
-        foreach (Edge *edge, edgeList)
+        foreach (Edge *edge, m_qListEdges)
             edge->adjust();
         break;
     default:

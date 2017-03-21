@@ -83,9 +83,28 @@ class DeepViewerWidget;
 class Node : public QGraphicsItem
 {
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a Node representing a Neuron
+    *
+    * @param [in] graphWidget   The viewer which holds the global properties
+    */
     Node(DeepViewerWidget *graphWidget);
 
+    //=========================================================================================================
+    /**
+    * Adds a connected edge to the node
+    *
+    * @param [in] edge      A connected edge
+    */
     void addEdge(Edge *edge);
+
+    //=========================================================================================================
+    /**
+    * Returns a list of all connected edges
+    *
+    * @return A list of all connected edges
+    */
     QList<Edge *> edges() const;
 
     enum { Type = UserType + 1 };
@@ -98,16 +117,28 @@ public:
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
+    //=========================================================================================================
+    /**
+    * This event handler is reimplemented to receive mouse press events for the widget.
+    *
+    * @param [in] event     Mouse press events for the widget
+    */
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+
+    //=========================================================================================================
+    /**
+    * This event handler is reimplemented to receive mouse release events for the widget.
+    *
+    * @param [in] event     Mouse release events for the widget
+    */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    float m_diameter;           /**< The diameter */
-    float m_radius;             /**< Half of diameter - for drawing speed already calculated beforehand */
+    float m_fDiameter;              /**< The diameter */
+    float m_fRadius;                /**< Half of diameter - for drawing speed already calculated beforehand */
 
-    QList<Edge *> edgeList;     /**< The list of connected edges */
-    QPointF newPos;             /**< The new Position when node was moved */
-    DeepViewerWidget *graph;    /**< The viewer this node attached to */
+    QList<Edge *> m_qListEdges;     /**< The list of connected edges */
+    DeepViewerWidget* m_pGraph;     /**< The viewer this node attached to */
 };
 
 //*************************************************************************************************************

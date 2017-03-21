@@ -90,12 +90,12 @@ Deep::~Deep()
 
 //*************************************************************************************************************
 
-//void Deep::RunEvaluationClassifier(FunctionPtr evalFunc, const DeviceDescriptor &device)
+//void Deep::runEvaluationClassifier(FunctionPtr evalFunc, const DeviceDescriptor &device)
 //{
 //    const std::wstring inputNodeName = L"features";
 
 //    Variable inputVar;
-//    if (!GetInputVariableByName(evalFunc, inputNodeName, inputVar))
+//    if (!getInputVariableByName(evalFunc, inputNodeName, inputVar))
 //    {
 //        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
 //        throw("Input variable not found error.");
@@ -163,7 +163,7 @@ Deep::~Deep()
 
 //*************************************************************************************************************
 
-//void Deep::MultiThreadsEvaluationWithClone(const DeviceDescriptor &device, const int threadCount)
+//void Deep::multiThreadsEvaluationWithClone(const DeviceDescriptor &device, const int threadCount)
 //{
 //    using namespace std::placeholders;
 
@@ -175,10 +175,10 @@ Deep::~Deep()
 //    auto inputVar = InputVariable({inputDim}, DataType::Float, L"features");
 
 //    assert(numHiddenLayers >= 1);
-//    auto classifierRoot = DeepModelCreator::SetupFullyConnectedDNNLayer(inputVar, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
+//    auto classifierRoot = DeepModelCreator::setupFullyConnectedDNNLayer(inputVar, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
 //    for (size_t i = 1; i < numHiddenLayers; ++i)
 //    {
-//        classifierRoot = DeepModelCreator::SetupFullyConnectedDNNLayer(classifierRoot, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
+//        classifierRoot = DeepModelCreator::setupFullyConnectedDNNLayer(classifierRoot, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
 //    }
 
 //    auto outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
@@ -187,17 +187,17 @@ Deep::~Deep()
 //    // Now test the structure
 //    if (classifierFunc->Parameters().size() != ((numHiddenLayers * 2) + 1))
 //    {
-//        throw std::runtime_error("MultiThreadsEvaluationWithClone: Function does not have expected Parameter count");
+//        throw std::runtime_error("multiThreadsEvaluationWithClone: Function does not have expected Parameter count");
 //    }
 
-//    OutputFunctionInfo(classifierFunc);
-//    fprintf(stderr, "MultiThreadsEvaluationWithClone on device=%d\n", device.Id());
+//    outputFunctionInfo(classifierFunc);
+//    fprintf(stderr, "multiThreadsEvaluationWithClone on device=%d\n", device.Id());
 
 //    // Run evaluation in parallel
 //    std::vector<std::thread> threadList(threadCount);
 //    for (int th = 0; th < threadCount; ++th)
 //    {
-//        threadList[th] = std::thread(RunEvaluationClassifier, classifierFunc->Clone(), device);
+//        threadList[th] = std::thread(runEvaluationClassifier, classifierFunc->Clone(), device);
 //    }
 
 //    for (int th = 0; th < threadCount; ++th)
@@ -217,7 +217,7 @@ Deep::~Deep()
 
 //    // Test multi-threads evaluation using clone.
 //    fprintf(stderr, "\n##### Run evaluation using clone function on CPU. #####\n");
-//    MultiThreadsEvaluationWithClone(DeviceDescriptor::CPUDevice(), numOfThreads);
+//    multiThreadsEvaluationWithClone(DeviceDescriptor::CPUDevice(), numOfThreads);
 //}
 
 
@@ -226,7 +226,7 @@ Deep::~Deep()
 size_t Deep::inputDimensions(const std::wstring inputNodeName)
 {
     Variable inputVar;
-    if (!GetInputVariableByName(m_pModel, inputNodeName, inputVar)) {
+    if (!getInputVariableByName(m_pModel, inputNodeName, inputVar)) {
         fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
         throw("Input variable not found error.");
     }
@@ -240,7 +240,7 @@ size_t Deep::inputDimensions(const std::wstring inputNodeName)
 size_t Deep::outputDimensions(const std::wstring outputNodeName)
 {
     Variable outputVar;
-    if (!GetOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
+    if (!getOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
         fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
         throw("Output variable not found error.");
     }
@@ -302,7 +302,7 @@ bool Deep::saveModel(const QString &fileName)
 
 bool Deep::evalModel(const MatrixXf& input, MatrixXf& output, const DeviceDescriptor &device)
 {
-    OutputFunctionInfo(m_pModel);
+    outputFunctionInfo(m_pModel);
 
     fprintf(stderr, "Evaluate model on device=%d\n", device.Id());
 
@@ -326,7 +326,7 @@ bool Deep::evalModel(const MatrixXf& input, MatrixXf& output, const DeviceDescri
     const std::wstring inputNodeName = L"features";
 
     Variable inputVar;
-    if (!GetInputVariableByName(m_pModel, inputNodeName, inputVar)) {
+    if (!getInputVariableByName(m_pModel, inputNodeName, inputVar)) {
         fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
         throw("Input variable not found error.");
     }
@@ -362,7 +362,7 @@ bool Deep::evalModel(const MatrixXf& input, MatrixXf& output, const DeviceDescri
     const std::wstring outputNodeName = L"labels";//L"out.z";
 
     Variable outputVar;
-    if (!GetOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
+    if (!getOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
         fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
         throw("Output variable not found error.");
     }
@@ -442,7 +442,7 @@ bool Deep::trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& t
     //
     const std::wstring inputNodeName = L"features";
     Variable inputFeatures;
-    if (!GetInputVariableByName(z, inputNodeName, inputFeatures)) {
+    if (!getInputVariableByName(z, inputNodeName, inputFeatures)) {
         fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
         throw("Input variable not found error.");
     }
@@ -559,7 +559,7 @@ void Deep::print()
 
 //*************************************************************************************************************
 
-void Deep::OutputFunctionInfo(FunctionPtr model)
+void Deep::outputFunctionInfo(FunctionPtr model)
 {
     auto inputVariables = model->Arguments();
     fprintf(stderr, "Function '%S': Input Variables (count=%lu)\n", model->Name().c_str(), (unsigned long)inputVariables.size());
@@ -577,7 +577,7 @@ void Deep::OutputFunctionInfo(FunctionPtr model)
 
 //*************************************************************************************************************
 
-bool Deep::GetVariableByName(std::vector<Variable> variableLists, std::wstring varName, Variable &var)
+bool Deep::getVariableByName(std::vector<Variable> variableLists, std::wstring varName, Variable &var)
 {
     for (std::vector<Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
     {
@@ -593,15 +593,15 @@ bool Deep::GetVariableByName(std::vector<Variable> variableLists, std::wstring v
 
 //*************************************************************************************************************
 
-bool Deep::GetInputVariableByName(FunctionPtr model, std::wstring varName, Variable &var)
+bool Deep::getInputVariableByName(FunctionPtr model, std::wstring varName, Variable &var)
 {
-    return GetVariableByName(model->Arguments(), varName, var);
+    return getVariableByName(model->Arguments(), varName, var);
 }
 
 
 //*************************************************************************************************************
 
-bool Deep::GetOutputVaraiableByName(FunctionPtr model, std::wstring varName, Variable &var)
+bool Deep::getOutputVaraiableByName(FunctionPtr model, std::wstring varName, Variable &var)
 {
-    return GetVariableByName(model->Outputs(), varName, var);
+    return getVariableByName(model->Outputs(), varName, var);
 }

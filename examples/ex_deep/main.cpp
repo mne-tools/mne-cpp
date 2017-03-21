@@ -89,7 +89,7 @@ using namespace CNTK;
 //=============================================================================================================
 
 // Helper function to generate a random data sample
-void generate_random_data_samples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
+void generateRandomDataSamples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
 {
     MatrixXi t_Y = MatrixXi::Zero(sample_size, 1);
     for(int i = 0; i < t_Y.rows(); ++i) {
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     int mysamplesize = 32;
     MatrixXf features, labels, outputs;
 
-    generate_random_data_samples(mysamplesize, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    generateRandomDataSamples(mysamplesize, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
 
     std::cout << "\nfeatures\n" << features << std::endl;
     std::cout << "\nlabels\n" << labels << std::endl;
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 
     // Generate new data
     int test_minibatch_size = 25;
-    generate_random_data_samples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    generateRandomDataSamples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
 
     deep_1.evalModel(features, outputs, device);
 
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     int num_samples = 20000;
 
     QVector<double> vecLoss, vecError;
-    generate_random_data_samples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
     deep_1.trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
 
     qDebug() << "\n Finished training \n";
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     // Generate new data
 
     test_minibatch_size = 25;
-    generate_random_data_samples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    generateRandomDataSamples(test_minibatch_size, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
 
     deep_1.evalModel(features, outputs, device);
 
@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
         //
         // Data Generation
         //
-        generate_random_data_samples(batchSize, static_cast<int>(deep_2.inputDimensions()), static_cast<int>(deep_2.outputDimensions()), trainFeatures, trainTarget);
+        generateRandomDataSamples(batchSize, static_cast<int>(deep_2.inputDimensions()), static_cast<int>(deep_2.outputDimensions()), trainFeatures, trainTarget);
 
         //
         // Training Generation
@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
     //
     // Data Generation
     //
-    generate_random_data_samples(eval_size, static_cast<int>(deep_2.inputDimensions()), static_cast<int>(deep_2.outputDimensions()), inputs, desired);
+    generateRandomDataSamples(eval_size, static_cast<int>(deep_2.inputDimensions()), static_cast<int>(deep_2.outputDimensions()), inputs, desired);
 
     std::cout << "inputs\n" << inputs << std::endl;
 

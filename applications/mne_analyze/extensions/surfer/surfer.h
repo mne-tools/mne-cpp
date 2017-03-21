@@ -68,15 +68,6 @@
 namespace SURFEREXTENSION
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace ANSHAREDLIB;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -89,7 +80,7 @@ using namespace ANSHAREDLIB;
 *
 * @brief The Surfer class provides a Disp3D Views.
 */
-class SURFERSHARED_EXPORT Surfer : public IExtension
+class SURFERSHARED_EXPORT Surfer : public ANSHAREDLIB::IExtension
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "surfer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -129,10 +120,10 @@ public:
 
 private:
     // Control
-    QDockWidget*        m_control;  /**< Control Widget */
+    QDockWidget*        m_pControl; /**< Control Widget */
 
     // View
-    View3DAnalyze*      m_view;     /**< Control View */
+    View3DAnalyze*      m_pView;    /**< Control View */
 };
 
 } // NAMESPACE

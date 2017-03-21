@@ -129,7 +129,7 @@ public:
     * Evaluate the MNE Deep Model specified by the model file name
     *
     * @param [in] inputs    The input vector
-    * @param [in] outputs   The ouptut vector
+    * @param [out] outputs   The ouptut vector
     *
     * @return true when MNE Deep model was sucessfully evaluated.
     */
@@ -140,7 +140,7 @@ public:
     * Evaluate the MNE Deep Model specified by the model file name
     *
     * @param [in] inputs    The input vector
-    * @param [in] outputs   The ouptut vector
+    * @param [out] outputs  The ouptut vector
     *
     * @return true when MNE Deep model was sucessfully evaluated.
     */

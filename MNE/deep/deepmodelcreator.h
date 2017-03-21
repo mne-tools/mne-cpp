@@ -111,7 +111,6 @@ public:
     */
     virtual ~DeepModelCreator();
 
-
 //    //=========================================================================================================
 //    /**
 //    * Setup fully connected linear layer
@@ -121,7 +120,7 @@ public:
 //    * @param [in] device
 //    * @param [in] outputName
 //    */
-//    static CNTK::FunctionPtr SetupFullyConnectedLinearLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor &device, const std::wstring &outputName = L"")
+//    static CNTK::FunctionPtr setupFullyConnectedLinearLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor &device, const std::wstring &outputName = L"")
 //    {
 //        assert(input.Shape().Rank() == 1);
 //        size_t inputDim = input.Shape()[0];
@@ -143,15 +142,15 @@ public:
 //    * @param [in] device
 //    * @param [in] nonLinearity
 //    */
-//    static CNTK::FunctionPtr SetupFullyConnectedDNNLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor &device, const std::function<CNTK::FunctionPtr (const CNTK::FunctionPtr &)> &nonLinearity)
+//    static CNTK::FunctionPtr setupFullyConnectedDNNLayer(CNTK::Variable input, size_t outputDim, const CNTK::DeviceDescriptor &device, const std::function<CNTK::FunctionPtr (const CNTK::FunctionPtr &)> &nonLinearity)
 //    {
-//        return nonLinearity(SetupFullyConnectedLinearLayer(input, outputDim, device));
+//        return nonLinearity(setupFullyConnectedLinearLayer(input, outputDim, device));
 //    }
 
 
 
 
-    static CNTK::FunctionPtr FullyConnectedFeedForwardClassifierNet(CNTK::Variable input,
+    static CNTK::FunctionPtr fullyConnectedFeedForwardClassifierNet(CNTK::Variable input,
                                                                     size_t numHiddenLayers,
                                                                     const CNTK::Parameter& inputTimesParam,
                                                                     const CNTK::Parameter& inputPlusParam,
@@ -162,7 +161,7 @@ public:
 
 
 private:
-    static CNTK::FunctionPtr FullyConnectedDNNLayer(CNTK::Variable input,
+    static CNTK::FunctionPtr fullyConnectedDNNLayer(CNTK::Variable input,
                                                     const CNTK::Parameter& timesParam,
                                                     const CNTK::Parameter& plusParam,
                                                     const std::function<CNTK::FunctionPtr(const CNTK::FunctionPtr&)>& nonLinearity);

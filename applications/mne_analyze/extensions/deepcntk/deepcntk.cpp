@@ -71,7 +71,7 @@ using namespace CNTK;
 //=============================================================================================================
 
 // Helper function to generate a random data sample
-void generate_random_data_samples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
+void generateRandomDataSamples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
 {
     MatrixXi t_Y = MatrixXi::Zero(sample_size, 1);
     for(int i = 0; i < t_Y.rows(); ++i) {
@@ -103,9 +103,9 @@ void generate_random_data_samples(int sample_size, int feature_dim, int num_clas
 //=============================================================================================================
 
 DeepCNTK::DeepCNTK()
-: m_controlPanel(Q_NULLPTR)
-, m_control(Q_NULLPTR)
-, m_view(Q_NULLPTR)
+: m_pControlPanel(Q_NULLPTR)
+, m_pControl(Q_NULLPTR)
+, m_pView(Q_NULLPTR)
 {
 
 }
@@ -153,26 +153,22 @@ void DeepCNTK::init()
     MatrixXf features, labels;
 
     QVector<double> vecLoss, vecError;
-    generate_random_data_samples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
     m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
 
-
-
-
-
-
+    //
     // Init view
-
-    if(!m_controlPanel) {
-        m_controlPanel = new Controls();
+    //
+    if(!m_pControlPanel) {
+        m_pControlPanel = new Controls();
     }
 
     //
     // Create the viewer
     //
-    if(!m_view) {
-        m_view = new DeepViewerWidget(m_pModel, m_controlPanel);
-        m_view->setWindowTitle("Deep CNTK");
+    if(!m_pView) {
+        m_pView = new DeepViewerWidget(m_pModel, m_pControlPanel);
+        m_pView->setWindowTitle("Deep CNTK");
     }
 }
 
@@ -221,15 +217,15 @@ bool DeepCNTK::hasControl() const
 
 QDockWidget *DeepCNTK::getControl()
 {
-    if(!m_control) {
-        m_control = new QDockWidget(tr("Deep CNTK"));
-        m_control->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-        m_control->setMinimumWidth(180);
+    if(!m_pControl) {
+        m_pControl = new QDockWidget(tr("Deep CNTK"));
+        m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+        m_pControl->setMinimumWidth(180);
 
-        m_control->setWidget(m_controlPanel);
+        m_pControl->setWidget(m_pControlPanel);
     }
 
-    return m_control;
+    return m_pControl;
 }
 
 
@@ -246,13 +242,13 @@ bool DeepCNTK::hasView() const
 // check with owner ship and mdi area for garbage collection
 QWidget *DeepCNTK::getView()
 {
-    if(!m_view) {
+    if(!m_pView) {
         //
         // Create the viewer
         //
-        m_view = new DeepViewerWidget(m_pModel);
-        m_view->setWindowTitle("Deep CNTK");
+        m_pView = new DeepViewerWidget(m_pModel);
+        m_pView->setWindowTitle("Deep CNTK");
     }
 
-    return m_view;
+    return m_pView;
 }

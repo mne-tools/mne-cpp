@@ -72,13 +72,13 @@
 
 namespace DISPLIB
 {
-class DeepViewerWidget;
-class Controls;
+    class DeepViewerWidget;
+    class Controls;
 }
 
 namespace DEEPLIB
 {
-class Deep;
+    class Deep;
 }
 
 
@@ -89,15 +89,6 @@ class Deep;
 
 namespace DEEPCNTKEXTENSION
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace ANSHAREDLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,7 +102,7 @@ using namespace ANSHAREDLIB;
 *
 * @brief The DeepCNTK class provides a Machine Learning Capbilities.
 */
-class DEEPCNTKSHARED_EXPORT DeepCNTK : public IExtension
+class DEEPCNTKSHARED_EXPORT DeepCNTK : public ANSHAREDLIB::IExtension
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "deepcntk.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -154,13 +145,13 @@ private:
     QSharedPointer<DEEPLIB::Deep>   m_pDeep;            /**< CNTK Wrapper */
     CNTK::FunctionPtr               m_pModel;           /**< CNTK Model */
 
-    DISPLIB::Controls*              m_controlPanel;     /**< View Control Panel */
+    DISPLIB::Controls*              m_pControlPanel;    /**< View Control Panel */
 
     // Control
-    QDockWidget*                    m_control;          /**< Control Widget */
+    QDockWidget*                    m_pControl;         /**< Control Widget */
 
     // View
-    DISPLIB::DeepViewerWidget*      m_view;             /**< Control View */
+    DISPLIB::DeepViewerWidget*      m_pView;            /**< View */
 };
 
 } // NAMESPACE

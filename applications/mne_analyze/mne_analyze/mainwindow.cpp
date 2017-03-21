@@ -89,7 +89,7 @@ const char* extensionsDir = "/mne_analyze_extensions";        /**< holds path to
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pExtensionManager(new ANSHAREDLIB::ExtensionManager(this))
-, m_mdiView(Q_NULLPTR)
+, m_pMdiView(Q_NULLPTR)
 {
     fprintf(stderr, "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
@@ -154,11 +154,11 @@ void MainWindow::createActions()
     //View QMenu
     m_pActionCascade = new QAction(tr("&Cascade"), this);
     m_pActionCascade->setStatusTip(tr("Cascade the windows in the mdi window"));
-    connect(m_pActionCascade, &QAction::triggered, this, &MainWindow::mdiViewCascade);
+    connect(m_pActionCascade, &QAction::triggered, this->m_pMdiView, &MdiView::cascadeSubWindows);
 
     m_pActionTile = new QAction(tr("&Tile"), this);
     m_pActionTile->setStatusTip(tr("Tile the windows in the mdi window"));
-    connect(m_pActionTile, &QAction::triggered, this, &MainWindow::mdiViewTile);
+    connect(m_pActionTile, &QAction::triggered, this->m_pMdiView, &MdiView::tileSubWindows);
 
     //Help QMenu
     m_pActionAbout = new QAction(tr("&About"), this);
@@ -205,36 +205,18 @@ void MainWindow::createDockWindows()
 
 void MainWindow::createMdiView()
 {
-    m_mdiView = new MdiView(this);
-    setCentralWidget(m_mdiView);
+    m_pMdiView = new MdiView(this);
+    setCentralWidget(m_pMdiView);
 
     //Add Extension views to mdi
     for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
         IExtension* extension = m_pExtensionManager->getExtensions()[i];
         if(extension->hasView() && extension->getView()) {
-            m_mdiView->addSubWindow(extension->getView());
+            m_pMdiView->addSubWindow(extension->getView());
         }
     }
 
-    m_mdiView->cascadeSubWindows();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::mdiViewCascade()
-{
-    this->m_mdiView->cascadeSubWindows();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::mdiViewTile()
-{
-    //Since we need to acces some private attributes from ViewerWIdget, we need a method to do it
-    //Used to arrange the subwindows that contains the surfaces and 2D plots, in a Tile mode
-    this->m_mdiView->tileSubWindows();
+    m_pMdiView->cascadeSubWindows();
 }
 
 

@@ -91,7 +91,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 // Helper function to generate a random data sample
-void generate_random_data_samples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
+void generateRandomDataSamples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
 {
     MatrixXi t_Y = MatrixXi::Zero(sample_size, 1);
     for(int i = 0; i < t_Y.rows(); ++i) {
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     MatrixXf features, labels;
 
     QVector<double> vecLoss, vecError;
-    generate_random_data_samples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
     deep.trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
 
     //

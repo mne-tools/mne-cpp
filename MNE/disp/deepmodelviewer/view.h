@@ -84,7 +84,13 @@ class GraphicsView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    GraphicsView(View *v) : QGraphicsView(), view(v) { }
+    //=========================================================================================================
+    /**
+    * Constructs the GraphicsView
+    *
+    * @param [in] v     The View which this is the viewport of
+    */
+    GraphicsView(View *v) : QGraphicsView(), m_pView(v) { }
 
 protected:
 #ifndef QT_NO_WHEELEVENT
@@ -92,7 +98,7 @@ protected:
 #endif
 
 private:
-    View *view;
+    View *m_pView;      /**< The Widgte of this GraphicsView */
 };
 
 
@@ -106,44 +112,125 @@ class View : public QWidget
 {
     Q_OBJECT
 public:
-    explicit View(const QString &name, QWidget *parent = 0);
+    //=========================================================================================================
+    /**
+    * Constructs the View Widget which is a child of parent
+    *
+    * @param [in] parent    The parent widget
+    */
+    explicit View(QWidget *parent = 0);
 
-    QGraphicsView *view() const;
+    //=========================================================================================================
+    /**
+    * Returns the GraphicsView viewport of this view
+    *
+    * @return GraphicsView viewport
+    */
+    QGraphicsView *getView() const;
 
-public slots:
+public:
+    //=========================================================================================================
+    /**
+    * Zooms into the scene
+    *
+    * @param [in] level    The zooming level increment
+    */
     void zoomIn(int level = 1);
+
+    //=========================================================================================================
+    /**
+    * Zooms out of the scene
+    *
+    * @param [in] level    The zooming level decrement
+    */
     void zoomOut(int level = 1);
 
-#ifndef QT_NO_OPENGL
-    void enableOpenGL(bool use_opengl);
-    bool usesOpenGL() const { return m_use_opengl; }
-#endif
-    void enableAntialiasing(bool use_antialiasing);
-    bool usesAntialiasing() const { return m_use_antialiasing; }
 
+#ifndef QT_NO_OPENGL
+    //=========================================================================================================
+    /**
+    * Sets if opengl shpuld be used
+    *
+    * @param [in] useOpengl     if OpenGL should be used
+    */
+    void enableOpenGL(bool useOpengl);
+    //=========================================================================================================
+    /**
+    * Returns if OpenGl is used
+    *
+    * @return if OpenGl is used
+    */
+    bool usesOpenGL() const { return m_bUseOpengl; }
+#endif
+    //=========================================================================================================
+    /**
+    * Sets if antialiasing shpuld be used
+    *
+    * @param [in] useAntialiasing   if antialiasing should be used
+    */
+    void enableAntialiasing(bool useAntialiasing);
+    //=========================================================================================================
+    /**
+    * Returns if Antialiasing is used
+    *
+    * @return if Antialiasing is used
+    */
+    bool usesAntialiasing() const { return m_bUseAntialiasing; }
+
+    //=========================================================================================================
+    /**
+    * Toggles the pointer mode: Select or Drag
+    */
     void togglePointerMode();
+
+    //=========================================================================================================
+    /**
+    * Invokes the printing Dialog for the view
+    */
     void print();
 
-private slots:
+private:
+    //=========================================================================================================
+    /**
+    * Resets the View
+    */
     void resetView();
+    //=========================================================================================================
+    /**
+    * Enables the Reset button
+    */
     void setResetButtonEnabled();
+    //=========================================================================================================
+    /**
+    * Sets the rotation Matrix up
+    */
     void setupMatrix();
+    //=========================================================================================================
+    /**
+    * Rotates left
+    */
     void rotateLeft();
+    //=========================================================================================================
+    /**
+    * Rotates right
+    */
     void rotateRight();
 
 private:
-    GraphicsView *graphicsView;
-    QToolButton *selectModeButton;
-    QToolButton *dragModeButton;
-    QToolButton *antialiasButton;
-    QToolButton *printButton;
-    QToolButton *resetButton;
-    QSlider *zoomSlider;
-    QSlider *rotateSlider;
+    GraphicsView *m_pGgraphicsView;     /**< The GraphicsView view port of the view */
 
-    bool m_use_antialiasing;
+    QToolButton *m_pSelectModeButton;   /**< Select Mode Button */
+    QToolButton *m_pDragModeButton;     /**< Drag Mode Button */
+    QToolButton *m_pAntialiasButton;    /**< Antialias Button */
+    QToolButton *m_pPrintButton;        /**< Print Button */
+    QToolButton *m_pResetButton;        /**< Reset Button */
+
+    QSlider *m_pZoomSlider;             /**< Zoom Slider */
+    QSlider *m_pRotateSlider;           /**< Rotate Slider */
+
+    bool m_bUseAntialiasing;    /**< Antialiasing enabled? */
 #ifndef QT_NO_OPENGL
-    bool m_use_opengl;
+    bool m_bUseOpengl;          /**< OpenGL enabled? */
 #endif
 };
 

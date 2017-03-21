@@ -81,9 +81,6 @@ class AnalyzeData;
 class ANSHAREDSHARED_EXPORT ExtensionManager : public QPluginLoader
 {
     Q_OBJECT
-
-//    friend class MainWindow;
-
 public:
     typedef QSharedPointer<ExtensionManager> SPtr;               /**< Shared pointer type for ExtensionManager. */
     typedef QSharedPointer<const ExtensionManager> ConstSPtr;    /**< Const shared pointer type for ExtensionManager. */

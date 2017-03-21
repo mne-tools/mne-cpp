@@ -88,13 +88,13 @@ DeepModelCreator::~DeepModelCreator()
 
 //*************************************************************************************************************
 
-FunctionPtr DeepModelCreator::FullyConnectedFeedForwardClassifierNet(Variable input, size_t numHiddenLayers, const Parameter &inputTimesParam, const Parameter &inputPlusParam, const Parameter hiddenLayerTimesParam[], const Parameter hiddenLayerPlusParam[], const Parameter &outputTimesParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
+FunctionPtr DeepModelCreator::fullyConnectedFeedForwardClassifierNet(Variable input, size_t numHiddenLayers, const Parameter &inputTimesParam, const Parameter &inputPlusParam, const Parameter hiddenLayerTimesParam[], const Parameter hiddenLayerPlusParam[], const Parameter &outputTimesParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
 {
     assert(numHiddenLayers >= 1);
-    FunctionPtr h = FullyConnectedDNNLayer(input, inputTimesParam, inputPlusParam, nonLinearity);
+    FunctionPtr h = fullyConnectedDNNLayer(input, inputTimesParam, inputPlusParam, nonLinearity);
 
     for (size_t i = 1; i < numHiddenLayers; ++i) {
-        h = FullyConnectedDNNLayer(h, hiddenLayerTimesParam[i - 1], hiddenLayerPlusParam[i - 1], nonLinearity);
+        h = fullyConnectedDNNLayer(h, hiddenLayerTimesParam[i - 1], hiddenLayerPlusParam[i - 1], nonLinearity);
     }
 
     // Todo: assume that outputTimesParam has matched output dim and hiddenLayerDim
@@ -105,7 +105,7 @@ FunctionPtr DeepModelCreator::FullyConnectedFeedForwardClassifierNet(Variable in
 
 //*************************************************************************************************************
 
-FunctionPtr DeepModelCreator::FullyConnectedDNNLayer(Variable input, const Parameter &timesParam, const Parameter &plusParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
+FunctionPtr DeepModelCreator::fullyConnectedDNNLayer(Variable input, const Parameter &timesParam, const Parameter &plusParam, const std::function<FunctionPtr (const FunctionPtr &)> &nonLinearity)
 {
     assert(input.Shape().Rank() == 1);
 
@@ -144,7 +144,7 @@ FunctionPtr DeepModelCreator::FFN_1(const size_t inputDim, const size_t numOutpu
 
     Variable inputVar = InputVariable({inputDim}, DataType::Float, L"features");
 
-    return FullyConnectedFeedForwardClassifierNet(  inputVar,
+    return fullyConnectedFeedForwardClassifierNet(  inputVar,
                                                     numHiddenLayers,
                                                     inputTimesParam,
                                                     inputPlusParam,
@@ -183,7 +183,7 @@ FunctionPtr DeepModelCreator::DNN_1(const size_t inputDim, const size_t numOutpu
 
     Variable inputVar = InputVariable({inputDim}, DataType::Float, L"features");
 
-    return FullyConnectedFeedForwardClassifierNet(  inputVar,
+    return fullyConnectedFeedForwardClassifierNet(  inputVar,
                                                     numHiddenLayers,
                                                     inputTimesParam,
                                                     inputPlusParam,
