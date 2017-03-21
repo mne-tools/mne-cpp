@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     deepcntk.pro
+# @file     fiffio.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the deepcntk plug-in.
+# @brief    This project file generates the makefile for the fiffio plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,17 +39,16 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += DEEPCNTK_LIBRARY
+DEFINES += FIFFIO_LIBRARY
 
-QT += gui widgets 3dextras charts
+QT += gui widgets 3dextras
 
-TARGET = deepcntk
+TARGET = fiffio
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
-LIBS += -L$${CNTK_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -59,10 +58,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Deepd \
-            -lanSharedd \
-            -lCNTKLibrary-2.0
+            -lanSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -73,27 +69,23 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Deep \
-            -lanShared \
-            -lCNTKLibrary-2.0
+            -lanShared
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
-    deepcntk.cpp
+    fiffio.cpp
 
 HEADERS += \
-    deepcntk_global.h \
-    deepcntk.h
+    fiffio_global.h \
+    fiffio.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
-OTHER_FILES += deepcntk.json
+OTHER_FILES += fiffio.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
@@ -102,3 +94,4 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
+
