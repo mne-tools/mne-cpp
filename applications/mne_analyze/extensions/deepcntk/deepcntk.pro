@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     cntk.pro
+# @file     deepcntk.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the cntk plug-in.
+# @brief    This project file generates the makefile for the deepcntk plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += CNTK_LIBRARY
+DEFINES += DEEPCNTK_LIBRARY
 
 QT += gui widgets 3dextras
 
@@ -79,17 +79,17 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
-    cntk.cpp
+    deepcntk.cpp
 
 HEADERS += \
-    cntk_global.h \
-    cntk.h
+    deepcntk_global.h \
+    deepcntk.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
-OTHER_FILES += cntk.json
+OTHER_FILES += deepcntk.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD

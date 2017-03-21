@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cntk.h
+* @file     deepcntk.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the CNTK class.
+* @brief    Contains the declaration of the DeepCNTK class.
 *
 */
 
-#ifndef SURFER_H
-#define SURFER_H
+#ifndef DEEPCNTK_H
+#define DEEPCNTK_H
 
 
 //*************************************************************************************************************
@@ -42,10 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "cntk_global.h"
+#include "deepcntk_global.h"
 
 #include <anShared/Interfaces/IExtension.h>
-
 
 
 //*************************************************************************************************************
@@ -60,10 +59,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SURFEREXTENSION
+// DEFINE NAMESPACE DEEPCNTKEXTENSION
 //=============================================================================================================
 
-namespace SURFEREXTENSION
+namespace DEEPCNTKEXTENSION
 {
 
 
@@ -83,29 +82,29 @@ using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 /**
-* CNTK Extension
+* DeepCNTK Extension
 *
-* @brief The CNTK class provides a Disp3D Views.
+* @brief The DeepCNTK class provides a Machine Learning Capbilities.
 */
-class CNTKSHARED_EXPORT CNTK : public IExtension
+class DEEPCNTKSHARED_EXPORT DeepCNTK : public IExtension
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "cntk.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "deepcntk.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IExtension)
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a Surfer.
+    * Constructs a DeepCNTK.
     */
-    CNTK();
+    DeepCNTK();
 
     //=========================================================================================================
     /**
-    * Destroys the Surfer.
+    * Destroys the DeepCNTK.
     */
-    ~Surfer();
+    ~DeepCNTK();
 
     //=========================================================================================================
     /**
@@ -139,4 +138,4 @@ private:
 
 } // NAMESPACE
 
-#endif // SURFER_H
+#endif // DEEPCNTK_H
