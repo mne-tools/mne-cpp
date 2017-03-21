@@ -97,6 +97,9 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
 , m_dMaxHPIFitError(0.01)
 , m_dMeanErrorDist(0.0)
+, m_iNubmerBadChannels(0)
+, m_bUseSSP(true)
+, m_bUseComp(false)
 {
     ui->setupUi(this);
 
@@ -169,9 +172,34 @@ HPIWidget::~HPIWidget()
 
 //*************************************************************************************************************
 
-void HPIWidget::setData(const Eigen::MatrixXd& data)
+void HPIWidget::setData(const Eigen::MatrixXd& matData)
 {
-    m_matValue = data;
+    //If bad channels changed, recalcluate projectors
+    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matProjectors.rows() == 0 || m_matProjectors.cols() == 0) {
+        Eigen::MatrixXd matProj = Eigen::MatrixXd::Identity(matData.rows(), matData.rows());
+        Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(matData.rows(), matData.rows());
+
+        if(m_bUseSSP) {
+            // Use SSP + SGM + calibration
+            m_pFiffInfo->make_projector(matProj);
+            //set columns of matrix to zero depending on bad channels indexes
+            for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+                matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+            }
+        }
+
+        if(m_bUseComp) {
+            // Setup Comps
+            FiffCtfComp newComp;
+            m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+            matComp = newComp.data->data;
+        }
+
+        m_matProjectors = matProj * matComp;
+        m_iNubmerBadChannels = m_pFiffInfo->bads.size();
+    }
+
+    m_matValue = m_matProjectors * matData;
 }
 
 

@@ -423,6 +423,7 @@ protected:
     qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
     qint32                                  m_iSplitCount;                  /**< File split count */
     int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
+
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bIsRunning;                   /**< If thread is running flag.*/
