@@ -59,6 +59,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Deepd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lEvalDll \
             -lCNTKLibrary-2.0
 }
@@ -70,6 +71,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Deep \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lEvalDll \
             -lCNTKLibrary-2.0
 }

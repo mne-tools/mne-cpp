@@ -40,6 +40,7 @@ View::View(const QString &name, QWidget *parent)
 , m_use_opengl(false)
 #endif
 {
+    Q_UNUSED(name)
     graphicsView = new GraphicsView(this);
     graphicsView->setRenderHint(QPainter::Antialiasing, m_use_antialiasing);
     graphicsView->setDragMode(QGraphicsView::RubberBandDrag);

@@ -2,7 +2,7 @@
 #define CONTROL_H
 
 
-#include "../deep_global.h"
+#include "../disp_global.h"
 
 #include <QWidget>
 
@@ -13,7 +13,7 @@ QT_END_NAMESPACE
 class View;
 
 
-class DEEPSHARED_EXPORT Controls : public QWidget
+class DISPSHARED_EXPORT Controls : public QWidget
 {
     Q_OBJECT
 

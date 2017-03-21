@@ -63,8 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DEEPLIB;
-using namespace CNTK;
+using namespace DISPLIB;
 using namespace Eigen;
 using namespace QtCharts;
 

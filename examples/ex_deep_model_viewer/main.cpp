@@ -46,9 +46,10 @@
 #include <QCategoryAxis>
 
 #include <deep/deep.h>
-#include <deep/deepviewer.h>
 #include <deep/deepmodelcreator.h>
-#include <deep/deepmodelviewer/deepviewerwidget.h>
+
+#include <disp/deepviewer.h>
+#include <disp/deepmodelviewer/deepviewerwidget.h>
 
 #include <iostream>
 #include <random>
@@ -78,9 +79,10 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace DEEPLIB;
 using namespace QtCharts;
 using namespace CNTK;
+using namespace DEEPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
