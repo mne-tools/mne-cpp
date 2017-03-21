@@ -104,6 +104,8 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_bUseSSP(true)
 , m_bUseComp(false)
 , m_bLastFitGood(false)
+, m_pBemHeadKid(Q_NULLPTR)
+, m_pBemHeadAdult(Q_NULLPTR)
 {
     ui->setupUi(this);
 
@@ -167,7 +169,6 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadKid(t_fileHeadKid);
     m_pBemHeadKid = m_pData3DModel->addBemData("Head", "Kid", t_BemHeadKid);
-    updateHeadModel();
 
     QFile t_fileHeadAdult("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadAdult(t_fileHeadAdult);
@@ -665,47 +666,49 @@ void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPo
 
 void HPIWidget::updateHeadModel()
 {
-    if(m_pBemHeadAdult) {
-        QList<QStandardItem*> itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+    if(m_pFiffInfo) {
+        if(m_pBemHeadAdult) {
+            QList<QStandardItem*> itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
 
-        for(int j = 0; j < itemList.size(); ++j) {
-            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                QPointer<Renderable3DEntity> pEntity = pBemItem->getRenderableEntity();
-                QPointer<Qt3DCore::QTransform> pTransform = new Qt3DCore::QTransform();
+            for(int j = 0; j < itemList.size(); ++j) {
+                if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                    QPointer<Renderable3DEntity> pEntity = pBemItem->getRenderableEntity();
+                    QPointer<Qt3DCore::QTransform> pTransform = new Qt3DCore::QTransform();
 
-                QMatrix4x4 mat;
-                for(int r = 0; r < 3; ++r) {
-                    for(int c = 0; c < 3; ++c) {
-                        mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
+                    QMatrix4x4 mat;
+                    for(int r = 0; r < 3; ++r) {
+                        for(int c = 0; c < 3; ++c) {
+                            mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
+                        }
                     }
-                }
 
-                pTransform->setMatrix(mat);
-                pEntity->setTransform(pTransform);
+                    pTransform->setMatrix(mat);
+                    pEntity->setTransform(pTransform);
+                }
             }
         }
-    }
 
-    if(m_pBemHeadKid) {
-        QList<QStandardItem*> itemList = m_pBemHeadKid->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+        if(m_pBemHeadKid) {
+            QList<QStandardItem*> itemList = m_pBemHeadKid->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
 
-        for(int j = 0; j < itemList.size(); ++j) {
-            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                QPointer<Renderable3DEntity> pEntity = pBemItem->getRenderableEntity();
-                QPointer<Qt3DCore::QTransform> pTransform = new Qt3DCore::QTransform();
+            for(int j = 0; j < itemList.size(); ++j) {
+                if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                    QPointer<Renderable3DEntity> pEntity = pBemItem->getRenderableEntity();
+                    QPointer<Qt3DCore::QTransform> pTransform = new Qt3DCore::QTransform();
 
-                QMatrix4x4 mat;
-                for(int r = 0; r < 3; ++r) {
-                    for(int c = 0; c < 3; ++c) {
-                        mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
+                    QMatrix4x4 mat;
+                    for(int r = 0; r < 3; ++r) {
+                        for(int c = 0; c < 3; ++c) {
+                            mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
+                        }
                     }
+
+                    pTransform->setMatrix(mat);
+                    pEntity->setTransform(pTransform);
+
+                    //If it is the kids model scale it
+                    pEntity->setScale(0.75);
                 }
-
-                pTransform->setMatrix(mat);
-                pEntity->setTransform(pTransform);
-
-                //If it is the kids model scale it
-                pEntity->setScale(0.75);
             }
         }
     }

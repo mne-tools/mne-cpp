@@ -207,7 +207,7 @@ DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data,
  * Compare function for sorting
  *********************************************************************************/
 
-bool compare(HPISortStruct& a, HPISortStruct& b)
+bool compare(HPISortStruct a, HPISortStruct b)
 {
     return (a.base_arr < b.base_arr);
 }

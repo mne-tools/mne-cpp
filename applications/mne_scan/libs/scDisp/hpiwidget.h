@@ -277,6 +277,7 @@ protected:
     DISP3DLIB::BemTreeItem*                     m_pBemHeadAdult;        /**< The BEM head model for an adult. */
 
     double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
+
 signals:
     //=========================================================================================================
     /**
