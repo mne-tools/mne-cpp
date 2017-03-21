@@ -123,9 +123,9 @@ public:
     /**
     * Set the data needed for fitting.
     *
-    * @param[in] data  the data matrix
+    * @param[in] matData  The data matrix
     */
-    void setData(const Eigen::MatrixXd& data);
+    void setData(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -208,21 +208,26 @@ protected:
     */
     void updateLabels();
 
-    Ui::HPIWidget*                              ui;                 /**< The HPI dialog. */
+    Ui::HPIWidget*                              ui;                     /**< The HPI dialog. */
 
-    QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
-    QVector<double>                             m_vGof;             /**< The goodness of fit in mm for each fitted HPI coil. */
+    QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+    QVector<double>                             m_vGof;                 /**< The goodness of fit in mm for each fitted HPI coil. */
 
-    double                                      m_dMeanErrorDist;   /**< The error distances, averaged over all coil errors. */
+    double                                      m_dMeanErrorDist;       /**< The error distances, averaged over all coil errors. */
+    qint16                                      m_iNubmerBadChannels;   /**< The number of bad channels.*/
 
-    Eigen::SparseMatrix<double>                 m_sparseMatCals;    /**< Sparse calibration matrix.*/
-    Eigen::MatrixXd                             m_matValue;         /**< The current data block.*/
+    bool                                        m_bUseSSP;              /**< Use SSP's.*/
+    bool                                        m_bUseComp;             /**< Use Comps's.*/
 
-    QSharedPointer<DISP3DLIB::View3D>           m_pView3D;          /**< The 3D view. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;     /**< The Disp3D model. */
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The FiffInfo. */
+    Eigen::SparseMatrix<double>                 m_sparseMatCals;        /**< Sparse calibration matrix.*/
+    Eigen::MatrixXd                             m_matValue;             /**< The current data block.*/
+    Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
-    double                                      m_dMaxHPIFitError;  /**< The maximum HPI fitting error allowed.*/
+    QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The FiffInfo. */
+
+    double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
 signals:
     //=========================================================================================================
     /**
