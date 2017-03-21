@@ -28,13 +28,17 @@ QT_END_NAMESPACE
 
 class Node;
 class Edge;
+class Controls;
 
 
 class DEEPSHARED_EXPORT DeepViewerWidget : public QWidget
 {
     Q_OBJECT
 public:
-    DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent = 0);
+    DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent = Q_NULLPTR);
+
+    DeepViewerWidget(CNTK::FunctionPtr model, Controls *controls, QWidget *parent = Q_NULLPTR);
+
 
 private:
     void populateScene();

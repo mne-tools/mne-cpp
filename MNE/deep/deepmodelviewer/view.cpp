@@ -35,9 +35,9 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 
 View::View(const QString &name, QWidget *parent)
 : QWidget(parent)
-, m_use_antialiasing(false)
+, m_use_antialiasing(true)
 #ifndef QT_NO_OPENGL
-, m_use_opengl(true)
+, m_use_opengl(false)
 #endif
 {
     graphicsView = new GraphicsView(this);

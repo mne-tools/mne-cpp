@@ -71,6 +71,7 @@
 //=============================================================================================================
 
 class DeepViewerWidget;
+class Controls;
 
 namespace DEEPLIB
 {
@@ -152,6 +153,9 @@ private:
     // Deep Model
     QSharedPointer<DEEPLIB::Deep>   m_pDeep;
     CNTK::FunctionPtr               m_pModel;
+
+
+    Controls*                       m_controlPanel;
 
     // Control
     QDockWidget*                    m_control;

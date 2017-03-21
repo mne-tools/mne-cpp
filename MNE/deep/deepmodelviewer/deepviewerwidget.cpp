@@ -25,18 +25,40 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
 
     View *view = new View("");
     view->view()->setScene(m_pScene);
+
     Controls *controls = new Controls(view, this);
 
-    m_pSplitter = new QSplitter;
-    m_pSplitter->addWidget(view);
-    m_pSplitter->addWidget(controls);
-
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(m_pSplitter);
+    layout->addWidget(view);
+    layout->addWidget(controls);
     setLayout(layout);
 
     setWindowTitle(tr("Deep Model Viewer"));
 }
+
+
+//*************************************************************************************************************
+
+DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, Controls *controls, QWidget *parent)
+: QWidget(parent)
+, m_pModel(model)
+{
+    populateScene();
+
+    View *view = new View("");
+    view->view()->setScene(m_pScene);
+
+    controls->setView(view);
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(view);
+    setLayout(layout);
+
+    setWindowTitle(tr("Deep Model Viewer"));
+}
+
+
+//*************************************************************************************************************
 
 void DeepViewerWidget::populateScene()
 {

@@ -20,12 +20,34 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+Controls::Controls(QWidget* parent)
+: QWidget(parent)
+, m_view(Q_NULLPTR)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 Controls::Controls(View* v, QWidget* parent)
 : QWidget(parent)
 , m_view(v)
 {
     layoutForDesktop();
 }
+
+
+//*************************************************************************************************************
+
+void Controls::setView(View *v)
+{
+    m_view = v;
+    layoutForDesktop();
+}
+
+
+//*************************************************************************************************************
 
 void Controls::createCommonControls(QWidget* parent)
 {
@@ -146,6 +168,8 @@ void Controls::createCommonControls(QWidget* parent)
 }
 
 
+//*************************************************************************************************************
+
 void Controls::layoutForDesktop()
 {
     QGroupBox *mainGroup = new QGroupBox(this);
@@ -225,10 +249,16 @@ void Controls::layoutForDesktop()
 
 }
 
+
+//*************************************************************************************************************
+
 void Controls::emitQuitSignal()
 {
     emit quitPressed();
 }
+
+
+//*************************************************************************************************************
 
 void Controls::emitOkSignal()
 {
