@@ -45,6 +45,8 @@
 
 #include <fiff/fiff_coord_trans.h>
 
+#include <rtProcessing/rthpis.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -129,19 +131,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Perform a HPI fitting procedure.
-    *
-    * @return Returns true if fit was succesfull and meets the distance requirement.
-    */
-    bool performHPIFitting();
-
-    //=========================================================================================================
-    /**
     * Get GOF per coil in mm.
     *
     * @return   The GOF vector
     */
     QVector<double> getGOF();
+
+    //=========================================================================================================
+    /**
+    * Returns if last fit was ok.
+    *
+    * @return   True if last fit was ok.
+    */
+    bool wasLastFitOk();
 
 protected:
     virtual void closeEvent( QCloseEvent * event );
@@ -181,6 +183,14 @@ protected:
     //=========================================================================================================
     /**
     * Load a Polhemus file name.
+    *
+    * @param[in] fitResult  The fit result coming from the rt HPI class.
+    */
+    void onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);
+
+    //=========================================================================================================
+    /**
+    * Load a Polhemus file name.
     */
     void onBtnLoadPolhemusFile();
 
@@ -216,9 +226,24 @@ protected:
 
     //=========================================================================================================
     /**
-    * Updates the labels.
+    * Updates the error related labels.
     */
-    void updateLabels();
+    void updateErrorLabels();
+
+    //=========================================================================================================
+    /**
+    * Updates the transforamtion related labels.
+    */
+    void updateTransLabels();
+
+    //=========================================================================================================
+    /**
+    * Store the last fit which was ok.
+    *
+    * @param[in] devHeadTrans   The device to head transformation matrix to be stored.
+    * @param[in] fittedCoils    The fitted coils to be stored.
+    */
+    void storeResults(const FIFFLIB::FiffCoordTrans& devHeadTrans, const FIFFLIB::FiffDigPointSet& fittedCoils);
 
     Ui::HPIWidget*                              ui;                     /**< The HPI dialog. */
 
@@ -230,6 +255,7 @@ protected:
 
     bool                                        m_bUseSSP;              /**< Use SSP's.*/
     bool                                        m_bUseComp;             /**< Use Comps's.*/
+    bool                                        m_bLastFitGood;         /**< Flag specifying if last fit was ok or not.*/
 
     Eigen::SparseMatrix<double>                 m_sparseMatCals;        /**< Sparse calibration matrix.*/
     Eigen::MatrixXd                             m_matValue;             /**< The current data block.*/
@@ -238,6 +264,7 @@ protected:
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The FiffInfo. */
+    QSharedPointer<RTPROCESSINGLIB::RtHPIS>     m_pRtHPI;               /**< The real-time HPI object. */
 
     double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
 signals:
@@ -249,5 +276,6 @@ signals:
     */
     void continousHPIToggled(bool state);
 };
+
 } //NAMESPACE
 #endif // HPIWIDGET_H
