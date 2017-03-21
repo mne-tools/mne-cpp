@@ -66,10 +66,10 @@ QT_END_NAMESPACE
 
 namespace ANSHAREDLIB
 {
-class IExtension;
-class ExtensionManager;
-class AnalyzeData;
-class AnalyzeSettings;
+    class IExtension;
+    class ExtensionManager;
+    class AnalyzeData;
+    class AnalyzeSettings;
 }
 
 
@@ -81,12 +81,18 @@ class AnalyzeSettings;
 namespace MNEANALYZE
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
+
+//=============================================================================================================
+/**
+* MNE Analyze MainWindow
+*
+* @brief The MainWindow class provides the main mne analyze user interface.
+*/
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -94,22 +100,39 @@ public:
     typedef QSharedPointer<MainWindow> SPtr;               /**< Shared pointer type for MainWindow. */
     typedef QSharedPointer<const MainWindow> ConstSPtr;    /**< Const shared pointer type for MainWindow. */
 
-    MainWindow(QWidget *parent = 0);
+    //=========================================================================================================
+    /**
+    * Constructs a MainWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+    */
+    MainWindow(QWidget *parent = Q_NULLPTR);
 
+    //=========================================================================================================
+    /**
+    * Destroys the MainWindow.
+    * All MainWindow's children are deleted first. The application exits if MainWindow is the main widget.
+    */
     ~MainWindow();
 
-
+    //=========================================================================================================
+    /**
+    * Initializes the global settings
+    */
     void initGlobalSettings();
+
+    //=========================================================================================================
+    /**
+    * Initializes the global data base
+    */
     void initGlobalData();
 
 
-
 private:
-
     void createActions();       /**< Creates all actions for user interface of MainWindow class. */
     void createMenus();         /**< Creates all menus for user interface of MainWindow class. */
-    void createDockWindows();
-    void createMdiView();
+    void createDockWindows();   /**< Creates all dock windows for user interface of MainWindow class. */
+    void createMdiView();       /**< Creates all Windows within the MDI View for user interface of MainWindow class. */
 
     QAction*                            m_pActionOpenDataFile;      /**< open data file action */
     QAction*                            m_pActionExit;              /**< exit application action */
@@ -131,20 +154,18 @@ private:
 
 private:
     //Open a FIFF file
-    void openFiffFile();            /**< Implements open fiff action.*/
+    void openFiffFile();            /**< Implements open fiff action. TODO: Move to fiffio*/
+    //FIFF File management
+    QString                 m_fiffFileName;  /**< TODO: Move to fiffio */
+
     void about();                   /**< Implements about action.*/
 
-
 private:
-
     //MDI Central View
     MdiView *m_pMdiView;            /**< The Central MDI View.*/
 
-    //FIFF File management
-    QString                 m_fiffFileName;
-
-    QSharedPointer<ANSHAREDLIB::AnalyzeSettings>    m_analyzeSettings;
-    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;
+    QSharedPointer<ANSHAREDLIB::AnalyzeSettings>    m_analyzeSettings;  /**< The global settings.*/
+    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;      /**< The global data base.*/
 
 };
 

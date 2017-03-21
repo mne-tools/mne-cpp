@@ -285,12 +285,12 @@ void Controls::createLayout()
 
 
     // Set up connections
-    connect(antialiasButton, SIGNAL(toggled(bool)), m_pView, SLOT(enableAntialiasing(bool)));
+    connect(antialiasButton, &QPushButton::toggled, m_pView, &View::enableAntialiasing);
 
 //    connect(penWidth, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
 
 #ifndef QT_NO_OPENGL
-    connect(openGlButton, SIGNAL(clicked(bool)), m_pView, SLOT(enableOpenGL(bool)));
+    connect(openGlButton, &QPushButton::clicked, m_pView, &View::enableOpenGL);
 #endif
 //    connect(aboutButton, SIGNAL(clicked(bool)), m_renderer, SLOT(setDescriptionEnabled(bool)));
 //    connect(m_renderer, SIGNAL(descriptionEnabledChanged(bool)),
