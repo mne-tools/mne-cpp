@@ -92,108 +92,6 @@ using namespace FIFFLIB;
 #define MALLOC_20(x,t) (t *)malloc((x)*sizeof(t))
 
 
-#define ALLOC_CMATRIX_20(x,y) mne_cmatrix_20((x),(y))
-
-
-
-static void matrix_error_20(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-
-float **mne_cmatrix_20(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_20(nr,float *);
-    if (!m) matrix_error_20(1,nr,nc);
-    whole = MALLOC_20(nr*nc,float);
-    if (!whole) matrix_error_20(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-
-
-
-
-/*
- * float matrices
- */
-
-#define FREE_CMATRIX_20(m) mne_free_cmatrix_20((m))
-
-
-
-void mne_free_cmatrix_20 (float **m)
-{
-    if (m) {
-        FREE_20(*m);
-        FREE_20(m);
-    }
-}
-
-
-
-
-
-Eigen::MatrixXf toFloatEigenMatrix_20(float **mat, const int m, const int n)
-{
-    Eigen::MatrixXf eigen_mat(m,n);
-
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
-
-    return eigen_mat;
-}
-
-void fromFloatEigenMatrix_20(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromFloatEigenMatrix_20(const Eigen::MatrixXf& from_mat, float **& to_mat)
-{
-    fromFloatEigenMatrix_20(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-
-
-
-float **mne_lu_invert_20(float **mat,int dim)
-/*
-      * Invert a matrix using the LU decomposition from
-      * LAPACK
-      */
-{
-    Eigen::MatrixXf eigen_mat = toFloatEigenMatrix_20(mat, dim, dim);
-    Eigen::MatrixXf eigen_mat_inv = eigen_mat.inverse();
-    fromFloatEigenMatrix_20(eigen_mat_inv, mat);
-    return mat;
-}
-
-
 
 #define MAXWORD 1000
 
@@ -314,8 +212,8 @@ FiffCoordTransOld::FiffCoordTransOld(const FiffCoordTransOld &p_FiffCoordTransOl
         this->move[j] = p_FiffCoordTransOld.move[j];
         this->invmove[j] = p_FiffCoordTransOld.invmove[j];
         for (int k = 0; k < 3; k++) {
-            this->rot[j][k] = p_FiffCoordTransOld.rot[j][k];
-            this->invrot[j][k] = p_FiffCoordTransOld.invrot[j][k];
+            this->rot(j,k) = p_FiffCoordTransOld.rot(j,k);
+            this->invrot(j,k) = p_FiffCoordTransOld.invrot(j,k);
         }
     }
 }
@@ -334,10 +232,10 @@ FiffCoordTransOld *FiffCoordTransOld::catenate(FiffCoordTransOld *t1, FiffCoordT
     for (j = 0; j < 3; j++) {
         t->move[j] = t1->move[j];
         for (k = 0; k < 3; k++) {
-            t->rot[j][k] = 0.0;
-            t->move[j] += t1->rot[j][k]*t2->move[k];
+            t->rot(j,k) = 0.0;
+            t->move[j] += t1->rot(j,k)*t2->move[k];
             for (p = 0; p < 3; p++)
-                t->rot[j][k] += t1->rot[j][p]*t2->rot[p][k];
+                t->rot(j,k) += t1->rot(j,p)*t2->rot(p,k);
         }
     }
     add_inverse(t);
@@ -349,15 +247,13 @@ FiffCoordTransOld *FiffCoordTransOld::catenate(FiffCoordTransOld *t1, FiffCoordT
 
 FiffCoordTransOld::FiffCoordTransOld(int from, int to, float rot[3][3], float move[3])
 {
-    int j,k;
-
     this->from = from;
     this->to   = to;
 
-    for (j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++) {
         this->move[j] = move[j];
-        for (k = 0; k < 3; k++)
-            this->rot[j][k] = rot[j][k];
+        for (int k = 0; k < 3; k++)
+            this->rot(j,k) = rot[j][k];
     }
     add_inverse(this);
 }
@@ -376,26 +272,24 @@ FiffCoordTransOld::~FiffCoordTransOld()
 int FiffCoordTransOld::add_inverse(FiffCoordTransOld *t)
 {
     int   j,k;
-    float **m = ALLOC_CMATRIX_20(4,4);
+    Matrix4f m;
 
     for (j = 0; j < 3; j++) {
         for (k = 0; k < 3; k++)
-            m[j][k] = t->rot[j][k];
-        m[j][3] = t->move[j];
+            m(j,k) = t->rot(j,k);
+        m(j,3) = t->move[j];
     }
     for (k = 0; k < 3; k++)
-        m[3][k] = 0.0;
-    m[3][3] = 1.0;
-    if (mne_lu_invert_20(m,4) == NULL) {
-        FREE_CMATRIX_20(m);
-        return FAIL;
-    }
+        m(3,k) = 0.0;
+    m(3,3) = 1.0;
+
+    m = m.inverse().eval();
+
     for (j = 0; j < 3; j++) {
         for (k = 0; k < 3; k++)
-            t->invrot[j][k] = m[j][k];
-        t->invmove[j] = m[j][3];
+            t->invrot(j,k) = m(j,k);
+        t->invmove[j] = m(j,3);
     }
-    FREE_CMATRIX_20(m);
     return OK;
 }
 
@@ -411,8 +305,8 @@ FiffCoordTransOld *FiffCoordTransOld::fiff_invert_transform() const
         ti->move[j] = this->invmove[j];
         ti->invmove[j] = this->move[j];
         for (k = 0; k < 3; k++) {
-            ti->rot[j][k]    = this->invrot[j][k];
-            ti->invrot[j][k] = this->rot[j][k];
+            ti->rot(j,k)    = this->invrot(j,k);
+            ti->invrot(j,k) = this->rot(j,k);
         }
     }
     ti->from = this->to;
@@ -423,7 +317,7 @@ FiffCoordTransOld *FiffCoordTransOld::fiff_invert_transform() const
 
 //*************************************************************************************************************
 
-void FiffCoordTransOld::fiff_coord_trans(float r[], FiffCoordTransOld *t, int do_move)
+void FiffCoordTransOld::fiff_coord_trans(float r[], const FiffCoordTransOld *t, int do_move)
 /*
 * Apply coordinate transformation
 */
@@ -434,7 +328,7 @@ void FiffCoordTransOld::fiff_coord_trans(float r[], FiffCoordTransOld *t, int do
     for (j = 0; j < 3; j++) {
         res[j] = (do_move ? t->move[j] :  0.0);
         for (k = 0; k < 3; k++)
-            res[j] += t->rot[j][k]*r[k];
+            res[j] += t->rot(j,k)*r[k];
     }
     for (j = 0; j < 3; j++)
         r[j] = res[j];
@@ -520,7 +414,7 @@ void FiffCoordTransOld::fiff_coord_trans_inv(float r[], FiffCoordTransOld *t, in
     for (j = 0; j < 3; j++) {
         res[j] = (do_move ? t->invmove[j] :  0.0);
         for (k = 0; k < 3; k++)
-            res[j] += t->invrot[j][k]*r[k];
+            res[j] += t->invrot(j,k)*r[k];
     }
     for (j = 0; j < 3; j++)
         r[j] = res[j];
@@ -582,7 +476,7 @@ void FiffCoordTransOld::mne_print_coord_transform_label(FILE *log, char *label, 
             fprintf(log,"%s\n",mne_coord_frame_name(frame));
             for (p = 0; p < 3; p++)
                 fprintf(log,"\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n",
-                        t->rot[p][X_20],t->rot[p][Y_20],t->rot[p][Z_20],1000*t->move[p]);
+                        t->rot(p,X_20),t->rot(p,Y_20),t->rot(p,Z_20),1000*t->move[p]);
             fprintf(log,"\t% 8.6f % 8.6f % 8.6f  % 7.2f\n",0.0,0.0,0.0,1.0);
         }
     }
@@ -822,7 +716,7 @@ FiffCoordTransOld *FiffCoordTransOld::read_helper( FIFFLIB::FiffTag::SPtr& tag)
         for (r = 0; r < 3; ++r) {
             p_FiffCoordTrans->move[r] = t_pFloat[11+r];
             for (c = 0; c < 3; ++c) {
-                p_FiffCoordTrans->rot[r][c] = t_pFloat[2+count];
+                p_FiffCoordTrans->rot(r,c) = t_pFloat[2+count];
                 ++count;
             }
         }
@@ -831,7 +725,7 @@ FiffCoordTransOld *FiffCoordTransOld::read_helper( FIFFLIB::FiffTag::SPtr& tag)
         for (r = 0; r < 3; ++r) {
             p_FiffCoordTrans->invmove[r] = t_pFloat[23+r];
             for (c = 0; c < 3; ++c) {
-                p_FiffCoordTrans->invrot[r][c] = t_pFloat[14+count];
+                p_FiffCoordTrans->invrot(r,c) = t_pFloat[14+count];
                 ++count;
             }
         }

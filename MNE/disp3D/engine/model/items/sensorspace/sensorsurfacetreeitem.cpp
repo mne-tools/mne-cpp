@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     bemtreeitem.cpp
+* @file     sensorsurfacetreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BemTreeItem class definition.
+* @brief    SensorSurfaceTreeItem class definition.
 *
 */
 
@@ -38,15 +38,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "bemtreeitem.h"
-#include "bemsurfacetreeitem.h"
+#include "sensorsurfacetreeitem.h"
+#include "../common/metatreeitem.h"
+#include "../../3dhelpers/renderable3Dentity.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 
 #include <mne/mne_bem.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 
@@ -55,17 +57,15 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace Eigen;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -73,8 +73,8 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BemTreeItem::BemTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
+SensorSurfaceTreeItem::SensorSurfaceTreeItem(int iType, const QString& text)
+: AbstractSurfaceTreeItem(iType, text)
 {
     initItem();
 }
@@ -82,74 +82,49 @@ BemTreeItem::BemTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-BemTreeItem::~BemTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::initItem()
+void SensorSurfaceTreeItem::initItem()
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM item");
+    this->setToolTip("Sensor surface item");
 }
 
 
 //*************************************************************************************************************
 
-QVariant BemTreeItem::data(int role) const
+void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCore::QEntity* parent)
 {
-    switch(role) {
-        case Data3DTreeModelItemRoles::BemName:
-            return QVariant();
-        default: // do nothing;
-            break;
+    //Set parents
+    m_pRenderable3DEntity->setParent(parent);
+    m_pRenderable3DEntityNormals->setParent(parent);
+
+    QPointer<Qt3DRender::QMaterial> pMaterial = new PerVertexPhongAlphaMaterial(true);
+    this->setMaterial(pMaterial);
+
+    //Create color from curvature information with default gyri and sulcus colors
+    MatrixX3f matVertColor = createVertColor(tSensorSurface.rr);
+
+    //Set renderable 3D entity mesh and color data
+    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSensorSurface.rr,
+                                                        tSensorSurface.nn,
+                                                        tSensorSurface.tris,
+                                                        matVertColor,
+                                                        Qt3DRender::QGeometryRenderer::Triangles);
+
+    //Render normals
+    if(m_bRenderNormals) {
+        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSensorSurface.rr,
+                                                                      tSensorSurface.nn,
+                                                                      tSensorSurface.tris,
+                                                                      matVertColor,
+                                                                      Qt3DRender::QGeometryRenderer::Triangles);
     }
 
-    return AbstractTreeItem::data(role);
+    //Add data which is held by this SensorSurfaceTreeItem
+    QVariant data;
+
+    data.setValue(tSensorSurface.rr);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 }
-
-
-//*************************************************************************************************************
-
-void  BemTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
-{
-    //Generate child items based on BEM input parameters
-    for(int i = 0; i < tBem.size(); ++i) {
-        QString sBemSurfName;
-        sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], p3DEntityParent);
-
-        QList<QStandardItem*> list;
-        list << pSurfItem;
-        list << new QStandardItem(pSurfItem->toolTip());
-        this->appendRow(list);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-
-
 

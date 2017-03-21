@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     bemtreeitem.cpp
+* @file     networkview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BemTreeItem class definition.
+* @brief    NetworkView class definition.
 *
 */
 
@@ -38,24 +38,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "bemtreeitem.h"
-#include "bemsurfacetreeitem.h"
+#include "networkview.h"
 
-#include <mne/mne_bem.h>
+#include "../engine/model/data3Dtreemodel.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// QT INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -63,9 +56,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -73,83 +65,16 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BemTreeItem::BemTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
+NetworkView::NetworkView(const Network& tNetworkData, QWidget* parent)
+: AbstractView(parent)
 {
-    initItem();
+    //Add network data
+    m_pData3DModel->addConnectivityData("sample", tNetworkData.getConnectivityMethod(), tNetworkData);
 }
 
 
 //*************************************************************************************************************
 
-BemTreeItem::~BemTreeItem()
+NetworkView::~NetworkView()
 {
 }
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::initItem()
-{
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM item");
-}
-
-
-//*************************************************************************************************************
-
-QVariant BemTreeItem::data(int role) const
-{
-    switch(role) {
-        case Data3DTreeModelItemRoles::BemName:
-            return QVariant();
-        default: // do nothing;
-            break;
-    }
-
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  BemTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
-{
-    //Generate child items based on BEM input parameters
-    for(int i = 0; i < tBem.size(); ++i) {
-        QString sBemSurfName;
-        sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], p3DEntityParent);
-
-        QList<QStandardItem*> list;
-        list << pSurfItem;
-        list << new QStandardItem(pSurfItem->toolTip());
-        this->appendRow(list);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-
-
-

@@ -78,7 +78,6 @@ class FiffTag;
 namespace FIFFLIB
 {
 
-
 //=============================================================================================================
 /**
 * Implements an Fiff Coordinate Descriptor (Replaces *fiffCoordTrans, fiffCoordTransRec; struct of MNE-C fiff_types.h).
@@ -146,7 +145,7 @@ public:
     FiffCoordTransOld* fiff_invert_transform () const;
 
 
-    static void fiff_coord_trans (float r[3],FiffCoordTransOld* t,int do_move);
+    static void fiff_coord_trans (float r[3], const FiffCoordTransOld* t,int do_move);
 
 
     static FiffCoordTransOld* fiff_combine_transforms (int from,int to,FiffCoordTransOld* t1,FiffCoordTransOld* t2);
@@ -198,12 +197,12 @@ public:
     static FiffCoordTransOld* read_helper( QSharedPointer<FIFFLIB::FiffTag>& tag );
 
 public:
-    FIFFLIB::fiff_int_t   from;             /**< Source coordinate system. */
-    FIFFLIB::fiff_int_t   to;               /**< Destination coordinate system. */
-    FIFFLIB::fiff_float_t rot[3][3];        /**< The forward transform (rotation part) */
-    FIFFLIB::fiff_float_t move[3];          /**< The forward transform (translation part) */
-    FIFFLIB::fiff_float_t invrot[3][3];     /**< The inverse transform (rotation part) */
-    FIFFLIB::fiff_float_t invmove[3];       /**< The inverse transform (translation part) */
+    FIFFLIB::fiff_int_t from;       /**< Source coordinate system. */
+    FIFFLIB::fiff_int_t to;         /**< Destination coordinate system. */
+    Eigen::Matrix3f     rot;        /**< The forward transform (rotation part) */
+    Eigen::Vector3f     move;       /**< The forward transform (translation part) */
+    Eigen::Matrix3f     invrot;     /**< The inverse transform (rotation part) */
+    Eigen::Vector3f     invmove; /**< The inverse transform (translation part) */
 
     // ### OLD STRUCT ###
     //typedef struct _fiffCoordTransRec {

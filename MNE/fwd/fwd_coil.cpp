@@ -121,24 +121,6 @@ void mne_free_cmatrix_5 (float **m)
 }
 
 
-void fiff_coord_trans_5 (float r[3],const FiffCoordTransOld* t,int do_move)
-/*
-      * Apply coordinate transformation
-      */
-{
-    int j,k;
-    float res[3];
-
-    for (j = 0; j < 3; j++) {
-        res[j] = (do_move ? t->move[j] :  0.0);
-        for (k = 0; k < 3; k++)
-            res[j] += t->rot[j][k]*r[k];
-    }
-    for (j = 0; j < 3; j++)
-        r[j] = res[j];
-}
-
-
 static void normalize_5(float *rr)
 /*
       * Scale vector to unit length
@@ -259,8 +241,8 @@ FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld*
        * Optional coordinate transformation
        */
     if (t) {
-        fiff_coord_trans_5(res->r0,t,FIFFV_MOVE);
-        fiff_coord_trans_5(res->ex,t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(res->r0,t,FIFFV_MOVE);
+        FiffCoordTransOld::fiff_coord_trans(res->ex,t,FIFFV_MOVE);
         res->coord_frame = t->to;
     }
     else
