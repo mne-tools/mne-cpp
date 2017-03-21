@@ -38,7 +38,8 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    surfer
+    surfer \
+    fiffio
 
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SUBDIRS += \

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepcntk.h
+* @file     fiffio.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,22 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DeepCNTK class.
+* @brief    Contains the declaration of the FiffIO class.
 *
 */
 
-#ifndef DEEPCNTK_H
-#define DEEPCNTK_H
-
+#ifndef FIFFIO_H
+#define FIFFIO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deepcntk_global.h"
+#include "fiffio_global.h"
 
 #include <anShared/Interfaces/IExtension.h>
+
 
 
 //*************************************************************************************************************
@@ -59,31 +59,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CNTK INCLUDES
+// DEFINE NAMESPACE FIFFIOEXTENSION
 //=============================================================================================================
 
-#include <CNTKLibrary.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class DeepViewerWidget;
-
-namespace DEEPLIB
-{
-class Deep;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DEEPCNTKEXTENSION
-//=============================================================================================================
-
-namespace DEEPCNTKEXTENSION
+namespace FIFFIOEXTENSION
 {
 
 
@@ -103,29 +82,29 @@ using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 /**
-* DeepCNTK Extension
+* FiffIO Extension
 *
-* @brief The DeepCNTK class provides a Machine Learning Capbilities.
+* @brief The FiffIO class provides input and output capabilities for the fiff file format.
 */
-class DEEPCNTKSHARED_EXPORT DeepCNTK : public IExtension
+class FIFFIOSHARED_EXPORT FiffIO : public IExtension
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "deepcntk.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "fiffio.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IExtension)
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a DeepCNTK.
+    * Constructs a FiffIO.
     */
-    DeepCNTK();
+    FiffIO();
 
     //=========================================================================================================
     /**
-    * Destroys the DeepCNTK.
+    * Destroys the FiffIO.
     */
-    ~DeepCNTK();
+    ~FiffIO();
 
     //=========================================================================================================
     /**
@@ -149,18 +128,8 @@ protected:
 
 private:
 
-    // Deep Model
-    QSharedPointer<DEEPLIB::Deep>   m_pDeep;
-    CNTK::FunctionPtr               m_pModel;
-
-    // Control
-    QDockWidget*                    m_control;
-
-    // View
-    DeepViewerWidget*               m_view;
-
 };
 
 } // NAMESPACE
 
-#endif // DEEPCNTK_H
+#endif // FIFFIO_H
