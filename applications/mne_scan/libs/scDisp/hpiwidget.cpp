@@ -167,6 +167,7 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     QFile t_fileHead("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHead(t_fileHead);
     m_pBemHead = m_pData3DModel->addBemData("Head", "Model kid", t_BemHead);
+    updateHeadModel();
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -485,6 +486,22 @@ void HPIWidget::onFreqsChanged()
 
 void HPIWidget::onDoContinousHPI()
 {
+    if(!this->hpiLoaded()) {
+       QMessageBox msgBox;
+       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first!");
+       msgBox.exec();
+       ui->m_checkBox_continousHPI->setChecked(!ui->m_checkBox_continousHPI->isChecked());
+       return;
+    }
+
+    if(m_matValue.rows() == 0 || m_matValue.cols() == 0) {
+       QMessageBox msgBox;
+       msgBox.setText("No data has been received yet! Please start the measurement first!");
+       msgBox.exec();
+       ui->m_checkBox_continousHPI->setChecked(!ui->m_checkBox_continousHPI->isChecked());
+       return;
+    }
+
     emit continousHPIToggled(ui->m_checkBox_continousHPI->isChecked());
 
     if(ui->m_checkBox_continousHPI->isChecked()) {
@@ -659,6 +676,7 @@ void HPIWidget::updateHeadModel()
 
                 pTransform->setMatrix(mat);
                 pEntity->setTransform(pTransform);
+                pEntity->setScale(0.75);
             }
         }
     }
