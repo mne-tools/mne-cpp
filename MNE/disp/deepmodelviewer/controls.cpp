@@ -87,7 +87,7 @@ Controls::Controls(View* v, QWidget* parent)
 : QWidget(parent)
 , m_view(v)
 {
-    layoutForDesktop();
+    createLayout();
 }
 
 
@@ -96,7 +96,7 @@ Controls::Controls(View* v, QWidget* parent)
 void Controls::setView(View *v)
 {
     m_view = v;
-    layoutForDesktop();
+    createLayout();
 }
 
 
@@ -223,7 +223,7 @@ void Controls::createCommonControls(QWidget* parent)
 
 //*************************************************************************************************************
 
-void Controls::layoutForDesktop()
+void Controls::createLayout()
 {
     QGroupBox *mainGroup = new QGroupBox(this);
     mainGroup->setFixedWidth(180);
@@ -299,21 +299,4 @@ void Controls::layoutForDesktop()
     openGlButton->setChecked(m_view->usesOpenGL());
 #endif
     penWidth->setValue(50);
-
-}
-
-
-//*************************************************************************************************************
-
-void Controls::emitQuitSignal()
-{
-    emit quitPressed();
-}
-
-
-//*************************************************************************************************************
-
-void Controls::emitOkSignal()
-{
-    emit okPressed();
 }
