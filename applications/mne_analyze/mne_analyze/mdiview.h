@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief
+* @brief    MdiView class declaration.
 *
 */
 
@@ -72,7 +72,6 @@ QT_END_NAMESPACE
 namespace MNEANALYZE
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
@@ -94,6 +93,7 @@ public:
 
     //Cascade subwindows
     void cascadeSubWindows();
+
     //Tile subwindows
     void tileSubWindows();
 
