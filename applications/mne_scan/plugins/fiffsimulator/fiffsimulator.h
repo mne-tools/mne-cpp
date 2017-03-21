@@ -246,6 +246,9 @@ protected:
 
     qint32                  m_iActiveConnectorId;           /**< The active connector.*/
     qint32                  m_iBufferSize;                  /**< The raw data buffer size.*/
+    qint16                  m_iNubmerBadChannels;           /**< The number of bad channels.*/
+
+    Eigen::MatrixXd         m_matProjectors;                /**< Holds the matrix with the SSP and compensator projectors.*/
 
     QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
 

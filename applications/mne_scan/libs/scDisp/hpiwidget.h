@@ -199,14 +199,21 @@ protected:
     //=========================================================================================================
     /**
     * Perform a single HPI fit.
-    *
     */
     void onBtnDoSingleFit();
+
+    //=========================================================================================================
+    /**
+    * Updates the labels.
+    */
+    void updateLabels();
 
     Ui::HPIWidget*                              ui;                 /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
     QVector<double>                             m_vGof;             /**< The goodness of fit in mm for each fitted HPI coil. */
+
+    double                                      m_dMeanErrorDist;   /**< The error distances, averaged over all coil errors. */
 
     Eigen::SparseMatrix<double>                 m_sparseMatCals;    /**< Sparse calibration matrix.*/
     Eigen::MatrixXd                             m_matValue;         /**< The current data block.*/

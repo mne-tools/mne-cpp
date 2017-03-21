@@ -93,6 +93,7 @@ FiffSimulator::FiffSimulator()
 , m_bIsRunning(false)
 , m_iActiveConnectorId(0)
 , m_bDoContinousHPI(false)
+, m_iNubmerBadChannels(0)
 {
     //Init HPI
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
@@ -459,22 +460,27 @@ void FiffSimulator::updateHPI(const MatrixXf& matData)
 {
     //Update HPI data
     if(m_pFiffInfo && m_pHPIWidget) {
-        Eigen::MatrixXd matProj;
-        m_pFiffInfo->make_projector(matProj);
+        //If bad channels changed, recalcluate projectors
+        if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matProjectors.rows() == 0 || m_matProjectors.cols() == 0) {
+            qDebug()<<"FiffSimulator::updateHPI - Recalucuate SPP";
+            Eigen::MatrixXd matProj;
+            m_pFiffInfo->make_projector(matProj);
 
-        //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+            //set columns of matrix to zero depending on bad channels indexes
+            for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+                matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+            }
+
+            // Setup Comps
+            FiffCtfComp newComp;
+            m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+            Eigen::MatrixXd matComp = newComp.data->data;
+
+            m_matProjectors = matProj * matComp;
+            m_iNubmerBadChannels = m_pFiffInfo->bads.size();
         }
 
-        // Setup Comps
-        FiffCtfComp newComp;
-        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-        Eigen::MatrixXd matComp = newComp.data->data;
-
-        m_pHPIWidget->setData(matProj * matComp * matData.cast<double>());
-
-        //m_pHPIWidget->setData(matData.cast<double>());
+        m_pHPIWidget->setData(m_matProjectors * matData.cast<double>());
     }
 }
 
