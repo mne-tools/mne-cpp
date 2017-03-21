@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne_analyze project
+# @brief    This project file builds the MNE Analyze project
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -91,15 +91,11 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
     main.cpp \
-    Views/baseview.cpp \
-    Views/view3danalyze.cpp \
-    mdiview.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    mdiview.cpp
 
 HEADERS += \
     info.h \
-    Views/baseview.h \
-    Views/view3danalyze.h \
     mainwindow.h \
     mdiview.h
 
