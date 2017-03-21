@@ -130,6 +130,10 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     connect(ui->m_checkBox_useComp, &QCheckBox::clicked,
             this, &HPIWidget::onSSPCompUsageChanged);
 
+    //Init from default values
+    ui->m_checkBox_useSSP->setChecked(m_bUseSSP);
+    ui->m_checkBox_useComp->setChecked(m_bUseComp);
+
     //Setup View3D
     m_pView3D->setModel(m_pData3DModel);
 
@@ -486,7 +490,7 @@ bool HPIWidget::performHPIFitting()
                 return false;
             }
 
-            //Set newly calculated transformation matrix to fiff info
+            //If fit was good, set newly calculated transformation matrix to fiff info
             m_pFiffInfo->dev_head_t = transDevHead;
 
             //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
