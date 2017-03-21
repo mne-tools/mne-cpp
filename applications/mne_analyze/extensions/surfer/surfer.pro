@@ -8,7 +8,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -90,8 +90,6 @@ HEADERS += \
     surfer.h \
     Views/baseview.h \
     Views/view3danalyze.h
-
-FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
