@@ -48,7 +48,7 @@
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <disp/deepviewer.h>
+#include <disp/lineplot.h>
 
 #include <iostream>
 #include <random>
@@ -196,11 +196,11 @@ int main(int argc, char *argv[])
     qDebug() << "\n Finished training \n";
 
     //Plot error
-    QChartView *error_chartView = DeepViewer::linePlot(vecError,"Training Error");
+    QChartView *error_chartView = LinePlot::linePlot(vecError,"Training Error");
     error_chartView->show();
 
     //Plot loss
-    QChartView *loss_chartView = DeepViewer::linePlot(vecLoss,"Loss Error");
+    QChartView *loss_chartView = LinePlot::linePlot(vecLoss,"Loss Error");
     loss_chartView->show();
 
     //

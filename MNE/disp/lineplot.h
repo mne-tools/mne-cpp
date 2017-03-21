@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepviewer.cpp
+* @file     lineplot.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,94 +29,119 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepViewer class implementation.
+* @brief    LinePlot class declaration.
 *
 */
+
+#ifndef LINEPLOT_H
+#define LINEPLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deepviewer.h"
+#include "disp_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// SYSTEM INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDebug>
+#include <QVector>
+
+#include <QChart>
+#include <QChartView>
+#include <QLineSeries>
+
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace DISPLIB;
-using namespace Eigen;
-using namespace QtCharts;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-DeepViewer::DeepViewer()
-{
-}
-
-
-//*************************************************************************************************************
-
-DeepViewer::~DeepViewer()
+namespace DISPLIB
 {
 
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
+//=============================================================================================================
+/**
+* Line Plot based on QtCharts
+*
+* @brief Line Plot
+*/
+class DISPSHARED_EXPORT LinePlot
+{
+public:
+    typedef QSharedPointer<LinePlot> SPtr;            /**< Shared pointer type for DeepViewer. */
+    typedef QSharedPointer<const LinePlot> ConstSPtr; /**< Const shared pointer type for DeepViewer. */
+
+    //=========================================================================================================
+    /**
+    * Default constructor
+    */
+    LinePlot();
+
+    //=========================================================================================================
+    /**
+    * Destructs DeepModelCreator
+    */
+    virtual ~LinePlot();
+
+    //=========================================================================================================
+    /**
+    * Plot a line series
+    *
+    * @param [in] y         Data to plot
+    * @param [in] title     Plot title
+    *
+    * @return the view handle
+    */
+    static QtCharts::QChartView * linePlot(const QVector<double>& y, const QString& title = "");
+
+    //=========================================================================================================
+    /**
+    * Plot a line series
+    *
+    * @param [in] x         X-Axis data to plot
+    * @param [in] y         Y-Axis data to plot
+    * @param [in] title     Plot title
+    *
+    * @return the view handle
+    */
+    static QtCharts::QChartView * linePlot(const QVector<double>& x, const QVector<double>& y, const QString& title = "");
+
+private:
+
+};
 
 //*************************************************************************************************************
-
-QChartView *DeepViewer::linePlot(const QVector<double> &y, const QString &title)
-{
-    QVector<double> x(y.size());
-
-    for(int i = 0; i < x.size(); ++i) {
-        x[i] = i;
-    }
-
-    return linePlot(x, y, title);
-}
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
 
-//*************************************************************************************************************
+} // NAMESPACE
 
-QChartView *DeepViewer::linePlot(const QVector<double> &x, const QVector<double> &y, const QString &title)
-{
-    QLineSeries *series = new QLineSeries();
-    for(int i = 0; i < x.size(); ++i) {
-        series->append(x[i], y[i]);
-    }
-    QChart *chart = new QChart();
-    chart->legend()->hide();
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-    chart->setTitle(title);
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-
-    chartView->setWindowTitle(title);
-
-    return chartView;
-}
+#endif // LINEPLOT_H
