@@ -46,9 +46,9 @@
 #include <QCategoryAxis>
 
 #include <deep/deep.h>
-#include <deep/deepviewer.h>
 #include <deep/deepmodelcreator.h>
-#include <deep/deepviewer.h>
+
+#include <disp/deepviewer.h>
 
 #include <iostream>
 #include <random>
@@ -76,8 +76,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 using namespace DEEPLIB;
+using namespace DISPLIB;
+using namespace Eigen;
 using namespace QtCharts;
 using namespace CNTK;
 

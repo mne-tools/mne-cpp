@@ -38,11 +38,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = lib
 
 #QT       -= gui
-QT += widgets charts
-
-# Deep Model Viewer
-qtHaveModule(printsupport): QT += printsupport
-qtHaveModule(opengl): QT += opengl
+QT += widgets
 
 DEFINES += DEEP_LIBRARY
 
@@ -60,9 +56,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Dispd \ # Remove dependency -> put all dependent in disp itself
             -lEvalDll \
-            -lCNTKLibrary-2.0
+
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -70,7 +65,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Disp \ # Remove dependency -> put all dependent in disp itself
             -lEvalDll \
             -lCNTKLibrary-2.0
 }
@@ -110,25 +104,13 @@ else {
 SOURCES += \
     deep.cpp \
     deepeval.cpp \
-    deepmodelcreator.cpp \
-    deepviewer.cpp \
-    deepmodelviewer/edge.cpp \
-    deepmodelviewer/node.cpp \
-    deepmodelviewer/view.cpp \
-    deepmodelviewer/deepviewerwidget.cpp \
-    deepmodelviewer/controls.cpp
+    deepmodelcreator.cpp
 
 HEADERS +=\
     deep_global.h \
     deep.h \
     deepeval.h \
-    deepmodelcreator.h \
-    deepviewer.h \
-    deepmodelviewer/edge.h \
-    deepmodelviewer/node.h \
-    deepmodelviewer/view.h \
-    deepmodelviewer/deepviewerwidget.h \
-    deepmodelviewer/controls.h
+    deepmodelcreator.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -159,5 +141,3 @@ win32 {
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
 
-RESOURCES += \
-    deepmodelviewer/images.qrc

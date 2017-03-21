@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "../deep_global.h"
+#include "../disp_global.h"
 
 
 
@@ -31,7 +31,7 @@ class Edge;
 class Controls;
 
 
-class DEEPSHARED_EXPORT DeepViewerWidget : public QWidget
+class DISPSHARED_EXPORT DeepViewerWidget : public QWidget
 {
     Q_OBJECT
 public:

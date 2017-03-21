@@ -41,10 +41,11 @@
 #include "deepcntk.h"
 
 #include <deep/deep.h>
-#include <deep/deepviewer.h>
 #include <deep/deepmodelcreator.h>
-#include <deep/deepmodelviewer/deepviewerwidget.h>
-#include <deep/deepmodelviewer/controls.h>
+
+#include <disp/deepviewer.h>
+#include <disp/deepmodelviewer/deepviewerwidget.h>
+#include <disp/deepmodelviewer/controls.h>
 
 #include <iostream>
 #include <random>
@@ -59,6 +60,7 @@ using namespace DEEPCNTKEXTENSION;
 using namespace ANSHAREDLIB;
 using namespace Eigen;
 using namespace DEEPLIB;
+using namespace DISPLIB;
 //using namespace QtCharts;
 using namespace CNTK;
 

@@ -67,6 +67,7 @@ QPainterPath Node::shape() const
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
+    Q_UNUSED(option)
     painter->setPen(QColor(50, 100, 120, 200));
     painter->setBrush(QColor(200, 200, 210, 120));
 
