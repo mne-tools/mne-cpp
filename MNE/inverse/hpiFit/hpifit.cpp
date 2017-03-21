@@ -159,7 +159,7 @@ Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen:
  * same output
  *********************************************************************************/
 
-Eigen::MatrixXd compute_leadfield(Eigen::MatrixXd pos, struct SensorInfo sensors)
+Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors)
 {
 
     Eigen::MatrixXd pnt, ori, lf;
@@ -182,7 +182,7 @@ Eigen::MatrixXd compute_leadfield(Eigen::MatrixXd pos, struct SensorInfo sensors
  * same output
  *********************************************************************************/
 
-DipFitError dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct SensorInfo sensors)
+DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors)
 {
     // Variable Declaration
     struct DipFitError e;
@@ -207,7 +207,7 @@ DipFitError dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct Sensor
  * Compare function for sorting
  *********************************************************************************/
 
-bool compare(HPISortStruct a, HPISortStruct b)
+bool compare(HPISortStruct& a, HPISortStruct& b)
 {
     return (a.base_arr < b.base_arr);
 }
@@ -219,18 +219,18 @@ bool compare(HPISortStruct a, HPISortStruct b)
  * attempts to find a local minimizer
  *********************************************************************************/
 
-Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
+Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
                            int maxiter,
                            int maxfun,
                            int display,
-                           Eigen::MatrixXd data,
-                           struct SensorInfo sensors,
+                           const Eigen::MatrixXd& data,
+                           const struct SensorInfo& sensors,
                            int &simplex_numitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
     std::string header, how;
     int n, itercount, prnt;
-    Eigen::MatrixXd onesn, two2np1, one2n, v, y, v1, tempX1, tempX2, xbar, xr, x, xe, xc, xcc, xin;
+    Eigen::MatrixXd onesn, two2np1, one2n, v, y, v1, tempX1, tempX2, xbar, xr, x, xe, xc, xcc, xin, posCopy;
     std::vector <double> fv, fv1;
     std::vector <int> idx;
 
@@ -250,7 +250,9 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
 
     header = " Iteration   Func-count     min f(x) Procedure";
 
-    n = pos.cols();
+    posCopy = pos;
+
+    n = posCopy.cols();
 
     // Initialize parameters
     rho = 1; chi = 2; psi = 0.5; sigma = 0.5;
@@ -268,10 +270,10 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
     fv1.resize(n+1);
 
     for(int i = 0;i < n; i++) {
-        v(i,0) = pos(i);
+        v(i,0) = posCopy(i);
     }
 
-    tempdip = dipfitError(pos, data, sensors);
+    tempdip = dipfitError(posCopy, data, sensors);
     fv[0] = tempdip.error;
 
     func_evals = 1;
@@ -282,7 +284,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
     // Following improvement suggested by L.Pfeffer at Stanford
     usual_delta = 0.05;             // 5 percent deltas for non-zero terms
     zero_term_delta = 0.00025;      // Even smaller delta for zero elements of x
-    xin = pos.transpose();
+    xin = posCopy.transpose();
 
     for(int j = 0;j < n;j++) {
         y = xin;
@@ -294,8 +296,8 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
         }
 
         v.col(j+1).array() = y;
-        pos = y.transpose();
-        tempdip = dipfitError(pos, data, sensors);
+        posCopy = y.transpose();
+        tempdip = dipfitError(posCopy, data, sensors);
         fv[j+1] = tempdip.error;
     }
 
@@ -467,7 +469,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
  * heavily edited for use with MNE Scan Software
  *********************************************************************************/
 
-void doDipfitConcurrent(FittingCoilData &lCoilData)
+void doDipfitConcurrent(FittingCoilData& lCoilData)
 {
     // Initialize variables
     Eigen::RowVectorXd currentCoil = lCoilData.coilPos;
@@ -692,6 +694,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     coil.pos = coilPos;
+
     coil = dipfit(coil, sensors, amp, numCoils);
 
     Eigen::Matrix4d trans = computeTransformation(headHPI,coil.pos);
@@ -777,7 +780,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 //*************************************************************************************************************
 
-CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, Eigen::MatrixXd data, int numCoils)
+CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd& data, int numCoils)
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
@@ -791,7 +794,6 @@ CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, Eigen
 
         lCoilData.append(coilData);
     }
-
     //Do the concurrent filtering
     if(!lCoilData.isEmpty()) {
         //Do sequential

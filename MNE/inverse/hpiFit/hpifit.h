@@ -167,9 +167,9 @@ public:
     *
     * @param[in] t_mat           Data to estimate the HPI positions from
     * @param[out] transDevHead   The final dev head transformation matrix
-    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
     * @param[in] vFreqs          The frequencies for each coil.
-    * @param[in] fittedPointSet  The final fitted positions in form of a digitizer set.
+    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
+    * @param[out] fittedPointSet The final fitted positions in form of a digitizer set.
     * @param[in] p_pFiffInfo     Associated Fiff Information.
     * @param[in] bDoDebug        Print debug info to cmd line and write debug info to file.
     * @param[in] sHPIResourceDir The path to the debug file which is to be written.
@@ -195,7 +195,7 @@ protected:
     *
     * @return Returns the coil parameters.
     */
-    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, Eigen::MatrixXd data, int numCoils);
+    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd &data, int numCoils);
 
     //=========================================================================================================
     /**
