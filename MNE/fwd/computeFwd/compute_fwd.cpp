@@ -457,7 +457,7 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
     qint32 r, c;
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            *t_pStream << (float)trans->rot[r][c];
+            *t_pStream << (float)trans->rot(r,c);
     for (r = 0; r < 3; ++r)
         *t_pStream << (float)trans->move[r];
 
@@ -466,7 +466,7 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
     //
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            *t_pStream << (float)trans->invrot[r][c];
+            *t_pStream << (float)trans->invrot(r,c);
     for (r = 0; r < 3; ++r)
         *t_pStream << (float)trans->invmove[r];
 }
