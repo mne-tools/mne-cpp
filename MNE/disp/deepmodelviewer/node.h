@@ -102,11 +102,12 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    float m_diameter;
-    float m_radius; //half diameter -> for drawing speed already calculated beforehand
-    QList<Edge *> edgeList;
-    QPointF newPos;
-    DeepViewerWidget *graph;
+    float m_diameter;           /**< The diameter */
+    float m_radius;             /**< Half of diameter - for drawing speed already calculated beforehand */
+
+    QList<Edge *> edgeList;     /**< The list of connected edges */
+    QPointF newPos;             /**< The new Position when node was moved */
+    DeepViewerWidget *graph;    /**< The viewer this node attached to */
 };
 
 //*************************************************************************************************************

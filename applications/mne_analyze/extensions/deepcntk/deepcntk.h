@@ -149,10 +149,7 @@ public:
     virtual bool hasView() const;
     virtual QWidget* getView();
 
-protected:
-
 private:
-
     // Deep Model
     QSharedPointer<DEEPLIB::Deep>   m_pDeep;            /**< CNTK Wrapper */
     CNTK::FunctionPtr               m_pModel;           /**< CNTK Model */
@@ -164,7 +161,6 @@ private:
 
     // View
     DISPLIB::DeepViewerWidget*      m_view;             /**< Control View */
-
 };
 
 } // NAMESPACE

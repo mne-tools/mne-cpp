@@ -127,16 +127,12 @@ public:
     virtual bool hasView() const;
     virtual QWidget* getView();
 
-protected:
-
 private:
-
     // Control
-    QDockWidget*        m_control;
+    QDockWidget*        m_control;  /**< Control Widget */
 
     // View
-    View3DAnalyze*      m_view;
-
+    View3DAnalyze*      m_view;     /**< Control View */
 };
 
 } // NAMESPACE
