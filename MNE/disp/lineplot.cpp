@@ -54,7 +54,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 #include <QDebug>
 
 
@@ -73,8 +72,36 @@ using namespace QtCharts;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LinePlot::LinePlot()
+LinePlot::LinePlot(QWidget *parent)
+: QChartView(parent)
+, m_pLineSeries(Q_NULLPTR)
+, m_pChart(Q_NULLPTR)
 {
+    update();
+}
+
+
+//*************************************************************************************************************
+
+LinePlot::LinePlot(const QVector<double> &y, const QString& title, QWidget *parent)
+: QChartView(parent)
+, m_sTitle(title)
+, m_pLineSeries(Q_NULLPTR)
+, m_pChart(Q_NULLPTR)
+{
+    updateData(y);
+}
+
+
+//*************************************************************************************************************
+
+LinePlot::LinePlot(const QVector<double> &x, const QVector<double> &y, const QString& title, QWidget *parent)
+: QChartView(parent)
+, m_sTitle(title)
+, m_pLineSeries(Q_NULLPTR)
+, m_pChart(Q_NULLPTR)
+{
+    updateData(x, y);
 }
 
 
@@ -88,7 +115,34 @@ LinePlot::~LinePlot()
 
 //*************************************************************************************************************
 
-QChartView *LinePlot::linePlot(const QVector<double> &y, const QString &title)
+void LinePlot::setTitle(const QString &p_sTitle)
+{
+    m_sTitle = p_sTitle;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void LinePlot::setXLabel(const QString &p_sXLabel)
+{
+    m_sXLabel = p_sXLabel;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void LinePlot::setYLabel(const QString &p_sYLabel)
+{
+    m_sYLabel = p_sYLabel;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void LinePlot::updateData(const QVector<double> &y)
 {
     QVector<double> x(y.size());
 
@@ -96,27 +150,50 @@ QChartView *LinePlot::linePlot(const QVector<double> &y, const QString &title)
         x[i] = i;
     }
 
-    return linePlot(x, y, title);
+    return updateData(x, y);
 }
 
 
 //*************************************************************************************************************
 
-QChartView *LinePlot::linePlot(const QVector<double> &x, const QVector<double> &y, const QString &title)
+void LinePlot::updateData(const QVector<double> &x, const QVector<double> &y)
 {
-    QLineSeries *series = new QLineSeries();
-    for(int i = 0; i < x.size(); ++i) {
-        series->append(x[i], y[i]);
+    if(!m_pLineSeries) {
+        m_pLineSeries = new QLineSeries;
     }
-    QChart *chart = new QChart();
-    chart->legend()->hide();
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-    chart->setTitle(title);
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
+    else {
+        m_pLineSeries->clear();
+    }
 
-    chartView->setWindowTitle(title);
+    for(int i = 0; i < x.size(); ++i) {
+        m_pLineSeries->append(x[i], y[i]);
+    }
 
-    return chartView;
+    if(!m_pChart) {
+        m_pChart = new QChart;
+    }
+    else {
+        m_pChart->removeAllSeries();
+    }
+
+    m_pChart->legend()->hide();
+    m_pChart->addSeries(m_pLineSeries);
+    m_pChart->createDefaultAxes();
+
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void LinePlot::update()
+{
+    if(!m_pChart)
+        return;
+
+    m_pChart->setTitle(m_sTitle);
+
+    this->setChart(m_pChart);
+    this->setRenderHint(QPainter::Antialiasing);
+    this->setWindowTitle(m_sTitle);
 }
