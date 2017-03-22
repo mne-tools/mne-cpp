@@ -48,7 +48,7 @@
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <disp/lineplot.h>
+#include <dispCharts/lineplot.h>
 
 #include <iostream>
 #include <random>
@@ -77,7 +77,7 @@
 //=============================================================================================================
 
 using namespace DEEPLIB;
-using namespace DISPLIB;
+using namespace DISPCHARTSLIB;
 using namespace Eigen;
 using namespace QtCharts;
 using namespace CNTK;
