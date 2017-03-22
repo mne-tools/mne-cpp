@@ -53,6 +53,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// CNTK INCLUDES
+//=============================================================================================================
+
+#include <CNTKLibrary.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -105,7 +113,7 @@ void generateRandomDataSamples(int sample_size, int feature_dim, int num_classes
 DeepCNTK::DeepCNTK()
 : m_pControlPanel(Q_NULLPTR)
 , m_pControl(Q_NULLPTR)
-, m_pView(Q_NULLPTR)
+, m_pDeepViewer(Q_NULLPTR)
 {
 
 }
@@ -132,29 +140,8 @@ QSharedPointer<IExtension> DeepCNTK::clone() const
 
 void DeepCNTK::init()
 {
-    // Create a deep model
-    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-    size_t input_dim = 4;
-    size_t num_output_classes = 3;
-    m_pDeep = Deep::SPtr(new Deep);
-    m_pModel = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
-    m_pDeep->setModel(m_pModel);
-    m_pDeep->print();
 
-    //
-    // Training
-    //
-    qDebug() << "\n Start training \n";
-
-    // Initialize the parameters for the trainer
-    int minibatch_size = 25;
-    int num_samples = 20000;
-
-    MatrixXf features, labels;
-
-    QVector<double> vecLoss, vecError;
-    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-    m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+    setupModel();
 
     //
     // Init view
@@ -166,9 +153,15 @@ void DeepCNTK::init()
     //
     // Create the viewer
     //
-    if(!m_pView) {
-        m_pView = new DeepViewerWidget(m_pModel, m_pControlPanel);
-        m_pView->setWindowTitle("Deep CNTK");
+    if(!m_pDeepViewer) {
+        if(m_pDeep) {
+            m_pDeepViewer = new DeepViewerWidget(m_pDeep->getModel(), false);
+        }
+        else {
+            m_pDeepViewer = new DeepViewerWidget(false);
+        }
+        m_pControlPanel->setView(m_pDeepViewer->getView());
+        m_pDeepViewer->setWindowTitle("Deep CNTK");
     }
 }
 
@@ -221,7 +214,6 @@ QDockWidget *DeepCNTK::getControl()
         m_pControl = new QDockWidget(tr("Deep CNTK"));
         m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_pControl->setMinimumWidth(180);
-
         m_pControl->setWidget(m_pControlPanel);
     }
 
@@ -242,13 +234,52 @@ bool DeepCNTK::hasView() const
 // check with owner ship and mdi area for garbage collection
 QWidget *DeepCNTK::getView()
 {
-    if(!m_pView) {
-        //
-        // Create the viewer
-        //
-        m_pView = new DeepViewerWidget(m_pModel);
-        m_pView->setWindowTitle("Deep CNTK");
-    }
+    return m_pDeepViewer;
+}
 
-    return m_pView;
+
+//*************************************************************************************************************
+
+void DeepCNTK::setupModel()
+{
+    // Create a deep model
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+
+    size_t input_dim = 4;
+    size_t num_output_classes = 3;
+
+    m_pDeep = Deep::SPtr(new Deep);
+    FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
+    m_pDeep->setModel(model);
+    m_pDeep->print();
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTK::trainModel()
+{
+    //
+    // Training
+    //
+
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+
+    qDebug() << "\n Start training \n";
+
+    size_t input_dim = m_pDeep->inputDimensions();
+    size_t num_output_classes = m_pDeep->outputDimensions();
+
+    qDebug() << "input_dim" << input_dim;
+    qDebug() << "num_output_classes" << num_output_classes;
+
+    // Initialize the parameters for the trainer
+    int minibatch_size = 25;
+    int num_samples = 20000;
+
+    MatrixXf features, labels;
+
+    QVector<double> vecLoss, vecError;
+    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
 }

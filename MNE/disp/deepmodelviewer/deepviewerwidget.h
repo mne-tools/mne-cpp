@@ -85,6 +85,7 @@ namespace DISPLIB
 
 class Node;
 class Edge;
+class View;
 class Controls;
 
 
@@ -98,17 +99,21 @@ class DISPSHARED_EXPORT DeepViewerWidget : public QWidget
 {
     Q_OBJECT
 public:
-    DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent = Q_NULLPTR);
 
-    DeepViewerWidget(CNTK::FunctionPtr model, Controls *controls, QWidget *parent = Q_NULLPTR);
+    DeepViewerWidget(bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
+    DeepViewerWidget(CNTK::FunctionPtr model, bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
+
+    View* getView() const;
 
 private:
     void populateScene();
 
-    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
+    CNTK::FunctionPtr   m_pModel;  /**< The CNTK model v2 */
 
-    QGraphicsScene* m_pScene;
+    View*               m_pView;
+
+    QGraphicsScene*     m_pScene;
 
     QList< QList<Node*> > m_listLayers;
     QList< QList<Edge*> > m_listEdges;

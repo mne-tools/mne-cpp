@@ -208,7 +208,7 @@ View::View(QWidget *parent)
 
 //*************************************************************************************************************
 
-QGraphicsView *View::getView() const
+QGraphicsView *View::getGraphicsView() const
 {
     return static_cast<QGraphicsView *>(m_pGgraphicsView);
 }

@@ -126,7 +126,7 @@ public:
     *
     * @return GraphicsView viewport
     */
-    QGraphicsView *getView() const;
+    QGraphicsView *getGraphicsView() const;
 
 public:
     //=========================================================================================================
