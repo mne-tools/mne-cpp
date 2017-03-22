@@ -94,7 +94,7 @@ public:
     /**
     * Constructs a PluginManager with the given parent.
     *
-    * @param[in] parent pointer to parent Object. (It's normally the default value.)
+    * @param [in] parent    pointer to parent Object. (It's normally the default value.)
     */
     PluginManager(QObject* parent = 0);
 
@@ -108,7 +108,7 @@ public:
     /**
     * Loads plugins from given directory.
     *
-    * @param dir the plugin directory.
+    * @param [in] dir   the plugin directory.
     */
     void loadPlugins(const QString& dir);
 
@@ -116,8 +116,9 @@ public:
     /**
     * Finds index of plugin by name.
     *
+    * @param [in] name  the plugin name.
+    *
     * @return index of plugin.
-    * @param name the plugin name.
     */
     int findByName(const QString& name);
 
