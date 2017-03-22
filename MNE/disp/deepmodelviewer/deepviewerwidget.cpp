@@ -76,20 +76,22 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
+DeepViewerWidget::DeepViewerWidget(bool embeddedControl, QWidget *parent)
 : QWidget(parent)
-, m_pModel(model)
+, m_pView(new View)
 {
     populateScene();
 
-    View *view = new View;
-    view->getView()->setScene(m_pScene);
-
-    Controls *controls = new Controls(view, this);
+    m_pView->getGraphicsView()->setScene(m_pScene);
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(view);
-    layout->addWidget(controls);
+    layout->addWidget(m_pView);
+
+    if(embeddedControl) {
+        Controls *controls = new Controls(m_pView, this);
+        layout->addWidget(controls);
+    }
+
     setLayout(layout);
 
     setWindowTitle(tr("Deep Model Viewer"));
@@ -98,22 +100,34 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
 
 //*************************************************************************************************************
 
-DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, Controls *controls, QWidget *parent)
+DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, bool embeddedControl, QWidget *parent)
 : QWidget(parent)
 , m_pModel(model)
+, m_pView(new View)
 {
     populateScene();
 
-    View *view = new View;
-    view->getView()->setScene(m_pScene);
-
-    controls->setView(view);
+    m_pView->getGraphicsView()->setScene(m_pScene);
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(view);
+    layout->addWidget(m_pView);
+
+    if(embeddedControl) {
+        Controls *controls = new Controls(m_pView, this);
+        layout->addWidget(controls);
+    }
+
     setLayout(layout);
 
     setWindowTitle(tr("Deep Model Viewer"));
+}
+
+
+//*************************************************************************************************************
+
+View *DeepViewerWidget::getView() const
+{
+    return m_pView;
 }
 
 

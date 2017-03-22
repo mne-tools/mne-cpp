@@ -261,6 +261,14 @@ void Deep::runEvaluation(FunctionPtr model, const CNTK::Variable& inputVar, cons
 
 //*************************************************************************************************************
 
+FunctionPtr Deep::getModel()
+{
+    return m_pModel;
+}
+
+
+//*************************************************************************************************************
+
 void Deep::setModel(FunctionPtr &model)
 {
     m_pModel = model;

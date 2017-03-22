@@ -95,8 +95,12 @@ Controls::Controls(View* v, QWidget* parent)
 
 void Controls::setView(View *v)
 {
-    if(m_pView) {
-        qDebug() << "TODO Make sure that the old view is dosconnected and destroyed later on.";
+    if(!v){
+        fprintf(stderr,"Error: The view to set is empty!");
+        return;
+    }
+    if( m_pView ) {
+        qDebug() << "TODO Make sure that the old view is disconnected and destroyed later on.";
     }
 
     m_pView = v;
