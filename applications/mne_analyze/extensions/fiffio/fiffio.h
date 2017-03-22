@@ -68,14 +68,6 @@ namespace FIFFIOEXTENSION
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace ANSHAREDLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -86,7 +78,7 @@ using namespace ANSHAREDLIB;
 *
 * @brief The FiffIO class provides input and output capabilities for the fiff file format.
 */
-class FIFFIOSHARED_EXPORT FiffIO : public IExtension
+class FIFFIOSHARED_EXPORT FiffIO : public ANSHAREDLIB::IExtension
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "fiffio.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
