@@ -301,6 +301,7 @@ void View::print()
 
 void View::zoomIn(int level)
 {
+    if(!level) level = 1;
     m_pZoomSlider->setValue(m_pZoomSlider->value() + level);
 }
 
@@ -309,6 +310,7 @@ void View::zoomIn(int level)
 
 void View::zoomOut(int level)
 {
+    if(!level) level = 1;
     m_pZoomSlider->setValue(m_pZoomSlider->value() - level);
 }
 
