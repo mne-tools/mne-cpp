@@ -168,7 +168,8 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 
     QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadKid(t_fileHeadKid);
-    m_pBemHeadKid = m_pData3DModel->addBemData("Head", "Kid", t_BemHeadKid);
+    m_pBemHeadKid = m_pData3DModel->addBemData("Head", "Child", t_BemHeadKid);
+    m_pBemHeadKid->setCheckState(Qt::Unchecked);
 
     QFile t_fileHeadAdult("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadAdult(t_fileHeadAdult);
@@ -707,7 +708,7 @@ void HPIWidget::updateHeadModel()
                     pEntity->setTransform(pTransform);
 
                     //If it is the kids model scale it
-                    pEntity->setScale(0.75);
+                    pEntity->setScale(0.6);
                 }
             }
         }
