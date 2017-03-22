@@ -93,12 +93,14 @@ else {
 
 SOURCES += \
     bar.cpp \
-    spline.cpp
+    spline.cpp \
+    lineplot.cpp
 
 HEADERS += \
     dispcharts_global.h \
     bar.h \
-    spline.h
+    spline.h \
+    lineplot.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

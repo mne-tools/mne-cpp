@@ -62,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace DISPCHARTSLIB;
 using namespace Eigen;
 using namespace QtCharts;
 
