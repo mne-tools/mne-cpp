@@ -76,7 +76,8 @@ SUBDIRS += \
         !isEmpty( CNTK_INCLUDE_DIR ) {
             SUBDIRS += \
                 ex_deep \
-                ex_deep_eval
+                ex_deep_eval \
+                ex_deep_model_viewer
         }
     }
     else {

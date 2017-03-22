@@ -106,7 +106,9 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
 , m_eLogLevelCurrent(_LogLvMax)
 {
-    qDebug() << "MNE Scan - Version" << CInfo::AppVersion();
+    fprintf(stderr, "%s - Version %s\n",
+            CInfo::AppNameShort().toUtf8().constData(),
+            CInfo::AppVersion().toUtf8().constData());
 
     setCentralWidget(m_pStartUpWidget);
 
