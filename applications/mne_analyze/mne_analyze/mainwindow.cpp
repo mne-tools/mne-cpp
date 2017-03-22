@@ -104,11 +104,11 @@ MainWindow::MainWindow(QWidget *parent)
     m_pExtensionManager->loadExtension(qApp->applicationDirPath()+extensionsDir);
     m_pExtensionManager->initExtensions(m_analyzeSettings, m_analyzeData);
 
+    createDockWindows();
+    createMdiView();
+
     createActions();
     createMenus();
-    createDockWindows();
-
-    createMdiView();
 }
 
 
