@@ -109,9 +109,9 @@ public slots:
     void updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo);
 
 private:
-    Ui::ReferenceToolbarWidget*         ui;         /**< The UI class specified in the designer. */
+    Ui::ReferenceToolbarWidget*         ui;     /**< The UI class specified in the designer. */
 
-    QSharedPointer<Reference>           m_pRef;     /**< pointer to the Reference object */
+    Reference*                      m_pRef;     /**< pointer to the Reference object */
 };
 
 } //REFERENCEPLUGIN
