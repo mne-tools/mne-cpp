@@ -65,6 +65,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+QT_BEGIN_NAMESPACE
 class QAction;
 class QActionGroup;//switch between log levels
 class QMenu;
@@ -74,6 +75,7 @@ class QTimer;
 class QTime;
 class QDockWidget;
 class QTextBrowser;
+QT_END_NAMESPACE
 
 namespace SCSHAREDLIB
 {
@@ -123,9 +125,9 @@ public:
     /**
     * Constructs a MainWindow which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
     */
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -232,7 +234,7 @@ private:
     QMenu*                              m_pMenuLgLv;    /**< Holds the log level sub menu.*/
     QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
 
-    // Tool bar
+    // Tool Bar
     QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
     QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
     QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/

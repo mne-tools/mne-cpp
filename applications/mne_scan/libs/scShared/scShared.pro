@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_x.pro
+# @file     scShared.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     March, 2013
+# @date     March, 2012
 #
 # @section  LICENSE
 #

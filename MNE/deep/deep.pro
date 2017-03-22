@@ -37,7 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+#QT       -= gui
+QT += widgets
 
 DEFINES += DEEP_LIBRARY
 
@@ -55,7 +56,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lEvalDll
+            -lEvalDll \
+
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -63,7 +65,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lEvalDll
+            -lEvalDll \
+            -lCNTKLibrary-2.0
 }
 
 # OpenMP
@@ -99,13 +102,15 @@ else {
 }
 
 SOURCES += \
+    deep.cpp \
     deepeval.cpp \
-    deep.cpp
+    deepmodelcreator.cpp
 
 HEADERS +=\
     deep_global.h \
+    deep.h \
     deepeval.h \
-    deep.h
+    deepmodelcreator.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -135,3 +140,4 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
+
