@@ -196,11 +196,11 @@ int main(int argc, char *argv[])
     qDebug() << "\n Finished training \n";
 
     //Plot error
-    QChartView *error_chartView = LinePlot::linePlot(vecError,"Training Error");
+    LinePlot *error_chartView = new LinePlot(vecError,"Training Error");
     error_chartView->show();
 
     //Plot loss
-    QChartView *loss_chartView = LinePlot::linePlot(vecLoss,"Loss Error");
+    LinePlot *loss_chartView = new LinePlot(vecLoss,"Loss Error");
     loss_chartView->show();
 
     //

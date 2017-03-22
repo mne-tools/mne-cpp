@@ -107,7 +107,7 @@ public:
     *
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit Plot(QWidget *parent = 0);
+    explicit Plot(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -143,7 +143,7 @@ protected:
 
     bool m_bHoldOn;             /**< If multiple plots */
 
-    QList<QVector<QPointF> > m_qListVecPointFPaths;
+    QList<QVector<QPointF> > m_qListVecPointFPaths;     /**< List of point series */
 
     double m_dMinX;             /**< Minimal X value */
     double m_dMaxX;             /**< Maximal X value */

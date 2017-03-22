@@ -57,12 +57,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-
 #include <QChart>
 #include <QChartView>
 #include <QLineSeries>
-
 #include <QSharedPointer>
 
 
@@ -70,6 +67,7 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
 
 
 //*************************************************************************************************************
@@ -91,49 +89,103 @@ namespace DISPLIB
 *
 * @brief Line Plot
 */
-class DISPSHARED_EXPORT LinePlot
+class DISPSHARED_EXPORT LinePlot : public QtCharts::QChartView
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<LinePlot> SPtr;            /**< Shared pointer type for DeepViewer. */
     typedef QSharedPointer<const LinePlot> ConstSPtr; /**< Const shared pointer type for DeepViewer. */
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Constructs a line series plot
+    *
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
     */
-    LinePlot();
+    LinePlot(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destructs DeepModelCreator
+    * Constructs a line series plot
+    *
+    * @param [in] y         The double data vector
+    * @param [in] title     Plot title
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+    */
+    LinePlot(const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Constructs a line series plot
+    *
+    * @param [in] x         X-Axis data to plot
+    * @param [in] y         Y-Axis data to plot
+    * @param [in] title     Plot title
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+    */
+    LinePlot(const QVector<double>& x, const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Destructs the line series plot
     */
     virtual ~LinePlot();
 
     //=========================================================================================================
     /**
-    * Plot a line series
+    * Sets the scaled image view title.
     *
-    * @param [in] y         Data to plot
-    * @param [in] title     Plot title
-    *
-    * @return the view handle
+    * @param[in] p_sTitle   The title
     */
-    static QtCharts::QChartView * linePlot(const QVector<double>& y, const QString& title = "");
+    void setTitle(const QString &p_sTitle);
 
     //=========================================================================================================
     /**
-    * Plot a line series
+    * Sets the label of the y axes
+    *
+    * @param [in] p_sXLabel   The x axes label
+    */
+    void setXLabel(const QString &p_sXLabel);
+
+    //=========================================================================================================
+    /**
+    * Sets the label of the y axes
+    *
+    * @param [in] p_sXLabel   The y axes label
+    */
+    void setYLabel(const QString &p_sYLabel);
+
+    //=========================================================================================================
+    /**
+    * Updates the plot using a given double vector without given X data.
+    *
+    * @param [in] y          The double data vector
+    */
+    void updateData(const QVector<double>& y);
+
+    //=========================================================================================================
+    /**
+    * Updates the plot using the given vectors.
     *
     * @param [in] x         X-Axis data to plot
     * @param [in] y         Y-Axis data to plot
-    * @param [in] title     Plot title
-    *
-    * @return the view handle
     */
-    static QtCharts::QChartView * linePlot(const QVector<double>& x, const QVector<double>& y, const QString& title = "");
+    void updateData(const QVector<double>& x, const QVector<double>& y);
 
 private:
+    //=========================================================================================================
+    /**
+    * Updates the plot.
+    */
+    void update();
 
+private:
+    QString m_sTitle;                       /**< Title */
+    QString m_sXLabel;                      /**< X axes label */
+    QString m_sYLabel;                      /**< Y axes label */
+
+    QtCharts::QLineSeries*  m_pLineSeries;  /**< Line series */
+    QtCharts::QChart*       m_pChart;       /**< The chart */
 };
 
 //*************************************************************************************************************
