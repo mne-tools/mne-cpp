@@ -208,23 +208,23 @@ void DeepViewerWidget::populateScene()
             currentPos = layerRoot + QPointF(0,nodeDist * i);
             listCurrentLayer[i]->setPos(currentPos);
         }
-        m_listLayers.append(listCurrentLayer);
+        m_listLayerNodes.append(listCurrentLayer);
         listCurrentLayer.clear();
 
         // Create Edges
         if(layer - 1 >= 0) {
 
             // Dimension check
-            if(vecWeights[layer-1].rows() != m_listLayers[layer].size() && vecWeights[layer-1].cols() != m_listLayers[layer-1].size()) {
+            if(vecWeights[layer-1].rows() != m_listLayerNodes[layer].size() && vecWeights[layer-1].cols() != m_listLayerNodes[layer-1].size()) {
                 qCritical("Dimensions do not match.\n");
                 return;
 //                qDebug() << "Dimension Check" << vecWeights[layer-1].rows() << "x" << vecWeights[layer-1].cols();
-//                qDebug() << "Check" << m_listLayers[layer].size() << "x" << m_listLayers[layer-1].size();
+//                qDebug() << "Check" << m_listNodes[layer].size() << "x" << m_listNodes[layer-1].size();
             }
 
-            for(int i = 0; i < m_listLayers[layer-1].size(); ++i ) {
-                for(int j = 0; j < m_listLayers[layer].size(); ++j ) {
-                    listCurrentEdges.append(new Edge(m_listLayers[layer-1][i], m_listLayers[layer][j]));
+            for(int i = 0; i < m_listLayerNodes[layer-1].size(); ++i ) {
+                for(int j = 0; j < m_listLayerNodes[layer].size(); ++j ) {
+                    listCurrentEdges.append(new Edge(m_listLayerNodes[layer-1][i], m_listLayerNodes[layer][j]));
 
                     listCurrentEdges.last()->setWeight(vecWeights[layer-1](j,i));
 

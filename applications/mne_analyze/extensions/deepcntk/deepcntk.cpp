@@ -43,7 +43,7 @@
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <disp/lineplot.h>
+#include <dispCharts/lineplot.h>
 #include <disp/deepmodelviewer/deepviewerwidget.h>
 #include <disp/deepmodelviewer/controls.h>
 
