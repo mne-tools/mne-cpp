@@ -174,6 +174,14 @@ public:
     */
     void setCoilFrequencies(const QVector<int>& vCoilFreqs);
 
+    //=========================================================================================================
+    /**
+    * Set the new projection matrix.
+    *
+    * @param[in] matProjectors  The new projection matrix.
+    */
+    void setProjectionMatrix(const Eigen::MatrixXd& matProjectors);
+
 protected:
     //=========================================================================================================
     /**
@@ -191,6 +199,8 @@ protected:
     bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+
+    Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
 signals:
     void newFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);

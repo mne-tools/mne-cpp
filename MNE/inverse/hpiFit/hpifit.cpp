@@ -182,7 +182,7 @@ Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct Senso
  * same output
  *********************************************************************************/
 
-DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors)
+DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
@@ -194,6 +194,7 @@ DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data,
     e.moment = pinv(lf) * data;
 
     dif = data - lf * e.moment;
+    //dif = data - matProjectors * lf * e.moment;
 
     e.error = dif.array().square().sum()/data.array().square().sum();
 
@@ -224,6 +225,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
                            int maxfun,
                            int display,
                            const Eigen::MatrixXd& data,
+                           const Eigen::MatrixXd& matProjectors,
                            const struct SensorInfo& sensors,
                            int &simplex_numitr)
 {
@@ -273,7 +275,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
         v(i,0) = posCopy(i);
     }
 
-    tempdip = dipfitError(posCopy, data, sensors);
+    tempdip = dipfitError(posCopy, data, sensors, matProjectors);
     fv[0] = tempdip.error;
 
     func_evals = 1;
@@ -297,7 +299,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
 
         v.col(j+1).array() = y;
         posCopy = y.transpose();
-        tempdip = dipfitError(posCopy, data, sensors);
+        tempdip = dipfitError(posCopy, data, sensors, matProjectors);
         fv[j+1] = tempdip.error;
     }
 
@@ -360,7 +362,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
         x = xr.transpose();
         //std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
 
-        fxr = dipfitError(x, data, sensors);
+        fxr = dipfitError(x, data, sensors, matProjectors);
 
         func_evals = func_evals+1;
 
@@ -368,7 +370,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
             // Calculate the expansion point
             xe = (1 + rho * chi) * xbar - rho * chi * v.col(v.cols()-1);
             x = xe.transpose();
-            fxe = dipfitError(x, data, sensors);
+            fxe = dipfitError(x, data, sensors, matProjectors);
             func_evals = func_evals+1;
 
             if(fxe.error < fxr.error) {
@@ -392,7 +394,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
                     // Perform an outside contraction
                     xc = (1 + psi * rho) * xbar - psi * rho * v.col(v.cols()-1);
                     x = xc.transpose();
-                    fxc = dipfitError(x, data, sensors);
+                    fxc = dipfitError(x, data, sensors, matProjectors);
                     func_evals = func_evals + 1;
 
                     if(fxc.error <= fxr.error) {
@@ -406,7 +408,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
                 } else {
                     xcc = (1 - psi) * xbar + psi * v.col(v.cols()-1);
                     x = xcc.transpose();
-                    fxcc = dipfitError(x, data, sensors);
+                    fxcc = dipfitError(x, data, sensors, matProjectors);
                     func_evals = func_evals+1;
                     if(fxcc.error < fv[n]) {
                         v.col(v.cols()-1) = xcc;
@@ -422,7 +424,7 @@ Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
                     for(int j = 1;j < n+1;j++) {
                         v.col(j).array() = v.col(0).array() + sigma * (v.col(j).array() - v.col(0).array());
                         x = v.col(j).array().transpose();
-                        tempdip = dipfitError(x,data, sensors);
+                        tempdip = dipfitError(x,data, sensors, matProjectors);
                         fv[j] = tempdip.error;
                     }
                 }
@@ -485,10 +487,11 @@ void doDipfitConcurrent(FittingCoilData& lCoilData)
                                        2 * maxiter * currentCoil.cols(),
                                        display,
                                        currentData,
+                                       lCoilData.matProjector,
                                        currentSensors,
                                        simplex_numitr);
 
-    lCoilData.errorInfo = dipfitError(currentCoil, currentData, currentSensors);
+    lCoilData.errorInfo = dipfitError(currentCoil, currentData, currentSensors, lCoilData.matProjector);
     lCoilData.errorInfo.numIterations = simplex_numitr;
 }
 
@@ -507,17 +510,23 @@ HPIFit::HPIFit()
 //*************************************************************************************************************
 
 void HPIFit::fitHPI(const MatrixXd& t_mat,
-                          FiffCoordTrans& transDevHead,
-                          const QVector<int>& vFreqs,
-                          QVector<double>& vGof,
-                          FiffDigPointSet& fittedPointSet,
-                          FiffInfo::SPtr pFiffInfo,
-                          bool bDoDebug,
-                          const QString& sHPIResourceDir)
+                        const Eigen::MatrixXd& t_matProjectors,
+                        FiffCoordTrans& transDevHead,
+                        const QVector<int>& vFreqs,
+                        QVector<double>& vGof,
+                        FiffDigPointSet& fittedPointSet,
+                        FiffInfo::SPtr pFiffInfo,
+                        bool bDoDebug,
+                        const QString& sHPIResourceDir)
 {
     //Check if data was passed
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
+    }
+
+    //Check if projector was passed
+    if(t_matProjectors.rows() == 0 || t_matProjectors.cols() == 0 ) {
+        std::cout<<std::endl<< "HPIFit::fitHPI - No projector passed. Returning.";
     }
 
     vGof.clear();
@@ -594,6 +603,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     // Get the indices of inner layer channels and exclude bad channels.
     //TODO: Only supports babymeg and vectorview gradiometeres for hpi fitting.
     QVector<int> innerind(0);
+
     for (int i = 0; i < numCh; ++i) {
         if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
                 pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
@@ -605,6 +615,16 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             }
         }
     }
+
+    //Create new projector based on the excluded channels
+    MatrixXd matProjectorsInnerind(innerind.size(),innerind.size());
+
+    for (int i = 0; i < matProjectorsInnerind.cols(); ++i) {
+        matProjectorsInnerind.col(i) = t_matProjectors.col(innerind.at(i));
+    }
+
+    UTILSLIB::IOUtils::write_eigen_matrix(matProjectorsInnerind, "matProjectorsInnerind.txt");
+    UTILSLIB::IOUtils::write_eigen_matrix(t_matProjectors, "t_matProjectors.txt");
 
     // Initialize inner layer sensors
     sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
@@ -695,7 +715,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     coil.pos = coilPos;
 
-    coil = dipfit(coil, sensors, amp, numCoils);
+    coil = dipfit(coil, sensors, amp, numCoils, matProjectorsInnerind);
 
     Eigen::Matrix4d trans = computeTransformation(headHPI,coil.pos);
 
@@ -780,7 +800,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 //*************************************************************************************************************
 
-CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd& data, int numCoils)
+CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd& data, int numCoils, const Eigen::MatrixXd& t_matProjectors)
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
@@ -791,6 +811,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const
         coilData.coilPos = coil.pos.row(i);
         coilData.sensorData = data.col(i);
         coilData.sensorPos = sensors;
+        coilData.matProjector = t_matProjectors;
 
         lCoilData.append(coilData);
     }

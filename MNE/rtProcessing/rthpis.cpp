@@ -152,6 +152,16 @@ void RtHPIS::setCoilFrequencies(const QVector<int>& vCoilFreqs)
 
 //*************************************************************************************************************
 
+void RtHPIS::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
+{
+    m_mutex.lock();
+    m_matProjectors = matProjectors;
+    m_mutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
 void RtHPIS::run()
 {
     MatrixXd matData;
@@ -168,11 +178,12 @@ void RtHPIS::run()
             fitResult.devHeadTrans.to = 4;
 
             HPIFit::fitHPI(matData,
-                              fitResult.devHeadTrans,
-                              m_vCoilFreqs,
-                              fitResult.errorDistances,
-                              fitResult.fittedCoils,
-                              m_pFiffInfo);
+                            m_matProjectors,
+                            fitResult.devHeadTrans,
+                            m_vCoilFreqs,
+                            fitResult.errorDistances,
+                            fitResult.fittedCoils,
+                            m_pFiffInfo);
 
             emit newFittingResultAvailable(fitResult);
         }
