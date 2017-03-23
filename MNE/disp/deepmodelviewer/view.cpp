@@ -46,8 +46,11 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
 #include <QPrinter>
 #include <QPrintDialog>
+#endif
+
 #include <qmath.h>
 
 #ifndef QT_NO_OPENGL

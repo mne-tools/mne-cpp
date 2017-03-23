@@ -49,6 +49,14 @@
 #include <QGridLayout>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QPainter>
+
+#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
+#include <QPrinter>
+#include <QPrintDialog>
+#endif
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -113,5 +121,22 @@ void MdiView::tileSubWindows()
 {
     //Arrange subwindows in a Tile mode
     this->m_mdiArea->tileSubWindows();
+}
+
+
+//*************************************************************************************************************
+
+void MdiView::printCurrentSubWindow()
+{
+    qDebug() << "TODO Interface the central view widget to have to implement a specific paint function.";
+#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
+    QPrinter printer;
+    QPrintDialog dialog(&printer, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QPainter painter(&printer);
+        m_mdiArea->currentSubWindow()->render(&painter);
+    }
+#endif
+
 }
 
