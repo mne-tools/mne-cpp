@@ -253,10 +253,19 @@ void HPIWidget::updateProjections()
 
     if(m_bUseSSP) {
         // Use SSP + SGM + calibration
-        m_pFiffInfo->make_projector(matProj);
+        //Do a copy here because we are going to change the activity flags of the SSP's
+        FiffInfo infoTemp = *(m_pFiffInfo.data());
+
+        //Turn on all SSP
+        for(int i = 0; i < infoTemp.projs.size(); ++i) {
+            infoTemp.projs[i].active = true;
+        }
+
+        //Create the projector for all SSP's on
+        infoTemp.make_projector(matProj);
         //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
+        for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+            matProj.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
         }
     }
 
@@ -268,6 +277,8 @@ void HPIWidget::updateProjections()
     }
 
     m_matProjectors = matProj * matComp;
+
+    m_pRtHPI->setProjectionMatrix(m_matProjectors);
 }
 
 
@@ -436,11 +447,12 @@ void HPIWidget::onBtnDoSingleFit()
         devHeadTrans.to = 4;
 
         HPIFit::fitHPI(m_matValue,
-                          devHeadTrans,
-                          m_vCoilFreqs,
-                          m_vGof,
-                          fittedCoils,
-                          m_pFiffInfo);
+                        m_matProjectors,
+                        devHeadTrans,
+                        m_vCoilFreqs,
+                        m_vGof,
+                        fittedCoils,
+                        m_pFiffInfo);
 
         storeResults(devHeadTrans, fittedCoils);
     }

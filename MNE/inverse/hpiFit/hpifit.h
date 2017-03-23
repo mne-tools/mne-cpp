@@ -133,6 +133,7 @@ struct FittingCoilData {
     Eigen::RowVectorXd sensorData;
     DipFitError errorInfo;
     SensorInfo sensorPos;
+    Eigen::MatrixXd matProjector;
 };
 
 
@@ -166,6 +167,7 @@ public:
     * Perform one single HPI fit.
     *
     * @param[in] t_mat           Data to estimate the HPI positions from
+    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
     * @param[out] transDevHead   The final dev head transformation matrix
     * @param[in] vFreqs          The frequencies for each coil.
     * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
@@ -175,27 +177,29 @@ public:
     * @param[in] sHPIResourceDir The path to the debug file which is to be written.
     */
     static void fitHPI(const Eigen::MatrixXd& t_mat,
-                              FIFFLIB::FiffCoordTrans &transDevHead,
-                              const QVector<int>& vFreqs,
-                              QVector<double> &vGof,
-                              FIFFLIB::FiffDigPointSet& fittedPointSet,
-                              QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                              bool bDoDebug = false,
-                              const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
+                        const Eigen::MatrixXd& t_matProjectors,
+                        FIFFLIB::FiffCoordTrans &transDevHead,
+                        const QVector<int>& vFreqs,
+                        QVector<double> &vGof,
+                        FIFFLIB::FiffDigPointSet& fittedPointSet,
+                        QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                        bool bDoDebug = false,
+                        const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
 protected:
     //=========================================================================================================
     /**
     * Fits dipoles for the given coils and a given data set.
     *
-    * @param[in] CoilParam      The coil parameters.
-    * @param[in] sensors        The sensor information.
-    * @param[in] data           The data which used to fit the coils.
-    * @param[in] numCoils       The number of coils.
+    * @param[in] CoilParam       The coil parameters.
+    * @param[in] sensors         The sensor information.
+    * @param[in] data            The data which used to fit the coils.
+    * @param[in] numCoils        The number of coils.
+    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
     *
     * @return Returns the coil parameters.
     */
-    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd &data, int numCoils);
+    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd &data, int numCoils, const Eigen::MatrixXd &t_matProjectors);
 
     //=========================================================================================================
     /**
