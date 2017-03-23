@@ -134,10 +134,10 @@ void Edge::adjust()
 //        edgeOffset = QPointF ((line.dx() * 10) / length, (line.dy() * 10) / length);
         // In 90 degree steps
 //        if(abs(line.dx()) > abs(line.dy())) {
-            edgeOffset = QPointF(line.dx() < 0 ? -11 : 11, 0);
+            edgeOffset = QPointF(line.dx() < 0 ? -10 : 10, 0);
 //        }
 //        else {
-//            edgeOffset = QPointF(0, line.dy() < 0 ? -11 : 11);
+//            edgeOffset = QPointF(0, line.dy() < 0 ? -10 : 10);
 //        }
         m_sourcePoint = line.p1() + edgeOffset;
         m_destPoint = line.p2() - edgeOffset;
@@ -214,7 +214,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 //    }
     path.cubicTo(c1, c2, m_destPoint);
     QColor lg = m_color;
-    QPen pen(lg, m_penWidth);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
+    QPen pen(lg, m_penWidth, Qt::SolidLine, Qt::FlatCap);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
     painter->strokePath(path, pen);
 
 
