@@ -263,6 +263,14 @@ void Edge::updateLineWidth()
 
 void Edge::updateColor()
 {
-    m_color = QColor(DISPLIB::ColorMap::valueToRedBlue(m_weight));
-    m_color.setAlpha(abs(m_weight*255));
+    float weigt = m_weight;
+    if(weigt < -1.0f) {
+        weigt = -1.0f;
+    }
+    if(weigt > 1.0f) {
+        weigt = 1.0f;
+    }
+
+    m_color = QColor(DISPLIB::ColorMap::valueToRedBlue(weigt));
+    m_color.setAlpha(abs(weigt*255));
 }

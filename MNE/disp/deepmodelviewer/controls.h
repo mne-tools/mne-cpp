@@ -118,11 +118,27 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Create the common controls
+    * Create the Network controls
     *
-    * @param [in] parent    the group box where the controls should be attached to
+    * @param [in] parent    the group box where the Network controls should be attached to
     */
-    void createCommonControls(QWidget* parent);
+    void createNetworkControls(QWidget* parent);
+
+    //=========================================================================================================
+    /**
+    * Create the Appearance controls
+    *
+    * @param [in] parent    the group box where the Appearance controls should be attached to
+    */
+    void createAppearanceControls(QWidget* parent);
+
+    //=========================================================================================================
+    /**
+    * Create the View controls
+    *
+    * @param [in] parent    the group box where the View controls should be attached to
+    */
+    void createViewControls(QWidget* parent);
 
     //=========================================================================================================
     /**
@@ -132,11 +148,6 @@ private:
 
 private:
     View* m_pView;                  /**< The view which this control is connected to */
-
-    QGroupBox *m_pCapGroup;         /**< The Cap Group */
-    QGroupBox *m_pJoinGroup;        /**< The Join Group */
-    QGroupBox *m_pStyleGroup;       /**< The Style Group */
-    QGroupBox *m_pPathModeGroup;    /**< The Path Mode Group */
 };
 
 //*************************************************************************************************************
