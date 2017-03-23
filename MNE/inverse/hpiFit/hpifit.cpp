@@ -193,8 +193,8 @@ DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data,
 
     e.moment = pinv(lf) * data;
 
-    dif = data - lf * e.moment;
-    //dif = data - matProjectors * lf * e.moment;
+    //dif = data - lf * e.moment;
+    dif = data - matProjectors * lf * e.moment;
 
     e.error = dif.array().square().sum()/data.array().square().sum();
 
@@ -617,10 +617,15 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     //Create new projector based on the excluded channels
+    MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
     MatrixXd matProjectorsInnerind(innerind.size(),innerind.size());
 
+    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
+        matProjectorsRows.row(i) = t_matProjectors.row(innerind.at(i));
+    }
+
     for (int i = 0; i < matProjectorsInnerind.cols(); ++i) {
-        matProjectorsInnerind.col(i) = t_matProjectors.col(innerind.at(i));
+        matProjectorsInnerind.col(i) = matProjectorsRows.col(innerind.at(i));
     }
 
     UTILSLIB::IOUtils::write_eigen_matrix(matProjectorsInnerind, "matProjectorsInnerind.txt");
