@@ -616,7 +616,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
 
-    //Create new projector based on the excluded channels
+    //Create new projector based on the excluded channels, first exclude the rows then the columns
     MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
     MatrixXd matProjectorsInnerind(innerind.size(),innerind.size());
 
@@ -628,8 +628,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         matProjectorsInnerind.col(i) = matProjectorsRows.col(innerind.at(i));
     }
 
-    UTILSLIB::IOUtils::write_eigen_matrix(matProjectorsInnerind, "matProjectorsInnerind.txt");
-    UTILSLIB::IOUtils::write_eigen_matrix(t_matProjectors, "t_matProjectors.txt");
+    //UTILSLIB::IOUtils::write_eigen_matrix(matProjectorsInnerind, "matProjectorsInnerind.txt");
+    //UTILSLIB::IOUtils::write_eigen_matrix(t_matProjectors, "t_matProjectors.txt");
 
     // Initialize inner layer sensors
     sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
