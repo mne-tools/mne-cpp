@@ -180,8 +180,10 @@ public:
     //=========================================================================================================
     /**
     * Toggles the pointer mode: Select or Drag
+    *
+    * @param [in] selectMode    if select mode should be enabled, otherwise drag mode
     */
-    void togglePointerMode();
+    void enableSelectMode(bool selectMode);
 
     //=========================================================================================================
     /**
@@ -219,10 +221,6 @@ private:
 private:
     GraphicsView *m_pGgraphicsView;     /**< The GraphicsView view port of the view */
 
-    QToolButton *m_pSelectModeButton;   /**< Select Mode Button */
-    QToolButton *m_pDragModeButton;     /**< Drag Mode Button */
-    QToolButton *m_pAntialiasButton;    /**< Antialias Button */
-    QToolButton *m_pPrintButton;        /**< Print Button */
     QToolButton *m_pResetButton;        /**< Reset Button */
 
     QSlider *m_pZoomSlider;             /**< Zoom Slider */
