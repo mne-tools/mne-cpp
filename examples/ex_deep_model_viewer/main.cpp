@@ -48,7 +48,6 @@
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <disp/lineplot.h>
 #include <disp/deepmodelviewer/deepviewerwidget.h>
 
 #include <iostream>

@@ -109,14 +109,14 @@ public:
 private:
     void populateScene();
 
-    CNTK::FunctionPtr   m_pModel;  /**< The CNTK model v2 */
+    CNTK::FunctionPtr   m_pModel;   /**< The CNTK model v2 */
 
-    View*               m_pView;
+    View*               m_pView;    /**< The View Port */
 
-    QGraphicsScene*     m_pScene;
+    QGraphicsScene*     m_pScene;   /**< The Scene Containing the graphic item */
 
-    QList< QList<Node*> > m_listLayers;
-    QList< QList<Edge*> > m_listEdges;
+    QList< QList<Node*> > m_listLayerNodes; /**< List containing layer-wise Nodes */
+    QList< QList<Edge*> > m_listEdges;      /**< List containing between-layer-wise Edges */
 };
 
 //*************************************************************************************************************
