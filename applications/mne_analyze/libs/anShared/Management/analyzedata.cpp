@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "analyzedata.h"
+#include <inverse/dipoleFit/ecd_set.h>
 
 
 //*************************************************************************************************************
@@ -53,6 +54,8 @@
 //=============================================================================================================
 
 using namespace ANSHAREDLIB;
+using namespace INVERSELIB;
+
 
 
 //*************************************************************************************************************
@@ -72,4 +75,30 @@ AnalyzeData::AnalyzeData(QObject *parent)
 AnalyzeData::~AnalyzeData()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+ECDSet::SPtr AnalyzeData::currentECDSet() const
+{
+    return m_pCurrentECDSet;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeData::setCurrentECDSet(const ECDSet::SPtr &ecdSet)
+{
+    m_pCurrentECDSet = ecdSet;
+    m_qListECDSets.append(m_pCurrentECDSet);
+    emit currentECDSetChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QList<ECDSet::SPtr> AnalyzeData::ecdSets() const
+{
+    return m_qListECDSets;
 }

@@ -57,7 +57,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
+namespace INVERSELIB {
+    class ECDSet;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,26 +109,39 @@ public:
     */
     virtual ~AnalyzeData();
 
-
-
-//
 // Database Interface for now -> consider using a Abstract Item Model
-//
 signals:
+    void currentECDSetChanged_signal();    /**< Emmited when the current ECD Set changed*/
 
 public:
+    //=========================================================================================================
+    /**
+    * Returns the current ECD Set
+    *
+    * @return The current ECD Set
+    */
+    QSharedPointer<INVERSELIB::ECDSet> currentECDSet() const;
+    //=========================================================================================================
+    /**
+    * Sets the current ECD Set
+    *
+    * @param [in] ecdSet    Sets the current ECD Set;
+    */
+    void setCurrentECDSet(const QSharedPointer<INVERSELIB::ECDSet> &ecdSet);
 
-
-
-
-protected:
+    //=========================================================================================================
+    /**
+    * Returns a list of all past ECD Sets
+    *
+    * @return All past ECD Sets
+    */
+    QList<QSharedPointer<INVERSELIB::ECDSet> > ecdSets() const;
 
 // Database -> Consierd using abstract item models or other datamanagement architecture
 private:
-
-
-
-
+    // Dipole ECDs
+    QSharedPointer<INVERSELIB::ECDSet>          m_pCurrentECDSet;   /**< Current ECD Set.*/
+    QList< QSharedPointer<INVERSELIB::ECDSet> > m_qListECDSets;     /**< List of all past ECD Sets.*/
 };
 
 //*************************************************************************************************************
