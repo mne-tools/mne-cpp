@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "controls.h"
+#include "deepviewer.h"
 #include "view.h"
 
 
@@ -75,7 +76,7 @@ using namespace DISPLIB;
 
 Controls::Controls(QWidget* parent)
 : QWidget(parent)
-, m_pView(Q_NULLPTR)
+, m_pDeepViewer(Q_NULLPTR)
 {
 
 }
@@ -83,9 +84,9 @@ Controls::Controls(QWidget* parent)
 
 //*************************************************************************************************************
 
-Controls::Controls(View* v, QWidget* parent)
+Controls::Controls(DeepViewer* v, QWidget* parent)
 : QWidget(parent)
-, m_pView(v)
+, m_pDeepViewer(v)
 {
     createLayout();
 }
@@ -93,17 +94,17 @@ Controls::Controls(View* v, QWidget* parent)
 
 //*************************************************************************************************************
 
-void Controls::setView(View *v)
+void Controls::setDeepViewer(DeepViewer *v)
 {
     if(!v){
         fprintf(stderr,"Error: The view to set is empty!");
         return;
     }
-    if( m_pView ) {
+    if( m_pDeepViewer ) {
         qDebug() << "TODO Make sure that the old view is disconnected and destroyed later on.";
     }
 
-    m_pView = v;
+    m_pDeepViewer = v;
     createLayout();
 }
 
@@ -152,11 +153,17 @@ void Controls::createAppearanceControls(QWidget* parent)
     dashLine->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     dotLine->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    QGroupBox* penWidthGroup = new QGroupBox(parent);
-    QSlider *penWidth = new QSlider(Qt::Horizontal, penWidthGroup);
-    penWidth->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    penWidthGroup->setTitle(tr("Pen Width"));
-    penWidth->setRange(0, 500);
+    QGroupBox* weightStrengthGroup = new QGroupBox(parent);
+    QSlider *weightStrength = new QSlider(Qt::Horizontal, weightStrengthGroup);
+    weightStrength->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    weightStrengthGroup->setTitle(tr("Weight Strength"));
+    weightStrength->setRange(0, 10);
+
+    QGroupBox* weightThresholdGroup = new QGroupBox(parent);
+    QSlider *weightThreshold = new QSlider(Qt::Horizontal, weightThresholdGroup);
+    weightThreshold->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    weightThresholdGroup->setTitle(tr("Weight Threshold"));
+    weightThreshold->setRange(0, 100);
 
     QPushButton *antialiasButton = new QPushButton(parent);
     antialiasButton->setText(tr("Antialiasing"));
@@ -184,16 +191,19 @@ void Controls::createAppearanceControls(QWidget* parent)
     QVBoxLayout *appearanceGroupLayout = new QVBoxLayout(parent);
     appearanceGroupLayout->setMargin(3);
     appearanceGroupLayout->addWidget(penStyleGroup);
-    appearanceGroupLayout->addWidget(penWidthGroup);
+    appearanceGroupLayout->addWidget(weightStrengthGroup);
+    appearanceGroupLayout->addWidget(weightThresholdGroup);
     appearanceGroupLayout->addWidget(antialiasButton);
 #ifndef QT_NO_OPENGL
     appearanceGroupLayout->addWidget(openGlButton);
 #endif
     appearanceGroupLayout->addStretch(1);
 
-    QVBoxLayout *penWidthLayout = new QVBoxLayout(penWidthGroup);
-    penWidthLayout->addWidget(penWidth);
+    QVBoxLayout *weightStrengthLayout = new QVBoxLayout(weightStrengthGroup);
+    weightStrengthLayout->addWidget(weightStrength);
 
+    QVBoxLayout *weightThresholdLayout = new QVBoxLayout(weightThresholdGroup);
+    weightThresholdLayout->addWidget(weightThreshold);
 
     //
     // Set up connections
@@ -201,11 +211,11 @@ void Controls::createAppearanceControls(QWidget* parent)
 //    connect(solidLine, SIGNAL(clicked()), m_renderer, SLOT(setSolidLine()));
 //    connect(dashLine, SIGNAL(clicked()), m_renderer, SLOT(setDashLine()));
 //    connect(dotLine, SIGNAL(clicked()), m_renderer, SLOT(setDotLine()));
-//    connect(penWidth, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
+//    connect(weightStrength, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
 
-    connect(antialiasButton, &QPushButton::toggled, m_pView, &View::enableAntialiasing);
+    connect(antialiasButton, &QPushButton::toggled, m_pDeepViewer->getView(), &View::enableAntialiasing);
 #ifndef QT_NO_OPENGL
-    connect(openGlButton, &QPushButton::clicked, m_pView, &View::enableOpenGL);
+    connect(openGlButton, &QPushButton::clicked, m_pDeepViewer->getView(), &View::enableOpenGL);
 #endif
 
     //
@@ -213,11 +223,12 @@ void Controls::createAppearanceControls(QWidget* parent)
     //
     solidLine->setChecked(true);
 
-    antialiasButton->setChecked(m_pView->usesAntialiasing());
+    antialiasButton->setChecked(m_pDeepViewer->getView()->usesAntialiasing());
 #ifndef QT_NO_OPENGL
-    openGlButton->setChecked(m_pView->usesOpenGL());
+    openGlButton->setChecked(m_pDeepViewer->getView()->usesOpenGL());
 #endif
-    penWidth->setValue(50);
+    weightStrength->setValue(5);
+    weightThreshold->setValue(10);
 }
 
 
@@ -256,8 +267,8 @@ void Controls::createViewControls(QWidget *parent)
     //
     // Set up connections
     //
-    connect(selectModeButton, &QToolButton::toggled, m_pView, &View::enableSelectMode);
-    connect(printButton, &QPushButton::clicked, m_pView, &View::print);
+    connect(selectModeButton, &QToolButton::toggled, m_pDeepViewer->getView(), &View::enableSelectMode);
+    connect(printButton, &QPushButton::clicked, m_pDeepViewer->getView(), &View::print);
 
     //
     // Set the defaults

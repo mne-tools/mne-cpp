@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepviewerwidget.cpp
+* @file     deepviewer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepViewerWidget class implementation.
+* @brief    DeepViewer class implementation.
 *
 */
 
@@ -38,11 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "deepviewerwidget.h"
+#include "deepviewer.h"
 #include "view.h"
 #include "controls.h"
-#include "node.h"
-#include "edge.h"
+#include "network.h"
 
 
 //*************************************************************************************************************
@@ -76,9 +75,10 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DeepViewerWidget::DeepViewerWidget(bool embeddedControl, QWidget *parent)
+DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 : QWidget(parent)
 , m_pView(new View)
+, m_pNetwork(new Network)
 {
     populateScene();
 
@@ -88,7 +88,7 @@ DeepViewerWidget::DeepViewerWidget(bool embeddedControl, QWidget *parent)
     layout->addWidget(m_pView);
 
     if(embeddedControl) {
-        Controls *controls = new Controls(m_pView, this);
+        Controls *controls = new Controls(this, this);
         layout->addWidget(controls);
     }
 
@@ -100,10 +100,10 @@ DeepViewerWidget::DeepViewerWidget(bool embeddedControl, QWidget *parent)
 
 //*************************************************************************************************************
 
-DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, bool embeddedControl, QWidget *parent)
+DeepViewer::DeepViewer(CNTK::FunctionPtr model, bool embeddedControl, QWidget *parent)
 : QWidget(parent)
-, m_pModel(model)
 , m_pView(new View)
+, m_pNetwork(new Network)
 {
     populateScene();
 
@@ -113,7 +113,7 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, bool embeddedControl
     layout->addWidget(m_pView);
 
     if(embeddedControl) {
-        Controls *controls = new Controls(m_pView, this);
+        Controls *controls = new Controls(this, this);
         layout->addWidget(controls);
     }
 
@@ -125,7 +125,7 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, bool embeddedControl
 
 //*************************************************************************************************************
 
-View *DeepViewerWidget::getView() const
+View *DeepViewer::getView() const
 {
     return m_pView;
 }
@@ -133,7 +133,7 @@ View *DeepViewerWidget::getView() const
 
 //*************************************************************************************************************
 
-void DeepViewerWidget::populateScene()
+void DeepViewer::populateScene()
 {
     m_pScene = new QGraphicsScene(this);
 

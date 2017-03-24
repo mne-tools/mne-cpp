@@ -125,7 +125,9 @@ SOURCES += \
     selectionmanagerwindow.cpp \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
-    helpers/roundededgeswidget.cpp
+    helpers/roundededgeswidget.cpp \
+    deepmodelviewer/network.cpp \
+    deepmodelviewer/deepviewer.cpp
 
 HEADERS += \
     disp_global.h \
@@ -147,20 +149,20 @@ HEADERS += \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
-    helpers/roundededgeswidget.h
+    helpers/roundededgeswidget.h \
+    deepmodelviewer/network.h \
+    deepmodelviewer/deepviewer.h
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SOURCES += \
         deepmodelviewer/controls.cpp \
-        deepmodelviewer/deepviewerwidget.cpp \
         deepmodelviewer/edge.cpp \
         deepmodelviewer/node.cpp \
         deepmodelviewer/view.cpp
 
     HEADERS += \
         deepmodelviewer/controls.h \
-        deepmodelviewer/deepviewerwidget.h \
         deepmodelviewer/edge.h \
         deepmodelviewer/node.h \
         deepmodelviewer/view.h

@@ -64,7 +64,7 @@
 
 namespace DISPLIB
 {
-    class DeepViewerWidget;
+    class DeepViewer;
     class Controls;
 }
 
@@ -155,7 +155,7 @@ private:
     QDockWidget*                    m_pControl;         /**< Control Widget */
 
     // View
-    DISPLIB::DeepViewerWidget*      m_pDeepViewer;      /**< Viewer */
+    DISPLIB::DeepViewer*      m_pDeepViewer;      /**< Viewer */
 };
 
 } // NAMESPACE
