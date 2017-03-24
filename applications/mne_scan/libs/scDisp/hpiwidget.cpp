@@ -101,8 +101,8 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_dMaxHPIFitError(0.01)
 , m_dMeanErrorDist(0.0)
 , m_iNubmerBadChannels(0)
-, m_bUseSSP(true)
-, m_bUseComp(false)
+, m_bUseSSP(false)
+, m_bUseComp(true)
 , m_bLastFitGood(false)
 , m_pBemHeadKid(Q_NULLPTR)
 , m_pBemHeadAdult(Q_NULLPTR)
@@ -248,8 +248,8 @@ void HPIWidget::closeEvent(QCloseEvent *event)
 
 void HPIWidget::updateProjections()
 {
-    Eigen::MatrixXd matProj = Eigen::MatrixXd::Identity(m_matValue.rows(), m_matValue.rows());
-    Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_matValue.rows(), m_matValue.rows());
+    Eigen::MatrixXd matProj = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     if(m_bUseSSP) {
         // Use SSP + SGM + calibration
@@ -308,7 +308,7 @@ void HPIWidget::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
             }
         }
 
-        m_pData3DModel->addDigitizerData("Head", "Transformed", t_digSetWithoutAdditional);
+        m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
 
         t_digSetWithoutAdditional.clear();
         for(int i = 0; i < fittedPointSet.size(); ++i) {
@@ -322,7 +322,7 @@ void HPIWidget::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
 
         m_pData3DModel->addDigitizerData("Head", "Fitted", t_digSetWithoutAdditional);
     } else {
-        m_pData3DModel->addDigitizerData("Head", "Transformed", digPointSet);
+        m_pData3DModel->addDigitizerData("Head", "Tracked", digPointSet);
         m_pData3DModel->addDigitizerData("Head", "Fitted", fittedPointSet);
     }
 }
@@ -452,7 +452,8 @@ void HPIWidget::onBtnDoSingleFit()
                         m_vCoilFreqs,
                         m_vGof,
                         fittedCoils,
-                        m_pFiffInfo);
+                        m_pFiffInfo,
+                        true);
 
         storeResults(devHeadTrans, fittedCoils);
     }
