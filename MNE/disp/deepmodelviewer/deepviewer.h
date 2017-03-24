@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     controls.h
+* @file     deepviewer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Controls class declaration.
+* @brief    DeepViewer class declaration.
 *
 */
 
-#ifndef CONTROL_H
-#define CONTROL_H
+#ifndef DEEPVIEWER_H
+#define DEEPVIEWER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -58,7 +59,7 @@
 //=============================================================================================================
 
 QT_BEGIN_NAMESPACE
-class QGroupBox;
+class QGraphicsScene;
 QT_END_NAMESPACE
 
 
@@ -70,84 +71,43 @@ QT_END_NAMESPACE
 namespace DISPLIB
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DeepViewer;
+class Node;
+class Edge;
+class Network;
+class View;
+class Controls;
 
 
 //=============================================================================================================
 /**
-* Controls Widget for Deep Viewer
+* Implementing the CNTK Network Viewer
 *
-* @brief Line Plot
+* @brief The CNTK Network Viewer
 */
-class DISPSHARED_EXPORT Controls : public QWidget
+class DISPSHARED_EXPORT DeepViewer : public QWidget
 {
     Q_OBJECT
-
 public:
-    //=========================================================================================================
-    /**
-    * Constructs the Controls Widget without an attached view which is a child of parent
-    *
-    * @param [in] parent    The parent widget
-    */
-    Controls(QWidget *parent = Q_NULLPTR);
 
-    //=========================================================================================================
-    /**
-    * Constructs the Controls Widget with an attached view which is a child of parent
-    *
-    * @param [in] v         The view which should be controled by this
-    * @param [in] parent    The parent widgetarent widget
-    */
-    Controls(DeepViewer* v, QWidget *parent = Q_NULLPTR);
+    DeepViewer(bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
-    //=========================================================================================================
-    /**
-    * Sets the associated viewer if none was set before
-    *
-    * @param [in] v     The viewer to set
-    */
-    void setDeepViewer(DeepViewer* v);
+    DeepViewer(CNTK::FunctionPtr model, bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
+
+    View* getView() const;
 
 private:
-    //=========================================================================================================
-    /**
-    * Create the Network controls
-    *
-    * @param [in] parent    the group box where the Network controls should be attached to
-    */
-    void createNetworkControls(QWidget* parent);
+    void populateScene();
 
-    //=========================================================================================================
-    /**
-    * Create the Appearance controls
-    *
-    * @param [in] parent    the group box where the Appearance controls should be attached to
-    */
-    void createAppearanceControls(QWidget* parent);
+    View*               m_pView;    /**< The View Port */
 
-    //=========================================================================================================
-    /**
-    * Create the View controls
-    *
-    * @param [in] parent    the group box where the View controls should be attached to
-    */
-    void createViewControls(QWidget* parent);
+    QGraphicsScene*     m_pScene;   /**< The Scene Containing the graphic item */
 
-    //=========================================================================================================
-    /**
-    * Creates the layout
-    */
-    void createLayout();
-
-private:
-    DeepViewer* m_pDeepViewer;                  /**< The deep view which this control is connected to */
+    QPointer<Network>   m_pNetwork; /**< The CNTK visual network representation */
 };
 
 //*************************************************************************************************************
@@ -157,4 +117,4 @@ private:
 
 } // NAMESPACE
 
-#endif // CONTROL_H
+#endif // DEEPVIEWER_H

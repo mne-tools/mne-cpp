@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     node.cpp
+* @file     network.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Node class implementation.
+* @brief    Network class implementation.
 *
 */
 
@@ -38,20 +38,24 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "edge.h"
+#include "network.h"
+
 #include "node.h"
-#include "deepviewer.h"
+#include "edge.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
-
-#include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-#include <QStyleOption>
 
 
 //*************************************************************************************************************
@@ -60,16 +64,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
-
-//Definitions for fast plotting
-static const double Pi = 3.14159265358979323846264338327950288419717;
-static double TwoPi = 2.0 * Pi;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -77,98 +72,142 @@ static double TwoPi = 2.0 * Pi;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Node::Node(Network *network)
-: m_pNetwork(network)
-, m_fDiameter(20)
-, m_fRadius(m_fDiameter/2)
+Network::Network(CNTK::FunctionPtr model, QObject *parent)
+: QObject(parent)
+, m_pModel(model)
 {
 
-
-    setFlag(ItemIsMovable);
-    setFlag(ItemSendsGeometryChanges);
-    setCacheMode(DeviceCoordinateCache);
-    setZValue(-1);
 }
 
 
 //*************************************************************************************************************
 
-void Node::addEdge(Edge *edge)
+QList<QList<Node *> > Network::layerNodes() const
 {
-    m_qListEdges << edge;
-    edge->adjust();
+    return m_listLayerNodes;
 }
 
 
 //*************************************************************************************************************
 
-QList<Edge *> Node::edges() const
+void Network::setLayerNodes(const QList<QList<Node *> > &listLayerNodes)
 {
-    return m_qListEdges;
+    m_listLayerNodes = listLayerNodes;
 }
 
 
 //*************************************************************************************************************
 
-QRectF Node::boundingRect() const
+QList<QList<Edge *> > Network::edges() const
 {
-    qreal adjust = 2;
-    return QRectF( -m_fRadius - adjust, -m_fRadius - adjust, m_fDiameter + 3 + adjust, m_fDiameter + 3 + adjust);
+    return m_listEdges;
 }
 
 
 //*************************************************************************************************************
 
-QPainterPath Node::shape() const
+void Network::setEdges(const QList<QList<Edge *> > &listEdges)
 {
-    QPainterPath path;
-    path.addEllipse(-10, -10, 20, 20);
-    return path;
+    m_listEdges = listEdges;
 }
 
 
 //*************************************************************************************************************
 
-void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void Network::generateNetwork()
 {
-    Q_UNUSED(option)
-    painter->setPen(QColor(50, 100, 120, 200));
-    painter->setBrush(QColor(200, 200, 210, 120));
 
-    painter->drawEllipse(-m_fRadius, -m_fRadius, m_fDiameter, m_fDiameter);
-}
+    if(!m_pModel)
+        return;
 
+    //
+    // Analyze CNTK Model Structure
+    //
+    QVector<int> layerDim;
+    QVector<MatrixXf> vecWeights;
+    int inDim = 0;
+    int outDim = 0;
 
-//*************************************************************************************************************
+    MatrixXf weights;
+    VectorXf bias;
+    int bufferCount;
 
-QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    switch (change) {
-    case ItemPositionHasChanged:
-        foreach (Edge *edge, m_qListEdges)
-            edge->adjust();
-        break;
-    default:
-        break;
-    };
-
-    return QGraphicsItem::itemChange(change, value);
-}
+    for (int i = static_cast<int>(m_pModel->Parameters().size()) - 1; i >= 0 ; --i) {
+        fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
+        fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
 
 
-//*************************************************************************************************************
+        fprintf(stderr,"Value Dim: %ls\n",m_pModel->Parameters()[i].Value()->Shape().AsString().c_str());
 
-void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    update();
-    QGraphicsItem::mousePressEvent(event);
-}
+        QString param = QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
 
+        if(param.contains(" x ")) {
+            param.replace(QString("["), QString(""));param.replace(QString("]"), QString(""));
+            QStringList dimensions = param.split(" x ");
+            outDim = dimensions[0].toInt();
+            inDim = dimensions[1].toInt();
 
-//*************************************************************************************************************
+            weights.resize(outDim,inDim);
+            bufferCount = 0;
+            for(int m = 0; m < outDim; ++m) {
+                for(int n = 0; n < inDim; ++n) {
+                    weights(m,n) = m_pModel->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
+                    ++bufferCount;
+                }
+            }
 
-void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    update();
-    QGraphicsItem::mouseReleaseEvent(event);
+            // ToDo put in one class
+            layerDim.append(inDim);
+            vecWeights.append(weights);
+        }
+    }
+    layerDim.append(outDim);
+
+    //
+    // Create items according to the dimensions
+    //
+    int numLayers = layerDim.size();
+
+    double layerDist = 400.0;
+    double nodeDist = 50.0;
+
+    double x_root = -((numLayers-1.0)*layerDist) / 2.0;
+
+    QList<Node*> listCurrentLayer;
+    QList<Edge*> listCurrentEdges;
+    QPointF layerRoot, currentPos;
+
+    for(int layer = 0; layer < layerDim.size(); ++layer) {
+        layerRoot = QPointF( x_root + layer*layerDist, - (layerDim[layer]/2) * nodeDist);
+
+        // Create Nodes
+        for(int i = 0; i < layerDim[layer]; ++i ) {
+            listCurrentLayer.append(new Node(this));
+            currentPos = layerRoot + QPointF(0,nodeDist * i);
+            listCurrentLayer[i]->setPos(currentPos);
+        }
+        m_listLayerNodes.append(listCurrentLayer);
+        listCurrentLayer.clear();
+
+        // Create Edges
+        if(layer - 1 >= 0) {
+
+            // Dimension check
+            if(vecWeights[layer-1].rows() != m_listLayerNodes[layer].size() && vecWeights[layer-1].cols() != m_listLayerNodes[layer-1].size()) {
+                qCritical("Dimensions do not match.\n");
+                return;
+//                qDebug() << "Dimension Check" << vecWeights[layer-1].rows() << "x" << vecWeights[layer-1].cols();
+//                qDebug() << "Check" << m_listNodes[layer].size() << "x" << m_listNodes[layer-1].size();
+            }
+
+            for(int i = 0; i < m_listLayerNodes[layer-1].size(); ++i ) {
+                for(int j = 0; j < m_listLayerNodes[layer].size(); ++j ) {
+                    listCurrentEdges.append(new Edge(m_listLayerNodes[layer-1][i], m_listLayerNodes[layer][j]));
+
+                    listCurrentEdges.last()->setWeight(vecWeights[layer-1](j,i));
+                }
+            }
+            m_listEdges.append(listCurrentEdges);
+        }
+    }
 }

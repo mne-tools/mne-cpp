@@ -48,7 +48,7 @@
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <disp/deepmodelviewer/deepviewerwidget.h>
+#include <disp/deepmodelviewer/deepviewer.h>
 
 #include <iostream>
 #include <random>
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     //
     // Create the viewer
     //
-    DeepViewerWidget window(model);
+    DeepViewer window(model);
     window.showMaximized();
 
     return a.exec();

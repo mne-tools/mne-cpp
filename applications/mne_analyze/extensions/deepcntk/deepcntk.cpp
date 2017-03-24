@@ -44,7 +44,7 @@
 #include <deep/deepmodelcreator.h>
 
 #include <dispCharts/lineplot.h>
-#include <disp/deepmodelviewer/deepviewerwidget.h>
+#include <disp/deepmodelviewer/deepviewer.h>
 #include <disp/deepmodelviewer/controls.h>
 
 #include <iostream>
@@ -155,12 +155,12 @@ void DeepCNTK::init()
     //
     if(!m_pDeepViewer) {
         if(m_pDeep) {
-            m_pDeepViewer = new DeepViewerWidget(m_pDeep->getModel(), false);
+            m_pDeepViewer = new DeepViewer(m_pDeep->getModel(), false);
         }
         else {
-            m_pDeepViewer = new DeepViewerWidget(false);
+            m_pDeepViewer = new DeepViewer(false);
         }
-        m_pControlPanel->setView(m_pDeepViewer->getView());
+        m_pControlPanel->setDeepViewer(m_pDeepViewer);
         m_pDeepViewer->setWindowTitle("Deep CNTK");
     }
 }

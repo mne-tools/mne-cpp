@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepviewerwidget.h
+* @file     network.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,27 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepViewerWidget class declaration.
+* @brief    Network class declaration.
 *
 */
 
-#ifndef DEEPVIEWERWIDGET_H
-#define DEEPVIEWERWIDGET_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "../disp_global.h"
-
+#ifndef NETWORK_H
+#define NETWORK_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QGraphicsItem>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -65,8 +58,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+
 QT_BEGIN_NAMESPACE
-class QGraphicsScene;
+class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
 
@@ -78,6 +72,7 @@ QT_END_NAMESPACE
 namespace DISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -85,38 +80,50 @@ namespace DISPLIB
 
 class Node;
 class Edge;
-class View;
-class Controls;
 
 
 //=============================================================================================================
 /**
-* Implementing the CNTK Network Viewer
+* A CNTK Network representation ready for visualization
 *
-* @brief The CNTK Network Viewer
+* @brief A CNTK Network representation
 */
-class DISPSHARED_EXPORT DeepViewerWidget : public QWidget
+class Network : public QObject
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<Network> SPtr;               /**< Shared pointer type for Network. */
+    typedef QSharedPointer<const Network> ConstSPtr;    /**< Const shared pointer type for Network. */
 
-    DeepViewerWidget(bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
+    //=========================================================================================================
+    /**
+    * Constructs an Network with parent object parent.
+    *
+    * @param [in] parent   The parent of the Network
+    */
+    Network(CNTK::FunctionPtr model, QObject *parent = Q_NULLPTR);
 
-    DeepViewerWidget(CNTK::FunctionPtr model, bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
+    //=========================================================================================================
+    /**
+    * Network destructor
+    */
+    virtual ~Network() {}
 
-    View* getView() const;
+    QList<QList<Node *> > layerNodes() const;
+    void setLayerNodes(const QList<QList<Node *> > &listLayerNodes);
+
+    QList<QList<Edge *> > edges() const;
+    void setEdges(const QList<QList<Edge *> > &listEdges);
+
+protected:
+    void generateNetwork();
 
 private:
-    void populateScene();
-
     CNTK::FunctionPtr   m_pModel;   /**< The CNTK model v2 */
-
-    View*               m_pView;    /**< The View Port */
-
-    QGraphicsScene*     m_pScene;   /**< The Scene Containing the graphic item */
 
     QList< QList<Node*> > m_listLayerNodes; /**< List containing layer-wise Nodes */
     QList< QList<Edge*> > m_listEdges;      /**< List containing between-layer-wise Edges */
+
 };
 
 //*************************************************************************************************************
@@ -126,4 +133,4 @@ private:
 
 } // NAMESPACE
 
-#endif // DEEPVIEWERWIDGET_H
+#endif // NETWORK_H
