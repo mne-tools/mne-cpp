@@ -72,11 +72,29 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+Network::Network(QObject *parent)
+: QObject(parent)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 Network::Network(CNTK::FunctionPtr model, QObject *parent)
 : QObject(parent)
 , m_pModel(model)
 {
+    generateNetwork();
+}
 
+
+//*************************************************************************************************************
+
+void Network::setModel(CNTK::FunctionPtr &model)
+{
+    m_pModel = model;
+    // TODO Update network
 }
 
 
@@ -109,6 +127,14 @@ QList<QList<Edge *> > Network::edges() const
 void Network::setEdges(const QList<QList<Edge *> > &listEdges)
 {
     m_listEdges = listEdges;
+}
+
+
+//*************************************************************************************************************
+
+bool Network::isSetup() const
+{
+    return true;
 }
 
 
@@ -208,6 +234,7 @@ void Network::generateNetwork()
                 }
             }
             m_listEdges.append(listCurrentEdges);
+            listCurrentEdges.clear();
         }
     }
 }
