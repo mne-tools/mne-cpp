@@ -57,7 +57,7 @@ using namespace REFERENCEPLUGIN;
 
 ReferenceToolbarWidget::ReferenceToolbarWidget(REFERENCEPLUGIN::Reference *pRef, QWidget *parent)
 : ui(new Ui::ReferenceToolbarWidget)
-, m_pRef(QSharedPointer<Reference>(pRef))
+, m_pRef(pRef)
 {
     ui->setupUi(this);
 }

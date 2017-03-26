@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepEval class declaration.
+* @brief    DeepEval class declaration v1.
 *
 */
 
@@ -54,6 +54,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -70,9 +78,9 @@ namespace DEEPLIB
 
 //=============================================================================================================
 /**
-* DeepEval cntk wrapper descritpion
+* DeepEval CNTK v1 wrapper descritpion
 *
-* @brief DeepEval cntk wrapper to evaluate pretrained models
+* @brief DeepEval CNTK v1 wrapper to evaluate pretrained models
 */
 class DEEPSHARED_EXPORT DeepEval
 {
@@ -118,7 +126,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Evaluate the MNE Deep Model set by the model file name
+    * Evaluate the MNE Deep Model specified by the model file name
+    *
+    * @param [in] inputs    The input vector
+    * @param [out] outputs   The ouptut vector
+    *
+    * @return true when MNE Deep model was sucessfully evaluated.
+    */
+    bool evalModel(const Eigen::VectorXf& inputs, Eigen::VectorXf& outputs);
+
+    //=========================================================================================================
+    /**
+    * Evaluate the MNE Deep Model specified by the model file name
+    *
+    * @param [in] inputs    The input vector
+    * @param [out] outputs  The ouptut vector
     *
     * @return true when MNE Deep model was sucessfully evaluated.
     */
@@ -148,11 +170,12 @@ public:
     */
     size_t outputDimensions();
 
+
 private:
-    QString m_sModelFilename;                               /**< Model filename */
 
-    Microsoft::MSR::CNTK::IEvaluateModel<float>* m_pModel;   /**< The loaded model */
+    QString m_sModelFilename;       /**< Model filename */
 
+    Microsoft::MSR::CNTK::IEvaluateModel<float>* m_pModel_v1;  /**< The loaded model */
 };
 
 //*************************************************************************************************************
