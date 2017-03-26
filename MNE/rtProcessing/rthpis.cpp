@@ -330,7 +330,7 @@ Eigen::MatrixXd fminsearch(Eigen::MatrixXd pos,
     while ((func_evals < maxfun) && (itercount < maxiter)) {
 
         for (int i = 0;i < n;i++) {
-            tempX1(i) = abs(fv[0] - fv[i+1]);
+            tempX1(i) = fabs(fv[0] - fv[i+1]);
         }
 
         temp1 = tempX1.maxCoeff();
@@ -681,8 +681,8 @@ void RtHPIS::singleHPIFit(const MatrixXd& t_mat,
         int chIdx = 0;
 
         for (int i = 0; i < amp.rows(); ++i) {
-            if(abs(amp(i,j)) > maxVal) {
-                maxVal = abs(amp(i,j));
+            if(fabs(amp(i,j)) > maxVal) {
+                maxVal = fabs(amp(i,j));
 
                 if(chIdx < innerind.size()) {
                     chIdx = innerind.at(i);
