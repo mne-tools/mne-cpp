@@ -101,6 +101,15 @@ public:
     *
     * @param [in] parent   The parent of the Network
     */
+    Network(QObject *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Constructs an Network with parent object parent.
+    *
+    * @param [in] model     The CNTK model
+    * @param [in] parent    The parent of the Network
+    */
     Network(CNTK::FunctionPtr model, QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
@@ -109,11 +118,21 @@ public:
     */
     virtual ~Network() {}
 
+    //=========================================================================================================
+    /**
+    * Sets the CNTK Model v2
+    *
+    * @param [in] model     Model to set
+    */
+    void setModel(CNTK::FunctionPtr& model);
+
     QList<QList<Node *> > layerNodes() const;
     void setLayerNodes(const QList<QList<Node *> > &listLayerNodes);
 
     QList<QList<Edge *> > edges() const;
     void setEdges(const QList<QList<Edge *> > &listEdges);
+
+    bool isSetup() const;
 
 protected:
     void generateNetwork();

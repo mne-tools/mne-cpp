@@ -108,6 +108,8 @@ public:
 
     View* getView() const;
 
+    void setModel(CNTK::FunctionPtr& model);
+
 private:
     void populateScene();
 
