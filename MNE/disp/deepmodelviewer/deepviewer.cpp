@@ -103,7 +103,7 @@ DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 DeepViewer::DeepViewer(CNTK::FunctionPtr model, bool embeddedControl, QWidget *parent)
 : QWidget(parent)
 , m_pView(new View)
-, m_pNetwork(new Network)
+, m_pNetwork(new Network(model))
 {
     populateScene();
 
