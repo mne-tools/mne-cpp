@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -74,6 +75,7 @@ using namespace Eigen;
 
 Network::Network(QObject *parent)
 : QObject(parent)
+, m_penStyle(Qt::SolidLine)
 {
 
 }
@@ -84,6 +86,7 @@ Network::Network(QObject *parent)
 Network::Network(CNTK::FunctionPtr model, QObject *parent)
 : QObject(parent)
 , m_pModel(model)
+, m_penStyle(Qt::SolidLine)
 {
     generateNetwork();
 }
@@ -140,6 +143,39 @@ bool Network::isSetup() const
 
 //*************************************************************************************************************
 
+void Network::setSolidLine()
+{
+    if(m_penStyle != Qt::SolidLine) {
+        m_penStyle = Qt::SolidLine;
+        emit update_signal();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Network::setDashLine()
+{
+    if(m_penStyle != Qt::DashLine) {
+        m_penStyle = Qt::DashLine;
+        emit update_signal();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Network::setDotLine()
+{
+    if(m_penStyle != Qt::DotLine) {
+        m_penStyle = Qt::DotLine;
+        emit update_signal();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void Network::generateNetwork()
 {
 
@@ -158,7 +194,8 @@ void Network::generateNetwork()
     VectorXf bias;
     int bufferCount;
 
-    for (int i = static_cast<int>(m_pModel->Parameters().size()) - 1; i >= 0 ; --i) {
+    size_t i = m_pModel->Parameters().size() - 1;
+    for (int k = 0; k < static_cast<int>(m_pModel->Parameters().size()); ++k, --i) {
         fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
         fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
 
@@ -228,7 +265,7 @@ void Network::generateNetwork()
 
             for(int i = 0; i < m_listLayerNodes[layer-1].size(); ++i ) {
                 for(int j = 0; j < m_listLayerNodes[layer].size(); ++j ) {
-                    listCurrentEdges.append(new Edge(m_listLayerNodes[layer-1][i], m_listLayerNodes[layer][j]));
+                    listCurrentEdges.append(new Edge(this, m_listLayerNodes[layer-1][i], m_listLayerNodes[layer][j]));
 
                     listCurrentEdges.last()->setWeight(vecWeights[layer-1](j,i));
                 }

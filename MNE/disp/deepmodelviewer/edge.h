@@ -58,6 +58,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class Node;
+class Network;
 
 
 //=============================================================================================================
@@ -74,10 +75,11 @@ public:
     /**
     * Constructs a Edge representing a weight
     *
+    * @param [in] network       The network of which this edge is part of
     * @param [in] sourceNode    The Source Node of this Edge
     * @param [in] destNode      The Destination Node of this Edge
     */
-    Edge(Node *sourceNode, Node *destNode);
+    Edge(Network *network, Node *sourceNode, Node *destNode);
 
     //=========================================================================================================
     /**
@@ -130,6 +132,9 @@ private:
     qreal   m_penWidth;         /**< The Edges width derived from the weight */
 
     float   m_weight;           /**< The Weight related to the edge */
+
+
+    Network* m_pNetwork;        /**< The network this edge is part of*/
 };
 
 //*************************************************************************************************************

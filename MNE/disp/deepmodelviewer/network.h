@@ -134,11 +134,22 @@ public:
 
     bool isSetup() const;
 
+    inline Qt::PenStyle getPenStyle() const;
+    void setSolidLine();
+    void setDashLine();
+    void setDotLine();
+
+signals:
+    void update_signal();
+
 protected:
     void generateNetwork();
 
 private:
     CNTK::FunctionPtr   m_pModel;   /**< The CNTK model v2 */
+
+    Qt::PenStyle        m_penStyle; /**< Current weight pen style */
+
 
     QList< QList<Node*> > m_listLayerNodes; /**< List containing layer-wise Nodes */
     QList< QList<Edge*> > m_listEdges;      /**< List containing between-layer-wise Edges */
@@ -149,6 +160,11 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+Qt::PenStyle Network::getPenStyle() const
+{
+    return m_penStyle;
+}
 
 } // NAMESPACE
 

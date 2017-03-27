@@ -61,7 +61,6 @@
 //=============================================================================================================
 
 #include <QHBoxLayout>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -136,6 +135,14 @@ View *DeepViewer::getView() const
 
 //*************************************************************************************************************
 
+Network* DeepViewer::getNetwork() const
+{
+    return m_pNetwork;
+}
+
+
+//*************************************************************************************************************
+
 void DeepViewer::setModel(CNTK::FunctionPtr &model)
 {
 
@@ -151,6 +158,7 @@ void DeepViewer::populateScene()
     if(!m_pNetwork->isSetup())
         return;
 
+    connect(m_pNetwork, SIGNAL(update_signal()), m_pScene, SLOT(update()));
 
     //
     // Append layer nodes to scene

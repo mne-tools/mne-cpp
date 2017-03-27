@@ -108,6 +108,8 @@ public:
 
     View* getView() const;
 
+    Network* getNetwork() const;
+
     void setModel(CNTK::FunctionPtr& model);
 
 private:
@@ -117,7 +119,7 @@ private:
 
     QGraphicsScene*     m_pScene;   /**< The Scene Containing the graphic item */
 
-    QPointer<Network>   m_pNetwork; /**< The CNTK visual network representation */
+    Network*            m_pNetwork; /**< The CNTK visual network representation */
 };
 
 //*************************************************************************************************************
