@@ -152,7 +152,9 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
             if (tag->size() > 0)
             {
                 in->readRawData(tag->data(), tag->size());
-                FiffTag::convert_tag_data(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+                // Don't do this conversion because it breaks the writing on
+                // little endian systems (i.e., OSX, Linux, Windows...)
+                // FiffTag::convert_tag_data(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
             }
 
             //QDataStream out(p_pStreamOut);
