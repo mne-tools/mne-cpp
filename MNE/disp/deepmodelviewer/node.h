@@ -139,12 +139,16 @@ private:
 
     QList<Edge *> m_qListEdges;     /**< The list of connected edges */
     Network* m_pNetwork;            /**< The network this node is part of */
+
+    bool m_bIsAttached;             /**< If node is attached to a scene  TODO: Move this to Edge, Node basis class*/
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+
 
 } // NAMESPACE
 

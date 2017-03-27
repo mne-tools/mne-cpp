@@ -57,6 +57,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -76,6 +77,7 @@ using namespace Eigen;
 Network::Network(QObject *parent)
 : QObject(parent)
 , m_penStyle(Qt::SolidLine)
+, m_weightThreshold(0.1f)
 {
 
 }
@@ -87,6 +89,7 @@ Network::Network(CNTK::FunctionPtr model, QObject *parent)
 : QObject(parent)
 , m_pModel(model)
 , m_penStyle(Qt::SolidLine)
+, m_weightThreshold(0.1f)
 {
     generateNetwork();
 }
@@ -170,6 +173,19 @@ void Network::setDotLine()
     if(m_penStyle != Qt::DotLine) {
         m_penStyle = Qt::DotLine;
         emit update_signal();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Network::setWeightThreshold(int thr)
+{
+    float val = static_cast<float>(thr) / 100.0f;
+    if(val != m_weightThreshold) {
+        m_weightThreshold = val;
+        emit updateWeightThreshold_signal();
+        qDebug() << "setWeightThreshold" << m_weightThreshold;
     }
 }
 
