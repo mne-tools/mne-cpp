@@ -114,8 +114,8 @@ public:
 
 private:
     void initScene();
-
     void updateScene();
+    void redrawScene();
 
     View*               m_pView;    /**< The View Port */
 

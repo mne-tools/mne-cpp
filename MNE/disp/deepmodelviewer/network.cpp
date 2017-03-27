@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "network.h"
-
 #include "node.h"
 #include "edge.h"
 
@@ -57,7 +56,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -192,7 +190,6 @@ void Network::setWeightThreshold(int thr)
 
 void Network::setWeightStrength(int strength)
 {
-    qDebug() << "weight Strength" << strength;
     m_weightStrength = strength;
     emit updateWeightStrength_signal();
 }

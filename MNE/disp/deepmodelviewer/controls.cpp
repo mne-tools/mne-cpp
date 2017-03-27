@@ -158,7 +158,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     QSlider *weightStrength = new QSlider(Qt::Horizontal, weightStrengthGroup);
     weightStrength->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     weightStrengthGroup->setTitle(tr("Weight Strength"));
-    weightStrength->setRange(0, 10);
+    weightStrength->setRange(1, 12);
 
     QGroupBox* weightThresholdGroup = new QGroupBox(parent);
     QSlider *weightThreshold = new QSlider(Qt::Horizontal, weightThresholdGroup);
