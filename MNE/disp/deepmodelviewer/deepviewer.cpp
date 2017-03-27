@@ -158,10 +158,9 @@ void DeepViewer::initScene()
 {
     m_pScene = new QGraphicsScene(this);
 
-    connect(m_pNetwork, SIGNAL(update_signal()), m_pScene, SLOT(update()));
-
+    connect(m_pNetwork, &Network::update_signal, this, &DeepViewer::redrawScene);
     connect(m_pNetwork, &Network::updateWeightThreshold_signal, this, &DeepViewer::updateScene);
-    connect(m_pNetwork, &Network::updateWeightStrength_signal, this, &DeepViewer::updateScene);
+    connect(m_pNetwork, &Network::updateWeightStrength_signal, this, &DeepViewer::redrawScene);
 }
 
 
@@ -199,4 +198,12 @@ void DeepViewer::updateScene()
             }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::redrawScene()
+{
+    m_pScene->update(m_pView->getGraphicsView()->sceneRect());
 }
