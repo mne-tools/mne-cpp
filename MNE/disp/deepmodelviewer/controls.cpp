@@ -41,6 +41,7 @@
 #include "controls.h"
 #include "deepviewer.h"
 #include "view.h"
+#include "network.h"
 
 
 //*************************************************************************************************************
@@ -208,9 +209,9 @@ void Controls::createAppearanceControls(QWidget* parent)
     //
     // Set up connections
     //
-//    connect(solidLine, SIGNAL(clicked()), m_renderer, SLOT(setSolidLine()));
-//    connect(dashLine, SIGNAL(clicked()), m_renderer, SLOT(setDashLine()));
-//    connect(dotLine, SIGNAL(clicked()), m_renderer, SLOT(setDotLine()));
+    connect(solidLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setSolidLine);
+    connect(dashLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDashLine);
+    connect(dotLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDotLine);
 //    connect(weightStrength, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
 
     connect(antialiasButton, &QPushButton::toggled, m_pDeepViewer->getView(), &View::enableAntialiasing);

@@ -40,6 +40,7 @@
 
 #include "edge.h"
 #include "node.h"
+#include "network.h"
 #include "../helpers/colormap.h"
 
 //*************************************************************************************************************
@@ -56,7 +57,6 @@
 //=============================================================================================================
 
 #include <QPainter>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -84,8 +84,9 @@ static double TwoPi = 2.0 * Pi;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Edge::Edge(Node *sourceNode, Node *destNode)
-: m_arrowSize(10)
+Edge::Edge(Network *network, Node *sourceNode, Node *destNode)
+: m_pNetwork(network)
+, m_arrowSize(10)
 , m_color(Qt::lightGray)
 , m_penWidth(1)
 , m_weight(0)
@@ -214,7 +215,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 //    }
     path.cubicTo(c1, c2, m_destPoint);
     QColor lg = m_color;
-    QPen pen(lg, m_penWidth, Qt::SolidLine, Qt::FlatCap);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
+    QPen pen(lg, m_penWidth, m_pNetwork->getPenStyle(), Qt::FlatCap);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
     painter->strokePath(path, pen);
 
 
