@@ -110,9 +110,13 @@ public:
     * @param [in] weight    The weight to set
     */
     void setWeight(float weight);
+    inline float weight() const;
 
     enum { Type = UserType + 2 };
     int type() const override { return Type; }
+
+    inline bool attached() const;
+    inline void setAttached(bool attached);
 
 protected:
     QRectF boundingRect() const override;
@@ -133,14 +137,38 @@ private:
 
     float   m_weight;           /**< The Weight related to the edge */
 
+    Network* m_pNetwork;        /**< The network this edge is part of.*/
 
-    Network* m_pNetwork;        /**< The network this edge is part of*/
+    bool m_bIsAttached;         /**< If node is attached to a scene TODO: Move this to Edge, Node basis class*/
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+float Edge::weight() const
+{
+    return m_weight;
+}
+
+
+//*************************************************************************************************************
+
+bool Edge::attached() const
+{
+    return m_bIsAttached;
+}
+
+
+//*************************************************************************************************************
+
+void Edge::setAttached(bool attached)
+{
+    m_bIsAttached = attached;
+}
+
+
 
 } // NAMESPACE
 

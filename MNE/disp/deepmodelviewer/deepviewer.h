@@ -113,7 +113,9 @@ public:
     void setModel(CNTK::FunctionPtr& model);
 
 private:
-    void populateScene();
+    void initScene();
+
+    void updateScene();
 
     View*               m_pView;    /**< The View Port */
 

@@ -81,9 +81,8 @@ Node::Node(Network *network)
 : m_pNetwork(network)
 , m_fDiameter(20)
 , m_fRadius(m_fDiameter/2)
+, m_bIsAttached(false)
 {
-
-
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);

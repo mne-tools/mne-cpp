@@ -90,6 +90,7 @@ Edge::Edge(Network *network, Node *sourceNode, Node *destNode)
 , m_color(Qt::lightGray)
 , m_penWidth(1)
 , m_weight(0)
+, m_bIsAttached(false)
 {
     setAcceptedMouseButtons(0);
     m_pSource = sourceNode;
@@ -275,3 +276,4 @@ void Edge::updateColor()
     m_color = QColor(DISPLIB::ColorMap::valueToRedBlue(weigt));
     m_color.setAlpha(abs(weigt*255));
 }
+

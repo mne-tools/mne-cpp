@@ -139,8 +139,13 @@ public:
     void setDashLine();
     void setDotLine();
 
+    void setWeightThreshold(int thr);
+    inline float weightThreshold() const;
+
 signals:
     void update_signal();
+
+    void updateWeightThreshold_signal();
 
 protected:
     void generateNetwork();
@@ -149,6 +154,8 @@ private:
     CNTK::FunctionPtr   m_pModel;   /**< The CNTK model v2 */
 
     Qt::PenStyle        m_penStyle; /**< Current weight pen style */
+
+    float               m_weightThreshold;  /**< Threshold of weights to show [0.00, 1.00] */
 
 
     QList< QList<Node*> > m_listLayerNodes; /**< List containing layer-wise Nodes */
@@ -165,6 +172,15 @@ Qt::PenStyle Network::getPenStyle() const
 {
     return m_penStyle;
 }
+
+
+//*************************************************************************************************************
+
+float Network::weightThreshold() const
+{
+    return m_weightThreshold;
+}
+
 
 } // NAMESPACE
 

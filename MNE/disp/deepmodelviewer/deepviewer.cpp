@@ -61,6 +61,7 @@
 //=============================================================================================================
 
 #include <QHBoxLayout>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -82,7 +83,8 @@ DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 , m_pView(new View)
 , m_pNetwork(new Network)
 {
-    populateScene();
+    initScene();
+    updateScene();
 
     m_pView->getGraphicsView()->setScene(m_pScene);
 
@@ -107,7 +109,8 @@ DeepViewer::DeepViewer(CNTK::FunctionPtr model, bool embeddedControl, QWidget *p
 , m_pView(new View)
 , m_pNetwork(new Network(model))
 {
-    populateScene();
+    initScene();
+    updateScene();
 
     m_pView->getGraphicsView()->setScene(m_pScene);
 
@@ -148,24 +151,33 @@ void DeepViewer::setModel(CNTK::FunctionPtr &model)
 
 }
 
-
-//*************************************************************************************************************
-
-void DeepViewer::populateScene()
+void DeepViewer::initScene()
 {
     m_pScene = new QGraphicsScene(this);
 
+    connect(m_pNetwork, SIGNAL(update_signal()), m_pScene, SLOT(update()));
+
+    connect(m_pNetwork, &Network::updateWeightThreshold_signal, this, &DeepViewer::updateScene);
+}
+
+
+
+//*************************************************************************************************************
+
+void DeepViewer::updateScene()
+{
+
     if(!m_pNetwork->isSetup())
         return;
-
-    connect(m_pNetwork, SIGNAL(update_signal()), m_pScene, SLOT(update()));
 
     //
     // Append layer nodes to scene
     //
     for (int i = 0; i < m_pNetwork->layerNodes().size(); ++i) {
         for (int j = 0; j < m_pNetwork->layerNodes()[i].size(); ++j) {
-            m_pScene->addItem(m_pNetwork->layerNodes()[i][j]);
+            if(!m_pNetwork->layerNodes()[i][j]->scene()) {
+                m_pScene->addItem(m_pNetwork->layerNodes()[i][j]);
+            }
         }
     }
 
@@ -174,7 +186,14 @@ void DeepViewer::populateScene()
     //
     for (int i = 0; i < m_pNetwork->edges().size(); ++i) {
         for (int j = 0; j < m_pNetwork->edges()[i].size(); ++j) {
-            m_pScene->addItem(m_pNetwork->edges()[i][j]);
+            if(fabs(m_pNetwork->edges()[i][j]->weight()) > m_pNetwork->weightThreshold()) {
+                if(!m_pNetwork->edges()[i][j]->scene()) {
+                    m_pScene->addItem(m_pNetwork->edges()[i][j]);
+                }
+            }
+            else if(m_pNetwork->edges()[i][j]->scene()) {
+                m_pScene->removeItem(m_pNetwork->edges()[i][j]);
+            }
         }
     }
 }

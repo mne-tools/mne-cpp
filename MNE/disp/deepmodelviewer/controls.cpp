@@ -164,6 +164,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     QSlider *weightThreshold = new QSlider(Qt::Horizontal, weightThresholdGroup);
     weightThreshold->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     weightThresholdGroup->setTitle(tr("Weight Threshold"));
+    weightThreshold->setTickInterval(5);
     weightThreshold->setRange(0, 100);
 
     QPushButton *antialiasButton = new QPushButton(parent);
@@ -213,6 +214,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     connect(dashLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDashLine);
     connect(dotLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDotLine);
 //    connect(weightStrength, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
+    connect(weightThreshold, &QSlider::valueChanged, m_pDeepViewer->getNetwork(), &Network::setWeightThreshold);
 
     connect(antialiasButton, &QPushButton::toggled, m_pDeepViewer->getView(), &View::enableAntialiasing);
 #ifndef QT_NO_OPENGL
