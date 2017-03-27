@@ -151,6 +151,9 @@ void DeepViewer::setModel(CNTK::FunctionPtr &model)
 
 }
 
+
+//*************************************************************************************************************
+
 void DeepViewer::initScene()
 {
     m_pScene = new QGraphicsScene(this);
@@ -158,8 +161,8 @@ void DeepViewer::initScene()
     connect(m_pNetwork, SIGNAL(update_signal()), m_pScene, SLOT(update()));
 
     connect(m_pNetwork, &Network::updateWeightThreshold_signal, this, &DeepViewer::updateScene);
+    connect(m_pNetwork, &Network::updateWeightStrength_signal, this, &DeepViewer::updateScene);
 }
-
 
 
 //*************************************************************************************************************

@@ -122,7 +122,6 @@ protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void updateLineWidth();
     void updateColor();
 
 private:
@@ -133,7 +132,6 @@ private:
     QPointF m_destPoint;        /**< The calculated Destination Point */
     qreal   m_arrowSize;        /**< The Arrow Size */
     QColor  m_color;            /**< The Color derived from the weight */
-    qreal   m_penWidth;         /**< The Edges width derived from the weight */
 
     float   m_weight;           /**< The Weight related to the edge */
 

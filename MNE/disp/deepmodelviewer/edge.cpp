@@ -88,7 +88,6 @@ Edge::Edge(Network *network, Node *sourceNode, Node *destNode)
 : m_pNetwork(network)
 , m_arrowSize(10)
 , m_color(Qt::lightGray)
-, m_penWidth(1)
 , m_weight(0)
 , m_bIsAttached(false)
 {
@@ -154,7 +153,6 @@ void Edge::adjust()
 void Edge::setWeight(float weight)
 {
     m_weight = weight;
-    updateLineWidth();
     updateColor();
 }
 
@@ -216,7 +214,8 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 //    }
     path.cubicTo(c1, c2, m_destPoint);
     QColor lg = m_color;
-    QPen pen(lg, m_penWidth, m_pNetwork->getPenStyle(), Qt::FlatCap);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
+    float penWidth = fabs(m_weight*m_pNetwork->weightStrength());
+    QPen pen(lg, penWidth, m_pNetwork->getPenStyle(), Qt::FlatCap);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
     painter->strokePath(path, pen);
 
 
@@ -250,14 +249,6 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->setBrush(Qt::lightGray);
 //    painter->drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
     painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
-}
-
-
-//*************************************************************************************************************
-
-void Edge::updateLineWidth()
-{
-    m_penWidth = abs(m_weight*5);
 }
 
 

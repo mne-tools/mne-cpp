@@ -213,7 +213,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     connect(solidLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setSolidLine);
     connect(dashLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDashLine);
     connect(dotLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDotLine);
-//    connect(weightStrength, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
+    connect(weightStrength, &QSlider::valueChanged, m_pDeepViewer->getNetwork(), &Network::setWeightStrength);
     connect(weightThreshold, &QSlider::valueChanged, m_pDeepViewer->getNetwork(), &Network::setWeightThreshold);
 
     connect(antialiasButton, &QPushButton::toggled, m_pDeepViewer->getView(), &View::enableAntialiasing);
