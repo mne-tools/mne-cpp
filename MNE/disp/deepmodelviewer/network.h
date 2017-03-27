@@ -142,10 +142,14 @@ public:
     void setWeightThreshold(int thr);
     inline float weightThreshold() const;
 
+    void setWeightStrength(int strength);
+    inline float weightStrength() const;
+
 signals:
     void update_signal();
 
     void updateWeightThreshold_signal();
+    void updateWeightStrength_signal();
 
 protected:
     void generateNetwork();
@@ -156,7 +160,7 @@ private:
     Qt::PenStyle        m_penStyle; /**< Current weight pen style */
 
     float               m_weightThreshold;  /**< Threshold of weights to show [0.00, 1.00] */
-
+    float               m_weightStrength;   /**< The pen stroke size */
 
     QList< QList<Node*> > m_listLayerNodes; /**< List containing layer-wise Nodes */
     QList< QList<Edge*> > m_listEdges;      /**< List containing between-layer-wise Edges */
@@ -179,6 +183,14 @@ Qt::PenStyle Network::getPenStyle() const
 float Network::weightThreshold() const
 {
     return m_weightThreshold;
+}
+
+
+//*************************************************************************************************************
+
+float Network::weightStrength() const
+{
+    return m_weightStrength;
 }
 
 

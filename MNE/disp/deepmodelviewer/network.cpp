@@ -78,6 +78,7 @@ Network::Network(QObject *parent)
 : QObject(parent)
 , m_penStyle(Qt::SolidLine)
 , m_weightThreshold(0.1f)
+, m_weightStrength(5)
 {
 
 }
@@ -90,6 +91,7 @@ Network::Network(CNTK::FunctionPtr model, QObject *parent)
 , m_pModel(model)
 , m_penStyle(Qt::SolidLine)
 , m_weightThreshold(0.1f)
+, m_weightStrength(5)
 {
     generateNetwork();
 }
@@ -181,12 +183,18 @@ void Network::setDotLine()
 
 void Network::setWeightThreshold(int thr)
 {
-    float val = static_cast<float>(thr) / 100.0f;
-    if(val != m_weightThreshold) {
-        m_weightThreshold = val;
-        emit updateWeightThreshold_signal();
-        qDebug() << "setWeightThreshold" << m_weightThreshold;
-    }
+    m_weightThreshold = static_cast<float>(thr) / 100.0f;
+    emit updateWeightThreshold_signal();
+}
+
+
+//*************************************************************************************************************
+
+void Network::setWeightStrength(int strength)
+{
+    qDebug() << "weight Strength" << strength;
+    m_weightStrength = strength;
+    emit updateWeightStrength_signal();
 }
 
 
@@ -272,7 +280,7 @@ void Network::generateNetwork()
         if(layer - 1 >= 0) {
 
             // Dimension check
-            if(vecWeights[layer-1].rows() != m_listLayerNodes[layer].size() && vecWeights[layer-1].cols() != m_listLayerNodes[layer-1].size()) {
+            if( vecWeights[layer-1].rows() != m_listLayerNodes[layer].size() && vecWeights[layer-1].cols() != m_listLayerNodes[layer-1].size() ) {
                 qCritical("Dimensions do not match.\n");
                 return;
 //                qDebug() << "Dimension Check" << vecWeights[layer-1].rows() << "x" << vecWeights[layer-1].cols();
