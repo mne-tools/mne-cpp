@@ -165,7 +165,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     weightThreshold->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     weightThresholdGroup->setTitle(tr("Weight Threshold"));
     weightThreshold->setTickInterval(5);
-    weightThreshold->setRange(0, 100);
+    weightThreshold->setRange(0, 1000);
 
     QPushButton *antialiasButton = new QPushButton(parent);
     antialiasButton->setText(tr("Antialiasing"));
@@ -231,7 +231,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     openGlButton->setChecked(m_pDeepViewer->getView()->usesOpenGL());
 #endif
     weightStrength->setValue(5);
-    weightThreshold->setValue(10);
+    weightThreshold->setValue(200);
 }
 
 

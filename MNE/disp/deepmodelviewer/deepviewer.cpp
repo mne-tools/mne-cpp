@@ -84,7 +84,7 @@ DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 , m_pNetwork(new Network)
 {
     initScene();
-    updateScene();
+    updateSceneItems();
 
     m_pView->getGraphicsView()->setScene(m_pScene);
 
@@ -110,7 +110,7 @@ DeepViewer::DeepViewer(CNTK::FunctionPtr model, bool embeddedControl, QWidget *p
 , m_pNetwork(new Network(model))
 {
     initScene();
-    updateScene();
+    updateSceneItems();
 
     m_pView->getGraphicsView()->setScene(m_pScene);
 
@@ -148,7 +148,7 @@ Network* DeepViewer::getNetwork() const
 
 void DeepViewer::setModel(CNTK::FunctionPtr &model)
 {
-
+    Q_UNUSED(model)
 }
 
 
@@ -159,14 +159,14 @@ void DeepViewer::initScene()
     m_pScene = new QGraphicsScene(this);
 
     connect(m_pNetwork, &Network::update_signal, this, &DeepViewer::redrawScene);
-    connect(m_pNetwork, &Network::updateWeightThreshold_signal, this, &DeepViewer::updateScene);
+    connect(m_pNetwork, &Network::updateWeightThreshold_signal, this, &DeepViewer::updateSceneItems);
     connect(m_pNetwork, &Network::updateWeightStrength_signal, this, &DeepViewer::redrawScene);
 }
 
 
 //*************************************************************************************************************
 
-void DeepViewer::updateScene()
+void DeepViewer::updateSceneItems()
 {
 
     if(!m_pNetwork->isSetup())

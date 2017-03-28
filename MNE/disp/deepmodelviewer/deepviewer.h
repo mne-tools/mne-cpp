@@ -101,22 +101,69 @@ class DISPSHARED_EXPORT DeepViewer : public QWidget
 {
     Q_OBJECT
 public:
-
+    //=========================================================================================================
+    /**
+    * Constructs the DeepViewer which is a child of parent
+    *
+    * @param[in] embeddedControl    Whether the Deep Viewer Control should be embedded, i.e., generated within the Viewer
+    * @param[in] parent             The parent widget
+    */
     DeepViewer(bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
+    //=========================================================================================================
+    /**
+    * Constructs the DeepViewer which is a child of parent
+    *
+    * @param[in] model              The CNTK model which should be represented by the view
+    * @param[in] embeddedControl    Whether the Deep Viewer Control should be embedded, i.e., generated within the Viewer
+    * @param[in] parent             The parent widget
+    */
     DeepViewer(CNTK::FunctionPtr model, bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
+    //=========================================================================================================
+    /**
+    * Returns the view
+    *
+    * @return the view
+    */
     View* getView() const;
 
+    //=========================================================================================================
+    /**
+    * Returns the CNTK Network UI representation
+    *
+    * @return the view
+    */
     Network* getNetwork() const;
 
+    //=========================================================================================================
+    /**
+    * The CNTK model which should be represented by the viewer
+    *
+    * @param[in] model      The CNTK model which should be represented by the viewer
+    */
     void setModel(CNTK::FunctionPtr& model);
 
 private:
+    //=========================================================================================================
+    /**
+    * Initializes the GraphicsScene and setups connections
+    */
     void initScene();
-    void updateScene();
+
+    //=========================================================================================================
+    /**
+    * Update scene items, i.e, attaches or removes items according to their weights
+    */
+    void updateSceneItems();
+
+    //=========================================================================================================
+    /**
+    * Redraw scene - only the part which is within the view rectangle
+    */
     void redrawScene();
 
+private:
     View*               m_pView;    /**< The View Port */
 
     QGraphicsScene*     m_pScene;   /**< The Scene Containing the graphic item */

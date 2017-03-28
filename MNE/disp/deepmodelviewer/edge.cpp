@@ -89,7 +89,6 @@ Edge::Edge(Network *network, Node *sourceNode, Node *destNode)
 , m_arrowSize(10)
 , m_color(Qt::lightGray)
 , m_weight(0)
-, m_bIsAttached(false)
 {
     setAcceptedMouseButtons(0);
     m_pSource = sourceNode;
