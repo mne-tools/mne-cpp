@@ -61,6 +61,8 @@
 #include <QtWidgets>
 #endif
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -129,7 +131,7 @@ void Controls::createNetworkControls(QWidget *parent)
     //
     // Set up connections
     //
-//    connect(trainButton, SIGNAL(clicked(bool)), m_renderer, SLOT(setDescriptionEnabled(bool)));
+    connect(trainButton, &QPushButton::clicked, this, &Controls::requestTraining);
 
 }
 
@@ -165,7 +167,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     weightThreshold->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     weightThresholdGroup->setTitle(tr("Weight Threshold"));
     weightThreshold->setTickInterval(5);
-    weightThreshold->setRange(0, 1000);
+    weightThreshold->setRange(0, 2000);
 
     QPushButton *antialiasButton = new QPushButton(parent);
     antialiasButton->setText(tr("Antialiasing"));
@@ -324,4 +326,12 @@ void Controls::createLayout()
     //
     // Set the defaults:
     //
+}
+
+
+//*************************************************************************************************************
+
+void Controls::requestTraining()
+{
+    emit requestTraining_signal();
 }

@@ -154,6 +154,16 @@ void DeepViewer::setModel(CNTK::FunctionPtr &model)
 
 //*************************************************************************************************************
 
+void DeepViewer::updateModel()
+{
+    qDebug() << "updateModel";
+    //TODO Consistency checks
+    m_pNetwork->updateWeights();
+}
+
+
+//*************************************************************************************************************
+
 void DeepViewer::initScene()
 {
     m_pScene = new QGraphicsScene(this);
