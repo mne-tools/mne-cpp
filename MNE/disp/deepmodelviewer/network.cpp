@@ -88,7 +88,7 @@ Network::Network(CNTK::FunctionPtr model, QObject *parent)
 : QObject(parent)
 , m_pModel(model)
 , m_penStyle(Qt::SolidLine)
-, m_weightThreshold(0.1f)
+, m_weightThreshold(0.2f)
 , m_weightStrength(5)
 {
     generateNetwork();
@@ -181,7 +181,7 @@ void Network::setDotLine()
 
 void Network::setWeightThreshold(int thr)
 {
-    m_weightThreshold = static_cast<float>(thr) / 100.0f;
+    m_weightThreshold = static_cast<float>(thr) / 1000.0f;
     emit updateWeightThreshold_signal();
 }
 
