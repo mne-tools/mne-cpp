@@ -152,6 +152,10 @@ signals:
     void updateWeightStrength_signal();
 
 protected:
+    //=========================================================================================================
+    /**
+    * Generates the UI representation of the CNTK Network
+    */
     void generateNetwork();
 
 private:
