@@ -2843,7 +2843,7 @@ fiff_long_t FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
         //    Scan numbers may have been messed up
         //
         chs[k].scanNo = k+1;//+1 because
-        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+//        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
         this->write_ch_info(chs[k]);
     }
 
