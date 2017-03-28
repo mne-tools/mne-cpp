@@ -197,6 +197,84 @@ void Network::setWeightStrength(int strength)
 
 //*************************************************************************************************************
 
+void Network::updateWeights()
+{
+    // Update Weights
+
+    if(!m_pModel)
+        return;
+
+    //
+    // Analyze CNTK Model Structure
+    //
+    QVector<int> layerDim;
+    QVector<MatrixXf> vecWeights;
+    int inDim = 0;
+    int outDim = 0;
+
+    MatrixXf weights;
+    VectorXf bias;
+    int bufferCount;
+
+    size_t i = m_pModel->Parameters().size() - 1;
+    for (int k = 0; k < static_cast<int>(m_pModel->Parameters().size()); ++k, --i) {
+        QString param = QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
+
+        if(param.contains(" x ")) {
+            param.replace(QString("["), QString(""));param.replace(QString("]"), QString(""));
+            QStringList dimensions = param.split(" x ");
+            outDim = dimensions[0].toInt();
+            inDim = dimensions[1].toInt();
+
+            weights.resize(outDim,inDim);
+            bufferCount = 0;
+            for(int m = 0; m < outDim; ++m) {
+                for(int n = 0; n < inDim; ++n) {
+                    weights(m,n) = m_pModel->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
+                    ++bufferCount;
+                }
+            }
+
+            // ToDo put in one class
+            layerDim.append(inDim);
+            vecWeights.append(weights);
+        }
+    }
+    layerDim.append(outDim);
+
+    //
+    // Create items according to the dimensions
+    //
+
+    for(int layer = 0; layer < layerDim.size(); ++layer) {
+
+
+        // Create Edges
+        if(layer - 1 >= 0) {
+
+            // Dimension check
+            if( vecWeights[layer-1].rows() != m_listLayerNodes[layer].size() && vecWeights[layer-1].cols() != m_listLayerNodes[layer-1].size() ) {
+                qCritical("Dimensions do not match.\n");
+                return;
+//                qDebug() << "Dimension Check" << vecWeights[layer-1].rows() << "x" << vecWeights[layer-1].cols();
+//                qDebug() << "Check" << m_listNodes[layer].size() << "x" << m_listNodes[layer-1].size();
+            }
+
+            int count = 0;
+
+            for(int i = 0; i < m_listLayerNodes[layer-1].size(); ++i ) {
+                for(int j = 0; j < m_listLayerNodes[layer].size(); ++j ) {
+                    m_listEdges[layer-1][count]->setWeight(vecWeights[layer-1](j,i));
+                    ++count;
+                }
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void Network::generateNetwork()
 {
 

@@ -88,7 +88,6 @@ class DeepViewer;
 class DISPSHARED_EXPORT Controls : public QWidget
 {
     Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
@@ -114,6 +113,13 @@ public:
     * @param [in] v     The viewer to set
     */
     void setDeepViewer(DeepViewer* v);
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emmitted when training of the network is requested
+    */
+    void requestTraining_signal();
 
 private:
     //=========================================================================================================
@@ -145,6 +151,12 @@ private:
     * Creates the layout
     */
     void createLayout();
+
+    //=========================================================================================================
+    /**
+    * Request training after training button was pushed
+    */
+    void requestTraining();
 
 private:
     DeepViewer* m_pDeepViewer;                  /**< The deep view which this control is connected to */

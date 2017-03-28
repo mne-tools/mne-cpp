@@ -69,6 +69,7 @@ using namespace ANSHAREDLIB;
 using namespace Eigen;
 using namespace DEEPLIB;
 using namespace DISPLIB;
+using namespace DISPCHARTSLIB;
 //using namespace QtCharts;
 using namespace CNTK;
 
@@ -147,7 +148,8 @@ void DeepCNTK::init()
     // Init view
     //
     if(!m_pControlPanel) {
-        m_pControlPanel = new Controls();
+        m_pControlPanel = new Controls;
+        connect(m_pControlPanel, &Controls::requestTraining_signal, this, &DeepCNTK::trainModel);
     }
 
     //
@@ -282,4 +284,20 @@ void DeepCNTK::trainModel()
     QVector<double> vecLoss, vecError;
     generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
     m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+
+    qDebug() << "\n Finished training \n";
+
+    //Plot error
+    LinePlot *error_chartView = new LinePlot(vecError,"Training Error");
+    error_chartView->show();
+
+    //Plot loss
+    LinePlot *loss_chartView = new LinePlot(vecLoss,"Loss Error");
+    loss_chartView->show();
+
+   // Update Deep Viewer
+    if(m_pDeepViewer) {
+        m_pDeepViewer->updateModel();
+    }
+
 }
