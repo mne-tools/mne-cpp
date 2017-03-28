@@ -1,7 +1,7 @@
 <div align="center">
   <img src="http://www.mne-cpp.org/wp-content/uploads/2016/06/MNE-CPP_GitHub_Logo.png" width="600" height="300" alt="MNE-CPP"><br><br>
 </div>
-​
+
 -----------------
 
 | **`Windows`** | **`Linux / macOS`** | **`Dynamic Testing`** | **`Static Analysis`** | **`Support`** | **`Cite`** |
