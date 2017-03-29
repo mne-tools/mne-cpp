@@ -41,6 +41,7 @@
 #include "network.h"
 #include "node.h"
 #include "edge.h"
+#include <deep/deep.h>
 
 
 //*************************************************************************************************************
@@ -63,6 +64,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DEEPLIB;
 using namespace DISPLIB;
 using namespace Eigen;
 
@@ -84,7 +86,7 @@ Network::Network(QObject *parent)
 
 //*************************************************************************************************************
 
-Network::Network(CNTK::FunctionPtr model, QObject *parent)
+Network::Network(Deep::SPtr& model, QObject *parent)
 : QObject(parent)
 , m_pModel(model)
 , m_penStyle(Qt::SolidLine)
@@ -97,7 +99,7 @@ Network::Network(CNTK::FunctionPtr model, QObject *parent)
 
 //*************************************************************************************************************
 
-void Network::setModel(CNTK::FunctionPtr &model)
+void Network::setModel(Deep::SPtr& model)
 {
     m_pModel = model;
     // TODO Update network
@@ -216,9 +218,9 @@ void Network::updateWeights()
     VectorXf bias;
     int bufferCount;
 
-    size_t i = m_pModel->Parameters().size() - 1;
-    for (int k = 0; k < static_cast<int>(m_pModel->Parameters().size()); ++k, --i) {
-        QString param = QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
+    size_t i = m_pModel->getModel()->Parameters().size() - 1;
+    for (int k = 0; k < static_cast<int>(m_pModel->getModel()->Parameters().size()); ++k, --i) {
+        QString param = QString::fromStdWString(m_pModel->getModel()->Parameters()[i].Shape().AsString());
 
         if(param.contains(" x ")) {
             param.replace(QString("["), QString(""));param.replace(QString("]"), QString(""));
@@ -230,7 +232,7 @@ void Network::updateWeights()
             bufferCount = 0;
             for(int m = 0; m < outDim; ++m) {
                 for(int n = 0; n < inDim; ++n) {
-                    weights(m,n) = m_pModel->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
+                    weights(m,n) = m_pModel->getModel()->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
                     ++bufferCount;
                 }
             }
@@ -293,15 +295,15 @@ void Network::generateNetwork()
     VectorXf bias;
     int bufferCount;
 
-    size_t i = m_pModel->Parameters().size() - 1;
-    for (int k = 0; k < static_cast<int>(m_pModel->Parameters().size()); ++k, --i) {
-        fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
-        fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
+    size_t i = m_pModel->getModel()->Parameters().size() - 1;
+    for (int k = 0; k < static_cast<int>(m_pModel->getModel()->Parameters().size()); ++k, --i) {
+        fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->getModel()->Parameters().size() - i);
+        fprintf(stderr,"Dim: %ls\n",m_pModel->getModel()->Parameters()[i].Shape().AsString().c_str());
 
 
-        fprintf(stderr,"Value Dim: %ls\n",m_pModel->Parameters()[i].Value()->Shape().AsString().c_str());
+        fprintf(stderr,"Value Dim: %ls\n",m_pModel->getModel()->Parameters()[i].Value()->Shape().AsString().c_str());
 
-        QString param = QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
+        QString param = QString::fromStdWString(m_pModel->getModel()->Parameters()[i].Shape().AsString());
 
         if(param.contains(" x ")) {
             param.replace(QString("["), QString(""));param.replace(QString("]"), QString(""));
@@ -313,7 +315,7 @@ void Network::generateNetwork()
             bufferCount = 0;
             for(int m = 0; m < outDim; ++m) {
                 for(int n = 0; n < inDim; ++n) {
-                    weights(m,n) = m_pModel->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
+                    weights(m,n) = m_pModel->getModel()->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
                     ++bufferCount;
                 }
             }

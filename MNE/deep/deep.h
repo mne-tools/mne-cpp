@@ -66,6 +66,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -93,8 +94,9 @@ namespace DEEPLIB
 *
 * @brief Deep CNTK wrapper to train and evaluate models
 */
-class DEEPSHARED_EXPORT Deep
+class DEEPSHARED_EXPORT Deep : public QObject
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<Deep> SPtr;            /**< Shared pointer type for Deep. */
     typedef QSharedPointer<const Deep> ConstSPtr; /**< Const shared pointer type for Deep. */
@@ -103,7 +105,7 @@ public:
     /**
     * Default constructor
     */
-    Deep();
+    Deep(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -244,11 +246,16 @@ public:
     */
     bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
+    void cancelTraining();
+
     //=========================================================================================================
     /**
     * Print the model structure
     */
     void print();
+
+signals:
+
 
 protected:
     //=========================================================================================================
@@ -294,7 +301,6 @@ protected:
     * @return true when variable was found, false otherwise.
     */
     inline static bool getOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
-
 
 private:
 

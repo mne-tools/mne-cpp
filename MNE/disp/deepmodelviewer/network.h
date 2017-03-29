@@ -47,14 +47,6 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CNTK INCLUDES
-//=============================================================================================================
-
-#include <CNTKLibrary.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -62,6 +54,11 @@
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
+
+namespace DEEPLIB
+{
+class Deep;
+}
 
 
 //*************************************************************************************************************
@@ -107,10 +104,10 @@ public:
     /**
     * Constructs an Network with parent object parent.
     *
-    * @param [in] model     The CNTK model
-    * @param [in] parent    The parent of the Network
+    * @param [in] deepModel     The CNTK Model Wrapper
+    * @param [in] parent        The parent of the Network
     */
-    Network(CNTK::FunctionPtr model, QObject *parent = Q_NULLPTR);
+    Network(QSharedPointer<DEEPLIB::Deep>& deepModel, QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -120,11 +117,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the CNTK Model v2
+    * Sets the CNTK Model Wrapper
     *
-    * @param [in] model     Model to set
+    * @param [in] deepModel     CNTK Model Wrapper
     */
-    void setModel(CNTK::FunctionPtr& model);
+    void setModel(QSharedPointer<DEEPLIB::Deep>& deepModel);
 
     //=========================================================================================================
     /**
@@ -132,7 +129,7 @@ public:
     *
     * @return the current CNTK model v2
     */
-    inline CNTK::FunctionPtr model() const;
+    inline QSharedPointer<DEEPLIB::Deep> model() const;
 
     //=========================================================================================================
     /**
@@ -258,9 +255,9 @@ protected:
     void generateNetwork();
 
 private:
-    CNTK::FunctionPtr   m_pModel;   /**< The CNTK model v2 */
+    QSharedPointer<DEEPLIB::Deep>   m_pModel;    /**< CNTK Model Wrapper */
 
-    Qt::PenStyle        m_penStyle; /**< Current weight pen style */
+    Qt::PenStyle        m_penStyle;     /**< Current weight pen style */
 
     float               m_weightThreshold;  /**< Threshold of weights to show [0.00, 1.00] */
     float               m_weightStrength;   /**< The pen stroke size */
@@ -276,7 +273,7 @@ private:
 //=============================================================================================================
 
 
-CNTK::FunctionPtr Network::model() const
+QSharedPointer<DEEPLIB::Deep> Network::model() const
 {
     return m_pModel;
 }

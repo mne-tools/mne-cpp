@@ -46,6 +46,8 @@
 #include "node.h"
 #include "edge.h"
 
+#include <deep/deep.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -69,6 +71,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DEEPLIB;
 using namespace DISPLIB;
 using namespace Eigen;
 
@@ -104,7 +107,7 @@ DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 
 //*************************************************************************************************************
 
-DeepViewer::DeepViewer(CNTK::FunctionPtr model, bool embeddedControl, QWidget *parent)
+DeepViewer::DeepViewer(Deep::SPtr& model, bool embeddedControl, QWidget *parent)
 : QWidget(parent)
 , m_pView(new View)
 , m_pNetwork(new Network(model))
@@ -146,7 +149,7 @@ Network* DeepViewer::getNetwork() const
 
 //*************************************************************************************************************
 
-void DeepViewer::setModel(CNTK::FunctionPtr &model)
+void DeepViewer::setModel(Deep::SPtr& model)
 {
     Q_UNUSED(model)
 }

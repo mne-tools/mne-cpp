@@ -155,7 +155,7 @@ private:
     QDockWidget*                    m_pControl;         /**< Control Widget */
 
     // View
-    DISPLIB::DeepViewer*      m_pDeepViewer;      /**< Viewer */
+    DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
 };
 
 } // NAMESPACE

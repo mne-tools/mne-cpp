@@ -41,7 +41,7 @@ CONFIG += plugin
 
 DEFINES += DEEPCNTK_LIBRARY
 
-QT += gui widgets 3dextras charts
+QT += gui widgets 3dextras charts concurrent
 
 TARGET = deepcntk
 CONFIG(debug, debug|release) {

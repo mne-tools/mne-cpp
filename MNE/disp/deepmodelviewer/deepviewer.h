@@ -55,20 +55,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CNTK INCLUDES
-//=============================================================================================================
-
-#include <CNTKLibrary.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 QT_BEGIN_NAMESPACE
 class QGraphicsScene;
 QT_END_NAMESPACE
+
+namespace DEEPLIB
+{
+class Deep;
+}
 
 
 //*************************************************************************************************************
@@ -118,7 +115,7 @@ public:
     * @param[in] embeddedControl    Whether the Deep Viewer Control should be embedded, i.e., generated within the Viewer
     * @param[in] parent             The parent widget
     */
-    DeepViewer(CNTK::FunctionPtr model, bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
+    DeepViewer(QSharedPointer<DEEPLIB::Deep>& model, bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -142,7 +139,7 @@ public:
     *
     * @param[in] model      The CNTK model which should be represented by the viewer
     */
-    void setModel(CNTK::FunctionPtr& model);
+    void setModel(QSharedPointer<DEEPLIB::Deep>& model);
 
     //=========================================================================================================
     /**

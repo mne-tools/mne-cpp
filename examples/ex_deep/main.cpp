@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 
     QVector<double> vecLoss, vecError;
     generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-    deep_1.trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+    deep_1.trainModel(features, labels, vecLoss, vecError, minibatch_size);
 
     qDebug() << "\n Finished training \n";
 

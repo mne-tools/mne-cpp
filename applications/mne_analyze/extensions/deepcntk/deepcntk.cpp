@@ -53,6 +53,16 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtConcurrent>
+#include <QFutureWatcher>
+#include <QProgressDialog>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // CNTK INCLUDES
 //=============================================================================================================
 
@@ -157,11 +167,12 @@ void DeepCNTK::init()
     //
     if(!m_pDeepViewer) {
         if(m_pDeep) {
-            m_pDeepViewer = new DeepViewer(m_pDeep->getModel(), false);
+            m_pDeepViewer = new DeepViewer(m_pDeep, false);
         }
         else {
             m_pDeepViewer = new DeepViewer(false);
         }
+
         m_pControlPanel->setDeepViewer(m_pDeepViewer);
         m_pDeepViewer->setWindowTitle("Deep CNTK");
     }
@@ -261,6 +272,11 @@ void DeepCNTK::setupModel()
 
 void DeepCNTK::trainModel()
 {
+//    QFutureWatcher<bool> trainFutureWatcher;
+//    QProgressDialog progressDialog("Train model...", "Cancel Training", 0, 0, m_pDeepViewer, Qt::Dialog);
+
+    //progress.open(m_pDeep.data(),&Deep::cancelTraining);
+
     //
     // Training
     //
@@ -283,7 +299,19 @@ void DeepCNTK::trainModel()
 
     QVector<double> vecLoss, vecError;
     generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+
+
+//    progressDialog.setRange(0,num_samples/minibatch_size);
+
+    //Run the training in seperate thread
+//    trainFutureWatcher.setFuture(QtConcurrent::run( m_pDeep.data(),
+//                                                    &Deep::trainModel,
+//                                                    features, labels, vecLoss, vecError, minibatch_size));
     m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+
+//    progressDialog.exec();
+
+//    trainFutureWatcher.waitForFinished();
 
     qDebug() << "\n Finished training \n";
 
