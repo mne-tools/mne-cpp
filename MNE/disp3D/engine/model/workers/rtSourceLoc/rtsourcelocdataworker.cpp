@@ -538,6 +538,9 @@ void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
     } else if(sColormapType == "Hot") {        
         m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
         m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
+    } else if(sColormapType == "Jet") {
+        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToJet;
+        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToJet;
     }
 }
 
@@ -755,7 +758,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     leftHemi.vecVertNo = m_lVisualizationInfo[0].vVertNo;
     leftHemi.matVertPos = matVertPosLeftHemi;
     leftHemi.iDistPow = 3;
-    leftHemi.dThresholdDistance = 0.003;
+    leftHemi.dThresholdDistance = 0.005;
     inputData.append(leftHemi);
 
     SmoothOperatorInfo rightHemi;
@@ -764,7 +767,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     rightHemi.vecVertNo = m_lVisualizationInfo[1].vVertNo;
     rightHemi.matVertPos = matVertPosRightHemi;
     rightHemi.iDistPow = 3;
-    rightHemi.dThresholdDistance = 0.003;
+    rightHemi.dThresholdDistance = 0.005;
     inputData.append(rightHemi);
 
     QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);
