@@ -75,10 +75,12 @@ else {
 !isEmpty( CNTK_INCLUDE_DIR ) {
     LIBS += -L$${CNTK_LIBRARY_DIR}
     CONFIG(debug, debug|release) {
-        LIBS += -lCNTKLibrary-2.0 \
+        LIBS += -lMNE$${MNE_LIB_VERSION}Deepd \
+                -lCNTKLibrary-2.0 \
     }
     else {
-        LIBS += -lCNTKLibrary-2.0 \
+        LIBS += -lMNE$${MNE_LIB_VERSION}Deep \
+                -lCNTKLibrary-2.0 \
     }
 }
 

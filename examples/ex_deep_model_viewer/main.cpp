@@ -140,10 +140,10 @@ int main(int argc, char *argv[])
     DeviceDescriptor device = DeviceDescriptor::CPUDevice();
     size_t input_dim = 4;
     size_t num_output_classes = 3;
-    Deep deep;
+    Deep::SPtr deep(new Deep);
     FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
-    deep.setModel(model);
-    deep.print();
+    deep->setModel(model);
+    deep->print();
 
     //
     // Training
@@ -158,12 +158,12 @@ int main(int argc, char *argv[])
 
     QVector<double> vecLoss, vecError;
     generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-    deep.trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+    deep->trainModel(features, labels, vecLoss, vecError, minibatch_size);
 
     //
     // Create the viewer
     //
-    DeepViewer window(model);
+    DeepViewer window(deep);
     window.showMaximized();
 
     return a.exec();

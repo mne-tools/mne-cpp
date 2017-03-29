@@ -75,7 +75,8 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Deep::Deep()
+Deep::Deep(QObject *parent)
+: QObject(parent)
 {
 }
 
@@ -538,6 +539,14 @@ bool Deep::trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& t
 //    qDebug() << "Finished minibatch training: loss" << loss << "; error" << error << "; samples" << minibatch_samples;
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void Deep::cancelTraining()
+{
+    qDebug() << "cancelTraining()";
 }
 
 
