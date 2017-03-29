@@ -82,8 +82,6 @@ using namespace FIFFLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::vector <double> m_base_arr;
-
 Eigen::MatrixXd pinv(Eigen::MatrixXd a)
 {
     double epsilon = std::numeric_limits<double>::epsilon();
@@ -822,7 +820,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const
     }
     //Do the concurrent filtering
     if(!lCoilData.isEmpty()) {
-        //Do sequential
+//        //Do sequential
 //        for(int l = 0; l < lCoilData.size(); ++l) {
 //            doDipfitConcurrent(lCoilData[l]);
 //        }
