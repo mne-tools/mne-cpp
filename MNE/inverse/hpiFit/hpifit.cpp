@@ -720,7 +720,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     coil = dipfit(coil, sensors, amp, numCoils, matProjectorsInnerind);
 
-    Eigen::Matrix4d trans = computeTransformation(headHPI,coil.pos);
+    Eigen::Matrix4d trans = computeTransformation(headHPI, coil.pos);
+    //Eigen::Matrix4d trans = computeTransformation(coil.pos, headHPI);
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
@@ -820,15 +821,15 @@ CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const
     }
     //Do the concurrent filtering
     if(!lCoilData.isEmpty()) {
-//        //Do sequential
-//        for(int l = 0; l < lCoilData.size(); ++l) {
-//            doDipfitConcurrent(lCoilData[l]);
-//        }
+        //Do sequential
+        for(int l = 0; l < lCoilData.size(); ++l) {
+            doDipfitConcurrent(lCoilData[l]);
+        }
 
-        //Do concurrent
-        QFuture<void> future = QtConcurrent::map(lCoilData,
-                                             doDipfitConcurrent);
-        future.waitForFinished();
+//        //Do concurrent
+//        QFuture<void> future = QtConcurrent::map(lCoilData,
+//                                             doDipfitConcurrent);
+//        future.waitForFinished();
 
         //Transform results to final coil information
         for(qint32 i = 0; i < lCoilData.size(); ++i) {
@@ -856,7 +857,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
     double meanx,meany,meanz,normf;
 
     for(int i = 0; i < 15; ++i) {
-        // Calcualte translation
+        // Calcualte mean translation for all points -> centroid of both data sets
         xdiff = NH.col(0) - BT.col(0);
         ydiff = NH.col(1) - BT.col(1);
         zdiff = NH.col(2) - BT.col(2);
@@ -865,7 +866,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
         meany = ydiff.mean();
         meanz = zdiff.mean();
 
-        // Apply translation
+        // Apply translation -> bring both data sets to the same center location
         for (int j = 0; j < BT.rows(); ++j) {
             BT(j,0) = BT(j,0) + meanx;
             BT(j,1) = BT(j,1) + meany;
@@ -878,6 +879,13 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
         Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
 
         Q = svd.matrixU() * svd.matrixV().transpose();
+
+        //Handle special reflection case
+        if(Q.determinant() < 0) {
+            Q(0,2) = Q(0,2) * -1;
+            Q(1,2) = Q(1,2) * -1;
+            Q(2,2) = Q(2,2) * -1;
+        }
 
         // Apply rotation on translated points
         BT = BT * Q;
@@ -898,7 +906,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
         Trans(1,3) = meany;
         Trans(2,3) = meanz;
 
-        // Safe rotation and translation to final amtrix for next iteration step
+        // Safe rotation and translation to final matrix for next iteration step
         transFinal = Rot * Trans * transFinal;
     }
 
