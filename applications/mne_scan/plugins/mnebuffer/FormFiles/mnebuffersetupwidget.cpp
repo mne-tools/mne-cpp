@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     %{HdrFileName}
-* @author   %{author} <%{eMail}>;
+* @file     dummysetupwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Eric Larson <larson.eric.d@gmail.com>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, %{author} and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh, Eric Larson and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +30,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     %{CN} class declaration.
+* @brief    Contains the implementation of the MneBufferSetupWidget class.
 *
 */
-
-#ifndef %{GUARD}
-#define %{GUARD}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "mnebuffersetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -48,88 +47,45 @@
 // QT INCLUDES
 //=============================================================================================================
 
-%{JS: QtSupport.qtIncludes([ 'QtCore/QSharedPointer' ,
-						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
-                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
-                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : '' ],
-						   [ 'QtCore/QSharedPointer',
-						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
-                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
-                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : ''])}\
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
+
+using namespace MNEBUFFERPLUGIN;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE %{JS: Cpp.namespaces('%{Class}')[0]}
-//=============================================================================================================
-%{JS: Cpp.openNamespaces('%{Class}')}
-
-//*************************************************************************************************************
-//=============================================================================================================
-// %{JS: Cpp.namespaces('%{Class}')[0]} FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//=============================================================================================================
-/**
-* Description of what this class is intended to do (in detail).
-*
-* @brief Brief description of this class.
-*/
-
-@if '%{Base}'
-class %{CN} : public %{Base}
-@else
-class %{CN}
-@endif
+MneBufferSetupWidget::MneBufferSetupWidget(MneBuffer* toolbox, QWidget *parent)
+: QWidget(parent)
+, m_pMneBuffer(toolbox)
 {
-@if %{isQObject}
-     Q_OBJECT
-@endif
+    ui.setupUi(this);
 
-public:
-    typedef QSharedPointer<%{CN}> SPtr;            /**< Shared pointer type for %{CN}. */
-    typedef QSharedPointer<const %{CN}> ConstSPtr; /**< Const shared pointer type for %{CN}. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a %{CN} object.
-    */
-@if '%{Base}' === 'QObject'
-    explicit %{CN}(QObject *parent = 0);
-@elsif '%{Base}' === 'QWidget' || '%{Base}' === 'QMainWindow'
-    explicit %{CN}(QWidget *parent = 0);
-@else
-    %{CN}();
-@endif
-	
-@if %{isQObject}
-signals:
-@endif
-protected:
-	
-private:
-
-
-};
+    //Always connect GUI elemts after ui.setpUi has been called
+    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 
-%{JS: Cpp.closeNamespaces('%{Class}')}
-#endif // %{GUARD}
+MneBufferSetupWidget::~MneBufferSetupWidget()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void MneBufferSetupWidget::showAboutDialog()
+{
+    MneBufferAboutWidget aboutDialog(this);
+    aboutDialog.exec();
+}

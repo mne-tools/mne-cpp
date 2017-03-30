@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     %{HdrFileName}
-* @author   %{author} <%{eMail}>;
+* @file     mnebufferwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;;
+*           Eric Larson <larson.eric.d@gmail.com>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, %{author} and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh, Eric Larson and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     %{CN} class declaration.
+* @brief    Contains the declaration of the MneBufferWidget class.
 *
 */
 
-#ifndef %{GUARD}
-#define %{GUARD}
-
+#ifndef MNEBUFFERWIDGET_H
+#define MNEBUFFERWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "../ui_mnebuffertoolbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -48,20 +50,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-%{JS: QtSupport.qtIncludes([ 'QtCore/QSharedPointer' ,
-						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
-                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
-                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : '' ],
-						   [ 'QtCore/QSharedPointer',
-						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
-                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
-                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : ''])}\
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE MNEBUFFERPLUGIN
 //=============================================================================================================
+
+namespace MNEBUFFERPLUGIN
+{
 
 
 //*************************************************************************************************************
@@ -70,66 +68,36 @@
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE %{JS: Cpp.namespaces('%{Class}')[0]}
-//=============================================================================================================
-%{JS: Cpp.openNamespaces('%{Class}')}
-
-//*************************************************************************************************************
-//=============================================================================================================
-// %{JS: Cpp.namespaces('%{Class}')[0]} FORWARD DECLARATIONS
-//=============================================================================================================
-
-
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* DECLARE CLASS MneBufferWidget
 *
-* @brief Brief description of this class.
+* @brief The MneBufferWidget class provides a MNE Buffer widget structure.
 */
-
-@if '%{Base}'
-class %{CN} : public %{Base}
-@else
-class %{CN}
-@endif
+class MneBufferWidget : public QWidget
 {
-@if %{isQObject}
-     Q_OBJECT
-@endif
+    Q_OBJECT
 
 public:
-    typedef QSharedPointer<%{CN}> SPtr;            /**< Shared pointer type for %{CN}. */
-    typedef QSharedPointer<const %{CN}> ConstSPtr; /**< Const shared pointer type for %{CN}. */
+    typedef QSharedPointer<MneBufferWidget> SPtr;         /**< Shared pointer type for MneBufferWidget. */
+    typedef QSharedPointer<MneBufferWidget> ConstSPtr;    /**< Const shared pointer type for MneBufferWidget. */
 
     //=========================================================================================================
     /**
-    * Constructs a %{CN} object.
+    * Constructs a MneBufferWidget.
     */
-@if '%{Base}' === 'QObject'
-    explicit %{CN}(QObject *parent = 0);
-@elsif '%{Base}' === 'QWidget' || '%{Base}' === 'QMainWindow'
-    explicit %{CN}(QWidget *parent = 0);
-@else
-    %{CN}();
-@endif
-	
-@if %{isQObject}
-signals:
-@endif
-protected:
-	
+    explicit MneBufferWidget(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the MneBufferWidget.
+    */
+    ~MneBufferWidget();
+
 private:
-
-
+    Ui::MneBufferToolbarWidget* ui;        /**< The UI class specified in the designer. */
 };
 
+}   //namespace
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-%{JS: Cpp.closeNamespaces('%{Class}')}
-#endif // %{GUARD}
+#endif // MNEBUFFERWIDGET_H

@@ -262,7 +262,7 @@ protected:
     void generateNetwork();
 
 private:
-    QSharedPointer<DEEPLIB::Deep>   m_pModel;    /**< CNTK Model Wrapper */
+    QSharedPointer<DEEPLIB::Deep> m_pModel; /**< CNTK Model Wrapper */
 
     Qt::PenStyle        m_penStyle;         /**< Current weight pen style */
 
@@ -278,7 +278,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 QSharedPointer<DEEPLIB::Deep> Network::model() const
 {
