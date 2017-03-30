@@ -93,7 +93,7 @@ public:
      * constructs the SsvepBciScreen object
      *
      */
-    SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QOpenGLWidget *parent = 0 );
+    SsvepBciScreen(SsvepBci *pSsvepBci, SsvepBciSetupStimulusWidget *pSsvepBciSetupStimulusWidget, QOpenGLWidget *parent = 0 );
 
     //=========================================================================================================
     /**
@@ -134,8 +134,8 @@ public slots:
     void clearScreen();
 
 private:
-    QSharedPointer<SsvepBci>                        m_pSsvepBci;                        /**< pointer to referring SsvepBci class */
-    QSharedPointer<SsvepBciSetupStimulusWidget>     m_pSsvepBciSetupStimulusWidget;     /**< pointer to referring SsvepBciSetupStimulusWidget class */
+    SsvepBci*                       m_pSsvepBci;                        /**< pointer to referring SsvepBci class */
+    SsvepBciSetupStimulusWidget*    m_pSsvepBciSetupStimulusWidget;     /**< pointer to referring SsvepBciSetupStimulusWidget class */
     // draw items
     QList<SsvepBciFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
     QSharedPointer<ScreenKeyboard>  m_pScreenKeyboard;  /**< pointer that holds the Screen-keyboard */

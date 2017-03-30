@@ -217,7 +217,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
             data.setValue(colDefault);
-            item->setData(data, MetaTreeItemRoles::PointColor);            
+            item->setData(data, MetaTreeItemRoles::PointColor);
             item->setData(data, Qt::DecorationRole);
         }
     }

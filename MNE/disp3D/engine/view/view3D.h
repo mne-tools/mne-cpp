@@ -227,10 +227,10 @@ protected:
 
     QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
 
-    QVector3D                           m_vecCameraTrans;               /**< The camera translation vector. */
-    QVector3D                           m_vecCameraTransOld;            /**< The camera old translation vector. */
-    QVector3D                           m_vecCameraRotation;            /**< The camera rotation vector. */
-    QVector3D                           m_vecCameraRotationOld;         /**< The camera old rotation vector. */
+    QVector3D                           m_vecViewTrans;               /**< The camera translation vector. */
+    QVector3D                           m_vecViewTransOld;            /**< The camera old translation vector. */
+    QVector3D                           m_vecViewRotation;            /**< The camera rotation vector. */
+    QVector3D                           m_vecViewRotationOld;         /**< The camera old rotation vector. */
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;        /**< The animations for each 3D object. */
     QList<QPair<QPointer<Qt3DRender::QPointLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */

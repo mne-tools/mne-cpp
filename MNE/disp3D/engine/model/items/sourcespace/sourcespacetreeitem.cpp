@@ -173,7 +173,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
             pos.setZ(sourcePos(2));
 
             Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.0015f);
+            sourceSphere->setRadius(0.001f);
             pSourceSphereEntity->addComponent(sourceSphere);
 
             pSourceSphereEntity->setPosition(pos);

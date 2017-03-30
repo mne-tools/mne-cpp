@@ -56,7 +56,7 @@ using namespace REFERENCEPLUGIN;
 //=============================================================================================================
 
 ReferenceAboutWidget::ReferenceAboutWidget(QWidget *parent)
-    : QDialog(parent)
+: QDialog(parent)
 {
     ui.setupUi(this);
 }

@@ -111,6 +111,14 @@ void AbstractSurfaceTreeItem::setMaterial(QPointer<Qt3DRender::QMaterial> pMater
 
 //*************************************************************************************************************
 
+QPointer<Renderable3DEntity> AbstractSurfaceTreeItem::getRenderableEntity()
+{
+    return m_pRenderable3DEntity;
+}
+
+
+//*************************************************************************************************************
+
 void AbstractSurfaceTreeItem::initItem()
 {
     this->setEditable(false);

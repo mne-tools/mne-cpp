@@ -45,6 +45,8 @@
 
 #include <fiff/fiff_coord_trans.h>
 
+#include <rtProcessing/rthpis.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,6 +76,7 @@ namespace Ui {
 namespace DISP3DLIB {
     class View3D;
     class Data3DTreeModel;
+    class BemTreeItem;
 }
 
 namespace FIFFLIB {
@@ -123,20 +126,34 @@ public:
     /**
     * Set the data needed for fitting.
     *
-    * @param[in] data  the data matrix
+    * @param[in] matData  The data matrix
     */
-    void setData(const Eigen::MatrixXd& data);
+    void setData(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
-    * Set the isRunning flag.
+    * Get GOF per coil in mm.
     *
-    * @param[in] bStatus  Whether data is streamed and the thread is running, which uses this hpi dialog.
+    * @return   The GOF vector
     */
-    void setIsRunning(bool bStatus);
+    QVector<double> getGOF();
+
+    //=========================================================================================================
+    /**
+    * Returns if last fit was ok.
+    *
+    * @return   True if last fit was ok.
+    */
+    bool wasLastFitOk();
 
 protected:
-     virtual void closeEvent( QCloseEvent * event );
+    virtual void closeEvent( QCloseEvent * event );
+
+    //=========================================================================================================
+    /**
+    * Update the projectors for SSP and Comps.
+    */
+    void updateProjections();
 
     //=========================================================================================================
     /**
@@ -144,12 +161,10 @@ protected:
     *
     * @param[in] digPointSet                    The new digitizer set.
     * @param[in] fittedPointSet                 The new fitted dipoles set.
-    * @param[in] vGof                           The goodness of fit in mm for each fitted HPI coil.
     * @param[in] bSortOutAdditionalDigitizer    Whether additional or extra digitized points dhould be sorted out. Too many points could lead to 3D performance issues.
     */
     void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet,
                                   const FIFFLIB::FiffDigPointSet& fittedPointSet,
-                                  const QVector<double>& vGof,
                                   bool bSortOutAdditionalDigitizer = true);
 
     //=========================================================================================================
@@ -163,54 +178,115 @@ protected:
     //=========================================================================================================
     /**
     * Read Polhemus data from fif file.
-    *
     */
-    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(QString fileName);
-
-    //=========================================================================================================
-    /**
-    * Perform a single HPI fit.
-    *
-    */
-    void onBtnDoSingleFit();
+    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
 
     //=========================================================================================================
     /**
     * Load a Polhemus file name.
     *
+    * @param[in] fitResult  The fit result coming from the rt HPI class.
+    */
+    void onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);
+
+    //=========================================================================================================
+    /**
+    * Load a Polhemus file name.
     */
     void onBtnLoadPolhemusFile();
 
     //=========================================================================================================
     /**
     * Load a Polhemus file name.
-    *
     */
     void onFreqsChanged();
 
     //=========================================================================================================
     /**
-    * Perform a HPI fitting procedure.
-    *
-    * @param[in] vFreqs    the frequencies for each coil.
+    * Load a Polhemus file name.
     */
-    void performHPIFitting(const QVector<int>& vFreqs);
+    void onDoContinousHPI();
 
-    Ui::HPIWidget*                              ui;                 /**< The HPI dialog. */
+    //=========================================================================================================
+    /**
+    * The max distance value for continous HPI fitting changed.
+    */
+    void onContinousHPIMaxDistChanged();
 
-    QVector<int>                                m_vCoilFreqs;       /**< Vector contains the HPI coil frequencies. */
+    //=========================================================================================================
+    /**
+    * Toggle SSP's and Comp's.
+    */
+    void onSSPCompUsageChanged();
 
-    bool                                        m_bIsRunning;         /**< Is the measurement running or not. Computed via first data received. */
+    //=========================================================================================================
+    /**
+    * Perform a single HPI fit.
+    */
+    void onBtnDoSingleFit();
 
-    Eigen::SparseMatrix<double>                 m_sparseMatCals;    /**< Sparse calibration matrix.*/
-    Eigen::MatrixXd                             m_matValue;         /**< The current data block.*/
+    //=========================================================================================================
+    /**
+    * Updates the error related labels.
+    */
+    void updateErrorLabels();
 
-    QSharedPointer<DISP3DLIB::View3D>           m_pView3D;          /**< The 3D view. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;     /**< The Disp3D model. */
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The FiffInfo. */
+    //=========================================================================================================
+    /**
+    * Updates the transformation related labels.
+    */
+    void updateTransLabels();
+
+    //=========================================================================================================
+    /**
+    * Store the last fit which was ok.
+    *
+    * @param[in] devHeadTrans   The device to head transformation matrix to be stored.
+    * @param[in] fittedCoils    The fitted coils to be stored.
+    */
+    void storeResults(const FIFFLIB::FiffCoordTrans& devHeadTrans, const FIFFLIB::FiffDigPointSet& fittedCoils);
+
+    //=========================================================================================================
+    /**
+    * Updates the head model based on the current head/device transformation.
+    */
+    void updateHeadModel();
+
+    Ui::HPIWidget*                              ui;                     /**< The HPI dialog. */
+
+    QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+    QVector<double>                             m_vGof;                 /**< The goodness of fit in mm for each fitted HPI coil. */
+
+    double                                      m_dMeanErrorDist;       /**< The error distances, averaged over all coil errors. */
+    qint16                                      m_iNubmerBadChannels;   /**< The number of bad channels.*/
+
+    bool                                        m_bUseSSP;              /**< Use SSP's.*/
+    bool                                        m_bUseComp;             /**< Use Comps's.*/
+    bool                                        m_bLastFitGood;         /**< Flag specifying if last fit was ok or not.*/
+
+    Eigen::SparseMatrix<double>                 m_sparseMatCals;        /**< Sparse calibration matrix.*/
+    Eigen::MatrixXd                             m_matValue;             /**< The current data block.*/
+    Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+
+    QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The FiffInfo. */
+    QSharedPointer<RTPROCESSINGLIB::RtHPIS>     m_pRtHPI;               /**< The real-time HPI object. */
+
+    DISP3DLIB::BemTreeItem*                     m_pBemHeadKid;          /**< The BEM head model for a kid. */
+    DISP3DLIB::BemTreeItem*                     m_pBemHeadAdult;        /**< The BEM head model for an adult. */
+
+    double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
 
 signals:
-    void needData();
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user toggled the do HPI check box.
+    *
+    * @param[in] state    Whether to do continous HPI.
+    */
+    void continousHPIToggled(bool state);
 };
+
 } //NAMESPACE
 #endif // HPIWIDGET_H
