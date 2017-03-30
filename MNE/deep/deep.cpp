@@ -75,7 +75,8 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Deep::Deep()
+Deep::Deep(QObject *parent)
+: QObject(parent)
 {
 }
 
@@ -256,6 +257,14 @@ void Deep::runEvaluation(FunctionPtr model, const CNTK::Variable& inputVar, cons
     std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
     model->Forward({{inputVar, inputValue}}, outputs, device);
     outputValue = outputs[outputVar];
+}
+
+
+//*************************************************************************************************************
+
+FunctionPtr Deep::getModel()
+{
+    return m_pModel;
 }
 
 
@@ -530,6 +539,14 @@ bool Deep::trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& t
 //    qDebug() << "Finished minibatch training: loss" << loss << "; error" << error << "; samples" << minibatch_samples;
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void Deep::cancelTraining()
+{
+    qDebug() << "cancelTraining()";
 }
 
 

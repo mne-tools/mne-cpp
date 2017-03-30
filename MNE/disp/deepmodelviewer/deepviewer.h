@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     node.h
+* @file     deepviewer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Node class declaration.
+* @brief    DeepViewer class declaration.
 *
 */
 
-#ifndef NODE_H
-#define NODE_H
+#ifndef DEEPVIEWER_H
+#define DEEPVIEWER_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../disp_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QList>
+#include <QWidget>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -50,10 +58,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
 QT_BEGIN_NAMESPACE
-class QGraphicsSceneMouseEvent;
+class QGraphicsScene;
 QT_END_NAMESPACE
+
+namespace DEEPLIB
+{
+class Deep;
+}
 
 
 //*************************************************************************************************************
@@ -64,83 +76,102 @@ QT_END_NAMESPACE
 namespace DISPLIB
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class Node;
 class Edge;
 class Network;
+class View;
+class Controls;
 
 
 //=============================================================================================================
 /**
-* A Node is a graphical representation of a neuron in the deep viewer
+* Implementing the CNTK Network Viewer
 *
-* @brief A neuron representation
+* @brief The CNTK Network Viewer
 */
-class Node : public QGraphicsItem
+class DISPSHARED_EXPORT DeepViewer : public QWidget
 {
+    Q_OBJECT
 public:
     //=========================================================================================================
     /**
-    * Constructs a Node representing a Neuron
+    * Constructs the DeepViewer which is a child of parent
     *
-    * @param [in] network   The network  of which this node is part of
+    * @param[in] embeddedControl    Whether the Deep Viewer Control should be embedded, i.e., generated within the Viewer
+    * @param[in] parent             The parent widget
     */
-    Node(Network *network);
+    DeepViewer(bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Adds a connected edge to the node
+    * Constructs the DeepViewer which is a child of parent
     *
-    * @param [in] edge      A connected edge
+    * @param[in] model              The CNTK model which should be represented by the view
+    * @param[in] embeddedControl    Whether the Deep Viewer Control should be embedded, i.e., generated within the Viewer
+    * @param[in] parent             The parent widget
     */
-    void addEdge(Edge *edge);
+    DeepViewer(QSharedPointer<DEEPLIB::Deep>& model, bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Returns a list of all connected edges
+    * Returns the view
     *
-    * @return A list of all connected edges
+    * @return the view
     */
-    QList<Edge *> edges() const;
-
-    enum { Type = UserType + 1 };
-    int type() const override { return Type; }
-
-    QRectF boundingRect() const override;
-    QPainterPath shape() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-protected:
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    View* getView() const;
 
     //=========================================================================================================
     /**
-    * This event handler is reimplemented to receive mouse press events for the widget.
+    * Returns the CNTK Network UI representation
     *
-    * @param [in] event     Mouse press events for the widget
+    * @return the view
     */
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    Network* getNetwork() const;
 
     //=========================================================================================================
     /**
-    * This event handler is reimplemented to receive mouse release events for the widget.
+    * The CNTK model which should be represented by the viewer
     *
-    * @param [in] event     Mouse release events for the widget
+    * @param[in] model      The CNTK model which should be represented by the viewer
     */
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void setModel(QSharedPointer<DEEPLIB::Deep>& model);
+
+    //=========================================================================================================
+    /**
+    * Updates the view according to the current model set
+    */
+    void updateModel();
 
 private:
-    float m_fDiameter;              /**< The diameter */
-    float m_fRadius;                /**< Half of diameter - for drawing speed already calculated beforehand */
+    //=========================================================================================================
+    /**
+    * Initializes the GraphicsScene and setups connections
+    */
+    void initScene();
 
-    QList<Edge *> m_qListEdges;     /**< The list of connected edges */
-    Network* m_pNetwork;            /**< The network this node is part of */
+    //=========================================================================================================
+    /**
+    * Update scene items, i.e, attaches or removes items according to their weights
+    */
+    void updateSceneItems();
 
-    bool m_bIsAttached;             /**< If node is attached to a scene  TODO: Move this to Edge, Node basis class*/
+    //=========================================================================================================
+    /**
+    * Redraw scene - only the part which is within the view rectangle
+    */
+    void redrawScene();
+
+private:
+    View*               m_pView;    /**< The View Port */
+
+    QGraphicsScene*     m_pScene;   /**< The Scene Containing the graphic item */
+
+    Network*            m_pNetwork; /**< The CNTK visual network representation */
 };
 
 //*************************************************************************************************************
@@ -148,8 +179,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
-
 } // NAMESPACE
 
-#endif // NODE_H
+#endif // DEEPVIEWER_H

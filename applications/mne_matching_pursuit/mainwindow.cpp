@@ -2591,7 +2591,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
             FiffRawData raw(t_fileIn);
 
             RowVectorXd cals;
-            FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
+            FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, raw.info, cals, picks);
 
             //   Set up the reading parameters
             fiff_int_t from = raw.first_samp;

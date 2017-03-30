@@ -46,8 +46,11 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
 #include <QPrinter>
 #include <QPrintDialog>
+#endif
+
 #include <qmath.h>
 
 #ifndef QT_NO_OPENGL
@@ -150,39 +153,15 @@ View::View(QWidget *parent)
     rotateSliderLayout->addWidget(rotateRightIcon);
 
     m_pResetButton = new QToolButton;
-    m_pResetButton->setText(tr("Reset"));
+    m_pResetButton->setText(tr("0"));
     m_pResetButton->setEnabled(false);
 
-    // Label layout
-    QHBoxLayout *labelLayout = new QHBoxLayout;
-    m_pSelectModeButton = new QToolButton;//Pointer Mode
-    m_pSelectModeButton->setText(tr("Select"));
-    m_pSelectModeButton->setCheckable(true);
-    m_pSelectModeButton->setChecked(true);
-    m_pDragModeButton = new QToolButton;
-    m_pDragModeButton->setText(tr("Drag"));
-    m_pDragModeButton->setCheckable(true);
-    m_pDragModeButton->setChecked(false);
-    m_pPrintButton = new QToolButton;
-    m_pPrintButton->setIcon(QIcon(QPixmap(":/fileprint.png")));
-
-    QButtonGroup *pointerModeGroup = new QButtonGroup(this);
-    pointerModeGroup->setExclusive(true);
-    pointerModeGroup->addButton(m_pSelectModeButton);
-    pointerModeGroup->addButton(m_pDragModeButton);
-
-    labelLayout->addStretch();
-    labelLayout->addWidget(m_pSelectModeButton);
-    labelLayout->addWidget(m_pDragModeButton);
-    labelLayout->addStretch();
-    labelLayout->addWidget(m_pPrintButton);
-
+    // Layout
     QGridLayout *topLayout = new QGridLayout;
-    topLayout->addLayout(labelLayout, 0, 0);
-    topLayout->addWidget(m_pGgraphicsView, 1, 0);
-    topLayout->addLayout(zoomSliderLayout, 1, 1);
-    topLayout->addLayout(rotateSliderLayout, 2, 0);
-    topLayout->addWidget(m_pResetButton, 2, 1);
+    topLayout->addWidget(m_pGgraphicsView, 0, 0);
+    topLayout->addLayout(zoomSliderLayout, 0, 1);
+    topLayout->addLayout(rotateSliderLayout, 1, 0);
+    topLayout->addWidget(m_pResetButton, 1, 1);
     setLayout(topLayout);
 
     connect(m_pResetButton, &QToolButton::clicked, this, &View::resetView);
@@ -192,13 +171,10 @@ View::View(QWidget *parent)
             this, &View::setResetButtonEnabled);
     connect(m_pGgraphicsView->horizontalScrollBar(), &QScrollBar::valueChanged,
             this, &View::setResetButtonEnabled);
-    connect(m_pSelectModeButton, &QToolButton::toggled, this, &View::togglePointerMode);
-    connect(m_pDragModeButton, &QToolButton::toggled, this, &View::togglePointerMode);
     connect(rotateLeftIcon, &QToolButton::clicked, this, &View::rotateLeft);
     connect(rotateRightIcon, &QToolButton::clicked, this, &View::rotateRight);
     connect(zoomInIcon, &QToolButton::clicked, this, &View::zoomIn);
     connect(zoomOutIcon, &QToolButton::clicked, this, &View::zoomOut);
-    connect(m_pPrintButton, &QToolButton::clicked, this, &View::print);
 
     setupMatrix();
 
@@ -208,7 +184,7 @@ View::View(QWidget *parent)
 
 //*************************************************************************************************************
 
-QGraphicsView *View::getView() const
+QGraphicsView *View::getGraphicsView() const
 {
     return static_cast<QGraphicsView *>(m_pGgraphicsView);
 }
@@ -252,12 +228,12 @@ void View::setupMatrix()
 
 //*************************************************************************************************************
 
-void View::togglePointerMode()
+void View::enableSelectMode(bool selectMode)
 {
-    m_pGgraphicsView->setDragMode(m_pSelectModeButton->isChecked()
+    m_pGgraphicsView->setDragMode(selectMode
                               ? QGraphicsView::RubberBandDrag
                               : QGraphicsView::ScrollHandDrag);
-    m_pGgraphicsView->setInteractive(m_pSelectModeButton->isChecked());
+    m_pGgraphicsView->setInteractive(selectMode);
 }
 
 

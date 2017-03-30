@@ -59,20 +59,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CNTK INCLUDES
-//=============================================================================================================
-
-#include <CNTKLibrary.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace DISPLIB
 {
-    class DeepViewerWidget;
+    class DeepViewer;
     class Controls;
 }
 
@@ -141,9 +133,21 @@ public:
     virtual QWidget* getView();
 
 private:
+    //=========================================================================================================
+    /**
+    * Setup the model
+    */
+    void setupModel();
+
+    //=========================================================================================================
+    /**
+    * Start the model training
+    */
+    void trainModel();
+
+private:
     // Deep Model
     QSharedPointer<DEEPLIB::Deep>   m_pDeep;            /**< CNTK Wrapper */
-    CNTK::FunctionPtr               m_pModel;           /**< CNTK Model */
 
     DISPLIB::Controls*              m_pControlPanel;    /**< View Control Panel */
 
@@ -151,7 +155,7 @@ private:
     QDockWidget*                    m_pControl;         /**< Control Widget */
 
     // View
-    DISPLIB::DeepViewerWidget*      m_pView;            /**< View */
+    DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
 };
 
 } // NAMESPACE

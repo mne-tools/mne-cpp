@@ -39,6 +39,7 @@ include(../../../mne-cpp.pri)
 TEMPLATE = app
 
 QT += gui widgets 3dextras
+qtHaveModule(printsupport): QT += printsupport
 
 TARGET = mne_analyze
 

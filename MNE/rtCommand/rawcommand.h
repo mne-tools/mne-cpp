@@ -122,7 +122,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns wether the received command was in Json format.
+    * Returns whether the received command was in Json format.
     *
     * @return true if received command was in Json format, false otherwise.
     */
