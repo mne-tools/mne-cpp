@@ -138,6 +138,7 @@ public:
     * @return layer-wise lists of nodes
     */
     QList<QList<Node *> > layerNodes() const;
+
     //=========================================================================================================
     /**
     * Sets the layer-wise lists of nodes
@@ -153,6 +154,7 @@ public:
     * @return layer-connection-wise lists of edges
     */
     QList<QList<Edge *> > edges() const;
+
     //=========================================================================================================
     /**
     * Sets the layer-connection-wise lists of edges, representing weights
@@ -176,16 +178,19 @@ public:
     * @return the current pen style
     */
     inline Qt::PenStyle getPenStyle() const;
+
     //=========================================================================================================
     /**
     * Sets solid line as the current pen style
     */
     void setSolidLine();
+
     //=========================================================================================================
     /**
     * Sets dash line as the current pen style
     */
     void setDashLine();
+
     //=========================================================================================================
     /**
     * Sets dot line as the current pen style
@@ -199,6 +204,7 @@ public:
     * @param [in] thr   the weight threshold
     */
     void setWeightThreshold(int thr);
+
     //=========================================================================================================
     /**
     * Returns the weight threshold, i.e., the threshold over which edges should be attached to the scene
@@ -214,6 +220,7 @@ public:
     * @param [in] strength   the weight strength
     */
     void setWeightStrength(int strength);
+
     //=========================================================================================================
     /**
     * Returns the weight strength, i.e., the basic strength multiplier for the edges pen width
@@ -257,7 +264,7 @@ protected:
 private:
     QSharedPointer<DEEPLIB::Deep>   m_pModel;    /**< CNTK Model Wrapper */
 
-    Qt::PenStyle        m_penStyle;     /**< Current weight pen style */
+    Qt::PenStyle        m_penStyle;         /**< Current weight pen style */
 
     float               m_weightThreshold;  /**< Threshold of weights to show [0.00, 1.00] */
     float               m_weightStrength;   /**< The pen stroke size */

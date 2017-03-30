@@ -250,7 +250,6 @@ void Network::updateWeights()
 
     for(int layer = 0; layer < layerDim.size(); ++layer) {
 
-
         // Create Edges
         if(layer - 1 >= 0) {
 
@@ -280,8 +279,9 @@ void Network::updateWeights()
 void Network::generateNetwork()
 {
 
-    if(!m_pModel)
+    if(!m_pModel){
         return;
+    }
 
     //
     // Analyze CNTK Model Structure

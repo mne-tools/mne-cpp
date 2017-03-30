@@ -103,7 +103,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Constructs Deep which is a child of parent
+    *
+    * @param [in] parent    The parent QObject
     */
     Deep(QObject *parent = Q_NULLPTR);
 
@@ -246,6 +248,10 @@ public:
     */
     bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
 
+    //=========================================================================================================
+    /**
+    * Cancel the current training session
+    */
     void cancelTraining();
 
     //=========================================================================================================
