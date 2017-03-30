@@ -66,6 +66,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -93,17 +94,20 @@ namespace DEEPLIB
 *
 * @brief Deep CNTK wrapper to train and evaluate models
 */
-class DEEPSHARED_EXPORT Deep
+class DEEPSHARED_EXPORT Deep : public QObject
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<Deep> SPtr;            /**< Shared pointer type for Deep. */
     typedef QSharedPointer<const Deep> ConstSPtr; /**< Const shared pointer type for Deep. */
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Constructs Deep which is a child of parent
+    *
+    * @param [in] parent    The parent QObject
     */
-    Deep();
+    Deep(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -165,6 +169,14 @@ public:
     * @param [in] device    Device to use for evaluation
     */
     static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Returns the CNTK Model v2
+    *
+    * @return the CNTK Model
+    */
+    CNTK::FunctionPtr getModel();
 
     //=========================================================================================================
     /**
@@ -238,9 +250,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Cancel the current training session
+    */
+    void cancelTraining();
+
+    //=========================================================================================================
+    /**
     * Print the model structure
     */
     void print();
+
+signals:
+
 
 protected:
     //=========================================================================================================
@@ -286,7 +307,6 @@ protected:
     * @return true when variable was found, false otherwise.
     */
     inline static bool getOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
-
 
 private:
 

@@ -160,6 +160,11 @@ void MainWindow::createActions()
     m_pActionTile->setStatusTip(tr("Tile the windows in the mdi window"));
     connect(m_pActionTile, &QAction::triggered, this->m_pMdiView, &MdiView::tileSubWindows);
 
+    m_pActionPrint = new QAction(tr("&Print..."), this);
+    m_pActionPrint->setStatusTip(tr("Prints the current view."));
+    m_pActionPrint->setShortcut(QKeySequence::Print);
+    connect(m_pActionPrint, &QAction::triggered, this->m_pMdiView, &MdiView::printCurrentSubWindow);
+
     //Help QMenu
     m_pActionAbout = new QAction(tr("&About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
@@ -179,6 +184,8 @@ void MainWindow::createMenus()
     m_pMenuView = menuBar()->addMenu(tr("&View"));
     m_pMenuView->addAction(m_pActionCascade);
     m_pMenuView->addAction(m_pActionTile);
+    m_pMenuView->addSeparator();
+    m_pMenuView->addAction(m_pActionPrint);
 
     menuBar()->addSeparator();
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     view.h
+* @file     network.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    View class declaration.
+* @brief    Network class declaration.
 *
 */
 
-#ifndef VIEW_H
-#define VIEW_H
+#ifndef NETWORK_H
+#define NETWORK_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QGraphicsView>
+#include <QGraphicsItem>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -50,11 +50,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+
 QT_BEGIN_NAMESPACE
-class QLabel;
-class QSlider;
-class QToolButton;
+class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
+
+namespace DEEPLIB
+{
+class Deep;
+}
 
 
 //*************************************************************************************************************
@@ -65,170 +69,209 @@ QT_END_NAMESPACE
 namespace DISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class View;
+class Node;
+class Edge;
 
 
 //=============================================================================================================
 /**
-* GraphicsView visualizes the contents of a QGraphicsScene in a scrollable viewport. To create a scene with
-* geometrical items, see QGraphicsScene's documentation.
+* A CNTK Network representation ready for visualization
 *
-* @brief The GraphicsView class provides a widget for displaying the contents of a QGraphicsScene.
+* @brief A CNTK Network representation
 */
-class GraphicsView : public QGraphicsView
+class Network : public QObject
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<Network> SPtr;               /**< Shared pointer type for Network. */
+    typedef QSharedPointer<const Network> ConstSPtr;    /**< Const shared pointer type for Network. */
+
     //=========================================================================================================
     /**
-    * Constructs the GraphicsView
+    * Constructs an Network with parent object parent.
     *
-    * @param [in] v     The View which this is the viewport of
+    * @param [in] parent   The parent of the Network
     */
-    GraphicsView(View *v) : QGraphicsView(), m_pView(v) { }
+    Network(QObject *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Constructs an Network with parent object parent.
+    *
+    * @param [in] deepModel     The CNTK Model Wrapper
+    * @param [in] parent        The parent of the Network
+    */
+    Network(QSharedPointer<DEEPLIB::Deep>& deepModel, QObject *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Network destructor
+    */
+    virtual ~Network() {}
+
+    //=========================================================================================================
+    /**
+    * Sets the CNTK Model Wrapper
+    *
+    * @param [in] deepModel     CNTK Model Wrapper
+    */
+    void setModel(QSharedPointer<DEEPLIB::Deep>& deepModel);
+
+    //=========================================================================================================
+    /**
+    * Returns the CNTK Model v2
+    *
+    * @return the current CNTK model v2
+    */
+    inline QSharedPointer<DEEPLIB::Deep> model() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the layer-wise lists of nodes
+    *
+    * @return layer-wise lists of nodes
+    */
+    QList<QList<Node *> > layerNodes() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the layer-wise lists of nodes
+    *
+    * @param [in] listLayerNodes   layer-wise lists of nodes
+    */
+    void setLayerNodes(const QList<QList<Node *> > &listLayerNodes);
+
+    //=========================================================================================================
+    /**
+    * Returns the layer-connection-wise lists of edges, representing weights
+    *
+    * @return layer-connection-wise lists of edges
+    */
+    QList<QList<Edge *> > edges() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the layer-connection-wise lists of edges, representing weights
+    *
+    * @param [in] listEdges     layer-connection-wise lists of edges
+    */
+    void setEdges(const QList<QList<Edge *> > &listEdges);
+
+    //=========================================================================================================
+    /**
+    * Returns whether Network UI representation was setup
+    *
+    * @return true if Network UI representation was setup, false otherwise
+    */
+    bool isSetup() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current setup pen style
+    *
+    * @return the current pen style
+    */
+    inline Qt::PenStyle getPenStyle() const;
+
+    //=========================================================================================================
+    /**
+    * Sets solid line as the current pen style
+    */
+    void setSolidLine();
+
+    //=========================================================================================================
+    /**
+    * Sets dash line as the current pen style
+    */
+    void setDashLine();
+
+    //=========================================================================================================
+    /**
+    * Sets dot line as the current pen style
+    */
+    void setDotLine();
+
+    //=========================================================================================================
+    /**
+    * Sets the weight threshold, i.e., the threshold over which edges should be attached to the scene
+    *
+    * @param [in] thr   the weight threshold
+    */
+    void setWeightThreshold(int thr);
+
+    //=========================================================================================================
+    /**
+    * Returns the weight threshold, i.e., the threshold over which edges should be attached to the scene
+    *
+    * @return the weight threshold
+    */
+    inline float weightThreshold() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the weight strength, i.e., the basic strength multiplier
+    *
+    * @param [in] strength   the weight strength
+    */
+    void setWeightStrength(int strength);
+
+    //=========================================================================================================
+    /**
+    * Returns the weight strength, i.e., the basic strength multiplier for the edges pen width
+    *
+    * @return the weight strength
+    */
+    inline float weightStrength() const;
+
+    //=========================================================================================================
+    /**
+    * Update the weights according to the current model
+    */
+    void updateWeights();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Signal emitted when the CNTK network UI representation got updated
+    */
+    void update_signal();
+
+    //=========================================================================================================
+    /**
+    * Signal emitted when the threshold weights got updated
+    */
+    void updateWeightThreshold_signal();
+
+    //=========================================================================================================
+    /**
+    * Signal emitted when the weight strength got updated
+    */
+    void updateWeightStrength_signal();
 
 protected:
-#ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QWheelEvent *) override;
-#endif
+    //=========================================================================================================
+    /**
+    * Generates the UI representation of the CNTK Network
+    */
+    void generateNetwork();
 
 private:
-    View *m_pView;      /**< The Widgte of this GraphicsView */
-};
+    QSharedPointer<DEEPLIB::Deep>   m_pModel;    /**< CNTK Model Wrapper */
 
+    Qt::PenStyle        m_penStyle;         /**< Current weight pen style */
 
-//=============================================================================================================
-/**
-* The Deep model View Widget containing the graphics view, as well as view related functions
-*
-* @brief The View Widget containing the graphics view
-*/
-class View : public QWidget
-{
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-    * Constructs the View Widget which is a child of parent
-    *
-    * @param [in] parent    The parent widget
-    */
-    explicit View(QWidget *parent = 0);
+    float               m_weightThreshold;  /**< Threshold of weights to show [0.00, 1.00] */
+    float               m_weightStrength;   /**< The pen stroke size */
 
-    //=========================================================================================================
-    /**
-    * Returns the GraphicsView viewport of this view
-    *
-    * @return GraphicsView viewport
-    */
-    QGraphicsView *getGraphicsView() const;
+    QList< QList<Node*> > m_listLayerNodes; /**< List containing layer-wise Nodes */
+    QList< QList<Edge*> > m_listEdges;      /**< List containing between-layer-wise Edges */
 
-public:
-    //=========================================================================================================
-    /**
-    * Zooms into the scene
-    *
-    * @param [in] level    The zooming level increment
-    */
-    void zoomIn(int level = 1);
-
-    //=========================================================================================================
-    /**
-    * Zooms out of the scene
-    *
-    * @param [in] level    The zooming level decrement
-    */
-    void zoomOut(int level = 1);
-
-#ifndef QT_NO_OPENGL
-    //=========================================================================================================
-    /**
-    * Sets if opengl shpuld be used
-    *
-    * @param [in] useOpengl     if OpenGL should be used
-    */
-    void enableOpenGL(bool useOpengl);
-    //=========================================================================================================
-    /**
-    * Returns if OpenGl is used
-    *
-    * @return if OpenGl is used
-    */
-    bool usesOpenGL() const { return m_bUseOpengl; }
-#endif
-    //=========================================================================================================
-    /**
-    * Sets if antialiasing shpuld be used
-    *
-    * @param [in] useAntialiasing   if antialiasing should be used
-    */
-    void enableAntialiasing(bool useAntialiasing);
-    //=========================================================================================================
-    /**
-    * Returns if Antialiasing is used
-    *
-    * @return if Antialiasing is used
-    */
-    bool usesAntialiasing() const { return m_bUseAntialiasing; }
-
-    //=========================================================================================================
-    /**
-    * Toggles the pointer mode: Select or Drag
-    *
-    * @param [in] selectMode    if select mode should be enabled, otherwise drag mode
-    */
-    void enableSelectMode(bool selectMode);
-
-    //=========================================================================================================
-    /**
-    * Invokes the printing Dialog for the view
-    */
-    void print();
-
-private:
-    //=========================================================================================================
-    /**
-    * Resets the View
-    */
-    void resetView();
-    //=========================================================================================================
-    /**
-    * Enables the Reset button
-    */
-    void setResetButtonEnabled();
-    //=========================================================================================================
-    /**
-    * Sets the rotation Matrix up
-    */
-    void setupMatrix();
-    //=========================================================================================================
-    /**
-    * Rotates left
-    */
-    void rotateLeft();
-    //=========================================================================================================
-    /**
-    * Rotates right
-    */
-    void rotateRight();
-
-private:
-    GraphicsView *m_pGgraphicsView;     /**< The GraphicsView view port of the view */
-
-    QToolButton *m_pResetButton;        /**< Reset Button */
-
-    QSlider *m_pZoomSlider;             /**< Zoom Slider */
-    QSlider *m_pRotateSlider;           /**< Rotate Slider */
-
-    bool m_bUseAntialiasing;    /**< Antialiasing enabled? */
-#ifndef QT_NO_OPENGL
-    bool m_bUseOpengl;          /**< OpenGL enabled? */
-#endif
 };
 
 //*************************************************************************************************************
@@ -236,6 +279,37 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+
+QSharedPointer<DEEPLIB::Deep> Network::model() const
+{
+    return m_pModel;
+}
+
+
+//*************************************************************************************************************
+
+Qt::PenStyle Network::getPenStyle() const
+{
+    return m_penStyle;
+}
+
+
+//*************************************************************************************************************
+
+float Network::weightThreshold() const
+{
+    return m_weightThreshold;
+}
+
+
+//*************************************************************************************************************
+
+float Network::weightStrength() const
+{
+    return m_weightStrength;
+}
+
+
 } // NAMESPACE
 
-#endif // VIEW_H
+#endif // NETWORK_H

@@ -84,7 +84,8 @@ HEADERS += \
     Interfaces/IExtension.h \
     Management/analyzedata.h \
     Management/analyzesettings.h \
-    Management/extensionmanager.h
+    Management/extensionmanager.h \
+    Interfaces/IStandardView.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
