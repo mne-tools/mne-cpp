@@ -225,6 +225,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the current scale.
+    *
+    * @param[in] scale     The new scaling value.
+    */
+    void setScale(float scale);
+
+    //=========================================================================================================
+    /**
     * Sets the value of a specific paramater of the materials for this entity.
     *
     * @param[in] fValue             The value to be set.
@@ -283,10 +291,5 @@ signals:
 };
 
 } // NAMESPACE
-
-#ifndef metatype_renderable3Dentity
-#define metatype_renderable3Dentity
-Q_DECLARE_METATYPE(DISP3DLIB::Renderable3DEntity*)
-#endif
 
 #endif // RENDERABLE3DENTITY_H
