@@ -91,7 +91,7 @@ using namespace RTPROCESSINGLIB;
 /**
 * DECLARE CLASS RTHPI
 *
-* @brieCoilParampi class provides a RtHpi algorithm structure.
+* @brie This class provides a RtHpi algorithm structure.
 */
 class RTHPISHARED_EXPORT RtHpi : public IAlgorithm
 {

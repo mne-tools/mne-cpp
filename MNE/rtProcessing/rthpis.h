@@ -96,7 +96,7 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 //=========================================================================================================
 /**
-* The strucut specifing all data needed to perform coil-wise fitting.
+* The struct specifing all data needed to perform coil-wise fitting.
 */
 struct FittingResult {
     FIFFLIB::FiffDigPointSet fittedCoils;

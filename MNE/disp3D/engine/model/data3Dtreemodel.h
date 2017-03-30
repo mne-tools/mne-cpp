@@ -160,152 +160,152 @@ public:
     /**
     * Adds FreeSurfer brain data SETS.
     *
-    * @param[in] subject            The name of the subject.
+    * @param[in] sSubject           The name of the subject.
     * @param[in] sMriSetName        The name of the MRI set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tSurfaceSet        FreeSurfer surface set.
-    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @param[in] surfaceSet         FreeSurfer surface set.
+    * @param[in] annotationSet      FreeSurfer annotation set.
     *
     * @return                       Returns a QList with the added surface tree items. The ordering
     *                               of the list hereby corresponds to the ordering of the input surface set.
     *                               The list is empty if no item was added.
     */
-    QList<FsSurfaceTreeItem*> addSurfaceSet(const QString& subject,
+    QList<FsSurfaceTreeItem*> addSurfaceSet(const QString& sSubject,
                                             const QString& sMriSetName,
-                                            const FSLIB::SurfaceSet& tSurfaceSet,
-                                            const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+                                            const FSLIB::SurfaceSet& surfaceSet,
+                                            const FSLIB::AnnotationSet& annotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
     * Adds FreeSurfer brain data.
     *
-    * @param[in] subject            The name of the subject.
+    * @param[in] sSubject           The name of the subject.
     * @param[in] sMriSetName        The name of the MRI set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] pSurface           FreeSurfer surface.
-    * @param[in] pAnnotation        FreeSurfer annotation.
+    * @param[in] surface            FreeSurfer surface.
+    * @param[in] annotation         FreeSurfer annotation.
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    FsSurfaceTreeItem* addSurface(const QString& subject,
-                                  const QString& set,
-                                  const FSLIB::Surface& tSurface,
-                                  const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    FsSurfaceTreeItem* addSurface(const QString& sSubject,
+                                  const QString& sSet,
+                                  const FSLIB::Surface& surface,
+                                  const FSLIB::Annotation& annotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
     * Adds source space brain data.
     *
-    * @param[in] subject                The name of the subject.
+    * @param[in] sSubject               The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tSourceSpace           The source space information.
+    * @param[in] sourceSpace            The source space information.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addSourceSpace(const QString& subject,
+    SourceSpaceTreeItem* addSourceSpace(const QString& sSubject,
                                         const QString& sMeasurementSetName,
-                                        const MNELIB::MNESourceSpace& tSourceSpace);
+                                        const MNELIB::MNESourceSpace& sourceSpace);
 
     //=========================================================================================================
     /**
     * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
     *
-    * @param[in] subject                The name of the subject.
+    * @param[in] sSubject               The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tForwardSolution       The forward solution information.
+    * @param[in] forwardSolution        The forward solution information.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addForwardSolution(const QString& subject,
+    SourceSpaceTreeItem* addForwardSolution(const QString& sSubject,
                                             const QString& sMeasurementSetName,
-                                            const MNELIB::MNEForwardSolution& tForwardSolution);
+                                            const MNELIB::MNEForwardSolution& forwardSolution);
 
     //=========================================================================================================
     /**
     * Adds source estimated activation data (MNE or RTC-MUSIC).
     *
-    * @param[in] subject                The name of the subject.
+    * @param[in] sSubject               The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tSourceEstimate        The MNESourceEstimate.
-    * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] sourceEstimate         The MNESourceEstimate.
+    * @param[in] forwardSolution        The MNEForwardSolution.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    MneEstimateTreeItem* addSourceData(const QString& subject,
+    MneEstimateTreeItem* addSourceData(const QString& sSubject,
                                        const QString& sMeasurementSetName,
-                                       const MNELIB::MNESourceEstimate& tSourceEstimate,
-                                       const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+                                       const MNELIB::MNESourceEstimate& sourceEstimate,
+                                       const MNELIB::MNEForwardSolution& forwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
     * Adds source estimated activation data (dipole fit).
     *
-    * @param[in] subject                The name of the subject.
+    * @param[in] sSubject               The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tECDSet                The ECDSet dipole data.
+    * @param[in] ecdSet                 The ECDSet dipole data.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    EcdDataTreeItem* addDipoleFitData(const QString& subject,
-                                      const QString& set,
-                                      const INVERSELIB::ECDSet& tECDSet);
+    EcdDataTreeItem* addDipoleFitData(const QString& sSubject,
+                                      const QString& sSet,
+                                      const INVERSELIB::ECDSet& ecdSet);
 
     //=========================================================================================================
     /**
     * Adds connectivity estimation data.
     *
-    * @param[in] subject                The name of the subject.
+    * @param[in] sSubject               The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tNetworkData           The connectivity data.
+    * @param[in] networkData            The connectivity data.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    NetworkTreeItem* addConnectivityData(const QString& subject,
+    NetworkTreeItem* addConnectivityData(const QString& sSubject,
                                          const QString& sMeasurementSetName,
-                                         const CONNECTIVITYLIB::Network& tNetworkData);
+                                         const CONNECTIVITYLIB::Network& networkData);
 
     //=========================================================================================================
     /**
     * Adds BEM data.
     *
-    * @param[in] subject            The name of the subject.
+    * @param[in] sSubject           The name of the subject.
     * @param[in] sBemSetName        The name of the BEM set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tBem               The Bem information.
+    * @param[in] bem                The Bem information.
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    BemTreeItem* addBemData(const QString& subject,
+    BemTreeItem* addBemData(const QString& sSubject,
                             const QString& sBemSetName,
-                            const MNELIB::MNEBem& tBem);
+                            const MNELIB::MNEBem& bem);
 
 
     //=========================================================================================================
     /**
     * Adds sensor data.
     *
-    * @param[in] subject            The name of the subject.
+    * @param[in] sSubject           The name of the subject.
     * @param[in] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tSensor            The sensor surface information in form of a BEM model. Sensor surfaces are internally represented as MNEBem models.
+    * @param[in] sensor             The sensor surface information in form of a BEM model. Sensor surfaces are internally represented as MNEBem models.
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorSetTreeItem* addMegSensorData(const QString& subject,
+    SensorSetTreeItem* addMegSensorData(const QString& sSubject,
                                         const QString& sSensorSetName,
-                                        const MNELIB::MNEBem& tSensor,
+                                        const MNELIB::MNEBem& sensor,
                                         const QList<FIFFLIB::FiffChInfo>& lChInfo = QList<FIFFLIB::FiffChInfo>());
 
     //=========================================================================================================
     /**
     * Adds digitizer data.
     *
-    * @param[in] subject                The name of the subject.
+    * @param[in] sSubject               The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tDigitizer             The digitizer information.
+    * @param[in] digitizer              The digitizer information.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    DigitizerSetTreeItem* addDigitizerData(const QString& subject,
+    DigitizerSetTreeItem* addDigitizerData(const QString& sSubject,
                                            const QString& sMeasurementSetName,
-                                           const FIFFLIB::FiffDigPointSet &tDigitizer);
+                                           const FIFFLIB::FiffDigPointSet &digitizer);
 
     //=========================================================================================================
     /**
@@ -326,11 +326,11 @@ protected:
     /**
     * Create a subject tree item if the item was not found. This is a convenience function.
     *
-    * @param[in] subject            The name of the subject.
+    * @param[in] sSubject           The name of the subject.
     *
     * @return                       Returns a pointer to the first found or created subject tree item. Default is a NULL pointer if no item was found.
     */
-    SubjectTreeItem* addSubject(const QString& subject);
+    SubjectTreeItem* addSubject(const QString& sSubject);
 
     //=========================================================================================================
     /**
