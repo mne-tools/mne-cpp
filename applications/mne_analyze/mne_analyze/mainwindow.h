@@ -138,6 +138,8 @@ private:
     QAction*                            m_pActionOpenDataFile;      /**< open data file action */
     QAction*                            m_pActionExit;              /**< exit application action */
 
+
+    QAction*                            m_pActionPrint;             /**< view print action */
     QAction*                            m_pActionCascade;           /**< view cascade action */
     QAction*                            m_pActionTile;              /**< view tile action */
 

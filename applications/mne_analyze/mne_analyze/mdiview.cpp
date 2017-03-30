@@ -40,6 +40,8 @@
 
 #include "mdiview.h"
 
+#include <anShared/Interfaces/IStandardView.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,6 +51,14 @@
 #include <QGridLayout>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QPainter>
+
+#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
+#include <QPrinter>
+#include <QPrintDialog>
+#endif
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -57,6 +67,7 @@
 //=============================================================================================================
 
 using namespace MNEANALYZE;
+using namespace ANSHAREDLIB;
 
 
 //*************************************************************************************************************
@@ -113,5 +124,31 @@ void MdiView::tileSubWindows()
 {
     //Arrange subwindows in a Tile mode
     this->m_mdiArea->tileSubWindows();
+}
+
+
+//*************************************************************************************************************
+
+void MdiView::printCurrentSubWindow()
+{
+    if(!m_mdiArea->currentSubWindow())
+        return;
+
+#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
+    IStandardView *view = qobject_cast<IStandardView *>(m_mdiArea->currentSubWindow());
+    // if no standrad view -> render widget to printer otherwise call print function
+    if(!view){
+        QPrinter printer;
+        QPrintDialog dialog(&printer, this);
+        if (dialog.exec() == QDialog::Accepted) {
+            QPainter painter(&printer);
+            m_mdiArea->currentSubWindow()->render(&painter);
+        }
+    }
+    else {
+        view->print();
+    }
+#endif
+
 }
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     analyzedata.h
+* @file     IStandardView.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,16 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Analyze Settings Class.
+* @brief    Contains declaration of IStandardView interface class.
 *
 */
+
+#ifndef ISTANDARDVIEW_H
+#define ISTANDARDVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "analyzesettings.h"
+#include "../anshared_global.h"
 
 
 //*************************************************************************************************************
@@ -46,30 +49,52 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace ANSHAREDLIB;
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-AnalyzeSettings::AnalyzeSettings(QObject *parent)
-: QObject(parent)
+namespace ANSHAREDLIB
 {
 
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
+
+//=========================================================================================================
+/**
+* DECLARE CLASS IStandardView
+*
+* @brief The IStandardView class is the base interface class for the standard view.
+*/
+class ANSHAREDSHARED_EXPORT IStandardView : public QWidget
+{
+public:
+    //=========================================================================================================
+    /**
+    * Destroys the view.
+    */
+    virtual ~IStandardView() {}
+
+    //=========================================================================================================
+    /**
+    * Implements printing of the standard view.
+    */
+    virtual void print() = 0;
+};
 
 //*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-AnalyzeSettings::~AnalyzeSettings()
-{
+} //Namespace
 
-}
+Q_DECLARE_INTERFACE(ANSHAREDLIB::IStandardView, "ansharedlib/1.0")
+
+#endif //ISTANDARDVIEW_H
