@@ -43,5 +43,6 @@ SUBDIRS += \
 
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SUBDIRS += \
-        deepcntk
+        deepcntk \
+#        deepcntknets
 }

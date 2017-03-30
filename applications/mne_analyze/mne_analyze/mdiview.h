@@ -97,6 +97,9 @@ public:
     //Tile subwindows
     void tileSubWindows();
 
+    //Print current subwindow
+    void printCurrentSubWindow();
+
 private:
     //Layout
     QGridLayout             *m_gridLayout;

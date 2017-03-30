@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets svg charts
+QT  += core widgets svg
 
 # Deep Model Viewer
 qtHaveModule(printsupport): QT += printsupport
@@ -75,10 +75,12 @@ else {
 !isEmpty( CNTK_INCLUDE_DIR ) {
     LIBS += -L$${CNTK_LIBRARY_DIR}
     CONFIG(debug, debug|release) {
-        LIBS += -lCNTKLibrary-2.0 \
+        LIBS += -lMNE$${MNE_LIB_VERSION}Deepd \
+                -lCNTKLibrary-2.0 \
     }
     else {
-        LIBS += -lCNTKLibrary-2.0 \
+        LIBS += -lMNE$${MNE_LIB_VERSION}Deep \
+                -lCNTKLibrary-2.0 \
     }
 }
 
@@ -125,8 +127,7 @@ SOURCES += \
     selectionmanagerwindow.cpp \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
-    helpers/roundededgeswidget.cpp \
-    lineplot.cpp
+    helpers/roundededgeswidget.cpp
 
 HEADERS += \
     disp_global.h \
@@ -148,24 +149,25 @@ HEADERS += \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
-    helpers/roundededgeswidget.h \
-    lineplot.h
+    helpers/roundededgeswidget.h
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SOURCES += \
         deepmodelviewer/controls.cpp \
-        deepmodelviewer/deepviewerwidget.cpp \
         deepmodelviewer/edge.cpp \
         deepmodelviewer/node.cpp \
-        deepmodelviewer/view.cpp
+        deepmodelviewer/view.cpp \
+        deepmodelviewer/network.cpp \
+        deepmodelviewer/deepviewer.cpp
 
     HEADERS += \
         deepmodelviewer/controls.h \
-        deepmodelviewer/deepviewerwidget.h \
         deepmodelviewer/edge.h \
         deepmodelviewer/node.h \
-        deepmodelviewer/view.h
+        deepmodelviewer/view.h \
+        deepmodelviewer/network.h \
+        deepmodelviewer/deepviewer.h
 
     RESOURCES += \
         deepmodelviewer/images.qrc

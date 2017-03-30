@@ -40,6 +40,7 @@
 
 #include "edge.h"
 #include "node.h"
+#include "network.h"
 #include "../helpers/colormap.h"
 
 //*************************************************************************************************************
@@ -56,7 +57,6 @@
 //=============================================================================================================
 
 #include <QPainter>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -84,10 +84,10 @@ static double TwoPi = 2.0 * Pi;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Edge::Edge(Node *sourceNode, Node *destNode)
-: m_arrowSize(10)
+Edge::Edge(Network *network, Node *sourceNode, Node *destNode)
+: m_pNetwork(network)
+, m_arrowSize(10)
 , m_color(Qt::lightGray)
-, m_penWidth(1)
 , m_weight(0)
 {
     setAcceptedMouseButtons(0);
@@ -134,10 +134,10 @@ void Edge::adjust()
 //        edgeOffset = QPointF ((line.dx() * 10) / length, (line.dy() * 10) / length);
         // In 90 degree steps
 //        if(abs(line.dx()) > abs(line.dy())) {
-            edgeOffset = QPointF(line.dx() < 0 ? -11 : 11, 0);
+            edgeOffset = QPointF(line.dx() < 0 ? -10 : 10, 0);
 //        }
 //        else {
-//            edgeOffset = QPointF(0, line.dy() < 0 ? -11 : 11);
+//            edgeOffset = QPointF(0, line.dy() < 0 ? -10 : 10);
 //        }
         m_sourcePoint = line.p1() + edgeOffset;
         m_destPoint = line.p2() - edgeOffset;
@@ -152,7 +152,6 @@ void Edge::adjust()
 void Edge::setWeight(float weight)
 {
     m_weight = weight;
-    updateLineWidth();
     updateColor();
 }
 
@@ -214,7 +213,8 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 //    }
     path.cubicTo(c1, c2, m_destPoint);
     QColor lg = m_color;
-    QPen pen(lg, m_penWidth);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
+    float penWidth = fabs(m_weight*m_pNetwork->weightStrength());
+    QPen pen(lg, penWidth, m_pNetwork->getPenStyle(), Qt::FlatCap);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
     painter->strokePath(path, pen);
 
 
@@ -253,16 +253,17 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
 //*************************************************************************************************************
 
-void Edge::updateLineWidth()
-{
-    m_penWidth = abs(m_weight*5);
-}
-
-
-//*************************************************************************************************************
-
 void Edge::updateColor()
 {
-    m_color = QColor(DISPLIB::ColorMap::valueToRedBlue(m_weight));
-    m_color.setAlpha(abs(m_weight*255));
+    float weigt = m_weight;
+    if(weigt < -1.0f) {
+        weigt = -1.0f;
+    }
+    if(weigt > 1.0f) {
+        weigt = 1.0f;
+    }
+
+    m_color = QColor(DISPLIB::ColorMap::valueToRedBlue(weigt));
+    m_color.setAlpha(abs(weigt*255));
 }
+
