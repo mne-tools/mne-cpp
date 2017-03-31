@@ -41,7 +41,7 @@ CONFIG += plugin
 
 DEFINES += MNEBUFFER_LIBRARY
 
-QT += widgets
+QT += widgets network
 
 TARGET = mnebuffer
 CONFIG(debug, debug|release) {
@@ -68,14 +68,18 @@ SOURCES += \
         mnebuffer.cpp \
         FormFiles/mnebuffersetupwidget.cpp \
         FormFiles/mnebufferaboutwidget.cpp \
-        FormFiles/mnebufferwidget.cpp
+        FormFiles/mnebufferwidget.cpp \
+        receiver.cpp \
+        sender.cpp
 
 HEADERS += \
         mnebuffer.h\
         mnebuffer_global.h \
         FormFiles/mnebuffersetupwidget.h \
         FormFiles/mnebufferaboutwidget.h \
-        FormFiles/mnebufferwidget.h
+        FormFiles/mnebufferwidget.h \
+        receiver.h \
+        sender.h
 
 FORMS += \
         FormFiles/mnebuffersetup.ui \

@@ -42,6 +42,7 @@
 #include "mnebuffer.h"
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -238,6 +239,12 @@ void MneBuffer::run()
 
 void MneBuffer::showMneBufferWidget()
 {
-    m_pMneBufferWidget = MneBufferWidget::SPtr(new MneBufferWidget());
-    m_pMneBufferWidget->show();
+    sender =  QSharedPointer<Sender>(new Sender);
+    receiver =  QSharedPointer<Receiver>(new Receiver);
+
+    sender->show();
+    receiver->show();
+
+//    m_pMneBufferWidget = MneBufferWidget::SPtr(new MneBufferWidget());
+//    m_pMneBufferWidget->show();
 }

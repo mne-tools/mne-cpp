@@ -51,6 +51,9 @@
 #include "FormFiles/mnebuffersetupwidget.h"
 #include "FormFiles/mnebufferwidget.h"
 
+#include "sender.h"
+#include "receiver.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -132,6 +135,13 @@ public:
     */
     void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
+
 protected:
     //=========================================================================================================
     /**
@@ -153,12 +163,8 @@ private:
     PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pMneBufferInput;      /**< The NewRealTimeMultiSampleArray of the DummyToolbox input.*/
     PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pMneBufferOutput;     /**< The NewRealTimeMultiSampleArray of the DummyToolbox output.*/
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
+    QSharedPointer<Sender> sender;
+    QSharedPointer<Receiver> receiver;
 };
 
 } // NAMESPACE
