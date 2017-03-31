@@ -206,12 +206,12 @@ HPIWidget::~HPIWidget()
 void HPIWidget::setData(const Eigen::MatrixXd& matData)
 {
     //If bad channels changed, recalcluate projectors
-    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matProjectors.rows() == 0 || m_matProjectors.cols() == 0) {
+    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matCompProjectors.rows() == 0 || m_matCompProjectors.cols() == 0) {
         updateProjections();
         m_iNubmerBadChannels = m_pFiffInfo->bads.size();
     }
 
-    m_matValue = m_matProjectors * matData;
+    m_matValue = m_matCompProjectors * matData;
 
     //Do continous HPI if wanted
     if(ui->m_checkBox_continousHPI->isChecked()) {
@@ -248,7 +248,7 @@ void HPIWidget::closeEvent(QCloseEvent *event)
 
 void HPIWidget::updateProjections()
 {
-    Eigen::MatrixXd matProj = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     if(m_bUseSSP) {
@@ -262,10 +262,10 @@ void HPIWidget::updateProjections()
         }
 
         //Create the projector for all SSP's on
-        infoTemp.make_projector(matProj);
+        infoTemp.make_projector(m_matProjectors);
         //set columns of matrix to zero depending on bad channels indexes
         for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
-            matProj.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+            m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
         }
     }
 
@@ -276,7 +276,7 @@ void HPIWidget::updateProjections()
         matComp = newComp.data->data;
     }
 
-    m_matProjectors = matProj * matComp;
+    m_matCompProjectors = m_matProjectors * matComp;
 
     m_pRtHPI->setProjectionMatrix(m_matProjectors);
 }

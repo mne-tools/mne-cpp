@@ -267,6 +267,7 @@ protected:
     Eigen::SparseMatrix<double>                 m_sparseMatCals;        /**< Sparse calibration matrix.*/
     Eigen::MatrixXd                             m_matValue;             /**< The current data block.*/
     Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    Eigen::MatrixXd                             m_matCompProjectors;    /**< Holds the matrix with the SSP and compensator projectors.*/
 
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
