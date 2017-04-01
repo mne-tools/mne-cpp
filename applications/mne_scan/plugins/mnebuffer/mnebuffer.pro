@@ -70,7 +70,8 @@ SOURCES += \
         FormFiles/mnebufferaboutwidget.cpp \
         FormFiles/mnebufferwidget.cpp \
         receiver.cpp \
-        sender.cpp
+        sender.cpp \
+    socketserver.c
 
 HEADERS += \
         mnebuffer.h\
@@ -79,7 +80,19 @@ HEADERS += \
         FormFiles/mnebufferaboutwidget.h \
         FormFiles/mnebufferwidget.h \
         receiver.h \
-        sender.h
+        sender.h \
+    socketserver.h \
+    buffer.h \
+    message.h \
+    platform_includes.h \
+    compiler.h \
+    platform.h \
+    osx/clock_gettime.h \
+    win32/clock_gettime.h \
+    win32/fsync.h \
+    win32/gettimeofday.h \
+    win32/stdint.h \
+    win32/usleep.h
 
 FORMS += \
         FormFiles/mnebuffersetup.ui \
