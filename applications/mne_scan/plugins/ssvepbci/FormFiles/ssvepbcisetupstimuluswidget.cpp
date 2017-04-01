@@ -60,20 +60,20 @@ using namespace SSVEPBCIPLUGIN;
 SsvepBciSetupStimulusWidget::SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QWidget *parent)
 : QDialog(parent)
 , ui(new Ui::SsvepBciSetupStimulusWidget)
-, m_pSsvepBci(QSharedPointer<SsvepBci>(pSsvepBci))
+, m_pSsvepBci(pSsvepBci)
 , m_bIsRunning(false)
 , m_bReadFreq(false)
 {
     ui->setupUi(this);
 
     //setup the test screen and initialize screen for subject
-    m_pSsvepBciScreen = QSharedPointer<SsvepBciScreen>(new SsvepBciScreen(m_pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget>(this)));
+    m_pSsvepBciScreen = QSharedPointer<SsvepBciScreen>(new SsvepBciScreen(m_pSsvepBci, this));
     m_pScreen  =  QSharedPointer<QScreen>(QGuiApplication::screens()[1]); // specify which screen to use
     m_pSsvepBciScreen->move(m_pScreen->geometry().x(), m_pScreen->geometry().y());
     m_pSsvepBciScreen->showFullScreen(); // showFullScreen();
 
     // connect signal for frequency change
-    connect(this, &SsvepBciSetupStimulusWidget::frequencyChanged, m_pSsvepBci.data(), &SsvepBci::setChangeSSVEPParameterFlag);
+    connect(this, &SsvepBciSetupStimulusWidget::frequencyChanged, m_pSsvepBci, &SsvepBci::setChangeSSVEPParameterFlag);
 
     // connect screen buttons
     connect(ui->m_pushButton_clearScreen, &QPushButton::clicked, this, &SsvepBciSetupStimulusWidget::clearItems);
