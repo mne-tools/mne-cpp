@@ -110,7 +110,8 @@ HEADERS +=\
     deep_global.h \
     deep.h \
     deepeval.h \
-    deepmodelcreator.h
+    deepmodelcreator.h \
+    IDeepConfiguration.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
