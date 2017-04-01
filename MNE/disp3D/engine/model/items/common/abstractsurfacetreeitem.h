@@ -144,6 +144,14 @@ public:
     */
     virtual void setMaterial(QPointer<Qt3DRender::QMaterial> pMaterial);
 
+    //=========================================================================================================
+    /**
+    * Returns the RenderableEntity as a pointer.
+    *
+    * @return   The RenderableEntity as a pointer.
+    */
+    virtual QPointer<Renderable3DEntity> getRenderableEntity();
+
 protected:
     //=========================================================================================================
     /**

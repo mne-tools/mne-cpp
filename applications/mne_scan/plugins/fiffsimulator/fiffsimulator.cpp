@@ -92,6 +92,7 @@ FiffSimulator::FiffSimulator()
 , m_pRawMatrixBuffer_In(0)
 , m_bIsRunning(false)
 , m_iActiveConnectorId(0)
+, m_bDoContinousHPI(false)
 {
     //Init HPI
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
@@ -99,11 +100,6 @@ FiffSimulator::FiffSimulator()
     connect(m_pActionComputeHPI, &QAction::triggered,
             this, &FiffSimulator::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
-
-    connect(this, &FiffSimulator::started,
-            this, &FiffSimulator::sendStatusToHPI);
-    connect(this, &FiffSimulator::finished,
-            this, &FiffSimulator::sendStatusToHPI);
 }
 
 
@@ -259,18 +255,27 @@ QWidget* FiffSimulator::setupWidget()
 
 void FiffSimulator::run()
 {
-    while(true)
-    {
+    MatrixXf matValue;
+
+    while(true) {
         {
             QMutexLocker locker(&m_qMutex);
             if(!m_bIsRunning)
                 break;
         }
         //pop matrix
-        m_matValue = m_pRawMatrixBuffer_In->pop();
+        matValue = m_pRawMatrixBuffer_In->pop();
+
+        //Update HPI data (for single and continous HPI fitting)
+        updateHPI(matValue);
+
+        //Do continous HPI fitting and write result to data block
+        if(m_bDoContinousHPI) {
+            doContinousHPI(matValue);
+        }
 
         //emit values
-        m_pRTMSA_FiffSimulator->data()->setValue(m_matValue.cast<double>());
+        m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
     }
 }
 
@@ -436,9 +441,8 @@ void FiffSimulator::showHPIDialog()
     } else {
         if (!m_pHPIWidget) {
             m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-
-            connect(m_pHPIWidget.data(), &HPIWidget::needData,
-                    this, &FiffSimulator::sendHPIData);
+            connect(m_pHPIWidget.data(), &HPIWidget::continousHPIToggled,
+                    this, &FiffSimulator::onContinousHPIToggled);
         }
 
         if (!m_pHPIWidget->isVisible()) {
@@ -451,40 +455,57 @@ void FiffSimulator::showHPIDialog()
 
 //*************************************************************************************************************
 
-void FiffSimulator::sendHPIData()
+void FiffSimulator::updateHPI(const MatrixXf& matData)
 {
+    //Update HPI data
     if(m_pFiffInfo && m_pHPIWidget) {
-        Eigen::MatrixXd matProj;
-        m_pFiffInfo->make_projector(matProj);
-
-        //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
-        }
-
-        // Setup Comps
-        FiffCtfComp newComp;
-        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-        Eigen::MatrixXd matComp = newComp.data->data;
-
-        m_pHPIWidget->setData(matProj * matComp * m_matValue.cast<double>());
-
-        //m_pHPIWidget->setData(m_matValue.cast<double>());
+        m_pHPIWidget->setData(matData.cast<double>());
     }
 }
 
 
 //*************************************************************************************************************
 
-void FiffSimulator::sendStatusToHPI()
+void FiffSimulator::doContinousHPI(MatrixXf& matData)
 {
-    if (!m_pHPIWidget) {
-        m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
+    //This only works with babyMEG HPI channels 400 ... 407
+    if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
+        if(m_pHPIWidget->wasLastFitOk()) {
+            // Load device to head transformation matrix from Fiff info
+            QMatrix3x3 rot;
 
-        connect(m_pHPIWidget.data(), &HPIWidget::needData,
-                this, &FiffSimulator::sendHPIData);
+            for(int ir = 0; ir < 3; ir++) {
+                for(int ic = 0; ic < 3; ic++) {
+                    rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
+                }
+            }
+
+            QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+
+            // Write rotation quaternion to HPI Ch #1~3
+            matData.row(401) = MatrixXf::Constant(1,matData.cols(), quatHPI.x());
+            matData.row(402) = MatrixXf::Constant(1,matData.cols(), quatHPI.y());
+            matData.row(403) = MatrixXf::Constant(1,matData.cols(), quatHPI.z());
+
+            // Write translation vector to HPI Ch #4~6
+            matData.row(404) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(0,3));
+            matData.row(405) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(1,3));
+            matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
+
+            // Write GOF to HPI Ch #7
+            // Write goodness of fit (GOF)to HPI Ch #7
+            float dpfitError = 0.0;
+            float GOF = 1 - dpfitError;
+            matData.row(407) = MatrixXf::Constant(1,matData.cols(), GOF);
+        }
     }
+}
 
-    m_pHPIWidget->setIsRunning(this->isRunning());
+
+//*************************************************************************************************************
+
+void FiffSimulator::onContinousHPIToggled(bool bDoContinousHPI)
+{
+    m_bDoContinousHPI = bDoContinousHPI;
 }
 

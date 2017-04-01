@@ -118,6 +118,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pComboBox->addItem("Hot Negative 1");
             pComboBox->addItem("Hot Negative 2");
             pComboBox->addItem("Hot");
+            pComboBox->addItem("Jet");
             return pComboBox;
         }
 

@@ -64,10 +64,12 @@ using namespace SSVEPBCIPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SsvepBciScreen::SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QOpenGLWidget *parent)
+SsvepBciScreen::SsvepBciScreen(SsvepBci* pSsvepBci,
+                               SsvepBciSetupStimulusWidget* pSsvepBciSetupStimulusWidget,
+                               QOpenGLWidget *parent)
 : m_pSsvepBci(pSsvepBci)
 , m_pSsvepBciSetupStimulusWidget(pSsvepBciSetupStimulusWidget)
-, m_pScreenKeyboard(QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSsvepBci, m_pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen>(this))))
+, m_pScreenKeyboard(Q_NULLPTR)
 , m_dXPosCross(0.5)
 , m_dYPosCross(0.5)
 , m_dStep(0.01)
@@ -93,8 +95,8 @@ SsvepBciScreen::SsvepBciScreen(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
     setUpdateBehavior(UpdateBehavior::PartialUpdate);
 
     // connect classResult and frequency list signal of SsvepBci class to setClassResult slot
-    connect(m_pSsvepBci.data(), &SsvepBci::classificationResult, this, &SsvepBciScreen::setClassResults);
-    connect(m_pSsvepBci.data(), &SsvepBci::getFrequencyLabels, this, &SsvepBciScreen::updateFrequencyList);
+    connect(m_pSsvepBci, &SsvepBci::classificationResult, this, &SsvepBciScreen::setClassResults);
+    connect(m_pSsvepBci, &SsvepBci::getFrequencyLabels, this, &SsvepBciScreen::updateFrequencyList);
 
     // initialize freqList
     m_lFreqList << 6.66 << 7.5 << 8.57 << 10 << 12;
@@ -199,7 +201,7 @@ void SsvepBciScreen::updateFrequencyList(MyQList freqList)
 void SsvepBciScreen::useScreenKeyboard(bool useKeyboard)
 {
     if(m_pScreenKeyboard == NULL){
-        m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSsvepBci, m_pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen>(this)));
+        m_pScreenKeyboard = QSharedPointer<ScreenKeyboard>(new ScreenKeyboard(m_pSsvepBci, m_pSsvepBciSetupStimulusWidget, this));
     }
 
     m_bUseScreenKeyboard = useKeyboard;

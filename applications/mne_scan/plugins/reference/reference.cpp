@@ -64,7 +64,6 @@ Reference::Reference()
 , m_pRefInput(Q_NULLPTR)
 , m_pRefOutput(Q_NULLPTR)
 , m_pRefBuffer(Q_NULLPTR)
-, m_pRefToolbarWidget(QSharedPointer<ReferenceToolbarWidget>(new ReferenceToolbarWidget(this)))
 {
     //Add action which will be visible in the plugin's toolbar
     m_pActionRefToolbarWidget = new QAction(QIcon(":/icons/options.png"), tr("Reference Toolbar"),this);

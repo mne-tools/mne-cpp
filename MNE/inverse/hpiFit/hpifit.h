@@ -1,17 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rthpis.h
-* @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
-*           Lorenz Esch <Lorenz.Esch@ntu-ilmenau.de>;
-*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+* @file     hpifit.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-*
 * @version  1.0
-* @date     November, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Chiran Doshi, Lorenz Esch, Limin Sun, and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -32,29 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtHPIS class declaration.
+* @brief    HPIFit class declaration.
 *
 */
 
-#ifndef RTHPIS_H
-#define RTHPIS_H
+#ifndef HPIFIT_H
+#define HPIFIT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtprocessing_global.h"
-
-#include <generics/circularmatrixbuffer.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_coord_trans.h>
+#include "../inverse_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -65,10 +57,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
 #include <QSharedPointer>
-#include <QVector>
 
 
 //*************************************************************************************************************
@@ -78,15 +67,17 @@
 
 namespace FIFFLIB{
     class FiffInfo;
+    class FiffCoordTrans;
+    class FiffDigPointSet;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTPROCESSINGLIB
+// DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
-namespace RTPROCESSINGLIB
+namespace INVERSELIB
 {
 
 
@@ -94,116 +85,134 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
+/**
+* The strucut specifing the coil parameters.
+*/
+struct CoilParam {
+    Eigen::MatrixXd pos;
+    Eigen::MatrixXd mom;
+    Eigen::VectorXd dpfiterror;
+    Eigen::VectorXd dpfitnumitr;
+};
+
 //=========================================================================================================
 /**
-* The struct specifing all data needed to perform coil-wise fitting.
+* The strucut specifing the dipole error.
 */
-struct FittingResult {
-    FIFFLIB::FiffDigPointSet fittedCoils;
-    FIFFLIB::FiffCoordTrans devHeadTrans;
-    QVector<double> errorDistances;
+struct DipFitError {
+    double error;
+    Eigen::MatrixXd moment;
+    int numIterations;
 };
+
+//=========================================================================================================
+/**
+* The strucut specifing the sensor parameters.
+*/
+struct SensorInfo {
+    Eigen::MatrixXd coilpos;
+    Eigen::MatrixXd coilori;
+    Eigen::MatrixXd tra;
+};
+
+//=========================================================================================================
+/**
+* The strucut specifing the sorting parameters.
+*/
+struct HPISortStruct {
+    double base_arr;
+    int idx;
+};
+
+//=========================================================================================================
+/**
+* The strucut specifing all data needed to perform coil-wise fitting.
+*/
+struct FittingCoilData {
+    Eigen::RowVectorXd coilPos;
+    Eigen::RowVectorXd sensorData;
+    DipFitError errorInfo;
+    SensorInfo sensorPos;
+    Eigen::MatrixXd matProjector;
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Real-time Head Coil Positions estimation.
+* HPI Fit algorithms.
 *
-* @brief Real-time Head Coil Positions estimation.
+* @brief HPI Fit algorithms.
 */
-class RTPROCESSINGSHARED_EXPORT RtHPIS : public QThread
+class INVERSESHARED_EXPORT HPIFit
 {
-    Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtHPIS> SPtr;             /**< Shared pointer type for RtHPIS. */
-    typedef QSharedPointer<const RtHPIS> ConstSPtr;  /**< Const shared pointer type for RtHPIS. */
+    typedef QSharedPointer<HPIFit> SPtr;             /**< Shared pointer type for HPIFit. */
+    typedef QSharedPointer<const HPIFit> ConstSPtr;  /**< Const shared pointer type for HPIFit. */
 
     //=========================================================================================================
     /**
-    * Creates the real-time HPIS estimation object.
+    * Default constructor.
+    */
+    explicit HPIFit();
+
+    //=========================================================================================================
+    /**
+    * Perform one single HPI fit.
     *
-    * @param[in] p_pFiffInfo        Associated Fiff Information
-    * @param[in] parent     Parent QObject (optional)
+    * @param[in] t_mat           Data to estimate the HPI positions from
+    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
+    * @param[out] transDevHead   The final dev head transformation matrix
+    * @param[in] vFreqs          The frequencies for each coil.
+    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
+    * @param[out] fittedPointSet The final fitted positions in form of a digitizer set.
+    * @param[in] p_pFiffInfo     Associated Fiff Information.
+    * @param[in] bDoDebug        Print debug info to cmd line and write debug info to file.
+    * @param[in] sHPIResourceDir The path to the debug file which is to be written.
     */
-    explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo, QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the Real-time HPI estimation object.
-    */
-    ~RtHPIS();    
-
-    //=========================================================================================================
-    /**
-    * Slot to receive incoming data.
-    *
-    * @param[in] p_DataSegment  Data to estimate the HPI positions from
-    */
-    void append(const Eigen::MatrixXd &p_DataSegment);
-
-    //=========================================================================================================
-    /**
-    * Returns true if is running, otherwise false.
-    *
-    * @return true if is running, false otherwise
-    */
-    inline bool isRunning();
-
-    //=========================================================================================================
-    /**
-    * Starts the RtHPIS by starting the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the RtHPIS by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
-
-    //=========================================================================================================
-    /**
-    * Set the coil frequencies.
-    *
-    * @param[in] vCoilFreqs  The coil frequencies.
-    */
-    void setCoilFrequencies(const QVector<int>& vCoilFreqs);
-
-    //=========================================================================================================
-    /**
-    * Set the new projection matrix.
-    *
-    * @param[in] matProjectors  The new projection matrix.
-    */
-    void setProjectionMatrix(const Eigen::MatrixXd& matProjectors);
+    static void fitHPI(const Eigen::MatrixXd& t_mat,
+                        const Eigen::MatrixXd& t_matProjectors,
+                        FIFFLIB::FiffCoordTrans &transDevHead,
+                        const QVector<int>& vFreqs,
+                        QVector<double> &vGof,
+                        FIFFLIB::FiffDigPointSet& fittedPointSet,
+                        QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                        bool bDoDebug = false,
+                        const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Fits dipoles for the given coils and a given data set.
+    *
+    * @param[in] CoilParam       The coil parameters.
+    * @param[in] sensors         The sensor information.
+    * @param[in] data            The data which used to fit the coils.
+    * @param[in] numCoils        The number of coils.
+    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
+    *
+    * @return Returns the coil parameters.
     */
-    virtual void run();
+    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd &data, int numCoils, const Eigen::MatrixXd &t_matProjectors);
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
+    //=========================================================================================================
+    /**
+    * Computes the transformation matrix between two sets of 3D points.
+    *
+    * @param[in] NH     The first set of input 3D points (row-wise order).
+    * @param[in] BT     The second set of input 3D points (row-wise order).
+    *
+    * @return Returns the transformation matrix.
+    */
+    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
 
-    QMutex              m_mutex;                /**< The global mutex to provide thread safety.*/
-
-    bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
-
-    QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
-
-    Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
-
-signals:
-    void newFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);
+    static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
 
 //*************************************************************************************************************
@@ -211,16 +220,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtHPIS::isRunning()
-{
-    return m_bIsRunning;
-}
 
-} // NAMESPACE
+} //NAMESPACE
 
-#ifndef metatype_rthpisfittingresult
-#define metatype_rthpisfittingresult
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::FittingResult)
-#endif
-
-#endif // RTHPIS_H
+#endif // HPIFIT_H
