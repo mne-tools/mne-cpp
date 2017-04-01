@@ -250,6 +250,14 @@ void Renderable3DEntity::setPosition(QVector3D position)
 
 //*************************************************************************************************************
 
+void Renderable3DEntity::setScale(float scale)
+{
+    m_pTransform->setScale(scale);
+}
+
+
+//*************************************************************************************************************
+
 void Renderable3DEntity::updateTransform()
 {
     QMatrix4x4 m;

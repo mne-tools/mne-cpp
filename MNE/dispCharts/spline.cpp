@@ -357,6 +357,18 @@ void Spline::setColorMap(QString colorMap)
         plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHot(1));
     }
 
+    else if (colorMap == "Jet")
+    {
+        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToJet(0));
+
+        for (int i = 1; i < stepsNumber; ++i)
+        {
+            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToJet((double)i * (0.5 / (double)stepsNumber)));
+            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToJet((double)0.5 + (i * (0.5 / (double)stepsNumber))));
+        }
+        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToJet(1));
+    }
+
     else
     {
         return;

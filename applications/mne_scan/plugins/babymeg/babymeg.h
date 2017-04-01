@@ -286,14 +286,26 @@ protected:
     //=========================================================================================================
     /**
     * Sends the current data block to the HPI dialog.
+    *
+    * @param [in] matData   The new data block.
     */
-    void sendHPIData();
+    void updateHPI(const Eigen::MatrixXf &matData);
 
     //=========================================================================================================
     /**
-    * Sends the current thread status to the HPI dialog.
+    * Sends the current data block to the HPI dialog and performs a fit.
+    *
+    * @param [in] matData   The data block to which the HPI information is to be written.
     */
-    void sendStatusToHPI();
+    void doContinousHPI(Eigen::MatrixXf& matData);
+
+    //=========================================================================================================
+    /**
+    * Toggles teh continous HPI flag.
+    *
+    * @param [in] bDoContinousHPI   Whether to do continous HPI.
+    */
+    void onContinousHPIToggled(bool bDoContinousHPI);
 
     //=========================================================================================================
     /**
@@ -334,12 +346,6 @@ protected:
     * Starts or stops a file recording depending on the current recording state.
     */
     void toggleRecordingFile();
-
-    //=========================================================================================================
-    /**
-    * Update HPI.
-    */
-    void updateHPI();
 
     //=========================================================================================================
     /**
@@ -417,9 +423,11 @@ protected:
     qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
     qint32                                  m_iSplitCount;                  /**< File split count */
     int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
+
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bIsRunning;                   /**< If thread is running flag.*/
+    bool                                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
     QString                                 m_sBabyMEGDataPath;             /**< The data storage path.*/
     QString                                 m_sCurrentProject;              /**< The current project which is part of the filename to be recorded.*/
     QString                                 m_sCurrentSubject;              /**< The current subject which is part of the filename to be recorded.*/
@@ -435,7 +443,6 @@ protected:
 
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
-    Eigen::MatrixXf                         m_matValue;                     /**< The current data block.*/
 
     QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
     QAction*                m_pActionRecordFile;            /**< start recording action */
