@@ -252,6 +252,13 @@ protected:
     */
     void updateHeadModel();
 
+//    //=========================================================================================================
+//    /**
+//    * Align the MEG fiducials to the MRI fiducials.
+//    */
+//    int alignFiducials(digitizerData head_dig,
+//                       digitizerData mri_dig);
+
     Ui::HPIWidget*                              ui;                     /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
