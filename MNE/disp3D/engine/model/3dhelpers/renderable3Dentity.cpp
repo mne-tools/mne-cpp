@@ -116,13 +116,6 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 
 //*************************************************************************************************************
 
-Renderable3DEntity::~Renderable3DEntity()
-{
-}
-
-
-//*************************************************************************************************************
-
 void Renderable3DEntity::setTransform(QPointer<Qt3DCore::QTransform> pTransform)
 {
     if(m_pTransform) {
