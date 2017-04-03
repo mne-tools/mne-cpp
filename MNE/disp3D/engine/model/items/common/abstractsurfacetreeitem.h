@@ -90,6 +90,7 @@ namespace DISP3DLIB
 
 class MetaTreeItem;
 class Renderable3DEntity;
+class CustomMesh;
 
 
 //=============================================================================================================
@@ -113,7 +114,8 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit AbstractSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::AbstractSurfaceItem, const QString& text = "Abstract Surface");
+    explicit AbstractSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::AbstractSurfaceItem,
+                                     const QString& text = "Abstract Surface");
 
     //=========================================================================================================
     /**
@@ -143,6 +145,14 @@ public:
     * @return   The RenderableEntity as a pointer.
     */
     virtual QPointer<Renderable3DEntity> getRenderableEntity();
+
+    //=========================================================================================================
+    /**
+    * Returns the custom mesh.
+    *
+    * @return The costum mesh.
+    */
+    QPointer<CustomMesh> getCustomMesh();
 
 protected:
     //=========================================================================================================
@@ -250,11 +260,13 @@ protected:
     */
     virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
-    QPointer<Renderable3DEntity>        m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
+    QPointer<Renderable3DEntity>        m_pRenderable3DEntity;              /**< The surface renderable 3D entity. */
 
-    QPointer<Qt3DRender::QMaterial>     m_pMaterial;                                /**< The material. Ownership belongs to RenderableEntity. */
-    QPointer<Qt3DRender::QMaterial>     m_pTessMaterial;                            /**< The tesselation material. Ownership belongs to RenderableEntity. */
-    QPointer<Qt3DRender::QMaterial>     m_pNormalMaterial;                          /**< The normal material. Ownership belongs to RenderableEntity. */
+    QPointer<Qt3DRender::QMaterial>     m_pMaterial;                        /**< The material. Ownership belongs to RenderableEntity. */
+    QPointer<Qt3DRender::QMaterial>     m_pTessMaterial;                    /**< The tesselation material. Ownership belongs to RenderableEntity. */
+    QPointer<Qt3DRender::QMaterial>     m_pNormalMaterial;                  /**< The normal material. Ownership belongs to RenderableEntity. */
+
+    QPointer<CustomMesh>                m_pCustomMesh;                      /**< The actual mesh information (vertices, normals, colors). */
 };
 
 } //NAMESPACE DISP3DLIB

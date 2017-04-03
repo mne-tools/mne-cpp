@@ -42,6 +42,7 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_bem.h>
 
@@ -102,11 +103,11 @@ void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCor
     MatrixX3f matVertColor = createVertColor(tSensorSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSensorSurface.rr,
-                                                        tSensorSurface.nn,
-                                                        tSensorSurface.tris,
-                                                        matVertColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
+    m_pCustomMesh->setMeshData(tSensorSurface.rr,
+                                tSensorSurface.nn,
+                                tSensorSurface.tris,
+                                matVertColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
 
     //Add data which is held by this SensorSurfaceTreeItem
     QVariant data;

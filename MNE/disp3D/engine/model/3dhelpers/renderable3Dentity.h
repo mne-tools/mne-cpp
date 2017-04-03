@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../../../disp3D_global.h"
-#include "custommesh.h"
 
 
 //*************************************************************************************************************
@@ -73,10 +72,6 @@ namespace Qt3DCore {
     class QTransform;
 }
 
-namespace Qt3DRender{
-    class QMaterial;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,8 +86,6 @@ namespace DISP3DLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class ShaderMaterial;
 
 
 //=============================================================================================================
@@ -123,35 +116,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor for freesurfer mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The color info of all the vertices.
-    * @param[in] parent         The parent of this class.
-    */
-    Renderable3DEntity(const Eigen::MatrixX3f& tMatVert,
-                       const Eigen::MatrixX3f& tMatNorm,
-                       const Eigen::MatrixX3i& tMatTris,
-                       const Eigen::MatrixX3f& tMatColors,
-                       Qt3DCore::QEntity* parent = 0);
-
-    //=========================================================================================================
-    /**
     * Sets the entity's transformation.
     *
     * @param[in] pTransform     The new entity's transform.
     */
     void setTransform(QPointer<Qt3DCore::QTransform> pTransform);
-
-    //=========================================================================================================
-    /**
-    * Returns the custom mesh.
-    *
-    * @return The costum mesh.
-    */
-    QPointer<CustomMesh> getCustomMesh();
 
     //=========================================================================================================
     /**
@@ -235,7 +204,6 @@ public:
     void setMaterialParameter(float fValue, QString sParameterName);
 
 protected: 
-    QPointer<CustomMesh>                        m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
 
     float                                       m_fRotX;                 /**< The x axis rotation value. */

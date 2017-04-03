@@ -42,6 +42,7 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_bem.h>
 
@@ -102,11 +103,11 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tBemSurface.rr,
-                                                        tBemSurface.nn,
-                                                        tBemSurface.tris,
-                                                        matVertColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
+    m_pCustomMesh->setMeshData(tBemSurface.rr,
+                                tBemSurface.nn,
+                                tBemSurface.tris,
+                                matVertColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
 
     //Find out BEM layer type and change items name
     this->setText(MNEBemSurface::id_name(tBemSurface.id));

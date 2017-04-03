@@ -43,6 +43,7 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/networkmaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
@@ -88,7 +89,7 @@ using namespace CONNECTIVITYLIB;
 //=============================================================================================================
 
 NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
-: AbstractTreeItem(iType, text)
+: AbstractSurfaceTreeItem(iType, text)
 , m_bDataIsInit(false)
 , m_bNodesPlotted(false)
 , m_pItemNetworkThreshold(new MetaTreeItem())
@@ -341,11 +342,11 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         matLineColor(i,2) = 1.0f;
     }
 
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tMatVert,
-                                                        tMatNorm,
-                                                        tMatLines,
-                                                        matLineColor,
-                                                        Qt3DRender::QGeometryRenderer::Lines);
+    m_pCustomMesh->setMeshData(tMatVert,
+                                tMatNorm,
+                                tMatLines,
+                                matLineColor,
+                                Qt3DRender::QGeometryRenderer::Lines);
 }
 
 

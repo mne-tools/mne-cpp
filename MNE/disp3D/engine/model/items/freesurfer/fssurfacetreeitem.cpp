@@ -43,6 +43,7 @@
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>
@@ -130,11 +131,11 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
 
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(),
-                                                        tSurface.nn(),
-                                                        tSurface.tris(),
-                                                        matCurvatureColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
+    m_pCustomMesh->setMeshData(tSurface.rr(),
+                                tSurface.nn(),
+                                tSurface.tris(),
+                                matCurvatureColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
     m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     //Add data which is held by this FsSurfaceTreeItem

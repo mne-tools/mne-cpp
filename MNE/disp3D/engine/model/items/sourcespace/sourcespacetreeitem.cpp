@@ -41,6 +41,7 @@
 #include "sourcespacetreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_hemisphere.h>
 
@@ -127,11 +128,11 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
     MatrixX3f matVertColor = createVertColor(tHemisphere.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tHemisphere.rr,
-                                                        tHemisphere.nn,
-                                                        tHemisphere.tris,
-                                                        matVertColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
+    m_pCustomMesh->setMeshData(tHemisphere.rr,
+                                tHemisphere.nn,
+                                tHemisphere.tris,
+                                matVertColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
 
     //Add data which is held by this SourceSpaceTreeItem
     QVariant data;

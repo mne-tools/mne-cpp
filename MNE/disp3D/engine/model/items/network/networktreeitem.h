@@ -43,7 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 
-#include "../common/abstracttreeitem.h"
+#include "../common/abstractsurfacetreeitem.h"
 #include "../common/types.h"
 
 #include <connectivity/network/network.h>
@@ -105,7 +105,7 @@ class MetaTreeItem;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT NetworkTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT NetworkTreeItem : public AbstractSurfaceTreeItem
 {
     Q_OBJECT
 
