@@ -93,6 +93,10 @@ AbstractMeshTreeItem::~AbstractMeshTreeItem()
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
+
+        for(int i = 0; i < m_pRenderable3DEntity->childNodes().size(); ++i) {
+            m_pRenderable3DEntity->deleteLater();
+        }
     }
 }
 
