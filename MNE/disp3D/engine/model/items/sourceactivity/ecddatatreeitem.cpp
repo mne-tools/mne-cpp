@@ -103,6 +103,10 @@ EcdDataTreeItem::~EcdDataTreeItem()
 {
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
+
+        for(int i = 0; i < m_pRenderable3DEntity->childNodes().size(); ++i) {
+            m_pRenderable3DEntity->deleteLater();
+        }
     }
 }
 
