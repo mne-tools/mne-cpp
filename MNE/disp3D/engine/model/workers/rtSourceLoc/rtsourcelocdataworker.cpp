@@ -742,8 +742,8 @@ QPair<MatrixX3f, MatrixX3f> RtSourceLocDataWorker::performVisualizationTypeCalcu
         }
     }
 
-////    int iAllTimer = allTimer.elapsed();
-////    qDebug() << "All time" << iAllTimer;
+//    int iAllTimer = allTimer.elapsed();
+//    qDebug() << "All time" << iAllTimer;
 
     QPair<MatrixX3f, MatrixX3f> colorPair;
     colorPair.first =  m_lVisualizationInfo[0].matFinalVertColor;
