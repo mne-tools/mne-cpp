@@ -85,13 +85,6 @@ SensorSetTreeItem::SensorSetTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-SensorSetTreeItem::~SensorSetTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void SensorSetTreeItem::initItem()
 {
     this->setEditable(false);

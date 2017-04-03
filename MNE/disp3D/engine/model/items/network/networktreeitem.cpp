@@ -93,19 +93,8 @@ NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
 , m_bDataIsInit(false)
 , m_bNodesPlotted(false)
 , m_pItemNetworkThreshold(new MetaTreeItem())
-, m_pRenderable3DEntity(new Renderable3DEntity())
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-NetworkTreeItem::~NetworkTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-    }
 }
 
 
@@ -137,6 +126,14 @@ void NetworkTreeItem::initItem()
     list << pItemNetworkMatrix;
     list << new QStandardItem(pItemNetworkMatrix->toolTip());
     this->appendRow(list);
+
+    //Set shaders
+    m_pRenderable3DEntity->removeComponent(m_pMaterial);
+    m_pRenderable3DEntity->removeComponent(m_pTessMaterial);
+    m_pRenderable3DEntity->removeComponent(m_pNormalMaterial);
+
+    NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
+    m_pRenderable3DEntity->addComponent(pNetworkMaterial);
 }
 
 
@@ -162,10 +159,6 @@ void NetworkTreeItem::initData(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pRenderable3DEntity->setParent(parent);
-
-    //Set shaders
-    NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
-    m_pRenderable3DEntity->addComponent(pNetworkMaterial);
 
     m_bDataIsInit = true;
 }
@@ -201,18 +194,6 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
 void NetworkTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
-void NetworkTreeItem::setVisible(bool state)
-{
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        m_lNodes.at(i)->setEnabled(state);
-    }
-
-    m_pRenderable3DEntity->setEnabled(state);
 }
 
 
@@ -314,7 +295,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         //Plot in edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
-            if(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight() >= vecThreshold.x()) {
+            if(abs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()) >= vecThreshold.x()) {
                 tMatLines.conservativeResize(count+1,2);
                 tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
                 tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
@@ -324,7 +305,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
 
         //Plot out edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
-            if(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight() >= vecThreshold.x()) {
+            if(abs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()) >= vecThreshold.x()) {
                 tMatLines.conservativeResize(count+1,2);
                 tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
                 tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();

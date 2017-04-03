@@ -152,7 +152,7 @@ public:
     *
     * @return The costum mesh.
     */
-    QPointer<CustomMesh> getCustomMesh();
+    virtual QPointer<CustomMesh> getCustomMesh();
 
 protected:
     //=========================================================================================================

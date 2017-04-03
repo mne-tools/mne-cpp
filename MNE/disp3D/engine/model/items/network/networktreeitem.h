@@ -124,12 +124,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~NetworkTreeItem();
-
-    //=========================================================================================================
-    /**
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
@@ -176,14 +170,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
-
-    //=========================================================================================================
-    /**
     * This function gets called whenever the network threshold changes.
     *
     * @param[in] vecThresholds     The new threshold values used for threshold the network.
@@ -203,8 +189,6 @@ private:
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
     MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
-
-    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;          /**< The renderable 3D entity. */
 
     QList<QPointer<Renderable3DEntity> >        m_lNodes;                       /**< The currently displayed node points as 3D spheres. */
 

@@ -286,7 +286,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                 QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
 
                 //Get data
-                MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+                MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>().array().abs();
 
                 //Calcualte histogram
                 Eigen::VectorXd resultClassLimit;
@@ -484,7 +484,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
                     QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
 
                     //Get data
-                    MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+                    MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>().array().abs();
 
                     //Calcualte histogram
                     Eigen::VectorXd resultClassLimit;
