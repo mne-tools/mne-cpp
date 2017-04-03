@@ -138,6 +138,13 @@ void AbstractSurfaceTreeItem::initItem()
     pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
     pItemSurfCol->setData(data, Qt::DecorationRole);
 
+    //Material options
+    MetaTreeItem* pItemMaterialOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Material");
+    list.clear();
+    list << pItemMaterialOptions;
+    list << new QStandardItem("The material options");
+    this->appendRow(list);
+
     QString surfaceType("Phong Alpha");
     MetaTreeItem* pItemMaterialType = new MetaTreeItem(MetaTreeItemTypes::MaterialType, surfaceType);
     connect(pItemMaterialType, &MetaTreeItem::dataChanged,
@@ -145,7 +152,7 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << pItemMaterialType;
     list << new QStandardItem(pItemMaterialType->toolTip());
-    this->appendRow(list);
+    pItemMaterialOptions->appendRow(list);
     data.setValue(QString(surfaceType));
     pItemMaterialType->setData(data, MetaTreeItemRoles::SurfaceMaterial);
     pItemMaterialType->setData(data, Qt::DecorationRole);
@@ -157,7 +164,7 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << itemTessInner;
     list << new QStandardItem(itemTessInner->toolTip());
-    pItemMaterialType->appendRow(list);
+    pItemMaterialOptions->appendRow(list);
     data.setValue(fTessInner);
     itemTessInner->setData(data, MetaTreeItemRoles::SurfaceTessInner);
 
@@ -168,7 +175,7 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << itemTessOuter;
     list << new QStandardItem(itemTessOuter->toolTip());
-    pItemMaterialType->appendRow(list);
+    pItemMaterialOptions->appendRow(list);
     data.setValue(fTessOuter);
     itemTessOuter->setData(data, MetaTreeItemRoles::SurfaceTessOuter);
 
@@ -179,7 +186,7 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << itemTriangleScale;
     list << new QStandardItem(itemTriangleScale->toolTip());
-    pItemMaterialType->appendRow(list);
+    pItemMaterialOptions->appendRow(list);
     data.setValue(fTriangleScale);
     itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 
@@ -190,6 +197,13 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << pItemShowNormals;
     list << new QStandardItem("Show the normals");
+    pItemMaterialOptions->appendRow(list);
+
+    //Transformation
+    MetaTreeItem* pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
+    list.clear();
+    list << pItemMaterialOptions;
+    list << new QStandardItem("The material options");
     this->appendRow(list);
 
     MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
@@ -199,7 +213,7 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << itemXTrans;
     list << new QStandardItem(itemXTrans->toolTip());
-    this->appendRow(list);
+    pItemTransformationOptions->appendRow(list);
 
     MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
     itemYTrans->setEditable(true);
@@ -208,7 +222,7 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << itemYTrans;
     list << new QStandardItem(itemYTrans->toolTip());
-    this->appendRow(list);
+    pItemTransformationOptions->appendRow(list);
 
     MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
     itemZTrans->setEditable(true);
@@ -217,7 +231,7 @@ void AbstractSurfaceTreeItem::initItem()
     list.clear();
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
-    this->appendRow(list);
+    pItemTransformationOptions->appendRow(list);
 
     //Init materials
     m_pRenderable3DEntity->addComponent(m_pMaterial);
