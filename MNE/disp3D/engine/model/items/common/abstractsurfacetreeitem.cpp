@@ -44,6 +44,7 @@
 #include "../../materials/pervertexphongalphamaterial.h"
 #include "../../materials/pervertextessphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 
 //*************************************************************************************************************
@@ -79,6 +80,7 @@ AbstractSurfaceTreeItem::AbstractSurfaceTreeItem(int iType, const QString& text)
 , m_pMaterial(new PerVertexPhongAlphaMaterial())
 , m_pTessMaterial(new PerVertexTessPhongAlphaMaterial())
 , m_pNormalMaterial(new ShowNormalsMaterial())
+, m_pCustomMesh(new CustomMesh())
 {
     initItem();
 }
@@ -100,6 +102,14 @@ AbstractSurfaceTreeItem::~AbstractSurfaceTreeItem()
 QPointer<Renderable3DEntity> AbstractSurfaceTreeItem::getRenderableEntity()
 {
     return m_pRenderable3DEntity;
+}
+
+
+//*************************************************************************************************************
+
+QPointer<CustomMesh> AbstractSurfaceTreeItem::getCustomMesh()
+{
+    return m_pCustomMesh;
 }
 
 
@@ -202,8 +212,8 @@ void AbstractSurfaceTreeItem::initItem()
     //Transformation
     MetaTreeItem* pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
     list.clear();
-    list << pItemMaterialOptions;
-    list << new QStandardItem("The material options");
+    list << pItemTransformationOptions;
+    list << new QStandardItem("The transformation options");
     this->appendRow(list);
 
     MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
@@ -254,7 +264,7 @@ void AbstractSurfaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-            m_pRenderable3DEntity->getCustomMesh()->setColor(value.value<MatrixX3f>());
+            m_pCustomMesh->setColor(value.value<MatrixX3f>());
             break;
 
         default: // do nothing;
