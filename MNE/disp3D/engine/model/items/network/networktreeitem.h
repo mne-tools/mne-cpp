@@ -124,13 +124,6 @@ public:
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
     * @param[in] parent                 The Qt3D entity parent of the new item.
@@ -162,14 +155,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
     * This function gets called whenever the network threshold changes.
     *
     * @param[in] vecThresholds     The new threshold values used for threshold the network.
@@ -189,10 +174,6 @@ private:
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
     MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
-
-    QList<QPointer<Renderable3DEntity> >        m_lNodes;                       /**< The currently displayed node points as 3D spheres. */
-
-signals:
 
 };
 

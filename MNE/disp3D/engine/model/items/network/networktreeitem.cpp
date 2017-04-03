@@ -139,22 +139,6 @@ void NetworkTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant NetworkTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  NetworkTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 void NetworkTreeItem::initData(Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
@@ -191,14 +175,6 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
 void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
@@ -213,35 +189,6 @@ void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 
 void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& vecThreshold)
 {
-//    // Delete all old renderable children
-//    Renderable3DEntity* pParentTemp = new Renderable3DEntity();
-//    QList<QObject*> list = m_pRenderable3DEntity->children();
-//    QMutableListIterator<QObject*> i(list);
-//    int counter = 0;
-
-//    while (i.hasNext()) {
-//        if(Renderable3DEntity* entity = dynamic_cast<Renderable3DEntity*>(i.next())) {
-//            entity->setParent(pParentTemp);
-//            delete entity;
-//            i.remove();
-//            counter++;
-//        }
-//    }
-
-//    delete pParentTemp;
-
-//    qDebug() << "Deleted children from qt3d entity:" << counter;
-
-//    //Delete all nodes
-//    QMutableListIterator<QPointer<Renderable3DEntity> > i(m_lNodes);
-
-//    while(i.hasNext()) {
-//        delete i.next();
-//        i.remove();
-//    }
-
-//    m_lNodes.clear();
-
     //Create network vertices and normals
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
@@ -281,8 +228,6 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
             Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
             material->setAmbient(Qt::blue);
             sourceSphereEntity->addComponent(material);
-
-            m_lNodes.append(sourceSphereEntity);
         }
 
         m_bNodesPlotted = true;

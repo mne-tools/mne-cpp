@@ -119,13 +119,6 @@ public:
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Initializes the rt data item with neccessary information for visualization computations.
     *
     * @param[in] tForwardSolution                   The MNEForwardSolution.

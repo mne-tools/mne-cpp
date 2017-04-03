@@ -94,14 +94,6 @@ void AbstractTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant AbstractTreeItem::data(int role) const
-{
-    return QStandardItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
 void AbstractTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);

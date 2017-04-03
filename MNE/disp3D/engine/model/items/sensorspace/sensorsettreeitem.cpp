@@ -96,29 +96,6 @@ void SensorSetTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant SensorSetTreeItem::data(int role) const
-{
-    switch(role) {
-        case Data3DTreeModelItemRoles::BemName:
-            return QVariant();
-        default: // do nothing;
-            break;
-    }
-
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  SensorSetTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate sensor surfaces as childs

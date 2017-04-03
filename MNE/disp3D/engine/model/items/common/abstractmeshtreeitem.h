@@ -127,7 +127,6 @@ public:
     /**
     * AbstractTreeItem functions
     */
-    virtual QVariant data(int role = Qt::UserRole + 1) const;
     virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================

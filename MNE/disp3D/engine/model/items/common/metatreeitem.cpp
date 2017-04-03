@@ -173,14 +173,6 @@ void MetaTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant MetaTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
 void MetaTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);

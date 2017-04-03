@@ -115,14 +115,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
     * Adds source space data.
     *
     * @param[in] tHemisphere        The hemisphere data of the source space.
@@ -144,11 +136,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    void setVisible(bool state);
-
-    QList<QPointer<Renderable3DEntity> >        m_lSpheres;                 /**< The currently displayed source points as 3D spheres. */
-
 };
 
 } //NAMESPACE DISP3DLIB

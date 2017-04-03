@@ -100,22 +100,6 @@ void MriTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant MriTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  MriTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 QList<FsSurfaceTreeItem*> MriTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters

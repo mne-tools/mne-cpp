@@ -123,22 +123,6 @@ void MeasurementTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant MeasurementTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  MeasurementTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 SourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
