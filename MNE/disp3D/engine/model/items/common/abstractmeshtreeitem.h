@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     abstractsurfacetreeitem.h
+* @file     AbstractMeshTreeItem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     AbstractSurfaceTreeItem class declaration.
+* @brief     AbstractMeshTreeItem class declaration.
 *
 */
 
-#ifndef ABSTRACTSURFACETREEITEM_H
-#define ABSTRACTSURFACETREEITEM_H
+#ifndef ABSTRACTMESHTREEITEM_H
+#define ABSTRACTMESHTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,17 +95,17 @@ class CustomMesh;
 
 //=============================================================================================================
 /**
-* AbstractSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* AbstractMeshTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT AbstractSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT AbstractMeshTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AbstractSurfaceTreeItem> SPtr;             /**< Shared pointer type for AbstractSurfaceTreeItem class. */
-    typedef QSharedPointer<const AbstractSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for AbstractSurfaceTreeItem class. */
+    typedef QSharedPointer<AbstractMeshTreeItem> SPtr;             /**< Shared pointer type for AbstractMeshTreeItem class. */
+    typedef QSharedPointer<const AbstractMeshTreeItem> ConstSPtr;  /**< Const shared pointer type for AbstractMeshTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -114,14 +114,14 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit AbstractSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::AbstractSurfaceItem,
+    explicit AbstractMeshTreeItem(int iType = Data3DTreeModelItemTypes::AbstractSurfaceItem,
                                      const QString& text = "Abstract Surface");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~AbstractSurfaceTreeItem();
+    ~AbstractMeshTreeItem();
 
     //=========================================================================================================
     /**
@@ -271,4 +271,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // ABSTRACTSURFACETREEITEM_H
+#endif // ABSTRACTMESHTREEITEM_H

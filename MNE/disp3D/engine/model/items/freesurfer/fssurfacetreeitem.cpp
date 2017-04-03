@@ -79,7 +79,7 @@ using namespace FSLIB;
 //=============================================================================================================
 
 FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
-: AbstractSurfaceTreeItem(iType, text)
+: AbstractMeshTreeItem(iType, text)
 , m_sColorInfoOrigin("Color from curvature")
 , m_pItemSurfColGyri(new MetaTreeItem())
 , m_pItemSurfColSulci(new MetaTreeItem())

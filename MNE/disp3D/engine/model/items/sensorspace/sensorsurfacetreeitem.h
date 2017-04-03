@@ -43,7 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 
-#include "../common/abstractsurfacetreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 #include "../common/types.h"
 
 
@@ -100,7 +100,7 @@ class Renderable3DEntity;
 *
 * @brief SensorSurfaceTreeItem provides a generic brain tree item to hold sensor surfaces.
 */
-class DISP3DNEWSHARED_EXPORT SensorSurfaceTreeItem : public AbstractSurfaceTreeItem
+class DISP3DNEWSHARED_EXPORT SensorSurfaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 

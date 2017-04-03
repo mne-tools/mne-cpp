@@ -75,7 +75,7 @@ using namespace MNELIB;
 //=============================================================================================================
 
 BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
-: AbstractSurfaceTreeItem(iType, text)
+: AbstractMeshTreeItem(iType, text)
 {
     initItem();
 }

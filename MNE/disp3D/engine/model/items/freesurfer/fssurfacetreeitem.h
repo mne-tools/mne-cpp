@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstractsurfacetreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 #include "../common/types.h"
 
 
@@ -94,7 +94,7 @@ class Renderable3DEntity;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractSurfaceTreeItem
+class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
