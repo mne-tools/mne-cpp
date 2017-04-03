@@ -88,7 +88,7 @@ namespace Data3DTreeModelItemTypes
                     AnnotationItem = QStandardItem::UserType + 4,
                     MNEEstimateItem = QStandardItem::UserType + 5,
                     SourceSpaceItem = QStandardItem::UserType + 6,
-                    RTConnectivityDataItem = QStandardItem::UserType + 7,
+                    NetworkItem = QStandardItem::UserType + 7,
                     SubjectItem = QStandardItem::UserType + 8,
                     BemItem = QStandardItem::UserType + 9,
                     BemSurfaceItem = QStandardItem::UserType + 10,
@@ -129,7 +129,9 @@ namespace MetaTreeItemTypes
                     SurfaceTessInner = QStandardItem::UserType + 122,
                     SurfaceTessOuter = QStandardItem::UserType + 123,
                     SurfaceTriangleScale = QStandardItem::UserType + 124,
-                    NumberDipoles = QStandardItem::UserType + 125};
+                    NumberDipoles = QStandardItem::UserType + 125,
+                    MaterialType = QStandardItem::UserType + 126,
+                    ShowNormals = QStandardItem::UserType + 127  };
 }
 
 // Model item roles
@@ -195,7 +197,8 @@ namespace MetaTreeItemRoles
                     NetworkThreshold = Qt::UserRole + 22,
                     SurfaceTessInner = Qt::UserRole + 23,
                     SurfaceTessOuter = Qt::UserRole + 24,
-                    SurfaceTriangleScale = Qt::UserRole + 25};
+                    SurfaceTriangleScale = Qt::UserRole + 25,
+                    SurfaceMaterial = Qt::UserRole + 26};
 }
 
 } //NAMESPACE DISP3DLIB

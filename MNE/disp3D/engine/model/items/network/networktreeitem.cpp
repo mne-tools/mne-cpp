@@ -128,7 +128,7 @@ void NetworkTreeItem::initItem()
     this->appendRow(list);
     data.setValue(vecEdgeTrehshold);
     m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
-    connect(m_pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
+    connect(m_pItemNetworkThreshold, &MetaTreeItem::dataChanged,
             this, &NetworkTreeItem::onNetworkThresholdChanged);
 
     list.clear();
@@ -217,11 +217,13 @@ void NetworkTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
+void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 {
-    Network tNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network>();
+    if(vecThresholds.canConvert<QVector3D>()) {
+        Network tNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network>();
 
-    plotNetwork(tNetwork, vecThresholds);
+        plotNetwork(tNetwork, vecThresholds.value<QVector3D>());
+    }
 }
 
 

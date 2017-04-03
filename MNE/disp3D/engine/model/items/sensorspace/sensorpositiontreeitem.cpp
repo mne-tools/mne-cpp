@@ -109,7 +109,7 @@ void SensorPositionTreeItem::initItem()
     QList<QStandardItem*> list;
 
     MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
-    connect(pItemColor, &MetaTreeItem::colorChanged,
+    connect(pItemColor, &MetaTreeItem::dataChanged,
             this, &SensorPositionTreeItem::onSurfaceColorChanged);
     list.clear();
     list << pItemColor;
@@ -121,7 +121,7 @@ void SensorPositionTreeItem::initItem()
 
     float fAlpha = 1.0f;
     MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::alphaChanged,
+    connect(itemAlpha, &MetaTreeItem::dataChanged,
             this, &SensorPositionTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
@@ -243,14 +243,16 @@ void SensorPositionTreeItem::onCheckStateChanged(const Qt::CheckState& checkStat
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::onSurfaceColorChanged(const QColor& color)
+void SensorPositionTreeItem::onSurfaceColorChanged(const QVariant& color)
 {
-    for(int i = 0; i < m_lRects.size(); ++i) {
-        for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
-            Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
+    if(color.canConvert<QColor>()) {
+        for(int i = 0; i < m_lRects.size(); ++i) {
+            for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
+                Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
 
-            if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
-                pMaterial->setAmbient(color);
+                if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
+                    pMaterial->setAmbient(color.value<QColor>());
+                }
             }
         }
     }
@@ -259,14 +261,16 @@ void SensorPositionTreeItem::onSurfaceColorChanged(const QColor& color)
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::onSurfaceAlphaChanged(float fAlpha)
+void SensorPositionTreeItem::onSurfaceAlphaChanged(const QVariant& fAlpha)
 {
-    for(int i = 0; i < m_lRects.size(); ++i) {
-        for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
-            Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
+    if(fAlpha.canConvert<float>()) {
+        for(int i = 0; i < m_lRects.size(); ++i) {
+            for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
+                Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
 
-            if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
-                pMaterial->setAlpha(fAlpha);
+                if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
+                    pMaterial->setAlpha(fAlpha.toFloat());
+                }
             }
         }
     }

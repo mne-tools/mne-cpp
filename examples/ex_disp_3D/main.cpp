@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(true);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
-            pRTDataItem->setVisualizationType("Annotation based");
+            pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColortable("Hot");
         }
     }

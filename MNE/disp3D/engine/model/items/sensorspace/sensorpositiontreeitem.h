@@ -173,7 +173,7 @@ protected:
     *
     * @param[in] color        The new surface color.
     */
-    void onSurfaceColorChanged(const QColor &color);
+    void onSurfaceColorChanged(const QVariant& color);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ protected:
     *
     * @param[in] fAlpha     The new alpha value.
     */
-    void onSurfaceAlphaChanged(float fAlpha);
+    void onSurfaceAlphaChanged(const QVariant& fAlpha);
 
     QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
 

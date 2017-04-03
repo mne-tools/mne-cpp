@@ -91,7 +91,6 @@ SourceSpaceTreeItem::~SourceSpaceTreeItem()
 {
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->deleteLater();
-        m_pRenderable3DEntityNormals->deleteLater();
     }
 }
 
@@ -121,7 +120,6 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
 {
     //Set parents
     m_pRenderable3DEntity->setParent(parent);
-    m_pRenderable3DEntityNormals->setParent(parent);
 
     m_pRenderable3DEntity->setRotX(40);
 
@@ -134,15 +132,6 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QE
                                                         tHemisphere.tris,
                                                         matVertColor,
                                                         Qt3DRender::QGeometryRenderer::Triangles);
-
-    //Render normals
-    if(m_bRenderNormals) {
-        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tHemisphere.rr,
-                                                                      tHemisphere.nn,
-                                                                      tHemisphere.tris,
-                                                                      matVertColor,
-                                                                      Qt3DRender::QGeometryRenderer::Triangles);
-    }
 
     //Add data which is held by this SourceSpaceTreeItem
     QVariant data;

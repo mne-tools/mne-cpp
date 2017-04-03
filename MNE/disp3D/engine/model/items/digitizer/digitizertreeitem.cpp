@@ -106,7 +106,7 @@ void DigitizerTreeItem::initItem()
     QList<QStandardItem*> list;
 
     MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
-    connect(pItemColor, &MetaTreeItem::colorChanged,
+    connect(pItemColor, &MetaTreeItem::dataChanged,
             this, &DigitizerTreeItem::onSurfaceColorChanged);
     list.clear();
     list << pItemColor;
@@ -248,14 +248,16 @@ void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
+void DigitizerTreeItem::onSurfaceColorChanged(const QVariant& color)
 {
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {
-            Qt3DCore::QComponent* pComponent = m_lSpheres.at(i)->components().at(j);
+    if(color.canConvert<QColor>()) {
+        for(int i = 0; i < m_lSpheres.size(); ++i) {
+            for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {
+                Qt3DCore::QComponent* pComponent = m_lSpheres.at(i)->components().at(j);
 
-            if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
-                pMaterial->setAmbient(color);
+                if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
+                    pMaterial->setAmbient(color.value<QColor>());
+                }
             }
         }
     }
