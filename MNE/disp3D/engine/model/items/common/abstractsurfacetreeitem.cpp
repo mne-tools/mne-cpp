@@ -245,6 +245,10 @@ void AbstractSurfaceTreeItem::initItem()
 
     //Init materials
     m_pRenderable3DEntity->addComponent(m_pMaterial);
+    m_pRenderable3DEntity->addComponent(m_pNormalMaterial);
+
+    //Init custom mesh
+    m_pRenderable3DEntity->addComponent(m_pCustomMesh);
 }
 
 
@@ -372,16 +376,16 @@ void AbstractSurfaceTreeItem::onSurfaceColorChanged(const QVariant& color)
 
 void AbstractSurfaceTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
 {
-//    m_pRenderable3DEntity->removeComponent(m_pTessMaterial);
-//    m_pRenderable3DEntity->removeComponent(m_pMaterial);
+    m_pRenderable3DEntity->removeComponent(m_pTessMaterial);
+    m_pRenderable3DEntity->removeComponent(m_pMaterial);
 
-//    if(sMaterial.toString() == "Phong Alpha") {
-//        m_pRenderable3DEntity->addComponent(m_pMaterial);
-//        m_pRenderable3DEntity->getCustomMesh()->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
-//    } else if(sMaterial.toString() == "Phong Alpha Tesselation") {
-//        m_pRenderable3DEntity->addComponent(m_pTessMaterial);
-//        m_pRenderable3DEntity->getCustomMesh()->setPrimitiveType(Qt3DRender::QGeometryRenderer::Patches);
-//    }
+    if(sMaterial.toString() == "Phong Alpha") {
+        m_pRenderable3DEntity->addComponent(m_pMaterial);
+        m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
+    } else if(sMaterial.toString() == "Phong Alpha Tesselation") {
+        m_pRenderable3DEntity->addComponent(m_pTessMaterial);
+        m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Patches);
+    }
 }
 
 

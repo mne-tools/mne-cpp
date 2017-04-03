@@ -106,7 +106,6 @@ namespace MetaTreeItemTypes
 {
     enum ItemType{FileName = QStandardItem::UserType + 100,
                     FilePath = QStandardItem::UserType + 101,
-                    SurfaceType = QStandardItem::UserType + 102,
                     SurfaceColorGyri = QStandardItem::UserType + 103,
                     SurfaceColorSulci = QStandardItem::UserType + 104,
                     SurfaceColorVert = QStandardItem::UserType + 105,
