@@ -163,23 +163,14 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(tSurface.fileName());
     itemSurfFileName->setData(data, MetaTreeItemRoles::SurfaceFileName);
 
-    MetaTreeItem *itemSurfType = new MetaTreeItem(MetaTreeItemTypes::SurfaceType, tSurface.surf());
-    itemSurfType->setEditable(false);
-    list.clear();
-    list << itemSurfType;
-    list << new QStandardItem(itemSurfType->toolTip());
-    this->appendRow(list);
-    data.setValue(tSurface.surf());
-    itemSurfType->setData(data, MetaTreeItemRoles::SurfaceType);
-
-    MetaTreeItem *itemSurfPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tSurface.filePath());
-    itemSurfPath->setEditable(false);
-    list.clear();
-    list << itemSurfPath;
-    list << new QStandardItem(itemSurfPath->toolTip());
-    this->appendRow(list);
-    data.setValue(tSurface.filePath());
-    itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
+//    MetaTreeItem *itemSurfPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tSurface.filePath());
+//    itemSurfPath->setEditable(false);
+//    list.clear();
+//    list << itemSurfPath;
+//    list << new QStandardItem(itemSurfPath->toolTip());
+//    this->appendRow(list);
+//    data.setValue(tSurface.filePath());
+//    itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
 }
 
 

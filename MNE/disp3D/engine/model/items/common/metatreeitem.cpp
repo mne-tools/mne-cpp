@@ -97,9 +97,6 @@ void MetaTreeItem::initItem()
         case MetaTreeItemTypes::FilePath:
             sToolTip = "File path";
             break;
-        case MetaTreeItemTypes::SurfaceType:
-            sToolTip = "Surface type";
-            break;
         case MetaTreeItemTypes::SurfaceColorGyri:
             sToolTip = "Color Gyri";
             break;
