@@ -89,6 +89,14 @@ void SensorSurfaceTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("Sensor surface item");
+
+    //Set shaders
+    m_pRenderable3DEntity->removeComponent(m_pMaterial);
+    m_pRenderable3DEntity->removeComponent(m_pTessMaterial);
+    m_pRenderable3DEntity->removeComponent(m_pNormalMaterial);
+
+    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+    m_pRenderable3DEntity->addComponent(pBemMaterial);
 }
 
 

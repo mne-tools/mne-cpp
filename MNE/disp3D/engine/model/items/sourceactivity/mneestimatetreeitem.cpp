@@ -480,7 +480,6 @@ void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 void MneEstimateTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        qDebug() << "MneEstimateTreeItem::onDataNormalizationValueChanged"<<vecThresholds.value<QVector3D>() ;
         m_pSourceLocRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
     }
 }
