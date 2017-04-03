@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     abstractsurfacetreeitem.cpp
+* @file     abstractmeshtreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    AbstractSurfaceTreeItem class definition.
+* @brief    AbstractMeshTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "abstractsurfacetreeitem.h"
+#include "abstractmeshtreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
@@ -74,7 +74,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AbstractSurfaceTreeItem::AbstractSurfaceTreeItem(int iType, const QString& text)
+AbstractMeshTreeItem::AbstractMeshTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pMaterial(new PerVertexPhongAlphaMaterial())
@@ -88,7 +88,7 @@ AbstractSurfaceTreeItem::AbstractSurfaceTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-AbstractSurfaceTreeItem::~AbstractSurfaceTreeItem()
+AbstractMeshTreeItem::~AbstractMeshTreeItem()
 {
     //Schedule deletion/Decouple of all entities so that the SceneGraph is NOT plotting them anymore.
     if(m_pRenderable3DEntity) {
@@ -99,7 +99,7 @@ AbstractSurfaceTreeItem::~AbstractSurfaceTreeItem()
 
 //*************************************************************************************************************
 
-QPointer<Renderable3DEntity> AbstractSurfaceTreeItem::getRenderableEntity()
+QPointer<Renderable3DEntity> AbstractMeshTreeItem::getRenderableEntity()
 {
     return m_pRenderable3DEntity;
 }
@@ -107,7 +107,7 @@ QPointer<Renderable3DEntity> AbstractSurfaceTreeItem::getRenderableEntity()
 
 //*************************************************************************************************************
 
-QPointer<CustomMesh> AbstractSurfaceTreeItem::getCustomMesh()
+QPointer<CustomMesh> AbstractMeshTreeItem::getCustomMesh()
 {
     return m_pCustomMesh;
 }
@@ -115,7 +115,7 @@ QPointer<CustomMesh> AbstractSurfaceTreeItem::getCustomMesh()
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::initItem()
+void AbstractMeshTreeItem::initItem()
 {
     this->setEditable(false);
     this->setCheckable(true);
@@ -129,7 +129,7 @@ void AbstractSurfaceTreeItem::initItem()
     float fAlpha = 0.35f;
     MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
     connect(itemAlpha, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceAlphaChanged);
+            this, &AbstractMeshTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
@@ -139,7 +139,7 @@ void AbstractSurfaceTreeItem::initItem()
 
     MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
     connect(pItemSurfCol, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceColorChanged);
+            this, &AbstractMeshTreeItem::onSurfaceColorChanged);
     list.clear();
     list << pItemSurfCol;
     list << new QStandardItem(pItemSurfCol->toolTip());
@@ -158,7 +158,7 @@ void AbstractSurfaceTreeItem::initItem()
     QString surfaceType("Phong Alpha");
     MetaTreeItem* pItemMaterialType = new MetaTreeItem(MetaTreeItemTypes::MaterialType, surfaceType);
     connect(pItemMaterialType, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceMaterialChanged);
+            this, &AbstractMeshTreeItem::onSurfaceMaterialChanged);
     list.clear();
     list << pItemMaterialType;
     list << new QStandardItem(pItemMaterialType->toolTip());
@@ -170,7 +170,7 @@ void AbstractSurfaceTreeItem::initItem()
     float fTessInner = 1.0;
     MetaTreeItem *itemTessInner = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessInner, QString("%1").arg(fTessInner));
     connect(itemTessInner, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceTessInnerChanged);
+            this, &AbstractMeshTreeItem::onSurfaceTessInnerChanged);
     list.clear();
     list << itemTessInner;
     list << new QStandardItem(itemTessInner->toolTip());
@@ -181,7 +181,7 @@ void AbstractSurfaceTreeItem::initItem()
     float fTessOuter = 1.0;
     MetaTreeItem *itemTessOuter = new MetaTreeItem(MetaTreeItemTypes::SurfaceTessOuter, QString("%1").arg(fTessOuter));
     connect(itemTessOuter, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceTessOuterChanged);
+            this, &AbstractMeshTreeItem::onSurfaceTessOuterChanged);
     list.clear();
     list << itemTessOuter;
     list << new QStandardItem(itemTessOuter->toolTip());
@@ -192,7 +192,7 @@ void AbstractSurfaceTreeItem::initItem()
     float fTriangleScale = 1.0;
     MetaTreeItem *itemTriangleScale = new MetaTreeItem(MetaTreeItemTypes::SurfaceTriangleScale, QString("%1").arg(fTriangleScale));
     connect(itemTriangleScale, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceTriangleScaleChanged);
+            this, &AbstractMeshTreeItem::onSurfaceTriangleScaleChanged);
     list.clear();
     list << itemTriangleScale;
     list << new QStandardItem(itemTriangleScale->toolTip());
@@ -202,7 +202,7 @@ void AbstractSurfaceTreeItem::initItem()
 
     MetaTreeItem* pItemShowNormals = new MetaTreeItem(MetaTreeItemTypes::ShowNormals, "Show normals");
     connect(pItemShowNormals, &MetaTreeItem::checkStateChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceNormalsChanged);
+            this, &AbstractMeshTreeItem::onSurfaceNormalsChanged);
     pItemShowNormals->setCheckable(true);
     list.clear();
     list << pItemShowNormals;
@@ -219,7 +219,7 @@ void AbstractSurfaceTreeItem::initItem()
     MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
     itemXTrans->setEditable(true);
     connect(itemXTrans, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceTranslationXChanged);
+            this, &AbstractMeshTreeItem::onSurfaceTranslationXChanged);
     list.clear();
     list << itemXTrans;
     list << new QStandardItem(itemXTrans->toolTip());
@@ -228,7 +228,7 @@ void AbstractSurfaceTreeItem::initItem()
     MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
     itemYTrans->setEditable(true);
     connect(itemYTrans, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceTranslationYChanged);
+            this, &AbstractMeshTreeItem::onSurfaceTranslationYChanged);
     list.clear();
     list << itemYTrans;
     list << new QStandardItem(itemYTrans->toolTip());
@@ -237,7 +237,7 @@ void AbstractSurfaceTreeItem::initItem()
     MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
     itemZTrans->setEditable(true);
     connect(itemZTrans, &MetaTreeItem::dataChanged,
-            this, &AbstractSurfaceTreeItem::onSurfaceTranslationZChanged);
+            this, &AbstractMeshTreeItem::onSurfaceTranslationZChanged);
     list.clear();
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
@@ -245,7 +245,6 @@ void AbstractSurfaceTreeItem::initItem()
 
     //Init materials
     m_pRenderable3DEntity->addComponent(m_pMaterial);
-    m_pRenderable3DEntity->addComponent(m_pNormalMaterial);
 
     //Init custom mesh
     m_pRenderable3DEntity->addComponent(m_pCustomMesh);
@@ -254,7 +253,7 @@ void AbstractSurfaceTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant AbstractSurfaceTreeItem::data(int role) const
+QVariant AbstractMeshTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -262,7 +261,7 @@ QVariant AbstractSurfaceTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::setData(const QVariant& value, int role)
+void AbstractMeshTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
@@ -279,7 +278,7 @@ void AbstractSurfaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::setVisible(bool state)
+void AbstractMeshTreeItem::setVisible(bool state)
 {
     for(int i = 0; i < m_pRenderable3DEntity->childNodes().size(); ++i) {
         m_pRenderable3DEntity->childNodes()[i]->setEnabled(state);
@@ -290,7 +289,7 @@ void AbstractSurfaceTreeItem::setVisible(bool state)
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceAlphaChanged(const QVariant& fAlpha)
+void AbstractMeshTreeItem::onSurfaceAlphaChanged(const QVariant& fAlpha)
 {
     if(fAlpha.canConvert<float>()) {
         m_pRenderable3DEntity->setMaterialParameter(fAlpha.toFloat(), "alpha");
@@ -300,7 +299,7 @@ void AbstractSurfaceTreeItem::onSurfaceAlphaChanged(const QVariant& fAlpha)
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceTessInnerChanged(const QVariant& fTessInner)
+void AbstractMeshTreeItem::onSurfaceTessInnerChanged(const QVariant& fTessInner)
 {
     m_pRenderable3DEntity->setMaterialParameter(fTessInner.toFloat(), "innerTess");
 }
@@ -308,7 +307,7 @@ void AbstractSurfaceTreeItem::onSurfaceTessInnerChanged(const QVariant& fTessInn
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceTessOuterChanged(const QVariant& fTessOuter)
+void AbstractMeshTreeItem::onSurfaceTessOuterChanged(const QVariant& fTessOuter)
 {
     m_pRenderable3DEntity->setMaterialParameter(fTessOuter.toFloat(), "outerTess");
 }
@@ -316,7 +315,7 @@ void AbstractSurfaceTreeItem::onSurfaceTessOuterChanged(const QVariant& fTessOut
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale)
+void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale)
 {
     m_pRenderable3DEntity->setMaterialParameter(fTriangleScale.toFloat(), "triangleScale");
 }
@@ -324,7 +323,7 @@ void AbstractSurfaceTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTri
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void AbstractMeshTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {    
     m_pRenderable3DEntity->setEnabled(checkState == Qt::Unchecked ? false : true);
 }
@@ -332,7 +331,7 @@ void AbstractSurfaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkSta
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
+void AbstractMeshTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
 {
     QVector3D position = m_pRenderable3DEntity->position();
     position.setX(fTransX.toFloat());
@@ -342,7 +341,7 @@ void AbstractSurfaceTreeItem::onSurfaceTranslationXChanged(const QVariant& fTran
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
+void AbstractMeshTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
 {
     QVector3D position = m_pRenderable3DEntity->position();
     position.setY(fTransY.toFloat());
@@ -352,7 +351,7 @@ void AbstractSurfaceTreeItem::onSurfaceTranslationYChanged(const QVariant& fTran
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceTranslationZChanged(const QVariant& fTransZ)
+void AbstractMeshTreeItem::onSurfaceTranslationZChanged(const QVariant& fTransZ)
 {
     QVector3D position = m_pRenderable3DEntity->position();
     position.setZ(fTransZ.toFloat());
@@ -362,7 +361,7 @@ void AbstractSurfaceTreeItem::onSurfaceTranslationZChanged(const QVariant& fTran
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceColorChanged(const QVariant& color)
+void AbstractMeshTreeItem::onSurfaceColorChanged(const QVariant& color)
 {
     QVariant data;
     MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color.value<QColor>());
@@ -374,7 +373,7 @@ void AbstractSurfaceTreeItem::onSurfaceColorChanged(const QVariant& color)
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
+void AbstractMeshTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
 {
     m_pRenderable3DEntity->removeComponent(m_pTessMaterial);
     m_pRenderable3DEntity->removeComponent(m_pMaterial);
@@ -391,7 +390,7 @@ void AbstractSurfaceTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial
 
 //*************************************************************************************************************
 
-void AbstractSurfaceTreeItem::onSurfaceNormalsChanged(const Qt::CheckState& checkState)
+void AbstractMeshTreeItem::onSurfaceNormalsChanged(const Qt::CheckState& checkState)
 {
     m_pNormalMaterial->setEnabled(checkState == Qt::Unchecked ? false : true);
 }
@@ -399,7 +398,7 @@ void AbstractSurfaceTreeItem::onSurfaceNormalsChanged(const Qt::CheckState& chec
 
 //*************************************************************************************************************
 
-MatrixX3f AbstractSurfaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
+MatrixX3f AbstractMeshTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
 {
     MatrixX3f matColor(vertices.rows(),3);
 

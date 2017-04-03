@@ -80,7 +80,7 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
-: AbstractSurfaceTreeItem(iType, text)
+: AbstractMeshTreeItem(iType, text)
 {
     initItem();
 }

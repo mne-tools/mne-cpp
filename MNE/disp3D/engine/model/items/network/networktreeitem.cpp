@@ -89,7 +89,7 @@ using namespace CONNECTIVITYLIB;
 //=============================================================================================================
 
 NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
-: AbstractSurfaceTreeItem(iType, text)
+: AbstractMeshTreeItem(iType, text)
 , m_bDataIsInit(false)
 , m_bNodesPlotted(false)
 , m_pItemNetworkThreshold(new MetaTreeItem())
