@@ -88,16 +88,6 @@ SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem::~SourceSpaceTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-    }
-}
-
-
-//*************************************************************************************************************
-
 void SourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState == Qt::Unchecked ? false : true);

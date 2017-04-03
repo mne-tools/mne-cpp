@@ -115,12 +115,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~SourceSpaceTreeItem();
-
-    //=========================================================================================================
-    /**
     * Call this function whenever the check box of this item was checked.
     *
     * @param[in] checkState        The current checkstate.
