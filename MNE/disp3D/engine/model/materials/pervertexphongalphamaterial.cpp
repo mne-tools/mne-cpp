@@ -141,7 +141,7 @@ void PerVertexPhongAlphaMaterial::init()
     m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
-    //If wanted setup transparency
+    //If wanted setup transparency - TODO: Fix transparency problem and remove this
     if(m_bUseAlpha) {
         m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
         m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);

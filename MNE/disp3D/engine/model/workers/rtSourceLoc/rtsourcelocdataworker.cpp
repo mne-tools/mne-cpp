@@ -180,7 +180,7 @@ void transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, do
 
     float dSample;
     QRgb qRgb;
-    double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
+    double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
 
     for(int r = 0; r < data.rows(); ++r) {
         dSample = data(r);
@@ -192,7 +192,12 @@ void transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, do
             } else if(dSample < dTrehsoldX) {
                 dSample = 0.0;
             } else {
-                dSample = (dSample - dTrehsoldX) / (dTrehsoldDiff);
+                if(dTresholdDiff != 0.0) {
+                    dSample = (dSample - dTrehsoldX) / (dTresholdDiff);
+                } else {
+                    dSample = 0.0f;
+                }
+
             }
 
             qRgb = functionHandlerColorMap(dSample);
@@ -214,15 +219,19 @@ void transformDataToColor(float fSample, QColor& finalVertColor, double dTrehsol
 {
     //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
     //      Otherwise we would have to check which color map to take for each vertex.
-    double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
+    double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
 
     //Check lower and upper thresholds and normalize to one
     if(fSample >= dTrehsoldZ) {
-        fSample = 1.0;
+        fSample = 1.0f;
     } else if(fSample < dTrehsoldX) {
-        fSample = 0.0;
+        fSample = 0.0f;
     } else {
-        fSample = (fSample - dTrehsoldX) / dTrehsoldDiff;
+        if(dTresholdDiff != 0.0) {
+            fSample = (fSample - dTrehsoldX) / dTresholdDiff;
+        } else {
+            fSample = 0.0f;
+        }
     }
 
     QRgb qRgb;
@@ -383,7 +392,8 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_bAnnotationDataIsInit(false)
 {
     m_lVisualizationInfo << VisualizationInfo() << VisualizationInfo();
-    m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
+    m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
+    m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
 }
 
 
@@ -497,7 +507,7 @@ void RtSourceLocDataWorker::setAnnotationData(const Eigen::VectorXi& vecLabelIds
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setNumberAverages(const int &iNumAvr)
+void RtSourceLocDataWorker::setNumberAverages(int iNumAvr)
 {
     QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = iNumAvr;
@@ -506,7 +516,7 @@ void RtSourceLocDataWorker::setNumberAverages(const int &iNumAvr)
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setInterval(const int& iMSec)
+void RtSourceLocDataWorker::setInterval(int iMSec)
 {
     QMutexLocker locker(&m_qMutex);
     m_iMSecIntervall = iMSec;
@@ -515,7 +525,7 @@ void RtSourceLocDataWorker::setInterval(const int& iMSec)
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setVisualizationType(const int& iVisType)
+void RtSourceLocDataWorker::setVisualizationType(int iVisType)
 {
     QMutexLocker locker(&m_qMutex);
     m_iVisualizationType = iVisType;
@@ -532,12 +542,12 @@ void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
     if(sColormapType == "Hot Negative 1") {
         m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative1;
         m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative1;
+    } else if(sColormapType == "Hot") {
+        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
+        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
     } else if(sColormapType == "Hot Negative 2") {
         m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
         m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative2;
-    } else if(sColormapType == "Hot") {        
-        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
-        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
     } else if(sColormapType == "Jet") {
         m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToJet;
         m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToJet;
@@ -732,8 +742,8 @@ QPair<MatrixX3f, MatrixX3f> RtSourceLocDataWorker::performVisualizationTypeCalcu
         }
     }
 
-//    int iAllTimer = allTimer.elapsed();
-//    qDebug() << "All time" << iAllTimer;
+////    int iAllTimer = allTimer.elapsed();
+////    qDebug() << "All time" << iAllTimer;
 
     QPair<MatrixX3f, MatrixX3f> colorPair;
     colorPair.first =  m_lVisualizationInfo[0].matFinalVertColor;

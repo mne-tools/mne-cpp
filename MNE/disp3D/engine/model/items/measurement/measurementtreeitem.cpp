@@ -334,7 +334,7 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
 {
     if(!tNetworkData.getNodes().isEmpty()) {
         //Add source estimation data as child
-        if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
+        if(this->findChildren(Data3DTreeModelItemTypes::NetworkItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
             m_pNetworkTreeItem = new NetworkTreeItem();
 

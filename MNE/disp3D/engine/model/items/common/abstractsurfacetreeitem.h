@@ -138,14 +138,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Removes the old material and sets the new material.
-    *
-    * @param[in] pMaterial     The new material.
-    */
-    virtual void setMaterial(QPointer<Qt3DRender::QMaterial> pMaterial);
-
-    //=========================================================================================================
-    /**
     * Returns the RenderableEntity as a pointer.
     *
     * @return   The RenderableEntity as a pointer.
@@ -165,7 +157,7 @@ protected:
     *
     * @param[in] fAlpha     The new alpha value.
     */
-    virtual void onSurfaceAlphaChanged(float fAlpha);
+    virtual void onSurfaceAlphaChanged(const QVariant& fAlpha);
 
     //=========================================================================================================
     /**
@@ -173,7 +165,7 @@ protected:
     *
     * @param[in] fTessInner     The new inner tesselation value.
     */
-    virtual void onSurfaceTessInnerChanged(float fTessInner);
+    virtual void onSurfaceTessInnerChanged(const QVariant& fTessInner);
 
     //=========================================================================================================
     /**
@@ -181,7 +173,7 @@ protected:
     *
     * @param[in] fTessOuter     The new outer tesselation value.
     */
-    virtual void onSurfaceTessOuterChanged(float fTessOuter);
+    virtual void onSurfaceTessOuterChanged(const QVariant& fTessOuter);
 
     //=========================================================================================================
     /**
@@ -189,7 +181,7 @@ protected:
     *
     * @param[in] fTriangleScale     The triangle scale value.
     */
-    virtual void onSurfaceTriangleScaleChanged(float fTriangleScale);
+    virtual void onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale);
 
     //=========================================================================================================
     /**
@@ -205,7 +197,7 @@ protected:
     *
     * @param[in] fTransX        The current x translation.
     */
-    virtual void onSurfaceTranslationXChanged(float fTransX);
+    virtual void onSurfaceTranslationXChanged(const QVariant& fTransX);
 
     //=========================================================================================================
     /**
@@ -213,7 +205,7 @@ protected:
     *
     * @param[in] fTransY        The current y translation.
     */
-    virtual void onSurfaceTranslationYChanged(float fTransY);
+    virtual void onSurfaceTranslationYChanged(const QVariant& fTransY);
 
     //=========================================================================================================
     /**
@@ -221,7 +213,7 @@ protected:
     *
     * @param[in] fTransZ        The current z translation.
     */
-    virtual void onSurfaceTranslationZChanged(float fTransZ);
+    virtual void onSurfaceTranslationZChanged(const QVariant& fTransZ);
 
     //=========================================================================================================
     /**
@@ -229,7 +221,23 @@ protected:
     *
     * @param[in] color        The new surface color.
     */
-    virtual void onSurfaceColorChanged(const QColor &color);
+    virtual void onSurfaceColorChanged(const QVariant& color);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the surface material was changed.
+    *
+    * @param[in] material        The new surface material.
+    */
+    virtual void onSurfaceMaterialChanged(const QVariant& sMaterial);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever surface normal visisbility state changed.
+    *
+    * @param[in] checkState        The current check state of teh corresponding item.
+    */
+    virtual void onSurfaceNormalsChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**
@@ -243,12 +251,10 @@ protected:
     virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
     QPointer<Renderable3DEntity>        m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
-    QPointer<Renderable3DEntity>        m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
 
     QPointer<Qt3DRender::QMaterial>     m_pMaterial;                                /**< The material. Ownership belongs to RenderableEntity. */
-
-    bool        m_bUseTesselation;      /**< Whether to use tesselation. */
-    bool        m_bRenderNormals;       /**< Whether to render normals. */
+    QPointer<Qt3DRender::QMaterial>     m_pTessMaterial;                            /**< The tesselation material. Ownership belongs to RenderableEntity. */
+    QPointer<Qt3DRender::QMaterial>     m_pNormalMaterial;                          /**< The normal material. Ownership belongs to RenderableEntity. */
 };
 
 } //NAMESPACE DISP3DLIB

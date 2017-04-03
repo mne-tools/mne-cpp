@@ -312,6 +312,15 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             //return pPlotLA;
         }
 
+        case MetaTreeItemTypes::MaterialType: {
+            QComboBox* pComboBox = new QComboBox(parent);
+
+            pComboBox->setCurrentText(index.model()->data(index, MetaTreeItemRoles::SurfaceMaterial).toString());
+            pComboBox->addItem("Phong Alpha Tesselation");
+            pComboBox->addItem("Phong Alpha");
+            return pComboBox;
+        }
+
         default: // do nothing;
             break;
     }
@@ -503,6 +512,13 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             return;
         }
 
+        case MetaTreeItemTypes::MaterialType: {
+            QString materialType = index.model()->data(index, MetaTreeItemRoles::SurfaceMaterial).toString();
+            QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+            pComboBox->setCurrentText(materialType);
+            return;
+        }
+
         default: // do nothing;
             break;
     }
@@ -558,11 +574,11 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 
                 QString displayThreshold;
                 displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
-                QVariant dataDisplay;
-                dataDisplay.setValue(displayThreshold);
-
-                model->setData(index, dataDisplay, Qt::DisplayRole);
-                model->setData(index, returnVector, MetaTreeItemRoles::DistributedSourceLocThreshold);
+                QVariant data;
+                data.setValue(displayThreshold);
+                model->setData(index, data, Qt::DisplayRole);
+                data.setValue(returnVector);
+                model->setData(index, data, MetaTreeItemRoles::DistributedSourceLocThreshold);
             }
             return;
         }
@@ -687,13 +703,24 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 
                 QString displayThreshold;
                 displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
-                QVariant dataDisplay;
-                dataDisplay.setValue(displayThreshold);
-                model->setData(index, dataDisplay, Qt::DisplayRole);
 
-                model->setData(index, returnVector, MetaTreeItemRoles::NetworkThreshold);
+                QVariant data;
+                data.setValue(displayThreshold);
+                model->setData(index, data, Qt::DisplayRole);
+                data.setValue(returnVector);
+                model->setData(index, data, MetaTreeItemRoles::NetworkThreshold);
             }
 
+            return;
+        }
+
+        case MetaTreeItemTypes::MaterialType: {
+            QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+            QVariant data;
+            data.setValue(pComboBox->currentText());
+
+            model->setData(index, data, MetaTreeItemRoles::SurfaceMaterial);
+            model->setData(index, data, Qt::DisplayRole);
             return;
         }
 

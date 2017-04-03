@@ -96,7 +96,7 @@ void FsSurfaceTreeItem::initItem()
     QVariant data;
 
     m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
-    connect(m_pItemSurfColSulci, &MetaTreeItem::curvColorsChanged,
+    connect(m_pItemSurfColSulci, &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list << m_pItemSurfColSulci;
     list << new QStandardItem(m_pItemSurfColSulci->toolTip());
@@ -106,7 +106,7 @@ void FsSurfaceTreeItem::initItem()
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
 
     m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
-    connect(m_pItemSurfColGyri, &MetaTreeItem::curvColorsChanged,
+    connect(m_pItemSurfColGyri, &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list.clear();
     list << m_pItemSurfColGyri;
@@ -124,7 +124,6 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
 {
     //Set parents
     m_pRenderable3DEntity->setParent(parent);
-    m_pRenderable3DEntityNormals->setParent(parent);
 
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
@@ -137,16 +136,6 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
                                                         matCurvatureColor,
                                                         Qt3DRender::QGeometryRenderer::Triangles);
     m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-
-    //Render normals
-    if(m_bRenderNormals) {
-        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSurface.rr(),
-                                                      tSurface.nn(),
-                                                      tSurface.tris(),
-                                                      matCurvatureColor,
-                                                      Qt3DRender::QGeometryRenderer::Triangles);
-        m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-    }
 
     //Add data which is held by this FsSurfaceTreeItem
     QVariant data;

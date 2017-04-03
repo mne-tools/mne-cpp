@@ -163,7 +163,7 @@ protected:
     *
     * @param[in] color        The new surface color.
     */
-    void onSurfaceColorChanged(const QColor &color);
+    void onSurfaceColorChanged(const QVariant &color);
 
     QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
 

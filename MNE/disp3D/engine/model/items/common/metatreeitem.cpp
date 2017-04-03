@@ -163,6 +163,9 @@ void MetaTreeItem::initItem()
         case MetaTreeItemTypes::NumberDipoles:
             sToolTip = "The number of dipoles";
             break;
+        case MetaTreeItemTypes::MaterialType:
+            sToolTip = "The surface material";
+            break;
         default: // do nothing;
             break;
     }
@@ -181,95 +184,10 @@ QVariant MetaTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  MetaTreeItem::setData(const QVariant& value, int role)
+void MetaTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
-    switch(role) {
-        case MetaTreeItemRoles::SurfaceColorSulci: {
-            emit curvColorsChanged();
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceColorGyri: {
-            emit curvColorsChanged();
-            break;
-        }
-
-        case MetaTreeItemRoles::StreamingTimeInterval: {
-            emit rtDataTimeIntervalChanged(value.toInt());
-            break;
-        }
-
-        case MetaTreeItemRoles::DistributedSourceLocThreshold: {
-            QVector3D vecTemp = value.value<QVector3D>();
-            emit rtDataNormalizationValueChanged(vecTemp);
-            break;
-        }
-
-        case MetaTreeItemRoles::ColormapType: {
-            emit rtDataColormapTypeChanged(value.toString());
-            break;
-        }
-
-        case MetaTreeItemRoles::VisualizationType: {
-            emit rtDataVisualizationTypeChanged(value.toString());
-            break;
-        }
-
-        case MetaTreeItemRoles::Color: {
-            emit colorChanged(value.value<QColor>());
-            break;
-        }
-
-        case MetaTreeItemRoles::NumberAverages: {
-            emit rtDataNumberAveragesChanged(value.toInt());
-            break;
-        }
-
-        case MetaTreeItemRoles::AlphaValue: {
-            emit alphaChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTessInner: {
-            emit surfaceTessInnerChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTessOuter: {
-            emit surfaceTessOuterChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTriangleScale: {
-            emit surfaceTriangleScaleChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTranslateX: {
-            emit surfaceTranslationXChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTranslateY: {
-            emit surfaceTranslationYChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTranslateZ: {
-            emit surfaceTranslationZChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::NetworkThreshold: {
-            QVector3D vecTemp = value.value<QVector3D>();
-            emit networkThresholdChanged(vecTemp);
-            break;
-        }
-
-        default: // do nothing;
-            break;
-    }
+    emit dataChanged(value);
 }
 

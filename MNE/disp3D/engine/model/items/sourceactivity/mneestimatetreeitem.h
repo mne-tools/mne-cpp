@@ -254,7 +254,7 @@ protected:
     *
     * @param[in] sColormapType     The name of the new colormap type.
     */
-    void onColormapTypeChanged(const QString& sColormapType);
+    void onColormapTypeChanged(const QVariant& sColormapType);
 
     //=========================================================================================================
     /**
@@ -262,7 +262,7 @@ protected:
     *
     * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
     */
-    void onTimeIntervalChanged(int iMSec);
+    void onTimeIntervalChanged(const QVariant &iMSec);
 
     //=========================================================================================================
     /**
@@ -270,7 +270,7 @@ protected:
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(const QVector3D& vecThresholds);
+    void onDataNormalizationValueChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
@@ -278,7 +278,7 @@ protected:
     *
     * @param[in] sVisType     The new visualization type.
     */
-    void onVisualizationTypeChanged(const QString& sVisType);
+    void onVisualizationTypeChanged(const QVariant& sVisType);
 
     //=========================================================================================================
     /**
@@ -294,7 +294,7 @@ protected:
     *
     * @param[in] iNumAvr     The new number of averages.
     */
-    void onNumberAveragesChanged(int iNumAvr);
+    void onNumberAveragesChanged(const QVariant& iNumAvr);
 
     bool                                m_bIsDataInit;                      /**< The init flag. */
 

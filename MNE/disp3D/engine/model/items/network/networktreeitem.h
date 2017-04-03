@@ -120,7 +120,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit NetworkTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "Connectivity Data");
+    explicit NetworkTreeItem(int iType = Data3DTreeModelItemTypes::NetworkItem, const QString& text = "Connectivity Data");
 
     //=========================================================================================================
     /**
@@ -188,7 +188,7 @@ private:
     *
     * @param[in] vecThresholds     The new threshold values used for threshold the network.
     */
-    void onNetworkThresholdChanged(const QVector3D& vecThresholds);
+    void onNetworkThresholdChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**

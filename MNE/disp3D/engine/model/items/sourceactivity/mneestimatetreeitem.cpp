@@ -122,7 +122,7 @@ void MneEstimateTreeItem::initItem()
     pItemStreamStatus->setData(data, MetaTreeItemRoles::StreamStatus);
 
     MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::VisualizationType, "Vertex based");
-    connect(pItemVisuaizationType, &MetaTreeItem::rtDataVisualizationTypeChanged,
+    connect(pItemVisuaizationType, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onVisualizationTypeChanged);
     list.clear();
     list << pItemVisuaizationType;
@@ -131,18 +131,18 @@ void MneEstimateTreeItem::initItem()
     data.setValue(QString("Vertex based"));
     pItemVisuaizationType->setData(data, MetaTreeItemRoles::VisualizationType);
 
-    MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot Negative 2");
-    connect(pItemColormapType, &MetaTreeItem::rtDataColormapTypeChanged,
+    MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot");
+    connect(pItemColormapType, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onColormapTypeChanged);
     list.clear();
     list << pItemColormapType;
     list << new QStandardItem(pItemColormapType->toolTip());
     this->appendRow(list);
-    data.setValue(QString("Hot Negative 2"));
+    data.setValue(QString("Hot"));
     pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
 
     MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0,5.5,15");
-    connect(pItemSourceLocNormValue, &MetaTreeItem::rtDataNormalizationValueChanged,
+    connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onDataNormalizationValueChanged);
     list.clear();
     list << pItemSourceLocNormValue;
@@ -152,7 +152,7 @@ void MneEstimateTreeItem::initItem()
     pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "50");
-    connect(pItemStreamingInterval, &MetaTreeItem::rtDataTimeIntervalChanged,
+    connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onTimeIntervalChanged);
     list.clear();
     list << pItemStreamingInterval;
@@ -172,7 +172,7 @@ void MneEstimateTreeItem::initItem()
     this->appendRow(list);
 
     MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
-    connect(pItemAveragedStreaming, &MetaTreeItem::rtDataNumberAveragesChanged,
+    connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onNumberAveragesChanged);
     list.clear();
     list << pItemAveragedStreaming;
@@ -443,7 +443,7 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
         m_pSourceLocRtDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
         m_pSourceLocRtDataWorker->stop();
-    }    
+    }
 }
 
 
@@ -457,43 +457,52 @@ void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceC
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onColormapTypeChanged(const QString& sColormapType)
+void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
-    m_pSourceLocRtDataWorker->setColormapType(sColormapType);
-}
-
-
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::onTimeIntervalChanged(int iMSec)
-{
-    m_pSourceLocRtDataWorker->setInterval(iMSec);
-}
-
-
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::onDataNormalizationValueChanged(const QVector3D& vecThresholds)
-{
-    m_pSourceLocRtDataWorker->setNormalization(vecThresholds);
-}
-
-
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::onVisualizationTypeChanged(const QString& sVisType)
-{
-    int iVisType = Data3DTreeModelItemRoles::VertexBased;
-
-    if(sVisType == "Annotation based") {
-        iVisType = Data3DTreeModelItemRoles::AnnotationBased;
+    if(sColormapType.canConvert<QString>()) {
+        m_pSourceLocRtDataWorker->setColormapType(sColormapType.toString());
     }
+}
 
-    if(sVisType == "Smoothing based") {
-        iVisType = Data3DTreeModelItemRoles::SmoothingBased;
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
+{
+    if(iMSec.canConvert<int>()) {
+        m_pSourceLocRtDataWorker->setInterval(iMSec.toInt());
     }
+}
 
-    m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
+{
+    if(vecThresholds.canConvert<QVector3D>()) {
+        qDebug() << "MneEstimateTreeItem::onDataNormalizationValueChanged"<<vecThresholds.value<QVector3D>() ;
+        m_pSourceLocRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
+{
+    if(sVisType.canConvert<QString>()) {
+        int iVisType = Data3DTreeModelItemRoles::VertexBased;
+
+        if(sVisType.toString() == "Annotation based") {
+            iVisType = Data3DTreeModelItemRoles::AnnotationBased;
+        }
+
+        if(sVisType.toString() == "Smoothing based") {
+            iVisType = Data3DTreeModelItemRoles::SmoothingBased;
+        }
+
+        m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
+    }
 }
 
 
@@ -511,8 +520,10 @@ void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNumberAveragesChanged(int iNumAvr)
+void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
-    m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr);
+    if(iNumAvr.canConvert<int>()) {
+        m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr.toInt());
+    }
 }
 
