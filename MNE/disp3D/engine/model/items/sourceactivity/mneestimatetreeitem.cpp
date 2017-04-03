@@ -185,22 +185,6 @@ void MneEstimateTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant MneEstimateTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
                                 const MatrixX3f& matSurfaceVertColorLeftHemi,
                                 const MatrixX3f& matSurfaceVertColorRightHemi,

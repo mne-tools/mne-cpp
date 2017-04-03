@@ -253,14 +253,6 @@ void AbstractMeshTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant AbstractMeshTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
 void AbstractMeshTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
@@ -325,6 +317,10 @@ void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriang
 
 void AbstractMeshTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {    
+    for(int i = 0; i < m_pRenderable3DEntity->childNodes().size(); ++i) {
+        m_pRenderable3DEntity->childNodes()[i]->setEnabled(checkState == Qt::Unchecked ? false : true);
+    }
+
     m_pRenderable3DEntity->setEnabled(checkState == Qt::Unchecked ? false : true);
 }
 

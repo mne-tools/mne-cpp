@@ -99,22 +99,6 @@ void FsAnnotationTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant FsAnnotationTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  FsAnnotationTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 void FsAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation)
 {
     //Create color from annotation data if annotation is not empty

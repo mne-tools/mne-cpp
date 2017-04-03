@@ -134,22 +134,6 @@ void SensorPositionTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant SensorPositionTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* parent)
 {
     //Clear all data

@@ -120,22 +120,6 @@ void EcdDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant EcdDataTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void EcdDataTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 void EcdDataTreeItem::initData(Qt3DCore::QEntity* parent)
 {      
     //Create renderable 3D entity

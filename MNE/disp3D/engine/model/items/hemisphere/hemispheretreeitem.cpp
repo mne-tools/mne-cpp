@@ -111,30 +111,6 @@ void HemisphereTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant HemisphereTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void HemisphereTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-int HemisphereTreeItem::columnCount() const
-{
-    return 2;
-}
-
-
-//*************************************************************************************************************
-
 FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of HemisphereTreeItem based on the hemisphere information

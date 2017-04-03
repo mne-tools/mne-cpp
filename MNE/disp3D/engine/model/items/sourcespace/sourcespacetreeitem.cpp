@@ -88,14 +88,6 @@ SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-void SourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
 void SourceSpaceTreeItem::initItem()
 {
     this->setEditable(false);
@@ -161,8 +153,6 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
             Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
             material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
-
-            m_lSpheres.append(pSourceSphereEntity);
         }
     } else {
         for(int i = 0; i < tHemisphere.vertno.rows(); i++) {
@@ -182,20 +172,6 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
             Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
             material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
-
-            m_lSpheres.append(pSourceSphereEntity);
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-void SourceSpaceTreeItem::setVisible(bool state)
-{
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        m_lSpheres.at(i)->setEnabled(state);
-    }
-
-    m_pRenderable3DEntity->setEnabled(state);
 }
