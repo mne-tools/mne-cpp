@@ -116,11 +116,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation.
+    * Sets the entity's transformation. This will clear the old transformation.
     *
     * @param[in] transform     The new entity's transform.
     */
     void setTransform(const Qt3DCore::QTransform &transform);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    void applyTransform(const Qt3DCore::QTransform& transform);
 
     //=========================================================================================================
     /**
