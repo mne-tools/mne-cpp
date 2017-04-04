@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fssurfacetreeitem.h
+* @file     abstract3Dtreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     FsSurfaceTreeItem class declaration.
+* @brief     Abstract3DTreeItem class declaration.
 *
 */
 
-#ifndef FSSURFACETREEITEM_H
-#define FSSURFACETREEITEM_H
+#ifndef Abstract3DTreeItem_H
+#define Abstract3DTreeItem_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,8 +42,8 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstractmeshtreeitem.h"
-#include "../common/types.h"
+#include "../../3dhelpers/renderable3Dentity.h"
+#include "types.h"
 
 
 //*************************************************************************************************************
@@ -51,23 +51,13 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QPointer>
+#include <QStandardItem>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Qt3DCore {
-    class QEntity;
-}
 
 
 //*************************************************************************************************************
@@ -84,23 +74,18 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MetaTreeItem;
-
 
 //=============================================================================================================
 /**
-* FsSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* Abstract3DTreeItem provides Abstract3DTreeItem provides the basic tree item. This item should be used as a base class for all tree items throughout the disp3D library.
 *
-* @brief Provides a generic brain tree item.
+* @brief Provides the basic tree item.
 */
-class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractMeshTreeItem
+class DISP3DNEWSHARED_EXPORT Abstract3DTreeItem : public Renderable3DEntity, public QStandardItem
 {
     Q_OBJECT
 
-public:
-    typedef QSharedPointer<FsSurfaceTreeItem> SPtr;             /**< Shared pointer type for FsSurfaceTreeItem class. */
-    typedef QSharedPointer<const FsSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for FsSurfaceTreeItem class. */
-
+public :
     //=========================================================================================================
     /**
     * Default constructor.
@@ -108,66 +93,79 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit FsSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceItem,
-                               const QString& text = "Surface",
-                               Qt3DCore::QEntity* p3DEntityParent = 0);
+    Abstract3DTreeItem(int iType = Data3DTreeModelItemTypes::UnknownItem, const QString& text = "", QEntity* p3DEntityParent = 0);
+    virtual ~Abstract3DTreeItem();
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
-    *
-    * @param[in] tSurface           FreeSurfer surface.
+    * QStandardItem functions
     */
-    void addData(const FSLIB::Surface& tSurface);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    int type() const;
 
     //=========================================================================================================
     /**
-    * Call this function whenever visibilty of teh annoation has changed.
+    * Returns all children of this item based on their type.
     *
-    * @param[in] isVisible     The visibility flag.
+    * @param[in] type    The type of the child items which should be looked for.
+    *
+    * @return           List with all found items.
     */
-    void onAnnotationVisibilityChanged(bool isVisible);
+    QList<QStandardItem*> findChildren(int type);
+
+    //=========================================================================================================
+    /**
+    * Returns all children of this item based on their text.
+    *
+    * @param[in] text    The text of the child items which should be looked for.
+    *
+    * @return           List with all found items.
+    */
+    QList<QStandardItem*> findChildren(const QString& text);
+
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a child to this item based on a pointer.
+    *
+    * @param[in] newItem    The new item as a pointer.
+    */
+    Abstract3DTreeItem &operator<<(Abstract3DTreeItem* newItem);
+
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a child to this item based on a reference.
+    *
+    * @param[in] newItem    The new item as a reference.
+    */
+    Abstract3DTreeItem &operator<<(Abstract3DTreeItem& newItem);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
+    * Init this item.
     */
-    void initItem();
+    virtual void initItem();
 
     //=========================================================================================================
     /**
-    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
-    */
-    void onColorInfoOriginOrCurvColorChanged();
-
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given curvature and color data.
+    * Call this function whenever the check box of this item was checked.
     *
-    * @param[in] curvature      The curvature information.
-    * @param[in] colSulci       The sulci color information.
-    * @param[in] colGyri        The gyri color information.
-    *
-    * @return The final colors per vertex (RGB).
+    * @param[in] checkState        The current checkstate.
     */
-    MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
-                                       const QColor& colSulci = QColor(50,50,50),
-                                       const QColor& colGyri = QColor(125,125,125)) const;
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
-
-    QPointer<MetaTreeItem>          m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
-    QPointer<MetaTreeItem>          m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
+    int     m_iType;        /**< This item's type. */
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
+    * Emit this signal whenever this item's check state changed.
+    *
+    * @param[in] checkState     The current check state.
     */
-    void colorOriginChanged();
+    void checkStateChanged(const Qt::CheckState& checkState);
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // FSSURFACETREEITEM_H
+#endif // Abstract3DTreeItem_H

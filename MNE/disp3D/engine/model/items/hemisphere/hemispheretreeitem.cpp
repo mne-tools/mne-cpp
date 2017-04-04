@@ -84,8 +84,6 @@ using namespace DISP3DLIB;
 
 HemisphereTreeItem::HemisphereTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pSurfaceItem(Q_NULLPTR)
-, m_pAnnotItem(Q_NULLPTR)
 {
     initItem();
 }
@@ -133,14 +131,14 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
     //Add childs
     //Add surface child
-    m_pSurfaceItem = new FsSurfaceTreeItem(Data3DTreeModelItemTypes::SurfaceItem);
+    m_pSurfaceItem = new FsSurfaceTreeItem(Data3DTreeModelItemTypes::SurfaceItem, "Surface", p3DEntityParent);
 
     QList<QStandardItem*> list;
     list << m_pSurfaceItem;
     list << new QStandardItem(m_pSurfaceItem->toolTip());
     this->appendRow(list);
 
-    m_pSurfaceItem->addData(tSurface, p3DEntityParent);
+    m_pSurfaceItem->addData(tSurface);
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {

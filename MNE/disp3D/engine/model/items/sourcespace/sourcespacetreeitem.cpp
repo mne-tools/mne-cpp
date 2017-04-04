@@ -101,10 +101,7 @@ void SourceSpaceTreeItem::initItem()
 
 void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
 {
-    //Set parents
-    m_pRenderable3DEntity->setParent(parent);
-
-    m_pRenderable3DEntity->setRotX(40);
+    this->setRotX(40);
 
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tHemisphere.rr);
@@ -137,7 +134,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 
     if(tHemisphere.isClustered()) {
         for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++) {
-            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
             sourcePos = tHemisphere.rr.row(tHemisphere.cluster_info.centroidVertno.at(i));
             pos.setX(sourcePos(0));
@@ -156,7 +153,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
         }
     } else {
         for(int i = 0; i < tHemisphere.vertno.rows(); i++) {
-            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
             sourcePos = tHemisphere.rr.row(tHemisphere.vertno(i));
             pos.setX(sourcePos(0));

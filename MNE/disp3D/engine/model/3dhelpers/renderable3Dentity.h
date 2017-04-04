@@ -188,6 +188,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
+    *
+    * @param[in] state     The visiblity flag.
+    */
+    virtual void setVisible(bool state);
+
+    //=========================================================================================================
+    /**
     * Sets the current scale.
     *
     * @param[in] scale     The new scaling value.

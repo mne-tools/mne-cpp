@@ -87,11 +87,11 @@ DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
 DigitizerTreeItem::~DigitizerTreeItem()
 {
     if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-
-        for(int i = 0; i < m_pRenderable3DEntity->childNodes().size(); ++i) {
-            m_pRenderable3DEntity->childNodes().at(i)->deleteLater();
+        for(int i = 0; i < m_lSpheres.size(); ++i) {
+            m_lSpheres.at(i)->deleteLater();
         }
+
+        m_pRenderable3DEntity->deleteLater();
     }
 }
 
