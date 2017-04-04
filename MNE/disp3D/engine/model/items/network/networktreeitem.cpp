@@ -60,7 +60,7 @@
 //=============================================================================================================
 
 #include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DCore/QTransform>
 
 
@@ -209,7 +209,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
             transform->setMatrix(m);
             sourceSphereEntity->addComponent(transform);
 
-            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
             material->setAmbient(Qt::blue);
             sourceSphereEntity->addComponent(material);
         }

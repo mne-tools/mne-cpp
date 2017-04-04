@@ -46,6 +46,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <Qt3DExtras/QPhongMaterial>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,11 +85,12 @@ void Abstract3DTreeItem::initItem()
 
     //Transformation
     QList<QStandardItem*> list;
+    QVariant data;
 
-    MetaTreeItem* pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
-    pItemTransformationOptions->setEditable(false);
+    m_pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
+    m_pItemTransformationOptions->setEditable(false);
     list.clear();
-    list << pItemTransformationOptions;
+    list << m_pItemTransformationOptions;
     list << new QStandardItem("The transformation options");
     this->appendRow(list);
 
@@ -98,7 +101,7 @@ void Abstract3DTreeItem::initItem()
     list.clear();
     list << itemXTrans;
     list << new QStandardItem(itemXTrans->toolTip());
-    pItemTransformationOptions->appendRow(list);
+    m_pItemTransformationOptions->appendRow(list);
 
     MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
     itemYTrans->setEditable(true);
@@ -107,7 +110,7 @@ void Abstract3DTreeItem::initItem()
     list.clear();
     list << itemYTrans;
     list << new QStandardItem(itemYTrans->toolTip());
-    pItemTransformationOptions->appendRow(list);
+    m_pItemTransformationOptions->appendRow(list);
 
     MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
     itemZTrans->setEditable(true);
@@ -116,11 +119,41 @@ void Abstract3DTreeItem::initItem()
     list.clear();
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
-    pItemTransformationOptions->appendRow(list);
+    m_pItemTransformationOptions->appendRow(list);
 
-     //Do the connects
-     connect(this, &Abstract3DTreeItem::checkStateChanged,
-             this, &Abstract3DTreeItem::onCheckStateChanged);
+    //Color
+    m_pItemAppearanceOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Appearance");
+    m_pItemAppearanceOptions->setEditable(false);
+    list.clear();
+    list << m_pItemAppearanceOptions;
+    list << new QStandardItem("The color options");
+    this->appendRow(list);
+
+    float fAlpha = 0.35f;
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
+    connect(itemAlpha, &MetaTreeItem::dataChanged,
+            this, &Abstract3DTreeItem::onAlphaChanged);
+    list.clear();
+    list << itemAlpha;
+    list << new QStandardItem(itemAlpha->toolTip());
+    m_pItemAppearanceOptions->appendRow(list);
+    data.setValue(fAlpha);
+    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
+
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Color");
+    connect(pItemSurfCol, &MetaTreeItem::dataChanged,
+            this, &Abstract3DTreeItem::onColorChanged);
+    list.clear();
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
+    m_pItemAppearanceOptions->appendRow(list);
+    data.setValue(QColor(100,100,100));
+    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
+    pItemSurfCol->setData(data, Qt::DecorationRole);
+
+    //Do the connects
+    connect(this, &Abstract3DTreeItem::checkStateChanged,
+                this, &Abstract3DTreeItem::onCheckStateChanged);
 }
 
 
@@ -225,9 +258,11 @@ void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 void Abstract3DTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
 {
-    QVector3D position = this->position();
-    position.setX(fTransX.toFloat());
-    this->setPosition(position);
+    if(fTransX.canConvert<float>()) {
+        QVector3D position = this->position();
+        position.setX(fTransX.toFloat());
+        this->setPosition(position);
+    }
 }
 
 
@@ -235,9 +270,11 @@ void Abstract3DTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
 
 void Abstract3DTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
 {
-    QVector3D position = this->position();
-    position.setY(fTransY.toFloat());
-    this->setPosition(position);
+    if(fTransY.canConvert<float>()) {
+        QVector3D position = this->position();
+        position.setY(fTransY.toFloat());
+        this->setPosition(position);
+    }
 }
 
 
@@ -245,7 +282,27 @@ void Abstract3DTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
 
 void Abstract3DTreeItem::onSurfaceTranslationZChanged(const QVariant& fTransZ)
 {
-    QVector3D position = this->position();
-    position.setZ(fTransZ.toFloat());
-    this->setPosition(position);
+    if(fTransZ.canConvert<float>()) {
+        QVector3D position = this->position();
+        position.setZ(fTransZ.toFloat());
+        this->setPosition(position);
+    }
 }
+
+
+//*************************************************************************************************************
+
+void Abstract3DTreeItem::onColorChanged(const QVariant& color)
+{
+    //ka = ambient for standard QT materials, overlaod onColorchanged() if you use your own materials (i.e. fssurfacetreeitem)
+    this->setMaterialParameter(color, "ka");
+}
+
+
+//*************************************************************************************************************
+
+void Abstract3DTreeItem::onAlphaChanged(const QVariant& fAlpha)
+{
+    this->setMaterialParameter(fAlpha, "alpha");
+}
+

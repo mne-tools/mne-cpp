@@ -141,14 +141,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the alpha value changed.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    virtual void onSurfaceAlphaChanged(const QVariant& fAlpha);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever the inner tesselation value changed.
     *
     * @param[in] fTessInner     The new inner tesselation value.
@@ -177,7 +169,7 @@ protected:
     *
     * @param[in] color        The new surface color.
     */
-    virtual void onSurfaceColorChanged(const QVariant& color);
+    virtual void onColorChanged(const QVariant& color);
 
     //=========================================================================================================
     /**

@@ -185,16 +185,21 @@ void Renderable3DEntity::setRotZ(float rotZ)
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setMaterialParameter(float fValue, QString sParameterName)
+void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterName)
 {
     //Look for all materials and set the corresponding parameters
-    QComponentVector vComponents = this->components();
+    QComponentVector vComponents;
+    for(int t = 0; t < this->childNodes().size(); ++t) {
+        if(QEntity* pEntity = dynamic_cast<QEntity*>(this->childNodes().at(t))) {
+            vComponents = pEntity->components();
 
-    for(int j = 0; j < vComponents.size(); ++j) {
-        if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
-            for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
-                if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
-                    pMaterial->effect()->parameters().at(i)->setValue(fValue);
+            for(int j = 0; j < vComponents.size(); ++j) {
+                if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
+                    for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
+                        if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
+                            pMaterial->effect()->parameters().at(i)->setValue(data);
+                        }
+                    }
                 }
             }
         }

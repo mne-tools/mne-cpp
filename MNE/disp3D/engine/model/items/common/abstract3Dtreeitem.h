@@ -74,6 +74,8 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MetaTreeItem;
+
 
 //=============================================================================================================
 /**
@@ -180,7 +182,26 @@ protected:
     */
     virtual void onSurfaceTranslationZChanged(const QVariant& fTransZ);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever the color was changed.
+    *
+    * @param[in] color        The new surface color.
+    */
+    virtual void onColorChanged(const QVariant& color);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the alpha value changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    virtual void onAlphaChanged(const QVariant& fAlpha);
+
     int     m_iType;        /**< This item's type. */
+
+    QPointer<MetaTreeItem>      m_pItemTransformationOptions;
+    QPointer<MetaTreeItem>      m_pItemAppearanceOptions;
 
 signals:
     //=========================================================================================================
