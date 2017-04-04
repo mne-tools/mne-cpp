@@ -168,7 +168,7 @@ public:
     * @param [out] output   The ouptuts (rows = samples, cols = output results)
     * @param [in] device    Device to use for evaluation
     */
-    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
@@ -195,7 +195,7 @@ public:
     *
     * @return true when successfully loaded, false otherwise.
     */
-    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
@@ -217,7 +217,7 @@ public:
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    bool evalModel(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool evalModel(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
@@ -232,7 +232,7 @@ public:
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    bool trainModel(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, QVector<double>& loss, QVector<double>& error, int minibatch_size = 25, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool trainModel(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, QVector<double>& loss, QVector<double>& error, int minibatch_size = 25, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
@@ -246,7 +246,7 @@ public:
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
