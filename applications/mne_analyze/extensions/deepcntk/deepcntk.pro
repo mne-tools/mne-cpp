@@ -63,7 +63,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lanSharedd \
-            -lCNTKLibrary-2.0
+            -lCntk.Core-2.0rc1d
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -78,7 +78,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lanShared \
-            -lCNTKLibrary-2.0
+            -lCntk.Core-2.0rc1
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
