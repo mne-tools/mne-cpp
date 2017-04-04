@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "digitizertreeitem.h"
-#include "../../3dhelpers/renderable3Dentity.h"
 #include "../common/metatreeitem.h"
 
 #include <fiff/fiff_constants.h>
@@ -96,7 +95,7 @@ void DigitizerTreeItem::initItem()
 
     MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
     connect(pItemColor, &MetaTreeItem::dataChanged,
-            this, &DigitizerTreeItem::onSurfaceColorChanged);
+            this, &DigitizerTreeItem::onColorChanged);
     list.clear();
     list << pItemColor;
     list << new QStandardItem(pItemColor->toolTip());
@@ -192,7 +191,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::onSurfaceColorChanged(const QVariant& color)
+void DigitizerTreeItem::onColorChanged(const QVariant& color)
 {
     if(color.canConvert<QColor>()) {
         for(int i = 0; i < this->childNodes().size(); ++i) {

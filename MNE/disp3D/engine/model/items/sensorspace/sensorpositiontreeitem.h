@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
+#include "../common/abstract3Dtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -86,8 +86,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Renderable3DEntity;
-
 
 //=============================================================================================================
 /**
@@ -95,7 +93,7 @@ class Renderable3DEntity;
 *
 * @brief SensorPositionTreeItem provides a tree item to visualize sensor position data.
 */
-class DISP3DNEWSHARED_EXPORT SensorPositionTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT SensorPositionTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
@@ -107,27 +105,21 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit SensorPositionTreeItem(int iType = Data3DTreeModelItemTypes::SensorPositionItem, const QString& text = "Sensor Position");
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~SensorPositionTreeItem();
+    explicit SensorPositionTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
+                                    int iType = Data3DTreeModelItemTypes::SensorPositionItem,
+                                    const QString& text = "Sensor Position");
 
     //=========================================================================================================
     /**
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
-    * @param[in] parent             The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns true if successful.
     */
-    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, Qt3DCore::QEntity* parent);
+    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo);
 
     //=========================================================================================================
     /**
@@ -136,14 +128,6 @@ public:
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
     */
     void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
 
 protected:
     //=========================================================================================================
@@ -154,19 +138,11 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever the surface color was changed.
     *
     * @param[in] color        The new surface color.
     */
-    void onSurfaceColorChanged(const QVariant& color);
+    void onColorChanged(const QVariant& color);
 
     //=========================================================================================================
     /**
@@ -174,11 +150,7 @@ protected:
     *
     * @param[in] fAlpha     The new alpha value.
     */
-    void onSurfaceAlphaChanged(const QVariant& fAlpha);
-
-    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
-
-    QList<QPointer<Renderable3DEntity> >        m_lRects;                   /**< The currently displayed sensors points as 3D rectangles. */
+    void onAlphaChanged(const QVariant& fAlpha);
 };
 
 } //NAMESPACE DISP3DLIB
