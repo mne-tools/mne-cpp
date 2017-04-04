@@ -94,7 +94,9 @@ void FsSurfaceTreeItem::initItem()
     QList<QStandardItem*> list;
     QVariant data;
 
-    m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
+    if(!m_pItemSurfColSulci) {
+        m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
+    }
     connect(m_pItemSurfColSulci, &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list << m_pItemSurfColSulci;
@@ -104,7 +106,9 @@ void FsSurfaceTreeItem::initItem()
     m_pItemSurfColSulci->setData(data, MetaTreeItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
 
-    m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
+    if(!m_pItemSurfColGyri) {
+        m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
+    }
     connect(m_pItemSurfColGyri, &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list.clear();

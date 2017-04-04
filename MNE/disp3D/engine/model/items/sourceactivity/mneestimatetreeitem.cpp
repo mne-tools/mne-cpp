@@ -78,7 +78,6 @@ using namespace DISP3DLIB;
 MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsDataInit(false)
-, m_pSourceLocRtDataWorker(new RtSourceLocDataWorker(this))
 {
     initItem();
 }
@@ -88,9 +87,11 @@ MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
 
 MneEstimateTreeItem::~MneEstimateTreeItem()
 {
-    if(m_pSourceLocRtDataWorker->isRunning()) {
-        m_pSourceLocRtDataWorker->stop();
-        delete m_pSourceLocRtDataWorker;
+    if(!m_pSourceLocRtDataWorker) {
+        if(m_pSourceLocRtDataWorker->isRunning()) {
+            m_pSourceLocRtDataWorker->stop();
+            delete m_pSourceLocRtDataWorker;
+        }
     }
 }
 
@@ -99,9 +100,6 @@ MneEstimateTreeItem::~MneEstimateTreeItem()
 
 void MneEstimateTreeItem::initItem()
 {
-    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
-            this, &MneEstimateTreeItem::onNewRtData);
-
     this->setEditable(false);
     this->setToolTip("MNE Estimate item");
 
@@ -251,6 +249,13 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
     //set rt data corresponding to the hemisphere
+    if(!m_pSourceLocRtDataWorker) {
+        m_pSourceLocRtDataWorker = new RtSourceLocDataWorker();
+    }
+
+    connect(m_pSourceLocRtDataWorker, &RtSourceLocDataWorker::newRtData,
+            this, &MneEstimateTreeItem::onNewRtData);
+
     m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
                                              this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>(),
                                              tForwardSolution.src[0].neighbor_vert,
@@ -284,7 +289,9 @@ void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
     data.setValue(tSourceEstimate.data);
     this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-    m_pSourceLocRtDataWorker->addData(tSourceEstimate.data);
+    if(m_pSourceLocRtDataWorker) {
+        m_pSourceLocRtDataWorker->addData(tSourceEstimate.data);
+    }
 }
 
 
@@ -423,10 +430,12 @@ void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisp
 
 void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
-    if(checkState == Qt::Checked) {
-        m_pSourceLocRtDataWorker->start();
-    } else if(checkState == Qt::Unchecked) {
-        m_pSourceLocRtDataWorker->stop();
+    if(m_pSourceLocRtDataWorker) {
+        if(checkState == Qt::Checked) {
+            m_pSourceLocRtDataWorker->start();
+        } else if(checkState == Qt::Unchecked) {
+            m_pSourceLocRtDataWorker->stop();
+        }
     }
 }
 
@@ -444,7 +453,9 @@ void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceC
 void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
-        m_pSourceLocRtDataWorker->setColormapType(sColormapType.toString());
+        if(m_pSourceLocRtDataWorker) {
+            m_pSourceLocRtDataWorker->setColormapType(sColormapType.toString());
+        }
     }
 }
 
@@ -454,7 +465,9 @@ void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 {
     if(iMSec.canConvert<int>()) {
-        m_pSourceLocRtDataWorker->setInterval(iMSec.toInt());
+        if(m_pSourceLocRtDataWorker) {
+            m_pSourceLocRtDataWorker->setInterval(iMSec.toInt());
+        }
     }
 }
 
@@ -464,7 +477,9 @@ void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 void MneEstimateTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        m_pSourceLocRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
+        if(m_pSourceLocRtDataWorker) {
+            m_pSourceLocRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
+        }
     }
 }
 
@@ -484,7 +499,9 @@ void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
             iVisType = Data3DTreeModelItemRoles::SmoothingBased;
         }
 
-        m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
+        if(m_pSourceLocRtDataWorker) {
+            m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
+        }
     }
 }
 
@@ -493,10 +510,12 @@ void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
 
 void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
-    if(checkState == Qt::Checked) {
-        m_pSourceLocRtDataWorker->setLoop(true);
-    } else if(checkState == Qt::Unchecked) {
-        m_pSourceLocRtDataWorker->setLoop(false);
+    if(m_pSourceLocRtDataWorker) {
+        if(checkState == Qt::Checked) {
+            m_pSourceLocRtDataWorker->setLoop(true);
+        } else if(checkState == Qt::Unchecked) {
+            m_pSourceLocRtDataWorker->setLoop(false);
+        }
     }
 }
 
@@ -506,7 +525,9 @@ void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
-        m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr.toInt());
+        if(m_pSourceLocRtDataWorker) {
+            m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr.toInt());
+        }
     }
 }
 

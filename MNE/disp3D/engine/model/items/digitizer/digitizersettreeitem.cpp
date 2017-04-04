@@ -94,13 +94,6 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-DigitizerSetTreeItem::~DigitizerSetTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void DigitizerSetTreeItem::initItem()
 {
     this->setEditable(false);
@@ -298,14 +291,3 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 //    }
 }
 
-
-//*************************************************************************************************************
-
-void DigitizerSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}

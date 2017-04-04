@@ -81,13 +81,6 @@ FsAnnotationTreeItem::FsAnnotationTreeItem(int iType, const QString & text)
 
 //*************************************************************************************************************
 
-FsAnnotationTreeItem::~FsAnnotationTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void FsAnnotationTreeItem::initItem()
 {
     this->setEditable(false);

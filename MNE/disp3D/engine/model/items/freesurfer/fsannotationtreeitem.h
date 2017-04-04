@@ -112,12 +112,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~FsAnnotationTreeItem();
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on annotation information to this item.
     *
     * @param[in] tSurface           FreeSurfer surface.
