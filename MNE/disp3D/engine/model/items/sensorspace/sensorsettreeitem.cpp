@@ -123,8 +123,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
 
     //Add sensor locations as child items
     if(!lChInfoGrad.isEmpty()) {
-        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
-        pSensorPosItem->addData(lChInfoGrad, p3DEntityParent);
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
+        pSensorPosItem->addData(lChInfoGrad);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -133,8 +133,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
     }
 
     if(!lChInfoMag.isEmpty()) {
-        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
-        pSensorPosItem->addData(lChInfoMag, p3DEntityParent);
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
+        pSensorPosItem->addData(lChInfoMag);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;

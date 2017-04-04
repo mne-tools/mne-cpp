@@ -86,8 +86,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Renderable3DEntity;
-
 
 //=============================================================================================================
 /**
@@ -136,7 +134,7 @@ protected:
     *
     * @param[in] color        The new surface color.
     */
-    void onSurfaceColorChanged(const QVariant &color);
+    void onColorChanged(const QVariant &color);
 };
 
 } //NAMESPACE DISP3DLIB
