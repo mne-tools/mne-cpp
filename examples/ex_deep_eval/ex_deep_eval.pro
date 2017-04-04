@@ -59,8 +59,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Deepd \
-            -lEvalDll \
-            -lCNTKLibrary-2.0
+            -lCntk.Eval-2.0rc1d \
+            -lCntk.Core-2.0rc1d
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -70,8 +70,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Deep \
-            -lEvalDll \
-            -lCNTKLibrary-2.0
+            -lCntk.Eval-2.0rc1 \
+            -lCntk.Core-2.0rc1
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
