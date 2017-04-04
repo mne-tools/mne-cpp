@@ -56,7 +56,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lEvalDll \
+            -lCntk.Eval-2.0rc1 \
+            -lCNTKLibrary-2.0
 
 }
 else {
@@ -65,7 +66,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lEvalDll \
+            -lCntk.Eval-2.0rc1 \
             -lCNTKLibrary-2.0
 }
 
