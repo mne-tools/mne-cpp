@@ -79,8 +79,8 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
-: AbstractMeshTreeItem(iType, text)
+SourceSpaceTreeItem::SourceSpaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
 }
@@ -99,10 +99,8 @@ void SourceSpaceTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
+void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
 {
-    this->setRotX(40);
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tHemisphere.rr);
 

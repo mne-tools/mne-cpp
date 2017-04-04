@@ -90,10 +90,13 @@ public :
     /**
     * Default constructor.
     *
+    * @param[in] p3DEntityParent    The parent 3D entity.
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    Abstract3DTreeItem(int iType = Data3DTreeModelItemTypes::UnknownItem, const QString& text = "", QEntity* p3DEntityParent = 0);
+    Abstract3DTreeItem(QEntity* p3DEntityParent = 0,
+                       int iType = Data3DTreeModelItemTypes::UnknownItem,
+                       const QString& text = "");
     virtual ~Abstract3DTreeItem();
 
     //=========================================================================================================

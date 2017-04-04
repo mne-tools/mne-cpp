@@ -74,8 +74,8 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AbstractMeshTreeItem::AbstractMeshTreeItem(int iType, const QString& text, QEntity* p3DEntityParent)
-: Abstract3DTreeItem(iType, text, p3DEntityParent)
+AbstractMeshTreeItem::AbstractMeshTreeItem(QEntity* p3DEntityParent, int iType, const QString& text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 , m_pMaterial(new PerVertexPhongAlphaMaterial())
 , m_pTessMaterial(new PerVertexTessPhongAlphaMaterial())
 , m_pNormalMaterial(new ShowNormalsMaterial())
@@ -279,14 +279,6 @@ void AbstractMeshTreeItem::onSurfaceTessOuterChanged(const QVariant& fTessOuter)
 void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale)
 {
     this->setMaterialParameter(fTriangleScale.toFloat(), "triangleScale");
-}
-
-
-//*************************************************************************************************************
-
-void AbstractMeshTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{    
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
 }
 
 

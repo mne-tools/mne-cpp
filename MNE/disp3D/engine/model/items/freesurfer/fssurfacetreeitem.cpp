@@ -78,8 +78,8 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text, Qt3DCore::QEntity *p3DEntityParent)
-: AbstractMeshTreeItem(iType, text, p3DEntityParent)
+FsSurfaceTreeItem::FsSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 , m_sColorInfoOrigin("Color from curvature")
 {
     initItem();
