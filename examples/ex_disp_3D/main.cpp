@@ -255,10 +255,10 @@ int main(int argc, char *argv[])
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 //    p3DDataModel->addMegSensorData("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
 
-//    // Read & show digitizer points
-//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    FiffDigPointSet t_Dig(t_fileDig);
-//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    // Read & show digitizer points
+    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    FiffDigPointSet t_Dig(t_fileDig);
+    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values

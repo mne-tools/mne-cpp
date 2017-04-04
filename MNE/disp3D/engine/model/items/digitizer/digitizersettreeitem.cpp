@@ -172,8 +172,8 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 
     if (!tLAP.empty()){
         //Create a LAP digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"LAP");
-        digitizerItem->addData(tLAP, parent);
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
+        digitizerItem->addData(tLAP);
         itemList << digitizerItem;
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
@@ -181,8 +181,8 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
     if (!tNasion.empty()){
         //Create a Nasion digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
-         digitizerItem->addData(tNasion, parent);
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
+         digitizerItem->addData(tNasion);
         itemList << digitizerItem;
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
@@ -190,8 +190,8 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
     if (!tRAP.empty()){
         //Create a RAO digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"RAP");
-        digitizerItem->addData(tRAP, parent);
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
+        digitizerItem->addData(tRAP);
         itemList << digitizerItem;
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
@@ -199,8 +199,8 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
     if (!tHpi.empty()){
         //Create a HPI digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
-        digitizerItem->addData(tHpi, parent);
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+        digitizerItem->addData(tHpi);
         itemList << digitizerItem;
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
@@ -208,8 +208,8 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
     if (!tEeg.empty()){
         //Create a EEG digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
-        digitizerItem->addData(tEeg, parent);
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+        digitizerItem->addData(tEeg);
         itemList << digitizerItem;
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);
@@ -217,8 +217,8 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
     if (!tExtra.empty()){
         //Create a extra digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
-        digitizerItem->addData(tExtra, parent);
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+        digitizerItem->addData(tExtra);
         itemList << digitizerItem;
         itemList << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemList);

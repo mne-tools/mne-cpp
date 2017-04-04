@@ -317,7 +317,8 @@ void AbstractMeshTreeItem::onSurfaceTranslationZChanged(const QVariant& fTransZ)
 void AbstractMeshTreeItem::onSurfaceColorChanged(const QVariant& color)
 {
     QVariant data;
-    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color.value<QColor>());
+    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(),
+                                                color.value<QColor>());
 
     data.setValue(matNewVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);

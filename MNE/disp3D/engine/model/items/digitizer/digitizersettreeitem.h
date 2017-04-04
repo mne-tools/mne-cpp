@@ -125,7 +125,6 @@ public:
     * Adds digitizer data to this item.
     *
     * @param[in] tDigitizer         The digitizer data.
-    * @param[in] parent             The Qt3D entity parent of the new item.
     */
     void addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
