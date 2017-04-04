@@ -173,30 +173,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the the translation x of this item changed.
-    *
-    * @param[in] fTransX        The current x translation.
-    */
-    virtual void onSurfaceTranslationXChanged(const QVariant& fTransX);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation y of this item changed.
-    *
-    * @param[in] fTransY        The current y translation.
-    */
-    virtual void onSurfaceTranslationYChanged(const QVariant& fTransY);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the the translation z of this item changed.
-    *
-    * @param[in] fTransZ        The current z translation.
-    */
-    virtual void onSurfaceTranslationZChanged(const QVariant& fTransZ);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever the surface color was changed.
     *
     * @param[in] color        The new surface color.

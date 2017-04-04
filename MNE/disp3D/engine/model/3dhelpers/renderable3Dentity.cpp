@@ -231,7 +231,9 @@ void Renderable3DEntity::setVisible(bool state)
 
 void Renderable3DEntity::setScale(float scale)
 {
-    m_pTransform->setScale(scale);
+    if(m_pTransform) {
+        m_pTransform->setScale(scale);
+    }
 }
 
 
@@ -247,8 +249,7 @@ void Renderable3DEntity::updateTransform()
     m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
     m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
 
-    m_pTransform->setMatrix(m);
+    if(m_pTransform) {
+        m_pTransform->setMatrix(m);
+    }
 }
-
-
-
