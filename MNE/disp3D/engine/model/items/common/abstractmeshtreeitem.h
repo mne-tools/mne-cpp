@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
+#include "../common/abstract3Dtreeitem.h"
 #include "../common/types.h"
 
 
@@ -89,7 +89,6 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MetaTreeItem;
-class Renderable3DEntity;
 class CustomMesh;
 
 
@@ -97,9 +96,9 @@ class CustomMesh;
 /**
 * AbstractMeshTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
-* @brief Provides a generic brain tree item.
+* @brief Provides a generic mesh tree item.
 */
-class DISP3DNEWSHARED_EXPORT AbstractMeshTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT AbstractMeshTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
@@ -111,39 +110,19 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
     */
-    explicit AbstractMeshTreeItem(int iType = Data3DTreeModelItemTypes::AbstractSurfaceItem,
-                                     const QString& text = "Abstract Surface");
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~AbstractMeshTreeItem();
+    explicit AbstractMeshTreeItem(int iType = Data3DTreeModelItemTypes::AbstractMeshItem,
+                                  const QString& text = "Abstract Mesh",
+                                  Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    virtual void setVisible(bool state);
-
-    //=========================================================================================================
-    /**
-    * Returns the RenderableEntity as a pointer.
-    *
-    * @return   The RenderableEntity as a pointer.
-    */
-    virtual QPointer<Renderable3DEntity> getRenderableEntity();
 
     //=========================================================================================================
     /**
@@ -258,8 +237,6 @@ protected:
     * @return The colors per vertex
     */
     virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
-
-    QPointer<Renderable3DEntity>        m_pRenderable3DEntity;              /**< The surface renderable 3D entity. */
 
     QPointer<Qt3DRender::QMaterial>     m_pMaterial;                        /**< The material. Ownership belongs to RenderableEntity. */
     QPointer<Qt3DRender::QMaterial>     m_pTessMaterial;                    /**< The tesselation material. Ownership belongs to RenderableEntity. */

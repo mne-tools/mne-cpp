@@ -78,11 +78,9 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
-: AbstractMeshTreeItem(iType, text)
+FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text, Qt3DCore::QEntity *p3DEntityParent)
+: AbstractMeshTreeItem(iType, text, p3DEntityParent)
 , m_sColorInfoOrigin("Color from curvature")
-, m_pItemSurfColGyri(new MetaTreeItem())
-, m_pItemSurfColSulci(new MetaTreeItem())
 {
     initItem();
 }
@@ -121,11 +119,8 @@ void FsSurfaceTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
+void FsSurfaceTreeItem::addData(const Surface& tSurface)
 {
-    //Set parents
-    m_pRenderable3DEntity->setParent(parent);
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
@@ -136,7 +131,7 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
                                 tSurface.tris(),
                                 matCurvatureColor,
                                 Qt3DRender::QGeometryRenderer::Triangles);
-    m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+    this->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     //Add data which is held by this FsSurfaceTreeItem
     QVariant data;
@@ -192,7 +187,7 @@ void FsSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
 void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 {
-    if(this->hasChildren()) {
+    if(m_pItemSurfColSulci && m_pItemSurfColGyri) {
         QVariant data;
         MatrixX3f matNewVertColor;
 
@@ -239,7 +234,7 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 
 //*************************************************************************************************************
 
-MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
+MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri) const
 {
     MatrixX3f colors(curvature.rows(), 3);
 

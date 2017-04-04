@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     renderable3Dentity.cpp
+* @file     abstract3Dtreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,24 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Renderable3DEntity class definition.
+* @brief    Abstract3DTreeItem class definition.
 *
 */
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "renderable3Dentity.h"
+#include "abstract3Dtreeitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -57,28 +54,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-
-#include <Qt3DRender/QMaterial>
-#include <Qt3DExtras/QPerVertexColorMaterial>
-#include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DCore/QComponent>
-#include <Qt3DRender/QEffect>
-#include <Qt3DRender/QParameter>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-using namespace Eigen;
-using namespace Qt3DCore;
-using namespace Qt3DRender;
 
 
 //*************************************************************************************************************
@@ -86,117 +65,44 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pTransform(new Qt3DCore::QTransform())
-, m_fRotX(0.0f)
-, m_fRotY(0.0f)
-, m_fRotZ(0.0f)
+Abstract3DTreeItem::Abstract3DTreeItem(int iType, const QString& text, QEntity* p3DEntityParent)
+: QStandardItem(text)
+, Renderable3DEntity(p3DEntityParent)
+, m_iType(iType)
 {
-    this->addComponent(m_pTransform);
+    initItem();
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setTransform(QPointer<Qt3DCore::QTransform> pTransform)
+Abstract3DTreeItem::~Abstract3DTreeItem()
 {
-    if(m_pTransform) {
-        this->removeComponent(m_pTransform);
-        m_pTransform = pTransform;
-        this->addComponent(m_pTransform);
-    }
 }
 
 
 //*************************************************************************************************************
 
-float Renderable3DEntity::rotX() const
+void Abstract3DTreeItem::initItem()
 {
-    return m_fRotX;
+    this->setToolTip("Abstract 3D Tree Item");
+
+     //Do the connects
+     connect(this, &Abstract3DTreeItem::checkStateChanged,
+             this, &Abstract3DTreeItem::onCheckStateChanged);
 }
 
 
 //*************************************************************************************************************
 
-float Renderable3DEntity::rotY() const
+void Abstract3DTreeItem::setData(const QVariant& value, int role)
 {
-    return m_fRotY;
-}
+    QStandardItem::setData(value, role);
 
-
-//*************************************************************************************************************
-
-float Renderable3DEntity::rotZ() const
-{
-    return m_fRotZ;
-}
-
-
-//*************************************************************************************************************
-
-QVector3D Renderable3DEntity::position() const
-{
-    return m_position;
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setRotX(float rotX)
-{
-    if(m_fRotX == rotX) {
-        return;
-    }
-
-    m_fRotX = rotX;
-    emit rotXChanged(rotX);
-    updateTransform();
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setRotY(float rotY)
-{
-    if(m_fRotY == rotY) {
-        return;
-    }
-
-    m_fRotY = rotY;
-    emit rotYChanged(rotY);
-    updateTransform();
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setRotZ(float rotZ)
-{
-    if(m_fRotZ == rotZ) {
-        return;
-    }
-
-    m_fRotZ = rotZ;
-    emit rotZChanged(rotZ);
-    updateTransform();
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setMaterialParameter(float fValue, QString sParameterName)
-{
-    //Look for all materials and set the corresponding parameters
-    QComponentVector vComponents = this->components();
-
-    for(int j = 0; j < vComponents.size(); ++j) {
-        if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
-            for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
-                if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
-                    pMaterial->effect()->parameters().at(i)->setValue(fValue);
-                }
-            }
+    switch(role) {
+        case Qt::CheckStateRole:{
+            emit checkStateChanged(this->checkState());
+            break;
         }
     }
 }
@@ -204,51 +110,79 @@ void Renderable3DEntity::setMaterialParameter(float fValue, QString sParameterNa
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setPosition(QVector3D position)
+int Abstract3DTreeItem::type() const
 {
-    if(m_position == position) {
-        return;
+    return m_iType;
+}
+
+
+//*************************************************************************************************************
+
+QList<QStandardItem*> Abstract3DTreeItem::findChildren(int type)
+{
+    QList<QStandardItem*> itemList;
+
+    if(this->hasChildren()) {
+        for(int row = 0; row<this->rowCount(); row++) {
+            for(int col = 0; col<this->columnCount(); col++) {
+                if(this->child(row, col)->type() == type) {
+                    itemList.append(this->child(row, col));
+                }
+            }
+        }
     }
 
-    m_position = position;
-    emit positionChanged(position);
-    updateTransform();
+    return itemList;
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setVisible(bool state)
+QList<QStandardItem*> Abstract3DTreeItem::findChildren(const QString& text)
 {
-    for(int i = 0; i < this->childNodes().size(); ++i) {
-        this->childNodes()[i]->setEnabled(state);
+    QList<QStandardItem*> itemList;
+
+    if(this->hasChildren()) {
+        for(int row = 0; row<this->rowCount(); row++) {
+            for(int col = 0; col<this->columnCount(); col++) {
+                if(this->child(row, col)->text() == text) {
+                    itemList.append(this->child(row, col));
+                }
+            }
+        }
     }
-    this->setEnabled(state);
+
+    return itemList;
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setScale(float scale)
+Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem* newItem)
 {
-    m_pTransform->setScale(scale);
+    this->appendRow(newItem);
+
+    return *this;
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::updateTransform()
+Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem& newItem)
 {
-    QMatrix4x4 m;
+    this->appendRow(&newItem);
 
-    //Do the translation after rotating, otherwise rotation around the x,y,z axis would be screwed up
-    m.translate(m_position);
-    m.rotate(m_fRotX, QVector3D(1.0f, 0.0f, 0.0f));
-    m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
-
-    m_pTransform->setMatrix(m);
+    return *this;
 }
 
 
+//*************************************************************************************************************
 
+void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    for(int i = 0; i<this->rowCount(); i++) {
+        if(this->child(i)->isCheckable()) {
+            this->child(i)->setCheckState(checkState);
+        }
+    }
+}

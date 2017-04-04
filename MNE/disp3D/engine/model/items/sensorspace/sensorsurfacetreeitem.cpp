@@ -91,12 +91,12 @@ void SensorSurfaceTreeItem::initItem()
     this->setToolTip("Sensor surface item");
 
     //Set shaders
-    m_pRenderable3DEntity->removeComponent(m_pMaterial);
-    m_pRenderable3DEntity->removeComponent(m_pTessMaterial);
-    m_pRenderable3DEntity->removeComponent(m_pNormalMaterial);
+    this->removeComponent(m_pMaterial);
+    this->removeComponent(m_pTessMaterial);
+    this->removeComponent(m_pNormalMaterial);
 
     PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
-    m_pRenderable3DEntity->addComponent(pBemMaterial);
+    this->addComponent(pBemMaterial);
 }
 
 
@@ -104,9 +104,6 @@ void SensorSurfaceTreeItem::initItem()
 
 void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCore::QEntity* parent)
 {
-    //Set parents
-    m_pRenderable3DEntity->setParent(parent);
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tSensorSurface.rr);
 

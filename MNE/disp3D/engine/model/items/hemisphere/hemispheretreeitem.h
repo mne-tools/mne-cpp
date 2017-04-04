@@ -50,6 +50,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,7 +94,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneEstimateTreeItem;
 class FsSurfaceTreeItem;
 class FsAnnotationTreeItem;
 class SourceSpaceTreeItem;
@@ -181,8 +182,8 @@ protected:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    FsSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    FsAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
+    QPointer<FsSurfaceTreeItem>           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
+    QPointer<FsAnnotationTreeItem>        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
 };
 
 } //NAMESPACE DISP3DLIB
