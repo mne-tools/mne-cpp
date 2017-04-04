@@ -261,14 +261,13 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::Q
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::ECDDataItem).size() == 0) {
             //If ecd data item does not exists yet, create it here!
-            m_EcdDataTreeItem = new EcdDataTreeItem();
+            m_EcdDataTreeItem = new EcdDataTreeItem(p3DEntityParent);
 
             QList<QStandardItem*> list;
             list << m_EcdDataTreeItem;
             list << new QStandardItem(m_EcdDataTreeItem->toolTip());
             this->appendRow(list);
 
-            m_EcdDataTreeItem->initData(p3DEntityParent);
             m_EcdDataTreeItem->addData(pECDSet);
 
         } else {
