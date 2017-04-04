@@ -87,7 +87,10 @@ void Abstract3DTreeItem::initItem()
     QList<QStandardItem*> list;
     QVariant data;
 
-    m_pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
+    if(!m_pItemTransformationOptions) {
+        m_pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
+    }
+
     m_pItemTransformationOptions->setEditable(false);
     list.clear();
     list << m_pItemTransformationOptions;
@@ -122,7 +125,10 @@ void Abstract3DTreeItem::initItem()
     m_pItemTransformationOptions->appendRow(list);
 
     //Color
-    m_pItemAppearanceOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Appearance");
+    if(!m_pItemAppearanceOptions) {
+        m_pItemAppearanceOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Appearance");
+    }
+
     m_pItemAppearanceOptions->setEditable(false);
     list.clear();
     list << m_pItemAppearanceOptions;

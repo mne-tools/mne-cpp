@@ -157,23 +157,3 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         }
     }
 }
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::onAlphaChanged(const QVariant& fAlpha)
-{
-    if(fAlpha.canConvert<float>()) {
-        for(int i = 0; i < this->childNodes().size(); ++i) {
-            if(Qt3DCore::QEntity* pNode = dynamic_cast<Qt3DCore::QEntity*>(this->childNodes().at(i))) {
-                for(int j = 0; j < pNode->components().size(); ++j) {
-                    Qt3DCore::QComponent* pComponent = pNode->components().at(j);
-
-                    if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
-                        pMaterial->setAlpha(fAlpha.toFloat());
-                    }
-                }
-            }
-        }
-    }
-}

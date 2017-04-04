@@ -134,7 +134,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
 };
 
 } //NAMESPACE DISP3DLIB

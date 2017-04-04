@@ -82,13 +82,6 @@ BemTreeItem::BemTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-BemTreeItem::~BemTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void BemTreeItem::initItem()
 {
     this->setEditable(false);
@@ -138,18 +131,4 @@ void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent
         this->appendRow(list);
     }
 }
-
-
-//*************************************************************************************************************
-
-void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-
-
 

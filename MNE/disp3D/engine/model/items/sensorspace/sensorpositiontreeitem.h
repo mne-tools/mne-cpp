@@ -135,14 +135,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the alpha value changed.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    void onAlphaChanged(const QVariant& fAlpha);
 };
 
 } //NAMESPACE DISP3DLIB

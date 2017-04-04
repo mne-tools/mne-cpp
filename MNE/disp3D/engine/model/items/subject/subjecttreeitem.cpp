@@ -78,13 +78,6 @@ SubjectTreeItem::SubjectTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-SubjectTreeItem::~SubjectTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void SubjectTreeItem::initItem()
 {
     this->setEditable(false);

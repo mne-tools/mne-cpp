@@ -91,13 +91,6 @@ HemisphereTreeItem::HemisphereTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-HemisphereTreeItem::~HemisphereTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void HemisphereTreeItem::initItem()
 {
     this->setEditable(false);
@@ -131,7 +124,9 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
     //Add childs
     //Add surface child
-    m_pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SurfaceItem, "Surface");
+    if(!m_pSurfaceItem) {
+        m_pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SurfaceItem, "Surface");
+    }
 
     QList<QStandardItem*> list;
     list << m_pSurfaceItem;
@@ -142,7 +137,10 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
-        m_pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
+        if(!m_pAnnotItem) {
+            m_pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
+        }
+
         connect(m_pAnnotItem, &FsAnnotationTreeItem::annotationVisibiltyChanged,
                 m_pSurfaceItem, &FsSurfaceTreeItem::onAnnotationVisibilityChanged);
 
@@ -182,8 +180,7 @@ SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemispher
 
     this->setData(data, Data3DTreeModelItemRoles::SurfaceHemi);
 
-    //Add childs
-    //Add surface child
+    //Add extra info
     SourceSpaceTreeItem* pSourceSpaceItem = new SourceSpaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SourceSpaceItem);
 
     QList<QStandardItem*> list;
@@ -211,16 +208,3 @@ FsAnnotationTreeItem* HemisphereTreeItem::getAnnotItem()
 {
     return m_pAnnotItem;
 }
-
-
-//*************************************************************************************************************
-
-void HemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); i++) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-

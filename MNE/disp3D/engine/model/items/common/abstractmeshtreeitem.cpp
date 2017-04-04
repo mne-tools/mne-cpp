@@ -184,7 +184,9 @@ void AbstractMeshTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-            m_pCustomMesh->setColor(value.value<MatrixX3f>());
+            if(m_pCustomMesh) {
+                m_pCustomMesh->setColor(value.value<MatrixX3f>());
+            }
             break;
 
         default: // do nothing;
@@ -239,10 +241,14 @@ void AbstractMeshTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
 
     if(sMaterial.toString() == "Phong Alpha") {
         this->addComponent(m_pMaterial);
-        m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
+        if(m_pCustomMesh) {
+            m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
+        }
     } else if(sMaterial.toString() == "Phong Alpha Tesselation") {
         this->addComponent(m_pTessMaterial);
-        m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Patches);
+        if(m_pCustomMesh) {
+            m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Patches);
+        }
     }
 }
 

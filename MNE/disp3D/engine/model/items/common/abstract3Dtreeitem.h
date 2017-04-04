@@ -200,8 +200,8 @@ protected:
 
     int     m_iType;        /**< This item's type. */
 
-    QPointer<MetaTreeItem>      m_pItemTransformationOptions;
-    QPointer<MetaTreeItem>      m_pItemAppearanceOptions;
+    QPointer<MetaTreeItem>      m_pItemTransformationOptions;       /**< The item holding the transfomation (translation, etc.) group. */
+    QPointer<MetaTreeItem>      m_pItemAppearanceOptions;           /**< The item holding the appearance (color, alpha, etc.) group. */
 
 signals:
     //=========================================================================================================

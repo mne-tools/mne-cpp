@@ -94,12 +94,6 @@ public:
     */
     explicit SubjectTreeItem(int iType = Data3DTreeModelItemTypes::SubjectItem, const QString& text = "");
 
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~SubjectTreeItem();
-
 protected:
     //=========================================================================================================
     /**

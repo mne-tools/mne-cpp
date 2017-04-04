@@ -96,17 +96,8 @@ using namespace CONNECTIVITYLIB;
 
 MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pMneEstimateTreeItem(new MneEstimateTreeItem())
-, m_pNetworkTreeItem(new NetworkTreeItem())
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-MeasurementTreeItem::~MeasurementTreeItem()
-{
 }
 
 
@@ -172,7 +163,9 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
         if(this->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
             if(!tForwardSolution.isEmpty()) {
-                m_pMneEstimateTreeItem = new MneEstimateTreeItem();
+                if(!m_pMneEstimateTreeItem) {
+                    m_pMneEstimateTreeItem = new MneEstimateTreeItem();
+                }
 
                 QList<QStandardItem*> list;
                 list << m_pMneEstimateTreeItem;
@@ -241,7 +234,9 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                 qDebug() << "MeasurementTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
             }
         } else {
-            m_pMneEstimateTreeItem->addData(tSourceEstimate);
+            if(m_pMneEstimateTreeItem) {
+                m_pMneEstimateTreeItem->addData(tSourceEstimate);
+            }
         }
 
         return m_pMneEstimateTreeItem;
@@ -261,7 +256,9 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::Q
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::ECDDataItem).size() == 0) {
             //If ecd data item does not exists yet, create it here!
-            m_EcdDataTreeItem = new EcdDataTreeItem(p3DEntityParent);
+            if(!m_EcdDataTreeItem) {
+                m_EcdDataTreeItem = new EcdDataTreeItem(p3DEntityParent);
+            }
 
             QList<QStandardItem*> list;
             list << m_EcdDataTreeItem;
@@ -271,7 +268,9 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::Q
             m_EcdDataTreeItem->addData(pECDSet);
 
         } else {
-            m_EcdDataTreeItem->addData(pECDSet);
+            if(m_EcdDataTreeItem) {
+                m_EcdDataTreeItem->addData(pECDSet);
+            }
         }
 
         return m_EcdDataTreeItem;
@@ -319,7 +318,9 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::NetworkItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
-            m_pNetworkTreeItem = new NetworkTreeItem(p3DEntityParent);
+            if(!m_pNetworkTreeItem) {
+                m_pNetworkTreeItem = new NetworkTreeItem(p3DEntityParent);
+            }
 
             QList<QStandardItem*> list;
             list << m_pNetworkTreeItem;
@@ -328,7 +329,9 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
 
             m_pNetworkTreeItem->addData(tNetworkData);
         } else {
-            m_pNetworkTreeItem->addData(tNetworkData);
+            if(m_pNetworkTreeItem) {
+                m_pNetworkTreeItem->addData(tNetworkData);
+            }
         }
 
         return m_pNetworkTreeItem;
@@ -346,18 +349,6 @@ void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const M
 {
     if(m_pMneEstimateTreeItem) {
         m_pMneEstimateTreeItem->setColorOrigin(leftHemiColor, rightHemiColor);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MeasurementTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
     }
 }
 

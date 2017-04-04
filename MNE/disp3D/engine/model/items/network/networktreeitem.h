@@ -159,7 +159,7 @@ private:
 
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
-    MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+    QPointer<MetaTreeItem>                      m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
 
 };
 

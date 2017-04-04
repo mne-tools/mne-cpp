@@ -120,12 +120,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~MriTreeItem();
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
     * @param[in] tSurfaceSet        FreeSurfer surface set.
@@ -136,7 +130,9 @@ public:
     *                               of the list hereby corresponds to the ordering of the input surface set.
     *                               The list is empty if no item was added.
     */
-    QList<FsSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    QList<FsSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet,
+                                      const FSLIB::AnnotationSet& tAnnotationSet,
+                                      Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -164,14 +160,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**

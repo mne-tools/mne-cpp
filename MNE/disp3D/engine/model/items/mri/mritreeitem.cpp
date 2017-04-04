@@ -82,13 +82,6 @@ MriTreeItem::MriTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-MriTreeItem::~MriTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void MriTreeItem::initItem()
 {
     this->setEditable(false);
@@ -183,18 +176,6 @@ void MriTreeItem::setRtVertColor(const QPair<MatrixX3f, MatrixX3f>& sourceColorS
                 data.setValue(sourceColorSamples.second);
                 pHemiItem->getSurfaceItem()->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
             }
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MriTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
         }
     }
 }

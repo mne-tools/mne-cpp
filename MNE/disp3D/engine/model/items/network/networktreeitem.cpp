@@ -91,7 +91,6 @@ using namespace CONNECTIVITYLIB;
 NetworkTreeItem::NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
 : AbstractMeshTreeItem(p3DEntityParent, iType, text)
 , m_bNodesPlotted(false)
-, m_pItemNetworkThreshold(new MetaTreeItem())
 {
     initItem();
 }
@@ -111,8 +110,11 @@ void NetworkTreeItem::initItem()
     QVariant data;
 
     QVector3D vecEdgeTrehshold(0,5,10);
-    m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold,
-                                               QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
+    if(!m_pItemNetworkThreshold) {
+        m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold,
+                                                    QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
+    }
+
     list << m_pItemNetworkThreshold;
     list << new QStandardItem(m_pItemNetworkThreshold->toolTip());
     this->appendRow(list);
@@ -152,8 +154,10 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
     //Plot network
-    plotNetwork(tNetworkData,
-                m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
+    if(m_pItemNetworkThreshold) {
+        plotNetwork(tNetworkData,
+                    m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
+    }
 }
 
 
