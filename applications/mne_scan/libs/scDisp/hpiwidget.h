@@ -238,15 +238,9 @@ protected:
 
     //=========================================================================================================
     /**
-    * Updates the digitizer in the 3D view based on the current head/device transformation.
+    * Updates the digitizer and head models in the 3D view based on the current head/device transformation.
     */
-    void updateDigitizer();
-
-    //=========================================================================================================
-    /**
-    * Updates the head model in the 3D view based on the current head/device transformation.
-    */
-    void updateHeadModel();
+    void update3DView();
 
 //    //=========================================================================================================
 //    /**
@@ -280,8 +274,7 @@ protected:
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadKid;          /**< The BEM head model for a kid. */
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAdult;        /**< The BEM head model for an adult. */
 
-    QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedDigitizer;
-    QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedFitted;
+    QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
 
     double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
 

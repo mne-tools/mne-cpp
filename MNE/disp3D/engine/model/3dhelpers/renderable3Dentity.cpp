@@ -99,12 +99,34 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setTransform(QPointer<Qt3DCore::QTransform> pTransform)
+void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 {
     if(m_pTransform) {
-        this->removeComponent(m_pTransform);
-        m_pTransform = pTransform;
-        this->addComponent(m_pTransform);
+        m_pTransform->setMatrix(transform.matrix());
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterName)
+{
+    //Look for all materials and set the corresponding parameters
+    QComponentVector vComponents;
+    for(int t = 0; t < this->childNodes().size(); ++t) {
+        if(QEntity* pEntity = dynamic_cast<QEntity*>(this->childNodes().at(t))) {
+            vComponents = pEntity->components();
+
+            for(int j = 0; j < vComponents.size(); ++j) {
+                if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
+                    for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
+                        if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
+                            pMaterial->effect()->parameters().at(i)->setValue(data);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -180,30 +202,6 @@ void Renderable3DEntity::setRotZ(float rotZ)
     m_fRotZ = rotZ;
     emit rotZChanged(rotZ);
     updateTransform();
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterName)
-{
-    //Look for all materials and set the corresponding parameters
-    QComponentVector vComponents;
-    for(int t = 0; t < this->childNodes().size(); ++t) {
-        if(QEntity* pEntity = dynamic_cast<QEntity*>(this->childNodes().at(t))) {
-            vComponents = pEntity->components();
-
-            for(int j = 0; j < vComponents.size(); ++j) {
-                if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
-                    for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
-                        if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
-                            pMaterial->effect()->parameters().at(i)->setValue(data);
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 
