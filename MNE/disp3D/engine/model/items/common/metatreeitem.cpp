@@ -143,13 +143,13 @@ void MetaTreeItem::initItem()
             sToolTip = "Surface triangle scale value";
             break;
         case MetaTreeItemTypes::SurfaceTranslateX:
-            sToolTip = "Surface x translation value";
+            sToolTip = "x translation value";
             break;
         case MetaTreeItemTypes::SurfaceTranslateY:
-            sToolTip = "Surface y translation value";
+            sToolTip = "y translation value";
             break;
         case MetaTreeItemTypes::SurfaceTranslateZ:
-            sToolTip = "Surface z translation value";
+            sToolTip = "z translation value";
             break;
         case MetaTreeItemTypes::NetworkThreshold:
             sToolTip = "The threshold used to scale the network";

@@ -130,6 +130,7 @@ void AbstractMeshTreeItem::initItem()
 
     //Material options
     MetaTreeItem* pItemMaterialOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Material");
+    pItemMaterialOptions->setEditable(false);
     list.clear();
     list << pItemMaterialOptions;
     list << new QStandardItem("The material options");
@@ -189,40 +190,6 @@ void AbstractMeshTreeItem::initItem()
     list << new QStandardItem("Show the normals");
     pItemMaterialOptions->appendRow(list);
 
-    //Transformation
-    MetaTreeItem* pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
-    list.clear();
-    list << pItemTransformationOptions;
-    list << new QStandardItem("The transformation options");
-    this->appendRow(list);
-
-    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
-    itemXTrans->setEditable(true);
-    connect(itemXTrans, &MetaTreeItem::dataChanged,
-            this, &AbstractMeshTreeItem::onSurfaceTranslationXChanged);
-    list.clear();
-    list << itemXTrans;
-    list << new QStandardItem(itemXTrans->toolTip());
-    pItemTransformationOptions->appendRow(list);
-
-    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
-    itemYTrans->setEditable(true);
-    connect(itemYTrans, &MetaTreeItem::dataChanged,
-            this, &AbstractMeshTreeItem::onSurfaceTranslationYChanged);
-    list.clear();
-    list << itemYTrans;
-    list << new QStandardItem(itemYTrans->toolTip());
-    pItemTransformationOptions->appendRow(list);
-
-    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
-    itemZTrans->setEditable(true);
-    connect(itemZTrans, &MetaTreeItem::dataChanged,
-            this, &AbstractMeshTreeItem::onSurfaceTranslationZChanged);
-    list.clear();
-    list << itemZTrans;
-    list << new QStandardItem(itemZTrans->toolTip());
-    pItemTransformationOptions->appendRow(list);
-
     //Init materials
     this->addComponent(m_pMaterial);
 
@@ -279,36 +246,6 @@ void AbstractMeshTreeItem::onSurfaceTessOuterChanged(const QVariant& fTessOuter)
 void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale)
 {
     this->setMaterialParameter(fTriangleScale.toFloat(), "triangleScale");
-}
-
-
-//*************************************************************************************************************
-
-void AbstractMeshTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
-{
-    QVector3D position = this->position();
-    position.setX(fTransX.toFloat());
-    this->setPosition(position);
-}
-
-
-//*************************************************************************************************************
-
-void AbstractMeshTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
-{
-    QVector3D position = this->position();
-    position.setY(fTransY.toFloat());
-    this->setPosition(position);
-}
-
-
-//*************************************************************************************************************
-
-void AbstractMeshTreeItem::onSurfaceTranslationZChanged(const QVariant& fTransZ)
-{
-    QVector3D position = this->position();
-    position.setZ(fTransZ.toFloat());
-    this->setPosition(position);
 }
 
 

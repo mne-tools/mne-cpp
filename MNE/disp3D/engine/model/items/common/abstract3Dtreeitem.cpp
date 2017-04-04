@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include "abstract3Dtreeitem.h"
+#include "../common/metatreeitem.h"
 
 
 //*************************************************************************************************************
@@ -76,16 +77,46 @@ Abstract3DTreeItem::Abstract3DTreeItem(QEntity* p3DEntityParent, int iType, cons
 
 //*************************************************************************************************************
 
-Abstract3DTreeItem::~Abstract3DTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void Abstract3DTreeItem::initItem()
 {
     this->setToolTip("Abstract 3D Tree Item");
+
+    //Transformation
+    QList<QStandardItem*> list;
+
+    MetaTreeItem* pItemTransformationOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Transformation");
+    pItemTransformationOptions->setEditable(false);
+    list.clear();
+    list << pItemTransformationOptions;
+    list << new QStandardItem("The transformation options");
+    this->appendRow(list);
+
+    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
+    itemXTrans->setEditable(true);
+    connect(itemXTrans, &MetaTreeItem::dataChanged,
+            this, &Abstract3DTreeItem::onSurfaceTranslationXChanged);
+    list.clear();
+    list << itemXTrans;
+    list << new QStandardItem(itemXTrans->toolTip());
+    pItemTransformationOptions->appendRow(list);
+
+    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
+    itemYTrans->setEditable(true);
+    connect(itemYTrans, &MetaTreeItem::dataChanged,
+            this, &Abstract3DTreeItem::onSurfaceTranslationYChanged);
+    list.clear();
+    list << itemYTrans;
+    list << new QStandardItem(itemYTrans->toolTip());
+    pItemTransformationOptions->appendRow(list);
+
+    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
+    itemZTrans->setEditable(true);
+    connect(itemZTrans, &MetaTreeItem::dataChanged,
+            this, &Abstract3DTreeItem::onSurfaceTranslationZChanged);
+    list.clear();
+    list << itemZTrans;
+    list << new QStandardItem(itemZTrans->toolTip());
+    pItemTransformationOptions->appendRow(list);
 
      //Do the connects
      connect(this, &Abstract3DTreeItem::checkStateChanged,
@@ -187,4 +218,34 @@ void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
     }
 
     this->setVisible(checkState == Qt::Unchecked ? false : true);
+}
+
+
+//*************************************************************************************************************
+
+void Abstract3DTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
+{
+    QVector3D position = this->position();
+    position.setX(fTransX.toFloat());
+    this->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void Abstract3DTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
+{
+    QVector3D position = this->position();
+    position.setY(fTransY.toFloat());
+    this->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void Abstract3DTreeItem::onSurfaceTranslationZChanged(const QVariant& fTransZ)
+{
+    QVector3D position = this->position();
+    position.setZ(fTransZ.toFloat());
+    this->setPosition(position);
 }
