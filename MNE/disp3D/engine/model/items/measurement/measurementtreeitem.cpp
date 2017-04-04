@@ -301,8 +301,8 @@ DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigit
     // Add Data to the first Digitizer Set Item
     //Check if it is really a digitizer tree item
     if(itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem) {
-        if(DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
-            pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
+        if(pReturnItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
+            pReturnItem->addData(tDigitizer, p3DEntityParent);
         }
     }
 

@@ -118,9 +118,18 @@ public:
     /**
     * Sets the entity's transformation.
     *
-    * @param[in] pTransform     The new entity's transform.
+    * @param[in] transform     The new entity's transform.
     */
-    void setTransform(QPointer<Qt3DCore::QTransform> pTransform);
+    void setTransform(const Qt3DCore::QTransform &transform);
+
+    //=========================================================================================================
+    /**
+    * Sets the value of a specific paramater of the materials for this entity.
+    *
+    * @param[in] data             The value to be set.
+    * @param[in] sParameterName   The name of the parameter to be set.
+    */
+    void setMaterialParameter(QVariant data, QString sParameterName);
 
     //=========================================================================================================
     /**
@@ -201,15 +210,6 @@ public:
     * @param[in] scale     The new scaling value.
     */
     void setScale(float scale);
-
-    //=========================================================================================================
-    /**
-    * Sets the value of a specific paramater of the materials for this entity.
-    *
-    * @param[in] data             The value to be set.
-    * @param[in] sParameterName   The name of the parameter to be set.
-    */
-    void setMaterialParameter(QVariant data, QString sParameterName);
 
 protected: 
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
