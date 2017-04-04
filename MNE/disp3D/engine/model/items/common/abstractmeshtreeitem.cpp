@@ -106,28 +106,6 @@ void AbstractMeshTreeItem::initItem()
     QList<QStandardItem*> list;
     QVariant data;
 
-    float fAlpha = 0.35f;
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::dataChanged,
-            this, &AbstractMeshTreeItem::onSurfaceAlphaChanged);
-    list.clear();
-    list << itemAlpha;
-    list << new QStandardItem(itemAlpha->toolTip());
-    this->appendRow(list);
-    data.setValue(fAlpha);
-    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
-
-    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::Color, "Surface color");
-    connect(pItemSurfCol, &MetaTreeItem::dataChanged,
-            this, &AbstractMeshTreeItem::onSurfaceColorChanged);
-    list.clear();
-    list << pItemSurfCol;
-    list << new QStandardItem(pItemSurfCol->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemSurfCol->setData(data, MetaTreeItemRoles::Color);
-    pItemSurfCol->setData(data, Qt::DecorationRole);
-
     //Material options
     MetaTreeItem* pItemMaterialOptions = new MetaTreeItem(MetaTreeItemTypes::UnknownItem, "Material");
     pItemMaterialOptions->setEditable(false);
@@ -217,16 +195,6 @@ void AbstractMeshTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-void AbstractMeshTreeItem::onSurfaceAlphaChanged(const QVariant& fAlpha)
-{
-    if(fAlpha.canConvert<float>()) {
-        this->setMaterialParameter(fAlpha.toFloat(), "alpha");
-    }
-}
-
-
-//*************************************************************************************************************
-
 void AbstractMeshTreeItem::onSurfaceTessInnerChanged(const QVariant& fTessInner)
 {
     this->setMaterialParameter(fTessInner.toFloat(), "innerTess");
@@ -251,7 +219,7 @@ void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriang
 
 //*************************************************************************************************************
 
-void AbstractMeshTreeItem::onSurfaceColorChanged(const QVariant& color)
+void AbstractMeshTreeItem::onColorChanged(const QVariant& color)
 {
     QVariant data;
     MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(),

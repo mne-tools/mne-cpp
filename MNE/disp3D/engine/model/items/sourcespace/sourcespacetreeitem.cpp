@@ -52,7 +52,7 @@
 //=============================================================================================================
 
 #include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DCore/QTransform>
 
 
@@ -145,7 +145,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 
             pSourceSphereEntity->setPosition(pos);
 
-            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
             material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
         }
@@ -164,7 +164,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 
             pSourceSphereEntity->setPosition(pos);
 
-            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
             material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
         }

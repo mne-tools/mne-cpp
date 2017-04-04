@@ -687,7 +687,7 @@ void HPIWidget::updateHeadModel()
                     pBemItem->setTransform(pTransform);
 
                     //If it is the kids model scale it
-                    pBemItem->setScale(0.6);
+                    pBemItem->setScale(0.6f);
                 }
             }
         }

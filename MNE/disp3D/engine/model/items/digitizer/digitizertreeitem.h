@@ -125,14 +125,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onColorChanged(const QVariant &color);
 };
 
 } //NAMESPACE DISP3DLIB

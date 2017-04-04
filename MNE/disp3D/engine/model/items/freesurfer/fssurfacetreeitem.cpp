@@ -99,7 +99,7 @@ void FsSurfaceTreeItem::initItem()
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list << m_pItemSurfColSulci;
     list << new QStandardItem(m_pItemSurfColSulci->toolTip());
-    this->appendRow(list);
+    m_pItemAppearanceOptions->appendRow(list);
     data.setValue(QColor(50,50,50));
     m_pItemSurfColSulci->setData(data, MetaTreeItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
@@ -110,7 +110,7 @@ void FsSurfaceTreeItem::initItem()
     list.clear();
     list << m_pItemSurfColGyri;
     list << new QStandardItem(m_pItemSurfColGyri->toolTip());
-    this->appendRow(list);
+    m_pItemAppearanceOptions->appendRow(list);
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);

@@ -91,32 +91,6 @@ void SensorPositionTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip(this->text());
-
-    //Add color picker item as meta information item
-    QVariant data;
-    QList<QStandardItem*> list;
-
-    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
-    connect(pItemColor, &MetaTreeItem::dataChanged,
-            this, &SensorPositionTreeItem::onColorChanged);
-    list.clear();
-    list << pItemColor;
-    list << new QStandardItem(pItemColor->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemColor->setData(data, MetaTreeItemRoles::Color);
-    pItemColor->setData(data, Qt::DecorationRole);
-
-    float fAlpha = 1.0f;
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::dataChanged,
-            this, &SensorPositionTreeItem::onAlphaChanged);
-    list.clear();
-    list << itemAlpha;
-    list << new QStandardItem(itemAlpha->toolTip());
-    this->appendRow(list);
-    data.setValue(fAlpha);
-    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 }
 
 
@@ -180,26 +154,6 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
             data.setValue(colDefault);
             item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::onColorChanged(const QVariant& color)
-{
-    if(color.canConvert<QColor>()) {
-        for(int i = 0; i < this->childNodes().size(); ++i) {
-            if(Qt3DCore::QEntity* pNode = dynamic_cast<Qt3DCore::QEntity*>(this->childNodes().at(i))) {
-                for(int j = 0; j < pNode->components().size(); ++j) {
-                    Qt3DCore::QComponent* pComponent = pNode->components().at(j);
-
-                    if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
-                        pMaterial->setAmbient(color.value<QColor>());
-                    }
-                }
-            }
         }
     }
 }

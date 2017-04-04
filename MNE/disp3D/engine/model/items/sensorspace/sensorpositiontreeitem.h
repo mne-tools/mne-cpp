@@ -121,6 +121,7 @@ public:
     */
     void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo);
 
+protected:
     //=========================================================================================================
     /**
     * Plots the sensors.
@@ -129,20 +130,11 @@ public:
     */
     void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo);
 
-protected:
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    void onColorChanged(const QVariant& color);
 
     //=========================================================================================================
     /**

@@ -51,7 +51,7 @@
 //=============================================================================================================
 
 #include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 
 
 //*************************************************************************************************************
@@ -88,21 +88,6 @@ void DigitizerTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip(this->text());
-
-    //Add color picker item as meta information item
-    QVariant data;
-    QList<QStandardItem*> list;
-
-    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
-    connect(pItemColor, &MetaTreeItem::dataChanged,
-            this, &DigitizerTreeItem::onColorChanged);
-    list.clear();
-    list << pItemColor;
-    list << new QStandardItem(pItemColor->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemColor->setData(data, MetaTreeItemRoles::Color);
-    pItemColor->setData(data, Qt::DecorationRole);
 }
 
 
@@ -131,7 +116,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
         pSourceSphereEntity->addComponent(sourceSphere);
         pSourceSphereEntity->setPosition(pos);
 
-        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+        Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
 
         switch (tDigitizer[i].kind) {
             case FIFFV_POINT_CARDINAL:
@@ -176,7 +161,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
     }
 
     //Update colors in color item
-    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
+    QList<QStandardItem*> items = m_pItemAppearanceOptions->findChildren(MetaTreeItemTypes::Color);
 
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
@@ -184,26 +169,6 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
             data.setValue(colDefault);
             item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerTreeItem::onColorChanged(const QVariant& color)
-{
-    if(color.canConvert<QColor>()) {
-        for(int i = 0; i < this->childNodes().size(); ++i) {
-            if(Qt3DCore::QEntity* pNode = dynamic_cast<Qt3DCore::QEntity*>(this->childNodes().at(i))) {
-                for(int j = 0; j < pNode->components().size(); ++j) {
-                    Qt3DCore::QComponent* pComponent = pNode->components().at(j);
-
-                    if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
-                        pMaterial->setAmbient(color.value<QColor>());
-                    }
-                }
-            }
         }
     }
 }

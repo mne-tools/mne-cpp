@@ -206,10 +206,10 @@ public:
     /**
     * Sets the value of a specific paramater of the materials for this entity.
     *
-    * @param[in] fValue             The value to be set.
-    * @param[in] sParameterName     The name of the parameter to be set.
+    * @param[in] data             The value to be set.
+    * @param[in] sParameterName   The name of the parameter to be set.
     */
-    void setMaterialParameter(float fValue, QString sParameterName);
+    void setMaterialParameter(QVariant data, QString sParameterName);
 
 protected: 
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */

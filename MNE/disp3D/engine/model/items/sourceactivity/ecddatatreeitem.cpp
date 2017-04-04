@@ -58,7 +58,7 @@
 #include <QStandardItemModel>
 #include <Qt3DRender/qshaderprogram.h>
 #include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DCore/QTransform>
 #include <QQuaternion>
 #include <Qt3DExtras/QConeMesh>
@@ -179,7 +179,7 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
         transform->setMatrix(m);
         dipoleEntity->addComponent(transform);
 
-        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+        Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
         material->setAmbient(QColor(rand()%255, rand()%255, rand()%255));
         dipoleEntity->addComponent(material);
     }
