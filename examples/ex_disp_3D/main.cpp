@@ -245,10 +245,10 @@ int main(int argc, char *argv[])
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-//    //Read and show BEM
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bem(t_fileBem);
-//    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+    //Read and show BEM
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem(t_fileBem);
+    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
 //    //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");

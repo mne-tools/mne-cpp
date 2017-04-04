@@ -117,18 +117,13 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit NetworkTreeItem(int iType = Data3DTreeModelItemTypes::NetworkItem, const QString& text = "Connectivity Data");
-
-    //=========================================================================================================
-    /**
-    * Initializes the rt connectivity data item with neccessary information for visualization computations.
-    *
-    * @param[in] parent                 The Qt3D entity parent of the new item.
-    */
-    void initData(Qt3DCore::QEntity *parent);
+    explicit NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
+                             int iType = Data3DTreeModelItemTypes::NetworkItem,
+                             const QString& text = "Connectivity Data");
 
     //=========================================================================================================
     /**
@@ -137,14 +132,6 @@ public:
     * @param[in] tNetworkData       The new connectivity data.
     */
     void addData(const CONNECTIVITYLIB::Network& tNetworkData);
-
-    //=========================================================================================================
-    /**
-    * Updates the rt connectivity data which is streamed by this item's worker thread item.
-    *
-    * @return                       Returns true if this item is initialized.
-    */
-    inline bool isDataInit() const;
 
 private:
     //=========================================================================================================
@@ -170,7 +157,6 @@ private:
     */
     void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData, const QVector3D& vecThreshold);
 
-    bool                                        m_bDataIsInit;                  /**< The data init flag. */
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
     MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
@@ -182,16 +168,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool NetworkTreeItem::isDataInit() const
-{
-    return m_bDataIsInit;
-}
-
 } //NAMESPACE DISP3DLIB
-
-#ifndef metatype_networksptr
-#define metatype_networksptr
-Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network);
-#endif
 
 #endif // NETWORKTREEITEM_H

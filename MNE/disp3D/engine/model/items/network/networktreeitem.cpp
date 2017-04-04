@@ -88,9 +88,8 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
-: AbstractMeshTreeItem(iType, text)
-, m_bDataIsInit(false)
+NetworkTreeItem::NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 , m_bNodesPlotted(false)
 , m_pItemNetworkThreshold(new MetaTreeItem())
 {
@@ -140,21 +139,8 @@ void NetworkTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::initData(Qt3DCore::QEntity* parent)
-{
-    m_bDataIsInit = true;
-}
-
-
-//*************************************************************************************************************
-
 void NetworkTreeItem::addData(const Network& tNetworkData)
 {
-    if(!m_bDataIsInit) {
-        qDebug() << "NetworkTreeItem::addData - NetworkTreeItem data has not been initialized yet!";
-        return;
-    }
-
     //Add data which is held by this NetworkTreeItem
     QVariant data;
 

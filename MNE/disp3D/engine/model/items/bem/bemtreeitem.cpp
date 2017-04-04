@@ -129,8 +129,8 @@ void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent
     for(int i = 0; i < tBem.size(); ++i) {
         QString sBemSurfName;
         sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
-        pSurfItem->addData(tBem[i], p3DEntityParent);
+        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
+        pSurfItem->addData(tBem[i]);
 
         QList<QStandardItem*> list;
         list << pSurfItem;

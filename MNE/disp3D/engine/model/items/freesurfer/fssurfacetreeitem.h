@@ -105,12 +105,13 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit FsSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceItem,
-                               const QString& text = "Surface",
-                               Qt3DCore::QEntity* p3DEntityParent = 0);
+    explicit FsSurfaceTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
+                               int iType = Data3DTreeModelItemTypes::SurfaceItem,
+                               const QString& text = "Surface");
 
     //=========================================================================================================
     /**

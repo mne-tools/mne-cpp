@@ -100,8 +100,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
 {
     //Generate sensor surfaces as childs
     for(int i = 0; i < tSensor.size(); ++i) {
-        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem);
-        pSurfItem->addData(tSensor[i], p3DEntityParent);
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorSurfaceItem);
+        pSurfItem->addData(tSensor[i]);
 
         QList<QStandardItem*> list;
         list << pSurfItem;

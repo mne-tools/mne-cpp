@@ -320,14 +320,13 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::NetworkItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
-            m_pNetworkTreeItem = new NetworkTreeItem();
+            m_pNetworkTreeItem = new NetworkTreeItem(p3DEntityParent);
 
             QList<QStandardItem*> list;
             list << m_pNetworkTreeItem;
             list << new QStandardItem(m_pNetworkTreeItem->toolTip());
             this->appendRow(list);
 
-            m_pNetworkTreeItem->initData(p3DEntityParent);
             m_pNetworkTreeItem->addData(tNetworkData);
         } else {
             m_pNetworkTreeItem->addData(tNetworkData);

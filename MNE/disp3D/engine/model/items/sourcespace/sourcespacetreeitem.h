@@ -108,19 +108,19 @@ public:
     /**
     * Default constructor.
     *
+    * @param[in] p3DEntityParent    The parent 3D entity.
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit SourceSpaceTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    explicit SourceSpaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0, int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
     * Adds source space data.
     *
     * @param[in] tHemisphere        The hemisphere data of the source space.
-    * @param[in] parent             The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
+    void addData(const MNELIB::MNEHemisphere& tHemisphere);
 
 protected:
     //=========================================================================================================

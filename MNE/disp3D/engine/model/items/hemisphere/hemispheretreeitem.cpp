@@ -131,7 +131,7 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
     //Add childs
     //Add surface child
-    m_pSurfaceItem = new FsSurfaceTreeItem(Data3DTreeModelItemTypes::SurfaceItem, "Surface", p3DEntityParent);
+    m_pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SurfaceItem, "Surface");
 
     QList<QStandardItem*> list;
     list << m_pSurfaceItem;
@@ -184,14 +184,14 @@ SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemispher
 
     //Add childs
     //Add surface child
-    SourceSpaceTreeItem* pSourceSpaceItem = new SourceSpaceTreeItem(Data3DTreeModelItemTypes::SourceSpaceItem);
+    SourceSpaceTreeItem* pSourceSpaceItem = new SourceSpaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SourceSpaceItem);
 
     QList<QStandardItem*> list;
     list << pSourceSpaceItem;
     list << new QStandardItem(pSourceSpaceItem->toolTip());
     this->appendRow(list);
 
-    pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
+    pSourceSpaceItem->addData(tHemisphere);
 
     return pSourceSpaceItem;
 }

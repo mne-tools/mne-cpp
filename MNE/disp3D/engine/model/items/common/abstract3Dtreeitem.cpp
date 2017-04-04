@@ -65,7 +65,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Abstract3DTreeItem::Abstract3DTreeItem(int iType, const QString& text, QEntity* p3DEntityParent)
+Abstract3DTreeItem::Abstract3DTreeItem(QEntity* p3DEntityParent, int iType, const QString& text)
 : QStandardItem(text)
 , Renderable3DEntity(p3DEntityParent)
 , m_iType(iType)
@@ -185,4 +185,6 @@ void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
             this->child(i)->setCheckState(checkState);
         }
     }
+
+    this->setVisible(checkState == Qt::Unchecked ? false : true);
 }

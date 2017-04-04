@@ -74,8 +74,8 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorSurfaceTreeItem::SensorSurfaceTreeItem(int iType, const QString& text)
-: AbstractMeshTreeItem(iType, text)
+SensorSurfaceTreeItem::SensorSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
 }
@@ -102,7 +102,7 @@ void SensorSurfaceTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCore::QEntity* parent)
+void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface)
 {
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tSensorSurface.rr);

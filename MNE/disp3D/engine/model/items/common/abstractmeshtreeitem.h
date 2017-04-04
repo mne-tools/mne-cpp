@@ -110,13 +110,13 @@ public:
     /**
     * Default constructor.
     *
+    * @param[in] p3DEntityParent    The parent 3D entity.
     * @param[in] iType              The type of the item. See types.h for declaration and definition.
     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    * @param[in] p3DEntityParent    The parent 3D entity.
     */
-    explicit AbstractMeshTreeItem(int iType = Data3DTreeModelItemTypes::AbstractMeshItem,
-                                  const QString& text = "Abstract Mesh",
-                                  Qt3DCore::QEntity* p3DEntityParent = 0);
+    explicit AbstractMeshTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
+                                  int iType = Data3DTreeModelItemTypes::AbstractMeshItem,
+                                  const QString& text = "Abstract Mesh");
 
     //=========================================================================================================
     /**
@@ -170,14 +170,6 @@ protected:
     * @param[in] fTriangleScale     The triangle scale value.
     */
     virtual void onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**
