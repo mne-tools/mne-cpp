@@ -615,17 +615,10 @@ void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPo
 
 void HPIWidget::update3DView()
 {
-    qDebug()<< "m_pTrackedDigitizer" <<m_pTrackedDigitizer;
-    qDebug()<< "m_pFiffInfo" <<m_pFiffInfo;
-    qDebug()<< "m_pBemHeadAdult" <<m_pBemHeadAdult;
-    qDebug()<< "m_pBemHeadKid" <<m_pBemHeadKid;
-
     if(m_pTrackedDigitizer &&
             m_pFiffInfo &&
             m_pBemHeadAdult &&
             m_pBemHeadKid) {
-        qDebug()<< "updating 3d view";
-
         //Prepare new transform
         QMatrix4x4 mat;
         for(int r = 0; r < 3; ++r) {
@@ -657,10 +650,9 @@ void HPIWidget::update3DView()
         itemList = m_pBemHeadKid->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                pBemItem->setTransform(pTransform);
-
                 //If it is the kid's model scale it
-                pBemItem->setScale(0.6f);
+                pTransform.setScale(0.65f);
+                pBemItem->setTransform(pTransform);
             }
         }
     }
