@@ -250,10 +250,10 @@ int main(int argc, char *argv[])
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-//    //Read and show sensor helmets
-//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-//    p3DDataModel->addMegSensorData("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
+    //Read and show sensor helmets
+    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+    p3DDataModel->addMegSensorData("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
 
     // Read & show digitizer points
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");

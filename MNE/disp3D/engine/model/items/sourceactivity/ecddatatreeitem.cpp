@@ -40,7 +40,6 @@
 
 #include "ecddatatreeitem.h"
 #include "../common/metatreeitem.h"
-#include "../../3dhelpers/renderable3Dentity.h"
 
 #include <inverse/dipoleFit/ecd_set.h>
 
@@ -88,26 +87,10 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EcdDataTreeItem::EcdDataTreeItem(int iType, const QString &text)
-: AbstractTreeItem(iType, text)
-, m_bIsDataInit(false)
-, m_pRenderable3DEntity(new Renderable3DEntity())
+EcdDataTreeItem::EcdDataTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-EcdDataTreeItem::~EcdDataTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-
-        for(int i = 0; i < m_pRenderable3DEntity->childNodes().size(); ++i) {
-            m_pRenderable3DEntity->childNodes().at(i)->deleteLater();
-        }
-    }
 }
 
 
@@ -124,24 +107,8 @@ void EcdDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void EcdDataTreeItem::initData(Qt3DCore::QEntity* parent)
-{      
-    //Create renderable 3D entity
-    m_pRenderable3DEntity->setParent(parent);
-
-    m_bIsDataInit = true;
-}
-
-
-//*************************************************************************************************************
-
 void EcdDataTreeItem::addData(const ECDSet& pECDSet)
 {
-    if(!m_bIsDataInit) {
-        qDebug() << "EcdDataTreeItem::addData - EcdDataTreeItem data has not been initialized yet!";
-        return;
-    }
-
     //Add further infos as children
     QList<QStandardItem*> list;
     MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberDipoles, QString::number(pECDSet.size()));
@@ -159,26 +126,6 @@ void EcdDataTreeItem::addData(const ECDSet& pECDSet)
 
     //Plot dipole moment
     plotDipoles(pECDSet);
-}
-
-
-//*************************************************************************************************************
-
-void EcdDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
-void EcdDataTreeItem::setVisible(bool state)
-{
-    for(int i = 0; i < m_lDipoles.size(); ++i) {
-        m_lDipoles.at(i)->setEnabled(state);
-    }
-
-    m_pRenderable3DEntity->setEnabled(state);
 }
 
 
@@ -209,7 +156,7 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
 
         QQuaternion final = QQuaternion::rotationTo(from, to);
 
-        Renderable3DEntity* dipoleEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+        Renderable3DEntity* dipoleEntity = new Renderable3DEntity(this);
 
         Qt3DExtras::QConeMesh* dipoleCone = new Qt3DExtras::QConeMesh();
         dipoleCone->setBottomRadius(0.001f);
@@ -235,8 +182,6 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
         Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
         material->setAmbient(QColor(rand()%255, rand()%255, rand()%255));
         dipoleEntity->addComponent(material);
-
-        m_lDipoles.append(dipoleEntity);
     }
 }
 
