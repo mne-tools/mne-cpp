@@ -109,6 +109,16 @@ void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 
 //*************************************************************************************************************
 
+void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pTransform) {
+        m_pTransform->setMatrix(m_pTransform->matrix() * transform.matrix());
+    }
+}
+
+
+//*************************************************************************************************************
+
 void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterName)
 {
     //Look for all materials and set the corresponding parameters

@@ -634,7 +634,7 @@ void HPIWidget::update3DView()
         QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                pDigItem->setTransform(pTransform);
+                pDigItem->applyTransform(pTransform);
             }
         }
 
@@ -642,7 +642,7 @@ void HPIWidget::update3DView()
         itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                pBemItem->setTransform(pTransform);
+                pBemItem->applyTransform(pTransform);
             }
         }
 
@@ -652,7 +652,7 @@ void HPIWidget::update3DView()
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
                 //If it is the kid's model scale it
                 pTransform.setScale(0.65f);
-                pBemItem->setTransform(pTransform);
+                pBemItem->applyTransform(pTransform);
             }
         }
     }
