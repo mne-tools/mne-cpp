@@ -120,7 +120,7 @@ void SensorPositionTreeItem::initItem()
     list << new QStandardItem(pItemColor->toolTip());
     this->appendRow(list);
     data.setValue(QColor(100,100,100));
-    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
+    pItemColor->setData(data, MetaTreeItemRoles::Color);
     pItemColor->setData(data, Qt::DecorationRole);
 
     float fAlpha = 1.0f;
@@ -201,7 +201,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
             data.setValue(colDefault);
-            item->setData(data, MetaTreeItemRoles::PointColor);
+            item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
         }
     }

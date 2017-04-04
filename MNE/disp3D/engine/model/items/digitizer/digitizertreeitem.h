@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
+#include "../common/abstract3Dtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -95,7 +95,7 @@ class Renderable3DEntity;
 *
 * @brief DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
 */
-class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
@@ -107,33 +107,21 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit DigitizerTreeItem(int iType = Data3DTreeModelItemTypes::DigitizerItem, const QString& text = "Digitizer");
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~DigitizerTreeItem();
+    explicit DigitizerTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
+                               int iType = Data3DTreeModelItemTypes::DigitizerItem,
+                               const QString& text = "Digitizer");
 
     //=========================================================================================================
     /**
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] tDigitizer         The digitizer data.
-    * @param[in] parent             The Qt3D entity parent of the new item.
     */
-    void addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
+    void addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer);
 
 protected:
     //=========================================================================================================
@@ -144,23 +132,11 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever the surface color was changed.
     *
     * @param[in] color        The new surface color.
     */
     void onSurfaceColorChanged(const QVariant &color);
-
-    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;      /**< The renderable 3D entity. */
-
-    QList<QPointer<Renderable3DEntity> >        m_lSpheres;                 /**< The currently displayed digitizer points as 3D spheres. */
 };
 
 } //NAMESPACE DISP3DLIB

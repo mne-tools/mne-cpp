@@ -107,7 +107,9 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             connect(pColorDialog, &QColorDialog::currentColorChanged,
                     this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Sulci Color");
+            pColorDialog->setCurrentColor(index.model()->data(index, MetaTreeItemRoles::Color).value<QColor>());
             pColorDialog->show();
+
             return pColorDialog;
         }
 
@@ -181,7 +183,6 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Color");
             pColorDialog->show();
-            pColorDialog->setCurrentColor(index.model()->data(index, MetaTreeItemRoles::Color).value<QColor>());
             return pColorDialog;
         }
 

@@ -192,7 +192,6 @@ namespace MetaTreeItemRoles
                     SurfaceTranslateX = Qt::UserRole + 18,
                     SurfaceTranslateY = Qt::UserRole + 19,
                     SurfaceTranslateZ = Qt::UserRole + 20,
-                    PointColor = Qt::UserRole + 21,
                     NetworkThreshold = Qt::UserRole + 22,
                     SurfaceTessInner = Qt::UserRole + 23,
                     SurfaceTessOuter = Qt::UserRole + 24,

@@ -74,25 +74,10 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
-, m_pRenderable3DEntity(new Renderable3DEntity())
+DigitizerTreeItem::DigitizerTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-DigitizerTreeItem::~DigitizerTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        for(int i = 0; i < m_lSpheres.size(); ++i) {
-            m_lSpheres.at(i)->deleteLater();
-        }
-
-        m_pRenderable3DEntity->deleteLater();
-    }
 }
 
 
@@ -117,26 +102,21 @@ void DigitizerTreeItem::initItem()
     list << new QStandardItem(pItemColor->toolTip());
     this->appendRow(list);
     data.setValue(QColor(100,100,100));
-    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
+    pItemColor->setData(data, MetaTreeItemRoles::Color);
     pItemColor->setData(data, Qt::DecorationRole);
 }
 
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
+void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
 {
-    //Clear all data
-    m_lSpheres.clear();
-
-    m_pRenderable3DEntity->setParent(parent);
-
     //Create digitizers as small 3D spheres
     QVector3D pos;
     QColor colDefault(100,100,100);
 
     for(int i = 0; i < tDigitizer.size(); ++i) {
-        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
         pos.setX(tDigitizer[i].r[0]);
         pos.setY(tDigitizer[i].r[1]);
@@ -194,8 +174,6 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         }
 
         pSourceSphereEntity->addComponent(material);
-
-        m_lSpheres.append(pSourceSphereEntity);
     }
 
     //Update colors in color item
@@ -205,7 +183,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
             data.setValue(colDefault);
-            item->setData(data, MetaTreeItemRoles::PointColor);
+            item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
         }
     }
@@ -214,37 +192,17 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::setVisible(bool state)
-{
-    if(m_pRenderable3DEntity) {
-        for(int i = 0; i < m_lSpheres.size(); ++i) {
-            m_lSpheres.at(i)->setEnabled(state);
-        }
-
-        m_pRenderable3DEntity->setEnabled(state);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
 void DigitizerTreeItem::onSurfaceColorChanged(const QVariant& color)
 {
     if(color.canConvert<QColor>()) {
-        for(int i = 0; i < m_lSpheres.size(); ++i) {
-            for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {
-                Qt3DCore::QComponent* pComponent = m_lSpheres.at(i)->components().at(j);
+        for(int i = 0; i < this->childNodes().size(); ++i) {
+            if(Qt3DCore::QEntity* pNode = dynamic_cast<Qt3DCore::QEntity*>(this->childNodes().at(i))) {
+                for(int j = 0; j < pNode->components().size(); ++j) {
+                    Qt3DCore::QComponent* pComponent = pNode->components().at(j);
 
-                if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
-                    pMaterial->setAmbient(color.value<QColor>());
+                    if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
+                        pMaterial->setAmbient(color.value<QColor>());
+                    }
                 }
             }
         }
