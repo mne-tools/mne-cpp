@@ -615,26 +615,23 @@ void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPo
 
 void HPIWidget::update3DView()
 {
-    if(m_pTrackedDigitizer &&
-            m_pFiffInfo &&
-            m_pBemHeadAdult &&
-            m_pBemHeadKid) {
+    if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAdult && m_pBemHeadKid) {
         //Prepare new transform
         QMatrix4x4 mat;
-        for(int r = 0; r < 3; ++r) {
-            for(int c = 0; c < 3; ++c) {
-                mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
+        for(int r = 0; r < 4; ++r) {
+            for(int c = 0; c < 4; ++c) {
+                mat(r,c) = m_pFiffInfo->dev_head_t.invtrans(r,c);
             }
         }
 
-        Qt3DCore::QTransform pTransform;
-        pTransform.setMatrix(mat);
+        Qt3DCore::QTransform transform;
+        transform.setMatrix(mat);
 
         //Update fast scan / tracked digitizer
         QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                pDigItem->applyTransform(pTransform);
+                pDigItem->setTransform(transform);
             }
         }
 
@@ -642,7 +639,7 @@ void HPIWidget::update3DView()
         itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                pBemItem->applyTransform(pTransform);
+                pBemItem->setTransform(transform);
             }
         }
 
@@ -651,8 +648,8 @@ void HPIWidget::update3DView()
         for(int j = 0; j < itemList.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
                 //If it is the kid's model scale it
-                pTransform.setScale(0.65f);
-                pBemItem->applyTransform(pTransform);
+                pBemItem->setTransform(transform);
+                pBemItem->setScale(0.65f);
             }
         }
     }

@@ -108,7 +108,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor for freesurfer mesh.#
+    * Default constructor.
     *
     * @param[in] parent         The parent of this entity.
     */
@@ -116,11 +116,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Default destructor.
+    */
+    ~Renderable3DEntity();
+
+    //=========================================================================================================
+    /**
     * Sets the entity's transformation. This will clear the old transformation.
     *
     * @param[in] transform     The new entity's transform.
     */
-    void setTransform(const Qt3DCore::QTransform &transform);
+    virtual void setTransform(const Qt3DCore::QTransform &transform);
 
     //=========================================================================================================
     /**
@@ -128,7 +134,7 @@ public:
     *
     * @param[in] transform     The new entity's transform.
     */
-    void applyTransform(const Qt3DCore::QTransform& transform);
+    virtual void applyTransform(const Qt3DCore::QTransform& transform);
 
     //=========================================================================================================
     /**
@@ -137,7 +143,7 @@ public:
     * @param[in] data             The value to be set.
     * @param[in] sParameterName   The name of the parameter to be set.
     */
-    void setMaterialParameter(QVariant data, QString sParameterName);
+    virtual void setMaterialParameter(QVariant data, QString sParameterName);
 
     //=========================================================================================================
     /**
@@ -145,7 +151,7 @@ public:
     *
     * @return The x-axis rotation value.
     */
-    float rotX() const;
+    virtual float rotX() const;
 
     //=========================================================================================================
     /**
@@ -153,7 +159,7 @@ public:
     *
     * @return The y-axis rotation value.
     */
-    float rotY() const;
+    virtual float rotY() const;
 
     //=========================================================================================================
     /**
@@ -161,7 +167,7 @@ public:
     *
     * @return The z-axis rotation value.
     */
-    float rotZ() const;
+    virtual float rotZ() const;
 
     //=========================================================================================================
     /**
@@ -169,7 +175,7 @@ public:
     *
     * @return The position/translation value.
     */
-    QVector3D position() const;
+    virtual QVector3D position() const;
 
     //=========================================================================================================
     /**
@@ -177,7 +183,7 @@ public:
     *
     * @param[in] rotX     The x-axis rotation value.
     */
-    void setRotX(float rotX);
+    virtual void setRotX(float rotX);
 
     //=========================================================================================================
     /**
@@ -185,7 +191,7 @@ public:
     *
     * @param[in] rotY     The y-axis rotation value.
     */
-    void setRotY(float rotY);
+    virtual void setRotY(float rotY);
 
     //=========================================================================================================
     /**
@@ -193,7 +199,7 @@ public:
     *
     * @param[in] rotZ     The z-axis rotation value.
     */
-    void setRotZ(float rotZ);
+    virtual void setRotZ(float rotZ);
 
     //=========================================================================================================
     /**
@@ -201,7 +207,7 @@ public:
     *
     * @param[in] position     The position/translation value.
     */
-    void setPosition(QVector3D position);
+    virtual void setPosition(QVector3D position);
 
     //=========================================================================================================
     /**
@@ -217,7 +223,7 @@ public:
     *
     * @param[in] scale     The new scaling value.
     */
-    void setScale(float scale);
+    virtual void setScale(float scale);
 
 protected: 
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
@@ -231,7 +237,7 @@ protected:
     /**
     * Update the set transformation with the currently set translation and rotation values.
     */
-    void updateTransform();
+    virtual void updateTransform();
 
 signals:
     //=========================================================================================================
