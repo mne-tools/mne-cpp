@@ -87,11 +87,9 @@ MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
 
 MneEstimateTreeItem::~MneEstimateTreeItem()
 {
-    if(!m_pSourceLocRtDataWorker) {
-        if(m_pSourceLocRtDataWorker->isRunning()) {
-            m_pSourceLocRtDataWorker->stop();
-            delete m_pSourceLocRtDataWorker;
-        }
+    if(m_pSourceLocRtDataWorker->isRunning()) {
+        m_pSourceLocRtDataWorker->stop();
+        delete m_pSourceLocRtDataWorker;
     }
 }
 
