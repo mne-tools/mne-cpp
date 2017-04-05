@@ -99,6 +99,16 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 
 //*************************************************************************************************************
 
+Renderable3DEntity::~Renderable3DEntity()
+{
+    for(int i = 0; i < this->childNodes().size(); ++i) {
+        this->childNodes()[i]->deleteLater();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 {
     if(m_pTransform) {

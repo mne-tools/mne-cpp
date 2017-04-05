@@ -160,8 +160,23 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
         pSourceSphereEntity->addComponent(material);
     }
 
+    //Update alpha
+    float alpha = 1.0;
+    this->setMaterialParameter(QVariant(alpha), "alpha");
+
+    QList<QStandardItem*> items = m_pItemAppearanceOptions->findChildren(MetaTreeItemTypes::AlphaValue);
+
+    for(int i = 0; i < items.size(); ++i) {
+        if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
+            QVariant data;
+            data.setValue(alpha);
+            item->setData(data, MetaTreeItemRoles::AlphaValue);
+            item->setData(data, Qt::DecorationRole);
+        }
+    }
+
     //Update colors in color item
-    QList<QStandardItem*> items = m_pItemAppearanceOptions->findChildren(MetaTreeItemTypes::Color);
+    items = m_pItemAppearanceOptions->findChildren(MetaTreeItemTypes::Color);
 
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
