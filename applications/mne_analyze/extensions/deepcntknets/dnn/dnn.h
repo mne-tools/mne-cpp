@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IDeepConfiguration.h
+* @file     deepcntk.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IDeepConfiguration interface class.
+* @brief    Contains the declaration of the DeepCNTK class.
 *
 */
 
-#ifndef IDEEPCONFIGURATION_H
-#define IDEEPCONFIGURATION_H
+#ifndef DNN_H
+#define DNN_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deep_global.h"
+#include "dnn_global.h"
+
+#include "../../deepcntk/IDeepCNTKNet.h"
 
 
 //*************************************************************************************************************
@@ -49,16 +52,26 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QSharedPointer>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DEEPLIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace DEEPLIB
+{
+    class Deep;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DNNCONFIGURATION
+//=============================================================================================================
+
+namespace DNNCONFIGURATION
 {
 
 //*************************************************************************************************************
@@ -67,37 +80,43 @@ namespace DEEPLIB
 //=============================================================================================================
 
 
-
-//=========================================================================================================
+//=============================================================================================================
 /**
-* DECLARE CLASS IDeepConfiguration
+* DeepCNTK Extension
 *
-* @brief The IDeepConfiguration class is the base interface class for all deep network configurations.
+* @brief The DeepCNTK class provides a Machine Learning Capbilities.
 */
-class DEEPSHARED_EXPORT IDeepConfiguration : public QObject
+class DNNSHARED_EXPORT DNN : public DEEPCNTKEXTENSION::IDeepCNTKNet
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "deepcntkextension/1.0" FILE "dnn.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(DEEPCNTKEXTENSION::IDeepCNTKNet)
+
 public:
-    typedef QSharedPointer<IDeepConfiguration> SPtr;               /**< Shared pointer type for IDeepConfiguration. */
-    typedef QSharedPointer<const IDeepConfiguration> ConstSPtr;    /**< Const shared pointer type for IDeepConfiguration. */
+    //=========================================================================================================
+    /**
+    * Constructs a DNN.
+    */
+    DNN();
 
     //=========================================================================================================
     /**
-    * Destroys the network configuration.
+    * Destroys the DNN.
     */
-    virtual ~IDeepConfiguration() {}
+    ~DNN();
 
     //=========================================================================================================
     /**
     * Initializes the network configuration.
     */
-    virtual void init() = 0;
+    virtual void init();
 
     //=========================================================================================================
     /**
     * Is called when network configuration unloaded.
     */
-    virtual void unload() = 0;
+    virtual void unload();
 
     //=========================================================================================================
     /**
@@ -106,35 +125,27 @@ public:
     *
     * @return the name of the configuration.
     */
-    virtual QString getName() const = 0;
+    virtual QString getName() const;
 
     //=========================================================================================================
     /**
     * Trains the network configuration.
     * Pure virtual method.
     */
-    virtual void train() = 0;
+    virtual void train();
 
     //=========================================================================================================
     /**
     * Evaluates the network configuration.
     * Pure virtual method.
     */
-    virtual void eval() = 0;
+    virtual void eval();
 
 private:
-
-
+    // Deep Model
+    QSharedPointer<DEEPLIB::Deep>   m_pDeep;            /**< CNTK Wrapper */
 };
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+} // NAMESPACE
 
-
-} //Namespace
-
-Q_DECLARE_INTERFACE(DEEPLIB::IDeepConfiguration, "deeplib/1.0")
-
-#endif //IDEEPCONFIGURATION_H
+#endif // DNN_H

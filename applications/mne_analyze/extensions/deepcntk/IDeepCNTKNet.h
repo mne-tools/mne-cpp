@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     IDeepConfiguration.h
+* @file     IDeepCNTKNet.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2017
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,63 +29,56 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IDeepConfiguration interface class.
+* @brief    Contains declaration of IDeepCNTKNet interface class.
 *
 */
 
-#ifndef IDEEPCONFIGURATION_H
-#define IDEEPCONFIGURATION_H
+#ifndef IDEEPCNTKNET_H
+#define IDEEPCNTKNET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deep_global.h"
+#include <deep/IDeepConfiguration.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DEEPLIB
+// DEFINE NAMESPACE DEEPCNTKEXTENSION
 //=============================================================================================================
 
-namespace DEEPLIB
+namespace DEEPCNTKEXTENSION
 {
 
-//*************************************************************************************************************
+
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-
-//=========================================================================================================
 /**
-* DECLARE CLASS IDeepConfiguration
+* DECLARE CLASS IDeepCNTKNet
 *
-* @brief The IDeepConfiguration class is the base interface class for all deep network configurations.
+* @brief The IDeepCNTKNet class provides an interface for a CNTK network configurations.
 */
-class DEEPSHARED_EXPORT IDeepConfiguration : public QObject
+class IDeepCNTKNet : public DEEPLIB::IDeepConfiguration
 {
-    Q_OBJECT
 public:
-    typedef QSharedPointer<IDeepConfiguration> SPtr;               /**< Shared pointer type for IDeepConfiguration. */
-    typedef QSharedPointer<const IDeepConfiguration> ConstSPtr;    /**< Const shared pointer type for IDeepConfiguration. */
+    typedef QSharedPointer<IDeepCNTKNet> SPtr;               /**< Shared pointer type for IDeepCNTKNet. */
+    typedef QSharedPointer<const IDeepCNTKNet> ConstSPtr;    /**< Const shared pointer type for IDeepCNTKNet. */
 
     //=========================================================================================================
     /**
-    * Destroys the network configuration.
+    * Destroys the IDeepCNTKNet.
     */
-    virtual ~IDeepConfiguration() {}
+    virtual ~IDeepCNTKNet() {}
 
     //=========================================================================================================
     /**
@@ -122,8 +115,7 @@ public:
     */
     virtual void eval() = 0;
 
-private:
-
+protected:
 
 };
 
@@ -132,9 +124,8 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+} // NAMESPACE
 
-} //Namespace
+Q_DECLARE_INTERFACE(DEEPCNTKEXTENSION::IDeepCNTKNet, "deepcntkextension/1.0")
 
-Q_DECLARE_INTERFACE(DEEPLIB::IDeepConfiguration, "deeplib/1.0")
-
-#endif //IDEEPCONFIGURATION_H
+#endif // IDEEPCNTKNET_H

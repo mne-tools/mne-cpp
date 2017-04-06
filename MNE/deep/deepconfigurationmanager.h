@@ -99,23 +99,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Loads extensions from given directory.
+    * Loads deep configurations from given directory.
     *
-    * @param [in] dir    the plugin directory.
+    * @param [in] dir   the configuration directory.
     */
-    void loadExtension(const QString& dir);
+    void loadDeepConfigurations(const QString& dir);
 
     //=========================================================================================================
     /**
-    * Initializes the extensions.
+    * Initializes the deep configurations.
     */
-    void initExtensions();
+    void initDeepConfigurations();
 
     //=========================================================================================================
     /**
-    * Finds index of extension by name.
+    * Finds index of configuration by name.
     *
-    * @param [in] name  the extension name.
+    * @param [in] name  the configuration name.
     *
     * @return index of extension.
     */

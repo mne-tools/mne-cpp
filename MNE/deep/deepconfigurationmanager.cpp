@@ -83,7 +83,7 @@ DeepConfigurationManager::~DeepConfigurationManager()
 
 //*************************************************************************************************************
 
-void DeepConfigurationManager::loadExtension(const QString& dir)
+void DeepConfigurationManager::loadDeepConfigurations(const QString& dir)
 {
     QDir deepConfigurationsDir(dir);
 
@@ -108,7 +108,7 @@ void DeepConfigurationManager::loadExtension(const QString& dir)
 
 //*************************************************************************************************************
 
-void DeepConfigurationManager::initExtensions()
+void DeepConfigurationManager::initDeepConfigurations()
 {
     foreach(IDeepConfiguration* deepConfiguration, m_qVecDeepConfiguration)
     {
