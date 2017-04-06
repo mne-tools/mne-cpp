@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     extensionmanager.h
+* @file     deepconfigurationmanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ExtensionManager class.
+* @brief    Contains the declaration of the DeepConfigurationManager class.
 *
 */
 
-#ifndef EXTENSIONMANAGER_H
-#define EXTENSIONMANAGER_H
+#ifndef DEEPCONFIGURATIONMANAGER_H
+#define DEEPCONFIGURATIONMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../anshared_global.h"
+#include "deep_global.h"
 
 
 //*************************************************************************************************************
@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE DEEPLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace DEEPLIB
 {
 
 
@@ -67,37 +67,35 @@ namespace ANSHAREDLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class IExtension;
-class AnalyzeSettings;
-class AnalyzeData;
+class IDeepConfiguration;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ExtensionManager
+* DECLARE CLASS DeepConfigurationManager
 *
-* @brief The ExtensionManager class provides a dynamic plugin loader. As well as the handling of the loaded extensions.
+* @brief The DeepConfigurationManager class provides a dynamic plugin loader. As well as the handling of the loaded extensions.
 */
-class ANSHAREDSHARED_EXPORT ExtensionManager : public QPluginLoader
+class DEEPSHARED_EXPORT DeepConfigurationManager : public QPluginLoader
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<ExtensionManager> SPtr;               /**< Shared pointer type for ExtensionManager. */
-    typedef QSharedPointer<const ExtensionManager> ConstSPtr;    /**< Const shared pointer type for ExtensionManager. */
+    typedef QSharedPointer<DeepConfigurationManager> SPtr;               /**< Shared pointer type for DeepConfigurationManager. */
+    typedef QSharedPointer<const DeepConfigurationManager> ConstSPtr;    /**< Const shared pointer type for DeepConfigurationManager. */
 
     //=========================================================================================================
     /**
-    * Constructs a ExtensionManager with the given parent.
+    * Constructs a DeepConfigurationManager with the given parent.
     *
     * @param[in] parent pointer to parent Object. (It's normally the default value.)
     */
-    ExtensionManager(QObject* parent = 0);
+    DeepConfigurationManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ExtensionManager.
+    * Destroys the DeepConfigurationManager.
     */
-    virtual ~ExtensionManager();
+    virtual ~DeepConfigurationManager();
 
     //=========================================================================================================
     /**
@@ -110,11 +108,8 @@ public:
     //=========================================================================================================
     /**
     * Initializes the extensions.
-    *
-    * @param [in] settings      the global mne analyze settings
-    * @param [in] data          the global mne analyze data
     */
-    void initExtensions(QSharedPointer<AnalyzeSettings>& settings, QSharedPointer<AnalyzeData>& data);
+    void initExtensions();
 
     //=========================================================================================================
     /**
@@ -128,14 +123,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns vector containing all extensions.
+    * Returns vector containing all deep configurations.
     *
-    * @return reference to vector containing all extensions.
+    * @return reference to vector containing all plugins.
     */
-    inline const QVector<IExtension*>& getExtensions();
+    inline const QVector<IDeepConfiguration*>& getDeepConfigurations();
 
 private:
-    QVector<IExtension*>    m_qVecExtensions;       /**< Vector containing all extensions. */
+    QVector<IDeepConfiguration*>    m_qVecDeepConfiguration;       /**< Vector containing all deep configurations. */
 };
 
 
@@ -144,11 +139,11 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<IExtension*>& ExtensionManager::getExtensions()
+inline const QVector<IDeepConfiguration*>& DeepConfigurationManager::getDeepConfigurations()
 {
-    return m_qVecExtensions;
+    return m_qVecDeepConfiguration;
 }
 
 } // NAMESPACE
 
-#endif // EXTENSIONMANAGER_H
+#endif // DEEPCONFIGURATIONMANAGER_H
