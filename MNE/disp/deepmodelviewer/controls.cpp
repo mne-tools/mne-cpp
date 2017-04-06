@@ -80,6 +80,7 @@ using namespace DISPLIB;
 
 Controls::Controls(QWidget* parent)
 : QWidget(parent)
+, m_pNetworkConfigs(Q_NULLPTR)
 , m_pDeepViewer(Q_NULLPTR)
 {
 
@@ -90,6 +91,7 @@ Controls::Controls(QWidget* parent)
 
 Controls::Controls(DeepViewer* v, QWidget* parent)
 : QWidget(parent)
+, m_pNetworkConfigs(Q_NULLPTR)
 , m_pDeepViewer(v)
 {
     createLayout();
@@ -115,12 +117,22 @@ void Controls::setDeepViewer(DeepViewer *v)
 
 //*************************************************************************************************************
 
+QComboBox *Controls::getConfigurationComboBox()
+{
+    return m_pNetworkConfigs;
+}
+
+
+//*************************************************************************************************************
+
 void Controls::createNetworkControls(QWidget *parent)
 {
     //
     // Create Controls
     //
-    QComboBox *networkConfigurationComboBox = new QComboBox(parent);
+    if(!m_pNetworkConfigs) {
+        m_pNetworkConfigs = new QComboBox(parent);
+    }
     QPushButton *trainButton = new QPushButton(parent);
     trainButton->setText(tr("Train"));
 
@@ -128,7 +140,7 @@ void Controls::createNetworkControls(QWidget *parent)
     // Layouts
     //
     QVBoxLayout *networkGroupLayout = new QVBoxLayout(parent);
-    networkGroupLayout->addWidget(networkConfigurationComboBox);
+    networkGroupLayout->addWidget(m_pNetworkConfigs);
     networkGroupLayout->addWidget(trainButton);
 
     //
