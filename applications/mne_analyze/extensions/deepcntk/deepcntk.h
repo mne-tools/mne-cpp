@@ -71,7 +71,6 @@ namespace DISPLIB
 namespace DEEPLIB
 {
     class Deep;
-    class DeepConfigurationManager;
 }
 
 
@@ -87,6 +86,8 @@ namespace DEEPCNTKEXTENSION
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class DeepCNTKManager;
 
 
 //=============================================================================================================
@@ -158,7 +159,7 @@ private:
     // View
     DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
 
-    DEEPLIB::DeepConfigurationManager* m_pDeepNetworks; /**< Deep Networks */
+    DeepCNTKManager*                m_pDeepNetworks;    /**< Deep Networks */
 
 
 };

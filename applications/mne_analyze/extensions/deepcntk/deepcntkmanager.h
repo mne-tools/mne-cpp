@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IDeepConfiguration.h
+* @file     deepcntkmanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IDeepConfiguration interface class.
+* @brief    Contains the declaration of the DeepCNTKManager class.
 *
 */
 
-#ifndef IDEEPCONFIGURATION_H
-#define IDEEPCONFIGURATION_H
+#ifndef DEEPCNTKMANAGER_H
+#define DEEPCNTKMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deep_global.h"
+#include "deepcntk_global.h"
 
 
 //*************************************************************************************************************
@@ -49,92 +49,111 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QSharedPointer>
+#include <QVector>
+#include <QPluginLoader>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DEEPLIB
+// DEFINE NAMESPACE DEEPCNTKEXTENSION
 //=============================================================================================================
 
-namespace DEEPLIB
+namespace DEEPCNTKEXTENSION
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class IDeepCNTKNet;
 
 
-//=========================================================================================================
+//=============================================================================================================
 /**
-* DECLARE CLASS IDeepConfiguration
+* DECLARE CLASS DeepCNTKManager
 *
-* @brief The IDeepConfiguration class is the base interface class for all deep network configurations.
+* @brief The DeepCNTKManager class provides a dynamic plugin loader. As well as the handling of the loaded extensions.
 */
-class DEEPSHARED_EXPORT IDeepConfiguration : public QObject
+class DEEPCNTKSHARED_EXPORT DeepCNTKManager : public QPluginLoader
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<IDeepConfiguration> SPtr;               /**< Shared pointer type for IDeepConfiguration. */
-    typedef QSharedPointer<const IDeepConfiguration> ConstSPtr;    /**< Const shared pointer type for IDeepConfiguration. */
+    typedef QSharedPointer<DeepCNTKManager> SPtr;               /**< Shared pointer type for DeepCNTKManager. */
+    typedef QSharedPointer<const DeepCNTKManager> ConstSPtr;    /**< Const shared pointer type for DeepCNTKManager. */
 
     //=========================================================================================================
     /**
-    * Destroys the network configuration.
-    */
-    virtual ~IDeepConfiguration() {}
-
-    //=========================================================================================================
-    /**
-    * Initializes the network configuration.
-    */
-    virtual void init() = 0;
-
-    //=========================================================================================================
-    /**
-    * Is called when network configuration unloaded.
-    */
-    virtual void unload() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the network configuration name.
-    * Pure virtual method.
+    * Constructs a DeepCNTKManager with the given parent.
     *
-    * @return the name of the configuration.
+    * @param[in] parent     pointer to parent Object. (It's normally the default value.)
     */
-    virtual QString getName() const = 0;
+    DeepCNTKManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Trains the network configuration.
-    * Pure virtual method.
+    * Destroys the DeepCNTKManager.
     */
-    virtual void train() = 0;
+    virtual ~DeepCNTKManager();
 
     //=========================================================================================================
     /**
-    * Evaluates the network configuration.
-    * Pure virtual method.
+    * Loads deep configurations from given directory.
+    *
+    * @param [in] dir   the configuration directory.
     */
-    virtual void eval() = 0;
+    void loadDeepConfigurations(const QString& dir);
+
+    //=========================================================================================================
+    /**
+    * Initializes the deep configurations.
+    */
+    void initDeepConfigurations();
+
+    //=========================================================================================================
+    /**
+    * Finds index of configuration by name.
+    *
+    * @param [in] name  the configuration name.
+    *
+    * @return index of extension.
+    */
+    int findByName(const QString& name);
+
+    //=========================================================================================================
+    /**
+    * Returns vector containing all deep configurations.
+    *
+    * @return reference to vector containing all plugins.
+    */
+    inline const QVector<IDeepCNTKNet*>& getDeepConfigurations();
+
+    //=========================================================================================================
+    /**
+    * Returns a string list of configuration names.
+    *
+    * @return Deep configuration names.
+    */
+    QStringList getDeepConfigurationNames() const;
 
 private:
+    int m_iCurrentConfiguration;                        /**< Current configuration. */
 
-
+    QVector<IDeepCNTKNet*>    m_qVecDeepConfiguration;  /**< Vector containing all deep configurations. */
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline const QVector<IDeepCNTKNet*>& DeepCNTKManager::getDeepConfigurations()
+{
+    return m_qVecDeepConfiguration;
+}
 
-} //Namespace
+} // NAMESPACE
 
-Q_DECLARE_INTERFACE(DEEPLIB::IDeepConfiguration, "deeplib/1.0")
-
-#endif //IDEEPCONFIGURATION_H
+#endif // DEEPCNTKMANAGER_H

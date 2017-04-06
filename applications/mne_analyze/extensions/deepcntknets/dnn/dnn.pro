@@ -49,6 +49,7 @@ CONFIG(debug, debug|release) {
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
+LIBS += -L$${MNE_BINARY_DIR}/mne_analyze_extensions
 LIBS += -L$${CNTK_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
@@ -61,7 +62,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Deepd \
             -lanSharedd \
-            -lCntk.Core-2.0rc1d
+            -lCntk.Core-2.0rc1d \
+            -ldeepcntkd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -74,7 +76,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Deep \
             -lanShared \
-            -lCntk.Core-2.0rc1
+            -lCntk.Core-2.0rc1 \
+            -ldeepcntk
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions/deepcntknets

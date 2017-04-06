@@ -105,16 +105,13 @@ else {
 SOURCES += \
     deep.cpp \
     deepeval.cpp \
-    deepmodelcreator.cpp \
-    deepconfigurationmanager.cpp
+    deepmodelcreator.cpp
 
 HEADERS +=\
     deep_global.h \
     deep.h \
     deepeval.h \
-    deepmodelcreator.h \
-    IDeepConfiguration.h \
-    deepconfigurationmanager.h
+    deepmodelcreator.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

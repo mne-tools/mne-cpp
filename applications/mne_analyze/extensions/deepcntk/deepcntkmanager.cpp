@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepconfigurationmanager.h
+* @file     deepcntkmanager.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DeepConfigurationManager class.
+* @brief    Contains the implementation of the DeepCNTKManager class.
 *
 */
-
-#ifndef DEEPCONFIGURATIONMANAGER_H
-#define DEEPCONFIGURATIONMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deep_global.h"
+#include "deepcntkmanager.h"
+#include "IDeepCNTKNet.h"
 
 
 //*************************************************************************************************************
@@ -49,101 +47,100 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-#include <QPluginLoader>
+#include <QDir>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DEEPLIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace DEEPLIB
-{
+using namespace DEEPCNTKEXTENSION;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class IDeepConfiguration;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DeepConfigurationManager
-*
-* @brief The DeepConfigurationManager class provides a dynamic plugin loader. As well as the handling of the loaded extensions.
-*/
-class DEEPSHARED_EXPORT DeepConfigurationManager : public QPluginLoader
+DeepCNTKManager::DeepCNTKManager(QObject *parent)
+: QPluginLoader(parent)
+, m_iCurrentConfiguration(0)
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<DeepConfigurationManager> SPtr;               /**< Shared pointer type for DeepConfigurationManager. */
-    typedef QSharedPointer<const DeepConfigurationManager> ConstSPtr;    /**< Const shared pointer type for DeepConfigurationManager. */
 
-    //=========================================================================================================
-    /**
-    * Constructs a DeepConfigurationManager with the given parent.
-    *
-    * @param[in] parent pointer to parent Object. (It's normally the default value.)
-    */
-    DeepConfigurationManager(QObject* parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the DeepConfigurationManager.
-    */
-    virtual ~DeepConfigurationManager();
-
-    //=========================================================================================================
-    /**
-    * Loads deep configurations from given directory.
-    *
-    * @param [in] dir   the configuration directory.
-    */
-    void loadDeepConfigurations(const QString& dir);
-
-    //=========================================================================================================
-    /**
-    * Initializes the deep configurations.
-    */
-    void initDeepConfigurations();
-
-    //=========================================================================================================
-    /**
-    * Finds index of configuration by name.
-    *
-    * @param [in] name  the configuration name.
-    *
-    * @return index of extension.
-    */
-    int findByName(const QString& name);
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing all deep configurations.
-    *
-    * @return reference to vector containing all plugins.
-    */
-    inline const QVector<IDeepConfiguration*>& getDeepConfigurations();
-
-private:
-    QVector<IDeepConfiguration*>    m_qVecDeepConfiguration;       /**< Vector containing all deep configurations. */
-};
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline const QVector<IDeepConfiguration*>& DeepConfigurationManager::getDeepConfigurations()
-{
-    return m_qVecDeepConfiguration;
 }
 
-} // NAMESPACE
 
-#endif // DEEPCONFIGURATIONMANAGER_H
+//*************************************************************************************************************
+
+DeepCNTKManager::~DeepCNTKManager()
+{
+    for(int i = 0; i < m_qVecDeepConfiguration.size(); ++i) {
+        delete m_qVecDeepConfiguration[i];
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTKManager::loadDeepConfigurations(const QString& dir)
+{
+    QDir deepConfigurationsDir(dir);
+
+    foreach(QString file, deepConfigurationsDir.entryList(QDir::Files))
+    {
+        fprintf(stderr,"Loading deep configuration %s... ",file.toUtf8().constData());
+
+        this->setFileName(deepConfigurationsDir.absoluteFilePath(file));
+        QObject *pDeepConfiguration = this->instance();
+
+        // IExtension
+        if(pDeepConfiguration) {
+            fprintf(stderr,"Deep configuration %s loaded.\n",file.toUtf8().constData());
+            m_qVecDeepConfiguration.push_back(qobject_cast<IDeepCNTKNet*>(pDeepConfiguration));
+        }
+        else {
+            fprintf(stderr,"Deep configuration %s could not be instantiated!\n",file.toUtf8().constData());
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTKManager::initDeepConfigurations()
+{
+    foreach(IDeepCNTKNet* deepConfiguration, m_qVecDeepConfiguration)
+    {
+        deepConfiguration->init();
+    }
+}
+
+
+//*************************************************************************************************************
+
+int DeepCNTKManager::findByName(const QString& name)
+{
+    QVector<IDeepCNTKNet*>::const_iterator it = m_qVecDeepConfiguration.begin();
+    for(int i = 0; it != m_qVecDeepConfiguration.end(); ++i, ++it)
+        if((*it)->getName() == name)
+            return i;
+
+    return -1;
+}
+
+
+//*************************************************************************************************************
+
+QStringList DeepCNTKManager::getDeepConfigurationNames() const
+{
+    QStringList names;
+
+    foreach(IDeepCNTKNet* deepConfiguration, m_qVecDeepConfiguration)
+    {
+        names << deepConfiguration->getName();
+    }
+
+    return names;
+}
