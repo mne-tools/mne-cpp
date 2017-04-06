@@ -39,9 +39,9 @@
 //=============================================================================================================
 
 #include "deepcntk.h"
+#include "deepcntkmanager.h"
 
 #include <deep/deep.h>
-#include <deep/deepconfigurationmanager.h>
 #include <deep/deepmodelcreator.h>
 
 #include <dispCharts/lineplot.h>
@@ -167,7 +167,7 @@ void DeepCNTK::init()
     // Deep Configuration Manager
     //
     if(!m_pDeepNetworks) {
-        m_pDeepNetworks = new DeepConfigurationManager(this);
+        m_pDeepNetworks = new DeepCNTKManager(this);
         m_pDeepNetworks->loadDeepConfigurations(qApp->applicationDirPath()+deepCNTKNetsDir);
         m_pDeepNetworks->initDeepConfigurations();
         qDebug() << "Debug" << qApp->applicationDirPath()+deepCNTKNetsDir;

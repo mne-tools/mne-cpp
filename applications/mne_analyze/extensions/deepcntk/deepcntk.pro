@@ -84,12 +84,14 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
-    deepcntk.cpp
+    deepcntk.cpp \
+    deepcntkmanager.cpp
 
 HEADERS += \
     deepcntk_global.h \
     deepcntk.h \
-    IDeepCNTKNet.h
+    IDeepCNTKNet.h \
+    deepcntkmanager.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

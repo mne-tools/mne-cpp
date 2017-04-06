@@ -4,11 +4,11 @@
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -36,20 +36,20 @@
 #ifndef IDEEPCNTKNET_H
 #define IDEEPCNTKNET_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <deep/IDeepConfiguration.h>
+#include "deepcntk_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
 #include <QSharedPointer>
 
 
@@ -61,22 +61,28 @@
 namespace DEEPCNTKEXTENSION
 {
 
-
+//*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=========================================================================================================
 /**
 * DECLARE CLASS IDeepCNTKNet
 *
-* @brief The IDeepCNTKNet class provides an interface for a CNTK network configurations.
+* @brief The IDeepCNTKNet class is the base interface class for all deep network configurations.
 */
-class IDeepCNTKNet : public DEEPLIB::IDeepConfiguration
+class DEEPCNTKSHARED_EXPORT IDeepCNTKNet : public QObject
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<IDeepCNTKNet> SPtr;               /**< Shared pointer type for IDeepCNTKNet. */
     typedef QSharedPointer<const IDeepCNTKNet> ConstSPtr;    /**< Const shared pointer type for IDeepCNTKNet. */
 
     //=========================================================================================================
     /**
-    * Destroys the IDeepCNTKNet.
+    * Destroys the network configuration.
     */
     virtual ~IDeepCNTKNet() {}
 
@@ -115,7 +121,8 @@ public:
     */
     virtual void eval() = 0;
 
-protected:
+private:
+
 
 };
 
@@ -124,8 +131,9 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE
+
+} //Namespace
 
 Q_DECLARE_INTERFACE(DEEPCNTKEXTENSION::IDeepCNTKNet, "deepcntkextension/1.0")
 
-#endif // IDEEPCNTKNET_H
+#endif //IDEEPCNTKNET_H

@@ -49,6 +49,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QComboBox>
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QVBoxLayout>
@@ -119,6 +120,7 @@ void Controls::createNetworkControls(QWidget *parent)
     //
     // Create Controls
     //
+    QComboBox *networkConfigurationComboBox = new QComboBox(parent);
     QPushButton *trainButton = new QPushButton(parent);
     trainButton->setText(tr("Train"));
 
@@ -126,6 +128,7 @@ void Controls::createNetworkControls(QWidget *parent)
     // Layouts
     //
     QVBoxLayout *networkGroupLayout = new QVBoxLayout(parent);
+    networkGroupLayout->addWidget(networkConfigurationComboBox);
     networkGroupLayout->addWidget(trainButton);
 
     //
