@@ -114,6 +114,20 @@ public:
     */
     virtual QString getName() const = 0;
 
+    //=========================================================================================================
+    /**
+    * Trains the network configuration.
+    * Pure virtual method.
+    */
+    virtual void train() = 0;
+
+    //=========================================================================================================
+    /**
+    * Evaluates the network configuration.
+    * Pure virtual method.
+    */
+    virtual void eval() = 0;
+
 private:
 
 

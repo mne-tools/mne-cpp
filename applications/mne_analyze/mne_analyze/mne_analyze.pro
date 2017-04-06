@@ -93,12 +93,12 @@ else {
     LIBS += -L$${CNTK_LIBRARY_DIR}
     CONFIG(debug, debug|release) {
         LIBS += -lMNE$${MNE_LIB_VERSION}Deepd \
-                -lCNTKLibrary-2.0 \
+                -lCntk.Core-2.0rc1d \
 
     }
     else {
         LIBS += -lMNE$${MNE_LIB_VERSION}Deep \
-                -lCNTKLibrary-2.0 \
+                -lCntk.Core-2.0rc1 \
     }
 }
 

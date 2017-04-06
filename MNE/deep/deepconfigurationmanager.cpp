@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     extensionmanager.h
+* @file     deepconfigurationmanager.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ExtensionManager class.
+* @brief    Contains the implementation of the ExtensionManager class.
 *
 */
-
-#ifndef EXTENSIONMANAGER_H
-#define EXTENSIONMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../anshared_global.h"
+#include "deepconfigurationmanager.h"
+#include "IDeepConfiguration.h"
 
 
 //*************************************************************************************************************
@@ -49,106 +47,84 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-#include <QPluginLoader>
+#include <QDir>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace ANSHAREDLIB
-{
+using namespace DEEPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class IExtension;
-class AnalyzeSettings;
-class AnalyzeData;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS ExtensionManager
-*
-* @brief The ExtensionManager class provides a dynamic plugin loader. As well as the handling of the loaded extensions.
-*/
-class ANSHAREDSHARED_EXPORT ExtensionManager : public QPluginLoader
+DeepConfigurationManager::DeepConfigurationManager(QObject *parent)
+: QPluginLoader(parent)
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<ExtensionManager> SPtr;               /**< Shared pointer type for ExtensionManager. */
-    typedef QSharedPointer<const ExtensionManager> ConstSPtr;    /**< Const shared pointer type for ExtensionManager. */
 
-    //=========================================================================================================
-    /**
-    * Constructs a ExtensionManager with the given parent.
-    *
-    * @param[in] parent pointer to parent Object. (It's normally the default value.)
-    */
-    ExtensionManager(QObject* parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the ExtensionManager.
-    */
-    virtual ~ExtensionManager();
-
-    //=========================================================================================================
-    /**
-    * Loads extensions from given directory.
-    *
-    * @param [in] dir    the plugin directory.
-    */
-    void loadExtension(const QString& dir);
-
-    //=========================================================================================================
-    /**
-    * Initializes the extensions.
-    *
-    * @param [in] settings      the global mne analyze settings
-    * @param [in] data          the global mne analyze data
-    */
-    void initExtensions(QSharedPointer<AnalyzeSettings>& settings, QSharedPointer<AnalyzeData>& data);
-
-    //=========================================================================================================
-    /**
-    * Finds index of extension by name.
-    *
-    * @param [in] name  the extension name.
-    *
-    * @return index of extension.
-    */
-    int findByName(const QString& name);
-
-    //=========================================================================================================
-    /**
-    * Returns vector containing all extensions.
-    *
-    * @return reference to vector containing all extensions.
-    */
-    inline const QVector<IExtension*>& getExtensions();
-
-private:
-    QVector<IExtension*>    m_qVecExtensions;       /**< Vector containing all extensions. */
-};
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline const QVector<IExtension*>& ExtensionManager::getExtensions()
-{
-    return m_qVecExtensions;
 }
 
-} // NAMESPACE
 
-#endif // EXTENSIONMANAGER_H
+//*************************************************************************************************************
+
+DeepConfigurationManager::~DeepConfigurationManager()
+{
+    for(int i = 0; i < m_qVecDeepConfiguration.size(); ++i) {
+        delete m_qVecDeepConfiguration[i];
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepConfigurationManager::loadExtension(const QString& dir)
+{
+    QDir deepConfigurationsDir(dir);
+
+    foreach(QString file, deepConfigurationsDir.entryList(QDir::Files))
+    {
+        fprintf(stderr,"Loading deep configuration %s... ",file.toUtf8().constData());
+
+        this->setFileName(deepConfigurationsDir.absoluteFilePath(file));
+        QObject *pDeepConfiguration = this->instance();
+
+        // IExtension
+        if(pDeepConfiguration) {
+            fprintf(stderr,"Deep configuration %s loaded.\n",file.toUtf8().constData());
+            m_qVecDeepConfiguration.push_back(qobject_cast<IDeepConfiguration*>(pDeepConfiguration));
+        }
+        else {
+            fprintf(stderr,"Deep configuration %s could not be instantiated!\n",file.toUtf8().constData());
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepConfigurationManager::initExtensions()
+{
+    foreach(IDeepConfiguration* deepConfiguration, m_qVecDeepConfiguration)
+    {
+        deepConfiguration->init();
+    }
+}
+
+
+//*************************************************************************************************************
+
+int DeepConfigurationManager::findByName(const QString& name)
+{
+    QVector<IDeepConfiguration*>::const_iterator it = m_qVecDeepConfiguration.begin();
+    for(int i = 0; it != m_qVecDeepConfiguration.end(); ++i, ++it)
+        if((*it)->getName() == name)
+            return i;
+
+    return -1;
+}
