@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     IDeepConfiguration.h
+* @file     dnn.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains declaration of IDeepConfiguration interface class.
+* @brief    Contains the implementation of the DNN class.
 *
 */
-
-#ifndef IDEEPCONFIGURATION_H
-#define IDEEPCONFIGURATION_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deep_global.h"
+#include "dnn.h"
+
+#include <iostream>
+#include <random>
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -49,92 +51,115 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QSharedPointer>
+#include <QtConcurrent>
+#include <QFutureWatcher>
+#include <QProgressDialog>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DEEPLIB
+// CNTK INCLUDES
 //=============================================================================================================
 
-namespace DEEPLIB
+//#include <CNTKLibrary.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DNNCONFIGURATION;
+using namespace DEEPLIB;
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC FUNCTIONS
+//=============================================================================================================
+
+// Helper function to generate a random data sample
+void generateRandomDataSamples(int sample_size, int feature_dim, int num_classes, MatrixXf& X, MatrixXf& Y)
+{
+    MatrixXi t_Y = MatrixXi::Zero(sample_size, 1);
+    for(int i = 0; i < t_Y.rows(); ++i) {
+        t_Y(i,0) = rand() % num_classes;
+    }
+
+    std::default_random_engine generator;
+    std::normal_distribution<float> distribution(0.0,1.0);
+
+    X = MatrixXf::Zero(sample_size, feature_dim);
+    for(int i = 0; i < X.rows(); ++i) {
+        for(int j = 0; j < X.cols(); ++j) {
+            float number = distribution(generator);
+            X(i,j) = (number + 3) * (t_Y(i) + 1);
+        }
+    }
+
+    Y = MatrixXf::Zero(sample_size, num_classes);
+
+    for(int i = 0; i < Y.rows(); ++i) {
+        Y(i,t_Y(i)) = 1;
+    }
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+DNN::DNN()
 {
 
+}
+
+
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-
-//=========================================================================================================
-/**
-* DECLARE CLASS IDeepConfiguration
-*
-* @brief The IDeepConfiguration class is the base interface class for all deep network configurations.
-*/
-class DEEPSHARED_EXPORT IDeepConfiguration : public QObject
+DNN::~DNN()
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<IDeepConfiguration> SPtr;               /**< Shared pointer type for IDeepConfiguration. */
-    typedef QSharedPointer<const IDeepConfiguration> ConstSPtr;    /**< Const shared pointer type for IDeepConfiguration. */
 
-    //=========================================================================================================
-    /**
-    * Destroys the network configuration.
-    */
-    virtual ~IDeepConfiguration() {}
+}
 
-    //=========================================================================================================
-    /**
-    * Initializes the network configuration.
-    */
-    virtual void init() = 0;
-
-    //=========================================================================================================
-    /**
-    * Is called when network configuration unloaded.
-    */
-    virtual void unload() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns the network configuration name.
-    * Pure virtual method.
-    *
-    * @return the name of the configuration.
-    */
-    virtual QString getName() const = 0;
-
-    //=========================================================================================================
-    /**
-    * Trains the network configuration.
-    * Pure virtual method.
-    */
-    virtual void train() = 0;
-
-    //=========================================================================================================
-    /**
-    * Evaluates the network configuration.
-    * Pure virtual method.
-    */
-    virtual void eval() = 0;
-
-private:
-
-
-};
 
 //*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+
+void DNN::init()
+{
+
+}
 
 
-} //Namespace
+//*************************************************************************************************************
 
-Q_DECLARE_INTERFACE(DEEPLIB::IDeepConfiguration, "deeplib/1.0")
+void DNN::unload()
+{
 
-#endif //IDEEPCONFIGURATION_H
+}
+
+
+//*************************************************************************************************************
+
+QString DNN::getName() const
+{
+    return "DNN";
+}
+
+
+//*************************************************************************************************************
+
+void DNN::train()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void DNN::eval()
+{
+
+}

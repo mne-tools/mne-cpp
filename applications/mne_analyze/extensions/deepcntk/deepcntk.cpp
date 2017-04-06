@@ -41,6 +41,7 @@
 #include "deepcntk.h"
 
 #include <deep/deep.h>
+#include <deep/deepconfigurationmanager.h>
 #include <deep/deepmodelcreator.h>
 
 #include <dispCharts/lineplot.h>
@@ -86,6 +87,14 @@ using namespace CNTK;
 
 //*************************************************************************************************************
 //=============================================================================================================
+// CONST
+//=============================================================================================================
+
+const char* deepCNTKNetsDir = "/mne_analyze_extensions/deepcntknets";        /**< holds path to the extensions.*/
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // STATIC FUNCTIONS
 //=============================================================================================================
 
@@ -125,6 +134,7 @@ DeepCNTK::DeepCNTK()
 : m_pControlPanel(Q_NULLPTR)
 , m_pControl(Q_NULLPTR)
 , m_pDeepViewer(Q_NULLPTR)
+, m_pDeepNetworks(Q_NULLPTR)
 {
 
 }
@@ -151,8 +161,17 @@ QSharedPointer<IExtension> DeepCNTK::clone() const
 
 void DeepCNTK::init()
 {
-
     setupModel();
+
+    //
+    // Deep Configuration Manager
+    //
+    if(!m_pDeepNetworks) {
+        m_pDeepNetworks = new DeepConfigurationManager(this);
+        m_pDeepNetworks->loadDeepConfigurations(qApp->applicationDirPath()+deepCNTKNetsDir);
+        m_pDeepNetworks->initDeepConfigurations();
+        qDebug() << "Debug" << qApp->applicationDirPath()+deepCNTKNetsDir;
+    }
 
     //
     // Init view

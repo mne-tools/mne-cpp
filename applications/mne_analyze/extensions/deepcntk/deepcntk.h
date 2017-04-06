@@ -71,6 +71,7 @@ namespace DISPLIB
 namespace DEEPLIB
 {
     class Deep;
+    class DeepConfigurationManager;
 }
 
 
@@ -156,6 +157,10 @@ private:
 
     // View
     DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
+
+    DEEPLIB::DeepConfigurationManager* m_pDeepNetworks; /**< Deep Networks */
+
+
 };
 
 } // NAMESPACE

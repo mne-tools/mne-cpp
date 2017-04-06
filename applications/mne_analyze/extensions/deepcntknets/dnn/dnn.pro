@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     deepcntk.pro
+# @file     dnn.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,21 +29,21 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the deepcntk plug-in.
+# @brief    This project file generates the makefile for the dnn configuration.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../../mne-cpp.pri)
+include(../../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += DEEPCNTK_LIBRARY
+DEFINES += DNN_LIBRARY
 
-QT += gui widgets 3dextras charts concurrent
+QT += gui widgets charts concurrent
 
-TARGET = deepcntk
+TARGET = dnn
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -60,8 +60,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Deepd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lanSharedd \
             -lCntk.Core-2.0rc1d
 }
@@ -75,28 +73,25 @@ else {
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Deep \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lanShared \
             -lCntk.Core-2.0rc1
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions/deepcntknets
 
 SOURCES += \
-    deepcntk.cpp
+    dnn.cpp
 
 HEADERS += \
-    deepcntk_global.h \
-    deepcntk.h \
-    IDeepCNTKNet.h
+    dnn_global.h \
+    dnn.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
-OTHER_FILES += deepcntk.json
+OTHER_FILES += dnn.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD

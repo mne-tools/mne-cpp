@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     extensions.pro
+# @file     deepcntknets.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,20 +29,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the extensions for MNE Analyze project.
+# @brief    This project file builds the Deep CNTK Nets for MNE Analyze project.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    surfer \
-    fiffio
-
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SUBDIRS += \
-        deepcntk \
-        deepcntknets
+        dnn
 }
