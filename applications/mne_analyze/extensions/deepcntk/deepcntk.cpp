@@ -170,7 +170,6 @@ void DeepCNTK::init()
         m_pDeepNetworks = new DeepCNTKManager(this);
         m_pDeepNetworks->loadDeepConfigurations(qApp->applicationDirPath()+deepCNTKNetsDir);
         m_pDeepNetworks->initDeepConfigurations();
-        qDebug() << "Debug" << qApp->applicationDirPath()+deepCNTKNetsDir;
     }
 
     //
@@ -195,6 +194,9 @@ void DeepCNTK::init()
         m_pControlPanel->setDeepViewer(m_pDeepViewer);
         m_pDeepViewer->setWindowTitle("Deep CNTK");
     }
+
+    QComboBox *combo = m_pControlPanel->getConfigurationComboBox();
+    combo->addItems(m_pDeepNetworks->getDeepConfigurationNames());
 }
 
 
