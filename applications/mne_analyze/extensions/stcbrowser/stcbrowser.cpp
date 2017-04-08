@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepcntk.h
+* @file     stcbrowser.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,125 +29,107 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DeepCNTK class.
+* @brief    Contains the implementation of the STCBrowser class.
 *
 */
-
-#ifndef DEEPCNTK_H
-#define DEEPCNTK_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deepcntk_global.h"
-#include <anShared/Interfaces/IExtension.h>
+#include "stcbrowser.h"
+#include "FormFiles/stccontrol.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
+using namespace STCBROWSEREXTENSION;
+using namespace ANSHAREDLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace DISPLIB
+STCBrowser::STCBrowser()
 {
-    class DeepViewer;
-    class Controls;
+
 }
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DEEPCNTKEXTENSION
-//=============================================================================================================
 
-namespace DEEPCNTKEXTENSION
+STCBrowser::~STCBrowser()
 {
+
+}
+
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class DeepCNTKManager;
-
-
-//=============================================================================================================
-/**
-* DeepCNTK Extension
-*
-* @brief The DeepCNTK class provides a Machine Learning Capbilities.
-*/
-class DEEPCNTKSHARED_EXPORT DeepCNTK : public ANSHAREDLIB::IExtension
+QSharedPointer<IExtension> STCBrowser::clone() const
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "deepcntk.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IExtension)
+    QSharedPointer<STCBrowser> pSTCBrowserClone(new STCBrowser);
+    return pSTCBrowserClone;
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a DeepCNTK.
-    */
-    DeepCNTK();
 
-    //=========================================================================================================
-    /**
-    * Destroys the DeepCNTK.
-    */
-    ~DeepCNTK();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * IExtension functions
-    */
-    virtual QSharedPointer<IExtension> clone() const;
-    virtual void init();
-    virtual void unload();
-    virtual QString getName() const;
+void STCBrowser::init()
+{
 
-    virtual QMenu* getMenu();
-    virtual QDockWidget* getControl();
-    virtual QWidget* getView();
+}
 
-private:
-    //=========================================================================================================
-    /**
-    * Reset the current model
-    */
-    void resetDeepViewer();
 
-    //=========================================================================================================
-    /**
-    * Update the current model
-    */
-    void updateDeepViewer();
+//*************************************************************************************************************
 
-private:
-    DISPLIB::Controls*              m_pControlPanel;    /**< View Control Panel */
+void STCBrowser::unload()
+{
 
-    // Control
-    QDockWidget*                    m_pControl;         /**< Control Widget */
+}
 
-    // View
-    DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
 
-    DeepCNTKManager*                m_pDeepCNTKManager; /**< Deep Networks */
+//*************************************************************************************************************
 
-};
+QString STCBrowser::getName() const
+{
+    return "STC Browser";
+}
 
-} // NAMESPACE
 
-#endif // DEEPCNTK_H
+//*************************************************************************************************************
+
+QMenu *STCBrowser::getMenu()
+{
+    return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+QDockWidget *STCBrowser::getControl()
+{
+//    if(!m_pControl) {
+//        m_pControl = new QDockWidget(tr("STC Control"));
+//        m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+//        m_pControl->setMinimumWidth(180);
+//        m_pStcControl = new STCControl;
+//        m_pControl->setWidget(m_pStcControl);
+//    }
+
+    return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+QWidget *STCBrowser::getView()
+{
+    return Q_NULLPTR;
+}
