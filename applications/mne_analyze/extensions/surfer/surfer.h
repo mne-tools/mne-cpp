@@ -109,13 +109,8 @@ public:
     virtual void unload();
     virtual QString getName() const;
 
-    virtual bool hasMenu() const;
     virtual QMenu* getMenu();
-
-    virtual bool hasControl() const;
     virtual QDockWidget* getControl();
-
-    virtual bool hasView() const;
     virtual QWidget* getView();
 
 private:

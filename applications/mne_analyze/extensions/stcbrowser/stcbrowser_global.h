@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffio.h
+* @file     stcbrowser_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,22 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FiffIO class.
+* @brief    Contains the STCBrowser library export/import macros.
 *
 */
 
-#ifndef FIFFIO_H
-#define FIFFIO_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "fiffio_global.h"
-
-#include <anShared/Interfaces/IExtension.h>
-
+#ifndef STCBROWSER_GLOBAL_H
+#define STCBROWSER_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -52,71 +42,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFIOEXTENSION
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-namespace FIFFIOEXTENSION
-{
+#if defined(STCBROWSER_LIBRARY)
+#  define STCBROWSERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define STCBROWSERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//=============================================================================================================
-/**
-* FiffIO Extension
-*
-* @brief The FiffIO class provides input and output capabilities for the fiff file format.
-*/
-class FIFFIOSHARED_EXPORT FiffIO : public ANSHAREDLIB::IExtension
-{
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "fiffio.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IExtension)
-
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a FiffIO.
-    */
-    FiffIO();
-
-    //=========================================================================================================
-    /**
-    * Destroys the FiffIO.
-    */
-    ~FiffIO();
-
-    //=========================================================================================================
-    /**
-    * IExtension functions
-    */
-    virtual QSharedPointer<IExtension> clone() const;
-    virtual void init();
-    virtual void unload();
-    virtual QString getName() const;
-
-    virtual QMenu* getMenu();
-    virtual QDockWidget* getControl();
-    virtual QWidget* getView();
-
-protected:
-
-private:
-
-};
-
-} // NAMESPACE
-
-#endif // FIFFIO_H
+#endif // STCBROWSER_GLOBAL_H

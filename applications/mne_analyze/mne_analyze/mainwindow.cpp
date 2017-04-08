@@ -198,11 +198,17 @@ void MainWindow::createMenus()
 
 void MainWindow::createDockWindows()
 {
+    setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
+
     //Add Extension views to mdi
     for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
         IExtension* extension = m_pExtensionManager->getExtensions()[i];
-        if(extension->hasControl() && extension->getControl()) {
-            addDockWidget(Qt::LeftDockWidgetArea,extension->getControl());
+
+        qDebug() << "create dock" << extension->getName();
+
+        QDockWidget* control = extension->getControl();
+        if(control) {
+            addDockWidget(Qt::LeftDockWidgetArea,control);
         }
     }
 }
@@ -218,8 +224,12 @@ void MainWindow::createMdiView()
     //Add Extension views to mdi
     for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
         IExtension* extension = m_pExtensionManager->getExtensions()[i];
-        if(extension->hasView() && extension->getView()) {
-            m_pMdiView->addSubWindow(extension->getView());
+
+        qDebug() << "create mdi" << extension->getName();
+
+        QWidget* view = extension->getView();
+        if(view) {
+            m_pMdiView->addSubWindow(view);
         }
     }
 

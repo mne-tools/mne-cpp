@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>STCControl</class>
+ <widget class="QWidget" name="STCControl">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>180</width>
+    <height>283</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>180</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>STC Control</string>
+  </property>
+  <layout class="QVBoxLayout" name="m_qVerticalLayoutRoot">
+   <item>
+    <widget class="QGroupBox" name="m_qGroupBoxProperties">
+     <property name="title">
+      <string>Properties</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLineEdit" name="m_qLineEditSTCFile"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_qGroupBoxBrowser">
+     <property name="title">
+      <string>Browser</string>
+     </property>
+     <layout class="QVBoxLayout" name="m_qVerticalLayoutBrowser">
+      <item>
+       <widget class="QSlider" name="m_qSliderTimePoint">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

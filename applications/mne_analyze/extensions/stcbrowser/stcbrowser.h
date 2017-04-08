@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepcntk.h
+* @file     stcbrowser.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,21 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DeepCNTK class.
+* @brief    Contains the declaration of the FiffIO class.
 *
 */
 
-#ifndef DEEPCNTK_H
-#define DEEPCNTK_H
-
+#ifndef STCBROWSER_H
+#define STCBROWSER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "deepcntk_global.h"
+#include "stcbrowser_global.h"
+
 #include <anShared/Interfaces/IExtension.h>
+
 
 
 //*************************************************************************************************************
@@ -60,54 +61,49 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB
-{
-    class DeepViewer;
-    class Controls;
-}
+class STCControl;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DEEPCNTKEXTENSION
+// DEFINE NAMESPACE STCBROWSEREXTENSION
 //=============================================================================================================
 
-namespace DEEPCNTKEXTENSION
+namespace STCBROWSEREXTENSION
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DeepCNTKManager;
-
 
 //=============================================================================================================
 /**
-* DeepCNTK Extension
+* STCBrowser Extension
 *
-* @brief The DeepCNTK class provides a Machine Learning Capbilities.
+* @brief The STCBrowser class provides input and output capabilities for the fiff file format.
 */
-class DEEPCNTKSHARED_EXPORT DeepCNTK : public ANSHAREDLIB::IExtension
+class STCBROWSERSHARED_EXPORT STCBrowser : public ANSHAREDLIB::IExtension
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "deepcntk.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "stcbrowser.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IExtension)
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a DeepCNTK.
+    * Constructs a STCBrowser.
     */
-    DeepCNTK();
+    STCBrowser();
 
     //=========================================================================================================
     /**
-    * Destroys the DeepCNTK.
+    * Destroys the STCBrowser.
     */
-    ~DeepCNTK();
+    ~STCBrowser();
 
     //=========================================================================================================
     /**
@@ -122,32 +118,14 @@ public:
     virtual QDockWidget* getControl();
     virtual QWidget* getView();
 
-private:
-    //=========================================================================================================
-    /**
-    * Reset the current model
-    */
-    void resetDeepViewer();
-
-    //=========================================================================================================
-    /**
-    * Update the current model
-    */
-    void updateDeepViewer();
+protected:
 
 private:
-    DISPLIB::Controls*              m_pControlPanel;    /**< View Control Panel */
-
     // Control
-    QDockWidget*                    m_pControl;         /**< Control Widget */
-
-    // View
-    DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
-
-    DeepCNTKManager*                m_pDeepCNTKManager; /**< Deep Networks */
-
+    QDockWidget*        m_pControl;     /**< Control Widget */
+    STCControl*         m_pStcControl;  /**< The STC Control Widget */
 };
 
 } // NAMESPACE
 
-#endif // DEEPCNTK_H
+#endif // STCBROWSER_H
