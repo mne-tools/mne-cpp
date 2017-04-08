@@ -199,6 +199,8 @@ void MainWindow::createMenus()
 void MainWindow::createDockWindows()
 {
     setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
+    setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
+    setDockOptions(QMainWindow::ForceTabbedDocks);
 
     //Add Extension views to mdi
     for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
