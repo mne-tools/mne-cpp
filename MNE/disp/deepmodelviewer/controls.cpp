@@ -248,7 +248,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     openGlButton->setChecked(m_pDeepViewer->getView()->usesOpenGL());
 #endif
     weightStrength->setValue(5);
-    weightThreshold->setValue(200);
+    weightThreshold->setValue(400);
 }
 
 

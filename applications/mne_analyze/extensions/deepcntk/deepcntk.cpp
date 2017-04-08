@@ -203,7 +203,9 @@ void DeepCNTK::init()
     connect(m_pControlPanel, &Controls::requestTraining_signal, m_pDeepCNTKManager, &DeepCNTKManager::trainCurrentConfiguration);
     connect(combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), m_pDeepCNTKManager, &DeepCNTKManager::selectDeepConfiguration);
 
+
     connect(m_pDeepCNTKManager, &DeepCNTKManager::finishedTraining_signal, this, &DeepCNTK::updateDeepViewer);
+    connect(m_pDeepCNTKManager, &DeepCNTKManager::currentConfigurationChanged_signal, this, &DeepCNTK::resetDeepViewer);
 
 }
 
@@ -277,6 +279,14 @@ bool DeepCNTK::hasView() const
 QWidget *DeepCNTK::getView()
 {
     return m_pDeepViewer;
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTK::resetDeepViewer()
+{
+    m_pDeepViewer->setModel(m_pDeepCNTKManager->currentDeepConfiguration()->getModel());
 }
 
 

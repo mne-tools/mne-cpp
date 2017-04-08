@@ -77,7 +77,7 @@ using namespace Eigen;
 Network::Network(QObject *parent)
 : QObject(parent)
 , m_penStyle(Qt::SolidLine)
-, m_weightThreshold(0.2f)
+, m_weightThreshold(0.4f)
 , m_weightStrength(5)
 {
 
@@ -89,6 +89,7 @@ Network::Network(QObject *parent)
 void Network::setModel(Deep::SPtr& model)
 {
     if(m_pModel != model) {
+        cleanNetwork();
         m_pModel = model;
         generateNetwork();
     }
@@ -263,6 +264,32 @@ void Network::updateWeights()
             }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void Network::cleanNetwork()
+{
+    //
+    // Remove layer nodes from scene
+    //
+    for (int i = 0; i < m_listLayerNodes.size(); ++i) {
+        for (int j = 0; j < m_listLayerNodes[i].size(); ++j) {
+            delete m_listLayerNodes[i][j];
+        }
+    }
+    m_listLayerNodes.clear();
+
+    //
+    // Remove edges from scene
+    //
+    for (int i = 0; i < m_listEdges.size(); ++i) {
+        for (int j = 0; j < m_listEdges[i].size(); ++j) {
+            delete m_listEdges[i][j];
+        }
+    }
+    m_listEdges.clear();
 }
 
 

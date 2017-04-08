@@ -248,6 +248,12 @@ signals:
 protected:
     //=========================================================================================================
     /**
+    * Cleanes the UI representation of the CNTK Network
+    */
+    void cleanNetwork();
+
+    //=========================================================================================================
+    /**
     * Generates the UI representation of the CNTK Network
     */
     void generateNetwork();
