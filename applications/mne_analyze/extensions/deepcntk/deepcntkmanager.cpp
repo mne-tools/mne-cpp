@@ -144,3 +144,28 @@ QStringList DeepCNTKManager::getDeepConfigurationNames() const
 
     return names;
 }
+
+
+//*************************************************************************************************************
+
+IDeepCNTKNet *DeepCNTKManager::currentDeepConfiguration() const
+{
+    if(m_qVecDeepConfiguration.size() > 0) {
+        return m_qVecDeepConfiguration[m_iCurrentConfiguration];
+    }
+
+    return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTKManager::selectDeepConfiguration(int idx)
+{
+    if(idx != m_iCurrentConfiguration && idx >= 0 && idx < m_qVecDeepConfiguration.size()) {
+        m_iCurrentConfiguration = idx;
+        emit currentConfigurationChanged_signal();
+        qDebug() << "void DeepCNTKManager::selectDeepConfiguration(int idx)" << idx;
+    }
+
+}

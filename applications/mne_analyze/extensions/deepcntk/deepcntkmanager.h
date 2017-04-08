@@ -137,6 +137,25 @@ public:
     */
     QStringList getDeepConfigurationNames() const;
 
+    //=========================================================================================================
+    /**
+    * Returns the current deep configuration
+    *
+    * @return Current deep configuration.
+    */
+    IDeepCNTKNet* currentDeepConfiguration() const;
+
+    //=========================================================================================================
+    /**
+    * Selects a deep configuration
+    *
+    * @param [in] idx   Idx of the configuration to select
+    */
+    void selectDeepConfiguration(int idx);
+
+signals:
+    void currentConfigurationChanged_signal();
+
 private:
     int m_iCurrentConfiguration;                        /**< Current configuration. */
 
