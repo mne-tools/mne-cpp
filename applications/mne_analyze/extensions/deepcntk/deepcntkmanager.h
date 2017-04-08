@@ -153,8 +153,22 @@ public:
     */
     void selectDeepConfiguration(int idx);
 
+    //=========================================================================================================
+    /**
+    * Train current Configuration
+    */
+    void trainCurrentConfiguration();
+
+    //=========================================================================================================
+    /**
+    * Train test Configuration
+    */
+    void evalCurrentConfiguration();
+
 signals:
     void currentConfigurationChanged_signal();
+
+    void finishedTraining_signal();
 
 private:
     int m_iCurrentConfiguration;                        /**< Current configuration. */

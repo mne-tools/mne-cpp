@@ -102,15 +102,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs an Network with parent object parent.
-    *
-    * @param [in] deepModel     The CNTK Model Wrapper
-    * @param [in] parent        The parent of the Network
-    */
-    Network(QSharedPointer<DEEPLIB::Deep>& deepModel, QObject *parent = Q_NULLPTR);
-
-    //=========================================================================================================
-    /**
     * Network destructor
     */
     virtual ~Network() {}

@@ -87,33 +87,6 @@ DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 , m_pNetwork(new Network)
 {
     initScene();
-    updateSceneItems();
-
-    m_pView->getGraphicsView()->setScene(m_pScene);
-
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(m_pView);
-
-    if(embeddedControl) {
-        Controls *controls = new Controls(this, this);
-        layout->addWidget(controls);
-    }
-
-    setLayout(layout);
-
-    setWindowTitle(tr("Deep Model Viewer"));
-}
-
-
-//*************************************************************************************************************
-
-DeepViewer::DeepViewer(Deep::SPtr& model, bool embeddedControl, QWidget *parent)
-: QWidget(parent)
-, m_pView(new View)
-, m_pNetwork(new Network(model))
-{
-    initScene();
-    updateSceneItems();
 
     m_pView->getGraphicsView()->setScene(m_pScene);
 
@@ -151,7 +124,8 @@ Network* DeepViewer::getNetwork() const
 
 void DeepViewer::setModel(Deep::SPtr& model)
 {
-    Q_UNUSED(model)
+    m_pNetwork->setModel(model);
+    updateSceneItems();
 }
 
 
@@ -211,6 +185,8 @@ void DeepViewer::updateSceneItems()
             }
         }
     }
+
+    redrawScene();
 }
 
 

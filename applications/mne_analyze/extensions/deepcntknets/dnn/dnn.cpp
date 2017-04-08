@@ -40,8 +40,17 @@
 
 #include "dnn.h"
 
+#include <deep/deep.h>
+#include <deep/deepmodelcreator.h>
+
 #include <iostream>
 #include <random>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Core>
 
@@ -61,7 +70,7 @@
 // CNTK INCLUDES
 //=============================================================================================================
 
-//#include <CNTKLibrary.h>
+#include <CNTKLibrary.h>
 
 
 //*************************************************************************************************************
@@ -72,6 +81,7 @@
 using namespace DNNCONFIGURATION;
 using namespace DEEPLIB;
 using namespace Eigen;
+using namespace CNTK;
 
 
 //*************************************************************************************************************
@@ -129,7 +139,17 @@ DNN::~DNN()
 
 void DNN::init()
 {
+    qDebug() << "void DNN::init()";
+    // Create a deep model
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
 
+    size_t input_dim = 4;
+    size_t num_output_classes = 3;
+
+    m_pDeep = Deep::SPtr(new Deep);
+    FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
+    m_pDeep->setModel(model);
+    m_pDeep->print();
 }
 
 
@@ -138,6 +158,15 @@ void DNN::init()
 void DNN::unload()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+Deep::SPtr DNN::getModel() const
+{
+    qDebug() << "QSharedPointer<Deep> DNN::getModel() const";
+    return m_pDeep;
 }
 
 
@@ -153,7 +182,63 @@ QString DNN::getName() const
 
 void DNN::train()
 {
+    qDebug() << "void DNN::train()";
 
+//    QFutureWatcher<bool> trainFutureWatcher;
+//    QProgressDialog progressDialog("Train model...", "Cancel Training", 0, 0, m_pDeepViewer, Qt::Dialog);
+
+    //progress.open(m_pDeep.data(),&Deep::cancelTraining);
+
+    //
+    // Training
+    //
+
+    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+
+    qDebug() << "\n Start training \n";
+
+    size_t input_dim = m_pDeep->inputDimensions();
+    size_t num_output_classes = m_pDeep->outputDimensions();
+
+    qDebug() << "input_dim" << input_dim;
+    qDebug() << "num_output_classes" << num_output_classes;
+
+    // Initialize the parameters for the trainer
+    int minibatch_size = 25;
+    int num_samples = 20000;
+
+    MatrixXf features, labels;
+
+    QVector<double> vecLoss, vecError;
+    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+
+
+//    progressDialog.setRange(0,num_samples/minibatch_size);
+
+    //Run the training in seperate thread
+//    trainFutureWatcher.setFuture(QtConcurrent::run( m_pDeep.data(),
+//                                                    &Deep::trainModel,
+//                                                    features, labels, vecLoss, vecError, minibatch_size));
+    m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+
+//    progressDialog.exec();
+
+//    trainFutureWatcher.waitForFinished();
+
+    qDebug() << "\n Finished training \n";
+
+//    //Plot error
+//    LinePlot *error_chartView = new LinePlot(vecError,"Training Error");
+//    error_chartView->show();
+
+//    //Plot loss
+//    LinePlot *loss_chartView = new LinePlot(vecLoss,"Loss Error");
+//    loss_chartView->show();
+
+//   // Update Deep Viewer
+//    if(m_pDeepViewer) {
+//        m_pDeepViewer->updateModel();
+//    }
 }
 
 

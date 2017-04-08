@@ -40,6 +40,9 @@
 
 #include "fnn.h"
 
+#include <deep/deep.h>
+#include <deep/deepmodelcreator.h>
+
 #include <iostream>
 #include <random>
 
@@ -143,6 +146,14 @@ void FNN::unload()
 
 //*************************************************************************************************************
 
+Deep::SPtr FNN::getModel() const
+{
+    return m_pDeep;
+}
+
+
+//*************************************************************************************************************
+
 QString FNN::getName() const
 {
     return "FNN";
@@ -153,7 +164,7 @@ QString FNN::getName() const
 
 void FNN::train()
 {
-
+    qDebug() << "void FNN::train()";
 }
 
 
