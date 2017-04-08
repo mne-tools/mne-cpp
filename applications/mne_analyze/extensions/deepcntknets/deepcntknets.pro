@@ -39,5 +39,6 @@ TEMPLATE = subdirs
 
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SUBDIRS += \
-        dnn
+        dnn \
+        fnn
 }
