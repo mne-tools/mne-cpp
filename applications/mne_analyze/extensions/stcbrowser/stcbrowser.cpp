@@ -57,6 +57,8 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 STCBrowser::STCBrowser()
+: m_pControl(Q_NULLPTR)
+, m_pStcControl(Q_NULLPTR)
 {
 
 }
@@ -83,7 +85,7 @@ QSharedPointer<IExtension> STCBrowser::clone() const
 
 void STCBrowser::init()
 {
-
+    m_pStcControl = new STCControl;
 }
 
 
@@ -115,15 +117,17 @@ QMenu *STCBrowser::getMenu()
 
 QDockWidget *STCBrowser::getControl()
 {
-//    if(!m_pControl) {
-//        m_pControl = new QDockWidget(tr("STC Control"));
-//        m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-//        m_pControl->setMinimumWidth(180);
-//        m_pStcControl = new STCControl;
-//        m_pControl->setWidget(m_pStcControl);
-//    }
+    if(!m_pControl) {
+        qDebug() << "[1]";
+        m_pControl = new QDockWidget(tr("STC Control"));
+        m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+        m_pControl->setMinimumWidth(180);
+        m_pControl->setWidget(m_pStcControl);
 
-    return Q_NULLPTR;
+        qDebug() << "[2]";
+    }
+
+    return m_pControl;
 }
 
 

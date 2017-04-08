@@ -56,8 +56,8 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 Surfer::Surfer()
-: m_pControl(NULL)
-, m_pView(NULL)
+: m_pControl(Q_NULLPTR)
+, m_pView(Q_NULLPTR)
 {
 
 }
