@@ -120,8 +120,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the CNTK model.
+    *
+    * @return the CNTK model.
+    */
+    virtual QSharedPointer<DEEPLIB::Deep> getModel() const;
+
+    //=========================================================================================================
+    /**
     * Returns the network configuration name.
-    * Pure virtual method.
     *
     * @return the name of the configuration.
     */
@@ -130,14 +137,12 @@ public:
     //=========================================================================================================
     /**
     * Trains the network configuration.
-    * Pure virtual method.
     */
     virtual void train();
 
     //=========================================================================================================
     /**
     * Evaluates the network configuration.
-    * Pure virtual method.
     */
     virtual void eval();
 

@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "deepcntk_global.h"
-
 #include <anShared/Interfaces/IExtension.h>
 
 
@@ -54,7 +53,6 @@
 
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -66,11 +64,6 @@ namespace DISPLIB
 {
     class DeepViewer;
     class Controls;
-}
-
-namespace DEEPLIB
-{
-    class Deep;
 }
 
 
@@ -137,20 +130,11 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Setup the model
+    * Update the current model
     */
-    void setupModel();
-
-    //=========================================================================================================
-    /**
-    * Start the model training
-    */
-    void trainModel();
+    void updateDeepViewer();
 
 private:
-    // Deep Model
-    QSharedPointer<DEEPLIB::Deep>   m_pDeep;            /**< CNTK Wrapper */
-
     DISPLIB::Controls*              m_pControlPanel;    /**< View Control Panel */
 
     // Control
@@ -159,8 +143,7 @@ private:
     // View
     DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
 
-    DeepCNTKManager*                m_pDeepNetworks;    /**< Deep Networks */
-
+    DeepCNTKManager*                m_pDeepCNTKManager; /**< Deep Networks */
 
 };
 

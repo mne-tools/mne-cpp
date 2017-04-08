@@ -169,3 +169,24 @@ void DeepCNTKManager::selectDeepConfiguration(int idx)
     }
 
 }
+
+
+//*************************************************************************************************************
+
+void DeepCNTKManager::trainCurrentConfiguration()
+{
+    if (m_iCurrentConfiguration < m_qVecDeepConfiguration.size()) {
+        m_qVecDeepConfiguration[m_iCurrentConfiguration]->train();
+        emit finishedTraining_signal();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTKManager::evalCurrentConfiguration()
+{
+    if (m_iCurrentConfiguration < m_qVecDeepConfiguration.size()) {
+        m_qVecDeepConfiguration[m_iCurrentConfiguration]->eval();
+    }
+}
