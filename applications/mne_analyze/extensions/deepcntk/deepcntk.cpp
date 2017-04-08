@@ -60,6 +60,7 @@
 #include <QtConcurrent>
 #include <QFutureWatcher>
 #include <QProgressDialog>
+#include <QComboBox>
 
 
 //*************************************************************************************************************
@@ -197,6 +198,8 @@ void DeepCNTK::init()
 
     QComboBox *combo = m_pControlPanel->getConfigurationComboBox();
     combo->addItems(m_pDeepNetworks->getDeepConfigurationNames());
+
+    connect(combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), m_pDeepNetworks, &DeepCNTKManager::selectDeepConfiguration);
 }
 
 
