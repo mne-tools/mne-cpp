@@ -146,6 +146,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Remove scene items
+    */
+    void removeSceneItems();
+
+    //=========================================================================================================
+    /**
     * Update scene items, i.e, attaches or removes items according to their weights
     */
     void updateSceneItems();
