@@ -43,6 +43,7 @@
 
 #include "../mne_global.h"
 #include <mne/c/mne_types.h>
+#include <inverse/dipoleFit/analyze_types.h>
 
 
 //*************************************************************************************************************
@@ -344,7 +345,7 @@ public:
 
     static int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals);
 
-
+    static int align_fiducials(digitizerData head_dig, digitizerData mri_dig, mshDisplaySurface head_surf, int niter, int scale_head, float omit_dist);
 
 public:
     int             type;          /* Is this a volume or a surface */

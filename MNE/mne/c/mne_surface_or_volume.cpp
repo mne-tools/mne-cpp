@@ -2770,3 +2770,105 @@ bad : {
         return FAIL;
     }
 }
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::align_fiducials(digitizerData head_dig, digitizerData mri_dig, mshDisplaySurface head_surf, int niter, int scale_head, float omit_dist)
+/*
+ * Align the MEG fiducials to the MRI fiducials
+ */
+{
+    float          *head_fid[3],*mri_fid[3],**fid;
+    int            j,k;
+    fiffDigPoint   p = NULL;
+    digitizerData  dig = NULL;
+    float          nasion_weight = 5.0;
+    float          scales[3];
+
+    if (!head_dig) {
+        qCritical("MEG head coordinate system digitizer data not available");
+        goto bad;
+    }
+    if (!mri_dig) {
+        qCritical("MRI coordinate system digitizer data not available");
+        goto bad;
+    }
+
+    for (j = 0; j < 2; j++) {
+        dig = j == 0 ? head_dig : mri_dig;
+        fid = j == 0 ? head_fid : mri_fid;
+
+        for (k = 0; k < 3; k++) {
+            fid[k] = NULL;
+            for (k = 0, p = dig->points; k < dig->npoint; k++,p++) {
+                if (p->kind == FIFFV_POINT_CARDINAL) {
+                    if (p->ident == FIFFV_POINT_LPA)
+                        fid[0] = p->r;
+                    else if (p->ident == FIFFV_POINT_NASION)
+                        fid[1] = p->r;
+                    else if (p->ident == FIFFV_POINT_RPA)
+                        fid[2] = p->r;
+                }
+            }
+        }
+    }
+
+    for (k = 0; k < 3; k++) {
+        if (!head_fid[k]) {
+            qCritical("Some of the MEG fiducials were missing");
+            goto bad;
+        }
+
+        if (!mri_fid[k]) {
+            qCritical("Some of the MRI fiducials were missing");
+            goto bad;
+        }
+    }
+
+    if (scale_head) {
+        get_head_scale(head_dig,mri_fid,head_surf,scales);
+        fprintf(stderr,"xscale = %.3f yscale = %.3f zscale = %.3f\n",scales[0],scales[1],scales[2]);
+
+        for (j = 0; j < 3; j++)
+            for (k = 0; k < 3; k++)
+                mri_fid[j][k] = mri_fid[j][k]*scales[k];
+
+        scale_display_surface(head_surf,scales);
+    }
+
+    /*
+    * Initial alignment
+    */
+    FREE(head_dig->head_mri_t_adj);
+    head_dig->head_mri_t_adj = fiff_make_transform_card(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
+                                                        mri_fid[0],mri_fid[1],mri_fid[2]);
+
+    for (k = 0; k < head_dig->nfids; k++)
+        VEC_COPY(head_dig->mri_fids[k].r,mri_fid[k]);
+    FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After simple alignment : ",head_dig->head_mri_t_adj);
+
+    if (omit_dist > 0)
+        discard_outlier_digitizer_points(head_dig,head_surf,omit_dist);
+
+    /*
+    * Optional iterative refinement
+    */
+    if (niter > 0 && head_surf) {
+        for (k = 0; k < niter; k++) {
+            if (iterate_alignment_once(head_dig,head_surf,nasion_weight,mri_fid[1],k == niter-1 && niter > 1) == FAIL)
+                goto bad;
+        }
+
+        fprintf(stderr,"%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
+        1000.0*rms_digitizer_distance(head_dig,head_surf));
+        char *p = "After refinement :";
+        FiffCoordTransOld::mne_print_coord_transform_label(stderr,p,head_dig->head_mri_t_adj);
+    }
+
+    return OK;
+
+    bad :
+        return FAIL;
+}
+
