@@ -44,11 +44,14 @@
 #include "mne_source_space_old.h"
 #include "mne_patch_info.h"
 //#include "fwd_bem_model.h"
-#include <mne/c/mne_triangle.h>
 #include "mne_nearest.h"
 #include "filter_thread_arg.h"
+#include "mne_triangle.h"
+#include "mne_msh_display_surface.h"
 
 #include <fiff/fiff_stream.h>
+#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_dig_point.h>
 
 
 #include <QFile>
@@ -2774,15 +2777,20 @@ bad : {
 
 //*************************************************************************************************************
 
-int MneSurfaceOrVolume::align_fiducials(digitizerData head_dig, digitizerData mri_dig, mshDisplaySurface head_surf, int niter, int scale_head, float omit_dist)
+int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
+                                        FiffDigitizerData* mri_dig,
+                                        MneMshDisplaySurface* head_surf,
+                                        int niter,
+                                        int scale_head,
+                                        float omit_dist)
 /*
  * Align the MEG fiducials to the MRI fiducials
  */
 {
     float          *head_fid[3],*mri_fid[3],**fid;
     int            j,k;
-    fiffDigPoint   p = NULL;
-    digitizerData  dig = NULL;
+    FiffDigPoint*  p = NULL;
+    FiffDigitizerData*  dig = NULL;
     float          nasion_weight = 5.0;
     float          scales[3];
 
@@ -2862,8 +2870,7 @@ int MneSurfaceOrVolume::align_fiducials(digitizerData head_dig, digitizerData mr
 
         fprintf(stderr,"%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
         1000.0*rms_digitizer_distance(head_dig,head_surf));
-        char *p = "After refinement :";
-        FiffCoordTransOld::mne_print_coord_transform_label(stderr,p,head_dig->head_mri_t_adj);
+        FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After refinement :",head_dig->head_mri_t_adj);
     }
 
     return OK;

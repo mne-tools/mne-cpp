@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiff_digitizer_data.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mne_msh_picked.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     April, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,89 +29,89 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffDigitizerData Class.
+* @brief    MneMshPicked class declaration.
 *
 */
+
+#ifndef MNEMSHPICKED_H
+#define MNEMSHPICKED_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_digitizer_data.h"
-#include "fiff_coord_trans_old.h"
-#include "../fiff_dig_point.h"
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
+#include "../mne_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// Eigen INCLUDES
 //=============================================================================================================
 
-FiffDigitizerData::FiffDigitizerData()
-: filename(Q_NULLPTR)
-, head_mri_t(Q_NULLPTR)
-, head_mri_t_adj(Q_NULLPTR)
-, points(Q_NULLPTR)
-, coord_frame(FIFFV_COORD_UNKNOWN)
-, active(Q_NULLPTR)
-, discard(Q_NULLPTR)
-, npoint(0)
-, mri_fids(Q_NULLPTR)
-, nfids(0)
-, show(FALSE)
-, show_minimal(FALSE)
-, dist(Q_NULLPTR)
-, closest(Q_NULLPTR)
-, closest_point(Q_NULLPTR)
-, dist_valid(FALSE)
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace MNELIB
 {
-}
-
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData)
-:  filename(p_FiffDigitizerData.filename)
-, head_mri_t(p_FiffDigitizerData.head_mri_t)
-, head_mri_t_adj(p_FiffDigitizerData.head_mri_t_adj)
-, points(p_FiffDigitizerData.points)
-, coord_frame(p_FiffDigitizerData.coord_frame)
-, active(p_FiffDigitizerData.active)
-, discard(p_FiffDigitizerData.discard)
-, npoint(p_FiffDigitizerData.npoint)
-, mri_fids(p_FiffDigitizerData.mri_fids)
-, nfids(p_FiffDigitizerData.nfids)
-, show(p_FiffDigitizerData.show)
-, show_minimal(p_FiffDigitizerData.show_minimal)
-, dist(p_FiffDigitizerData.dist)
-, closest(p_FiffDigitizerData.closest)
-, closest_point(p_FiffDigitizerData.closest_point)
-, dist_valid(p_FiffDigitizerData.dist_valid)
+
+//=============================================================================================================
+/**
+* Replaces *mshPicked, mshPickedRec struct (analyze_types.c).
+*
+* @brief The MneMshPicked class.
+*/
+class MNESHARED_EXPORT MneMshPicked
 {
-}
+public:
+    typedef QSharedPointer<MneMshPicked> SPtr;              /**< Shared pointer type for MneMshPicked. */
+    typedef QSharedPointer<const MneMshPicked> ConstSPtr;   /**< Const shared pointer type for MneMshPicked. */
 
+    //=========================================================================================================
+    /**
+    * Constructs the MneMshPicked.
+    */
+    MneMshPicked();
+
+    //=========================================================================================================
+    /**
+    * Destroys the MneMshPicked.
+    */
+    ~MneMshPicked();
+
+public:
+    int   vert;			/* Vertex # */
+    int   sparse;			/* Is this a isolated point? */
+
+// ### OLD STRUCT ###
+//    typedef struct {
+//      int   vert;			/* Vertex # */
+//      int   sparse;			/* Is this a isolated point? */
+//    } *mshPicked,mshPickedRec;
+};
 
 //*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-FiffDigitizerData::~FiffDigitizerData()
-{
-    FREE_43(filename);
-    FREE_43(points);
-    FREE_43(head_mri_t);
-    FREE_43(head_mri_t_adj);
-    FREE_43(dist);
-    FREE_43(closest);
-    FREE_43(active);
-    FREE_43(discard);
-    FREE_CMATRIX_43(closest_point);
-    FREE_43(mri_fids);
+} // NAMESPACE MNELIB
 
-}
+#endif // MNEMSHPICKED_H

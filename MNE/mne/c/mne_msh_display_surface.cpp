@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiff_digitizer_data.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mne_msh_display_surface.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     April, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,25 +29,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffDigitizerData Class.
+* @brief    Implementation of the MneMshDisplaySurface Class.
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_digitizer_data.h"
-#include "fiff_coord_trans_old.h"
-#include "../fiff_dig_point.h"
+#include "mne_msh_display_surface.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -55,63 +55,82 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffDigitizerData::FiffDigitizerData()
-: filename(Q_NULLPTR)
-, head_mri_t(Q_NULLPTR)
-, head_mri_t_adj(Q_NULLPTR)
-, points(Q_NULLPTR)
-, coord_frame(FIFFV_COORD_UNKNOWN)
-, active(Q_NULLPTR)
-, discard(Q_NULLPTR)
-, npoint(0)
-, mri_fids(Q_NULLPTR)
-, nfids(0)
-, show(FALSE)
-, show_minimal(FALSE)
-, dist(Q_NULLPTR)
-, closest(Q_NULLPTR)
-, closest_point(Q_NULLPTR)
-, dist_valid(FALSE)
+MneMshDisplaySurface::MneMshDisplaySurface()
 {
+    int c;
+
+    filename = Q_NULLPTR;
+    time_loaded = 0;
+    s = Q_NULLPTR;
+    sketch = FALSE;
+    color_scale    = Q_NULLPTR;
+    vertex_colors  = Q_NULLPTR;
+    nvertex_colors = 3;
+    marker_colors  = Q_NULLPTR;
+    nmarker_colors = 3;
+    overlay_values = Q_NULLPTR;
+    alt_overlay_values = Q_NULLPTR;
+    marker_values      = Q_NULLPTR;
+    marker_tri         = Q_NULLPTR;
+    marker_tri_no      = Q_NULLPTR;
+    nmarker_tri        = 0;
+    subj               = Q_NULLPTR;
+    surf_name          = Q_NULLPTR;
+    rot[0]             = 0.0;
+    rot[1]             = 0.0;
+    rot[2]             = 0.0;
+
+    move[0]            = 0.0;
+    move[1]            = 0.0;
+    move[2]            = 0.0;
+
+    eye[0]             = 1.0;
+    eye[0]             = 0.0;
+    eye[0]             = 0.0;
+
+    up[0]              = 0.0;
+    up[1]              = 0.0;
+    up[2]              = 1.0;
+    fov                = 2.0;
+    fov_scale          = 1.0;
+    for (c = 0; c < 3; c++) {
+      minv[c] = -1.0;
+      maxv[c] = 1.0;
+    }
+    trans          = Q_NULLPTR;
+    transparent    = FALSE;
+    picked         = Q_NULLPTR;
+    npicked        = 0;
+    show_aux_data  = FALSE;
+    user_data      = Q_NULLPTR;
+    user_data_free = Q_NULLPTR;
+    maps = Q_NULLPTR;
+    nmap = 0;
 }
 
 
 //*************************************************************************************************************
 
-FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData)
-:  filename(p_FiffDigitizerData.filename)
-, head_mri_t(p_FiffDigitizerData.head_mri_t)
-, head_mri_t_adj(p_FiffDigitizerData.head_mri_t_adj)
-, points(p_FiffDigitizerData.points)
-, coord_frame(p_FiffDigitizerData.coord_frame)
-, active(p_FiffDigitizerData.active)
-, discard(p_FiffDigitizerData.discard)
-, npoint(p_FiffDigitizerData.npoint)
-, mri_fids(p_FiffDigitizerData.mri_fids)
-, nfids(p_FiffDigitizerData.nfids)
-, show(p_FiffDigitizerData.show)
-, show_minimal(p_FiffDigitizerData.show_minimal)
-, dist(p_FiffDigitizerData.dist)
-, closest(p_FiffDigitizerData.closest)
-, closest_point(p_FiffDigitizerData.closest_point)
-, dist_valid(p_FiffDigitizerData.dist_valid)
+MneMshDisplaySurface::~MneMshDisplaySurface()
 {
-}
+    FREE_44(filename);
+    delete s;
+    FREE_44(marker_values);
+    FREE_44(overlay_values);
+    FREE_44(alt_overlay_values);
+    FREE_44(vertex_colors);
+    FREE_44(marker_colors);
+    FREE_44(color_scale);
+    FREE_ICMATRIX_44(marker_tri);
+    FREE_44(marker_tri_no);
+    FREE_44(subj);
+    FREE_44(surf_name);
+    FREE_44(picked);
+    if (user_data_free)
+      delete user_data;
 
-
-//*************************************************************************************************************
-
-FiffDigitizerData::~FiffDigitizerData()
-{
-    FREE_43(filename);
-    FREE_43(points);
-    FREE_43(head_mri_t);
-    FREE_43(head_mri_t_adj);
-    FREE_43(dist);
-    FREE_43(closest);
-    FREE_43(active);
-    FREE_43(discard);
-    FREE_CMATRIX_43(closest_point);
-    FREE_43(mri_fids);
-
+    for (int k = 0; k < nmap; k++)
+      delete maps[k];
+    FREE_44(maps);
+    FREE_44(trans);
 }
