@@ -204,7 +204,7 @@ void DeepCNTK::init()
     connect(combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), m_pDeepCNTKManager, &DeepCNTKManager::selectDeepConfiguration);
 
 
-    connect(m_pDeepCNTKManager, &DeepCNTKManager::finishedTraining_signal, this, &DeepCNTK::updateDeepViewer);
+    connect(m_pDeepCNTKManager, &DeepCNTKManager::finishedTraining_signal, this, &DeepCNTK::trainingFinished);
     connect(m_pDeepCNTKManager, &DeepCNTKManager::currentConfigurationChanged_signal, this, &DeepCNTK::resetDeepViewer);
 
 }
@@ -255,6 +255,16 @@ QDockWidget *DeepCNTK::getControl()
 QWidget *DeepCNTK::getView()
 {
     return m_pDeepViewer;
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTK::trainingFinished()
+{
+
+
+    updateDeepViewer();
 }
 
 

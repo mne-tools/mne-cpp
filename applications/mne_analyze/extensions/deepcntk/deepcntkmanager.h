@@ -145,6 +145,8 @@ public:
     */
     IDeepCNTKNet* currentDeepConfiguration() const;
 
+// Member functions for current configuration
+public:
     //=========================================================================================================
     /**
     * Selects a deep configuration

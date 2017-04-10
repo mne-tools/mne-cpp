@@ -125,6 +125,12 @@ public:
 private:
     //=========================================================================================================
     /**
+    * Called when the network configuration finished training
+    */
+    void trainingFinished();
+
+    //=========================================================================================================
+    /**
     * Reset the current model
     */
     void resetDeepViewer();

@@ -49,6 +49,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QVector>
 #include <QObject>
 #include <QSharedPointer>
 
@@ -140,8 +141,44 @@ public:
     */
     virtual void eval() = 0;
 
-private:
+    //=========================================================================================================
+    /**
+    * Returns the loss of the current training session.
+    *
+    * @return the loss of the current training.
+    */
+    inline QVector<double> &currentLoss();
 
+    //=========================================================================================================
+    /**
+    * Returns the loss over all training session.
+    *
+    * @return the loss over all training session.
+    */
+    inline QVector<double> &overallLoss();
+
+    //=========================================================================================================
+    /**
+    * Returns the error of the current training session.
+    *
+    * @return the error of the current training.
+    */
+    inline QVector<double> &currentError();
+
+    //=========================================================================================================
+    /**
+    * Returns the error over all training session.
+    *
+    * @return the error over all training session.
+    */
+    inline QVector<double> &overallError();
+
+private:
+    QVector<double> m_CurrentLoss;      /**< The Loss of the current training session */
+    QVector<double> m_OverallLoss;      /**< The Loss over all training sessions */
+
+    QVector<double> m_CurrentError;     /**< The Error of the current training session */
+    QVector<double> m_OverallError;     /**< The Error over all training sessions */
 
 };
 
@@ -150,6 +187,34 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+QVector<double> &IDeepCNTKNet::currentLoss()
+{
+    return m_CurrentLoss;
+}
+
+
+//*************************************************************************************************************
+
+QVector<double> &IDeepCNTKNet::overallLoss()
+{
+    return m_OverallLoss;
+}
+
+
+//*************************************************************************************************************
+
+QVector<double> &IDeepCNTKNet::currentError()
+{
+    return m_CurrentError;
+}
+
+
+//*************************************************************************************************************
+
+QVector<double> &IDeepCNTKNet::overallError()
+{
+    return m_OverallError;
+}
 
 } //Namespace
 
