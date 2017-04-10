@@ -95,6 +95,15 @@ using namespace FIFFLIB;
 
 #define MAXWORD 1000
 
+#define VEC_DOT_20(x,y) ((x)[X_20]*(y)[X_20] + (x)[Y_20]*(y)[Y_20] + (x)[Z_20]*(y)[Z_20])
+
+#define VEC_LEN_20(x) sqrt(VEC_DOT_20(x,x))
+
+#define CROSS_PRODUCT_20(x,y,xy) {\
+    (xy)[X_20] =   (x)[Y_20]*(y)[Z_20]-(y)[Y_20]*(x)[Z_20];\
+    (xy)[Y_20] = -((x)[X_20]*(y)[Z_20]-(y)[X_20]*(x)[Z_20]);\
+    (xy)[Z_20] =   (x)[X_20]*(y)[Y_20]-(y)[X_20]*(x)[Y_20];\
+    }
 
 static void skip_comments(FILE *in)
 
@@ -693,6 +702,60 @@ FiffCoordTransOld *FiffCoordTransOld::mne_identity_transform(int from, int to)
                         { 0.0, 0.0, 1.0 } };
     float move[] = { 0.0, 0.0, 0.0 };
     return new FiffCoordTransOld(from,to,rot,move);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld * FiffCoordTransOld::fiff_make_transform_card (int from,int to,
+                                                                 float *rL,
+                                                                 float *rN,
+                                                                 float *rR)
+/* 'from' coordinate system
+* cardinal points expressed in
+* the 'to' system */
+
+{
+    FiffCoordTransOld* t = new FiffCoordTransOld();
+    float ex[3],ey[3],ez[3];	/* The unit vectors */
+    float alpha,alpha1,len;
+    float diff1[3],diff2[3];
+    int   k;
+    float r0[3];
+
+    t->from = from;
+    t->to   = to;
+    for (k = 0; k < 3; k++) {
+        diff1[k] = rN[k] - rL[k];
+        diff2[k] = rR[k] - rL[k];
+    }
+    alpha = VEC_DOT_20(diff1,diff2)/VEC_DOT_20(diff2,diff2);
+    len = VEC_LEN_20(diff2);
+    alpha1 = 1.0 - alpha;
+
+    for (k = 0; k < 3; k++) {
+        r0[k] = alpha1*rL[k] + alpha*rR[k];
+        ex[k] = diff2[k]/len;
+        ey[k] = rN[k] - r0[k];
+        t->move[k] = r0[k];
+    }
+
+    len = VEC_LEN_20(ey);
+
+    for (k = 0; k < 3; k++)
+        ey[k] = ey[k]/len;
+
+    CROSS_PRODUCT_20 (ex,ey,ez);
+
+    for (k = 0; k < 3; k++) {
+        t->rot(k,X_20) = ex[k];
+        t->rot(k,Y_20) = ey[k];
+        t->rot(k,Z_20) = ez[k];
+    }
+
+    add_inverse (t);
+
+    return (t);
 }
 
 

@@ -361,6 +361,13 @@ public:
                                int scale_head,
                                float omit_dist);
 
+    static void get_head_scale(FIFFLIB::FiffDigitizerData* dig,
+                                   float **mri_fid,
+                                   MneMshDisplaySurface* head_surf,
+                                   float *scales);
+
+    static void scale_display_surface(MneMshDisplaySurface* surf,
+                                        float *scales);
 public:
     int             type;          /* Is this a volume or a surface */
     QString         subject;      /* Name (id) of the subject */

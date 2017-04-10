@@ -53,6 +53,7 @@
 #include <fiff/c/fiff_digitizer_data.h>
 #include <fiff/fiff_dig_point.h>
 
+#include <utils/sphere.h>
 
 #include <QFile>
 #include <QCoreApplication>
@@ -2848,13 +2849,13 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     /*
     * Initial alignment
     */
-    FREE(head_dig->head_mri_t_adj);
-    head_dig->head_mri_t_adj = fiff_make_transform_card(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
-                                                        mri_fid[0],mri_fid[1],mri_fid[2]);
+    FREE_17(head_dig->head_mri_t_adj);
+    head_dig->head_mri_t_adj = FIFFLIB::FiffCoordTransOld::fiff_make_transform_card(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
+                                                                                    mri_fid[0],mri_fid[1],mri_fid[2]);
 
     for (k = 0; k < head_dig->nfids; k++)
-        VEC_COPY(head_dig->mri_fids[k].r,mri_fid[k]);
-    FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After simple alignment : ",head_dig->head_mri_t_adj);
+        VEC_COPY_17(head_dig->mri_fids[k].r,mri_fid[k]);
+    //FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After simple alignment : ",head_dig->head_mri_t_adj);
 
     if (omit_dist > 0)
         discard_outlier_digitizer_points(head_dig,head_surf,omit_dist);
@@ -2870,7 +2871,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         fprintf(stderr,"%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
         1000.0*rms_digitizer_distance(head_dig,head_surf));
-        FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After refinement :",head_dig->head_mri_t_adj);
+        //FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After refinement :",head_dig->head_mri_t_adj);
     }
 
     return OK;
@@ -2879,3 +2880,93 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
         return FAIL;
 }
 
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
+                                        float **mri_fid,
+                                        MneMshDisplaySurface* head_surf,
+                                        float *scales)
+/*
+ * Simple head size fit
+ */
+{
+    float **dig_rr  = NULL;
+    float **head_rr = NULL;
+    int   k,ndig,nhead;
+    float simplex_size = 2e-2;
+    float r0[3],Rdig,Rscalp;
+    float LR[3],LN[3],len,norm[3],diff[3];
+
+    scales[0] = scales[1] = scales[2] = 1.0;
+    if (!dig || !head_surf || !mri_fid)
+        return;
+
+    dig_rr  = MALLOC_17(dig->npoint,float *);
+    head_rr = MALLOC_17(head_surf->s->np,float *);
+    /*
+    * Pick only the points with positive z
+    */
+    for (k = 0, ndig = 0; k < dig->npoint; k++)
+        if (dig->points[k].r[Z_17] > 0)
+            dig_rr[ndig++] = dig->points[k].r;
+
+    if (UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig) == FAIL)
+        goto out;
+
+    fprintf(stderr,"Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
+    /*
+    * Pick only the points above the fiducial plane
+    */
+
+    VEC_DIFF_17(mri_fid[0],mri_fid[2],LR);
+    VEC_DIFF_17(mri_fid[0],mri_fid[1],LN);
+    CROSS_PRODUCT_17(LR,LN,norm);
+    len = VEC_LEN_17(norm);
+    norm[0] = norm[0]/len;
+    norm[1] = norm[1]/len;
+    norm[2] = norm[2]/len;
+
+    for (k = 0, nhead = 0; k < head_surf->s->np; k++) {
+        VEC_DIFF_17(mri_fid[0],head_surf->s->rr[k],diff);
+        if (VEC_DOT_17(diff,norm) > 0)
+            head_rr[nhead++] = head_surf->s->rr[k];
+    }
+
+    if (UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp) == FAIL)
+        goto out;
+
+    fprintf(stderr,"Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
+
+    scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
+
+    out : {
+        FREE_17(dig_rr);
+        FREE_17(head_rr);
+    return;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::scale_display_surface(MneMshDisplaySurface* surf,
+                                                float *scales)
+/*
+ * Not quite complete yet
+ */
+{
+  int j,k;
+
+  if (!surf || !scales)
+    return;
+
+  for (k = 0; k < 3; k++) {
+    surf->minv[k] = scales[k]*surf->minv[k];
+    surf->maxv[k] = scales[k]*surf->maxv[k];
+  }
+  for (j = 0; j < surf->s->np; j++)
+    for (k = 0; k < 3; k++)
+      surf->s->rr[j][k] = surf->s->rr[j][k]*scales[k];
+  return;
+}
