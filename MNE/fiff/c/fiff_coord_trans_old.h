@@ -192,6 +192,10 @@ public:
 
     static FiffCoordTransOld* mne_identity_transform(int from, int to);
 
+    static FiffCoordTransOld * fiff_make_transform_card (int from,int to,
+                                                     float *rL,
+                                                     float *rN,
+                                                     float *rR);
     //*************************************************************************************************************
     //TODO: remove later on
     static FiffCoordTransOld* read_helper( QSharedPointer<FIFFLIB::FiffTag>& tag );
