@@ -209,6 +209,9 @@ void DNN::train()
 
     MatrixXf features, labels;
 
+    currentLoss().clear();
+    currentError().clear();
+
     QVector<double> vecLoss, vecError;
     generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
 
@@ -225,20 +228,13 @@ void DNN::train()
 
 //    trainFutureWatcher.waitForFinished();
 
+    currentLoss() = vecLoss;
+    currentError() = vecError;
+
+    overallLoss().append(vecLoss);
+    overallError().append(vecError);
+
     qDebug() << "\n Finished training \n";
-
-//    //Plot error
-//    LinePlot *error_chartView = new LinePlot(vecError,"Training Error");
-//    error_chartView->show();
-
-//    //Plot loss
-//    LinePlot *loss_chartView = new LinePlot(vecLoss,"Loss Error");
-//    loss_chartView->show();
-
-//   // Update Deep Viewer
-//    if(m_pDeepViewer) {
-//        m_pDeepViewer->updateModel();
-//    }
 }
 
 
