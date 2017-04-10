@@ -1559,6 +1559,25 @@ int MneSurfaceOrVolume::mne_project_to_surface(MneSurfaceOld* s, void *proj_data
 
 //*************************************************************************************************************
 
+void MneSurfaceOrVolume::mne_project_to_triangle(MneSurfaceOld* s,
+                                                    int        best,
+                                                    float      *r,
+                                                    float      *proj)
+     /*
+      * Project to a triangle provided that we know the best match already
+      */
+{
+    float p,q,dist;
+
+    mne_nearest_triangle_point(r,s,best,&p,&q,&dist);
+    project_to_triangle(s,best,p,q,proj);
+
+    return;
+}
+
+
+//*************************************************************************************************************
+
 int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpaceOld* **spacesp, int *nspacep)
 /*
 * Read source spaces from a FIFF file
@@ -2950,6 +2969,214 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
 
 //*************************************************************************************************************
 
+int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData* d,
+                                                             MneMshDisplaySurface* head,
+                                                             float maxdist)
+     /*
+      * Discard outlier digitizer points
+      */
+{
+    int discarded = 0;
+    int k;
+
+    if (d && head) {
+        d->dist_valid = FALSE;
+        calculate_digitizer_distances(d,head,TRUE,TRUE);
+        for (k = 0; k < d->npoint; k++) {
+            d->discard[k] = FALSE;
+            /*
+            * Discard unless cardinal landmark or HPI coil
+            */
+            if (fabs(d->dist[k]) > maxdist &&
+            d->points[k].kind != FIFFV_POINT_CARDINAL &&
+            d->points[k].kind != FIFFV_POINT_HPI) {
+                discarded++;
+                d->discard[k] = TRUE;
+            }
+        }
+        fprintf(stderr,"%d points discarded (maxdist = %6.1f mm).\n",discarded,1000*maxdist);
+    }
+    return discarded;
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head,
+                                                        int do_all, int do_approx)
+/*
+ * Calculate the distances from the scalp surface
+ */
+{
+    float             **rr   = ALLOC_CMATRIX_17(dig->npoint,3);
+    int               k,nactive;
+    int               *closest;
+    float             *dist;
+    FiffDigPoint*     point = NULL;
+    FiffCoordTransOld*    t = dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t;
+    int               nstep = 4;
+
+    if (dig->dist_valid)
+        return;
+
+    dig->dist          = REALLOC_17(dig->dist,dig->npoint,float);
+    if (!dig->closest) {
+        /*
+        * Ensure that all closest values are initialized correctly
+        */
+        dig->closest       = MALLOC_17(dig->npoint,int);
+        for (k = 0; k < dig->npoint; k++)
+            dig->closest[k] = -1;
+    }
+    FREE_CMATRIX_17(dig->closest_point);
+
+    dig->closest_point = ALLOC_CMATRIX_17(dig->npoint,3);
+    closest            = MALLOC_17(dig->npoint,int);
+    dist               = MALLOC_17(dig->npoint,float);
+
+    for (k = 0, nactive = 0, point = dig->points; k < dig->npoint; k++, point++) {
+        if ((dig->active[k] && !dig->discard[k]) || do_all) {
+            VEC_COPY_17(rr[nactive],point->r);
+            FiffCoordTransOld::fiff_coord_trans(rr[nactive],t,FIFFV_MOVE);
+            if (do_approx) {
+                closest[nactive] = dig->closest[k];
+                if (closest[nactive] < 0)
+                    do_approx = FALSE;
+            }
+            else
+                closest[nactive] = -1;
+            nactive++;
+        }
+    }
+
+    mne_find_closest_on_surface_approx(head->s,rr,nactive,closest,dist,nstep);
+    /*
+    * Project the points on the triangles
+    */
+    if (!do_approx)
+        fprintf(stderr,"Inside or outside for %d points...",nactive);
+    for (k = 0, nactive = 0; k < dig->npoint; k++) {
+        if ((dig->active[k] && !dig->discard[k]) || do_all) {
+            dig->dist[k]    = dist[nactive];
+            dig->closest[k] = closest[nactive];
+            mne_project_to_triangle(head->s,dig->closest[k],rr[nactive],dig->closest_point[k]);
+            /*
+            * The above distance is with respect to the closest triangle only
+            * We need to use the solid angle criterion to decide the sign reliably
+            */
+            if (!do_approx && FALSE) {
+                if (sum_solids(rr[nactive],head->s)/(4*M_PI) > 0.9)
+                    dig->dist[k] = -fabs(dig->dist[k]);
+                else
+                    dig->dist[k] = fabs(dig->dist[k]);
+            }
+            nactive++;
+        }
+    }
+
+    if (!do_approx)
+        fprintf(stderr,"[done]\n");
+
+    FREE_CMATRIX_17(rr);
+    FREE_17(closest);
+    FREE_17(dist);
+    dig->dist_valid = TRUE;
+
+    return;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	   /* The digitizer data */
+                                               MneMshDisplaySurface* head, /* The head surface */
+                                               int nasion_weight,	   /* Weight for the nasion */
+                                               float *nasion_mri,	   /* Fixed correspondence point for the nasion (optional) */
+                                               int last_step)          /* Is this the last iteration step */
+/*
+ * Find the best alignment of the coordinate frames
+ */
+{
+    int   res       = FAIL;
+    float **rr_head = NULL;
+    float **rr_mri  = NULL;
+    float *w        = NULL;
+    int             k,nactive;
+    FiffDigPoint*    point = NULL;
+    FiffCoordTransOld* t = NULL;
+    float           max_diff = 40e-3;
+
+    if (!dig->head_mri_t_adj) {
+        err_set_error("Not adjusting the transformation");
+        goto out;
+    }
+    /*
+    * Calculate initial distances
+    */
+    calculate_digitizer_distances(dig,head,FALSE,TRUE);
+
+    /*
+    * Set up the alignment
+    */
+    rr_head = ALLOC_CMATRIX_17(dig->npoint,3);
+    rr_mri  = ALLOC_CMATRIX_17(dig->npoint,3);
+    w       = MALLOC_17(dig->npoint,float);
+
+    for (k = 0, nactive = 0, point = dig->points; k < dig->npoint; k++, point++) {
+        if (dig->active[k] && !dig->discard[k]) {
+            VEC_COPY_17(rr_head[nactive],point->r);
+            VEC_COPY_17(rr_mri[nactive],dig->closest_point[k]);
+            /*
+            * Special handling for the nasion
+            */
+            if (point->kind == FIFFV_POINT_CARDINAL &&
+            point->ident == FIFFV_POINT_NASION) {
+                w[nactive] = nasion_weight;
+                if (nasion_mri) {
+                    VEC_COPY_17(rr_mri[nactive],nasion_mri);
+                    VEC_COPY_17(rr_head[nactive],nasion_mri);
+                    FiffCoordTransOld::fiff_coord_trans_inv(rr_head[nactive],
+                    dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t,
+                    FIFFV_MOVE);
+                }
+            }
+            else
+                w[nactive] = 1.0;
+            nactive++;
+        }
+    }
+    if (nactive < 3) {
+        err_set_error("Not enough points to do the alignment");
+        goto out;
+    }
+    if ((t = FiffCoordTransOld::procrustes_align(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
+                                                    rr_head, rr_mri, w, nactive, max_diff)) == NULL)
+        goto out;
+
+    if (dig->head_mri_t_adj)
+        *dig->head_mri_t_adj = *t;
+    FREE_17(t);
+    /*
+    * Calculate final distances
+    */
+    dig->dist_valid = FALSE;
+    calculate_digitizer_distances(dig,head,FALSE,!last_step);
+    res = OK;
+    goto out;
+
+    out : {
+        FREE_CMATRIX_17(rr_head);
+        FREE_CMATRIX_17(rr_mri);
+        FREE_17(w);
+        return res;
+    }
+}
+
+
+
+
+//*************************************************************************************************************
+
 void MneSurfaceOrVolume::scale_display_surface(MneMshDisplaySurface* surf,
                                                 float *scales)
 /*
@@ -2970,3 +3197,8 @@ void MneSurfaceOrVolume::scale_display_surface(MneMshDisplaySurface* surf,
       surf->s->rr[j][k] = surf->s->rr[j][k]*scales[k];
   return;
 }
+
+
+
+
+
