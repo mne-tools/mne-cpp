@@ -43,7 +43,6 @@
 
 #include "../mne_global.h"
 #include <mne/c/mne_types.h>
-#include <inverse/dipoleFit/analyze_types.h>
 
 
 //*************************************************************************************************************
@@ -71,6 +70,15 @@
 
 #define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffDigitizerData;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,7 +90,7 @@ namespace MNELIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Forward Declarations
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MneTriangle;
@@ -91,6 +99,7 @@ class MneVolGeom;
 class MnePatchInfo;
 class MneSourceSpaceOld;
 class MneSurfaceOld;
+class MneMshDisplaySurface;
 
 
 //=============================================================================================================
@@ -345,7 +354,12 @@ public:
 
     static int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals);
 
-    static int align_fiducials(digitizerData head_dig, digitizerData mri_dig, mshDisplaySurface head_surf, int niter, int scale_head, float omit_dist);
+    static int align_fiducials(FIFFLIB::FiffDigitizerData* head_dig,
+                               FIFFLIB::FiffDigitizerData* mri_dig,
+                               MneMshDisplaySurface* head_surf,
+                               int niter,
+                               int scale_head,
+                               float omit_dist);
 
 public:
     int             type;          /* Is this a volume or a surface */
