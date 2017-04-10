@@ -258,6 +258,10 @@ public:
 
     static int mne_project_to_surface(MneSurfaceOld* s, void *proj_data, float *r, int project_it, float *distp);
 
+    static void mne_project_to_triangle(MneSurfaceOld* s,
+                                            int        best,
+                                            float      *r,
+                                            float      *proj);
 
     //============================= mne_source_space.c =============================
 
@@ -354,6 +358,8 @@ public:
 
     static int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals);
 
+    //============================= digitizer.c =============================
+
     static int align_fiducials(FIFFLIB::FiffDigitizerData* head_dig,
                                FIFFLIB::FiffDigitizerData* mri_dig,
                                MneMshDisplaySurface* head_surf,
@@ -366,8 +372,25 @@ public:
                                    MneMshDisplaySurface* head_surf,
                                    float *scales);
 
+    static int discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData* d,
+                                                 MneMshDisplaySurface* head,
+                                                 float maxdist);
+
+    static void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head,
+                                                                  int do_all, int do_approx);
+
+    static int iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	   /* The digitizer data */
+                                                   MneMshDisplaySurface* head, /* The head surface */
+                                                   int nasion_weight,	   /* Weight for the nasion */
+                                                   float *nasion_mri,	   /* Fixed correspondence point for the nasion (optional) */
+                                                   int last_step);          /* Is this the last iteration step */
+
+    //============================= display_surfaces.c =============================
+
     static void scale_display_surface(MneMshDisplaySurface* surf,
                                         float *scales);
+
+
 public:
     int             type;          /* Is this a volume or a surface */
     QString         subject;      /* Name (id) of the subject */

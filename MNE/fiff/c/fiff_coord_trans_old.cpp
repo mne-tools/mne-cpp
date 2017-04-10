@@ -91,7 +91,41 @@ using namespace FIFFLIB;
 
 #define MALLOC_20(x,t) (t *)malloc((x)*sizeof(t))
 
+static void matrix_error_20(int kind, int nr, int nc)
 
+{
+    if (kind == 1)
+        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
+    else if (kind == 2)
+        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
+    else
+        printf("Allocation error for a %d x %d matrix\n",nr,nc);
+    if (sizeof(void *) == 4) {
+        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
+        printf("Please consider moving to a 64-bit platform.");
+    }
+    printf("Cannot continue. Sorry.\n");
+    exit(1);
+}
+
+float **mne_cmatrix_20(int nr,int nc)
+
+{
+    int i;
+    float **m;
+    float *whole;
+
+    m = MALLOC_20(nr,float *);
+    if (!m) matrix_error_17(1,nr,nc);
+    whole = MALLOC_20(nr*nc,float);
+    if (!whole) matrix_error_20(2,nr,nc);
+
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
+}
+
+#define ALLOC_CMATRIX_20(x,y) mne_cmatrix_20((x),(y))
 
 #define MAXWORD 1000
 
@@ -756,6 +790,136 @@ FiffCoordTransOld * FiffCoordTransOld::fiff_make_transform_card (int from,int to
     add_inverse (t);
 
     return (t);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld* procrustes_align(int   from_frame,  /* The coordinate frames */
+                       int   to_frame,
+                       float **fromp,     /* Point locations in these two coordinate frames */
+                       float **top,
+                       float *w,	  /* Optional weights */
+                       int   np,	  /* How many points */
+                       float max_diff)	  /* Maximum allowed difference */
+/*
+ * Perform an alignment using the the solution of the orthogonal (weighted) Procrustes problem
+ */
+{
+    float **from = ALLOC_CMATRIX_20(np,3);
+    float **to   = ALLOC_CMATRIX_20(np,3);
+    float from0[3],to0[3],rr[3],diff[3];
+    int   j,k,c,p;
+    float rot[3][3];
+    float move[3];
+
+    /*
+    * Calculate the centroids and subtract;
+    */
+    for (c = 0; c < 3; c++)
+        from0[c] = to0[c] = 0.0;
+    for (j = 0; j < np; j++) {
+        for (c = 0; c < 3; c++) {
+            from0[c] += fromp[j][c];
+            to0[c] += top[j][c];
+        }
+    }
+    for (c = 0; c < 3; c++) {
+        from0[c] = from0[c]/np;
+        to0[c] = to0[c]/np;
+    }
+    for (j = 0; j < np; j++) {
+        for (c = 0; c < 3; c++) {
+            from[j][c] = fromp[j][c] - from0[c];
+            to[j][c]   = top[j][c]    - to0[c];
+        }
+    }
+    /*
+    * Compute the solution of the orthogonal Proscrustes problem
+    */
+    {
+        float **S;
+        float **uu = ALLOC_CMATRIX_20(3,3);
+        float **vv = ALLOC_CMATRIX_20(3,3);
+        float **R = NULL;
+        float sing[3];
+
+        if (w) {
+            /*
+            * This is the weighted version which allows multiplicity of points
+            */
+            S = ALLOC_CMATRIX_20(3,3);
+            for (j = 0; j < 3; j++) {
+                for (k = 0; k < 3; k++) {
+                    S[j][k] = 0.0;
+                    for (p = 0; p < np; p++)
+                        S[j][k] += w[p]*from[p][j]*to[p][k];
+                }
+            }
+        }
+        else
+            S = mne_matt_mat_mult(from,to,3,np,3);
+        if (mne_svd(S,3,3,sing,uu,vv) != 0) {
+            FREE_CMATRIX(S);
+            FREE_CMATRIX(uu);
+            FREE_CMATRIX(vv);
+            goto bad;
+        }
+        R = mne_matt_mat_mult(vv,uu,3,3,3);
+        for (j = 0; j < 3; j++)
+            for (k = 0; k < 3; k++)
+                rot[j][k] = R[j][k];
+        FREE_CMATRIX(R);
+        FREE_CMATRIX(S);
+        FREE_CMATRIX(uu);
+        FREE_CMATRIX(vv);
+    }
+    /*
+    * Now we need to generate a transformed translation vector
+    */
+    for (j = 0; j < 3; j++) {
+    move[j] = to0[j];
+    for (k = 0; k < 3; k++)
+    move[j] = move[j] - rot[j][k]*from0[k];
+    }
+    /*
+    * Test the transformation and print the results
+    */
+    #ifdef DEBUG
+    fprintf(stderr,"Procrustes matching (desired vs. transformed) :\n");
+    #endif
+    for (p = 0; p < np; p++) {
+        for (j = 0; j < 3; j++) {
+            rr[j] = move[j];
+        for (k = 0; k < 3; k++)
+            rr[j] += rot[j][k]*fromp[p][k];
+        }
+        VEC_DIFF(top[p],rr,diff);
+        #ifdef DEBUG
+        fprintf(stderr,"\t%7.2f %7.2f %7.2f mm <-> %7.2f %7.2f %7.2f mm diff = %8.3f mm\n",
+        1000*top[p][0],1000*top[p][1],1000*top[p][2],
+        1000*rr[0],1000*rr[1],1000*rr[2],1000*VEC_LEN(diff));
+        #endif
+        if (VEC_LEN(diff) > max_diff) {
+            err_printf_set_error("To large difference in matching : %7.1f > %7.1f mm",
+            1000*VEC_LEN(diff),1000*max_diff);
+            goto bad;
+        }
+    }
+    #ifdef DEBUG
+    fprintf(stderr,"\n");
+    #endif
+
+    FREE_CMATRIX(from);
+    FREE_CMATRIX(to);
+
+    return fiff_make_transform(from_frame,to_frame,rot,move);
+
+    bad : {
+        FREE_CMATRIX(from);
+        FREE_CMATRIX(to);
+        return NULL;
+    }
 }
 
 

@@ -196,6 +196,17 @@ public:
                                                      float *rL,
                                                      float *rN,
                                                      float *rR);
+
+    //============================= digitizer.c =============================
+
+    static FiffCoordTransOld* procrustes_align(int   from_frame,  /* The coordinate frames */
+                           int   to_frame,
+                           float **fromp,     /* Point locations in these two coordinate frames */
+                           float **top,
+                           float *w,	  /* Optional weights */
+                           int   np,	  /* How many points */
+                           float max_diff);	  /* Maximum allowed difference */
+
     //*************************************************************************************************************
     //TODO: remove later on
     static FiffCoordTransOld* read_helper( QSharedPointer<FIFFLIB::FiffTag>& tag );
