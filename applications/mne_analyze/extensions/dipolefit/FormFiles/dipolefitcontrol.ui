@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>STC Control</string>
+   <string>Dipole Fit Control</string>
   </property>
   <layout class="QVBoxLayout" name="m_qVerticalLayoutRoot">
    <property name="leftMargin">
