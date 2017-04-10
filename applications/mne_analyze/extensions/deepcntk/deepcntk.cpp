@@ -262,8 +262,16 @@ QWidget *DeepCNTK::getView()
 
 void DeepCNTK::trainingFinished()
 {
+    QString configName = m_pDeepCNTKManager->currentDeepConfiguration()->getName();
+    //Plot error
+    LinePlot *error_chartView = new LinePlot(m_pDeepCNTKManager->currentDeepConfiguration()->currentError(),QString("%1: Current Training Error").arg(configName));
+    error_chartView->show();
 
+    //Plot loss
+    LinePlot *loss_chartView = new LinePlot(m_pDeepCNTKManager->currentDeepConfiguration()->currentLoss(),QString("%1: Current Training Loss").arg(configName));
+    loss_chartView->show();
 
+   // Update Deep Viewer
     updateDeepViewer();
 }
 
