@@ -49,6 +49,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QPair>
+#include <QList>
 #include <QSharedPointer>
 
 
@@ -57,9 +59,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB {
+    class MNESourceEstimate;
+}
+
 namespace INVERSELIB {
+    class DipoleFitSettings;
     class ECDSet;
 }
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,7 +119,7 @@ public:
 
 // Database Interface for now -> consider using a Abstract Item Model
 signals:
-    void currentECDSetChanged_signal();    /**< Emmited when the current ECD Set changed*/
+    void ecdSetChanged_signal();    /**< Emmited when the current ECD Set changed*/
 
 public:
     //=========================================================================================================
@@ -125,9 +133,10 @@ public:
     /**
     * Sets the current ECD Set
     *
-    * @param [in] ecdSet    Sets the current ECD Set;
+    * @param [in] ecdSettings   Sets the settings corresponding to the current ECD Set;
+    * @param [in] ecdSet        Sets the current ECD Set;
     */
-    void setCurrentECDSet(const QSharedPointer<INVERSELIB::ECDSet> &ecdSet);
+    void addECDSet( QSharedPointer<INVERSELIB::DipoleFitSettings> &ecdSettings,  QSharedPointer<INVERSELIB::ECDSet> &ecdSet );
 
     //=========================================================================================================
     /**
@@ -135,13 +144,18 @@ public:
     *
     * @return All past ECD Sets
     */
-    QList<QSharedPointer<INVERSELIB::ECDSet> > ecdSets() const;
+    QList< QPair< QSharedPointer<INVERSELIB::DipoleFitSettings>, QSharedPointer<INVERSELIB::ECDSet> > > ecdSets() const;
+
+signals:
 
 // Database -> Consierd using abstract item models or other datamanagement architecture
 private:
     // Dipole ECDs
-    QSharedPointer<INVERSELIB::ECDSet>          m_pCurrentECDSet;   /**< Current ECD Set.*/
-    QList< QSharedPointer<INVERSELIB::ECDSet> > m_qListECDSets;     /**< List of all past ECD Sets.*/
+    QList< QPair< QSharedPointer<INVERSELIB::DipoleFitSettings>, QSharedPointer<INVERSELIB::ECDSet> > > m_qListECDSets;  /**< List of all past ECD Sets.*/
+
+    // STCs
+    QSharedPointer<MNELIB::MNESourceEstimate>   m_currentEstimate;  /**< Current Source Estimate.*/
+
 };
 
 //*************************************************************************************************************
