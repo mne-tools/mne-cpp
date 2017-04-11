@@ -39,6 +39,9 @@
 //=============================================================================================================
 
 #include "analyzedata.h"
+#include <mne/mne_sourceestimate.h>
+
+#include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/ecd_set.h>
 
 
@@ -55,7 +58,6 @@
 
 using namespace ANSHAREDLIB;
 using namespace INVERSELIB;
-
 
 
 //*************************************************************************************************************
@@ -82,23 +84,22 @@ AnalyzeData::~AnalyzeData()
 
 ECDSet::SPtr AnalyzeData::currentECDSet() const
 {
-    return m_pCurrentECDSet;
+    return m_qListECDSets.last().second;
 }
 
 
 //*************************************************************************************************************
 
-void AnalyzeData::setCurrentECDSet(const ECDSet::SPtr &ecdSet)
+void AnalyzeData::addECDSet( DipoleFitSettings::SPtr &ecdSettings,  ECDSet::SPtr &ecdSet)
 {
-    m_pCurrentECDSet = ecdSet;
-    m_qListECDSets.append(m_pCurrentECDSet);
-    emit currentECDSetChanged_signal();
+    m_qListECDSets.append(qMakePair(ecdSettings, ecdSet));
+    emit ecdSetChanged_signal();
 }
 
 
 //*************************************************************************************************************
 
-QList<ECDSet::SPtr> AnalyzeData::ecdSets() const
+QList< QPair< DipoleFitSettings::SPtr, ECDSet::SPtr > > AnalyzeData::ecdSets() const
 {
     return m_qListECDSets;
 }
