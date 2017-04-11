@@ -40,6 +40,11 @@ TEMPLATE = subdirs
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SUBDIRS += \
         dnn \
-        fnn \
-		bio
+        fnn
+
+    exists( $${MNE_ANALYZE_EXTENSIONS_DIR}/deepcntknets/bio/bio.pro ) {
+        message( "Including BIO Net Configuration" )
+        SUBDIRS += bio
+    }
+
 }
