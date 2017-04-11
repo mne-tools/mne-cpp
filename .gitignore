@@ -232,3 +232,4 @@ lib
 /bin/mne_analyze_extensions/deepcntknets/*.dll
 /bin/mne_analyze_extensions/deepcntknets/*.exp
 /bin/mne_analyze_extensions/deepcntknets/*.lib
+/applications/mne_analyze/extensions/deepcntknets/bio
