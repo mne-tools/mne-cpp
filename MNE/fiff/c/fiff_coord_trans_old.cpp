@@ -116,7 +116,7 @@ float **mne_cmatrix_20(int nr,int nc)
     float *whole;
 
     m = MALLOC_20(nr,float *);
-    if (!m) matrix_error_17(1,nr,nc);
+    if (!m) matrix_error_20(1,nr,nc);
     whole = MALLOC_20(nr*nc,float);
     if (!whole) matrix_error_20(2,nr,nc);
 
@@ -124,6 +124,12 @@ float **mne_cmatrix_20(int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
+
+#define VEC_DIFF_20(from,to,diff) {\
+    (diff)[X_20] = (to)[X_20] - (from)[X_20];\
+    (diff)[Y_20] = (to)[Y_20] - (from)[Y_20];\
+    (diff)[Z_20] = (to)[Z_20] - (from)[Z_20];\
+    }
 
 #define ALLOC_CMATRIX_20(x,y) mne_cmatrix_20((x),(y))
 
@@ -138,6 +144,129 @@ float **mne_cmatrix_20(int nr,int nc)
     (xy)[Y_20] = -((x)[X_20]*(y)[Z_20]-(y)[X_20]*(x)[Z_20]);\
     (xy)[Z_20] =   (x)[X_20]*(y)[Y_20]-(y)[X_20]*(x)[Y_20];\
     }
+
+#define FREE_CMATRIX_20(m) mne_FREE_CMATRIX_20((m))
+
+void mne_FREE_CMATRIX_20(float **m)
+{
+    if (m) {
+        FREE_20(*m);
+        FREE_20(m);
+    }
+}
+
+#define MIN_20(a,b) ((a) < (b) ? (a) : (b))
+
+
+//float
+Eigen::MatrixXf toFloatEigenMatrix_20(float **mat, const int m, const int n)
+{
+    Eigen::MatrixXf eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromFloatEigenVector_20(const Eigen::VectorXf& from_vec, float *to_vec, const int n)
+{
+    for ( int i = 0; i < n; ++i)
+        to_vec[i] = from_vec[i];
+}
+
+void fromFloatEigenMatrix_20(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+int mne_svd_20(float **mat,	/* The matrix */
+            int   m,int n,	/* m rows n columns */
+            float *sing,	/* Singular values (must have size
+                             * MIN(m,n)+1 */
+            float **uu,		/* Left eigenvectors */
+            float **vv)		/* Right eigenvectors */
+/*
+      * Compute the SVD of mat.
+      * The singular vector calculations depend on whether
+      * or not u and v are given.
+      *
+      * The allocations should be done as follows
+      *
+      * mat = ALLOC_CMATRIX_3(m,n);
+      * vv  = ALLOC_CMATRIX_3(MIN(m,n),n);
+      * uu  = ALLOC_CMATRIX_3(MIN(m,n),m);
+      * sing = MALLOC_3(MIN(m,n),float);
+      *
+      * mat is modified by this operation
+      *
+      * This simply allocates the workspace and calls the
+      * LAPACK Fortran routine
+      */
+
+{
+    int    udim = MIN_20(m,n);
+
+    Eigen::MatrixXf eigen_mat = toFloatEigenMatrix_20(mat, m, n);
+
+    //ToDo Optimize computation depending of whether uu or vv are defined
+    Eigen::JacobiSVD< Eigen::MatrixXf > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+    fromFloatEigenVector_20(svd.singularValues(), sing, svd.singularValues().size());
+
+    if (uu != NULL)
+        fromFloatEigenMatrix_20(svd.matrixU().transpose(), uu, udim, m);
+
+    if (vv != NULL)
+        fromFloatEigenMatrix_20(svd.matrixV().transpose(), vv, m, n);
+
+    return 0;
+    //  return info;
+}
+
+void mne_matt_mat_mult2_20 (float **m1,float **m2,float **result,
+                         int d1,int d2,int d3)
+     /* Matrix multiplication
+      * result(d1 x d3) = m1(d2 x d1)^T * m2(d2 x d3) */
+
+{
+    #ifdef BLAS
+    char  *transa = "N";
+    char  *transb = "T";
+    float zero = 0.0;
+    float one  = 1.0;
+
+    sgemm (transa,transb,&d3,&d1,&d2,
+            &one,m2[0],&d3,m1[0],&d1,&zero,result[0],&d3);
+
+    return;
+    #else
+    int j,k,p;
+    float sum;
+    int  one = 1;
+
+    for (j = 0; j < d1; j++)
+        for (k = 0; k < d3; k++) {
+            sum = 0.0;
+        for (p = 0; p < d2; p++)
+            sum = sum + m1[p][j]*m2[p][k];
+        result[j][k] = sum;
+    }
+    return;
+    #endif
+}
+
+float **mne_matt_mat_mult_20 (float **m1,float **m2,int d1,int d2,int d3)
+
+{
+  float **result = ALLOC_CMATRIX_20(d1,d3);
+  mne_matt_mat_mult2_20(m1,m2,result,d1,d2,d3);
+  return result;
+}
+
 
 static void skip_comments(FILE *in)
 
@@ -858,29 +987,29 @@ FiffCoordTransOld* procrustes_align(int   from_frame,  /* The coordinate frames 
             }
         }
         else
-            S = mne_matt_mat_mult(from,to,3,np,3);
-        if (mne_svd(S,3,3,sing,uu,vv) != 0) {
-            FREE_CMATRIX(S);
-            FREE_CMATRIX(uu);
-            FREE_CMATRIX(vv);
+            S = mne_matt_mat_mult_20(from,to,3,np,3);
+        if (mne_svd_20(S,3,3,sing,uu,vv) != 0) {
+            FREE_CMATRIX_20(S);
+            FREE_CMATRIX_20(uu);
+            FREE_CMATRIX_20(vv);
             goto bad;
         }
-        R = mne_matt_mat_mult(vv,uu,3,3,3);
+        R = mne_matt_mat_mult_20(vv,uu,3,3,3);
         for (j = 0; j < 3; j++)
             for (k = 0; k < 3; k++)
                 rot[j][k] = R[j][k];
-        FREE_CMATRIX(R);
-        FREE_CMATRIX(S);
-        FREE_CMATRIX(uu);
-        FREE_CMATRIX(vv);
+        FREE_CMATRIX_20(R);
+        FREE_CMATRIX_20(S);
+        FREE_CMATRIX_20(uu);
+        FREE_CMATRIX_20(vv);
     }
     /*
     * Now we need to generate a transformed translation vector
     */
     for (j = 0; j < 3; j++) {
-    move[j] = to0[j];
-    for (k = 0; k < 3; k++)
-    move[j] = move[j] - rot[j][k]*from0[k];
+        move[j] = to0[j];
+        for (k = 0; k < 3; k++)
+            move[j] = move[j] - rot[j][k]*from0[k];
     }
     /*
     * Test the transformation and print the results
@@ -894,15 +1023,15 @@ FiffCoordTransOld* procrustes_align(int   from_frame,  /* The coordinate frames 
         for (k = 0; k < 3; k++)
             rr[j] += rot[j][k]*fromp[p][k];
         }
-        VEC_DIFF(top[p],rr,diff);
+        VEC_DIFF_20(top[p],rr,diff);
         #ifdef DEBUG
         fprintf(stderr,"\t%7.2f %7.2f %7.2f mm <-> %7.2f %7.2f %7.2f mm diff = %8.3f mm\n",
         1000*top[p][0],1000*top[p][1],1000*top[p][2],
         1000*rr[0],1000*rr[1],1000*rr[2],1000*VEC_LEN(diff));
         #endif
-        if (VEC_LEN(diff) > max_diff) {
-            err_printf_set_error("To large difference in matching : %7.1f > %7.1f mm",
-            1000*VEC_LEN(diff),1000*max_diff);
+        if (VEC_LEN_20(diff) > max_diff) {
+            //err_printf_set_error("To large difference in matching : %7.1f > %7.1f mm",
+            //1000*VEC_LEN_20(diff),1000*max_diff);
             goto bad;
         }
     }
@@ -910,14 +1039,14 @@ FiffCoordTransOld* procrustes_align(int   from_frame,  /* The coordinate frames 
     fprintf(stderr,"\n");
     #endif
 
-    FREE_CMATRIX(from);
-    FREE_CMATRIX(to);
+    FREE_CMATRIX_20(from);
+    FREE_CMATRIX_20(to);
 
-    return fiff_make_transform(from_frame,to_frame,rot,move);
+    return new FiffCoordTransOld(from_frame,to_frame,rot,move);
 
     bad : {
-        FREE_CMATRIX(from);
-        FREE_CMATRIX(to);
+        FREE_CMATRIX_20(from);
+        FREE_CMATRIX_20(to);
         return NULL;
     }
 }
