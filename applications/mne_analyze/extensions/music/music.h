@@ -118,6 +118,9 @@ public:
     virtual QDockWidget* getControl();
     virtual QWidget* getView();
 
+
+    void calculate();
+
 protected:
 
 private:
