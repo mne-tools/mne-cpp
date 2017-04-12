@@ -123,7 +123,8 @@ SOURCES += \
     c/mne_msh_display_surface.cpp \
     c/mne_msh_picked.cpp \
     c/mne_morph_map.cpp \
-    c/mne_msh_color_scale_def.cpp
+    c/mne_msh_color_scale_def.cpp \
+    c/mne_proj_data.cpp
 
 HEADERS += \
     mne.h \
@@ -167,7 +168,8 @@ HEADERS += \
     c/mne_msh_display_surface.h \
     c/mne_msh_picked.h \
     c/mne_morph_map.h \
-    c/mne_msh_color_scale_def.h
+    c/mne_msh_color_scale_def.h \
+    c/mne_proj_data.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

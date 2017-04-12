@@ -216,15 +216,6 @@ public:
 
     //============================= mne_project_to_surface.c =============================
 
-    typedef struct {
-        float *a;
-        float *b;
-        float *c;
-        int   *act;
-        int   nactive;
-    } *projData,projDataRec;
-
-
     static void mne_triangle_coords(float       *r,       /* Location of a point */
                                     MneSurfaceOld*  s,	       /* The surface */
                                     int         tri,      /* Which triangle */
@@ -263,6 +254,8 @@ public:
                                             float      *r,
                                             float      *proj);
 
+    static void mne_find_closest_on_surface_approx(MneSurfaceOld* s, float **r, int np, int *nearest, float *dist, int nstep);
+
     //============================= mne_source_space.c =============================
 
     static int mne_read_source_spaces(const QString& name,               /* Read from here */
@@ -273,34 +266,18 @@ public:
     static void mne_source_space_update_inuse(MneSourceSpaceOld* s,
                                               int *new_inuse);
 
-
     static int mne_is_left_hemi_source_space(MneSourceSpaceOld* s);
 
-
-
-
-
-
-    //============================= mne_source_space.c =============================
-
-
-
     static int mne_transform_source_space(MneSourceSpaceOld* ss, FIFFLIB::FiffCoordTransOld* t);
-
 
     static int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
                                               FIFFLIB::FiffCoordTransOld* t,             /* The coordinate transformation */
                                               MneSourceSpaceOld* *spaces,       /* A list of source spaces */
                                               int            nspace);
 
-
-
-
-
     //============================= mne_forward_solution.c =============================
 
     static void enable_all_sources(MneSourceSpaceOld* s);
-
 
     //============================= resrict_sources.c =============================
 
@@ -384,6 +361,8 @@ public:
                                                    int nasion_weight,	   /* Weight for the nasion */
                                                    float *nasion_mri,	   /* Fixed correspondence point for the nasion (optional) */
                                                    int last_step);          /* Is this the last iteration step */
+
+    static float rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head);
 
     //============================= display_surfaces.c =============================
 

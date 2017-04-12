@@ -1030,8 +1030,7 @@ FiffCoordTransOld* procrustes_align(int   from_frame,  /* The coordinate frames 
         1000*rr[0],1000*rr[1],1000*rr[2],1000*VEC_LEN(diff));
         #endif
         if (VEC_LEN_20(diff) > max_diff) {
-            //err_printf_set_error("To large difference in matching : %7.1f > %7.1f mm",
-            //1000*VEC_LEN_20(diff),1000*max_diff);
+            printf("To large difference in matching : %7.1f > %7.1f mm", 1000*VEC_LEN_20(diff),1000*max_diff);
             goto bad;
         }
     }
