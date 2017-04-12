@@ -1578,6 +1578,36 @@ void MneSurfaceOrVolume::mne_project_to_triangle(MneSurfaceOld* s,
 
 //*************************************************************************************************************
 
+void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, float **r, int np, int *nearest, float *dist, int nstep)
+     /*
+      * Find the closest triangle on the surface for each point and the distance to it
+      * This uses the values in nearest as approximations of the closest triangle
+      */
+{
+    projData p = create_proj_data(s);
+    int k,was;
+    float mydist;
+
+    fprintf(stderr,"%s for %d points %d steps...",nearest[0] < 0 ? "Closest" : "Approx closest",np,nstep);
+
+    for (k = 0; k < np; k++) {
+        was = nearest[k];
+        decide_search_restriction(s,p,nearest[k],nstep,r[k]);
+        nearest[k] =  mne_project_to_surface(s,p,r[k],0,dist ? dist+k : &mydist);
+        if (nearest[k] < 0) {
+            decide_search_restriction(s,p,-1,nstep,r[k]);
+            nearest[k] =  mne_project_to_surface(s,p,r[k],0,dist ? dist+k : &mydist);
+        }
+    }
+
+    fprintf(stderr,"[done]\n");
+    free_proj_data(p);
+    return;
+}
+
+
+//*************************************************************************************************************
+
 int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpaceOld* **spacesp, int *nspacep)
 /*
 * Read source spaces from a FIFF file
@@ -3107,7 +3137,7 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
     float           max_diff = 40e-3;
 
     if (!dig->head_mri_t_adj) {
-        err_set_error("Not adjusting the transformation");
+        qCritical()<<"Not adjusting the transformation";
         goto out;
     }
     /*
@@ -3146,7 +3176,7 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
         }
     }
     if (nactive < 3) {
-        err_set_error("Not enough points to do the alignment");
+        qCritical() << "Not enough points to do the alignment";
         goto out;
     }
     if ((t = FiffCoordTransOld::procrustes_align(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
@@ -3173,6 +3203,24 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
 }
 
 
+//*************************************************************************************************************
+
+float MneSurfaceOrVolume::rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head)
+{
+    float rms;
+    int   k,nactive;
+
+    calculate_digitizer_distances(dig,head,FALSE,TRUE);
+
+    for (k = 0, rms = 0.0, nactive = 0; k < dig->npoint; k++)
+        if (dig->active[k] && !dig->discard[k]) {
+            rms = rms + dig->dist[k]*dig->dist[k];
+        nactive++;
+    }
+    if (nactive > 1)
+        rms = rms/(nactive-1);
+    return sqrt(rms);
+}
 
 
 //*************************************************************************************************************
