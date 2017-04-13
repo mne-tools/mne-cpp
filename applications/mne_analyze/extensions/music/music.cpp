@@ -135,7 +135,7 @@ void Music::unload()
 
 QString Music::getName() const
 {
-    return "STC Browser";
+    return "RAP-MUSIC";
 }
 
 
