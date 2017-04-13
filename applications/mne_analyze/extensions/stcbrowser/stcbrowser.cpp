@@ -118,13 +118,10 @@ QMenu *STCBrowser::getMenu()
 QDockWidget *STCBrowser::getControl()
 {
     if(!m_pControl) {
-        qDebug() << "[1]";
         m_pControl = new QDockWidget(tr("STC Browser"));
         m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_pControl->setMinimumWidth(180);
         m_pControl->setWidget(m_pStcControl);
-
-        qDebug() << "[2]";
     }
 
     return m_pControl;
