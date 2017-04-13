@@ -174,53 +174,29 @@ QWidget *Music::getView()
 
 void Music::calculate()
 {
-//    QApplication a(argc, argv);
+    QString fwdFileOption("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QString evokedFileOption("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QString subjectOption("sample");
+    QString subjectDirectoryOption("./MNE-sample-data/subjects");
 
-    // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Compute Inverse Rap Music Example");
-    parser.addHelpOption();
-    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
-    QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
-    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
-    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
-    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QString t_sFileNameStc("");//"RapMusic.stc");
+    QString annotOption("aparc.a2009s");
 
-    parser.addOption(fwdFileOption);
-    parser.addOption(evokedFileOption);
-    parser.addOption(subjectDirectoryOption);
-    parser.addOption(subjectOption);
-    parser.addOption(stcFileOption);
-    parser.addOption(annotOption);
-    parser.addOption(numDipolePairsOption);
-    parser.addOption(surfOption);
-//    parser.process(a);
+    QString surfOption("orig");
 
-    //Load data
-    QFile t_fileFwd(parser.value(fwdFileOption));
-    QFile t_fileEvoked(parser.value(evokedFileOption));
-    QString subject(parser.value(subjectOption));
-    QString subjectDir(parser.value(subjectDirectoryOption));
-
-    AnnotationSet t_annotationSet(subject, 2, parser.value(annotOption), subjectDir);
-    SurfaceSet t_surfSet(subject, 2, parser.value(surfOption), subjectDir);
-
-    QString t_sFileNameStc(parser.value(stcFileOption));
-
-    qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
+    qint32 numDipolePairs = 1;
 
     bool doMovie = false;
-    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
-        doMovie = false;
-    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
-        doMovie = true;
-    }
 
-    qDebug() << "Start calculation with stc:" << t_sFileNameStc;
+    //Load data
+    QFile t_fileFwd(fwdFileOption);
+    QFile t_fileEvoked(evokedFileOption);
+    QString subject(subjectOption);
+    QString subjectDir(subjectDirectoryOption);
+
+    AnnotationSet t_annotationSet(subject, 2, annotOption, subjectDir);
+    SurfaceSet t_surfSet(subject, 2, surfOption, subjectDir);
+
 
     // Load data
     fiff_int_t setno = 1;
