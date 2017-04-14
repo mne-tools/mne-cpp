@@ -48,6 +48,7 @@
 #include "filter_thread_arg.h"
 #include "mne_triangle.h"
 #include "mne_msh_display_surface.h"
+#include "mne_proj_data.h"
 
 #include <fiff/fiff_stream.h>
 #include <fiff/c/fiff_digitizer_data.h>
@@ -103,16 +104,13 @@ using namespace MNELIB;
 #define OK 0
 #endif
 
-
-
 #define X_17 0
 #define Y_17 1
 #define Z_17 2
 
-
 #define VEC_DOT_17(x,y) ((x)[X_17]*(y)[X_17] + (x)[Y_17]*(y)[Y_17] + (x)[Z_17]*(y)[Z_17])
-#define VEC_LEN_17(x) sqrt(VEC_DOT_17(x,x))
 
+#define VEC_LEN_17(x) sqrt(VEC_DOT_17(x,x))
 
 #define VEC_DIFF_17(from,to,diff) {\
     (diff)[X_17] = (to)[X_17] - (from)[X_17];\
@@ -120,21 +118,17 @@ using namespace MNELIB;
     (diff)[Z_17] = (to)[Z_17] - (from)[Z_17];\
     }
 
-
-
 #define VEC_COPY_17(to,from) {\
     (to)[X_17] = (from)[X_17];\
     (to)[Y_17] = (from)[Y_17];\
     (to)[Z_17] = (from)[Z_17];\
     }
 
-
 #define CROSS_PRODUCT_17(x,y,xy) {\
     (xy)[X_17] =   (x)[Y_17]*(y)[Z_17]-(y)[Y_17]*(x)[Z_17];\
     (xy)[Y_17] = -((x)[X_17]*(y)[Z_17]-(y)[X_17]*(x)[Z_17]);\
     (xy)[Z_17] =   (x)[X_17]*(y)[Y_17]-(y)[X_17]*(x)[Y_17];\
     }
-
 
 #define MALLOC_17(x,t) (t *)malloc((x)*sizeof(t))
 
@@ -143,7 +137,6 @@ using namespace MNELIB;
 #define ALLOC_INT_17(x) MALLOC_17(x,int)
 
 #define ALLOC_CMATRIX_17(x,y) mne_cmatrix_17((x),(y))
-
 
 static void matrix_error_17(int kind, int nr, int nc)
 
@@ -185,8 +178,6 @@ float **mne_cmatrix_17(int nr,int nc)
 
 #define FREE_ICMATRIX_17(m) mne_free_icmatrix_17((m))
 
-
-
 void mne_free_cmatrix_17 (float **m)
 {
     if (m) {
@@ -204,11 +195,7 @@ void mne_free_icmatrix_17 (int **m)
     }
 }
 
-
-
 #define NNEIGHBORS 26
-
-
 
 //============================= mne_mgh_mri_io.c =============================
 
@@ -1394,7 +1381,7 @@ int MneSurfaceOrVolume::nearest_triangle_point(float *r, MneSurfaceOld* s, void 
     double rr[3];			/* Vector from triangle corner #1 to r */
     double a,b,c,v1,v2,det;
     double best,dist,dist0;
-    projData    pd = (projData)user;
+    MneProjData*    pd = (MneProjData*)user;
     MneTriangle* this_tri;
 
     this_tri = s->tris+tri;
@@ -1584,7 +1571,7 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
       * This uses the values in nearest as approximations of the closest triangle
       */
 {
-    projData p = create_proj_data(s);
+    MneProjData* p = new MneProjData(s);
     int k,was;
     float mydist;
 
@@ -1601,7 +1588,98 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
     }
 
     fprintf(stderr,"[done]\n");
-    free_proj_data(p);
+    delete p;
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
+                      MneProjData*   p,
+                      int        approx_best, /* We know the best triangle approximately
+                                   * already */
+                      int        nstep,
+                      float      *r)
+     /*
+      * Restrict the search only to feasible triangles
+      */
+{
+    int k;
+    float diff[3],dist,mindist;
+    int minvert;
+
+    for (k = 0; k < s->ntri; k++)
+        p->act[k] = FALSE;
+
+    if (approx_best < 0) {
+        /*
+        * Search for the closest vertex
+        */
+        mindist = 1000.0;
+        minvert = 0;
+        for (k = 0; k < s->np; k++) {
+            VEC_DIFF_17(r,s->rr[k],diff);
+            dist = VEC_LEN_17(diff);
+            if (dist < mindist && s->nneighbor_tri[k] > 0) {
+                mindist = dist;
+                minvert = k;
+            }
+        }
+    }
+    else {
+    /*
+    * Just use this triangle
+    */
+    MneTriangle* this_tri = NULL;
+
+    this_tri = s->tris+approx_best;
+    VEC_DIFF_17(r,this_tri->r1,diff);
+    mindist = VEC_LEN_17(diff);
+    minvert = this_tri->vert[0];
+
+    VEC_DIFF_17(r,this_tri->r2,diff);
+    dist = VEC_LEN_17(diff);
+    if (dist < mindist) {
+        mindist = dist;
+        minvert = this_tri->vert[1];
+    }
+    VEC_DIFF_17(r,this_tri->r3,diff);
+    dist = VEC_LEN_17(diff);
+    if (dist < mindist) {
+        mindist = dist;
+        minvert = this_tri->vert[2];
+    }
+    }
+    /*
+    * Activate triangles in the neighborhood
+    */
+    activate_neighbors(s,minvert,p->act,nstep);
+
+    for (k = 0, p->nactive = 0; k < s->ntri; k++)
+        if (p->act[k])
+    p->nactive++;
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneSurfaceOrVolume::activate_neighbors(MneSurfaceOld* s, int start, int *act, int nstep)
+     /*
+      * Blessed recursion...
+      */
+{
+    int k;
+
+    if (nstep == 0)
+    return;
+
+    for (k = 0; k < s->nneighbor_tri[start]; k++)
+        act[s->neighbor_tri[start][k]] = TRUE;
+    for (k = 0; k < s->nneighbor_vert[start]; k++)
+        activate_neighbors(s,s->neighbor_vert[start][k],act,nstep-1);
+
     return;
 }
 
@@ -3231,19 +3309,19 @@ void MneSurfaceOrVolume::scale_display_surface(MneMshDisplaySurface* surf,
  * Not quite complete yet
  */
 {
-  int j,k;
+    int j,k;
 
-  if (!surf || !scales)
+    if (!surf || !scales)
+        return;
+
+    for (k = 0; k < 3; k++) {
+        surf->minv[k] = scales[k]*surf->minv[k];
+        surf->maxv[k] = scales[k]*surf->maxv[k];
+    }
+    for (j = 0; j < surf->s->np; j++)
+        for (k = 0; k < 3; k++)
+            surf->s->rr[j][k] = surf->s->rr[j][k]*scales[k];
     return;
-
-  for (k = 0; k < 3; k++) {
-    surf->minv[k] = scales[k]*surf->minv[k];
-    surf->maxv[k] = scales[k]*surf->maxv[k];
-  }
-  for (j = 0; j < surf->s->np; j++)
-    for (k = 0; k < 3; k++)
-      surf->s->rr[j][k] = surf->s->rr[j][k]*scales[k];
-  return;
 }
 
 

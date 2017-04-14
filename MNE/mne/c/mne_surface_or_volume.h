@@ -100,6 +100,7 @@ class MnePatchInfo;
 class MneSourceSpaceOld;
 class MneSurfaceOld;
 class MneMshDisplaySurface;
+class MneProjData;
 
 
 //=============================================================================================================
@@ -255,6 +256,15 @@ public:
                                             float      *proj);
 
     static void mne_find_closest_on_surface_approx(MneSurfaceOld* s, float **r, int np, int *nearest, float *dist, int nstep);
+
+    static void decide_search_restriction(MneSurfaceOld* s,
+                          MneProjData*   p,
+                          int        approx_best, /* We know the best triangle approximately
+                                       * already */
+                          int        nstep,
+                          float      *r);
+
+    static void activate_neighbors(MneSurfaceOld* s, int start, int *act, int nstep);
 
     //============================= mne_source_space.c =============================
 

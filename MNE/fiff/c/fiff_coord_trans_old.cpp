@@ -145,9 +145,9 @@ float **mne_cmatrix_20(int nr,int nc)
     (xy)[Z_20] =   (x)[X_20]*(y)[Y_20]-(y)[X_20]*(x)[Y_20];\
     }
 
-#define FREE_CMATRIX_20(m) mne_FREE_CMATRIX_20((m))
+#define FREE_CMATRIX_20(m) mne_free_cmatrix_20((m))
 
-void mne_FREE_CMATRIX_20(float **m)
+void mne_free_cmatrix_20(float **m)
 {
     if (m) {
         FREE_20(*m);
@@ -924,7 +924,7 @@ FiffCoordTransOld * FiffCoordTransOld::fiff_make_transform_card (int from,int to
 
 //*************************************************************************************************************
 
-FiffCoordTransOld* procrustes_align(int   from_frame,  /* The coordinate frames */
+FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The coordinate frames */
                        int   to_frame,
                        float **fromp,     /* Point locations in these two coordinate frames */
                        float **top,
