@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     extensions.pro
+# @file     invmne.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     February, 2017
+# @date     July, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,24 +29,74 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the extensions for MNE Analyze project.
+# @brief    This project file generates the makefile for the invmne extension.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = lib
 
-SUBDIRS += \
-    surfer \
-    fiffio \
-    stcbrowser \
-    dipolefit \
-    music \
-    invmne
+CONFIG += plugin
 
-!isEmpty( CNTK_INCLUDE_DIR ) {
-    SUBDIRS += \
-        deepcntk \
-        deepcntknets
+DEFINES += INVMNE_LIBRARY
+
+QT += gui widgets
+
+TARGET = invmne
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lanSharedd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lanShared
+}
+
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+
+SOURCES += \
+    invmne.cpp \
+    FormFiles/invmnecontrol.cpp
+
+HEADERS += \
+    invmne_global.h \
+    invmne.h \
+    FormFiles/invmnecontrol.h
+
+FORMS += \
+    FormFiles/invmnecontrol.ui
+
+OTHER_FILES += invmne.json
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
+
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+
