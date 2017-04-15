@@ -63,6 +63,7 @@
 #include <mne/c/mne_surface_or_volume.h>
 #include <mne/c/mne_cov_matrix.h>
 #include <fiff/c/fiff_digitizer_data.h>
+#include <mne/c/mne_msh_color_scale_def.h>
 
 
 
@@ -115,9 +116,9 @@ typedef struct {
   int                  do_signed;                    /* Preserve sign (current orientation) */
   int                  do_normal_comp;               /* Omit the components tangential to the cortex */
   int                  do_alt_noise;		     /* Try an alternate noise normalization */
-  mshColorScaleDefRec  scale_MNE;                    /* MNE scale */
-  mshColorScaleDefRec  scale_dSPM;                   /* SPM scale */
-  mshColorScaleDefRec  scale_sLORETA;                /* sLORETA scale */
+  MNELIB::MneMshColorScaleDef  scale_MNE;                    /* MNE scale */
+  MNELIB::MneMshColorScaleDef  scale_dSPM;                   /* SPM scale */
+  MNELIB::MneMshColorScaleDef  scale_sLORETA;                /* sLORETA scale */
   int                  nstep;	                     /* Desired number of smoothsteps */
   float                integ;	                     /* Time integration to apply */
   int                  show_scale_bar;               /* Display the color scale? */
@@ -199,7 +200,7 @@ typedef struct {
   mnePref             mne_prefs;		     /* MNE calculation preferences */
   float               *cur_vals;                     /* Current values */
   FIFFLIB::FiffSparseMatrix* nn_vals;			     /* Noise normalization values */
-  mshColorScaleDefRec scale;	                     /* Scale presently used for display */
+  MNELIB::MneMshColorScaleDef scale;	                     /* Scale presently used for display */
 
   FIFFLIB::FiffDigitizerData    *dig;                              /* These are the Polhemus data */
 

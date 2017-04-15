@@ -44,26 +44,7 @@
 #include "../mne_global.h"
 
 
-#define FREE_ICMATRIX_44(m) mne_free_icmatrix_44((m))
-#define FREE_44(x) if ((char *)(x) != NULL) free((char *)(x))
-
-void mne_free_icmatrix_44 (int **m)
-{
-    if (m) {
-        FREE_44(*m);
-        FREE_44(m);
-    }
-}
-
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
 
 
 //*************************************************************************************************************

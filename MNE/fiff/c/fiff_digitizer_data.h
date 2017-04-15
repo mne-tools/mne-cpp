@@ -44,26 +44,6 @@
 #include "../fiff_global.h"
 #include "../fiff_types.h"
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#define FREE_43(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
-
-#define FREE_CMATRIX_43(m) mne_free_cmatrix_43((m))
-
-void mne_free_cmatrix_43(float **m)
-{
-    if (m) {
-        FREE_43(*m);
-        FREE_43(m);
-    }
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
