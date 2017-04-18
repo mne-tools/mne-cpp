@@ -258,19 +258,19 @@ typedef mneSurfaceOrVolumeRec mneSourceVolumeRecRec;
 typedef mneSurfaceOrVolumeRec mneSurfaceRec;
 typedef mneSurfaceOrVolumeRec mneVolumeRec;
 
-typedef struct {		    /* FreeSurfer patches */
-  mneSurface       s;		    /* Patch represented as a surface */
-  int              *vert;	    /* Vertex numbers in the complete surface*/
-  int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
-  int              np_surf;	    /* How many points on the complete surface? */
-  int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
-  int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
-  int              ntri_surf;	    /* How many triangles on the complete surface */
-  int              *border;	    /* Is this vertex on the border? */
-  int              flat;	    /* Is this a flat patch? */
-  void             *user_data;      /* Anything else we want */
-  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
-} *mneSurfacePatch,mneSurfacePatchRec;
+//typedef struct {		    /* FreeSurfer patches */
+//  mneSurface       s;		    /* Patch represented as a surface */
+//  int              *vert;	    /* Vertex numbers in the complete surface*/
+//  int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
+//  int              np_surf;	    /* How many points on the complete surface? */
+//  int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
+//  int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
+//  int              ntri_surf;	    /* How many triangles on the complete surface */
+//  int              *border;	    /* Is this vertex on the border? */
+//  int              flat;	    /* Is this a flat patch? */
+//  void             *user_data;      /* Anything else we want */
+//  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
+//} *mneSurfacePatch,mneSurfacePatchRec;
 
 typedef struct {		/* Matrix specification with a channel list */
   int   nrow;			/* Number of rows */

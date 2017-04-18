@@ -67,6 +67,14 @@ namespace FIFFLIB
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FiffCoordTransOld;
+
+
 //=============================================================================================================
 /**
 * Implements an Fiff Coordinate Descriptor Set (Replaces *coordTransSet,coordTransSetRec; analyze_types.h).
@@ -91,7 +99,6 @@ public:
     * Refactored:  (.c)
     */
     ~FiffCoordTransSet();
-
 
 public:
     FIFFLIB::FiffCoordTransOld*    head_surf_RAS_t;   /* Transform from MEG head coordinates to surface RAS */
