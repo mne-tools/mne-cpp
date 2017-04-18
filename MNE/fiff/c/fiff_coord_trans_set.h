@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiff_dig_point.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     fiff_coord_trans_set.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     April, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,21 +29,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffDigPoint class declaration.
+* @brief    FiffCoordTransSet class declaration.
 *
 */
 
-#ifndef FIFF_DIG_POINT_H
-#define FIFF_DIG_POINT_H
+#ifndef FIFFCOORDTRANSSET_H
+#define FIFFCOORDTRANSSET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "fiff_global.h"
-#include "fiff_types.h"
+#include "../fiff_global.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -52,7 +56,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -63,79 +66,55 @@
 namespace FIFFLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
 
 //=============================================================================================================
 /**
-* Replaces fiffDigPointRec, *fiffDigPoint struct (analyze_types.h).
+* Implements an Fiff Coordinate Descriptor Set (Replaces *coordTransSet,coordTransSetRec; analyze_types.h).
 *
-* @brief Digitization point description
+* @brief Coordinate transformation descriptor
 */
-class FIFFSHARED_EXPORT FiffDigPoint
+class FIFFSHARED_EXPORT FiffCoordTransSet
 {
 public:
-    typedef QSharedPointer<FiffDigPoint> SPtr;              /**< Shared pointer type for FiffDigPoint. */
-    typedef QSharedPointer<const FiffDigPoint> ConstSPtr;   /**< Const shared pointer type for FiffDigPoint. */
+    typedef QSharedPointer<FiffCoordTransSet> SPtr;              /**< Shared pointer type for FiffCoordTransSet. */
+    typedef QSharedPointer<const FiffCoordTransSet> ConstSPtr;   /**< Const shared pointer type for FiffCoordTransSet. */
 
     //=========================================================================================================
     /**
-    * Constructs the digitization point description
+    * Constructs the FiffCoordTransSet
     */
-    FiffDigPoint();
+    FiffCoordTransSet();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied
+    * Destroys the FiffCoordTransSet
+    * Refactored:  (.c)
     */
-    FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
+    ~FiffCoordTransSet();
 
-    //=========================================================================================================
-    /**
-    * Destroys the digitization point description
-    */
-    ~FiffDigPoint();
-
-    //=========================================================================================================
-    /**
-    * Size of the old struct (fiffDigPointRec) 5*int = 5*4 = 20
-    *
-    * @return the size of the old struct fiffDigPointRec.
-    */
-    inline static qint32 storageSize();
 
 public:
-    fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG */
-    fiff_int_t      ident;          /**< Number identifying this point */
-    fiff_float_t    r[3];           /**< Point location */
-    fiff_int_t      coord_frame;    /**< Newly added to stay consistent with fiff MATLAB implementation */
+    FIFFLIB::FiffCoordTransOld*    head_surf_RAS_t;   /* Transform from MEG head coordinates to surface RAS */
+    FIFFLIB::FiffCoordTransOld*    surf_RAS_RAS_t;    /* Transform from surface RAS to RAS (nonzero origin) coordinates */
+    FIFFLIB::FiffCoordTransOld*    RAS_MNI_tal_t;     /* Transform from RAS (nonzero origin) to MNI Talairach coordinates */
+    FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_gtz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0) */
+    FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_ltz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0) */
 
-// ### OLD STRUCT ###
-// typedef struct _fiffDigPointRec {
-//  fiff_int_t kind;         /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG *
-//  fiff_int_t ident;        /**< Number identifying this point *
-//  fiff_float_t r[3];       /**< Point location *
-//  fiff_int_t coord_frame;  /**< Newly added to stay consistent with fiff MATLAB implementation *
-// } fiffDigPointRec, *fiffDigPoint; /**< Digitization point description *
-// typedef fiffDigPointRec  fiff_dig_point_t;
+    // ### OLD STRUCT ###
+//    typedef struct {
+//      FIFFLIB::FiffCoordTransOld*    head_surf_RAS_t;   /* Transform from MEG head coordinates to surface RAS */
+//      FIFFLIB::FiffCoordTransOld*    surf_RAS_RAS_t;    /* Transform from surface RAS to RAS (nonzero origin) coordinates */
+//      FIFFLIB::FiffCoordTransOld*    RAS_MNI_tal_t;     /* Transform from RAS (nonzero origin) to MNI Talairach coordinates */
+//      FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_gtz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0) */
+//      FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_ltz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0) */
+//    } *coordTransSet,coordTransSetRec;
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 FiffDigPoint::storageSize()
-{
-    return 20;
-}
+} // NAMESPACE FIFFLIB
 
-} // NAMESPACE
-
-#endif // FIFF_DIG_POINT_H
+#endif // FIFFCOORDTRANSSET_H

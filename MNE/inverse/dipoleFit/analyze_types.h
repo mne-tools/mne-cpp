@@ -63,6 +63,7 @@
 #include <mne/c/mne_surface_or_volume.h>
 #include <mne/c/mne_cov_matrix.h>
 #include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/c/fiff_coord_trans_set.h>
 #include <mne/c/mne_msh_color_scale_def.h>
 
 
@@ -152,7 +153,7 @@ typedef struct {
   int                 surf_type;		     /* OVERLAY_CORTEX or OVERLAY_SCALP */
   int                 type;	                     /* Type of the overlay data */
   int                 is_signed;		     /* Are these data signed? */
-  mshColorScaleDefRec scale;			     /* Scale to use */
+  MNELIB::MneMshColorScaleDef scale;			     /* Scale to use */
   int                 show_comments;		     /* Show the comment text */
   int                 show_scale_bar;		     /* Show the scale bar */
   int                 show_contours;		     /* Show the contour map for OVERLAY_SCALP */
@@ -177,11 +178,11 @@ typedef struct {		                     /* Overlay preferences. This structure ca
   int                  type;                         /* What kind of overlay? (fMRI, other) */
   int                  do_signed;                    /* Preserve sign (current orientation)
                               * This is never changed, just copied from the current overlay */
-  mshColorScaleDefRec  scale_MNE;                    /* MNE scale */
-  mshColorScaleDefRec  scale_dSPM;                   /* SPM scale */
-  mshColorScaleDefRec  scale_sLORETA;                /* sLORETA scale */
-  mshColorScaleDefRec  scale_fMRI;                   /* Scale */
-  mshColorScaleDefRec  scale_other;                  /* Scale */
+  MNELIB::MneMshColorScaleDef  scale_MNE;                    /* MNE scale */
+  MNELIB::MneMshColorScaleDef  scale_dSPM;                   /* SPM scale */
+  MNELIB::MneMshColorScaleDef  scale_sLORETA;                /* sLORETA scale */
+  MNELIB::MneMshColorScaleDef  scale_fMRI;                   /* Scale */
+  MNELIB::MneMshColorScaleDef  scale_other;                  /* Scale */
   int                  nstep;	                     /* Desired number of smoothsteps */
   float                alpha;	                     /* opacity */
   int                  show_comments;		     /* Show comment text */
@@ -241,8 +242,8 @@ typedef struct {		                     /* This is used for the calculated contou
 
 typedef struct {                                     /* These are the data from the HPI result block */
   char           *filename;			     /* Where did these come from */
-  fiffCoordTrans meg_head_t;			     /* The MEG device <-> head coordinate system transformation */
-  fiffDigPoint   hpi_coils;			     /* Locations of the HPI coils in MEG device coordinates */
+  FIFFLIB::FiffCoordTransSet* meg_head_t;			     /* The MEG device <-> head coordinate system transformation */
+  FIFFLIB::FiffDigPoint   *hpi_coils;			     /* Locations of the HPI coils in MEG device coordinates */
   int            ncoil;			             /* How many of them? */
   int            *dig_order;			     /* Which digitized HPI coil corresponds to each of the above coils */
   int            *coils_used;			     /* Which coils were used? */
@@ -408,20 +409,20 @@ typedef struct {		/* Light set */
 //  mneUserFreeFunc*   user_data_free;   /* Function to free the above */
 //} *mshDisplaySurface,mshDisplaySurfaceRec;
 
-typedef struct {
-  FIFFLIB::FiffCoordTransOld*    head_surf_RAS_t;   /* Transform from MEG head coordinates to surface RAS */
-  FIFFLIB::FiffCoordTransOld*    surf_RAS_RAS_t;    /* Transform from surface RAS to RAS (nonzero origin) coordinates */
-  FIFFLIB::FiffCoordTransOld*    RAS_MNI_tal_t;     /* Transform from RAS (nonzero origin) to MNI Talairach coordinates */
-  FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_gtz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0) */
-  FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_ltz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0) */
-} *coordTransSet,coordTransSetRec;
+//typedef struct {
+//  FIFFLIB::FiffCoordTransOld*    head_surf_RAS_t;   /* Transform from MEG head coordinates to surface RAS */
+//  FIFFLIB::FiffCoordTransOld*    surf_RAS_RAS_t;    /* Transform from surface RAS to RAS (nonzero origin) coordinates */
+//  FIFFLIB::FiffCoordTransOld*    RAS_MNI_tal_t;     /* Transform from RAS (nonzero origin) to MNI Talairach coordinates */
+//  FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_gtz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0) */
+//  FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_ltz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0) */
+//} *coordTransSet,coordTransSetRec;
 
 
 typedef struct {		       /* Set of display surfaces */
   char              *subj;	       /* The name of the subject */
   char              *morph_subj;       /* The subject we are morphing to */
-  coordTransSet     main_t;            /* Coordinate transformations for the main surfaces */
-  coordTransSet     morph_t;           /* Coordinate transformations for the morph surfaces */
+  FIFFLIB::FiffCoordTransSet*     main_t;            /* Coordinate transformations for the main surfaces */
+  FIFFLIB::FiffCoordTransSet*     morph_t;           /* Coordinate transformations for the morph surfaces */
   MNELIB::MneMshDisplaySurface **surfs;	       /* These are the surfaces */
   mneSurfacePatch   *patches;	       /* Optional patches for display */
   float             *patch_rot;	       /* Rotation angles for the (flat) patches */

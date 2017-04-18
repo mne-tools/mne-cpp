@@ -40,6 +40,9 @@
 //=============================================================================================================
 
 #include "mne_msh_display_surface_set.h"
+#include "mne_msh_display_surface.h"
+
+#include <fiff/c/fiff_coord_trans_set.h>
 
 
 #define MALLOC_47(x,t) (t *)malloc((x)*sizeof(t))
@@ -75,7 +78,7 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet()
 
     nsurf = nsurf;
     if (nsurf > 0) {
-        surfs = MALLOC_47(nsurf,mshDisplaySurface);
+        surfs = MALLOC_47(nsurf,MneMshDisplaySurface);
         patches = MALLOC_47(nsurf,mneSurfacePatch);
         patch_rot = MALLOC_47(nsurf,float);
         active = MALLOC_47(nsurf,int);

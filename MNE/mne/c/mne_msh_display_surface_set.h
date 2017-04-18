@@ -63,6 +63,16 @@ typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffCoordTransSet;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
@@ -108,8 +118,8 @@ public:
 public:
     char              *subj;	       /* The name of the subject */
     char              *morph_subj;       /* The subject we are morphing to */
-    coordTransSet     main_t;            /* Coordinate transformations for the main surfaces */
-    coordTransSet     morph_t;           /* Coordinate transformations for the morph surfaces */
+    FIFFLIB::FiffCoordTransSet     *main_t;            /* Coordinate transformations for the main surfaces */
+    FIFFLIB::FiffCoordTransSet     *morph_t;           /* Coordinate transformations for the morph surfaces */
     MneMshDisplaySurface **surfs;	       /* These are the surfaces */
     mneSurfacePatch   *patches;	       /* Optional patches for display */
     float             *patch_rot;	       /* Rotation angles for the (flat) patches */
