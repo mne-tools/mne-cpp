@@ -55,6 +55,7 @@
 #include <inverse/hpiFit/hpifit.h>
 
 #include <mne/mne_bem.h>
+#include <fwd/fwd_bem_model.h>
 
 
 //*************************************************************************************************************
@@ -165,6 +166,9 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
+
+
+    FwdBemModel* bemModel =  fwd_bem_load_three_layer_surfaces(const QString& name);
 
     QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadKid(t_fileHeadKid);

@@ -121,6 +121,7 @@ SOURCES += \
     c/mne_surface_or_volume.cpp \
     c/filter_thread_arg.cpp \
     c/mne_msh_display_surface.cpp \
+    c/mne_msh_display_surface_set.cpp \
     c/mne_msh_picked.cpp \
     c/mne_morph_map.cpp \
     c/mne_msh_color_scale_def.cpp \
@@ -166,6 +167,7 @@ HEADERS += \
     c/mne_surface_or_volume.h \
     c/filter_thread_arg.h \
     c/mne_msh_display_surface.h \
+    c/mne_msh_display_surface_set.h \
     c/mne_msh_picked.h \
     c/mne_morph_map.h \
     c/mne_msh_color_scale_def.h \
