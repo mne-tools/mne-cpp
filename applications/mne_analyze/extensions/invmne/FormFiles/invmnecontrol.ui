@@ -17,9 +17,9 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Music Control</string>
+   <string>MNE Control</string>
   </property>
-  <layout class="QVBoxLayout" name="m_qVerticalLayoutRoot">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -37,28 +37,117 @@
      <property name="title">
       <string>Properties</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLineEdit" name="m_qLineEditSTCFile"/>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_qLabelEvoked">
+        <property name="text">
+         <string>Evoked</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="m_qLineEditEvoked"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="m_qComboBoxEventType"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_qLabelInv">
+        <property name="text">
+         <string>Inv.-Op.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="m_qLineEditInv"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="m_qLabelSNR">
+        <property name="text">
+         <string>SNR</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox">
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="m_qLabelMethod">
+        <property name="text">
+         <string>Method</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QComboBox" name="m_qComboBoxMethod">
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>MNE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>dSPM</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>sLORETA</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="m_qLabelSTC">
+        <property name="text">
+         <string>STC</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="m_qLineEditSTC"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="m_qGroupBoxBrowser">
+    <widget class="QGroupBox" name="m_qGroupBoxCalculate">
      <property name="title">
-      <string>Browser</string>
+      <string/>
      </property>
-     <layout class="QVBoxLayout" name="m_qVerticalLayoutBrowser">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QSlider" name="m_qSliderTimePoint">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QPushButton" name="m_qPushButtonCalculate">
+        <property name="text">
+         <string>Calculate</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="m_qVerticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
