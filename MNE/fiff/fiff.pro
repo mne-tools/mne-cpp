@@ -105,7 +105,8 @@ SOURCES += fiff.cpp \
     fiff_dir_node.cpp \
     c/fiff_coord_trans_old.cpp \
     c/fiff_sparse_matrix.cpp \
-    c/fiff_digitizer_data.cpp
+    c/fiff_digitizer_data.cpp \
+    c/fiff_coord_trans_set.cpp \
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -137,7 +138,8 @@ HEADERS += fiff.h \
     c/fiff_coord_trans_old.h \
     c/fiff_sparse_matrix.h \
     c/fiff_types_mne-c.h \
-    c/fiff_digitizer_data.h
+    c/fiff_digitizer_data.h \
+    c/fiff_coord_trans_set.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

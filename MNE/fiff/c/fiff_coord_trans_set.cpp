@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_msh_display_surface.cpp
+* @file     fiff_coord_trans_set.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneMshDisplaySurface Class.
+* @brief    Implementation of the FiffCoordTransSet Class.
 *
 */
 
@@ -39,34 +39,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_msh_display_surface.h"
-#include "mne_surface_old.h"
-#include "mne_morph_map.h"
-#include "mne_source_space_old.h"
+#include "fiff_coord_trans_set.h"
+
+#include <QFile>
 
 
-#define FREE_44(x) if ((char *)(x) != NULL) free((char *)(x))
-
-void mne_free_icmatrix_44 (int **m)
-{
-    if (m) {
-        FREE_44(*m);
-        FREE_44(m);
-    }
-}
-
-
-#define FREE_ICMATRIX_44(m) mne_free_icmatrix_44((m))
-
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
+#include <Eigen/Dense>
 
 
 //*************************************************************************************************************
@@ -74,7 +52,10 @@ void mne_free_icmatrix_44 (int **m)
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace Eigen;
+using namespace FIFFLIB;
+
+#define FREE_48(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
 
 
 //*************************************************************************************************************
@@ -82,83 +63,24 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshDisplaySurface::MneMshDisplaySurface()
+FiffCoordTransSet::FiffCoordTransSet()
 {
-    int c;
-
-    filename = Q_NULLPTR;
-    time_loaded = 0;
-    s = Q_NULLPTR;
-    sketch = FALSE;
-    color_scale    = Q_NULLPTR;
-    vertex_colors  = Q_NULLPTR;
-    nvertex_colors = 3;
-    marker_colors  = Q_NULLPTR;
-    nmarker_colors = 3;
-    overlay_values = Q_NULLPTR;
-    alt_overlay_values = Q_NULLPTR;
-    marker_values      = Q_NULLPTR;
-    marker_tri         = Q_NULLPTR;
-    marker_tri_no      = Q_NULLPTR;
-    nmarker_tri        = 0;
-    subj               = Q_NULLPTR;
-    surf_name          = Q_NULLPTR;
-    rot[0]             = 0.0;
-    rot[1]             = 0.0;
-    rot[2]             = 0.0;
-
-    move[0]            = 0.0;
-    move[1]            = 0.0;
-    move[2]            = 0.0;
-
-    eye[0]             = 1.0;
-    eye[0]             = 0.0;
-    eye[0]             = 0.0;
-
-    up[0]              = 0.0;
-    up[1]              = 0.0;
-    up[2]              = 1.0;
-    fov                = 2.0;
-    fov_scale          = 1.0;
-    for (c = 0; c < 3; c++) {
-      minv[c] = -1.0;
-      maxv[c] = 1.0;
-    }
-    trans          = Q_NULLPTR;
-    transparent    = FALSE;
-    picked         = Q_NULLPTR;
-    npicked        = 0;
-    show_aux_data  = FALSE;
-    user_data      = Q_NULLPTR;
-    user_data_free = Q_NULLPTR;
-    maps = Q_NULLPTR;
-    nmap = 0;
+    surf_RAS_RAS_t    = Q_NULLPTR;
+    head_surf_RAS_t   = Q_NULLPTR;
+    RAS_MNI_tal_t     = Q_NULLPTR;
+    MNI_tal_tal_gtz_t = Q_NULLPTR;
+    MNI_tal_tal_ltz_t = Q_NULLPTR;
 }
 
 
 //*************************************************************************************************************
 
-MneMshDisplaySurface::~MneMshDisplaySurface()
+FiffCoordTransSet::~FiffCoordTransSet()
 {
-    FREE_44(filename);
-    delete s;
-    FREE_44(marker_values);
-    FREE_44(overlay_values);
-    FREE_44(alt_overlay_values);
-    FREE_44(vertex_colors);
-    FREE_44(marker_colors);
-    FREE_44(color_scale);
-    FREE_ICMATRIX_44(marker_tri);
-    FREE_44(marker_tri_no);
-    FREE_44(subj);
-    FREE_44(surf_name);
-    FREE_44(picked);
-    if (user_data_free)
-      delete user_data;
-
-    for (int k = 0; k < nmap; k++)
-      delete maps[k];
-    FREE_44(maps);
-    FREE_44(trans);
+    FREE_48(surf_RAS_RAS_t);
+    FREE_48(head_surf_RAS_t);
+    FREE_48(RAS_MNI_tal_t);
+    FREE_48(MNI_tal_tal_gtz_t);
+    FREE_48(MNI_tal_tal_ltz_t);
 }
 
