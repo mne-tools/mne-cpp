@@ -41,6 +41,9 @@
 
 #include "mne_msh_display_surface_set.h"
 #include "mne_msh_display_surface.h"
+#include "mne_surface_old.h"
+#include "mne_surface_patch.h"
+#include "mne_source_space_old.h"
 
 #include <fiff/c/fiff_coord_trans_set.h>
 
@@ -72,13 +75,14 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet()
+MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
 {
     int k;
 
     nsurf = nsurf;
     if (nsurf > 0) {
-        surfs = MALLOC_47(nsurf,MneMshDisplaySurface);
+        MneMshDisplaySurface* temp = new MneMshDisplaySurface;
+        surfs = MALLOC_47(nsurf,temp);
         patches = MALLOC_47(nsurf,mneSurfacePatch);
         patch_rot = MALLOC_47(nsurf,float);
         active = MALLOC_47(nsurf,int);
@@ -142,20 +146,19 @@ MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
     int k;
 
     for (k = 0; k < nsurf; k++)
-        free_display_surface(surfs[k]);
+        delete surfs[k];
     if (patches) {
         for (k = 0; k < nsurf; k++)
-            mne_free_surface_patch(patches[k]);
-        FREE(patches);
+            delete patches[k];
+        delete patches;
     }
-    free_coord_trans_set(main_t);
-    free_coord_trans_set(morph_t);
+    delete main_t;
+    delete morph_t;
     FREE_47(patch_rot);
     FREE_47(surfs);
-    free_light_set(lights);
+    delete lights;
     if (user_data_free)
         user_data_free(user_data);
-    FREE_47(set);
 }
 
 
@@ -168,11 +171,10 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
 {
     MneSourceSpaceOld* left  = Q_NULLPTR;
     MneSourceSpaceOld* right = Q_NULLPTR;
-    char *left_file = Q_NULLPTR;
-    char *right_file = Q_NULLPTR;
     char *this_surf = Q_NULLPTR;
     char *this_curv = Q_NULLPTR;
-    mshDisplaySurfaceSet surfs = Q_NULLPTR;
+    MneMshDisplaySurface* thisSurface = Q_NULLPTR;
+    MneMshDisplaySurfaceSet* surfs = Q_NULLPTR;
 
     if (!curv)
         curv = "curv";
@@ -181,27 +183,15 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     if (this_surf == Q_NULLPTR)
         goto bad;
     this_curv = mne_compose_surf_name(subj,curv,"lh");
-    fprintf(stderr,"Loading surface %s ...\n",this_surf);
-    if ((left = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
-        if ((left = mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
-            goto bad;
-        else
-            add_uniform_curv(left);
-    }
-    left_file = this_surf; this_surf = Q_NULLPTR;
-    FREE_47(this_curv);
+    if ((left = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR)
+        goto bad;
+    FREE_47(this_surf); FREE_47(this_curv);
 
     this_surf = mne_compose_surf_name(subj,name,"rh");
     this_curv = mne_compose_surf_name(subj,curv,"rh");
-    fprintf(stderr,"Loading surface %s ...\n",this_surf);
-    if ((right = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
-        if ((right = mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
-            goto bad;
-        else
-            add_uniform_curv(right);
-    }
-    right_file = this_surf; this_surf = Q_NULLPTR;
-    FREE_47(this_curv);
+    if ((right = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR)
+        goto bad;
+    FREE_47(this_surf); FREE(this_curv);
 
     surfs = new_display_surface_set(2);
 
@@ -210,30 +200,25 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
 
     surfs->active[0]  = TRUE;
     surfs->active[1]  = FALSE;
-    surfs->drawable[0]  = TRUE;
-    surfs->drawable[1]  = TRUE;
+    surfs->current    = 0;
 
-    this              = surfs->surfs[0];
-    this->filename    = left_file;
-    this->time_loaded = time(Q_NULLPTR);
-    this->s           = left;
-    this->s->id       = SURF_LEFT_HEMI;
-    this->subj        = mne_strdup(subj);
-    this->surf_name   = mne_strdup(name);
-    decide_surface_extent(this,"Left hemisphere");
-    decide_curv_display(name,this);
-    setup_curvature_colors (this);
+    thisSurface = surfs->surfs[0];
+    thisSurface->s         = left;
+    thisSurface->s->id     = SURF_LEFT_HEMI;
+    thisSurface->subj      = mne_strdup(subj);
+    thisSurface->surf_name = mne_strdup(name);
+    decide_surface_extent(thisSurface,"Left hemisphere");
+    decide_curv_display(name,thisSurface);
+    setup_curvature_colors (thisSurface);
 
-    this              = surfs->surfs[1];
-    this->filename    = right_file;
-    this->time_loaded = time(Q_NULLPTR);
-    this->s           = right;
-    this->s->id       = SURF_RIGHT_HEMI;
-    this->subj        = mne_strdup(subj);
-    this->surf_name   = mne_strdup(name);
-    decide_surface_extent(this,"Right hemisphere");
-    decide_curv_display(name,this);
-    setup_curvature_colors (this);
+    thisSurface    = surfs->surfs[1];
+    thisSurface->s         = right;
+    thisSurface->s->id     = SURF_RIGHT_HEMI;
+    thisSurface->subj      = mne_strdup(subj);
+    thisSurface->surf_name = mne_strdup(name);
+    decide_surface_extent(thisSurface,"Right hemisphere");
+    decide_curv_display(name,thisSurface);
+    setup_curvature_colors (thisSurface);
 
     apply_left_right_eyes(surfs);
 
@@ -242,10 +227,8 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     return surfs;
 
     bad : {
-        FREE_47(left_file);
-        FREE_47(right_file);
-        mne_free_source_space(left);
-        mne_free_source_space(right);
+        delete left;
+        delete right;
         FREE_47(this_surf);
         FREE_47(this_curv);
         return Q_NULLPTR;

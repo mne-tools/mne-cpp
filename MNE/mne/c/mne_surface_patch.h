@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_msh_display_surface_set.h
+* @file     mne_surface_path.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneMshDisplaySurfaceSet class declaration.
+* @brief    MneSurfacePatch class declaration.
 *
 */
 
-#ifndef MNEMSHDISPLAYSURFACESET_H
-#define MNEMSHDISPLAYSURFACESET_H
+#ifndef MNESURFACEPATCH_H
+#define MNESURFACEPATCH_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "../mne_global.h"
-
 
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 
@@ -67,7 +66,7 @@ typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 //=============================================================================================================
 
 namespace FIFFLIB {
-    class FiffCoordTransSet;
+    class FiffSparseMatrix;
 }
 
 
@@ -85,86 +84,60 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneMshDisplaySurface;
-class MneMshLightSet;
-class MneSurfacePatch;
+class MneSurfaceOld;
 
 
 //=============================================================================================================
 /**
-* Replaces  *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c).
+* Replaces *mneSurfacePatch,mneSurfacePatchRec struct (mne_types.c).
 *
-* @brief The MNE Msh Display Surface Set class holds information about a set of surfaces to be rendered.
+* @brief The MneSurfacePatch class.
 */
-class MNESHARED_EXPORT MneMshDisplaySurfaceSet
+class MNESHARED_EXPORT MneSurfacePatch
 {
 public:
-    typedef QSharedPointer<MneMshDisplaySurfaceSet> SPtr;              /**< Shared pointer type for MneMshDisplaySurfaceSet. */
-    typedef QSharedPointer<const MneMshDisplaySurfaceSet> ConstSPtr;   /**< Const shared pointer type for MneMshDisplaySurfaceSet. */
+    typedef QSharedPointer<MneSurfacePatch> SPtr;              /**< Shared pointer type for MneSurfacePatch. */
+    typedef QSharedPointer<const MneSurfacePatch> ConstSPtr;   /**< Const shared pointer type for MneSurfacePatch. */
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshDisplaySurfaceSet.
+    * Constructs the MneSurfacePatch.
     */
-    MneMshDisplaySurfaceSet(int nsurf);
+    MneSurfacePatch();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshDisplaySurfaceSet.
+    * Destroys the MneSurfacePatch.
     */
-    ~MneMshDisplaySurfaceSet();
-
-    static MneMshDisplaySurfaceSet* load_new_surface(char *subj, char *name, char *curv);
+    ~MneSurfacePatch();
 
 public:
-    char              *subj;	       /* The name of the subject */
-    char              *morph_subj;       /* The subject we are morphing to */
-    FIFFLIB::FiffCoordTransSet     *main_t;            /* Coordinate transformations for the main surfaces */
-    FIFFLIB::FiffCoordTransSet     *morph_t;           /* Coordinate transformations for the morph surfaces */
-    MneMshDisplaySurface **surfs;	       /* These are the surfaces */
-    MneSurfacePatch   **patches;	       /* Optional patches for display */
-    float             *patch_rot;	       /* Rotation angles for the (flat) patches */
-    int               nsurf;	       /* How many? */
-    int               use_patches;       /* Use patches for display? */
-    int               *active;	       /* Which surfaces are currently active */
-    int               *drawable;	       /* Which surfaces could be drawn? */
-    MneMshLightSet       *lights;            /* Lighting */
-    float             rot[3];            /* Rotation angles of the MRI (in radians) */
-    float             move[3];	       /* Possibly move the origin, too */
-    float             fov;	       /* Field of view (extent of the surface) */
-    float             fov_scale;	       /* How much space to leave */
-    float             eye[3];	       /* Eye position for viewing (used in composite views) */
-    float             up[3];	       /* Up vector for viewing */
-    float             bg_color[3];       /* Background color */
-    float             text_color[3];     /* Text color */
-    void              *user_data;        /* Can be used to store whatever */
-    mneUserFreeFunc   user_data_free;
+    MneSurfaceOld       *s;		    /* Patch represented as a surface */
+    int              *vert;	    /* Vertex numbers in the complete surface*/
+    int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
+    int              np_surf;	    /* How many points on the complete surface? */
+    int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
+    int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
+    int              ntri_surf;	    /* How many triangles on the complete surface */
+    int              *border;	    /* Is this vertex on the border? */
+    int              flat;	    /* Is this a flat patch? */
+    void             *user_data;      /* Anything else we want */
+    mneUserFreeFunc  user_data_free;  /* Function to set the above free */
 
 // ### OLD STRUCT ###
-//    typedef struct {		       /* Set of display surfaces */
-//      char              *subj;	       /* The name of the subject */
-//      char              *morph_subj;       /* The subject we are morphing to */
-//      coordTransSet     main_t;            /* Coordinate transformations for the main surfaces */
-//      coordTransSet     morph_t;           /* Coordinate transformations for the morph surfaces */
-//      mshDisplaySurface *surfs;	       /* These are the surfaces */
-//      mneSurfacePatch   *patches;	       /* Optional patches for display */
-//      float             *patch_rot;	       /* Rotation angles for the (flat) patches */
-//      int               nsurf;	       /* How many? */
-//      int               use_patches;       /* Use patches for display? */
-//      int               *active;	       /* Which surfaces are currently active */
-//      int               *drawable;	       /* Which surfaces could be drawn? */
-//      mshLightSet       lights;            /* Lighting */
-//      float             rot[3];            /* Rotation angles of the MRI (in radians) */
-//      float             move[3];	       /* Possibly move the origin, too */
-//      float             fov;	       /* Field of view (extent of the surface) */
-//      float             fov_scale;	       /* How much space to leave */
-//      float             eye[3];	       /* Eye position for viewing (used in composite views) */
-//      float             up[3];	       /* Up vector for viewing */
-//      float             bg_color[3];       /* Background color */
-//      float             text_color[3];     /* Text color */
-//      void              *user_data;        /* Can be used to store whatever */
-//      mneUserFreeFunc   user_data_free;
-//    } *mshDisplaySurfaceSet,mshDisplaySurfaceSetRec;
+//    typedef struct {		    /* FreeSurfer patches */
+//      mneSurface       s;		    /* Patch represented as a surface */
+//      int              *vert;	    /* Vertex numbers in the complete surface*/
+//      int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
+//      int              np_surf;	    /* How many points on the complete surface? */
+//      int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
+//      int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
+//      int              ntri_surf;	    /* How many triangles on the complete surface */
+//      int              *border;	    /* Is this vertex on the border? */
+//      int              flat;	    /* Is this a flat patch? */
+//      void             *user_data;      /* Anything else we want */
+//      mneUserFreeFunc  user_data_free;  /* Function to set the above free */
+//    } *mneSurfacePatch,mneSurfacePatchRec;
 };
 
 //*************************************************************************************************************
@@ -174,4 +147,4 @@ public:
 
 } // NAMESPACE MNELIB
 
-#endif // MNEMSHDISPLAYSURFACESET_H
+#endif // MNESURFACEPATCH_H
