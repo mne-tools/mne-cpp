@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_msh_display_surface.cpp
+* @file     mne_msh_display_surface_set.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneMshDisplaySurface Class.
+* @brief    Implementation of the MneMshDisplaySurfaceSet Class.
 *
 */
 
@@ -39,25 +39,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_msh_display_surface.h"
-#include "mne_surface_old.h"
-#include "mne_morph_map.h"
-#include "mne_source_space_old.h"
+#include "mne_msh_display_surface_set.h"
 
 
-#define FREE_44(x) if ((char *)(x) != NULL) free((char *)(x))
+#define MALLOC_47(x,t) (t *)malloc((x)*sizeof(t))
 
-void mne_free_icmatrix_44 (int **m)
-{
-    if (m) {
-        FREE_44(*m);
-        FREE_44(m);
-    }
-}
-
-
-#define FREE_ICMATRIX_44(m) mne_free_icmatrix_44((m))
-
+#define FREE_47(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
 
 #ifndef TRUE
 #define TRUE 1
@@ -82,130 +69,136 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshDisplaySurface::MneMshDisplaySurface()
+MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet()
 {
-    int c;
+    int k;
 
-    filename = Q_NULLPTR;
-    time_loaded = 0;
-    s = Q_NULLPTR;
-    sketch = FALSE;
-    color_scale    = Q_NULLPTR;
-    vertex_colors  = Q_NULLPTR;
-    nvertex_colors = 3;
-    marker_colors  = Q_NULLPTR;
-    nmarker_colors = 3;
-    overlay_values = Q_NULLPTR;
-    alt_overlay_values = Q_NULLPTR;
-    marker_values      = Q_NULLPTR;
-    marker_tri         = Q_NULLPTR;
-    marker_tri_no      = Q_NULLPTR;
-    nmarker_tri        = 0;
-    subj               = Q_NULLPTR;
-    surf_name          = Q_NULLPTR;
-    rot[0]             = 0.0;
-    rot[1]             = 0.0;
-    rot[2]             = 0.0;
+    nsurf = nsurf;
+    if (nsurf > 0) {
+        surfs = MALLOC_47(nsurf,mshDisplaySurface);
+        patches = MALLOC_47(nsurf,mneSurfacePatch);
+        patch_rot = MALLOC_47(nsurf,float);
+        active = MALLOC_47(nsurf,int);
+        drawable = MALLOC_47(nsurf,int);
 
-    move[0]            = 0.0;
-    move[1]            = 0.0;
-    move[2]            = 0.0;
-
-    eye[0]             = 1.0;
-    eye[0]             = 0.0;
-    eye[0]             = 0.0;
-
-    up[0]              = 0.0;
-    up[1]              = 0.0;
-    up[2]              = 1.0;
-    fov                = 2.0;
-    fov_scale          = 1.0;
-    for (c = 0; c < 3; c++) {
-      minv[c] = -1.0;
-      maxv[c] = 1.0;
+        for (k = 0; k < nsurf; k++) {
+            surfs[k]  = Q_NULLPTR;
+            active[k] = FALSE;
+            drawable[k] = TRUE;
+            patches[k] = Q_NULLPTR;
+            patch_rot[k] = 0.0;
+        }
     }
-    trans          = Q_NULLPTR;
-    transparent    = FALSE;
-    picked         = Q_NULLPTR;
-    npicked        = 0;
-    show_aux_data  = FALSE;
-    user_data      = Q_NULLPTR;
+    else {
+        surfs = Q_NULLPTR;
+        active = Q_NULLPTR;
+        patches = Q_NULLPTR;
+        drawable = Q_NULLPTR;
+        patch_rot= Q_NULLPTR;
+    }
+    subj       = Q_NULLPTR;
+    morph_subj = Q_NULLPTR;
+    main_t     = Q_NULLPTR;
+    morph_t    = Q_NULLPTR;
+
+    use_patches = FALSE;
+    lights  = Q_NULLPTR;
+    user_data = Q_NULLPTR;
     user_data_free = Q_NULLPTR;
-    maps = Q_NULLPTR;
-    nmap = 0;
+
+    rot[0] = 0.0;
+    rot[1] = 0.0;
+    rot[2] = 0.0;
+
+    move[0] = 0.0;
+    move[1] = 0.0;
+    move[2] = 0.0;
+
+    eye[0]      = 1.0;
+    eye[1]      = 0.0;
+    eye[2]      = 0.0;
+
+    up[0]       = 0.0;
+    up[1]       = 0.0;
+    up[2]       = 1.0;
+
+    bg_color[0] = 0.0;
+    bg_color[1] = 0.0;
+    bg_color[2] = 0.0;
+
+    text_color[0] = 1.0;
+    text_color[1] = 1.0;
+    text_color[2] = 1.0;
 }
 
 
 //*************************************************************************************************************
 
-MneMshDisplaySurface::~MneMshDisplaySurface()
+MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
 {
-    FREE_44(filename);
-    delete s;
-    FREE_44(marker_values);
-    FREE_44(overlay_values);
-    FREE_44(alt_overlay_values);
-    FREE_44(vertex_colors);
-    FREE_44(marker_colors);
-    FREE_44(color_scale);
-    FREE_ICMATRIX_44(marker_tri);
-    FREE_44(marker_tri_no);
-    FREE_44(subj);
-    FREE_44(surf_name);
-    FREE_44(picked);
-    if (user_data_free)
-      delete user_data;
+    int k;
 
-    for (int k = 0; k < nmap; k++)
-      delete maps[k];
-    FREE_44(maps);
-    FREE_44(trans);
+    for (k = 0; k < nsurf; k++)
+        free_display_surface(surfs[k]);
+    if (patches) {
+        for (k = 0; k < nsurf; k++)
+            mne_free_surface_patch(patches[k]);
+        FREE(patches);
+    }
+    free_coord_trans_set(main_t);
+    free_coord_trans_set(morph_t);
+    FREE_47(patch_rot);
+    FREE_47(surfs);
+    free_light_set(lights);
+    if (user_data_free)
+        user_data_free(user_data);
+    FREE_47(set);
 }
 
 
 //*************************************************************************************************************
 
-MneMshDisplaySurface* MneMshDisplaySurface::load_new_surface(char *subj, char *name, char *curv)
+MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, char *name, char *curv)
      /*
       * Load new display surface data
       */
 {
-    MneSourceSpaceOld* left  = NULL;
-    MneSourceSpaceOld* right = NULL;
-    char *left_file = NULL;
-    char *right_file = NULL;
-    char *this_surf = NULL;
-    char *this_curv = NULL;
-    mshDisplaySurfaceSet surfs = NULL;
+    MneSourceSpaceOld* left  = Q_NULLPTR;
+    MneSourceSpaceOld* right = Q_NULLPTR;
+    char *left_file = Q_NULLPTR;
+    char *right_file = Q_NULLPTR;
+    char *this_surf = Q_NULLPTR;
+    char *this_curv = Q_NULLPTR;
+    mshDisplaySurfaceSet surfs = Q_NULLPTR;
 
     if (!curv)
         curv = "curv";
 
     this_surf = mne_compose_surf_name(subj,name,"lh");
-    if (this_surf == NULL)
+    if (this_surf == Q_NULLPTR)
         goto bad;
     this_curv = mne_compose_surf_name(subj,curv,"lh");
     fprintf(stderr,"Loading surface %s ...\n",this_surf);
-    if ((left = mne_load_surface(this_surf,this_curv)) == NULL) {
-        if ((left = mne_load_surface(this_surf,NULL)) == NULL)
+    if ((left = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
+        if ((left = mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
             goto bad;
         else
             add_uniform_curv(left);
     }
-    left_file = this_surf; this_surf = NULL;
-    FREE_44(this_curv);
+    left_file = this_surf; this_surf = Q_NULLPTR;
+    FREE_47(this_curv);
 
     this_surf = mne_compose_surf_name(subj,name,"rh");
     this_curv = mne_compose_surf_name(subj,curv,"rh");
     fprintf(stderr,"Loading surface %s ...\n",this_surf);
-    if ((right = mne_load_surface(this_surf,this_curv)) == NULL) {
-        if ((right = mne_load_surface(this_surf,NULL)) == NULL)
+    if ((right = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
+        if ((right = mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
             goto bad;
         else
             add_uniform_curv(right);
     }
-    right_file = this_surf; this_surf = NULL;
-    FREE(this_curv);
+    right_file = this_surf; this_surf = Q_NULLPTR;
+    FREE_47(this_curv);
 
     surfs = new_display_surface_set(2);
 
@@ -217,8 +210,9 @@ MneMshDisplaySurface* MneMshDisplaySurface::load_new_surface(char *subj, char *n
     surfs->drawable[0]  = TRUE;
     surfs->drawable[1]  = TRUE;
 
+    this              = surfs->surfs[0];
     this->filename    = left_file;
-    this->time_loaded = time(NULL);
+    this->time_loaded = time(Q_NULLPTR);
     this->s           = left;
     this->s->id       = SURF_LEFT_HEMI;
     this->subj        = mne_strdup(subj);
@@ -229,7 +223,7 @@ MneMshDisplaySurface* MneMshDisplaySurface::load_new_surface(char *subj, char *n
 
     this              = surfs->surfs[1];
     this->filename    = right_file;
-    this->time_loaded = time(NULL);
+    this->time_loaded = time(Q_NULLPTR);
     this->s           = right;
     this->s->id       = SURF_RIGHT_HEMI;
     this->subj        = mne_strdup(subj);
@@ -245,12 +239,12 @@ MneMshDisplaySurface* MneMshDisplaySurface::load_new_surface(char *subj, char *n
     return surfs;
 
     bad : {
-        FREE_44(left_file);
-        FREE_44(right_file);
+        FREE_47(left_file);
+        FREE_47(right_file);
         mne_free_source_space(left);
         mne_free_source_space(right);
-        FREE_44(this_surf);
-        FREE_44(this_curv);
-        return NULL;
+        FREE_47(this_surf);
+        FREE_47(this_curv);
+        return Q_NULLPTR;
     }
 }
