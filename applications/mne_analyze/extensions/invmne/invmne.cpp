@@ -48,6 +48,8 @@
 #include <mne/mne.h>
 #include <mne/mne_sourceestimate.h>
 
+#include <inverse/minimumNorm/minimumnorm.h>
+
 #include <utils/mnemath.h>
 
 #include <iostream>
@@ -64,6 +66,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -100,7 +103,10 @@ QSharedPointer<IExtension> InvMNE::clone() const
 
 void InvMNE::init()
 {
-    m_pInvMNEControl = new InvMNEControl;
+    if(!m_pInvMNEControl) {
+        m_pInvMNEControl = new InvMNEControl;
+        connect(m_pInvMNEControl, &InvMNEControl::calculate_signal, this, &InvMNE::calculate);
+    }
 }
 
 
@@ -155,15 +161,26 @@ QWidget *InvMNE::getView()
 
 void InvMNE::calculate()
 {
+
+
+//    printf("Data contains %d sets\n",evokedSet.evoked.size());
+//    for(qint32 i = 0; i < evokedSet.evoked.size(); ++i) {
+//        printf("%s\n", evokedSet.evoked[i].comment.toUtf8().constData());
+//    }
+
+
     //*********************************************************************************************************
     // MNE Settings
     //*********************************************************************************************************
 
-    QString sampleEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QString evokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QString invFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-    QString method("dSPM");//"MNE" | "dSPM" | "sLORETA"
+
+    QString t_sFileNameStc("");
 
     float snr = 1.0f;//2.0f
+    QString method("dSPM");//"MNE" | "dSPM" | "sLORETA"
+
     float lambda2 = pow(1.0f / snr, 2.0f);
 
     int setno = 0;
@@ -173,7 +190,7 @@ void InvMNE::calculate()
     // LOAD DATA
     //*********************************************************************************************************
 
-    QFile t_fileEvoked(sampleEvokedFile);
+    QFile t_fileEvoked(evokedFile);
     QFile t_fileInv(invFile);
 
     bool dSPM = false;
@@ -188,126 +205,52 @@ void InvMNE::calculate()
     //
     //   Read the data first
     //
-    FiffEvokedSet evokedSet(t_fileEvoked);
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return;
 
     //
-    //   Then the inverse operator
+    //   Read the inverse operator
     //
-    MNEInverseOperator inv_raw(t_fileInv);
+    MNEInverseOperator inverse_operator(t_fileInv);
 
 
     //*********************************************************************************************************
     // Compute MNE
     //*********************************************************************************************************
 
-    printf("Data contains %d sets\n",evokedSet.evoked.size());
-    for(qint32 i = 0; i < evokedSet.evoked.size(); ++i) {
-        printf("%s\n", evokedSet.evoked[i].comment.toUtf8().constData());
-    }
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute MNE for %s >>>>>>>>>>>>>>>>>>>>>>>>>\n", evokedSet.evoked[setno].comment.toUtf8().constData());
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute MNE for %s >>>>>>>>>>>>>>>>>>>>>>>>>\n", evoked.comment.toUtf8().constData());
 
     //
-    //   Set up the inverse according to the parameters
+    // Compute inverse solution
     //
-    qint32 nave = evokedSet.evoked[setno].nave;
-
-    MNEInverseOperator inv = inv_raw.prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
-    //
-    //   Pick the correct channels from the data
-    //
-    FiffEvokedSet newEvokedSet = evokedSet.pick_channels(inv.noise_cov->names);
-
-    evokedSet = newEvokedSet;
-
-    printf("Picked %d channels from the data\n",evokedSet.info.nchan);
-    printf("Computing inverse...");
-    //
-    //   Simple matrix multiplication followed by combination of the
-    //   three current components
-    //
-    //   This does all the data transformations to compute the weights for the
-    //   eigenleads
-    //
-    SparseMatrix<double> reginv(inv.reginv.rows(),inv.reginv.rows());
-    // put this in the MNE algorithm class derived from inverse algorithm
-    //ToDo put this into a function of inv data
-    qint32 i;
-    for(i = 0; i < inv.reginv.rows(); ++i)
-        reginv.insert(i,i) = inv.reginv(i,0);
-
-    MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*evokedSet.evoked[setno].data;
-    //
-    //   Transformation into current distributions by weighting the eigenleads
-    //   with the weights computed above
-    //
-    MatrixXd sol;
-    if (inv.eigen_leads_weighted)
-    {
-        //
-        //     R^0.5 has been already factored in
-        //
-        printf("(eigenleads already weighted)...");
-        sol = inv.eigen_leads->data*trans;
-    }
-    else
-    {
-        //
-        //     R^0.5 has to factored in
-        //
-       printf("(eigenleads need to be weighted)...");
-
-       SparseMatrix<double> sourceCov(inv.source_cov->data.rows(),inv.source_cov->data.rows());
-       for(i = 0; i < inv.source_cov->data.rows(); ++i)
-           sourceCov.insert(i,i) = sqrt(inv.source_cov->data(i,0));
-
-       sol   = sourceCov*inv.eigen_leads->data*trans;
-    }
-
-    if (inv.source_ori == FIFFV_MNE_FREE_ORI)
-    {
-        printf("combining the current components...");
-        MatrixXd sol1(sol.rows()/3,sol.cols());
-        for(i = 0; i < sol.cols(); ++i)
-        {
-            VectorXd* tmp = MNE::combine_xyz(sol.block(0,i,sol.rows(),1));
-            sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
-            delete tmp;
-        }
-        sol.resize(sol1.rows(),sol1.cols());
-        sol = sol1;
-    }
-    if (dSPM)
-    {
-        printf("(dSPM)...");
-        sol = inv.noisenorm*sol;
-    }
-    else if (sLORETA)
-    {
-        printf("(sLORETA)...");
-        sol = inv.noisenorm*sol;
-    }
-    printf("[done]\n");
-
-    //Results
-    float tmin = ((float)evokedSet.evoked[setno].first) / evokedSet.info.sfreq;
-    float tstep = 1/evokedSet.info.sfreq;
-
-    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
-
-    qDebug() << "Dimensionalities";
-    qDebug() << "sol" << sol.rows() << "x" << sol.cols();
-    qDebug() << "evoked" << evokedSet.evoked[setno].data.rows() << "x" << evokedSet.evoked[setno].data.cols();
-
-
-    printf("tmin = %f s\n", tmin);
-    printf("tstep = %f s\n", tstep);
-
-    qDebug() << "TODO: Output needs to be labeled, i.e. mapped to 0 and 1";
-
-//    m_features = evokedSet.evoked[setno].data.transpose();
-
-//    m_labels = sol.transpose();
+    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute MNE Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+
+    //*********************************************************************************************************
+    // Store MNE Solution
+    //*********************************************************************************************************
+
+    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    printf("tmin = %f s\n", sourceEstimate.tmin);
+    printf("tstep = %f s\n", sourceEstimate.tstep);
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileStc);
+
+        //test if everything was written correctly
+        MNESourceEstimate readSourceEstimate(t_fileStc);
+
+        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
+        printf("tmin = %f s\n", readSourceEstimate.tmin);
+        printf("tstep = %f s\n", readSourceEstimate.tstep);
+    }
 }
