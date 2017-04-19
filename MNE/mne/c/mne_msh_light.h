@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_light.h
+* @file     mne_msh_light.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneLight class declaration.
+* @brief    MneMshLight class declaration.
 *
 */
 
-#ifndef MNELIGHT_H
-#define MNELIGHT_H
+#ifndef MNEMSHLIGHT_H
+#define MNEMSHLIGHT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,10 +63,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffSparseMatrix;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,25 +83,25 @@ namespace MNELIB
 /**
 * Replaces *mshLight,mshLightRec struct (analyze_types.c).
 *
-* @brief The MneLight class.
+* @brief The MneMshLight class.
 */
-class MNESHARED_EXPORT MneLight
+class MNESHARED_EXPORT MneMshLight
 {
 public:
-    typedef QSharedPointer<MneLight> SPtr;              /**< Shared pointer type for MneLight. */
-    typedef QSharedPointer<const MneLight> ConstSPtr;   /**< Const shared pointer type for MneLight. */
+    typedef QSharedPointer<MneMshLight> SPtr;              /**< Shared pointer type for MneMshLight. */
+    typedef QSharedPointer<const MneMshLight> ConstSPtr;   /**< Const shared pointer type for MneMshLight. */
 
     //=========================================================================================================
     /**
-    * Constructs the MneLight.
+    * Constructs the MneMshLight.
     */
-    MneLight();
+    MneMshLight();
 
     //=========================================================================================================
     /**
-    * Destroys the MneLight.
+    * Destroys the MneMshLight.
     */
-    ~MneLight();
+    ~MneMshLight();
 
 public:
     int   state;			/* On or off? */
@@ -128,4 +124,4 @@ public:
 
 } // NAMESPACE MNELIB
 
-#endif // MNELIGHT_H
+#endif // MNEMSHLIGHT_H

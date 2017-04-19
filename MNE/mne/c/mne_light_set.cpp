@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_morph_map.cpp
+* @file     mne_light_set.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneMorphMap Class.
+* @brief    Implementation of the MneLightSet Class.
 *
 */
 
@@ -39,12 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_morph_map.h"
+#include "mne_light_set.h"
 
-
-#define FREE_45(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define SURF_UNKNOWN -1
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,20 +55,15 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMorphMap::MneMorphMap()
+MneLightSet::MneLightSet()
 {
-    from_kind = SURF_UNKNOWN;
-    from_subj = Q_NULLPTR;
-    map       = Q_NULLPTR;
-    best      = Q_NULLPTR;
+
 }
 
 
 //*************************************************************************************************************
 
-MneMorphMap::~MneMorphMap()
+MneLightSet::~MneLightSet()
 {
-    FREE_45(from_subj);
-    delete map;
-    FREE_45(best);
+
 }
