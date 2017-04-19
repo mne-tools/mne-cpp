@@ -51,6 +51,14 @@
 
 #define ALLOC_CMATRIX_51(x,y) mne_cmatrix_51((x),(y))
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 static void matrix_error_51(int kind, int nr, int nc)
 
 {
@@ -170,3 +178,5 @@ MneSourceSpaceOld::~MneSourceSpaceOld()
 {
 
 }
+
+

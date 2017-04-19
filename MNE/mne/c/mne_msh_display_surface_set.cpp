@@ -45,7 +45,7 @@
 #include "mne_surface_old.h"
 #include "mne_surface_patch.h"
 #include "mne_source_space_old.h"
-#include "mne_msh_light.h"
+#include "mne_light_set.h"
 
 #include <fiff/c/fiff_coord_trans_set.h>
 
@@ -62,6 +62,26 @@
 #define FALSE 0
 #endif
 
+#define X_47 0
+#define Y_47 1
+#define Z_47 2
+
+#define SURF_LEFT_HEMI        FIFFV_MNE_SURF_LEFT_HEMI
+#define SURF_RIGHT_HEMI       FIFFV_MNE_SURF_RIGHT_HEMI
+
+#define VEC_COPY_47(to,from) {\
+    (to)[X_47] = (from)[X_47];\
+    (to)[Y_47] = (from)[Y_47];\
+    (to)[Z_47] = (from)[Z_47];\
+}
+
+#define SHOW_CURVATURE_NONE    0
+#define SHOW_CURVATURE_OVERLAY 1
+#define SHOW_OVERLAY_HEAT      1
+
+#define POS_CURV_COLOR  0.25
+#define NEG_CURV_COLOR  0.375
+#define EVEN_CURV_COLOR 0.375
 
 
 //*************************************************************************************************************
@@ -83,9 +103,8 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
 
     this->nsurf = nsurf;
     if (nsurf > 0) {
-        MneMshDisplaySurface* temp = new MneMshDisplaySurface;
-        surfs = MALLOC_47(nsurf,temp);
-        patches = MALLOC_47(nsurf,mneSurfacePatch);
+        surfs = MALLOC_47(nsurf,MneMshDisplaySurface*);
+        patches = MALLOC_47(nsurf,MneSurfacePatch*);
         patch_rot = MALLOC_47(nsurf,float);
         active = MALLOC_47(nsurf,int);
         drawable = MALLOC_47(nsurf,int);
@@ -173,54 +192,73 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
 {
     MneSourceSpaceOld* left  = Q_NULLPTR;
     MneSourceSpaceOld* right = Q_NULLPTR;
+    char *left_file = Q_NULLPTR;
+    char *right_file = Q_NULLPTR;
     char *this_surf = Q_NULLPTR;
     char *this_curv = Q_NULLPTR;
-    MneMshDisplaySurface* thisSurface = Q_NULLPTR;
+    MneMshDisplaySurface* pThis = Q_NULLPTR;
     MneMshDisplaySurfaceSet* surfs = Q_NULLPTR;
 
     if (!curv)
         curv = "curv";
 
-    this_surf = mne_compose_surf_name(subj,name,"lh");
+    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,"lh");
     if (this_surf == Q_NULLPTR)
         goto bad;
-    this_curv = mne_compose_surf_name(subj,curv,"lh");
-    if ((left = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR)
-        goto bad;
-    FREE_47(this_surf); FREE_47(this_curv);
+    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,"lh");
+    fprintf(stderr,"Loading surface %s ...\n",this_surf);
+    if ((left = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
+        if ((left = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
+            goto bad;
+        else
+            MneSurfaceOrVolume::add_uniform_curv((MneSurfaceOld*)left);
+    }
+    left_file = this_surf; this_surf = Q_NULLPTR;
+    FREE_47(this_curv);
 
-    this_surf = mne_compose_surf_name(subj,name,"rh");
-    this_curv = mne_compose_surf_name(subj,curv,"rh");
-    if ((right = mne_load_surface(this_surf,this_curv)) == Q_NULLPTR)
-        goto bad;
-    FREE_47(this_surf); FREE(this_curv);
+    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,"rh");
+    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,"rh");
+    fprintf(stderr,"Loading surface %s ...\n",this_surf);
+    if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
+        if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
+            goto bad;
+        else
+            MneSurfaceOrVolume::add_uniform_curv((MneSurfaceOld*)right);
+    }
+    right_file = this_surf; this_surf = Q_NULLPTR;
+    FREE_47(this_curv);
 
-    surfs = new_display_surface_set(2);
+    surfs = new MneMshDisplaySurfaceSet(2);
 
-    surfs->surfs[0] = new_display_surface();
-    surfs->surfs[1] = new_display_surface();
+    surfs->surfs[0] = new MneMshDisplaySurface();
+    surfs->surfs[1] = new MneMshDisplaySurface();
 
     surfs->active[0]  = TRUE;
     surfs->active[1]  = FALSE;
-    surfs->current    = 0;
+    surfs->drawable[0]  = TRUE;
+    surfs->drawable[1]  = TRUE;
 
-    thisSurface = surfs->surfs[0];
-    thisSurface->s         = left;
-    thisSurface->s->id     = SURF_LEFT_HEMI;
-    thisSurface->subj      = mne_strdup(subj);
-    thisSurface->surf_name = mne_strdup(name);
-    decide_surface_extent(thisSurface,"Left hemisphere");
-    decide_curv_display(name,thisSurface);
-    setup_curvature_colors (thisSurface);
+    pThis              = surfs->surfs[0];
+    pThis->filename    = left_file;
+    //pThis->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
+    pThis->s           = (MneSurfaceOld*)left;
+    pThis->s->id       = SURF_LEFT_HEMI;
+    pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
+    pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
+    decide_surface_extent(pThis,"Left hemisphere");
+    decide_curv_display(name,pThis);
+    setup_curvature_colors (pThis);
 
-    thisSurface    = surfs->surfs[1];
-    thisSurface->s         = right;
-    thisSurface->s->id     = SURF_RIGHT_HEMI;
-    thisSurface->subj      = mne_strdup(subj);
-    thisSurface->surf_name = mne_strdup(name);
-    decide_surface_extent(thisSurface,"Right hemisphere");
-    decide_curv_display(name,thisSurface);
-    setup_curvature_colors (thisSurface);
+    pThis              = surfs->surfs[1];
+    pThis->filename    = right_file;
+    //pThis->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
+    pThis->s           = (MneSurfaceOld*)right;
+    pThis->s->id       = SURF_RIGHT_HEMI;
+    pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
+    pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
+    decide_surface_extent(pThis,"Right hemisphere");
+    decide_curv_display(name,pThis);
+    setup_curvature_colors (pThis);
 
     apply_left_right_eyes(surfs);
 
@@ -228,11 +266,162 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
 
     return surfs;
 
-    bad : {
+bad : {
+        FREE_47(left_file);
+        FREE_47(right_file);
         delete left;
         delete right;
         FREE_47(this_surf);
         FREE_47(this_curv);
         return Q_NULLPTR;
     }
+}
+
+
+//*************************************************************************************************************
+
+void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
+                                                    char *tag)
+
+{
+    float minv[3],maxv[3];
+    int k,c;
+    float *r;
+    MneSourceSpaceOld* s = (MneSourceSpaceOld*)surf->s;
+
+    VEC_COPY_47(minv,s->rr[0]);
+    VEC_COPY_47(maxv,s->rr[0]);
+    for (k = 0; k < s->np; k++) {
+        r = s->rr[k];
+        for (c = 0; c < 3; c++) {
+            if (r[c] < minv[c])
+                minv[c] = r[c];
+            if (r[c] > maxv[c])
+                maxv[c] = r[c];
+        }
+    }
+#ifdef DEBUG
+    fprintf(stderr,"%s:\n",tag);
+    fprintf(stderr,"\tx = %f ... %f mm\n",1000*minv[X],1000*maxv[X]);
+    fprintf(stderr,"\ty = %f ... %f mm\n",1000*minv[Y],1000*maxv[Y]);
+    fprintf(stderr,"\tz = %f ... %f mm\n",1000*minv[Z],1000*maxv[Z]);
+#endif
+
+    surf->fov = 0;
+    for (c = 0; c < 3; c++) {
+        if (fabs(minv[c]) > surf->fov)
+            surf->fov = fabs(minv[c]);
+        if (fabs(maxv[c]) > surf->fov)
+            surf->fov = fabs(maxv[c]);
+    }
+    VEC_COPY_47(surf->minv,minv);
+    VEC_COPY_47(surf->maxv,maxv);
+    surf->fov_scale = 1.1f;
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneMshDisplaySurfaceSet::decide_curv_display(char *name,
+                MneMshDisplaySurface* s)
+
+{
+    if (strstr(name,"inflated") == name || strstr(name,"sphere") == name || strstr(name,"white") == name)
+        s->curvature_color_mode = SHOW_CURVATURE_OVERLAY;
+    else
+        s->curvature_color_mode = SHOW_CURVATURE_NONE;
+    s->overlay_color_mode = SHOW_OVERLAY_HEAT;
+    /*
+  s->overlay_color_mode = SHOW_OVERLAY_NEGPOS;
+  */
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
+{
+    int k,c;
+    MneSourceSpaceOld* s;
+    float *col;
+    float curv_sum;
+    int   ncolor;
+
+    if (surf == NULL || surf->s == NULL)
+        return;
+
+    s = (MneSourceSpaceOld*)surf->s;
+
+    ncolor = surf->nvertex_colors;
+
+    if (!surf->vertex_colors)
+        surf->vertex_colors = MALLOC_47(ncolor*s->np,float);
+    col = surf->vertex_colors;
+
+    curv_sum = 0.0;
+    if (surf->curvature_color_mode == SHOW_CURVATURE_OVERLAY) {
+        for (k = 0; k < s->np; k++) {
+            curv_sum += fabs(s->curv[k]);
+            for (c = 0; c < 3; c++)
+                col[c] = (s->curv[k] > 0) ? POS_CURV_COLOR : NEG_CURV_COLOR;
+            if (ncolor == 4)
+                col[3] = 1.0;
+            col = col+ncolor;
+        }
+    }
+    else {
+        for (k = 0; k < s->np; k++) {
+            curv_sum += fabs(s->curv[k]);
+            for (c = 0; c < 3; c++)
+                col[c] = EVEN_CURV_COLOR;
+            if (ncolor == 4)
+                col[3] = 1.0;
+            col = col+ncolor;
+        }
+    }
+#ifdef DEBUG
+    fprintf(stderr,"Average curvature : %f\n",curv_sum/s->np);
+#endif
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void MneMshDisplaySurfaceSet::apply_left_right_eyes(MneMshDisplaySurfaceSet* surfs)
+{
+    mshEyes eyes;
+    MneMshDisplaySurface* surf;
+    int k;
+
+    if (surfs == NULL)
+        return;
+
+    if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1)
+        eyes = &default_eyes;
+    else
+        eyes = all_eyes+current_eyes;
+
+    for (k = 0; k < surfs->nsurf; k++) {
+        surf = surfs->surfs[k];
+        switch(surf->s->id) {
+        case SURF_LEFT_HEMI :
+        case SURF_LEFT_MORPH_HEMI :
+            VEC_COPY_47(surf->eye,eyes->left);
+            VEC_COPY_47(surf->up,eyes->left_up);
+            break;
+        case SURF_RIGHT_HEMI :
+        case SURF_RIGHT_MORPH_HEMI :
+            VEC_COPY_47(surf->eye,eyes->right);
+            VEC_COPY_47(surf->up,eyes->right_up);
+            break;
+        default :
+            VEC_COPY_47(surf->eye,eyes->left);
+            VEC_COPY_47(surf->up,eyes->left_up);
+            break;
+        }
+    }
+    return;
 }

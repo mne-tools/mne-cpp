@@ -91,12 +91,11 @@ public:
     /**
     * Constructs the MNE Source Space
     */
-    MneSourceSpaceOld(int np);
+    MneSourceSpaceOld(int np = 0);
 
     //=========================================================================================================
     /**
     * Destroys the MNE Source Space
-    * Refactored:  (.c)
     */
     ~MneSourceSpaceOld();
 

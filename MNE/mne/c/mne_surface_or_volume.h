@@ -70,6 +70,16 @@
 
 #define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
 
+//============================= mne_surface_io.c =============================
+
+#define TRIANGLE_FILE_MAGIC_NUMBER  (0xfffffe)
+#define NEW_QUAD_FILE_MAGIC_NUMBER  (0xfffffd)
+#define QUAD_FILE_MAGIC_NUMBER      (0xffffff)
+
+//============================= mne_mgh_mri_io.c =============================
+
+#define TAG_OLD_SURF_GEOM           20
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -379,6 +389,52 @@ public:
     static void scale_display_surface(MneMshDisplaySurface* surf,
                                         float *scales);
 
+    static void add_uniform_curv(MneSurfaceOld* s);
+
+    //============================= mne_filename_util.c =============================
+
+    static char * mne_compose_surf_name(char *subj,
+                    const char *name,
+                    const char *prefix);
+
+    //============================= mne_surface_io.c =============================
+
+    static MneSourceSpaceOld* mne_load_surface(char *surf_file,
+                    char *curv_file);
+
+    static MneSourceSpaceOld* mne_load_surface_geom(char *surf_file,
+                         char *curv_file,
+                         int  add_geometry,
+                         int  check_too_many_neighbors);
+
+    static int mne_read_triangle_file(char  *fname,
+                   int   *nvertp,
+                   int   *ntrip,
+                   float ***vertp,
+                   int   ***trip,
+                   void  **tagsp);
+
+    static int mne_read_curvature_file(char  *fname,
+                    float **curvsp,
+                    int   *ncurvp);
+
+    //============================= mne_mgh_mri_io.c =============================
+
+    static MneVolGeom* mne_get_volume_geom_from_tag(void *tagsp);
+
+    static MneVolGeom* mne_dup_vol_geom(MneVolGeom* g);
+
+    static int mne_read_mgh_tags(FILE *fp, void **tagsp);
+
+    //============================= mne_binio.c =============================
+
+    static int mne_read_int3(FILE *in, int *ival);
+
+    static int mne_read_int(FILE *in, int *ival);
+
+    //============================= mne_misc.c =============================
+
+    static char *mne_strdup(const char *s);
 
 public:
     int             type;          /* Is this a volume or a surface */
