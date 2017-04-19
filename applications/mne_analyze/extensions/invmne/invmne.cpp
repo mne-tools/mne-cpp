@@ -41,6 +41,8 @@
 #include "invmne.h"
 #include "FormFiles/invmnecontrol.h"
 
+#include <anShared/Management/analyzedata.h>
+
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
@@ -176,8 +178,6 @@ void InvMNE::calculate()
     QString evokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QString invFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
 
-    QString t_sFileNameStc("");
-
     float snr = 1.0f;//2.0f
     QString method("dSPM");//"MNE" | "dSPM" | "sLORETA"
 
@@ -241,16 +241,5 @@ void InvMNE::calculate()
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
 
-    if(!t_sFileNameStc.isEmpty())
-    {
-        QFile t_fileStc(t_sFileNameStc);
-        sourceEstimate.write(t_fileStc);
-
-        //test if everything was written correctly
-        MNESourceEstimate readSourceEstimate(t_fileStc);
-
-        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
-        printf("tmin = %f s\n", readSourceEstimate.tmin);
-        printf("tstep = %f s\n", readSourceEstimate.tstep);
-    }
+    globalData()->addSTC(sourceEstimate);
 }
