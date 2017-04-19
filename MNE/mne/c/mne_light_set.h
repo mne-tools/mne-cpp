@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_morph_map.h
+* @file     mne_light_set.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneMorphMap class declaration.
+* @brief    MneLightSet class declaration.
 *
 */
 
-#ifndef MNEMORPHMAP_H
-#define MNEMORPHMAP_H
+#ifndef MNELIGHTSET_H
+#define MNELIGHTSET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,10 +63,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffSparseMatrix;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,46 +78,44 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MneMshLight;
+
 
 //=============================================================================================================
 /**
-* Replaces *morphMap,morphMapRec struct (analyze_types.c).
+* Replaces *mshLightSet,mshLightSetRec struct (analyze_types.c).
 *
-* @brief The MneMorphMap class.
+* @brief The MneLightSet class.
 */
-class MNESHARED_EXPORT MneMorphMap
+class MNESHARED_EXPORT MneLightSet
 {
 public:
-    typedef QSharedPointer<MneMorphMap> SPtr;              /**< Shared pointer type for MneMorphMap. */
-    typedef QSharedPointer<const MneMorphMap> ConstSPtr;   /**< Const shared pointer type for MneMorphMap. */
+    typedef QSharedPointer<MneLightSet> SPtr;              /**< Shared pointer type for MneLightSet. */
+    typedef QSharedPointer<const MneLightSet> ConstSPtr;   /**< Const shared pointer type for MneLightSet. */
 
     //=========================================================================================================
     /**
-    * Constructs the MneMorphMap.
+    * Constructs the MneLightSet.
     */
-    MneMorphMap();
+    MneLightSet();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMorphMap.
+    * Destroys the MneLightSet.
     */
-    ~MneMorphMap();
+    ~MneLightSet();
 
 public:
-    FIFFLIB::FiffSparseMatrix* map;		/* Multiply the data in the from surface with this to get to
-                   * 'this' surface from the 'from' surface */
-    int *best;			/* For each point on 'this' surface, the closest point on 'from' surface */
-    int from_kind;		/* The kind field of the other surface */
-    char *from_subj;		/* Name of the subject of the other surface */
+    char     *name;		/* Name of this set */
+    MneMshLight* lights;		/* Which lights */
+    int      nlight;		/* How many */
 
 // ### OLD STRUCT ###
-//    typedef struct {
-//      FIFFLIB::FiffSparseMatrix* map;		/* Multiply the data in the from surface with this to get to
-//                     * 'this' surface from the 'from' surface */
-//      int *best;			/* For each point on 'this' surface, the closest point on 'from' surface */
-//      int from_kind;		/* The kind field of the other surface */
-//      char *from_subj;		/* Name of the subject of the other surface */
-//    } *morphMap,morphMapRec;
+//    typedef struct {		/* Light set */
+//      char     *name;		/* Name of this set */
+//      mshLight lights;		/* Which lights */
+//      int      nlight;		/* How many */
+//    } *mshLightSet,mshLightSetRec;
 };
 
 //*************************************************************************************************************
@@ -131,4 +125,4 @@ public:
 
 } // NAMESPACE MNELIB
 
-#endif // MNEMORPHMAP_H
+#endif // MNELIGHTSET_H

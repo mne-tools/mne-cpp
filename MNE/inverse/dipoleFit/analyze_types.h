@@ -65,6 +65,7 @@
 #include <fiff/c/fiff_digitizer_data.h>
 #include <fiff/c/fiff_coord_trans_set.h>
 #include <mne/c/mne_msh_color_scale_def.h>
+#include <mne/c/mne_surface_patch.h>
 
 
 typedef struct {
@@ -332,17 +333,17 @@ typedef struct {
   mneUserFreeFunc  user_data_free;                   /* Called to free the above object */
 } *mshMegEegData,mshMegEegDataRec;
 
-typedef struct {		/* Definition of lighting */
-  int   state;			/* On or off? */
-  float pos[3];			/* Where is the light? */
-  float diff[3];		/* Diffuse intensity */
-} *mshLight,mshLightRec;	/* We are only using diffuse lights here */
+//typedef struct {		/* Definition of lighting */
+//  int   state;			/* On or off? */
+//  float pos[3];			/* Where is the light? */
+//  float diff[3];		/* Diffuse intensity */
+//} *mshLight,mshLightRec;	/* We are only using diffuse lights here */
 
-typedef struct {		/* Light set */
-  char     *name;		/* Name of this set */
-  mshLight lights;		/* Which lights */
-  int      nlight;		/* How many */
-} *mshLightSet,mshLightSetRec;
+//typedef struct {		/* Light set */
+//  char     *name;		/* Name of this set */
+//  mshLight lights;		/* Which lights */
+//  int      nlight;		/* How many */
+//} *mshLightSet,mshLightSetRec;
 
 //typedef struct {
 //  int   vert;			/* Vertex # */
@@ -418,30 +419,30 @@ typedef struct {		/* Light set */
 //} *coordTransSet,coordTransSetRec;
 
 
-typedef struct {		       /* Set of display surfaces */
-  char              *subj;	       /* The name of the subject */
-  char              *morph_subj;       /* The subject we are morphing to */
-  FIFFLIB::FiffCoordTransSet*     main_t;            /* Coordinate transformations for the main surfaces */
-  FIFFLIB::FiffCoordTransSet*     morph_t;           /* Coordinate transformations for the morph surfaces */
-  MNELIB::MneMshDisplaySurface **surfs;	       /* These are the surfaces */
-  mneSurfacePatch   *patches;	       /* Optional patches for display */
-  float             *patch_rot;	       /* Rotation angles for the (flat) patches */
-  int               nsurf;	       /* How many? */
-  int               use_patches;       /* Use patches for display? */
-  int               *active;	       /* Which surfaces are currently active */
-  int               *drawable;	       /* Which surfaces could be drawn? */
-  mshLightSet       lights;            /* Lighting */
-  float             rot[3];            /* Rotation angles of the MRI (in radians) */
-  float             move[3];	       /* Possibly move the origin, too */
-  float             fov;	       /* Field of view (extent of the surface) */
-  float             fov_scale;	       /* How much space to leave */
-  float             eye[3];	       /* Eye position for viewing (used in composite views) */
-  float             up[3];	       /* Up vector for viewing */
-  float             bg_color[3];       /* Background color */
-  float             text_color[3];     /* Text color */
-  void              *user_data;        /* Can be used to store whatever */
-  mneUserFreeFunc   user_data_free;
-} *mshDisplaySurfaceSet,mshDisplaySurfaceSetRec;
+//typedef struct {		       /* Set of display surfaces */
+//  char              *subj;	       /* The name of the subject */
+//  char              *morph_subj;       /* The subject we are morphing to */
+//  FIFFLIB::FiffCoordTransSet*     main_t;            /* Coordinate transformations for the main surfaces */
+//  FIFFLIB::FiffCoordTransSet*     morph_t;           /* Coordinate transformations for the morph surfaces */
+//  MNELIB::MneMshDisplaySurface **surfs;	       /* These are the surfaces */
+//  MNELIB::MneSurfacePatch   **patches;	       /* Optional patches for display */
+//  float             *patch_rot;	       /* Rotation angles for the (flat) patches */
+//  int               nsurf;	       /* How many? */
+//  int               use_patches;       /* Use patches for display? */
+//  int               *active;	       /* Which surfaces are currently active */
+//  int               *drawable;	       /* Which surfaces could be drawn? */
+//  mshLightSet       lights;            /* Lighting */
+//  float             rot[3];            /* Rotation angles of the MRI (in radians) */
+//  float             move[3];	       /* Possibly move the origin, too */
+//  float             fov;	       /* Field of view (extent of the surface) */
+//  float             fov_scale;	       /* How much space to leave */
+//  float             eye[3];	       /* Eye position for viewing (used in composite views) */
+//  float             up[3];	       /* Up vector for viewing */
+//  float             bg_color[3];       /* Background color */
+//  float             text_color[3];     /* Text color */
+//  void              *user_data;        /* Can be used to store whatever */
+//  mneUserFreeFunc   user_data_free;
+//} *mshDisplaySurfaceSet,mshDisplaySurfaceSetRec;
 
 typedef struct {		/* Where to look at the surfaces from */
   char  *name;			/* Name of this definition */
@@ -459,7 +460,7 @@ typedef struct {
   float quater[4];		/* The unit quaternion */
   float move[3];		/* Translation */
   float good;			/* Geometric mean of the goodness of fits */
-  fiffCoordTrans t;		/* The corresponding fiff coordinate transformation */
+  FIFFLIB::FiffCoordTransOld *t;		/* The corresponding fiff coordinate transformation */
 } *contHpiData,contHpiDataRec;
 
 typedef struct {

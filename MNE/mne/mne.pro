@@ -126,7 +126,7 @@ SOURCES += \
     c/mne_morph_map.cpp \
     c/mne_msh_color_scale_def.cpp \
     c/mne_proj_data.cpp \
-    c/mne_light.cpp\
+    c/mne_msh_light.cpp\
     c/mne_light_set.cpp \
     c/mne_surface_patch.cpp \
 
@@ -176,7 +176,7 @@ HEADERS += \
     c/mne_morph_map.h \
     c/mne_msh_color_scale_def.h \
     c/mne_proj_data.h\
-    c/mne_light.h\
+    c/mne_msh_light.h\
     c/mne_light_set.h \
     c/mne_surface_patch.h \
 

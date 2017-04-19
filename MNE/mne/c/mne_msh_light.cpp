@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_light.cpp
+* @file     mne_msh_light.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneLight Class.
+* @brief    Implementation of the MneMshLight Class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_light.h"
+#include "mne_msh_light.h"
 
 
 //*************************************************************************************************************
@@ -55,13 +55,13 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneLight::MneLight()
+MneMshLight::MneMshLight()
 {
 }
 
 
 //*************************************************************************************************************
 
-MneLight::~MneLight()
+MneMshLight::~MneMshLight()
 {
 }
