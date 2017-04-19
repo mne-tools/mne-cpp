@@ -444,13 +444,13 @@ typedef struct {
 //  mneUserFreeFunc   user_data_free;
 //} *mshDisplaySurfaceSet,mshDisplaySurfaceSetRec;
 
-typedef struct {		/* Where to look at the surfaces from */
-  char  *name;			/* Name of this definition */
-  float left[3];		/* Left hemisphere viewpoint */
-  float right[3];		/* Right hemisphere viewpoint */
-  float left_up[3];		/* The up vectors */
-  float right_up[3];		/* The up vectors */
-} *mshEyes,mshEyesRec;
+//typedef struct {		/* Where to look at the surfaces from */
+//  char  *name;			/* Name of this definition */
+//  float left[3];		/* Left hemisphere viewpoint */
+//  float right[3];		/* Right hemisphere viewpoint */
+//  float left_up[3];		/* The up vectors */
+//  float right_up[3];		/* The up vectors */
+//} *mshEyes,mshEyesRec;
 
 typedef void (*colorEditorDoneFunc)(float *color, void *user);
 

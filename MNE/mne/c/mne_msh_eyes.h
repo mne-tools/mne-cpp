@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_light_set.h
+* @file     mne_msh_eyes.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneLightSet class declaration.
+* @brief    MneMshEyes class declaration.
 *
 */
 
-#ifndef MNELIGHTSET_H
-#define MNELIGHTSET_H
+#ifndef MNEMSHEYES_H
+#define MNEMSHEYES_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,44 +78,46 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneMshLight;
-
 
 //=============================================================================================================
 /**
-* Replaces *mshLightSet,mshLightSetRec struct (analyze_types.c).
+* Replaces *mshEyes,mshEyesRec struct (analyze_types.c).
 *
-* @brief The MneLightSet class.
+* @brief The MneMshEyes class.
 */
-class MNESHARED_EXPORT MneLightSet
+class MNESHARED_EXPORT MneMshEyes
 {
 public:
-    typedef QSharedPointer<MneLightSet> SPtr;              /**< Shared pointer type for MneLightSet. */
-    typedef QSharedPointer<const MneLightSet> ConstSPtr;   /**< Const shared pointer type for MneLightSet. */
+    typedef QSharedPointer<MneMshEyes> SPtr;              /**< Shared pointer type for MneMshEyes. */
+    typedef QSharedPointer<const MneMshEyes> ConstSPtr;   /**< Const shared pointer type for MneMshEyes. */
 
     //=========================================================================================================
     /**
-    * Constructs the MneLightSet.
+    * Constructs the MneMshEyes.
     */
-    MneLightSet();
+    MneMshEyes();
 
     //=========================================================================================================
     /**
-    * Destroys the MneLightSet.
+    * Destroys the MneMshEyes.
     */
-    ~MneLightSet();
+    ~MneMshEyes();
 
 public:
-    char     *name;		/* Name of this set */
-    MneMshLight* lights;		/* Which lights */
-    int      nlight;		/* How many */
+    char  *name;			/* Name of this definition */
+    float left[3];		/* Left hemisphere viewpoint */
+    float right[3];		/* Right hemisphere viewpoint */
+    float left_up[3];		/* The up vectors */
+    float right_up[3];		/* The up vectors */
 
 // ### OLD STRUCT ###
-//    typedef struct {		/* Light set */
-//      char     *name;		/* Name of this set */
-//      mshLight lights;		/* Which lights */
-//      int      nlight;		/* How many */
-//    } *mshLightSet,mshLightSetRec;
+//    typedef struct {		/* Where to look at the surfaces from */
+//      char  *name;			/* Name of this definition */
+//      float left[3];		/* Left hemisphere viewpoint */
+//      float right[3];		/* Right hemisphere viewpoint */
+//      float left_up[3];		/* The up vectors */
+//      float right_up[3];		/* The up vectors */
+//    } *mshEyes,mshEyesRec;
 };
 
 //*************************************************************************************************************
@@ -125,4 +127,4 @@ public:
 
 } // NAMESPACE MNELIB
 
-#endif // MNELIGHTSET_H
+#endif // MNEMSHEYES_H
