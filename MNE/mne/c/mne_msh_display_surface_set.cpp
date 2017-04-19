@@ -46,6 +46,7 @@
 #include "mne_surface_patch.h"
 #include "mne_source_space_old.h"
 #include "mne_light_set.h"
+#include "mne_msh_eyes.h"
 
 #include <fiff/c/fiff_coord_trans_set.h>
 
@@ -79,9 +80,18 @@
 #define SHOW_CURVATURE_OVERLAY 1
 #define SHOW_OVERLAY_HEAT      1
 
+#define SURF_LEFT_MORPH_HEMI  (1 << 16 | FIFFV_MNE_SURF_LEFT_HEMI)
+#define SURF_RIGHT_MORPH_HEMI (1 << 16 | FIFFV_MNE_SURF_RIGHT_HEMI)
+
 #define POS_CURV_COLOR  0.25
 #define NEG_CURV_COLOR  0.375
 #define EVEN_CURV_COLOR 0.375
+
+static MNELIB::MneMshEyes   default_eyes;
+static MNELIB::MneMshEyes*  all_eyes     = Q_NULLPTR;
+static int          neyes        = 0;
+static int          current_eyes = -1;
+static MNELIB::MneMshLight* custom_lights    = Q_NULLPTR;
 
 
 //*************************************************************************************************************
@@ -99,6 +109,24 @@ using namespace MNELIB;
 
 MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
 {
+    default_eyes.name = Q_NULLPTR;
+
+    default_eyes.left[0] = -0.2;
+    default_eyes.left[0] = 0.0;
+    default_eyes.left[0] = 0.0;
+
+    default_eyes.right[0] = 0.2;
+    default_eyes.right[0] = 0.0;
+    default_eyes.right[0] = 0.0;
+
+    default_eyes.left_up[0] = 0.0;
+    default_eyes.left_up[0] = 0.0;
+    default_eyes.left_up[0] = 1.0;
+
+    default_eyes.right_up[0] = 0.0;
+    default_eyes.right_up[0] = 0.0;
+    default_eyes.right_up[0] = 1.0;
+
     int k;
 
     this->nsurf = nsurf;
@@ -200,7 +228,7 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     MneMshDisplaySurfaceSet* surfs = Q_NULLPTR;
 
     if (!curv)
-        curv = "curv";
+        *curv = 'curv';
 
     this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,"lh");
     if (this_surf == Q_NULLPTR)
@@ -216,8 +244,10 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     left_file = this_surf; this_surf = Q_NULLPTR;
     FREE_47(this_curv);
 
-    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,"rh");
-    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,"rh");
+    char rh = 'rh';
+
+    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,&rh);
+    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,&rh);
     fprintf(stderr,"Loading surface %s ...\n",this_surf);
     if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
         if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
@@ -245,7 +275,9 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     pThis->s->id       = SURF_LEFT_HEMI;
     pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
     pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
-    decide_surface_extent(pThis,"Left hemisphere");
+
+    char lefthemi[16] = "Left hemisphere";
+    decide_surface_extent(pThis,lefthemi);
     decide_curv_display(name,pThis);
     setup_curvature_colors (pThis);
 
@@ -256,7 +288,9 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     pThis->s->id       = SURF_RIGHT_HEMI;
     pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
     pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
-    decide_surface_extent(pThis,"Right hemisphere");
+
+    char righthemi[17] = "Right hemisphere";
+    decide_surface_extent(pThis,righthemi);
     decide_curv_display(name,pThis);
     setup_curvature_colors (pThis);
 
@@ -344,7 +378,7 @@ void MneMshDisplaySurfaceSet::decide_curv_display(char *name,
 void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
 {
     int k,c;
-    MneSourceSpaceOld* s;
+    MneSourceSpaceOld* s = NULL;;
     float *col;
     float curv_sum;
     int   ncolor;
@@ -392,17 +426,18 @@ void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
 
 void MneMshDisplaySurfaceSet::apply_left_right_eyes(MneMshDisplaySurfaceSet* surfs)
 {
-    mshEyes eyes;
-    MneMshDisplaySurface* surf;
+    MneMshEyes* eyes = Q_NULLPTR;
+    MneMshDisplaySurface* surf = Q_NULLPTR;
     int k;
 
     if (surfs == NULL)
         return;
 
-    if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1)
+    if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1) {
         eyes = &default_eyes;
-    else
+    } else {
         eyes = all_eyes+current_eyes;
+    }
 
     for (k = 0; k < surfs->nsurf; k++) {
         surf = surfs->surfs[k];
@@ -424,4 +459,30 @@ void MneMshDisplaySurfaceSet::apply_left_right_eyes(MneMshDisplaySurfaceSet* sur
         }
     }
     return;
+}
+
+
+//*************************************************************************************************************
+
+void MneMshDisplaySurfaceSet::setup_current_surface_lights(MneMshDisplaySurfaceSet* surfs)
+{
+    if (!surfs)
+        return;
+    initialize_custom_lights();
+    setup_these_surface_lights(surfs,custom_lights);
+    return;
+}
+
+
+//*************************************************************************************************************
+
+void initialize_custom_lights()
+{
+    if (!custom_lights) {
+        mshLightSet s = new_light_set();
+        s->nlight = ndefault;
+        s->lights = default_lights;
+        custom_lights = dup_light_set(s);
+        FREE(s);
+    }
 }

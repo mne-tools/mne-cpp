@@ -43,7 +43,6 @@
 
 #include "../mne_global.h"
 
-
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 
 
@@ -128,10 +127,13 @@ public:
 
     static void setup_curvature_colors(MneMshDisplaySurface* surf);
 
-
     //============================= eyes.c =============================
 
     static void apply_left_right_eyes(MneMshDisplaySurfaceSet* surfs);
+
+    //============================= lights.c =============================
+
+    static void setup_current_surface_lights(MneMshDisplaySurfaceSet* surfs);
 
 public:
     char              *subj;	       /* The name of the subject */
