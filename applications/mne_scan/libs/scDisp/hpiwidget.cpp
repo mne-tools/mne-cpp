@@ -168,7 +168,7 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     pVVItem->setCheckState(Qt::Unchecked);
 
 
-    FwdBemModel* bemModel =  fwd_bem_load_three_layer_surfaces(const QString& name);
+    //FwdBemModel* bemModel =  fwd_bem_load_three_layer_surfaces(const QString& name);
 
     QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadKid(t_fileHeadKid);

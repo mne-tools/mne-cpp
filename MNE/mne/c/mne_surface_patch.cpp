@@ -39,11 +39,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_surface_path.h"
+#include "mne_surface_patch.h"
+
+#include "mne_source_space_old.h"
 
 
 #define FREE_49(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
 #define MALLOC_49(x,t) (t *)malloc((x)*sizeof(t))
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 
 //*************************************************************************************************************
@@ -59,10 +69,8 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneSurfacePatch::MneSurfacePatch()
+MneSurfacePatch::MneSurfacePatch(int np)
 {
-    mneSurfacePatch p = MALLOC(1,mneSurfacePatchRec);
-
      if (np > 0) {
        vert = MALLOC_49(np,int);
        border = MALLOC_49(np,int);
@@ -71,7 +79,7 @@ MneSurfacePatch::MneSurfacePatch()
        vert = Q_NULLPTR;
        border = Q_NULLPTR;
      }
-     s = mne_new_source_space(np);
+     s = new MneSourceSpaceOld(np);
      surf_vert = Q_NULLPTR;
      tri       = Q_NULLPTR;
      surf_tri  = Q_NULLPTR;
@@ -83,7 +91,6 @@ MneSurfacePatch::MneSurfacePatch()
      user_data = Q_NULLPTR;
      user_data_free = Q_NULLPTR;
 
-     return p;
 }
 
 
@@ -98,6 +105,5 @@ MneSurfacePatch::~MneSurfacePatch()
     FREE_49(tri);
     FREE_49(surf_tri);
     if (user_data && user_data_free)
-      user_data_free(user_data);
-    FREE_49(p);
+        user_data_free(user_data);
 }

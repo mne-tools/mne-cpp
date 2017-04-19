@@ -84,7 +84,7 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneSurfaceOld;
+class MneSourceSpaceOld;
 
 
 //=============================================================================================================
@@ -103,7 +103,7 @@ public:
     /**
     * Constructs the MneSurfacePatch.
     */
-    MneSurfacePatch();
+    MneSurfacePatch(int np);
 
     //=========================================================================================================
     /**
@@ -112,7 +112,7 @@ public:
     ~MneSurfacePatch();
 
 public:
-    MneSurfaceOld       *s;		    /* Patch represented as a surface */
+    MneSourceSpaceOld       *s;		    /* Patch represented as a surface */
     int              *vert;	    /* Vertex numbers in the complete surface*/
     int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
     int              np_surf;	    /* How many points on the complete surface? */

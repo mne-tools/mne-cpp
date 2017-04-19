@@ -41,6 +41,8 @@
 
 #include "mne_light_set.h"
 
+#define FREE_50(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,7 +59,9 @@ using namespace MNELIB;
 
 MneLightSet::MneLightSet()
 {
-
+    name = Q_NULLPTR;
+    lights = Q_NULLPTR;
+    nlight = 0;
 }
 
 
@@ -65,5 +69,6 @@ MneLightSet::MneLightSet()
 
 MneLightSet::~MneLightSet()
 {
-
+    FREE_50(name);
+    FREE_50(lights);
 }
