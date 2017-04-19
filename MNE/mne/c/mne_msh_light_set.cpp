@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneLightSet Class.
+* @brief    Implementation of the MneMshLightSet Class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_light_set.h"
+#include "mne_msh_light_set.h"
 
 #define FREE_50(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
 
@@ -57,7 +57,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneLightSet::MneLightSet()
+MneMshLightSet::MneMshLightSet()
 {
     name = Q_NULLPTR;
     lights = Q_NULLPTR;
@@ -67,7 +67,7 @@ MneLightSet::MneLightSet()
 
 //*************************************************************************************************************
 
-MneLightSet::~MneLightSet()
+MneMshLightSet::~MneMshLightSet()
 {
     FREE_50(name);
     FREE_50(lights);

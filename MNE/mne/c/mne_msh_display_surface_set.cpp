@@ -45,7 +45,8 @@
 #include "mne_surface_old.h"
 #include "mne_surface_patch.h"
 #include "mne_source_space_old.h"
-#include "mne_light_set.h"
+#include "mne_msh_light_set.h"
+#include "mne_msh_light.h"
 #include "mne_msh_eyes.h"
 
 #include <fiff/c/fiff_coord_trans_set.h>
@@ -91,7 +92,38 @@ static MNELIB::MneMshEyes   default_eyes;
 static MNELIB::MneMshEyes*  all_eyes     = Q_NULLPTR;
 static int          neyes        = 0;
 static int          current_eyes = -1;
-static MNELIB::MneMshLight* custom_lights    = Q_NULLPTR;
+static int         ndefault         = 8;
+
+static mshLightSet custom_lights = Q_NULLPTR;
+static mshLightRec default_lights[] = { { TRUE, { 0.0,   0.0,  1.0 } , { 0.8, 0.8, 0.8 } },
+                    { TRUE, { 0.0,   0.0, -1.0 } , { 0.8, 0.8, 0.8 } },
+                    { TRUE, { 0.6,  -1.0, -1.0 } , { 0.6, 0.6, 0.6 } },
+                    { TRUE, { -0.6, -1.0, -1.0 } , { 0.6, 0.6, 0.6 } },
+                    { TRUE, { 1.0,   0.0, 0.0 }  , { 0.8, 0.8, 0.8 } },
+                    { TRUE, { -1.0,  0.0, 0.0 }  , { 0.8, 0.8, 0.8 } },
+                    { TRUE, { 0.0,   1.0, 0.5 }  , { 0.6, 0.6, 0.6 } },
+                    { FALSE, { 0.0,   0.0, -1.0 } , { 1.0, 1.0, 1.0 } }} ;
+
+mshLightSet new_light_set()
+{
+  mshLightSet s = MALLOC_47(1,mshLightSetRec);
+
+  s->name = NULL;
+  s->lights = NULL;
+  s->nlight = 0;
+
+  return s;
+}
+
+void free_light_set(mshLightSet s)
+{
+  if (!s)
+    return;
+  FREE_47(s->name);
+  FREE_47(s->lights);
+  FREE_47(s);
+  return;
+}
 
 
 //*************************************************************************************************************
@@ -144,8 +176,7 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
             patches[k] = Q_NULLPTR;
             patch_rot[k] = 0.0;
         }
-    }
-    else {
+    } else {
         surfs = Q_NULLPTR;
         active = Q_NULLPTR;
         patches = Q_NULLPTR;
@@ -476,13 +507,45 @@ void MneMshDisplaySurfaceSet::setup_current_surface_lights(MneMshDisplaySurfaceS
 
 //*************************************************************************************************************
 
-void initialize_custom_lights()
+void MneMshDisplaySurfaceSet::initialize_custom_lights()
 {
     if (!custom_lights) {
         mshLightSet s = new_light_set();
         s->nlight = ndefault;
         s->lights = default_lights;
         custom_lights = dup_light_set(s);
-        FREE(s);
+        free_light_set(s);
     }
 }
+
+
+//*************************************************************************************************************
+
+mshLightSet MneMshDisplaySurfaceSet::dup_light_set(mshLightSet s)
+{
+    mshLightSet res = NULL;
+    int k;
+
+    if (s) {
+        res = new_light_set();
+        res->lights = MALLOC_47(s->nlight,mshLightRec);
+        res->nlight = s->nlight;
+
+        for (k = 0; k < s->nlight; k++)
+            res->lights[k] = s->lights[k];
+    }
+    return res;
+}
+
+
+//*************************************************************************************************************
+
+void MneMshDisplaySurfaceSet::setup_these_surface_lights(MneMshDisplaySurfaceSet* surfs, mshLightSet set)
+{
+    if (!surfs || !set)
+        return;
+    free_light_set(surfs->lights);
+    surfs->lights = dup_light_set(set);
+    return;
+}
+
