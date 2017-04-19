@@ -91,7 +91,7 @@ public:
     /**
     * Constructs the MNE Source Space
     */
-    MneSourceSpaceOld();
+    MneSourceSpaceOld(int np);
 
     //=========================================================================================================
     /**

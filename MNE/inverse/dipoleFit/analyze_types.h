@@ -163,10 +163,10 @@ typedef struct {
   int                 nstep;			     /* Number of smoothsteps to take */
   float               time;	                     /* Timeslice to pick from stc data (in seconds) */
   float               integ;			     /* Time integration */
-  mneWdata            lh_data;			     /* LH wdata loaded from an overlay file */
-  mneWdata            rh_data;			     /* RH wdata loaded from an overlay file */
-  mneStcData          lh_stc_data;	             /* LH stc data loaded from an overlay file */
-  mneStcData          rh_stc_data;	             /* RH stc data loaded from an overlay file */
+//  mneWdata            lh_data;			     /* LH wdata loaded from an overlay file */
+//  mneWdata            rh_data;			     /* RH wdata loaded from an overlay file */
+//  mneStcData          lh_stc_data;	             /* LH stc data loaded from an overlay file */
+//  mneStcData          rh_stc_data;	             /* RH stc data loaded from an overlay file */
   int                 lh_sparse;	             /* Is LH data sparse */
   int                 rh_sparse;		     /* Is RH data sparse */
   int                 lh_match_surf;                 /* What kind of surface does the data match to */

@@ -40,10 +40,12 @@
 //=============================================================================================================
 
 #include "mne_msh_display_surface_set.h"
+
 #include "mne_msh_display_surface.h"
 #include "mne_surface_old.h"
 #include "mne_surface_patch.h"
 #include "mne_source_space_old.h"
+#include "mne_msh_light.h"
 
 #include <fiff/c/fiff_coord_trans_set.h>
 
@@ -79,7 +81,7 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
 {
     int k;
 
-    nsurf = nsurf;
+    this->nsurf = nsurf;
     if (nsurf > 0) {
         MneMshDisplaySurface* temp = new MneMshDisplaySurface;
         surfs = MALLOC_47(nsurf,temp);
