@@ -45,6 +45,18 @@
 
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 
+typedef struct {		/* Definition of lighting */
+  int   state;			/* On or off? */
+  float pos[3];			/* Where is the light? */
+  float diff[3];		/* Diffuse intensity */
+} *mshLight,mshLightRec;	/* We are only using diffuse lights here */
+
+typedef struct {		/* Light set */
+  char     *name;		/* Name of this set */
+  mshLight lights;		/* Which lights */
+  int      nlight;		/* How many */
+} *mshLightSet,mshLightSetRec;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,7 +97,7 @@ namespace MNELIB
 //=============================================================================================================
 
 class MneMshDisplaySurface;
-class MneLightSet;
+class MneMshLightSet;
 class MneSurfacePatch;
 
 
@@ -135,6 +147,12 @@ public:
 
     static void setup_current_surface_lights(MneMshDisplaySurfaceSet* surfs);
 
+    static void initialize_custom_lights();
+
+    static mshLightSet dup_light_set(mshLightSet s);
+
+    static void setup_these_surface_lights(MneMshDisplaySurfaceSet* surfs, mshLightSet set);
+
 public:
     char              *subj;	       /* The name of the subject */
     char              *morph_subj;       /* The subject we are morphing to */
@@ -147,7 +165,7 @@ public:
     int               use_patches;       /* Use patches for display? */
     int               *active;	       /* Which surfaces are currently active */
     int               *drawable;	       /* Which surfaces could be drawn? */
-    MneLightSet       *lights;            /* Lighting */
+    mshLightSet       lights;            /* Lighting */
     float             rot[3];            /* Rotation angles of the MRI (in radians) */
     float             move[3];	       /* Possibly move the origin, too */
     float             fov;	       /* Field of view (extent of the surface) */
