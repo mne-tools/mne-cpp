@@ -198,6 +198,15 @@ void mne_free_icmatrix_17 (int **m)
 
 #define NNEIGHBORS 26
 
+#define CURVATURE_FILE_MAGIC_NUMBER  (16777215)
+
+#define TAG_MGH_XFORM               31
+#define TAG_SURF_GEOM               21
+#define TAG_OLD_USEREALRAS          2
+#define TAG_COLORTABLE              5
+#define TAG_OLD_MGH_XFORM           30
+#define TAG_OLD_COLORTABLE          1
+
 #define ALLOC_ICMATRIX_17(x,y) mne_imatrix_17((x),(y))
 
 int **mne_imatrix_17(int nr,int nc)
@@ -3554,11 +3563,11 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     * Read the vertices
     */
         for (k = 0; k < nvert; k++) {
-            if (mne_read_float(fp,vert[k]+X) != 0)
+            if (mne_read_float(fp,vert[k]+X_17) != 0)
                 goto bad;
-            if (mne_read_float(fp,vert[k]+Y) != 0)
+            if (mne_read_float(fp,vert[k]+Y_17) != 0)
                 goto bad;
-            if (mne_read_float(fp,vert[k]+Z) != 0)
+            if (mne_read_float(fp,vert[k]+Z_17) != 0)
                 goto bad;
         }
         /*
@@ -3569,7 +3578,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
                 goto bad;
             if (check_vertex(tri[k][X_17],nvert) != OK)
                 goto bad;
-            if (mne_read_int(fp,tri[k_17]+Y_17) != 0)
+            if (mne_read_int(fp,tri[k]+Y_17) != 0)
                 goto bad;
             if (check_vertex(tri[k][Y_17],nvert) != OK)
                 goto bad;
@@ -3724,11 +3733,11 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
     int   val,k;
 
     if (!fp) {
-        err_set_sys_error(fname);
+        qCritical(fname);
         goto bad;
     }
     if (mne_read_int3(fp,&magic) != 0) {
-        err_printf_set_error("Bad magic in %s",fname);
+        fprintf(stderr, "Bad magic in %s",fname);
         goto bad;
     }
     if (magic == CURVATURE_FILE_MAGIC_NUMBER) {	    /* A new-style curvature file */
@@ -3745,7 +3754,7 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
         if (mne_read_int(fp,&val_pervert) != 0)
             goto bad;
         if (val_pervert != 1) {
-            err_set_error("Values per vertex not equal to one.");
+            qCritical("Values per vertex not equal to one.");
             goto bad;
         }
         /*
@@ -3806,6 +3815,42 @@ bad : {
 
 //*************************************************************************************************************
 
+int MneSurfaceOrVolume::check_quad(float **rr)
+
+{
+    float diff[3];
+    float size;
+    int k;
+
+    return OK;
+
+    for (k = 0; k < 4; k++) {
+        VEC_DIFF_17(rr[k],rr[k+1],diff);
+        size = VEC_LEN_17(diff);
+        if (size < 0.1) {
+            printf("Degenerate quad found. size length = %f mm",size);
+            return FAIL;
+        }
+    }
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::check_vertex(int no, int maxno)
+
+{
+    if (no < 0 || no > maxno-1) {
+        printf("Illegal vertex number %d (max %d).",no,maxno);
+        return FAIL;
+    }
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
 MneVolGeom* MneSurfaceOrVolume::mne_get_volume_geom_from_tag(void *tagsp)
 {
   mneMGHtagGroup tags = (mneMGHtagGroup)tagsp;
@@ -3832,9 +3877,9 @@ MneVolGeom* MneSurfaceOrVolume::mne_dup_vol_geom(MneVolGeom* g)
 {
     MneVolGeom* dup = NULL;
     if (g) {
-        dup = mne_new_vol_geom();
+        dup = new MneVolGeom();
         *dup = *g;
-        dup->filename = mne_strdup(g->filename);
+        dup->filename = g->filename;
     }
     return dup;
 }
@@ -3842,7 +3887,7 @@ MneVolGeom* MneSurfaceOrVolume::mne_dup_vol_geom(MneVolGeom* g)
 
 //*************************************************************************************************************
 
-static int MneSurfaceOrVolume::mne_read_mgh_tags(FILE *fp, void **tagsp)
+int MneSurfaceOrVolume::mne_read_mgh_tags(FILE *fp, void **tagsp)
 /*
  * Read all the tags from the file
  */
@@ -3866,6 +3911,113 @@ static int MneSurfaceOrVolume::mne_read_mgh_tags(FILE *fp, void **tagsp)
 
 //*************************************************************************************************************
 
+int MneSurfaceOrVolume::read_next_tag(FILE *fp, int *tagp, long long *lenp, unsigned char **datap)
+/*
+ * Read the next tag in the file
+ */
+{
+  int       ilen,tag;
+  long long len;
+
+  if (mne_read_int(fp,&tag) == FAIL) {
+    *tagp = 0;
+    return OK;
+  }
+  if (feof(fp)) {
+    *tagp = 0;
+    return OK;
+  }
+  switch (tag) {
+    case TAG_OLD_MGH_XFORM: /* This is obviously a burden of the past */
+      if (mne_read_int(fp,&ilen) == FAIL)
+    return FAIL;
+      len = ilen - 1;
+      break ;
+    case TAG_OLD_SURF_GEOM:
+    case TAG_OLD_USEREALRAS:
+    case TAG_OLD_COLORTABLE:
+      len = 0 ;
+      break ;
+    default:
+      if (mne_read_long(fp,&len) == FAIL)
+    return FAIL;
+      break;
+  }
+  *lenp = len;
+  *tagp = tag;
+  if (read_tag_data(fp,tag,len,datap,lenp) == FAIL)
+    return FAIL;
+  return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsigned char **val, long long *nbytesp)
+/*
+ * Read the data of one tag
+ */
+{
+    unsigned char *dum = NULL;
+    size_t snbytes = nbytes;
+
+    *val = NULL;
+    if (nbytes > 0) {
+        dum = MALLOC_17(nbytes+1,unsigned char);
+        if (fread(dum,sizeof(unsigned char),nbytes,fp) != snbytes) {
+            err_printf_set_error("Failed to read %d bytes of tag data",nbytes);
+            FREE(dum);
+            return FAIL;
+        }
+        dum[nbytes] = '\0'; /* Ensure null termination */
+        *val     = dum;
+        *nbytesp = nbytes;
+    }
+    else {			/* Need to handle special cases */
+        if (tag == TAG_OLD_SURF_GEOM) {
+            mneVolGeom g = read_vol_geom(fp);
+            if (!g)
+                return FAIL;
+            *val     = (unsigned char *)g;
+            *nbytesp = sizeof(mneVolGeomRec);
+        }
+        else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
+            int *vi = MALLOC_17(1,int);
+            if (mne_read_int(fp,vi) == FAIL)
+                vi = 0;
+            *val = (unsigned char *)vi;
+            *nbytesp = sizeof(int);
+        }
+        else {
+            fprintf(stderr,"Encountered an unknown tag with no length specification : %d\n",tag);
+            *val     = NULL;
+            *nbytesp = 0;
+        }
+    }
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+mneMGHtagGroup MneSurfaceOrVolume::mne_add_mgh_tag_to_group(mneMGHtagGroup g, int tag, long long len, unsigned char *data)
+{
+    mneMGHtag new_tag;
+
+    if (!g)
+        g = mne_new_mgh_tag_group();
+    g->tags = REALLOC_17(g->tags,g->ntags+1,mneMGHtag);
+    g->tags[g->ntags++] = new_tag = mne_new_mgh_tag();
+    new_tag->tag  = tag;
+    new_tag->len  = len;
+    new_tag->data = data;
+
+    return g;
+}
+
+
+//*************************************************************************************************************
+
 int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
      /*
       * Read the strange 3-byte integer
@@ -3875,9 +4027,9 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 
     if (fread (&s,3,1,in) != 1) {
         if (ferror(in))
-            err_set_sys_error("mne_read_int3");
+            qCritical("mne_read_int3");
         else
-            err_set_error("mne_read_int3 could not read data");
+            qCritical("mne_read_int3 could not read data");
         return FAIL;
     }
     s = (unsigned int)swap_int(s);
@@ -3896,13 +4048,73 @@ int MneSurfaceOrVolume::mne_read_int(FILE *in, int *ival)
     int s ;
     if (fread (&s,sizeof(int),1,in) != 1) {
         if (ferror(in))
-            err_set_sys_error("mne_read_int");
+            qCritical("mne_read_int");
         else
-            err_set_error("mne_read_int could not read data");
+            qCritical("mne_read_int could not read data");
         return FAIL;
     }
     *ival = swap_int(s);
     return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_read_int2(FILE *in, int *ival)
+     /*
+      * Read int from short
+      */
+{
+    short s ;
+    if (fread (&s,sizeof(short),1,in) != 1) {
+        if (ferror(in))
+            qCritical("mne_read_int2");
+        else
+            qCritical("mne_read_int2 could not read data");
+        return FAIL;
+    }
+    *ival = swap_short(s);
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_read_float(FILE *in, float *fval)
+     /*
+      * Read float
+      */
+{
+    float f ;
+    if (fread (&f,sizeof(float),1,in) != 1) {
+        if (ferror(in))
+            qCritical("mne_read_float");
+        else
+            qCritical("mne_read_float could not read data");
+        return FAIL;
+    }
+    *fval = swap_float(f);
+    return OK;
+}
+
+
+//*************************************************************************************************************
+
+int MneSurfaceOrVolume::mne_read_long(FILE *in, long long *lval)
+/*
+ * Read a 64-bit integer
+ */
+{
+  long long s ;
+  if (fread (&s,sizeof(long long),1,in) != 1) {
+    if (ferror(in))
+      qCritical("mne_read_long");
+    else
+      qCritical("mne_read_long could not read data");
+    return FAIL;
+  }
+  *lval = swap_long(s);
+  return OK;
 }
 
 

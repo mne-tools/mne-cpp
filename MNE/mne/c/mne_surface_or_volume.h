@@ -80,6 +80,17 @@
 
 #define TAG_OLD_SURF_GEOM           20
 
+typedef struct {
+    int           tag;
+    long long     len;
+    unsigned char *data;
+} *mneMGHtag,mneMGHtagRec;
+
+typedef struct {
+    int        ntags;
+    mneMGHtag  *tags;
+} *mneMGHtagGroup,mneMGHtagGroupRec;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -418,6 +429,10 @@ public:
                     float **curvsp,
                     int   *ncurvp);
 
+    static int check_quad(float **rr);
+
+    static int check_vertex(int no, int maxno);
+
     //============================= mne_mgh_mri_io.c =============================
 
     static MneVolGeom* mne_get_volume_geom_from_tag(void *tagsp);
@@ -426,11 +441,23 @@ public:
 
     static int mne_read_mgh_tags(FILE *fp, void **tagsp);
 
+    static int read_next_tag(FILE *fp, int *tagp, long long *lenp, unsigned char **datap);
+
+    static int read_tag_data(FILE *fp, int tag, long long nbytes, unsigned char **val, long long *nbytesp);
+
+    static mneMGHtagGroup mne_add_mgh_tag_to_group(mneMGHtagGroup g, int tag, long long len, unsigned char *data);
+
     //============================= mne_binio.c =============================
 
     static int mne_read_int3(FILE *in, int *ival);
 
     static int mne_read_int(FILE *in, int *ival);
+
+    static int mne_read_int2(FILE *in, int *ival);
+
+    static int mne_read_float(FILE *in, float *fval);
+
+    static int mne_read_long(FILE *in, long long *lval);
 
     //============================= mne_misc.c =============================
 
