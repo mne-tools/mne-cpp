@@ -86,13 +86,13 @@ namespace MNELIB
 //=============================================================================================================
 
 class MneMshDisplaySurface;
-class MneMshLightSet;
+class MneLightSet;
 class MneSurfacePatch;
 
 
 //=============================================================================================================
 /**
-* Replaces  *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c).
+* Replaces  *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c). Note that another implementation can be found in movie_types.h
 *
 * @brief The MNE Msh Display Surface Set class holds information about a set of surfaces to be rendered.
 */
@@ -114,7 +114,24 @@ public:
     */
     ~MneMshDisplaySurfaceSet();
 
+    //============================= display_surfaces.c =============================
+
     static MneMshDisplaySurfaceSet* load_new_surface(char *subj, char *name, char *curv);
+
+    static void decide_surface_extent(MneMshDisplaySurface* surf,
+                                                        char *tag);
+
+    static void decide_curv_display(char *name,
+                    MneMshDisplaySurface* s);
+
+    //============================= vertex_colors.c =============================
+
+    static void setup_curvature_colors(MneMshDisplaySurface* surf);
+
+
+    //============================= eyes.c =============================
+
+    static void apply_left_right_eyes(MneMshDisplaySurfaceSet* surfs);
 
 public:
     char              *subj;	       /* The name of the subject */
@@ -128,7 +145,7 @@ public:
     int               use_patches;       /* Use patches for display? */
     int               *active;	       /* Which surfaces are currently active */
     int               *drawable;	       /* Which surfaces could be drawn? */
-    MneMshLightSet       *lights;            /* Lighting */
+    MneLightSet       *lights;            /* Lighting */
     float             rot[3];            /* Rotation angles of the MRI (in radians) */
     float             move[3];	       /* Possibly move the origin, too */
     float             fov;	       /* Field of view (extent of the surface) */
