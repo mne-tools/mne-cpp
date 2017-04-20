@@ -58,6 +58,7 @@
 #include <fiff/fiff_dig_point.h>
 
 #include <utils/sphere.h>
+#include <utils/ioutils.h>
 
 #include <QFile>
 #include <QCoreApplication>
@@ -3963,7 +3964,7 @@ MneMghTagGroup* MneSurfaceOrVolume::mne_add_mgh_tag_to_group(MneMghTagGroup* g, 
 
     if (!g)
         g = new MneMghTagGroup();
-    g->tags = REALLOC_17(g->tags,g->ntags+1,MneMghTag);
+    g->tags = REALLOC_17(g->tags,g->ntags+1,MneMghTag*);
     g->tags[g->ntags++] = new_tag = new MneMghTag();
     new_tag->tag  = tag;
     new_tag->len  = len;
@@ -3990,7 +3991,7 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
     long pos = 0;
     int  fail = 0;
 
-    mneVolGeom vg = mne_new_vol_geom();
+    MneVolGeom* vg = new MneVolGeom();
 
     while ((p = fgets(line, sizeof(line), fp)) && counter < 8)
     {
@@ -4055,8 +4056,8 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
         /* note that this won't allow compression using pipe */
     }
     if (!vgRead) {
-        mne_free_vol_geom(vg);
-        vg = mne_new_vol_geom();
+        delete vg;
+        vg = new MneVolGeom();
     }
     return vg;
 }
@@ -4078,7 +4079,7 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
             qCritical("mne_read_int3 could not read data");
         return FAIL;
     }
-    s = (unsigned int)swap_int(s);
+    s = (unsigned int)UTILSLIB::IOUtils::swap_int(s);
     *ival = ((s >> 8) & 0xffffff);
     return OK;
 }
@@ -4099,7 +4100,7 @@ int MneSurfaceOrVolume::mne_read_int(FILE *in, int *ival)
             qCritical("mne_read_int could not read data");
         return FAIL;
     }
-    *ival = swap_int(s);
+    *ival = UTILSLIB::IOUtils::swap_int(s);
     return OK;
 }
 
@@ -4119,7 +4120,7 @@ int MneSurfaceOrVolume::mne_read_int2(FILE *in, int *ival)
             qCritical("mne_read_int2 could not read data");
         return FAIL;
     }
-    *ival = swap_short(s);
+    *ival = UTILSLIB::IOUtils::swap_short(s);
     return OK;
 }
 
@@ -4139,7 +4140,7 @@ int MneSurfaceOrVolume::mne_read_float(FILE *in, float *fval)
             qCritical("mne_read_float could not read data");
         return FAIL;
     }
-    *fval = swap_float(f);
+    *fval = UTILSLIB::IOUtils::swap_float(f);
     return OK;
 }
 
@@ -4159,14 +4160,14 @@ int MneSurfaceOrVolume::mne_read_long(FILE *in, long long *lval)
             qCritical("mne_read_long could not read data");
         return FAIL;
     }
-    *lval = swap_long(s);
+    *lval = UTILSLIB::IOUtils::swap_long(s);
     return OK;
 }
 
 
 //*************************************************************************************************************
 
-static char *MneSurfaceOrVolume::mne_strdup(const char *s)
+char *MneSurfaceOrVolume::mne_strdup(const char *s)
 {
     char *res;
     if (s == NULL)
