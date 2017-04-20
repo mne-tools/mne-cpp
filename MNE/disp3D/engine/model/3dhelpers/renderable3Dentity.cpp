@@ -134,18 +134,32 @@ void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterN
     //Look for all materials and set the corresponding parameters
     QComponentVector vComponents;
 
+    //Search in this item's components
     if(QEntity* pEntity = dynamic_cast<QEntity*>(this)) {
-        qDebug()<<"1";
         vComponents = pEntity->components();
 
         for(int j = 0; j < vComponents.size(); ++j) {
             if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
-                qDebug()<<"2";
                 for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
-                    qDebug()<<"2";
                     if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
-                        qDebug()<<"added";
                         pMaterial->effect()->parameters().at(i)->setValue(data);
+                    }
+                }
+            }
+        }
+    }
+
+    //Search in all child item components
+    for(int k = 0; k < this->childNodes().size(); ++k) {
+        if(QEntity* pEntity = dynamic_cast<QEntity*>(this->childNodes().at(k))) {
+            vComponents = pEntity->components();
+
+            for(int j = 0; j < vComponents.size(); ++j) {
+                if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
+                    for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
+                        if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
+                            pMaterial->effect()->parameters().at(i)->setValue(data);
+                        }
                     }
                 }
             }
