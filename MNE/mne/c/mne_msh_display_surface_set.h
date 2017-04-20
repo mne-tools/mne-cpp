@@ -130,7 +130,7 @@ public:
     static MneMshDisplaySurfaceSet* load_new_surface(char *subj, char *name, char *curv);
 
     static void decide_surface_extent(MneMshDisplaySurface* surf,
-                                                        char *tag);
+                                                        const char *tag);
 
     static void decide_curv_display(char *name,
                     MneMshDisplaySurface* s);
