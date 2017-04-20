@@ -275,10 +275,8 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     left_file = this_surf; this_surf = Q_NULLPTR;
     FREE_47(this_curv);
 
-    char rh = 'rh';
-
-    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,&rh);
-    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,&rh);
+    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,"rh");
+    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,"rh");
     fprintf(stderr,"Loading surface %s ...\n",this_surf);
     if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
         if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
@@ -307,8 +305,7 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
     pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
 
-    char lefthemi[16] = "Left hemisphere";
-    decide_surface_extent(pThis,lefthemi);
+    decide_surface_extent(pThis,"Left hemisphere");
     decide_curv_display(name,pThis);
     setup_curvature_colors (pThis);
 
@@ -320,8 +317,7 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, c
     pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
     pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
 
-    char righthemi[17] = "Right hemisphere";
-    decide_surface_extent(pThis,righthemi);
+    decide_surface_extent(pThis,"Right hemisphere");
     decide_curv_display(name,pThis);
     setup_curvature_colors (pThis);
 
