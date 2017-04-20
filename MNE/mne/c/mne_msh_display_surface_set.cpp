@@ -342,7 +342,7 @@ bad : {
 //*************************************************************************************************************
 
 void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
-                                                    char *tag)
+                                                    const char *tag)
 
 {
     float minv[3],maxv[3];
