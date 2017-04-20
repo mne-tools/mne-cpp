@@ -80,16 +80,6 @@
 
 #define TAG_OLD_SURF_GEOM           20
 
-typedef struct {
-    int           tag;
-    long long     len;
-    unsigned char *data;
-} *mneMGHtag,mneMGHtagRec;
-
-typedef struct {
-    int        ntags;
-    mneMGHtag  *tags;
-} *mneMGHtagGroup,mneMGHtagGroupRec;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -122,6 +112,7 @@ class MneSourceSpaceOld;
 class MneSurfaceOld;
 class MneMshDisplaySurface;
 class MneProjData;
+class MneMghTagGroup;
 
 
 //=============================================================================================================
@@ -341,16 +332,11 @@ public:
                               MneSourceSpaceOld* s, /* The associated source space */
                               float *areap);
 
-
-
     //============================= mne_add_geometry_info.c =============================
 
     static void mne_add_triangle_data(MneSourceSpaceOld* s);
 
-
-
     //============================= mne_add_geometry_info.c =============================
-
 
     static void mne_compute_cm(float **rr, int np, float *cm);
 
@@ -445,7 +431,9 @@ public:
 
     static int read_tag_data(FILE *fp, int tag, long long nbytes, unsigned char **val, long long *nbytesp);
 
-    static mneMGHtagGroup mne_add_mgh_tag_to_group(mneMGHtagGroup g, int tag, long long len, unsigned char *data);
+    static MneMghTagGroup* mne_add_mgh_tag_to_group(MneMghTagGroup* g, int tag, long long len, unsigned char *data);
+
+    static MneVolGeom* read_vol_geom(FILE *fp);
 
     //============================= mne_binio.c =============================
 
