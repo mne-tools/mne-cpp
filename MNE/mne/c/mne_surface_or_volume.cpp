@@ -50,6 +50,8 @@
 #include "mne_msh_display_surface.h"
 #include "mne_proj_data.h"
 #include "mne_vol_geom.h"
+#include "mne_mgh_tag_group.h"
+#include "mne_mgh_tag.h"
 
 #include <fiff/fiff_stream.h>
 #include <fiff/c/fiff_digitizer_data.h>
@@ -157,7 +159,6 @@ static void matrix_error_17(int kind, int nr, int nc)
 }
 
 float **mne_cmatrix_17(int nr,int nc)
-
 {
     int i;
     float **m;
@@ -207,6 +208,8 @@ void mne_free_icmatrix_17 (int **m)
 #define TAG_OLD_MGH_XFORM           30
 #define TAG_OLD_COLORTABLE          1
 
+#define TAG_USEREALRAS              4
+
 #define ALLOC_ICMATRIX_17(x,y) mne_imatrix_17((x),(y))
 
 int **mne_imatrix_17(int nr,int nc)
@@ -223,52 +226,6 @@ int **mne_imatrix_17(int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
-
-//============================= mne_mgh_mri_io.c =============================
-
-
-/*
- * The tag types are private to this module
- */
-typedef struct {
-    int           tag;
-    long long     len;
-    unsigned char *data;
-} *mneMGHtag,mneMGHtagRec;
-
-typedef struct {
-    int        ntags;
-    mneMGHtag  *tags;
-} *mneMGHtagGroup,mneMGHtagGroupRec;
-
-
-static void mne_free_mgh_tag(mneMGHtag t)
-{
-    if (!t)
-        return;
-    FREE_17(t->data);
-    FREE_17(t);
-    return;
-}
-
-void mne_free_mgh_tag_group(void *gp)
-
-{
-    int k;
-    mneMGHtagGroup g = (mneMGHtagGroup)gp;
-
-    if (!g)
-        return;
-    for (k = 0; k < g->ntags; k++)
-        mne_free_mgh_tag(g->tags[k]);
-    FREE_17(g->tags);
-    FREE_17(g);
-
-    return;
-}
-
-
 
 
 //float
@@ -348,37 +305,37 @@ static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
 static int comp_points1(const void *vp1,const void *vp2)
 
 {
-  MneNearest* v1 = (MneNearest*)vp1;
-  MneNearest* v2 = (MneNearest*)vp2;
+    MneNearest* v1 = (MneNearest*)vp1;
+    MneNearest* v2 = (MneNearest*)vp2;
 
-  if (v1->nearest > v2->nearest)
-    return 1;
-  else if (v1->nearest == v2->nearest)
-    return 0;
-  else
-    return -1;
+    if (v1->nearest > v2->nearest)
+        return 1;
+    else if (v1->nearest == v2->nearest)
+        return 0;
+    else
+        return -1;
 }
 
 static int comp_points2(const void *vp1,const void *vp2)
 
 {
-  MneNearest* v1 = (MneNearest*)vp1;
-  MneNearest* v2 = (MneNearest*)vp2;
+    MneNearest* v1 = (MneNearest*)vp1;
+    MneNearest* v2 = (MneNearest*)vp2;
 
-  if (v1->vert > v2->vert)
-    return 1;
-  else if (v1->vert == v2->vert)
-    return 0;
-  else
-    return -1;
+    if (v1->vert > v2->vert)
+        return 1;
+    else if (v1->vert == v2->vert)
+        return 0;
+    else
+        return -1;
 }
 
 void mne_sort_nearest_by_nearest(MneNearest* points, int npoint)
 
 {
-  if (npoint > 1 && points != NULL)
-    qsort(points,npoint,sizeof(MneNearest),comp_points1);
-  return;
+    if (npoint > 1 && points != NULL)
+        qsort(points,npoint,sizeof(MneNearest),comp_points1);
+    return;
 }
 
 
@@ -446,7 +403,7 @@ MneSurfaceOrVolume::~MneSurfaceOrVolume()
 
     if(this->vol_geom)
         delete this->vol_geom;
-    mne_free_mgh_tag_group(this->mgh_tags);
+    delete((MneMghTagGroup*)this->mgh_tags);
 
     if (this->user_data && this->user_data_free)
         this->user_data_free(this->user_data);
@@ -1575,10 +1532,10 @@ int MneSurfaceOrVolume::mne_project_to_surface(MneSurfaceOld* s, void *proj_data
 //*************************************************************************************************************
 
 void MneSurfaceOrVolume::mne_project_to_triangle(MneSurfaceOld* s,
-                                                    int        best,
-                                                    float      *r,
-                                                    float      *proj)
-     /*
+                                                 int        best,
+                                                 float      *r,
+                                                 float      *proj)
+/*
       * Project to a triangle provided that we know the best match already
       */
 {
@@ -1594,7 +1551,7 @@ void MneSurfaceOrVolume::mne_project_to_triangle(MneSurfaceOld* s,
 //*************************************************************************************************************
 
 void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, float **r, int np, int *nearest, float *dist, int nstep)
-     /*
+/*
       * Find the closest triangle on the surface for each point and the distance to it
       * This uses the values in nearest as approximations of the closest triangle
       */
@@ -1624,12 +1581,12 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
 //*************************************************************************************************************
 
 void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
-                      MneProjData*   p,
-                      int        approx_best, /* We know the best triangle approximately
-                                   * already */
-                      int        nstep,
-                      float      *r)
-     /*
+                                                   MneProjData*   p,
+                                                   int        approx_best, /* We know the best triangle approximately
+                                                                                      * already */
+                                                   int        nstep,
+                                                   float      *r)
+/*
       * Restrict the search only to feasible triangles
       */
 {
@@ -1656,28 +1613,28 @@ void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
         }
     }
     else {
-    /*
+        /*
     * Just use this triangle
     */
-    MneTriangle* this_tri = NULL;
+        MneTriangle* this_tri = NULL;
 
-    this_tri = s->tris+approx_best;
-    VEC_DIFF_17(r,this_tri->r1,diff);
-    mindist = VEC_LEN_17(diff);
-    minvert = this_tri->vert[0];
+        this_tri = s->tris+approx_best;
+        VEC_DIFF_17(r,this_tri->r1,diff);
+        mindist = VEC_LEN_17(diff);
+        minvert = this_tri->vert[0];
 
-    VEC_DIFF_17(r,this_tri->r2,diff);
-    dist = VEC_LEN_17(diff);
-    if (dist < mindist) {
-        mindist = dist;
-        minvert = this_tri->vert[1];
-    }
-    VEC_DIFF_17(r,this_tri->r3,diff);
-    dist = VEC_LEN_17(diff);
-    if (dist < mindist) {
-        mindist = dist;
-        minvert = this_tri->vert[2];
-    }
+        VEC_DIFF_17(r,this_tri->r2,diff);
+        dist = VEC_LEN_17(diff);
+        if (dist < mindist) {
+            mindist = dist;
+            minvert = this_tri->vert[1];
+        }
+        VEC_DIFF_17(r,this_tri->r3,diff);
+        dist = VEC_LEN_17(diff);
+        if (dist < mindist) {
+            mindist = dist;
+            minvert = this_tri->vert[2];
+        }
     }
     /*
     * Activate triangles in the neighborhood
@@ -1686,7 +1643,7 @@ void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
 
     for (k = 0, p->nactive = 0; k < s->ntri; k++)
         if (p->act[k])
-    p->nactive++;
+            p->nactive++;
     return;
 }
 
@@ -1694,14 +1651,14 @@ void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
 //*************************************************************************************************************
 
 void MneSurfaceOrVolume::activate_neighbors(MneSurfaceOld* s, int start, int *act, int nstep)
-     /*
+/*
       * Blessed recursion...
       */
 {
     int k;
 
     if (nstep == 0)
-    return;
+        return;
 
     for (k = 0; k < s->nneighbor_tri[start]; k++)
         act[s->neighbor_tri[start][k]] = TRUE;
@@ -1847,7 +1804,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
             }
 
             qDebug() << "ToDo: Check whether new_space->inuse contains the right stuff!!! - use VectorXi instead";
-//            new_space->inuse  = t_pTag->toInt();
+            //            new_space->inuse  = t_pTag->toInt();
             new_space->inuse = MALLOC_17(new_space->np,int); //DEBUG
             if (new_space->nuse > 0) {
                 new_space->vertno = MALLOC_17(new_space->nuse,int);
@@ -1908,8 +1865,8 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
                 for (k = 0; k < new_space->np; k++) {
                     new_space->nearest[k].dist = nearest_dist[k];
                 }
-//                FREE_17(nearest); nearest = NULL;
-//                FREE_17(nearest_dist); nearest_dist = NULL;
+                //                FREE_17(nearest); nearest = NULL;
+                //                FREE_17(nearest_dist); nearest_dist = NULL;
             }
             /*
             * We may have the distance matrix
@@ -1917,7 +1874,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag)) {
                 new_space->dist_limit = *t_pTag->toFloat();
                 if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
-//                    SparseMatrix<double> tmpSparse = t_pTag->toSparseFloatMatrix();
+                    //                    SparseMatrix<double> tmpSparse = t_pTag->toSparseFloatMatrix();
                     FiffSparseMatrix* dist = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     new_space->dist = dist->mne_add_upper_triangle_rcs();
                     delete dist;
@@ -3025,14 +2982,14 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
         }
 
         fprintf(stderr,"%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
-        1000.0*rms_digitizer_distance(head_dig,head_surf));
+                1000.0*rms_digitizer_distance(head_dig,head_surf));
         //FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After refinement :",head_dig->head_mri_t_adj);
     }
 
     return OK;
 
-    bad :
-        return FAIL;
+bad :
+    return FAIL;
 }
 
 
@@ -3095,10 +3052,10 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
 
     scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
 
-    out : {
+out : {
         FREE_17(dig_rr);
         FREE_17(head_rr);
-    return;
+        return;
     }
 }
 
@@ -3106,9 +3063,9 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
 //*************************************************************************************************************
 
 int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData* d,
-                                                             MneMshDisplaySurface* head,
-                                                             float maxdist)
-     /*
+                                                         MneMshDisplaySurface* head,
+                                                         float maxdist)
+/*
       * Discard outlier digitizer points
       */
 {
@@ -3124,8 +3081,8 @@ int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerD
             * Discard unless cardinal landmark or HPI coil
             */
             if (fabs(d->dist[k]) > maxdist &&
-            d->points[k].kind != FIFFV_POINT_CARDINAL &&
-            d->points[k].kind != FIFFV_POINT_HPI) {
+                    d->points[k].kind != FIFFV_POINT_CARDINAL &&
+                    d->points[k].kind != FIFFV_POINT_HPI) {
                 discarded++;
                 d->discard[k] = TRUE;
             }
@@ -3139,7 +3096,7 @@ int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerD
 //*************************************************************************************************************
 
 void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head,
-                                                        int do_all, int do_approx)
+                                                       int do_all, int do_approx)
 /*
  * Calculate the distances from the scalp surface
  */
@@ -3266,14 +3223,14 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
             * Special handling for the nasion
             */
             if (point->kind == FIFFV_POINT_CARDINAL &&
-            point->ident == FIFFV_POINT_NASION) {
+                    point->ident == FIFFV_POINT_NASION) {
                 w[nactive] = nasion_weight;
                 if (nasion_mri) {
                     VEC_COPY_17(rr_mri[nactive],nasion_mri);
                     VEC_COPY_17(rr_head[nactive],nasion_mri);
                     FiffCoordTransOld::fiff_coord_trans_inv(rr_head[nactive],
-                    dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t,
-                    FIFFV_MOVE);
+                                                            dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t,
+                                                            FIFFV_MOVE);
                 }
             }
             else
@@ -3286,7 +3243,7 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
         goto out;
     }
     if ((t = FiffCoordTransOld::procrustes_align(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
-                                                    rr_head, rr_mri, w, nactive, max_diff)) == NULL)
+                                                 rr_head, rr_mri, w, nactive, max_diff)) == NULL)
         goto out;
 
     if (dig->head_mri_t_adj)
@@ -3300,7 +3257,7 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
     res = OK;
     goto out;
 
-    out : {
+out : {
         FREE_CMATRIX_17(rr_head);
         FREE_CMATRIX_17(rr_mri);
         FREE_17(w);
@@ -3321,8 +3278,8 @@ float MneSurfaceOrVolume::rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig
     for (k = 0, rms = 0.0, nactive = 0; k < dig->npoint; k++)
         if (dig->active[k] && !dig->discard[k]) {
             rms = rms + dig->dist[k]*dig->dist[k];
-        nactive++;
-    }
+            nactive++;
+        }
     if (nactive > 1)
         rms = rms/(nactive-1);
     return sqrt(rms);
@@ -3332,7 +3289,7 @@ float MneSurfaceOrVolume::rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig
 //*************************************************************************************************************
 
 void MneSurfaceOrVolume::scale_display_surface(MneMshDisplaySurface* surf,
-                                                float *scales)
+                                               float *scales)
 /*
  * Not quite complete yet
  */
@@ -3372,9 +3329,9 @@ void MneSurfaceOrVolume::add_uniform_curv(MneSurfaceOld *s)
 //*************************************************************************************************************
 
 char * MneSurfaceOrVolume::mne_compose_surf_name(char *subj,
-                const char *name,
-                const char *prefix)
-     /*
+                                                 const char *name,
+                                                 const char *prefix)
+/*
       * Get the full path to a surface using the FreeSurfer hierarchy
       */
 {
@@ -3407,7 +3364,7 @@ char * MneSurfaceOrVolume::mne_compose_surf_name(char *subj,
 //*************************************************************************************************************
 
 MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface(char *surf_file,
-                char *curv_file)
+                                                        char *curv_file)
 {
     return mne_load_surface_geom(surf_file,curv_file,TRUE,TRUE);
 }
@@ -3416,10 +3373,10 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface(char *surf_file,
 //*************************************************************************************************************
 
 MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
-                     char *curv_file,
-                     int  add_geometry,
-                     int  check_too_many_neighbors)
-     /*
+                                                             char *curv_file,
+                                                             int  add_geometry,
+                                                             int  check_too_many_neighbors)
+/*
       * Load the surface and add the geometry information
       */
 {
@@ -3434,10 +3391,10 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
     void  *tags = Q_NULLPTR;
 
     if (mne_read_triangle_file(surf_file,&nvert,
-                                 &ntri,
-                                 &verts,
-                                 &tris,
-                                 &tags) == -1)
+                               &ntri,
+                               &verts,
+                               &tris,
+                               &tags) == -1)
         goto bad;
 
     if (curv_file != Q_NULLPTR) {
@@ -3485,8 +3442,8 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
 
     return s;
 
-    bad : {
-        mne_free_mgh_tag_group(tags);
+bad : {
+        delete ((MneMghTagGroup*)(tags));
         FREE_CMATRIX_17(verts);
         FREE_17(curvs);
         FREE_ICMATRIX_17(tris);
@@ -3499,12 +3456,12 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
 //*************************************************************************************************************
 
 int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
-               int   *nvertp,
-               int   *ntrip,
-               float ***vertp,
-               int   ***trip,
-               void  **tagsp)
-     /*
+                                               int   *nvertp,
+                                               int   *ntrip,
+                                               float ***vertp,
+                                               int   ***trip,
+                                               void  **tagsp)
+/*
       * Read the FS triangulated surface
       */
 {
@@ -3533,7 +3490,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
             magic != QUAD_FILE_MAGIC_NUMBER &&
             magic != NEW_QUAD_FILE_MAGIC_NUMBER) {
         printf("Bad magic in %s (%x vs %x)",fname,magic,
-                             TRIANGLE_FILE_MAGIC_NUMBER);
+               TRIANGLE_FILE_MAGIC_NUMBER);
         goto bad;
     }
     if (magic == TRIANGLE_FILE_MAGIC_NUMBER) {
@@ -3679,7 +3636,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     if (tagsp) {
         void *tags = NULL;
         if (mne_read_mgh_tags(fp, &tags) == FAIL) {
-            mne_free_mgh_tag_group(tags);
+            delete((MneMghTagGroup*)tags);
             goto bad;
         }
         *tagsp = tags;
@@ -3719,8 +3676,8 @@ bad : {
 //*************************************************************************************************************
 
 int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
-                float **curvsp,
-                int   *ncurvp)
+                                                float **curvsp,
+                                                int   *ncurvp)
 
 {
     FILE *fp = fopen(fname,"r");
@@ -3853,21 +3810,21 @@ int MneSurfaceOrVolume::check_vertex(int no, int maxno)
 
 MneVolGeom* MneSurfaceOrVolume::mne_get_volume_geom_from_tag(void *tagsp)
 {
-  mneMGHtagGroup tags = (mneMGHtagGroup)tagsp;
-  mneMGHtag      tag  = NULL;
-  MneVolGeom*     vg   = NULL;
-  int k;
+    MneMghTagGroup* tags = (MneMghTagGroup*)tagsp;
+    MneMghTag*      tag  = NULL;
+    MneVolGeom*     vg   = NULL;
+    int k;
 
-  if (tags) {
-    for (k = 0; k < tags->ntags; k++)
-      if (tags->tags[k]->tag == TAG_OLD_SURF_GEOM) {
-    tag = tags->tags[k];
-    break;
-      }
-    if (tag)
-      vg = mne_dup_vol_geom((MneVolGeom*)tag->data);
-  }
-  return vg;
+    if (tags) {
+        for (k = 0; k < tags->ntags; k++)
+            if (tags->tags[k]->tag == TAG_OLD_SURF_GEOM) {
+                tag = tags->tags[k];
+                break;
+            }
+        if (tag)
+            vg = mne_dup_vol_geom((MneVolGeom*)tag->data);
+    }
+    return vg;
 }
 
 
@@ -3895,7 +3852,7 @@ int MneSurfaceOrVolume::mne_read_mgh_tags(FILE *fp, void **tagsp)
     long long     len;
     int           tag;
     unsigned char *tag_data;
-    mneMGHtagGroup *tags = (mneMGHtagGroup  *)tagsp;
+    MneMghTagGroup **tags = (MneMghTagGroup **)tagsp;
 
     while (1) {
         if (read_next_tag(fp,&tag,&len,&tag_data) == FAIL)
@@ -3904,7 +3861,7 @@ int MneSurfaceOrVolume::mne_read_mgh_tags(FILE *fp, void **tagsp)
             break;
         *tags = mne_add_mgh_tag_to_group(*tags,tag,len,tag_data);
     }
-    tagsp = (void *)tags;
+    tagsp = (void **)tags;
     return OK;
 }
 
@@ -3916,38 +3873,38 @@ int MneSurfaceOrVolume::read_next_tag(FILE *fp, int *tagp, long long *lenp, unsi
  * Read the next tag in the file
  */
 {
-  int       ilen,tag;
-  long long len;
+    int       ilen,tag;
+    long long len;
 
-  if (mne_read_int(fp,&tag) == FAIL) {
-    *tagp = 0;
-    return OK;
-  }
-  if (feof(fp)) {
-    *tagp = 0;
-    return OK;
-  }
-  switch (tag) {
+    if (mne_read_int(fp,&tag) == FAIL) {
+        *tagp = 0;
+        return OK;
+    }
+    if (feof(fp)) {
+        *tagp = 0;
+        return OK;
+    }
+    switch (tag) {
     case TAG_OLD_MGH_XFORM: /* This is obviously a burden of the past */
-      if (mne_read_int(fp,&ilen) == FAIL)
-    return FAIL;
-      len = ilen - 1;
-      break ;
+        if (mne_read_int(fp,&ilen) == FAIL)
+            return FAIL;
+        len = ilen - 1;
+        break ;
     case TAG_OLD_SURF_GEOM:
     case TAG_OLD_USEREALRAS:
     case TAG_OLD_COLORTABLE:
-      len = 0 ;
-      break ;
+        len = 0 ;
+        break ;
     default:
-      if (mne_read_long(fp,&len) == FAIL)
-    return FAIL;
-      break;
-  }
-  *lenp = len;
-  *tagp = tag;
-  if (read_tag_data(fp,tag,len,datap,lenp) == FAIL)
-    return FAIL;
-  return OK;
+        if (mne_read_long(fp,&len) == FAIL)
+            return FAIL;
+        break;
+    }
+    *lenp = len;
+    *tagp = tag;
+    if (read_tag_data(fp,tag,len,datap,lenp) == FAIL)
+        return FAIL;
+    return OK;
 }
 
 
@@ -3965,8 +3922,8 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
     if (nbytes > 0) {
         dum = MALLOC_17(nbytes+1,unsigned char);
         if (fread(dum,sizeof(unsigned char),nbytes,fp) != snbytes) {
-            err_printf_set_error("Failed to read %d bytes of tag data",nbytes);
-            FREE(dum);
+            fprintf(stderr, "Failed to read %d bytes of tag data",nbytes);
+            FREE_17(dum);
             return FAIL;
         }
         dum[nbytes] = '\0'; /* Ensure null termination */
@@ -3975,11 +3932,11 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
     }
     else {			/* Need to handle special cases */
         if (tag == TAG_OLD_SURF_GEOM) {
-            mneVolGeom g = read_vol_geom(fp);
+            MneVolGeom* g = read_vol_geom(fp);
             if (!g)
                 return FAIL;
             *val     = (unsigned char *)g;
-            *nbytesp = sizeof(mneVolGeomRec);
+            *nbytesp = sizeof(MneVolGeom);
         }
         else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
             int *vi = MALLOC_17(1,int);
@@ -4000,14 +3957,14 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
 
 //*************************************************************************************************************
 
-mneMGHtagGroup MneSurfaceOrVolume::mne_add_mgh_tag_to_group(mneMGHtagGroup g, int tag, long long len, unsigned char *data)
+MneMghTagGroup* MneSurfaceOrVolume::mne_add_mgh_tag_to_group(MneMghTagGroup* g, int tag, long long len, unsigned char *data)
 {
-    mneMGHtag new_tag;
+    MneMghTag* new_tag = NULL;
 
     if (!g)
-        g = mne_new_mgh_tag_group();
-    g->tags = REALLOC_17(g->tags,g->ntags+1,mneMGHtag);
-    g->tags[g->ntags++] = new_tag = mne_new_mgh_tag();
+        g = new MneMghTagGroup();
+    g->tags = REALLOC_17(g->tags,g->ntags+1,MneMghTag);
+    g->tags[g->ntags++] = new_tag = new MneMghTag();
     new_tag->tag  = tag;
     new_tag->len  = len;
     new_tag->data = data;
@@ -4018,8 +3975,97 @@ mneMGHtagGroup MneSurfaceOrVolume::mne_add_mgh_tag_to_group(mneMGHtagGroup g, in
 
 //*************************************************************************************************************
 
+MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
+/*
+ * This the volume geometry reading code from FreeSurfer
+ */
+{
+    char line[256];
+    char param[64];
+    char eq[2];
+    char buf[256];
+    int vgRead = 0;
+    char *p = 0;
+    int counter = 0;
+    long pos = 0;
+    int  fail = 0;
+
+    mneVolGeom vg = mne_new_vol_geom();
+
+    while ((p = fgets(line, sizeof(line), fp)) && counter < 8)
+    {
+        if (strlen(p) == 0)
+            break ;
+        sscanf(line, "%s %s %*s", param, eq);
+        if (!strcmp(param, "valid")) {
+            sscanf(line, "%s %s %d \n", param, eq, &vg->valid);
+            vgRead = 1;
+            counter++;
+        }
+        else if (!strcmp(param, "filename")) {
+            if (sscanf(line, "%s %s %s\n", param, eq, buf) >= 3)
+                vg->filename = mne_strdup(buf);
+            counter++;
+        }
+        else if (!strcmp(param, "volume")) {
+            sscanf(line, "%s %s %d %d %d\n",
+                   param, eq, &vg->width, &vg->height, &vg->depth);
+            counter++;
+        }
+        else if (!strcmp(param, "voxelsize")) {
+            sscanf(line, "%s %s %f %f %f\n",
+                   param, eq, &vg->xsize, &vg->ysize, &vg->zsize);
+            /*
+       * We like these to be in meters
+       */
+            vg->xsize = vg->xsize/1000.0;
+            vg->ysize = vg->ysize/1000.0;
+            vg->zsize = vg->zsize/1000.0;
+            counter++;
+        }
+        else if (!strcmp(param, "xras")) {
+            sscanf(line, "%s %s %f %f %f\n",
+                   param, eq, vg->x_ras, vg->x_ras+1, vg->x_ras+2);
+            counter++;
+        }
+        else if (!strcmp(param, "yras")) {
+            sscanf(line, "%s %s %f %f %f\n",
+                   param, eq, vg->y_ras, vg->y_ras+1, vg->y_ras+2);
+            counter++;
+        }
+        else if (!strcmp(param, "zras")) {
+            sscanf(line, "%s %s %f %f %f\n",
+                   param, eq, vg->z_ras, vg->z_ras+1, vg->z_ras+2);
+            counter++;
+        }
+        else if (!strcmp(param, "cras")) {
+            sscanf(line, "%s %s %f %f %f\n",
+                   param, eq, vg->c_ras, vg->c_ras+1, vg->c_ras+2);
+            vg->c_ras[0] = vg->c_ras[0]/1000.0;
+            vg->c_ras[1] = vg->c_ras[1]/1000.0;
+            vg->c_ras[2] = vg->c_ras[2]/1000.0;
+            counter++;
+        }
+        /* rememver the current position */
+        pos = ftell(fp); /* if fail = 0, then ok */
+    };
+    if (p) { /* we read one more line */
+        if (pos > 0 ) /* if success in getting pos, then */
+            fail = fseek(fp, pos, SEEK_SET); /* restore the position */
+        /* note that this won't allow compression using pipe */
+    }
+    if (!vgRead) {
+        mne_free_vol_geom(vg);
+        vg = mne_new_vol_geom();
+    }
+    return vg;
+}
+
+
+//*************************************************************************************************************
+
 int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
-     /*
+/*
       * Read the strange 3-byte integer
       */
 {
@@ -4041,7 +4087,7 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 //*************************************************************************************************************
 
 int MneSurfaceOrVolume::mne_read_int(FILE *in, int *ival)
-     /*
+/*
       * Read a 32-bit integer
       */
 {
@@ -4061,7 +4107,7 @@ int MneSurfaceOrVolume::mne_read_int(FILE *in, int *ival)
 //*************************************************************************************************************
 
 int MneSurfaceOrVolume::mne_read_int2(FILE *in, int *ival)
-     /*
+/*
       * Read int from short
       */
 {
@@ -4081,7 +4127,7 @@ int MneSurfaceOrVolume::mne_read_int2(FILE *in, int *ival)
 //*************************************************************************************************************
 
 int MneSurfaceOrVolume::mne_read_float(FILE *in, float *fval)
-     /*
+/*
       * Read float
       */
 {
@@ -4105,16 +4151,16 @@ int MneSurfaceOrVolume::mne_read_long(FILE *in, long long *lval)
  * Read a 64-bit integer
  */
 {
-  long long s ;
-  if (fread (&s,sizeof(long long),1,in) != 1) {
-    if (ferror(in))
-      qCritical("mne_read_long");
-    else
-      qCritical("mne_read_long could not read data");
-    return FAIL;
-  }
-  *lval = swap_long(s);
-  return OK;
+    long long s ;
+    if (fread (&s,sizeof(long long),1,in) != 1) {
+        if (ferror(in))
+            qCritical("mne_read_long");
+        else
+            qCritical("mne_read_long could not read data");
+        return FAIL;
+    }
+    *lval = swap_long(s);
+    return OK;
 }
 
 

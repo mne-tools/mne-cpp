@@ -129,7 +129,9 @@ SOURCES += \
     c/mne_msh_light.cpp\
     c/mne_msh_light_set.cpp \
     c/mne_surface_patch.cpp \
-    c/mne_msh_eyes.cpp
+    c/mne_msh_eyes.cpp \
+    c/mne_mgh_tag.cpp \
+    c/mne_mgh_tag_group.cpp
 
 HEADERS += \
     mne.h \
@@ -179,7 +181,9 @@ HEADERS += \
     c/mne_msh_light.h\
     c/mne_msh_light_set.h \
     c/mne_surface_patch.h \
-    c/mne_msh_eyes.h
+    c/mne_msh_eyes.h \
+    c/mne_mgh_tag.h \
+    c/mne_mgh_tag_group.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
