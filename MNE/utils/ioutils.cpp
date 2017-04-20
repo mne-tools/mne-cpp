@@ -193,6 +193,21 @@ void IOUtils::swap_longp(qint64 *source)
 
 //*************************************************************************************************************
 
+float IOUtils::swap_float(float source)
+{
+    unsigned char *csource =  (unsigned char *)(&source);
+    float result;
+    unsigned char *cresult =  (unsigned char *)(&result);
+
+    cresult[0] = csource[3];
+    cresult[1] = csource[2];
+    cresult[2] = csource[1];
+    cresult[3] = csource[0];
+    return (result);
+}
+
+//*************************************************************************************************************
+
 void IOUtils::swap_floatp(float *source)
 
 {
