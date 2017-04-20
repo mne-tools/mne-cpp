@@ -186,10 +186,12 @@ void DeepCNTK::init()
         qDebug() << "m_pDeepCNTKManager->currentDeepConfiguration()" << m_pDeepCNTKManager->currentDeepConfiguration();
         m_pDeepCNTKManager->currentDeepConfiguration()->getModel()->print();
 
-            m_pDeepViewer = new DeepViewer(false);
-//        if(m_pDeepCNTKManager->currentDeepConfiguration()) {
+        m_pDeepViewer = new DeepViewer(false);
+
+        if(m_pDeepCNTKManager->currentDeepConfiguration()->getName() != "BIO") {
+            // Don't display model when its too complex
             m_pDeepViewer->setModel(m_pDeepCNTKManager->currentDeepConfiguration()->getModel());
-//        }
+        }
 
 
         m_pControlPanel->setDeepViewer(m_pDeepViewer);

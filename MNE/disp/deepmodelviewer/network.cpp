@@ -77,7 +77,7 @@ using namespace Eigen;
 Network::Network(QObject *parent)
 : QObject(parent)
 , m_penStyle(Qt::SolidLine)
-, m_weightThreshold(0.4f)
+, m_weightThreshold(0.45f)
 , m_weightStrength(5)
 {
 

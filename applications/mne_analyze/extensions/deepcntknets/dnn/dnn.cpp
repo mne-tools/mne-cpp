@@ -149,7 +149,6 @@ void DNN::init()
     m_pDeep = Deep::SPtr(new Deep);
     FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
     m_pDeep->setModel(model);
-    m_pDeep->print();
 }
 
 
