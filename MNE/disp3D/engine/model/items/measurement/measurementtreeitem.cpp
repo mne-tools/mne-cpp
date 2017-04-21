@@ -172,7 +172,7 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                 list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
                 this->appendRow(list);
 
-                connect(m_pMneEstimateTreeItem, &MneEstimateTreeItem::rtVertColorChanged,
+                connect(m_pMneEstimateTreeItem.data(), &MneEstimateTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onRtVertColorChanged);
 
                 //Divide into left right hemi
