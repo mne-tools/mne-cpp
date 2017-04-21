@@ -124,7 +124,7 @@ public:
     /**
     * Manual garbage collection, since Qt3D is still a bit buggy when it come to memory handling.
     */
-    void releaseNode(Qt3DCore::QNode *node);
+    //void releaseNode(Qt3DCore::QNode *node);
 
     //=========================================================================================================
     /**
