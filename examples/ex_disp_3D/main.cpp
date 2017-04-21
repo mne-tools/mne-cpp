@@ -57,6 +57,8 @@
 
 #include <iostream>
 
+#include <mne/c/mne_msh_display_surface_set.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -148,6 +150,10 @@ int main(int argc, char *argv[])
     } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClustering = true;
     }
+
+    //MneMshDisplaySurfaceSet test
+    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = MneMshDisplaySurfaceSet::load_new_surface("subject","pial",NULL);
+
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));

@@ -390,7 +390,7 @@ public:
 
     //============================= mne_filename_util.c =============================
 
-    static char * mne_compose_surf_name(char *subj,
+    static char * mne_compose_surf_name(const char *subj,
                     const char *name,
                     const char *prefix);
 
