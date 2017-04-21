@@ -127,12 +127,12 @@ public:
 
     //============================= display_surfaces.c =============================
 
-    static MneMshDisplaySurfaceSet* load_new_surface(char *subj, char *name, char *curv);
+    static MneMshDisplaySurfaceSet* load_new_surface(const char *subj, const char *name, char *curv);
 
     static void decide_surface_extent(MneMshDisplaySurface* surf,
                                                         const char *tag);
 
-    static void decide_curv_display(char *name,
+    static void decide_curv_display(const char *name,
                     MneMshDisplaySurface* s);
 
     //============================= vertex_colors.c =============================

@@ -244,7 +244,7 @@ MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
 
 //*************************************************************************************************************
 
-MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(char *subj, char *name, char *curv)
+MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const char *subj, const char *name, char *curv)
      /*
       * Load new display surface data
       */
@@ -384,7 +384,7 @@ void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
 
 //*************************************************************************************************************
 
-void MneMshDisplaySurfaceSet::decide_curv_display(char *name,
+void MneMshDisplaySurfaceSet::decide_curv_display(const char *name,
                 MneMshDisplaySurface* s)
 
 {

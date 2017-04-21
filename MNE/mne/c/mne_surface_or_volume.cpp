@@ -3329,7 +3329,7 @@ void MneSurfaceOrVolume::add_uniform_curv(MneSurfaceOld *s)
 
 //*************************************************************************************************************
 
-char * MneSurfaceOrVolume::mne_compose_surf_name(char *subj,
+char * MneSurfaceOrVolume::mne_compose_surf_name(const char *subj,
                                                  const char *name,
                                                  const char *prefix)
 /*
