@@ -125,6 +125,8 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
+
+    QList<Renderable3DEntity*> list;
 };
 
 } //NAMESPACE DISP3DLIB
