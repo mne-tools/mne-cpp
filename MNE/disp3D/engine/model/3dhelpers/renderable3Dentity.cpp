@@ -101,8 +101,28 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 
 Renderable3DEntity::~Renderable3DEntity()
 {
-    for(int i = 0; i < this->childNodes().size(); ++i) {
-        this->childNodes()[i]->deleteLater();
+    releaseNode(this);
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::releaseNode(Qt3DCore::QNode* node)
+{
+    if (QEntity* entity = dynamic_cast<QEntity*>(node)) {
+        QComponentVector components = entity->components();
+
+        foreach (QComponent* component, components) {
+            entity->removeComponent(component);
+            delete component;
+        }
+    }
+
+    QNodeVector nodes = node->childNodes();
+
+    foreach (QNode* nodeIt, nodes) {
+        releaseNode(nodeIt);
+        delete nodeIt;
     }
 }
 

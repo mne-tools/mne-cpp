@@ -57,7 +57,7 @@
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
-//=============================================================================================================
+//============================================================================= ================================
 
 
 //*************************************************************************************************************
@@ -95,13 +95,31 @@ void DigitizerTreeItem::initItem()
 
 void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
 {
-    //Create digitizers as small 3D spheres
     QVector3D pos;
+
+    if(!list.isEmpty() && list.size() == tDigitizer.size()) {
+        for(int i = 0; i < list.size(); ++i) {
+            pos.setX(tDigitizer[i].r[0]);
+            pos.setY(tDigitizer[i].r[1]);
+            pos.setZ(tDigitizer[i].r[2]);
+
+            list[i]->setPosition(pos);
+        }
+        return;
+    }
+
+//    for(int i = 0; i < list.size(); ++i) {
+//        list[i]->deleteLater();
+//    }
+//    list.clear();
+
+    //Create digitizers as small 3D spheres
     QColor colDefault(100,100,100);
 
     for(int i = 0; i < tDigitizer.size(); ++i) {
         Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
+        list.append(pSourceSphereEntity);
         pos.setX(tDigitizer[i].r[0]);
         pos.setY(tDigitizer[i].r[1]);
         pos.setZ(tDigitizer[i].r[2]);
@@ -121,16 +139,16 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
         switch (tDigitizer[i].kind) {
             case FIFFV_POINT_CARDINAL:
                 switch (tDigitizer[i].ident) {
-                    case 1:
+                    case FIFFV_POINT_LPA:
                     colDefault = Qt::green;
                     material->setAmbient(colDefault);
                     break;
-                    case 2:
+                    case FIFFV_POINT_NASION:
                     colDefault = Qt::yellow;
                     material->setAmbient(colDefault);
                     break;
-                    case 3:
-                    colDefault = Qt::darkGreen;
+                    case FIFFV_POINT_RPA:
+                    colDefault = Qt::magenta;
                     material->setAmbient(colDefault);
                     break;
                     default:

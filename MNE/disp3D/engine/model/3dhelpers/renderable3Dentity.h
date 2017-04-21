@@ -118,7 +118,13 @@ public:
     /**
     * Default destructor.
     */
-    ~Renderable3DEntity();
+    virtual ~Renderable3DEntity();
+
+    //=========================================================================================================
+    /**
+    * Manual garbage collection, since Qt3D is still a bit buggy when it come to memory handling.
+    */
+    void releaseNode(Qt3DCore::QNode *node);
 
     //=========================================================================================================
     /**
