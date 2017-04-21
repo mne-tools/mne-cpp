@@ -120,7 +120,7 @@ void NetworkTreeItem::initItem()
     this->appendRow(list);
     data.setValue(vecEdgeTrehshold);
     m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
-    connect(m_pItemNetworkThreshold, &MetaTreeItem::dataChanged,
+    connect(m_pItemNetworkThreshold.data(), &MetaTreeItem::dataChanged,
             this, &NetworkTreeItem::onNetworkThresholdChanged);
 
     list.clear();

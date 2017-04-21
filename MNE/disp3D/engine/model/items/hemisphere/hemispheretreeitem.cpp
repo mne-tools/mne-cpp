@@ -141,7 +141,7 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
             m_pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
         }
 
-        connect(m_pAnnotItem, &FsAnnotationTreeItem::annotationVisibiltyChanged,
+        connect(m_pAnnotItem.data(), &FsAnnotationTreeItem::annotationVisibiltyChanged,
                 m_pSurfaceItem, &FsSurfaceTreeItem::onAnnotationVisibilityChanged);
 
         list.clear();
