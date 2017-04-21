@@ -251,7 +251,7 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
         m_pSourceLocRtDataWorker = new RtSourceLocDataWorker();
     }
 
-    connect(m_pSourceLocRtDataWorker, &RtSourceLocDataWorker::newRtData,
+    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
             this, &MneEstimateTreeItem::onNewRtData);
 
     m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
