@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     abstractsurfacetreeitem.h
+* @file     abstract3Dtreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     AbstractSurfaceTreeItem class declaration.
+* @brief     Abstract3DTreeItem class declaration.
 *
 */
 
-#ifndef ABSTRACTSURFACETREEITEM_H
-#define ABSTRACTSURFACETREEITEM_H
+#ifndef Abstract3DTreeItem_H
+#define Abstract3DTreeItem_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,8 +42,8 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
-#include "../common/types.h"
+#include "../../3dhelpers/renderable3Dentity.h"
+#include "types.h"
 
 
 //*************************************************************************************************************
@@ -51,27 +51,13 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QPointer>
+#include <QStandardItem>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Qt3DCore {
-    class QEntity;
-}
-
-namespace Qt3DRender {
-    class QMaterial;
-}
 
 
 //*************************************************************************************************************
@@ -89,107 +75,80 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MetaTreeItem;
-class Renderable3DEntity;
 
 
 //=============================================================================================================
 /**
-* AbstractSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* Abstract3DTreeItem provides Abstract3DTreeItem provides the basic tree item. This item should be used as a base class for all tree items throughout the disp3D library.
 *
-* @brief Provides a generic brain tree item.
+* @brief Provides the basic tree item.
 */
-class DISP3DNEWSHARED_EXPORT AbstractSurfaceTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT Abstract3DTreeItem : public Renderable3DEntity, public QStandardItem
 {
     Q_OBJECT
 
-public:
-    typedef QSharedPointer<AbstractSurfaceTreeItem> SPtr;             /**< Shared pointer type for AbstractSurfaceTreeItem class. */
-    typedef QSharedPointer<const AbstractSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for AbstractSurfaceTreeItem class. */
-
+public :
     //=========================================================================================================
     /**
     * Default constructor.
     *
+    * @param[in] p3DEntityParent    The parent 3D entity.
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit AbstractSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::AbstractSurfaceItem, const QString& text = "Abstract Surface");
+    Abstract3DTreeItem(QEntity* p3DEntityParent = 0,
+                       int iType = Data3DTreeModelItemTypes::UnknownItem,
+                       const QString& text = "");
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * QStandardItem functions
     */
-    ~AbstractSurfaceTreeItem();
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    int type() const;
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
-    virtual QVariant data(int role = Qt::UserRole + 1) const;
-    virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
+    * Returns all children of this item based on their type.
     *
-    * @param[in] state     The visiblity flag.
+    * @param[in] type    The type of the child items which should be looked for.
+    *
+    * @return           List with all found items.
     */
-    virtual void setVisible(bool state);
+    QList<QStandardItem*> findChildren(int type);
 
     //=========================================================================================================
     /**
-    * Removes the old material and sets the new material.
+    * Returns all children of this item based on their text.
     *
-    * @param[in] pMaterial     The new material.
+    * @param[in] text    The text of the child items which should be looked for.
+    *
+    * @return           List with all found items.
     */
-    virtual void setMaterial(QPointer<Qt3DRender::QMaterial> pMaterial);
+    QList<QStandardItem*> findChildren(const QString& text);
 
     //=========================================================================================================
     /**
-    * Returns the RenderableEntity as a pointer.
+    * Overloaded stream operator to add a child to this item based on a pointer.
     *
-    * @return   The RenderableEntity as a pointer.
+    * @param[in] newItem    The new item as a pointer.
     */
-    virtual QPointer<Renderable3DEntity> getRenderableEntity();
+    Abstract3DTreeItem &operator<<(Abstract3DTreeItem* newItem);
+
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a child to this item based on a reference.
+    *
+    * @param[in] newItem    The new item as a reference.
+    */
+    Abstract3DTreeItem &operator<<(Abstract3DTreeItem& newItem);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
+    * Init this item.
     */
     virtual void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the alpha value changed.
-    *
-    * @param[in] fAlpha     The new alpha value.
-    */
-    virtual void onSurfaceAlphaChanged(float fAlpha);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the inner tesselation value changed.
-    *
-    * @param[in] fTessInner     The new inner tesselation value.
-    */
-    virtual void onSurfaceTessInnerChanged(float fTessInner);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the outer tesselation value changed.
-    *
-    * @param[in] fTessOuter     The new outer tesselation value.
-    */
-    virtual void onSurfaceTessOuterChanged(float fTessOuter);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the triangle scale value changed.
-    *
-    * @param[in] fTriangleScale     The triangle scale value.
-    */
-    virtual void onSurfaceTriangleScaleChanged(float fTriangleScale);
 
     //=========================================================================================================
     /**
@@ -205,7 +164,7 @@ protected:
     *
     * @param[in] fTransX        The current x translation.
     */
-    virtual void onSurfaceTranslationXChanged(float fTransX);
+    virtual void onSurfaceTranslationXChanged(const QVariant& fTransX);
 
     //=========================================================================================================
     /**
@@ -213,7 +172,7 @@ protected:
     *
     * @param[in] fTransY        The current y translation.
     */
-    virtual void onSurfaceTranslationYChanged(float fTransY);
+    virtual void onSurfaceTranslationYChanged(const QVariant& fTransY);
 
     //=========================================================================================================
     /**
@@ -221,36 +180,39 @@ protected:
     *
     * @param[in] fTransZ        The current z translation.
     */
-    virtual void onSurfaceTranslationZChanged(float fTransZ);
+    virtual void onSurfaceTranslationZChanged(const QVariant& fTransZ);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the surface color was changed.
+    * Call this function whenever the color was changed.
     *
     * @param[in] color        The new surface color.
     */
-    virtual void onSurfaceColorChanged(const QColor &color);
+    virtual void onColorChanged(const QVariant& color);
 
     //=========================================================================================================
     /**
-    * Creates a QByteArray of colors for given color for the input vertices.
+    * Call this function whenever the alpha value changed.
     *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
-    *
-    * @return The colors per vertex
+    * @param[in] fAlpha     The new alpha value.
     */
-    virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
+    virtual void onAlphaChanged(const QVariant& fAlpha);
 
-    QPointer<Renderable3DEntity>        m_pRenderable3DEntity;                      /**< The surface renderable 3D entity. */
-    QPointer<Renderable3DEntity>        m_pRenderable3DEntityNormals;               /**< The normals renderable 3D entity. */
+    int     m_iType;        /**< This item's type. */
 
-    QPointer<Qt3DRender::QMaterial>     m_pMaterial;                                /**< The material. Ownership belongs to RenderableEntity. */
+    QPointer<MetaTreeItem>      m_pItemTransformationOptions;       /**< The item holding the transfomation (translation, etc.) group. */
+    QPointer<MetaTreeItem>      m_pItemAppearanceOptions;           /**< The item holding the appearance (color, alpha, etc.) group. */
 
-    bool        m_bUseTesselation;      /**< Whether to use tesselation. */
-    bool        m_bRenderNormals;       /**< Whether to render normals. */
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever this item's check state changed.
+    *
+    * @param[in] checkState     The current check state.
+    */
+    void checkStateChanged(const Qt::CheckState& checkState);
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // ABSTRACTSURFACETREEITEM_H
+#endif // Abstract3DTreeItem_H

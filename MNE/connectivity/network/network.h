@@ -217,4 +217,9 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
+#ifndef metatype_networks
+#define metatype_networks
+Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network);
+#endif
+
 #endif // NETWORK_H
