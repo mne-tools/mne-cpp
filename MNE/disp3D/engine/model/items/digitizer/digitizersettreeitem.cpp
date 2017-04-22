@@ -94,35 +94,12 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-DigitizerSetTreeItem::~DigitizerSetTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void DigitizerSetTreeItem::initItem()
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("Digitizer set item");
-}
-
-
-//*************************************************************************************************************
-
-QVariant DigitizerSetTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  DigitizerSetTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
 }
 
 
@@ -177,151 +154,172 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         }
     }
 
-    //Create items all new - A bit more inefficient but we do not run into the problem that the QEntity
-    //is delted with deleteLater() which could let to deletion after the new Qentity has been created
-    //Delete all childs first. We do this because we always want to start fresh with the newly added digitizer data.
-    if(this->hasChildren()) {
-        this->removeRows(0, this->rowCount());
-    }
-
-    QList<QStandardItem*> itemList;
-
-    if (!tLAP.empty()){
-        //Create a LAP digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"LAP");
-        digitizerItem->addData(tLAP, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-    if (!tNasion.empty()){
-        //Create a Nasion digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
-         digitizerItem->addData(tNasion, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-    if (!tRAP.empty()){
-        //Create a RAO digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"RAP");
-        digitizerItem->addData(tRAP, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-    if (!tHpi.empty()){
-        //Create a HPI digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
-        digitizerItem->addData(tHpi, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-    if (!tEeg.empty()){
-        //Create a EEG digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
-        digitizerItem->addData(tEeg, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-    if (!tExtra.empty()){
-        //Create a extra digitizer item
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
-        digitizerItem->addData(tExtra, parent);
-        itemList << digitizerItem;
-        itemList << new QStandardItem(digitizerItem->toolTip());
-        this->appendRow(itemList);
-        itemList.clear();
-    }
-
-//    //Find exiting Digitizer Items and add data respectivley
-//    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
-//    bool bFoundCardinalItem = false;
-//    bool bFoundHPIItem = false;
-//    bool bFoundEEGItem = false;
-//    bool bFoundExtraItem = false;
-
-//    for(int i = 0; i < itemList.size(); ++i) {
-//        DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(itemList.at(i));
-
-//        if(item->text() == "Cardinal" && !tCardinal.empty()) {
-//            item->addData(tCardinal, parent);
-//            bFoundCardinalItem = true;
-//        }
-
-//        if(item->text() == "HPI" && !tHpi.empty()) {
-//            item->addData(tHpi, parent);
-//            bFoundHPIItem = true;
-//        }
-
-//        if(item->text() == "EEG/ECG" && !tEeg.empty()) {
-//            item->addData(tEeg, parent);
-//            bFoundEEGItem = true;
-//        }
-
-//        if(item->text() == "Extra" && !tExtra.empty()) {
-//            item->addData(tExtra, parent);
-//            bFoundExtraItem = true;
-//        }
+//    //Create items all new - A bit more inefficient but we do not run into the problem that the QEntity
+//    //is delted with deleteLater() which could let to deletion after the new Qentity has been created
+//    //Delete all childs first. We do this because we always want to start fresh with the newly added digitizer data.
+//    if(this->hasChildren()) {
+//        this->removeRows(0, this->rowCount());
 //    }
 
-//    //If not existent yet create here
-//    if (!bFoundCardinalItem && !tCardinal.empty()){
-//        //Create a cardinal digitizer item
-//        QList<QStandardItem*> itemListCardinal;
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Cardinal");
-//        state = digitizerItem->addData(tCardinal, parent);
-//        itemListCardinal << digitizerItem;
-//        itemListCardinal << new QStandardItem(digitizerItem->toolTip());
-//        this->appendRow(itemListCardinal);
-//    }
+//    QList<QStandardItem*> itemList;
 
-//    if (!bFoundHPIItem && !tHpi.empty()){
-//        //Create a hpi digitizer item
-//        QList<QStandardItem*> itemListHPI;
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"HPI");
-//        state = digitizerItem->addData(tHpi, parent);
-//        itemListHPI << digitizerItem;
-//        itemListHPI << new QStandardItem(digitizerItem->toolTip());
-//        this->appendRow(itemListHPI);
+//    if (!tLAP.empty()){
+//        //Create a LAP digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
+//        digitizerItem->addData(tLAP);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
 //    }
-
-//    if (!bFoundEEGItem && !tEeg.empty()){
-//        //Create a eeg ecg digitizer item
-//        QList<QStandardItem*> itemListEEG;
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
-//        state = digitizerItem->addData(tEeg, parent);
-//        itemListEEG << digitizerItem;
-//        itemListEEG << new QStandardItem(digitizerItem->toolTip());
-//        this->appendRow(itemListEEG);
+//    if (!tNasion.empty()){
+//        //Create a Nasion digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
+//         digitizerItem->addData(tNasion);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
 //    }
-
-//    if (!bFoundExtraItem && !tExtra.empty()){
+//    if (!tRAP.empty()){
+//        //Create a RAO digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
+//        digitizerItem->addData(tRAP);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
+//    }
+//    if (!tHpi.empty()){
+//        //Create a HPI digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+//        digitizerItem->addData(tHpi);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
+//    }
+//    if (!tEeg.empty()){
+//        //Create a EEG digitizer item
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+//        digitizerItem->addData(tEeg);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
+//    }
+//    if (!tExtra.empty()){
 //        //Create a extra digitizer item
-//        QList<QStandardItem*> itemListExtra;
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(Data3DTreeModelItemTypes::DigitizerItem,"Extra");
-//        state = digitizerItem->addData(tExtra, parent);
-//        itemListExtra << digitizerItem;
-//        itemListExtra << new QStandardItem(digitizerItem->toolTip());
-//        this->appendRow(itemListExtra);
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+//        digitizerItem->addData(tExtra);
+//        itemList << digitizerItem;
+//        itemList << new QStandardItem(digitizerItem->toolTip());
+//        this->appendRow(itemList);
+//        itemList.clear();
 //    }
-}
 
+    //Find exiting Digitizer Items and add data respectivley
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+    bool bFoundNasionlItem = false;
+    bool bFoundLAPItem = false;
+    bool bFoundRAPItem = false;
+    bool bFoundHPIItem = false;
+    bool bFoundEEGItem = false;
+    bool bFoundExtraItem = false;
 
-//*************************************************************************************************************
+    for(int i = 0; i < itemList.size(); ++i) {
+        DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(itemList.at(i));
 
-void DigitizerSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
+        if(item->text() == "Nasion" && !tNasion.empty()) {
+            item->addData(tNasion);
+            bFoundNasionlItem = true;
+        }
+
+        if(item->text() == "LAP" && !tLAP.empty()) {
+            item->addData(tLAP);
+            bFoundLAPItem = true;
+        }
+
+        if(item->text() == "RAP" && !tRAP.empty()) {
+            item->addData(tRAP);
+            bFoundRAPItem = true;
+        }
+
+        if(item->text() == "HPI" && !tHpi.empty()) {
+            item->addData(tHpi);
+            bFoundHPIItem = true;
+        }
+
+        if(item->text() == "EEG/ECG" && !tEeg.empty()) {
+            item->addData(tEeg);
+            bFoundEEGItem = true;
+        }
+
+        if(item->text() == "Extra" && !tExtra.empty()) {
+            item->addData(tExtra);
+            bFoundExtraItem = true;
         }
     }
+
+    //If not existent yet create here
+    if (!bFoundNasionlItem && !tNasion.empty()){
+        //Create a cardinal digitizer item
+        QList<QStandardItem*> itemListCardinal;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
+        digitizerItem->addData(tNasion);
+        itemListCardinal << digitizerItem;
+        itemListCardinal << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListCardinal);
+    }
+
+    if (!bFoundLAPItem && !tLAP.empty()){
+        //Create a cardinal digitizer item
+        QList<QStandardItem*> itemListCardinal;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
+        digitizerItem->addData(tLAP);
+        itemListCardinal << digitizerItem;
+        itemListCardinal << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListCardinal);
+    }
+
+    if (!bFoundRAPItem && !tRAP.empty()){
+        //Create a cardinal digitizer item
+        QList<QStandardItem*> itemListCardinal;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
+        digitizerItem->addData(tRAP);
+        itemListCardinal << digitizerItem;
+        itemListCardinal << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListCardinal);
+    }
+
+    if (!bFoundHPIItem && !tHpi.empty()){
+        //Create a hpi digitizer item
+        QList<QStandardItem*> itemListHPI;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+        digitizerItem->addData(tHpi);
+        itemListHPI << digitizerItem;
+        itemListHPI << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListHPI);
+    }
+
+    if (!bFoundEEGItem && !tEeg.empty()){
+        //Create a eeg ecg digitizer item
+        QList<QStandardItem*> itemListEEG;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+        digitizerItem->addData(tEeg);
+        itemListEEG << digitizerItem;
+        itemListEEG << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListEEG);
+    }
+
+    if (!bFoundExtraItem && !tExtra.empty()){
+        //Create a extra digitizer item
+        QList<QStandardItem*> itemListExtra;
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+        digitizerItem->addData(tExtra);
+        itemListExtra << digitizerItem;
+        itemListExtra << new QStandardItem(digitizerItem->toolTip());
+        this->appendRow(itemListExtra);
+    }
 }
+

@@ -96,17 +96,8 @@ using namespace CONNECTIVITYLIB;
 
 MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pMneEstimateTreeItem(new MneEstimateTreeItem())
-, m_pNetworkTreeItem(new NetworkTreeItem())
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-MeasurementTreeItem::~MeasurementTreeItem()
-{
 }
 
 
@@ -118,22 +109,6 @@ void MeasurementTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("Measurement item");
-}
-
-
-//*************************************************************************************************************
-
-QVariant MeasurementTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  MeasurementTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
 }
 
 
@@ -188,14 +163,16 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
         if(this->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
             if(!tForwardSolution.isEmpty()) {
-                m_pMneEstimateTreeItem = new MneEstimateTreeItem();
+                if(!m_pMneEstimateTreeItem) {
+                    m_pMneEstimateTreeItem = new MneEstimateTreeItem();
+                }
 
                 QList<QStandardItem*> list;
                 list << m_pMneEstimateTreeItem;
                 list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
                 this->appendRow(list);
 
-                connect(m_pMneEstimateTreeItem, &MneEstimateTreeItem::rtVertColorChanged,
+                connect(m_pMneEstimateTreeItem.data(), &MneEstimateTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onRtVertColorChanged);
 
                 //Divide into left right hemi
@@ -257,7 +234,9 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                 qDebug() << "MeasurementTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
             }
         } else {
-            m_pMneEstimateTreeItem->addData(tSourceEstimate);
+            if(m_pMneEstimateTreeItem) {
+                m_pMneEstimateTreeItem->addData(tSourceEstimate);
+            }
         }
 
         return m_pMneEstimateTreeItem;
@@ -277,18 +256,21 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::Q
         //Add source estimation data as child
         if(this->findChildren(Data3DTreeModelItemTypes::ECDDataItem).size() == 0) {
             //If ecd data item does not exists yet, create it here!
-            m_EcdDataTreeItem = new EcdDataTreeItem();
+            if(!m_EcdDataTreeItem) {
+                m_EcdDataTreeItem = new EcdDataTreeItem(p3DEntityParent);
+            }
 
             QList<QStandardItem*> list;
             list << m_EcdDataTreeItem;
             list << new QStandardItem(m_EcdDataTreeItem->toolTip());
             this->appendRow(list);
 
-            m_EcdDataTreeItem->initData(p3DEntityParent);
             m_EcdDataTreeItem->addData(pECDSet);
 
         } else {
-            m_EcdDataTreeItem->addData(pECDSet);
+            if(m_EcdDataTreeItem) {
+                m_EcdDataTreeItem->addData(pECDSet);
+            }
         }
 
         return m_EcdDataTreeItem;
@@ -319,8 +301,8 @@ DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigit
     // Add Data to the first Digitizer Set Item
     //Check if it is really a digitizer tree item
     if(itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem) {
-        if(DigitizerSetTreeItem* pDigitizerSetItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
-            pDigitizerSetItem->addData(tDigitizer, p3DEntityParent);
+        if(pReturnItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
+            pReturnItem->addData(tDigitizer, p3DEntityParent);
         }
     }
 
@@ -334,19 +316,22 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
 {
     if(!tNetworkData.getNodes().isEmpty()) {
         //Add source estimation data as child
-        if(this->findChildren(Data3DTreeModelItemTypes::RTConnectivityDataItem).size() == 0) {
+        if(this->findChildren(Data3DTreeModelItemTypes::NetworkItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
-            m_pNetworkTreeItem = new NetworkTreeItem();
+            if(!m_pNetworkTreeItem) {
+                m_pNetworkTreeItem = new NetworkTreeItem(p3DEntityParent);
+            }
 
             QList<QStandardItem*> list;
             list << m_pNetworkTreeItem;
             list << new QStandardItem(m_pNetworkTreeItem->toolTip());
             this->appendRow(list);
 
-            m_pNetworkTreeItem->initData(p3DEntityParent);
             m_pNetworkTreeItem->addData(tNetworkData);
         } else {
-            m_pNetworkTreeItem->addData(tNetworkData);
+            if(m_pNetworkTreeItem) {
+                m_pNetworkTreeItem->addData(tNetworkData);
+            }
         }
 
         return m_pNetworkTreeItem;
@@ -364,18 +349,6 @@ void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const M
 {
     if(m_pMneEstimateTreeItem) {
         m_pMneEstimateTreeItem->setColorOrigin(leftHemiColor, rightHemiColor);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MeasurementTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
     }
 }
 

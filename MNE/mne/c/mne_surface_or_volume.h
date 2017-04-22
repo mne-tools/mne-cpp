@@ -70,6 +70,26 @@
 
 #define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
 
+//============================= mne_surface_io.c =============================
+
+#define TRIANGLE_FILE_MAGIC_NUMBER  (0xfffffe)
+#define NEW_QUAD_FILE_MAGIC_NUMBER  (0xfffffd)
+#define QUAD_FILE_MAGIC_NUMBER      (0xffffff)
+
+//============================= mne_mgh_mri_io.c =============================
+
+#define TAG_OLD_SURF_GEOM           20
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffDigitizerData;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,7 +101,7 @@ namespace MNELIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Forward Declarations
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MneTriangle;
@@ -90,6 +110,9 @@ class MneVolGeom;
 class MnePatchInfo;
 class MneSourceSpaceOld;
 class MneSurfaceOld;
+class MneMshDisplaySurface;
+class MneProjData;
+class MneMghTagGroup;
 
 
 //=============================================================================================================
@@ -206,15 +229,6 @@ public:
 
     //============================= mne_project_to_surface.c =============================
 
-    typedef struct {
-        float *a;
-        float *b;
-        float *c;
-        int   *act;
-        int   nactive;
-    } *projData,projDataRec;
-
-
     static void mne_triangle_coords(float       *r,       /* Location of a point */
                                     MneSurfaceOld*  s,	       /* The surface */
                                     int         tri,      /* Which triangle */
@@ -248,6 +262,21 @@ public:
 
     static int mne_project_to_surface(MneSurfaceOld* s, void *proj_data, float *r, int project_it, float *distp);
 
+    static void mne_project_to_triangle(MneSurfaceOld* s,
+                                            int        best,
+                                            float      *r,
+                                            float      *proj);
+
+    static void mne_find_closest_on_surface_approx(MneSurfaceOld* s, float **r, int np, int *nearest, float *dist, int nstep);
+
+    static void decide_search_restriction(MneSurfaceOld* s,
+                          MneProjData*   p,
+                          int        approx_best, /* We know the best triangle approximately
+                                       * already */
+                          int        nstep,
+                          float      *r);
+
+    static void activate_neighbors(MneSurfaceOld* s, int start, int *act, int nstep);
 
     //============================= mne_source_space.c =============================
 
@@ -259,34 +288,18 @@ public:
     static void mne_source_space_update_inuse(MneSourceSpaceOld* s,
                                               int *new_inuse);
 
-
     static int mne_is_left_hemi_source_space(MneSourceSpaceOld* s);
 
-
-
-
-
-
-    //============================= mne_source_space.c =============================
-
-
-
     static int mne_transform_source_space(MneSourceSpaceOld* ss, FIFFLIB::FiffCoordTransOld* t);
-
 
     static int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
                                               FIFFLIB::FiffCoordTransOld* t,             /* The coordinate transformation */
                                               MneSourceSpaceOld* *spaces,       /* A list of source spaces */
                                               int            nspace);
 
-
-
-
-
     //============================= mne_forward_solution.c =============================
 
     static void enable_all_sources(MneSourceSpaceOld* s);
-
 
     //============================= resrict_sources.c =============================
 
@@ -319,16 +332,11 @@ public:
                               MneSourceSpaceOld* s, /* The associated source space */
                               float *areap);
 
-
-
     //============================= mne_add_geometry_info.c =============================
 
     static void mne_add_triangle_data(MneSourceSpaceOld* s);
 
-
-
     //============================= mne_add_geometry_info.c =============================
-
 
     static void mne_compute_cm(float **rr, int np, float *cm);
 
@@ -344,7 +352,104 @@ public:
 
     static int mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals);
 
+    //============================= digitizer.c =============================
 
+    static int align_fiducials(FIFFLIB::FiffDigitizerData* head_dig,
+                               FIFFLIB::FiffDigitizerData* mri_dig,
+                               MneMshDisplaySurface* head_surf,
+                               int niter,
+                               int scale_head,
+                               float omit_dist);
+
+    static void get_head_scale(FIFFLIB::FiffDigitizerData* dig,
+                                   float **mri_fid,
+                                   MneMshDisplaySurface* head_surf,
+                                   float *scales);
+
+    static int discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData* d,
+                                                 MneMshDisplaySurface* head,
+                                                 float maxdist);
+
+    static void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head,
+                                                                  int do_all, int do_approx);
+
+    static int iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	   /* The digitizer data */
+                                                   MneMshDisplaySurface* head, /* The head surface */
+                                                   int nasion_weight,	   /* Weight for the nasion */
+                                                   float *nasion_mri,	   /* Fixed correspondence point for the nasion (optional) */
+                                                   int last_step);          /* Is this the last iteration step */
+
+    static float rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head);
+
+    //============================= display_surfaces.c =============================
+
+    static void scale_display_surface(MneMshDisplaySurface* surf,
+                                        float *scales);
+
+    static void add_uniform_curv(MneSurfaceOld* s);
+
+    //============================= mne_filename_util.c =============================
+
+    static char * mne_compose_surf_name(const char *subj,
+                    const char *name,
+                    const char *prefix);
+
+    //============================= mne_surface_io.c =============================
+
+    static MneSourceSpaceOld* mne_load_surface(char *surf_file,
+                    char *curv_file);
+
+    static MneSourceSpaceOld* mne_load_surface_geom(char *surf_file,
+                         char *curv_file,
+                         int  add_geometry,
+                         int  check_too_many_neighbors);
+
+    static int mne_read_triangle_file(char  *fname,
+                   int   *nvertp,
+                   int   *ntrip,
+                   float ***vertp,
+                   int   ***trip,
+                   void  **tagsp);
+
+    static int mne_read_curvature_file(char  *fname,
+                    float **curvsp,
+                    int   *ncurvp);
+
+    static int check_quad(float **rr);
+
+    static int check_vertex(int no, int maxno);
+
+    //============================= mne_mgh_mri_io.c =============================
+
+    static MneVolGeom* mne_get_volume_geom_from_tag(void *tagsp);
+
+    static MneVolGeom* mne_dup_vol_geom(MneVolGeom* g);
+
+    static int mne_read_mgh_tags(FILE *fp, void **tagsp);
+
+    static int read_next_tag(FILE *fp, int *tagp, long long *lenp, unsigned char **datap);
+
+    static int read_tag_data(FILE *fp, int tag, long long nbytes, unsigned char **val, long long *nbytesp);
+
+    static MneMghTagGroup* mne_add_mgh_tag_to_group(MneMghTagGroup* g, int tag, long long len, unsigned char *data);
+
+    static MneVolGeom* read_vol_geom(FILE *fp);
+
+    //============================= mne_binio.c =============================
+
+    static int mne_read_int3(FILE *in, int *ival);
+
+    static int mne_read_int(FILE *in, int *ival);
+
+    static int mne_read_int2(FILE *in, int *ival);
+
+    static int mne_read_float(FILE *in, float *fval);
+
+    static int mne_read_long(FILE *in, long long *lval);
+
+    //============================= mne_misc.c =============================
+
+    static char *mne_strdup(const char *s);
 
 public:
     int             type;          /* Is this a volume or a surface */

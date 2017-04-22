@@ -269,6 +269,22 @@ FiffDigPoint& FiffDigPointSet::operator[] (qint32 idx)
 
 //*************************************************************************************************************
 
+FiffDigPointSet FiffDigPointSet::pickTypes(QList<int> includeTypes) const
+{
+    FiffDigPointSet pickedSet;
+
+    for(int i = 0; i < m_qListDigPoint.size(); ++i) {
+        if(includeTypes.contains(m_qListDigPoint[i].kind)) {
+            pickedSet << m_qListDigPoint[i];
+        }
+    }
+
+    return pickedSet;
+}
+
+
+//*************************************************************************************************************
+
 FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint &dig)
 {
     this->m_qListDigPoint.append(dig);
