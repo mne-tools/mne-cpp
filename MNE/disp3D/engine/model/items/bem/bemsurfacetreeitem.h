@@ -43,7 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 
-#include "../common/abstractsurfacetreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 #include "../common/types.h"
 
 
@@ -100,7 +100,7 @@ class Renderable3DEntity;
 *
 * @brief BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
 */
-class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractSurfaceTreeItem
+class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
@@ -112,19 +112,21 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BemSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::BemSurfaceItem, const QString& text = "BEM Surface");
+    explicit BemSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
+                                int iType = Data3DTreeModelItemTypes::BemSurfaceItem,
+                                const QString& text = "BEM Surface");
 
     //=========================================================================================================
     /**
     * Adds BEM model data.
     *
     * @param[in] tBemSurface        The bem data.
-    * @param[in] parent             The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEBemSurface &tBemSurface, Qt3DCore::QEntity* parent);
+    void addData(const MNELIB::MNEBemSurface &tBemSurface);
 
 protected:
     //=========================================================================================================
@@ -132,7 +134,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
 };
 
 } //NAMESPACE DISP3DLIB

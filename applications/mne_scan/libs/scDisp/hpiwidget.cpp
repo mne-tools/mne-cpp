@@ -48,11 +48,14 @@
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/bem/bemtreeitem.h>
 #include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
 #include <disp3D/engine/model/3dhelpers/renderable3Dentity.h>
 
 #include <inverse/hpiFit/hpifit.h>
 
 #include <mne/mne_bem.h>
+#include <fwd/fwd_bem_model.h>
 
 
 //*************************************************************************************************************
@@ -104,8 +107,6 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_bUseSSP(false)
 , m_bUseComp(true)
 , m_bLastFitGood(false)
-, m_pBemHeadKid(Q_NULLPTR)
-, m_pBemHeadAdult(Q_NULLPTR)
 {
     ui->setupUi(this);
 
@@ -166,6 +167,9 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
 
+
+    //FwdBemModel* bemModel =  fwd_bem_load_three_layer_surfaces(const QString& name);
+
     QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadKid(t_fileHeadKid);
     m_pBemHeadKid = m_pData3DModel->addBemData("Head", "Child", t_BemHeadKid);
@@ -175,7 +179,6 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     MNEBem t_BemHeadAdult(t_fileHeadAdult);
     m_pBemHeadAdult = m_pData3DModel->addBemData("Head", "Adult", t_BemHeadAdult);
     m_pBemHeadAdult->setCheckState(Qt::Unchecked);
-    updateHeadModel();
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -206,12 +209,12 @@ HPIWidget::~HPIWidget()
 void HPIWidget::setData(const Eigen::MatrixXd& matData)
 {
     //If bad channels changed, recalcluate projectors
-    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matProjectors.rows() == 0 || m_matProjectors.cols() == 0) {
+    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matCompProjectors.rows() == 0 || m_matCompProjectors.cols() == 0) {
         updateProjections();
         m_iNubmerBadChannels = m_pFiffInfo->bads.size();
     }
 
-    m_matValue = m_matProjectors * matData;
+    m_matValue = m_matCompProjectors * matData;
 
     //Do continous HPI if wanted
     if(ui->m_checkBox_continousHPI->isChecked()) {
@@ -248,7 +251,7 @@ void HPIWidget::closeEvent(QCloseEvent *event)
 
 void HPIWidget::updateProjections()
 {
-    Eigen::MatrixXd matProj = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     if(m_bUseSSP) {
@@ -262,10 +265,10 @@ void HPIWidget::updateProjections()
         }
 
         //Create the projector for all SSP's on
-        infoTemp.make_projector(matProj);
+        infoTemp.make_projector(m_matProjectors);
         //set columns of matrix to zero depending on bad channels indexes
         for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
-            matProj.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+            m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
         }
     }
 
@@ -276,55 +279,9 @@ void HPIWidget::updateProjections()
         matComp = newComp.data->data;
     }
 
-    m_matProjectors = matProj * matComp;
+    m_matCompProjectors = m_matProjectors * matComp;
 
     m_pRtHPI->setProjectionMatrix(m_matProjectors);
-}
-
-
-//*************************************************************************************************************
-
-void HPIWidget::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
-                                             const FiffDigPointSet& fittedPointSet,
-                                             bool bSortOutAdditionalDigitizer)
-{
-    if(bSortOutAdditionalDigitizer) {
-        FiffDigPointSet t_digSetWithoutAdditional;
-
-        for(int i = 0; i < digPointSet.size(); ++i) {
-            switch(digPointSet[i].kind)
-            {
-                case FIFFV_POINT_HPI:
-                    t_digSetWithoutAdditional << digPointSet[i];
-                    break;
-
-                case FIFFV_POINT_CARDINAL:
-                    t_digSetWithoutAdditional << digPointSet[i];
-                    break;
-
-                case FIFFV_POINT_EEG:
-                    t_digSetWithoutAdditional << digPointSet[i];
-                    break;
-            }
-        }
-
-        m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
-
-        t_digSetWithoutAdditional.clear();
-        for(int i = 0; i < fittedPointSet.size(); ++i) {
-            switch(fittedPointSet[i].kind)
-            {
-                case FIFFV_POINT_EEG:
-                    t_digSetWithoutAdditional << fittedPointSet[i];
-                    break;
-            }
-        }
-
-        m_pData3DModel->addDigitizerData("Head", "Fitted", t_digSetWithoutAdditional);
-    } else {
-        m_pData3DModel->addDigitizerData("Head", "Tracked", digPointSet);
-        m_pData3DModel->addDigitizerData("Head", "Fitted", fittedPointSet);
-    }
 }
 
 
@@ -377,8 +334,9 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
         }
     }
 
-    //Add all digitizer but additional points to View3D
-    this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet());
+    //Add all digitizer but additional points to the 3D view
+    FiffDigPointSet t_digSetWithoutAdditional = t_digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
+    m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -650,81 +608,53 @@ void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPo
     //If fit was good, set newly calculated transformation matrix to fiff info
     m_pFiffInfo->dev_head_t = devHeadTrans;
 
-    //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
-    FiffDigPointSet transformedCoils;
+    //Add and update items to 3D view
+    m_pData3DModel->addDigitizerData("Head", "Fitted", fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
 
-    for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
-        FiffDigPoint digPoint = m_pFiffInfo->dig.at(i);
-
-        MatrixX3f matPos(1,3);
-        matPos(0,0) = digPoint.r[0];
-        matPos(0,1) = digPoint.r[1];
-        matPos(0,2) = digPoint.r[2];
-
-        MatrixX3f matPosTrans = m_pFiffInfo->dev_head_t.apply_inverse_trans(matPos);
-
-        digPoint.r[0] = matPosTrans(0,0);
-        digPoint.r[1] = matPosTrans(0,1);
-        digPoint.r[2] = matPosTrans(0,2);
-
-        transformedCoils << digPoint;
-    }
-
-    this->setDigitizerDataToView3D(transformedCoils, fittedCoils);
-
-    updateHeadModel();
+    update3DView();
 }
 
 
 //*************************************************************************************************************
 
-void HPIWidget::updateHeadModel()
+void HPIWidget::update3DView()
 {
-    if(m_pFiffInfo) {
-        if(m_pBemHeadAdult) {
-            QList<QStandardItem*> itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-
-            for(int j = 0; j < itemList.size(); ++j) {
-                if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                    QPointer<Renderable3DEntity> pEntity = pBemItem->getRenderableEntity();
-                    QPointer<Qt3DCore::QTransform> pTransform = new Qt3DCore::QTransform();
-
-                    QMatrix4x4 mat;
-                    for(int r = 0; r < 3; ++r) {
-                        for(int c = 0; c < 3; ++c) {
-                            mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
-                        }
-                    }
-
-                    pTransform->setMatrix(mat);
-                    pEntity->setTransform(pTransform);
-                }
+    if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAdult && m_pBemHeadKid) {
+        //Prepare new transform
+        QMatrix4x4 mat;
+        for(int r = 0; r < 4; ++r) {
+            for(int c = 0; c < 4; ++c) {
+                mat(r,c) = m_pFiffInfo->dev_head_t.invtrans(r,c);
             }
         }
 
-        if(m_pBemHeadKid) {
-            QList<QStandardItem*> itemList = m_pBemHeadKid->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+        Qt3DCore::QTransform transform;
+        transform.setMatrix(mat);
 
-            for(int j = 0; j < itemList.size(); ++j) {
-                if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                    QPointer<Renderable3DEntity> pEntity = pBemItem->getRenderableEntity();
-                    QPointer<Qt3DCore::QTransform> pTransform = new Qt3DCore::QTransform();
+        //Update fast scan / tracked digitizer
+        QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+        for(int j = 0; j < itemList.size(); ++j) {
+            if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
+                pDigItem->setTransform(transform);
+            }
+        }
 
-                    QMatrix4x4 mat;
-                    for(int r = 0; r < 3; ++r) {
-                        for(int c = 0; c < 3; ++c) {
-                            mat(r,c) = m_pFiffInfo->dev_head_t.trans(r,c);
-                        }
-                    }
+        //Update adult head surface
+        itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+        for(int j = 0; j < itemList.size(); ++j) {
+            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                pBemItem->setTransform(transform);
+            }
+        }
 
-                    pTransform->setMatrix(mat);
-                    pEntity->setTransform(pTransform);
-
-                    //If it is the kids model scale it
-                    pEntity->setScale(0.6);
-                }
+        //Update kid's head surface
+        itemList = m_pBemHeadKid->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+        for(int j = 0; j < itemList.size(); ++j) {
+            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                //If it is the kid's model scale it
+                pBemItem->setTransform(transform);
+                pBemItem->setScale(0.65f);
             }
         }
     }
 }
-

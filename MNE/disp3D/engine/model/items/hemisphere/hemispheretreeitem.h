@@ -50,6 +50,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,7 +94,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneEstimateTreeItem;
 class FsSurfaceTreeItem;
 class FsAnnotationTreeItem;
 class SourceSpaceTreeItem;
@@ -120,20 +121,6 @@ public:
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
     explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~HemisphereTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-    int	columnCount() const;
 
     //=========================================================================================================
     /**
@@ -181,16 +168,8 @@ protected:
     */
     void initItem();
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    FsSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    FsAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
+    QPointer<FsSurfaceTreeItem>           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
+    QPointer<FsAnnotationTreeItem>        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
 };
 
 } //NAMESPACE DISP3DLIB

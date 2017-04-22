@@ -116,23 +116,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~DigitizerSetTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds digitizer data to this item.
     *
     * @param[in] tDigitizer         The digitizer data.
-    * @param[in] parent             The Qt3D entity parent of the new item.
     */
     void addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
@@ -142,14 +128,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 };
 
 } // NAMESPACE DISP3DLIB

@@ -75,13 +75,6 @@ AbstractTreeItem::AbstractTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-AbstractTreeItem::~AbstractTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void AbstractTreeItem::initItem()
 {
     this->setToolTip("Abstract Tree Item");
@@ -89,14 +82,6 @@ void AbstractTreeItem::initItem()
      //Do the connects
      connect(this, &AbstractTreeItem::checkStateChanged,
              this, &AbstractTreeItem::onCheckStateChanged);
-}
-
-
-//*************************************************************************************************************
-
-QVariant AbstractTreeItem::data(int role) const
-{
-    return QStandardItem::data(role);
 }
 
 
@@ -187,6 +172,9 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
 
 void AbstractTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
+    //Store old state
+    m_checkStateOld = this->checkState();
+
     for(int i = 0; i<this->rowCount(); i++) {
         if(this->child(i)->isCheckable()) {
             this->child(i)->setCheckState(checkState);
