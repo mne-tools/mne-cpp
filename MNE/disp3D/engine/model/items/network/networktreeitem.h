@@ -43,7 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 
-#include "../common/abstracttreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 #include "../common/types.h"
 
 #include <connectivity/network/network.h>
@@ -105,7 +105,7 @@ class MetaTreeItem;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT NetworkTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT NetworkTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
@@ -117,31 +117,13 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit NetworkTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "Connectivity Data");
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~NetworkTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
-    * Initializes the rt connectivity data item with neccessary information for visualization computations.
-    *
-    * @param[in] parent                 The Qt3D entity parent of the new item.
-    */
-    void initData(Qt3DCore::QEntity *parent);
+    explicit NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
+                             int iType = Data3DTreeModelItemTypes::NetworkItem,
+                             const QString& text = "Connectivity Data");
 
     //=========================================================================================================
     /**
@@ -150,14 +132,6 @@ public:
     * @param[in] tNetworkData       The new connectivity data.
     */
     void addData(const CONNECTIVITYLIB::Network& tNetworkData);
-
-    //=========================================================================================================
-    /**
-    * Updates the rt connectivity data which is streamed by this item's worker thread item.
-    *
-    * @return                       Returns true if this item is initialized.
-    */
-    inline bool isDataInit() const;
 
 private:
     //=========================================================================================================
@@ -168,27 +142,11 @@ private:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
-
-    //=========================================================================================================
-    /**
     * This function gets called whenever the network threshold changes.
     *
     * @param[in] vecThresholds     The new threshold values used for threshold the network.
     */
-    void onNetworkThresholdChanged(const QVector3D& vecThresholds);
+    void onNetworkThresholdChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
@@ -199,16 +157,9 @@ private:
     */
     void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData, const QVector3D& vecThreshold);
 
-    bool                                        m_bDataIsInit;                  /**< The data init flag. */
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
-    MetaTreeItem*                               m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
-
-    QPointer<Renderable3DEntity>                m_pRenderable3DEntity;          /**< The renderable 3D entity. */
-
-    QList<QPointer<Renderable3DEntity> >        m_lNodes;                       /**< The currently displayed node points as 3D spheres. */
-
-signals:
+    QPointer<MetaTreeItem>                      m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
 
 };
 
@@ -217,16 +168,6 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool NetworkTreeItem::isDataInit() const
-{
-    return m_bDataIsInit;
-}
-
 } //NAMESPACE DISP3DLIB
-
-#ifndef metatype_networksptr
-#define metatype_networksptr
-Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network);
-#endif
 
 #endif // NETWORKTREEITEM_H
