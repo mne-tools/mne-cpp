@@ -88,12 +88,10 @@ using namespace Qt3DRender;
 
 Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
-, m_pTransform(new Qt3DCore::QTransform())
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
 {
-    this->addComponent(m_pTransform);
 }
 
 
@@ -131,9 +129,12 @@ Renderable3DEntity::~Renderable3DEntity()
 
 void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 {
-    if(m_pTransform) {
-        m_pTransform->setMatrix(transform.matrix());
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
     }
+
+    m_pTransform->setMatrix(transform.matrix());
 }
 
 
@@ -141,9 +142,12 @@ void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 
 void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
 {
-    if(m_pTransform) {
-        m_pTransform->setMatrix(m_pTransform->matrix() * transform.matrix());
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
     }
+
+    m_pTransform->setMatrix(m_pTransform->matrix() * transform.matrix());
 }
 
 
@@ -291,9 +295,12 @@ void Renderable3DEntity::setVisible(bool state)
 
 void Renderable3DEntity::setScale(float scale)
 {
-    if(m_pTransform) {
-        m_pTransform->setScale(scale);
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
     }
+
+    m_pTransform->setScale(scale);
 }
 
 
@@ -309,7 +316,10 @@ void Renderable3DEntity::updateTransform()
     m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
     m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
 
-    if(m_pTransform) {
-        m_pTransform->setMatrix(m);
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
     }
+
+    m_pTransform->setMatrix(m);
 }
