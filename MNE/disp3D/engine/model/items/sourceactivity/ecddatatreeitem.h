@@ -42,15 +42,13 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
+#include "../common/abstract3Dtreeitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
-
-#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -87,8 +85,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Renderable3DEntity;
-
 
 //=============================================================================================================
 /**
@@ -96,7 +92,7 @@ class Renderable3DEntity;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT EcdDataTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT EcdDataTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
@@ -108,31 +104,13 @@ public:
     /**
     * Default constructor.
     *
+    * @param[in] p3DEntityParent    The parent 3D entity.
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit EcdDataTreeItem(int iType = Data3DTreeModelItemTypes::ECDDataItem, const QString& text = "Dipole fit data");
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~EcdDataTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
-    * Initializes the rt data item with neccessary information for visualization computations.
-    *
-    * @param[in] parent                 The Qt3D entity parent of the new item.
-    */
-    void initData(Qt3DCore::QEntity *parent);
+    explicit EcdDataTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
+                             int iType = Data3DTreeModelItemTypes::ECDDataItem,
+                             const QString& text = "Dipole fit data");
 
     //=========================================================================================================
     /**
@@ -141,14 +119,6 @@ public:
     * @param[in] pECDSet        The ECDSet dipole fit data.
     */
     void addData(const INVERSELIB::ECDSet& pECDSet);
-
-    //=========================================================================================================
-    /**
-    * Updates the rt data which is streamed by this item's worker thread item.
-    *
-    * @return                       Returns true if this item is initialized.
-    */
-    inline bool isDataInit() const;
 
 protected:
     //=========================================================================================================
@@ -159,47 +129,17 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever you want to plot the dipoles.
     *
     * @param[in] tECDSet     The dipole set data.
     */
     void plotDipoles(const INVERSELIB::ECDSet& tECDSet);
-
-    bool                                    m_bIsDataInit;                  /**< The init flag. */
-
-    QPointer<Renderable3DEntity>            m_pRenderable3DEntity;          /**< The renderable 3D entity. */
-
-    QList<QPointer<Renderable3DEntity> >    m_lDipoles;                     /**< The currently displayed dipoles as 3D objects. */
-
-signals:
-
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline bool EcdDataTreeItem::isDataInit() const
-{
-    return m_bIsDataInit;
-}
 
 } //NAMESPACE DISP3DLIB
 
