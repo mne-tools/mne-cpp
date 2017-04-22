@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -77,6 +78,7 @@ namespace DISP3DLIB {
     class View3D;
     class Data3DTreeModel;
     class BemTreeItem;
+    class DigitizerSetTreeItem;
 }
 
 namespace FIFFLIB {
@@ -154,18 +156,6 @@ protected:
     * Update the projectors for SSP and Comps.
     */
     void updateProjections();
-
-    //=========================================================================================================
-    /**
-    * Set new digitizer data to View3D.
-    *
-    * @param[in] digPointSet                    The new digitizer set.
-    * @param[in] fittedPointSet                 The new fitted dipoles set.
-    * @param[in] bSortOutAdditionalDigitizer    Whether additional or extra digitized points dhould be sorted out. Too many points could lead to 3D performance issues.
-    */
-    void setDigitizerDataToView3D(const FIFFLIB::FiffDigPointSet& digPointSet,
-                                  const FIFFLIB::FiffDigPointSet& fittedPointSet,
-                                  bool bSortOutAdditionalDigitizer = true);
 
     //=========================================================================================================
     /**
@@ -248,9 +238,16 @@ protected:
 
     //=========================================================================================================
     /**
-    * Updates the head model based on the current head/device transformation.
+    * Updates the digitizer and head models in the 3D view based on the current head/device transformation.
     */
-    void updateHeadModel();
+    void update3DView();
+
+//    //=========================================================================================================
+//    /**
+//    * Align the MEG fiducials to the MRI fiducials.
+//    */
+//    int alignFiducials(digitizerData head_dig,
+//                       digitizerData mri_dig);
 
     Ui::HPIWidget*                              ui;                     /**< The HPI dialog. */
 
@@ -267,14 +264,17 @@ protected:
     Eigen::SparseMatrix<double>                 m_sparseMatCals;        /**< Sparse calibration matrix.*/
     Eigen::MatrixXd                             m_matValue;             /**< The current data block.*/
     Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    Eigen::MatrixXd                             m_matCompProjectors;    /**< Holds the matrix with the SSP and compensator projectors.*/
 
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The FiffInfo. */
     QSharedPointer<RTPROCESSINGLIB::RtHPIS>     m_pRtHPI;               /**< The real-time HPI object. */
 
-    DISP3DLIB::BemTreeItem*                     m_pBemHeadKid;          /**< The BEM head model for a kid. */
-    DISP3DLIB::BemTreeItem*                     m_pBemHeadAdult;        /**< The BEM head model for an adult. */
+    QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadKid;          /**< The BEM head model for a kid. */
+    QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAdult;        /**< The BEM head model for an adult. */
+
+    QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
 
     double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
 

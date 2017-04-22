@@ -92,14 +92,12 @@ public :
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    AbstractTreeItem(int iType, const QString& text = "");
-    virtual ~AbstractTreeItem();
+    AbstractTreeItem(int iType = Data3DTreeModelItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**
     * QStandardItem functions
     */
-    QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
     int type() const;
 
@@ -154,7 +152,8 @@ protected:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
-    int     m_iType;        /**< This item's type. */
+    int             m_iType;            /**< This item's type. */
+    Qt::CheckState  m_checkStateOld;    /**< This item's old check state. */
 
 signals:
     //=========================================================================================================

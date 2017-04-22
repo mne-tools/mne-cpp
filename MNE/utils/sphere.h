@@ -128,10 +128,6 @@ public:
     */
     float& radius() { return m_r; }
 
-private:
-    Eigen::Vector3f m_center;   /**< Sphere's center */
-    float m_r;                  /**< Sphere's radius */
-
     //=========================================================================================================
     /**
     * Fits a sphere to a point cloud.
@@ -144,6 +140,12 @@ private:
     * @return true if successful.
     */
     static bool fit_sphere_to_points ( const Eigen::MatrixXf &rr, float simplex_size, Eigen::VectorXf &r0, float &R );
+    static bool fit_sphere_to_points ( float **rr, int np, float simplex_size, float *r0, float *R);
+
+
+private:
+    Eigen::Vector3f m_center;   /**< Sphere's center */
+    float m_r;                  /**< Sphere's radius */
 
     //=========================================================================================================
     /**

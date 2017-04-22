@@ -81,35 +81,12 @@ FsAnnotationTreeItem::FsAnnotationTreeItem(int iType, const QString & text)
 
 //*************************************************************************************************************
 
-FsAnnotationTreeItem::~FsAnnotationTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void FsAnnotationTreeItem::initItem()
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Unchecked);
     this->setToolTip("Freesurfer annotation item");
-}
-
-
-//*************************************************************************************************************
-
-QVariant FsAnnotationTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  FsAnnotationTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
 }
 
 

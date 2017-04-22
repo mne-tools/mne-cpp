@@ -174,15 +174,7 @@ public:
 
     static const QString& fwd_bem_explain_method(int method);
 
-
-
-
     static int get_int( FIFFLIB::FiffStream::SPtr& stream, const FIFFLIB::FiffDirNode::SPtr& node,int what,int *res);
-
-
-
-
-
 
     /*
     * Return a pointer to a specific surface in a BEM
@@ -195,18 +187,13 @@ public:
                                       int  *kinds,
                                       int  nkind);
 
-
     static FwdBemModel* fwd_bem_load_homog_surface(const QString& name);
 
     static FwdBemModel* fwd_bem_load_three_layer_surfaces(const QString& name);
 
-
-
     static int fwd_bem_load_solution(const QString& name, int bem_method, FwdBemModel* m);
 
-
     static int fwd_bem_set_head_mri_t(FwdBemModel* m, FIFFLIB::FiffCoordTransOld* t);
-
 
     //============================= dipole_fit_guesses.c =============================
 
@@ -216,8 +203,6 @@ public:
                                      float grid,         /* Spacing between guess points */
                                      float exclude,      /* Exclude points closer than this to the CM of the guess boundary surface */
                                      float mindist);
-
-
 
     //============================= fwd_bem_linear_collocation.c =============================
 
@@ -242,8 +227,6 @@ public:
 
     static int fwd_bem_linear_collocation_solution(FwdBemModel* m);
 
-
-
     //============================= fwd_bem_solution.c =============================
 
     static float **fwd_bem_multi_solution (float **solids,    /* The solid-angle matrix */
@@ -260,18 +243,13 @@ public:
                                     int nsurf,                  /* Number of surfaces */
                                     int *ntri);
 
-
-
     //============================= fwd_bem_constant_collocation.c =============================
-
 
     static int fwd_bem_check_solids (float **angles,int ntri1,int ntri2, float desired);
 
     static float **fwd_bem_solid_angles (const QList<MNELIB::MneSurfaceOld*>& surfs);
 
     static int fwd_bem_constant_collocation_solution(FwdBemModel* m);
-
-
 
     //============================= fwd_bem_model.c =============================
 
@@ -283,15 +261,12 @@ public:
                                         int         force_recompute,
                                         FwdBemModel* m);
 
-
-
     //============================= fwd_bem_pot.c =============================
 
     static float fwd_bem_inf_field(float *rd,      /* Dipole position */
                                    float *Q,       /* Dipole moment */
                                    float *rp,      /* Field point */
                                    float *dir);
-
 
     static float fwd_bem_inf_pot (float *rd,	/* Dipole position */
                            float *Q,	/* Dipole moment */
@@ -347,10 +322,7 @@ public:
                   float       *zgrad,
                   void        *client);
 
-
-
     //============================= fwd_bem_field.c =============================
-
 
     /*
      * These are some of the integration formulas listed in
@@ -479,13 +451,6 @@ public:
                    float        zgrad[],
                    void         *client);
 
-
-
-
-
-
-
-
     //============================= compute_forward.c =============================
 
     static void *meg_eeg_fwd_one_source_space(void *arg);
@@ -515,21 +480,17 @@ public:
 
 
     //============================= fwd_spherefield.c =============================
-    // TODO location of these functions need to be checked -> evtl moving to mor suitable space
+    // TODO location of these functions need to be checked -> evtl moving to more suitable space
     static int fwd_sphere_field(float        *rd,	        /* The dipole location */
                          float        Q[],	        /* The dipole components (xyz) */
                          FwdCoilSet*   coils,	/* The coil definitions */
                          float        Bval[],	/* Results */
                          void         *client);
 
-
     static int fwd_sphere_field_vec(float        *rd,	/* The dipole location */
                              FwdCoilSet*   coils,	/* The coil definitions */
                              float        **Bval,  /* Results: rows are the fields of the x,y, and z direction dipoles */
                              void         *client);
-
-
-
 
     static int fwd_sphere_field_grad(float        *rd,	 /* The dipole location */
                   float        Q[],      /* The dipole components (xyz) */
@@ -539,8 +500,6 @@ public:
                   float        ygrad[],  /* the dipole position coordinates */
                   float        zgrad[],
                   void         *client);
-
-
 
     //============================= fwd_mag_dipole_field.c =============================
     // TODO location of these functions need to be checked -> evtl moving to mor suitable space
@@ -557,10 +516,6 @@ public:
                                          FwdCoilSet*   coils,	/* The coil definitions */
                                          float        **Bval,       /* Results: rows are the fields of the x,y, and z direction dipoles */
                                          void         *client);
-
-
-
-
 
 public:
     QString     surf_name;      /* Name of the file where surfaces were loaded from */
