@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     hpifit.h
+* @file     hpifitdata.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     April, 2017
 *
 * @section  LICENSE
 *
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    HPIFit class declaration.
+* @brief    HPIFitData class declaration.
 *
 */
 
-#ifndef HPIFIT_H
-#define HPIFIT_H
+#ifndef HPIFITDATA_H
+#define HPIFITDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,13 +86,31 @@ namespace INVERSELIB
 // Declare all structures to be used
 //=============================================================================================================
 /**
-* The strucut specifing the coil parameters.
+* The strucut specifing the dipole error.
 */
-struct CoilParam {
-    Eigen::MatrixXd pos;
-    Eigen::MatrixXd mom;
-    Eigen::VectorXd dpfiterror;
-    Eigen::VectorXd dpfitnumitr;
+struct DipFitError {
+    double error;
+    Eigen::MatrixXd moment;
+    int numIterations;
+};
+
+//=========================================================================================================
+/**
+* The strucut specifing the sensor parameters.
+*/
+struct SensorInfo {
+    Eigen::MatrixXd coilpos;
+    Eigen::MatrixXd coilori;
+    Eigen::MatrixXd tra;
+};
+
+//=========================================================================================================
+/**
+* The strucut specifing the sorting parameters.
+*/
+struct HPISortStruct {
+    double base_arr;
+    int idx;
 };
 
 
@@ -104,74 +122,83 @@ struct CoilParam {
 
 //=============================================================================================================
 /**
-* HPI Fit algorithms.
+* HPI Fit algorithm data structure.
 *
-* @brief HPI Fit algorithms.
+* @brief HPI Fit algorithm data structure.
 */
-class INVERSESHARED_EXPORT HPIFit
+class INVERSESHARED_EXPORT HPIFitData
 {
 
 public:
-    typedef QSharedPointer<HPIFit> SPtr;             /**< Shared pointer type for HPIFit. */
-    typedef QSharedPointer<const HPIFit> ConstSPtr;  /**< Const shared pointer type for HPIFit. */
+    typedef QSharedPointer<HPIFitData> SPtr;             /**< Shared pointer type for HPIFitData. */
+    typedef QSharedPointer<const HPIFitData> ConstSPtr;  /**< Const shared pointer type for HPIFitData. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     */
-    explicit HPIFit();
+    explicit HPIFitData();
 
     //=========================================================================================================
     /**
-    * Perform one single HPI fit.
-    *
-    * @param[in] t_mat           Data to estimate the HPI positions from
-    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
-    * @param[out] transDevHead   The final dev head transformation matrix
-    * @param[in] vFreqs          The frequencies for each coil.
-    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
-    * @param[out] fittedPointSet The final fitted positions in form of a digitizer set.
-    * @param[in] p_pFiffInfo     Associated Fiff Information.
-    * @param[in] bDoDebug        Print debug info to cmd line and write debug info to file.
-    * @param[in] sHPIResourceDir The path to the debug file which is to be written.
+    * dipfit function is adapted from Fieldtrip Software. It has been heavily edited for use with MNE Scan Software.
     */
-    static void fitHPI(const Eigen::MatrixXd& t_mat,
-                        const Eigen::MatrixXd& t_matProjectors,
-                        FIFFLIB::FiffCoordTrans &transDevHead,
-                        const QVector<int>& vFreqs,
-                        QVector<double> &vGof,
-                        FIFFLIB::FiffDigPointSet& fittedPointSet,
-                        QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                        bool bDoDebug = false,
-                        const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
+    void doDipfitConcurrent();
+
+    Eigen::RowVectorXd  coilPos;
+    Eigen::RowVectorXd  sensorData;
+    DipFitError         errorInfo;
+    SensorInfo          sensorPos;
+    Eigen::MatrixXd     matProjector;
 
 protected:
     //=========================================================================================================
     /**
-    * Fits dipoles for the given coils and a given data set.
-    *
-    * @param[in] CoilParam       The coil parameters.
-    * @param[in] sensors         The sensor information.
-    * @param[in] data            The data which used to fit the coils.
-    * @param[in] numCoils        The number of coils.
-    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
-    *
-    * @return Returns the coil parameters.
+    * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
+    * The function has been compared with matlab magnetic_dipole and it gives same output.
     */
-    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd &data, int numCoils, const Eigen::MatrixXd &t_matProjectors);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen::MatrixXd ori);
 
     //=========================================================================================================
     /**
-    * Computes the transformation matrix between two sets of 3D points.
-    *
-    * @param[in] NH     The first set of input 3D points (row-wise order).
-    * @param[in] BT     The second set of input 3D points (row-wise order).
-    *
-    * @return Returns the transformation matrix.
+    * compute_leadfield computes a forward solution for a dipole in a a volume
+    * conductor model. The forward solution is expressed as the leadfield
+    * matrix (Nchan*3), where each column corresponds with the potential or field
+    * distributions on all sensors for one of the x,y,z-orientations of the dipole.
+    * The function has been compared with matlab ft_compute_leadfield and it gives
+    * same output.
     */
-    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors);
 
-    static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
+    //=========================================================================================================
+    /**
+    * dipfitError computes the error between measured and model data
+    * and can be used for non-linear fitting of dipole position.
+    * The function has been compared with matlab dipfit_error and it gives
+    * same output
+    */
+    DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors);
+
+    //=========================================================================================================
+    /**
+    * Compare function for sorting
+    */
+    static bool compare(HPISortStruct a, HPISortStruct b);
+
+    //=========================================================================================================
+    /**
+    * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
+    * X = fminsearch(X0, maxiter, maxfun, display, data, sensors) starts at X0 and
+    * attempts to find a local minimizer
+    */
+    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
+                               int maxiter,
+                               int maxfun,
+                               int display,
+                               const Eigen::MatrixXd& data,
+                               const Eigen::MatrixXd& matProjectors,
+                               const struct SensorInfo& sensors,
+                               int &simplex_numitr);
 };
 
 //*************************************************************************************************************
@@ -182,4 +209,4 @@ protected:
 
 } //NAMESPACE
 
-#endif // HPIFIT_H
+#endif // HPIFITDATA_H

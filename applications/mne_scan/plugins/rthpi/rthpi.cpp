@@ -276,10 +276,6 @@ void RtHpi::run()
 
     m_pRtHPIS = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
 
-    // Start HPI estimation
-    m_pRtHPIS->start();
-
-
     while (m_bIsRunning) {
         if(m_bProcessData) {
             MatrixXd t_mat = m_pRtHpiBuffer->pop();
@@ -288,6 +284,5 @@ void RtHpi::run()
         //msleep(1);
     }
     qDebug()<<"HPI estimation [Run] is done!";
-    m_pRtHPIS->stop();
 }
 
