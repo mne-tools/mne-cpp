@@ -244,7 +244,7 @@ MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
 
 //*************************************************************************************************************
 
-MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const char *subj, const char *name, char *curv)
+MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const QString &subject_id, const QString &surf, const QString &subjects_dir)
      /*
       * Load new display surface data
       */
@@ -257,14 +257,20 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const char *s
     char *this_curv = Q_NULLPTR;
     MneMshDisplaySurface* pThis = Q_NULLPTR;
     MneMshDisplaySurfaceSet* surfs = Q_NULLPTR;
+    QString pathLh, pathLhCurv, pathRh, pathRhCurv;
+    QByteArray ba_surf, ba_curv;
 
-    if (!curv)
-        *curv = 'curv';
+    pathLh = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("lh").arg(surf);
+    ba_surf = pathLh.toLatin1();
+    this_surf = ba_surf.data();
 
-    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,"lh");
     if (this_surf == Q_NULLPTR)
         goto bad;
-    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,"lh");
+
+    pathLhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("lh").arg("curv");
+    ba_curv = pathLhCurv.toLatin1();
+    this_curv = ba_curv.data();
+
     fprintf(stderr,"Loading surface %s ...\n",this_surf);
     if ((left = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
         if ((left = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
@@ -275,8 +281,14 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const char *s
     left_file = this_surf; this_surf = Q_NULLPTR;
     FREE_47(this_curv);
 
-    this_surf = MneSurfaceOrVolume::mne_compose_surf_name(subj,name,"rh");
-    this_curv = MneSurfaceOrVolume::mne_compose_surf_name(subj,curv,"rh");
+    pathRh = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg(surf);
+    ba_surf = pathRh.toLatin1();
+    this_surf = ba_surf.data();
+
+    pathRhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg("curv");
+    ba_curv = pathRhCurv.toLatin1();
+    this_curv = ba_curv.data();
+
     fprintf(stderr,"Loading surface %s ...\n",this_surf);
     if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
         if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
@@ -302,11 +314,11 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const char *s
     //pThis->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
     pThis->s           = (MneSurfaceOld*)left;
     pThis->s->id       = SURF_LEFT_HEMI;
-    pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
-    pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
+    pThis->subj        = subject_id.toUtf8().data();
+    pThis->surf_name   = surf.toUtf8().data();
 
     decide_surface_extent(pThis,"Left hemisphere");
-    decide_curv_display(name,pThis);
+    decide_curv_display(surf.toUtf8().data(),pThis);
     setup_curvature_colors (pThis);
 
     pThis              = surfs->surfs[1];
@@ -314,11 +326,11 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const char *s
     //pThis->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
     pThis->s           = (MneSurfaceOld*)right;
     pThis->s->id       = SURF_RIGHT_HEMI;
-    pThis->subj        = MneSurfaceOrVolume::mne_strdup(subj);
-    pThis->surf_name   = MneSurfaceOrVolume::mne_strdup(name);
+    pThis->subj        = subject_id.toUtf8().data();
+    pThis->surf_name   = surf.toUtf8().data();
 
     decide_surface_extent(pThis,"Right hemisphere");
-    decide_curv_display(name,pThis);
+    decide_curv_display(surf.toUtf8().data(),pThis);
     setup_curvature_colors (pThis);
 
     apply_left_right_eyes(surfs);
