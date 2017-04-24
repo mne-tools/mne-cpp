@@ -79,12 +79,51 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+void RtHPISWorker::doWork(const Eigen::MatrixXd& matData,
+            const Eigen::MatrixXd& m_matProjectors,
+            const QVector<int>& vFreqs,
+            QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo) {
+
+    //Perform actual fitting
+    FittingResult fitResult;
+    fitResult.devHeadTrans.from = 1;
+    fitResult.devHeadTrans.to = 4;
+
+    HPIFit::fitHPI(matData,
+                    m_matProjectors,
+                    fitResult.devHeadTrans,
+                    vFreqs,
+                    fitResult.errorDistances,
+                    fitResult.fittedCoils,
+                    pFiffInfo);
+
+    emit resultReady(fitResult);
+}
+
+
+//*************************************************************************************************************
+
 RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
-: QThread(parent)
+: QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
-, m_bIsRunning(false)
 {
     qRegisterMetaType<RTPROCESSINGLIB::FittingResult>("RTPROCESSINGLIB::FittingResult");
+    qRegisterMetaType<QVector<int> >("QVector<int>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
+
+    RtHPISWorker *worker = new RtHPISWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtHPIS::operate,
+            worker, &RtHPISWorker::doWork);
+
+    connect(worker, &RtHPISWorker::resultReady,
+            this, &RtHPIS::handleResults);
+
+    m_workerThread.start();
 }
 
 
@@ -92,51 +131,19 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 
 RtHPIS::~RtHPIS()
 {
-    if(this->isRunning()){
-        stop();
-    }
+    m_workerThread.quit();
+    m_workerThread.wait();
 }
 
 
 //*************************************************************************************************************
 
-void RtHPIS::append(const MatrixXd &p_DataSegment)
+void RtHPIS::append(const MatrixXd &data)
 {
-    if(!m_pRawMatrixBuffer) {
-        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(20, p_DataSegment.rows(), p_DataSegment.cols()));
-    }
-
-    m_pRawMatrixBuffer->push(&p_DataSegment);
-}
-
-
-//*************************************************************************************************************
-
-bool RtHPIS::start()
-{
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning()) {
-        QThread::wait();
-    }
-
-    m_bIsRunning = true;
-    QThread::start();
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool RtHPIS::stop()
-{
-    m_bIsRunning = false;
-
-    m_pRawMatrixBuffer->releaseFromPop();
-
-    m_pRawMatrixBuffer->clear();
-
-    return true;
+    emit operate(data,
+                 m_matProjectors,
+                 m_vCoilFreqs,
+                 m_pFiffInfo);
 }
 
 
@@ -144,9 +151,7 @@ bool RtHPIS::stop()
 
 void RtHPIS::setCoilFrequencies(const QVector<int>& vCoilFreqs)
 {
-    m_mutex.lock();
     m_vCoilFreqs = vCoilFreqs;
-    m_mutex.unlock();
 }
 
 
@@ -154,38 +159,13 @@ void RtHPIS::setCoilFrequencies(const QVector<int>& vCoilFreqs)
 
 void RtHPIS::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
 {
-    m_mutex.lock();
     m_matProjectors = matProjectors;
-    m_mutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void RtHPIS::run()
+void RtHPIS::handleResults(const RTPROCESSINGLIB::FittingResult& fitResult)
 {
-    MatrixXd matData;
-
-    while(m_bIsRunning)
-    {
-        if(m_pRawMatrixBuffer)
-        {
-            matData = m_pRawMatrixBuffer->pop();
-
-            //Perform actual fitting
-            FittingResult fitResult;
-            fitResult.devHeadTrans.from = 1;
-            fitResult.devHeadTrans.to = 4;
-
-            HPIFit::fitHPI(matData,
-                            m_matProjectors,
-                            fitResult.devHeadTrans,
-                            m_vCoilFreqs,
-                            fitResult.errorDistances,
-                            fitResult.fittedCoils,
-                            m_pFiffInfo);
-
-            emit newFittingResultAvailable(fitResult);
-        }
-    }
+    emit newFittingResultAvailable(fitResult);
 }
