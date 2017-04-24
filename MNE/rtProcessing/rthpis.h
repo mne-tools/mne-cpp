@@ -104,6 +104,34 @@ struct FittingResult {
     QVector<double> errorDistances;
 };
 
+class RtHPISWorker : public QObject
+{
+    Q_OBJECT
+
+//=============================================================================================================
+/**
+* Real-time HPI worker.
+*
+* @brief Real-time HPI worker.
+*/
+public slots:
+    //=========================================================================================================
+    /**
+    * Perform one single HPI fit.
+    *
+    * @param[in] t_mat           Data to estimate the HPI positions from
+    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
+    * @param[in] vFreqs          The frequencies for each coil.
+    * @param[in] p_pFiffInfo     Associated Fiff Information.
+    */
+    void doWork(const Eigen::MatrixXd& matData,
+                const Eigen::MatrixXd& m_matProjectors,
+                const QVector<int>& vFreqs,
+                QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+signals:
+    void resultReady(const RTPROCESSINGLIB::FittingResult &fitResult);
+};
 
 //=============================================================================================================
 /**
@@ -111,7 +139,7 @@ struct FittingResult {
 *
 * @brief Real-time Head Coil Positions estimation.
 */
-class RTPROCESSINGSHARED_EXPORT RtHPIS : public QThread
+class RTPROCESSINGSHARED_EXPORT RtHPIS : public QObject
 {
     Q_OBJECT
 
@@ -138,33 +166,9 @@ public:
     /**
     * Slot to receive incoming data.
     *
-    * @param[in] p_DataSegment  Data to estimate the HPI positions from
+    * @param[in] data  Data to estimate the HPI positions from
     */
-    void append(const Eigen::MatrixXd &p_DataSegment);
-
-    //=========================================================================================================
-    /**
-    * Returns true if is running, otherwise false.
-    *
-    * @return true if is running, false otherwise
-    */
-    inline bool isRunning();
-
-    //=========================================================================================================
-    /**
-    * Starts the RtHPIS by starting the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the RtHPIS by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
+    void append(const Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
@@ -185,36 +189,28 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Handles the result
     */
-    virtual void run();
+    void handleResults(const FittingResult &fitResult);
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
 
-    QMutex              m_mutex;                /**< The global mutex to provide thread safety.*/
-
-    bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
-
+    QThread             m_workerThread;         /**< The worker thread. */
     QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
-
     Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
 signals:
-    void newFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);
+    void newFittingResultAvailable(const RTPROCESSINGLIB::FittingResult &fitResult);
+    void operate(const Eigen::MatrixXd& matData,
+                 const Eigen::MatrixXd& matProjectors,
+                 const QVector<int>& vFreqs,
+                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline bool RtHPIS::isRunning()
-{
-    return m_bIsRunning;
-}
 
 } // NAMESPACE
 
