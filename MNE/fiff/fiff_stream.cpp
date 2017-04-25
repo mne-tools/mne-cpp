@@ -1803,8 +1803,9 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
 
 QStringList FiffStream::split_name_list(QString p_sNameList)
 {
-    return p_sNameList.split(":");
+    return p_sNameList.replace(" ","").split(":");
 }
+
 
 //*************************************************************************************************************
 
