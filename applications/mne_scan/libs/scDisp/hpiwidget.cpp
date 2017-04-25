@@ -344,7 +344,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
     ui->m_label_numberLoadedFiducials->setNum(numFiducials);
     ui->m_label_numberLoadedEEG->setNum(numEEG);
 
-    //Hdie show frequencies and errors based on the number of coils
+    //Hide/show frequencies and errors based on the number of coils
     if(numHPI == 3) {
         ui->m_label_gofCoil4->hide();
         ui->m_label_gofCoil4Description->hide();
@@ -398,22 +398,7 @@ void HPIWidget::onBtnDoSingleFit()
     //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
     //rt head motion correction will be performed using the rtHPI plugin.
     if(m_pFiffInfo) {
-        //Perform actual fitting
-        FiffDigPointSet fittedCoils;
-        FiffCoordTrans devHeadTrans;
-        devHeadTrans.from = 1;
-        devHeadTrans.to = 4;
-
-        HPIFit::fitHPI(m_matValue,
-                        m_matProjectors,
-                        devHeadTrans,
-                        m_vCoilFreqs,
-                        m_vGof,
-                        fittedCoils,
-                        m_pFiffInfo,
-                        true);
-
-        storeResults(devHeadTrans, fittedCoils);
+        m_pRtHPI->append(m_matValue);
     }
 }
 
@@ -458,6 +443,8 @@ void HPIWidget::onFreqsChanged()
     m_vCoilFreqs.append(ui->m_spinBox_freqCoil2->value());
     m_vCoilFreqs.append(ui->m_spinBox_freqCoil3->value());
     m_vCoilFreqs.append(ui->m_spinBox_freqCoil4->value());
+
+    m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
 }
 
 
@@ -482,12 +469,6 @@ void HPIWidget::onDoContinousHPI()
     }
 
     emit continousHPIToggled(ui->m_checkBox_continousHPI->isChecked());
-
-    if(ui->m_checkBox_continousHPI->isChecked()) {
-        m_pRtHPI->start();
-    } else {
-        m_pRtHPI->stop();
-    }
 }
 
 
