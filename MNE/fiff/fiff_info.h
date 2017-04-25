@@ -223,18 +223,6 @@ public:
     */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value);
 
-    //=========================================================================================================
-    /**
-    * Reverts the new channel naming conventions (whitespcae between channel type and number) to the input list.
-    */
-    void revert_new_chnames_conventions();
-
-    //=========================================================================================================
-    /**
-    * Applies the new channel naming conventions (whitespcae between channel type and number) to the input list.
-    */
-    void apply_new_chnames_conventions();
-
 // ToDo
 //    //=========================================================================================================
 //    /**
