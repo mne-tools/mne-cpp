@@ -104,17 +104,17 @@ struct FittingResult {
     QVector<double> errorDistances;
 };
 
-class RtHPISWorker : public QObject
-{
-    Q_OBJECT
-
 //=============================================================================================================
 /**
 * Real-time HPI worker.
 *
 * @brief Real-time HPI worker.
 */
-public slots:
+class RtHPISWorker : public QObject
+{
+    Q_OBJECT
+
+public:
     //=========================================================================================================
     /**
     * Perform one single HPI fit.
