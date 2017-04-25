@@ -1952,7 +1952,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     //    Blocks from the original
     //
     QList<fiff_int_t> blocks;
-    blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
+    blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_HPI_SUBSYSTEM << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY << FIFFB_DACQ_PARS << FIFFB_EVENTS;
     bool have_hpi_result = false;
     bool have_isotrak    = false;
     if (blocks.size() > 0 && !info.filename.isEmpty())
@@ -1973,6 +1973,33 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
                 have_isotrak = true;
         }
 
+        t_pStream2 = FiffStream::SPtr();
+    }
+    //
+    // Unused parameters from original file (could eventually put these in info struct)
+    //
+    QList<fiff_int_t> values;
+    values << FIFF_EXPERIMENTER << FIFF_DESCRIPTION << FIFF_PROJ_ID << FIFF_PROJ_NAME << FIFF_LINE_FREQ << FIFF_XPLOTTER_LAYOUT;
+    if (values.size() > 0 && !info.filename.isEmpty())
+    {
+        QFile t_qFile(info.filename);//ToDo this has to be adapted for TCPSocket
+        FiffStream::SPtr t_pStream2(new FiffStream(&t_qFile));
+        FiffTag::SPtr t_pTag;
+
+        t_pStream2->open();
+        QList<FiffDirNode::SPtr> nodes = t_pStream2->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+
+        for(qint32 k = 0; k < values.size(); ++k)
+        {
+            if(nodes.size() > 0 && nodes[0]->find_tag(t_pStream2, values[k], t_pTag)) {
+                if (values[k] == FIFF_EXPERIMENTER || values[k] == FIFF_DESCRIPTION || values[k] == FIFF_PROJ_NAME || values[k] == FIFF_XPLOTTER_LAYOUT)
+                    t_pStream->write_string(values[k], t_pTag->toString());
+                else if (values[k] == FIFF_PROJ_ID)
+                    t_pStream->write_int(values[k], t_pTag->toInt());
+                else if (values[k] == FIFF_LINE_FREQ)
+                    t_pStream->write_float(values[k], t_pTag->toFloat());
+            }
+        }
         t_pStream2 = FiffStream::SPtr();
     }
     //

@@ -131,6 +131,32 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
     return Sphere(center, R);
 }
 
+//*************************************************************************************************************
+
+bool Sphere::fit_sphere_to_points ( float **rr, int np, float simplex_size, float *r0, float *R )
+{
+    MatrixXf rr_eigen(np,3);
+    VectorXf r0_eigen(3);
+
+    MatrixX3f dig_rr_eigen;
+    for (int k = 0; k < np; k++) {
+        rr_eigen(k, 0) = rr[k][0];
+        rr_eigen(k, 1) = rr[k][1];
+        rr_eigen(k, 2) = rr[k][2];
+    }
+
+    r0_eigen(0) = r0[0];
+    r0_eigen(1) = r0[1];
+    r0_eigen(2) = r0[2];
+
+    bool state = UTILSLIB::Sphere::fit_sphere_to_points(rr_eigen,simplex_size,r0_eigen,*R);
+
+    r0[0] = r0_eigen(0);
+    r0[1] = r0_eigen(1);
+    r0[2] = r0_eigen(2);
+
+    return state;
+}
 
 //*************************************************************************************************************
 

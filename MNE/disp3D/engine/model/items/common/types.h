@@ -88,7 +88,7 @@ namespace Data3DTreeModelItemTypes
                     AnnotationItem = QStandardItem::UserType + 4,
                     MNEEstimateItem = QStandardItem::UserType + 5,
                     SourceSpaceItem = QStandardItem::UserType + 6,
-                    RTConnectivityDataItem = QStandardItem::UserType + 7,
+                    NetworkItem = QStandardItem::UserType + 7,
                     SubjectItem = QStandardItem::UserType + 8,
                     BemItem = QStandardItem::UserType + 9,
                     BemSurfaceItem = QStandardItem::UserType + 10,
@@ -99,14 +99,13 @@ namespace Data3DTreeModelItemTypes
                     SensorSetItem = QStandardItem::UserType + 15,
                     SensorSurfaceItem = QStandardItem::UserType + 16,
                     SensorPositionItem = QStandardItem::UserType + 17,
-                    AbstractSurfaceItem = QStandardItem::UserType + 18};
+                    AbstractMeshItem = QStandardItem::UserType + 18};
 }
 
 namespace MetaTreeItemTypes
 {
     enum ItemType{FileName = QStandardItem::UserType + 100,
                     FilePath = QStandardItem::UserType + 101,
-                    SurfaceType = QStandardItem::UserType + 102,
                     SurfaceColorGyri = QStandardItem::UserType + 103,
                     SurfaceColorSulci = QStandardItem::UserType + 104,
                     SurfaceColorVert = QStandardItem::UserType + 105,
@@ -129,7 +128,9 @@ namespace MetaTreeItemTypes
                     SurfaceTessInner = QStandardItem::UserType + 122,
                     SurfaceTessOuter = QStandardItem::UserType + 123,
                     SurfaceTriangleScale = QStandardItem::UserType + 124,
-                    NumberDipoles = QStandardItem::UserType + 125};
+                    NumberDipoles = QStandardItem::UserType + 125,
+                    MaterialType = QStandardItem::UserType + 126,
+                    ShowNormals = QStandardItem::UserType + 127  };
 }
 
 // Model item roles
@@ -191,11 +192,11 @@ namespace MetaTreeItemRoles
                     SurfaceTranslateX = Qt::UserRole + 18,
                     SurfaceTranslateY = Qt::UserRole + 19,
                     SurfaceTranslateZ = Qt::UserRole + 20,
-                    PointColor = Qt::UserRole + 21,
                     NetworkThreshold = Qt::UserRole + 22,
                     SurfaceTessInner = Qt::UserRole + 23,
                     SurfaceTessOuter = Qt::UserRole + 24,
-                    SurfaceTriangleScale = Qt::UserRole + 25};
+                    SurfaceTriangleScale = Qt::UserRole + 25,
+                    SurfaceMaterial = Qt::UserRole + 26};
 }
 
 } //NAMESPACE DISP3DLIB

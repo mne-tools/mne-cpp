@@ -154,8 +154,6 @@ public:
     * swap integer
     *
     * @param[in, out] source     integer to swap
-    *
-    * @return swapped integer
     */
     static void swap_intp (qint32 *source);
 
@@ -174,8 +172,6 @@ public:
     * swap long
     *
     * @param[in, out] source     long to swap
-    *
-    * @return swapped long
     */
     static void swap_longp (qint64 *source);
 
@@ -183,9 +179,17 @@ public:
     /**
     * swap float
     *
-    * @param[in, out] source     float to swap
+    * @param[in] source     float to swap
     *
     * @return swapped float
+    */
+    static float swap_float (float source);
+
+    //=========================================================================================================
+    /**
+    * swap float
+    *
+    * @param[in, out] source     float to swap
     */
     static void swap_floatp (float *source);
 
@@ -194,8 +198,6 @@ public:
     * swap double
     *
     * @param[in, out] source     double to swap
-    *
-    * @return swapped double
     */
     static void swap_doublep(double *source);
 

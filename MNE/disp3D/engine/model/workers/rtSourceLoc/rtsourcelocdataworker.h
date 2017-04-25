@@ -220,7 +220,7 @@ public:
     *
     * @param[in] samples                The new number of averages.
     */
-    void setNumberAverages(const int& iNumAvr);
+    void setNumberAverages(int iNumAvr);
 
     //=========================================================================================================
     /**
@@ -228,7 +228,7 @@ public:
     *
     * @param[in] iMSec                  The new length in milli Seconds to wait inbetween data samples.
     */
-    void setInterval(const int& iMSec);
+    void setInterval(int iMSec);
 
     //=========================================================================================================
     /**
@@ -236,7 +236,7 @@ public:
     *
     * @param[in] iVisType               The new visualization type.
     */
-    void setVisualizationType(const int& iVisType);
+    void setVisualizationType(int iVisType);
 
     //=========================================================================================================
     /**

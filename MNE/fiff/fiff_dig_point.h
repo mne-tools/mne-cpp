@@ -71,7 +71,7 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* Replaces _fiffDigPointRec struct.
+* Replaces fiffDigPointRec, *fiffDigPoint struct (analyze_types.h).
 *
 * @brief Digitization point description
 */

@@ -84,17 +84,8 @@ using namespace DISP3DLIB;
 
 HemisphereTreeItem::HemisphereTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
-, m_pSurfaceItem(Q_NULLPTR)
-, m_pAnnotItem(Q_NULLPTR)
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-HemisphereTreeItem::~HemisphereTreeItem()
-{
 }
 
 
@@ -106,30 +97,6 @@ void HemisphereTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("Brain hemisphere item");
-}
-
-
-//*************************************************************************************************************
-
-QVariant HemisphereTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void HemisphereTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-int HemisphereTreeItem::columnCount() const
-{
-    return 2;
 }
 
 
@@ -157,20 +124,25 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
     //Add childs
     //Add surface child
-    m_pSurfaceItem = new FsSurfaceTreeItem(Data3DTreeModelItemTypes::SurfaceItem);
+    if(!m_pSurfaceItem) {
+        m_pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SurfaceItem, "Surface");
+    }
 
     QList<QStandardItem*> list;
     list << m_pSurfaceItem;
     list << new QStandardItem(m_pSurfaceItem->toolTip());
     this->appendRow(list);
 
-    m_pSurfaceItem->addData(tSurface, p3DEntityParent);
+    m_pSurfaceItem->addData(tSurface);
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
-        m_pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
-        connect(m_pAnnotItem, &FsAnnotationTreeItem::annotationVisibiltyChanged,
-                m_pSurfaceItem, &FsSurfaceTreeItem::onAnnotationVisibilityChanged);
+        if(!m_pAnnotItem) {
+            m_pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
+        }
+
+        connect(m_pAnnotItem.data(), &FsAnnotationTreeItem::annotationVisibiltyChanged,
+                m_pSurfaceItem.data(), &FsSurfaceTreeItem::onAnnotationVisibilityChanged);
 
         list.clear();
         list << m_pAnnotItem;
@@ -208,16 +180,15 @@ SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemispher
 
     this->setData(data, Data3DTreeModelItemRoles::SurfaceHemi);
 
-    //Add childs
-    //Add surface child
-    SourceSpaceTreeItem* pSourceSpaceItem = new SourceSpaceTreeItem(Data3DTreeModelItemTypes::SourceSpaceItem);
+    //Add extra info
+    SourceSpaceTreeItem* pSourceSpaceItem = new SourceSpaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SourceSpaceItem);
 
     QList<QStandardItem*> list;
     list << pSourceSpaceItem;
     list << new QStandardItem(pSourceSpaceItem->toolTip());
     this->appendRow(list);
 
-    pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
+    pSourceSpaceItem->addData(tHemisphere);
 
     return pSourceSpaceItem;
 }
@@ -237,16 +208,3 @@ FsAnnotationTreeItem* HemisphereTreeItem::getAnnotItem()
 {
     return m_pAnnotItem;
 }
-
-
-//*************************************************************************************************************
-
-void HemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); i++) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-

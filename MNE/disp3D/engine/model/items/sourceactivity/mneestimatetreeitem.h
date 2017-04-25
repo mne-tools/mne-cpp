@@ -88,6 +88,7 @@ namespace DISP3DLIB
 
 class RtSourceLocDataWorker;
 
+
 //=============================================================================================================
 /**
 * MneEstimateTreeItem provides a generic item to hold information about real time source localization data to plot onto the brain surface.
@@ -109,20 +110,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem, const QString& text = "Source Loc Data");
+    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem, const QString& text = "MNE data");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
     ~MneEstimateTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
@@ -254,7 +248,7 @@ protected:
     *
     * @param[in] sColormapType     The name of the new colormap type.
     */
-    void onColormapTypeChanged(const QString& sColormapType);
+    void onColormapTypeChanged(const QVariant& sColormapType);
 
     //=========================================================================================================
     /**
@@ -262,7 +256,7 @@ protected:
     *
     * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
     */
-    void onTimeIntervalChanged(int iMSec);
+    void onTimeIntervalChanged(const QVariant &iMSec);
 
     //=========================================================================================================
     /**
@@ -270,7 +264,7 @@ protected:
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(const QVector3D& vecThresholds);
+    void onDataNormalizationValueChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
@@ -278,7 +272,7 @@ protected:
     *
     * @param[in] sVisType     The new visualization type.
     */
-    void onVisualizationTypeChanged(const QString& sVisType);
+    void onVisualizationTypeChanged(const QVariant& sVisType);
 
     //=========================================================================================================
     /**
@@ -294,7 +288,7 @@ protected:
     *
     * @param[in] iNumAvr     The new number of averages.
     */
-    void onNumberAveragesChanged(int iNumAvr);
+    void onNumberAveragesChanged(const QVariant& iNumAvr);
 
     bool                                m_bIsDataInit;                      /**< The init flag. */
 

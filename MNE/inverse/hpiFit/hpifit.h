@@ -95,47 +95,6 @@ struct CoilParam {
     Eigen::VectorXd dpfitnumitr;
 };
 
-//=========================================================================================================
-/**
-* The strucut specifing the dipole error.
-*/
-struct DipFitError {
-    double error;
-    Eigen::MatrixXd moment;
-    int numIterations;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the sensor parameters.
-*/
-struct SensorInfo {
-    Eigen::MatrixXd coilpos;
-    Eigen::MatrixXd coilori;
-    Eigen::MatrixXd tra;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the sorting parameters.
-*/
-struct HPISortStruct {
-    double base_arr;
-    int idx;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing all data needed to perform coil-wise fitting.
-*/
-struct FittingCoilData {
-    Eigen::RowVectorXd coilPos;
-    Eigen::RowVectorXd sensorData;
-    DipFitError errorInfo;
-    SensorInfo sensorPos;
-    Eigen::MatrixXd matProjector;
-};
-
 
 //*************************************************************************************************************
 //=============================================================================================================
