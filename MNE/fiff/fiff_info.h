@@ -223,9 +223,33 @@ public:
     */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value);
 
-    static void apply_new_chnames_conventions(QStringList& in);
+    //=========================================================================================================
+    /**
+    * Reverts the new channel naming convnetions (whitespcae between channel type and number) to the input list.
+    */
+    void revert_new_chnames_conventions();
 
-    static void revert_new_chnames_conventions(QStringList& in);
+    //=========================================================================================================
+    /**
+    * Applies the new channel naming convnetions (whitespcae between channel type and number) to the input list.
+    */
+    void apply_new_chnames_conventions();
+
+    //=========================================================================================================
+    /**
+    * Applies the new channel naming convnetions (whitespcae between channel type and number) to the input list.
+    *
+    * @param[out] chNames    The channel names to be altered
+    */
+    static void apply_new_chnames_conventions(QStringList& chNames);
+
+    //=========================================================================================================
+    /**
+    * Reverts the new channel naming convnetions (whitespcae between channel type and number) to the input list.
+    *
+    * @param[out] chNames    The channel names to be altered
+    */
+    static void revert_new_chnames_conventions(QStringList& chNames);
 
 // ToDo
 //    //=========================================================================================================

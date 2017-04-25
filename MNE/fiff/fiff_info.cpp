@@ -348,28 +348,61 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
     return new_chs;
 }
 
-
 //*************************************************************************************************************
 
-void FiffInfo::apply_new_chnames_conventions(QStringList& in)
+void FiffInfo::apply_new_chnames_conventions()
 {
-    for(int i = 0; i < in.size(); ++i) {
-        in[i].replace(" ","");
+    //Apply new channel name convnetions for the whole fiff info and all relevant fields
+    apply_new_chnames_conventions(this->bads);
+    apply_new_chnames_conventions(this->ch_names);
+
+    for(int i = 0; i < this->chs.size(); ++i) {
+        this->chs[i].ch_name.replace(" ","");
     }
 }
 
 
 //*************************************************************************************************************
 
-void FiffInfo::revert_new_chnames_conventions(QStringList& in)
+void FiffInfo::revert_new_chnames_conventions()
 {
-    for(int i = 0; i < in.size(); ++i) {
+    //Apply new channel name convnetions for the whole fiff info and all relevant fields
+    revert_new_chnames_conventions(this->bads);
+    revert_new_chnames_conventions(this->ch_names);
+
+    for(int i = 0; i < this->chs.size(); ++i) {
         QRegExp xRegExp("[0-9]{1,100}");
-        xRegExp.indexIn(in.at(i));
+        xRegExp.indexIn(this->chs[i].ch_name);
         QStringList xList = xRegExp.capturedTexts();
 
         for(int k = 0; k < xList.size(); ++k) {
-            in[i].replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+            this->chs[i].ch_name.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffInfo::apply_new_chnames_conventions(QStringList& chNames)
+{
+    for(int i = 0; i < chNames.size(); ++i) {
+        chNames[i].replace(" ","");
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffInfo::revert_new_chnames_conventions(QStringList& chNames)
+{
+    for(int i = 0; i < chNames.size(); ++i) {
+        QRegExp xRegExp("[0-9]{1,100}");
+        xRegExp.indexIn(chNames.at(i));
+        QStringList xList = xRegExp.capturedTexts();
+
+        for(int k = 0; k < xList.size(); ++k) {
+            chNames[i].replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
         }
     }
 }
