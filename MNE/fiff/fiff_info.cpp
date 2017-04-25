@@ -351,6 +351,32 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
 
 //*************************************************************************************************************
 
+void FiffInfo::apply_new_chnames_conventions(QStringList& in)
+{
+    for(int i = 0; i < in.size(); ++i) {
+        in[i].replace(" ","");
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffInfo::revert_new_chnames_conventions(QStringList& in)
+{
+    for(int i = 0; i < in.size(); ++i) {
+        QRegExp xRegExp("[0-9]{1,100}");
+        xRegExp.indexIn(in.at(i));
+        QStringList xList = xRegExp.capturedTexts();
+
+        for(int k = 0; k < xList.size(); ++k) {
+            in[i].replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void FiffInfo::writeToStream(FiffStream* p_pStream) const
 {
     //

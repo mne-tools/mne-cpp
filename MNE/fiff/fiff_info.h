@@ -223,6 +223,10 @@ public:
     */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value);
 
+    static void apply_new_chnames_conventions(QStringList& in);
+
+    static void revert_new_chnames_conventions(QStringList& in);
+
 // ToDo
 //    //=========================================================================================================
 //    /**
