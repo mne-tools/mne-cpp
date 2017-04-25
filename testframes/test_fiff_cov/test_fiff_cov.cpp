@@ -117,14 +117,11 @@ void TestFiffCov::initTestCase()
     IOUtils::read_eigen_matrix(data, QDir::currentPath()+"/mne-cpp-test-data/Result/ref_data_sample_audvis-cov.dat");
     covResult.data = data;
 
-    VectorXd dataOther;
-    IOUtils::read_eigen_matrix(dataOther, QDir::currentPath()+"/mne-cpp-test-data/Result/ref_other_sample_audvis-cov.dat");
-    if(dataOther.rows() >= 4) {
-        covResult.kind = dataOther(0);
-        covResult.diag = dataOther(1);
-        covResult.dim = dataOther(2);
-        covResult.nfree = dataOther(3);
-    }
+    covResult.kind = 1;
+    covResult.diag = 0;
+    covResult.dim = 366;
+    covResult.nfree = 15972;
+
 }
 
 
