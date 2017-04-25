@@ -1,17 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rthpis.h
-* @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
-*           Lorenz Esch <Lorenz.Esch@ntu-ilmenau.de>;
-*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+* @file     hpifitdata.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-*
 * @version  1.0
-* @date     November, 2016
+* @date     April, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Chiran Doshi, Lorenz Esch, Limin Sun, and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -32,29 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtHPIS class declaration.
+* @brief    HPIFitData class declaration.
 *
 */
 
-#ifndef RTHPIS_H
-#define RTHPIS_H
+#ifndef HPIFITDATA_H
+#define HPIFITDATA_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtprocessing_global.h"
-
-#include <generics/circularmatrixbuffer.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_coord_trans.h>
+#include "../inverse_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -65,10 +57,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
 #include <QSharedPointer>
-#include <QVector>
 
 
 //*************************************************************************************************************
@@ -78,15 +67,17 @@
 
 namespace FIFFLIB{
     class FiffInfo;
+    class FiffCoordTrans;
+    class FiffDigPointSet;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTPROCESSINGLIB
+// DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
-namespace RTPROCESSINGLIB
+namespace INVERSELIB
 {
 
 
@@ -94,117 +85,120 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
+/**
+* The strucut specifing the dipole error.
+*/
+struct DipFitError {
+    double error;
+    Eigen::MatrixXd moment;
+    int numIterations;
+};
+
 //=========================================================================================================
 /**
-* The struct specifing all data needed to perform coil-wise fitting.
+* The strucut specifing the sensor parameters.
 */
-struct FittingResult {
-    FIFFLIB::FiffDigPointSet fittedCoils;
-    FIFFLIB::FiffCoordTrans devHeadTrans;
-    QVector<double> errorDistances;
+struct SensorInfo {
+    Eigen::MatrixXd coilpos;
+    Eigen::MatrixXd coilori;
+    Eigen::MatrixXd tra;
 };
+
+//=========================================================================================================
+/**
+* The strucut specifing the sorting parameters.
+*/
+struct HPISortStruct {
+    double base_arr;
+    int idx;
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* Real-time HPI worker.
+* HPI Fit algorithm data structure.
 *
-* @brief Real-time HPI worker.
+* @brief HPI Fit algorithm data structure.
 */
-class RtHPISWorker : public QObject
+class INVERSESHARED_EXPORT HPIFitData
 {
-    Q_OBJECT
 
 public:
-    //=========================================================================================================
-    /**
-    * Perform one single HPI fit.
-    *
-    * @param[in] t_mat           Data to estimate the HPI positions from
-    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
-    * @param[in] vFreqs          The frequencies for each coil.
-    * @param[in] p_pFiffInfo     Associated Fiff Information.
-    */
-    void doWork(const Eigen::MatrixXd& matData,
-                const Eigen::MatrixXd& m_matProjectors,
-                const QVector<int>& vFreqs,
-                QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
-
-signals:
-    void resultReady(const RTPROCESSINGLIB::FittingResult &fitResult);
-};
-
-//=============================================================================================================
-/**
-* Real-time Head Coil Positions estimation.
-*
-* @brief Real-time Head Coil Positions estimation.
-*/
-class RTPROCESSINGSHARED_EXPORT RtHPIS : public QObject
-{
-    Q_OBJECT
-
-public:
-    typedef QSharedPointer<RtHPIS> SPtr;             /**< Shared pointer type for RtHPIS. */
-    typedef QSharedPointer<const RtHPIS> ConstSPtr;  /**< Const shared pointer type for RtHPIS. */
+    typedef QSharedPointer<HPIFitData> SPtr;             /**< Shared pointer type for HPIFitData. */
+    typedef QSharedPointer<const HPIFitData> ConstSPtr;  /**< Const shared pointer type for HPIFitData. */
 
     //=========================================================================================================
     /**
-    * Creates the real-time HPIS estimation object.
-    *
-    * @param[in] p_pFiffInfo        Associated Fiff Information
-    * @param[in] parent     Parent QObject (optional)
+    * Default constructor.
     */
-    explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo, QObject *parent = 0);
+    explicit HPIFitData();
 
     //=========================================================================================================
     /**
-    * Destroys the Real-time HPI estimation object.
+    * dipfit function is adapted from Fieldtrip Software. It has been heavily edited for use with MNE Scan Software.
     */
-    ~RtHPIS();    
+    void doDipfitConcurrent();
 
-    //=========================================================================================================
-    /**
-    * Slot to receive incoming data.
-    *
-    * @param[in] data  Data to estimate the HPI positions from
-    */
-    void append(const Eigen::MatrixXd &data);
-
-    //=========================================================================================================
-    /**
-    * Set the coil frequencies.
-    *
-    * @param[in] vCoilFreqs  The coil frequencies.
-    */
-    void setCoilFrequencies(const QVector<int>& vCoilFreqs);
-
-    //=========================================================================================================
-    /**
-    * Set the new projection matrix.
-    *
-    * @param[in] matProjectors  The new projection matrix.
-    */
-    void setProjectionMatrix(const Eigen::MatrixXd& matProjectors);
+    Eigen::RowVectorXd  coilPos;
+    Eigen::RowVectorXd  sensorData;
+    DipFitError         errorInfo;
+    SensorInfo          sensorPos;
+    Eigen::MatrixXd     matProjector;
 
 protected:
     //=========================================================================================================
     /**
-    * Handles the result
+    * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
+    * The function has been compared with matlab magnetic_dipole and it gives same output.
     */
-    void handleResults(const FittingResult &fitResult);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen::MatrixXd ori);
 
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
+    //=========================================================================================================
+    /**
+    * compute_leadfield computes a forward solution for a dipole in a a volume
+    * conductor model. The forward solution is expressed as the leadfield
+    * matrix (Nchan*3), where each column corresponds with the potential or field
+    * distributions on all sensors for one of the x,y,z-orientations of the dipole.
+    * The function has been compared with matlab ft_compute_leadfield and it gives
+    * same output.
+    */
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors);
 
-    QThread             m_workerThread;         /**< The worker thread. */
-    QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
-    Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    //=========================================================================================================
+    /**
+    * dipfitError computes the error between measured and model data
+    * and can be used for non-linear fitting of dipole position.
+    * The function has been compared with matlab dipfit_error and it gives
+    * same output
+    */
+    DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors);
 
-signals:
-    void newFittingResultAvailable(const RTPROCESSINGLIB::FittingResult &fitResult);
-    void operate(const Eigen::MatrixXd& matData,
-                 const Eigen::MatrixXd& matProjectors,
-                 const QVector<int>& vFreqs,
-                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    //=========================================================================================================
+    /**
+    * Compare function for sorting
+    */
+    static bool compare(HPISortStruct a, HPISortStruct b);
+
+    //=========================================================================================================
+    /**
+    * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
+    * X = fminsearch(X0, maxiter, maxfun, display, data, sensors) starts at X0 and
+    * attempts to find a local minimizer
+    */
+    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
+                               int maxiter,
+                               int maxfun,
+                               int display,
+                               const Eigen::MatrixXd& data,
+                               const Eigen::MatrixXd& matProjectors,
+                               const struct SensorInfo& sensors,
+                               int &simplex_numitr);
 };
 
 //*************************************************************************************************************
@@ -212,11 +206,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE
 
-#ifndef metatype_rthpisfittingresult
-#define metatype_rthpisfittingresult
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::FittingResult)
-#endif
+} //NAMESPACE
 
-#endif // RTHPIS_H
+#endif // HPIFITDATA_H
