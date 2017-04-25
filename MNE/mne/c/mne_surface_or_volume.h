@@ -391,8 +391,8 @@ public:
     //============================= mne_filename_util.c =============================
 
     static char * mne_compose_surf_name(const char *subj,
-                    const char *name,
-                    const char *prefix);
+                                        const char *name,
+                                        const char *prefix);
 
     //============================= mne_surface_io.c =============================
 

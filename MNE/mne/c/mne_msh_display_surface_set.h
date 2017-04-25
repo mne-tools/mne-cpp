@@ -127,7 +127,7 @@ public:
 
     //============================= display_surfaces.c =============================
 
-    static MneMshDisplaySurfaceSet* load_new_surface(const char *subj, const char *name, char *curv);
+    static MneMshDisplaySurfaceSet* load_new_surface(const QString &subject_id, const QString &surf, const QString &subjects_dir);
 
     static void decide_surface_extent(MneMshDisplaySurface* surf,
                                                         const char *tag);
