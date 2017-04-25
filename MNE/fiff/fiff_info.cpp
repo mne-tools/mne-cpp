@@ -351,42 +351,6 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
     return new_chs;
 }
 
-//*************************************************************************************************************
-
-void FiffInfo::apply_new_chnames_conventions()
-{
-    //Apply new channel name conventions for the whole fiff info and all relevant fields
-    this->bads = IOUtils::get_new_chnames_conventions(this->bads);
-    this->ch_names = IOUtils::get_new_chnames_conventions(this->ch_names);
-
-    for(int i = 0; i < this->chs.size(); ++i) {
-        this->chs[i].ch_name.replace(" ","");
-    }
-}
-
-
-//*************************************************************************************************************
-
-void FiffInfo::revert_new_chnames_conventions()
-{
-    QStringList xList;
-    QRegExp xRegExp;
-
-    //Apply new channel name conventions for the whole fiff info and all relevant fields
-    this->bads = IOUtils::get_old_chnames_conventions(this->bads);
-    this->ch_names = IOUtils::get_old_chnames_conventions(this->ch_names);
-
-    for(int i = 0; i < this->chs.size(); ++i) {
-        xRegExp = QRegExp("[0-9]{1,100}");
-        xRegExp.indexIn(this->chs[i].ch_name);
-        xList = xRegExp.capturedTexts();
-
-        for(int k = 0; k < xList.size(); ++k) {
-            this->chs[i].ch_name.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
-        }
-    }
-}
-
 
 //*************************************************************************************************************
 
