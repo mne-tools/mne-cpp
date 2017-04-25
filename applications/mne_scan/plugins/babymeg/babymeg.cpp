@@ -645,7 +645,7 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
 {
     //This only works with babyMEG HPI channels 400 ... 407
     if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
-        if(m_pHPIWidget->wasLastFitOk()) {
+        //if(m_pHPIWidget->wasLastFitOk()) {
             // Load device to head transformation matrix from Fiff info
             QMatrix3x3 rot;
 
@@ -658,8 +658,14 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
             QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
             // Write goodness of fit (GOF)to HPI Ch #7
-            float dpfitError = 0.0;
-            float GOF = 1 - dpfitError;
+//            float dpfitError = 0.0;
+//            float GOF = 1 - dpfitError;
+            QVector<double> vGof = m_pHPIWidget->getGOF();
+            float GOF = 0.0f;
+            for(int i = 0; i < vGof.size(); ++i) {
+                GOF += vGof.at(i);
+            }
+            GOF = GOF / vGof.size();
 
             // Write rotation quaternion to HPI Ch #1~3
             matData.row(401) = MatrixXf::Constant(1,matData.cols(), quatHPI.x());
@@ -673,7 +679,7 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
 
             // Write GOF to HPI Ch #7
             matData.row(407) = MatrixXf::Constant(1,matData.cols(), GOF);
-        }
+        //}
     }
 }
 
