@@ -352,9 +352,9 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t 
 
 void FiffInfo::apply_new_chnames_conventions()
 {
-    //Apply new channel name convnetions for the whole fiff info and all relevant fields
-    apply_new_chnames_conventions(this->bads);
-    apply_new_chnames_conventions(this->ch_names);
+    //Apply new channel name conventions for the whole fiff info and all relevant fields
+    this->bads = get_new_chnames_conventions(this->bads);
+    this->ch_names = get_new_chnames_conventions(this->ch_names);
 
     for(int i = 0; i < this->chs.size(); ++i) {
         this->chs[i].ch_name.replace(" ","");
@@ -366,14 +366,17 @@ void FiffInfo::apply_new_chnames_conventions()
 
 void FiffInfo::revert_new_chnames_conventions()
 {
-    //Apply new channel name convnetions for the whole fiff info and all relevant fields
-    revert_new_chnames_conventions(this->bads);
-    revert_new_chnames_conventions(this->ch_names);
+    QStringList xList;
+    QRegExp xRegExp;
+
+    //Apply new channel name conventions for the whole fiff info and all relevant fields
+    this->bads = get_old_chnames_conventions(this->bads);
+    this->ch_names = get_old_chnames_conventions(this->ch_names);
 
     for(int i = 0; i < this->chs.size(); ++i) {
-        QRegExp xRegExp("[0-9]{1,100}");
+        xRegExp = QRegExp("[0-9]{1,100}");
         xRegExp.indexIn(this->chs[i].ch_name);
-        QStringList xList = xRegExp.capturedTexts();
+        xList = xRegExp.capturedTexts();
 
         for(int k = 0; k < xList.size(); ++k) {
             this->chs[i].ch_name.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
@@ -384,27 +387,83 @@ void FiffInfo::revert_new_chnames_conventions()
 
 //*************************************************************************************************************
 
-void FiffInfo::apply_new_chnames_conventions(QStringList& chNames)
+QStringList FiffInfo::get_new_chnames_conventions(const QStringList& chNames)
 {
+    QStringList result;
+    QString replaceString;
+
     for(int i = 0; i < chNames.size(); ++i) {
-        chNames[i].replace(" ","");
+        replaceString = chNames.at(i);
+        replaceString.replace(" ","");
+        result.append(replaceString);
     }
+
+    return result;
 }
 
 
 //*************************************************************************************************************
 
-void FiffInfo::revert_new_chnames_conventions(QStringList& chNames)
+QStringList FiffInfo::get_old_chnames_conventions(const QStringList& chNames)
 {
+    QStringList result, xList;
+    QString replaceString;
+    QRegExp xRegExp;
+
     for(int i = 0; i < chNames.size(); ++i) {
-        QRegExp xRegExp("[0-9]{1,100}");
+        xRegExp = QRegExp("[0-9]{1,100}");
         xRegExp.indexIn(chNames.at(i));
-        QStringList xList = xRegExp.capturedTexts();
+        xList = xRegExp.capturedTexts();
 
         for(int k = 0; k < xList.size(); ++k) {
-            chNames[i].replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+            replaceString = chNames.at(i);
+            replaceString.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+            result.append(replaceString);
         }
     }
+
+    return result;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffInfo::check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention)
+{
+    bool bMatching = false;
+    QString replaceStringOldConv, replaceStringNewConv;
+
+    for(int i = 0; i < chNamesA.size(); ++i) {
+        if(chNamesB.contains(chNamesA.at(i))) {
+            bMatching = true;
+        } else if(bCheckForNewNamingConvention) {
+            //Create new convention
+            replaceStringNewConv = chNamesA.at(i);
+            replaceStringNewConv.replace(" ","");
+
+            if(chNamesB.contains(replaceStringNewConv)) {
+                bMatching = true;
+            } else {
+                //Create old convention
+                QRegExp xRegExp("[0-9]{1,100}");
+                xRegExp.indexIn(chNamesA.at(i));
+                QStringList xList = xRegExp.capturedTexts();
+
+                for(int k = 0; k < xList.size(); ++k) {
+                    replaceStringOldConv = chNamesA.at(i);
+                    replaceStringOldConv.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+
+                    if(chNamesB.contains(replaceStringNewConv) || chNamesB.contains(replaceStringOldConv) ) {
+                        bMatching = true;
+                    } else {
+                        bMatching = false;
+                    }
+                }
+            }
+        }
+    }
+
+    return bMatching;
 }
 
 
