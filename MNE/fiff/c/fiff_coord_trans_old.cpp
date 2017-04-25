@@ -91,9 +91,181 @@ using namespace FIFFLIB;
 
 #define MALLOC_20(x,t) (t *)malloc((x)*sizeof(t))
 
+static void matrix_error_20(int kind, int nr, int nc)
 
+{
+    if (kind == 1)
+        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
+    else if (kind == 2)
+        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
+    else
+        printf("Allocation error for a %d x %d matrix\n",nr,nc);
+    if (sizeof(void *) == 4) {
+        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
+        printf("Please consider moving to a 64-bit platform.");
+    }
+    printf("Cannot continue. Sorry.\n");
+    exit(1);
+}
+
+float **mne_cmatrix_20(int nr,int nc)
+
+{
+    int i;
+    float **m;
+    float *whole;
+
+    m = MALLOC_20(nr,float *);
+    if (!m) matrix_error_20(1,nr,nc);
+    whole = MALLOC_20(nr*nc,float);
+    if (!whole) matrix_error_20(2,nr,nc);
+
+    for(i=0;i<nr;i++)
+        m[i] = whole + i*nc;
+    return m;
+}
+
+#define VEC_DIFF_20(from,to,diff) {\
+    (diff)[X_20] = (to)[X_20] - (from)[X_20];\
+    (diff)[Y_20] = (to)[Y_20] - (from)[Y_20];\
+    (diff)[Z_20] = (to)[Z_20] - (from)[Z_20];\
+    }
+
+#define ALLOC_CMATRIX_20(x,y) mne_cmatrix_20((x),(y))
 
 #define MAXWORD 1000
+
+#define VEC_DOT_20(x,y) ((x)[X_20]*(y)[X_20] + (x)[Y_20]*(y)[Y_20] + (x)[Z_20]*(y)[Z_20])
+
+#define VEC_LEN_20(x) sqrt(VEC_DOT_20(x,x))
+
+#define CROSS_PRODUCT_20(x,y,xy) {\
+    (xy)[X_20] =   (x)[Y_20]*(y)[Z_20]-(y)[Y_20]*(x)[Z_20];\
+    (xy)[Y_20] = -((x)[X_20]*(y)[Z_20]-(y)[X_20]*(x)[Z_20]);\
+    (xy)[Z_20] =   (x)[X_20]*(y)[Y_20]-(y)[X_20]*(x)[Y_20];\
+    }
+
+#define FREE_CMATRIX_20(m) mne_free_cmatrix_20((m))
+
+void mne_free_cmatrix_20(float **m)
+{
+    if (m) {
+        FREE_20(*m);
+        FREE_20(m);
+    }
+}
+
+#define MIN_20(a,b) ((a) < (b) ? (a) : (b))
+
+
+//float
+Eigen::MatrixXf toFloatEigenMatrix_20(float **mat, const int m, const int n)
+{
+    Eigen::MatrixXf eigen_mat(m,n);
+
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            eigen_mat(i,j) = mat[i][j];
+
+    return eigen_mat;
+}
+
+void fromFloatEigenVector_20(const Eigen::VectorXf& from_vec, float *to_vec, const int n)
+{
+    for ( int i = 0; i < n; ++i)
+        to_vec[i] = from_vec[i];
+}
+
+void fromFloatEigenMatrix_20(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
+{
+    for ( int i = 0; i < m; ++i)
+        for ( int j = 0; j < n; ++j)
+            to_mat[i][j] = from_mat(i,j);
+}
+
+int mne_svd_20(float **mat,	/* The matrix */
+            int   m,int n,	/* m rows n columns */
+            float *sing,	/* Singular values (must have size
+                             * MIN(m,n)+1 */
+            float **uu,		/* Left eigenvectors */
+            float **vv)		/* Right eigenvectors */
+/*
+      * Compute the SVD of mat.
+      * The singular vector calculations depend on whether
+      * or not u and v are given.
+      *
+      * The allocations should be done as follows
+      *
+      * mat = ALLOC_CMATRIX_3(m,n);
+      * vv  = ALLOC_CMATRIX_3(MIN(m,n),n);
+      * uu  = ALLOC_CMATRIX_3(MIN(m,n),m);
+      * sing = MALLOC_3(MIN(m,n),float);
+      *
+      * mat is modified by this operation
+      *
+      * This simply allocates the workspace and calls the
+      * LAPACK Fortran routine
+      */
+
+{
+    int    udim = MIN_20(m,n);
+
+    Eigen::MatrixXf eigen_mat = toFloatEigenMatrix_20(mat, m, n);
+
+    //ToDo Optimize computation depending of whether uu or vv are defined
+    Eigen::JacobiSVD< Eigen::MatrixXf > svd(eigen_mat ,Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+    fromFloatEigenVector_20(svd.singularValues(), sing, svd.singularValues().size());
+
+    if (uu != NULL)
+        fromFloatEigenMatrix_20(svd.matrixU().transpose(), uu, udim, m);
+
+    if (vv != NULL)
+        fromFloatEigenMatrix_20(svd.matrixV().transpose(), vv, m, n);
+
+    return 0;
+    //  return info;
+}
+
+void mne_matt_mat_mult2_20 (float **m1,float **m2,float **result,
+                         int d1,int d2,int d3)
+     /* Matrix multiplication
+      * result(d1 x d3) = m1(d2 x d1)^T * m2(d2 x d3) */
+
+{
+    #ifdef BLAS
+    char  *transa = "N";
+    char  *transb = "T";
+    float zero = 0.0;
+    float one  = 1.0;
+
+    sgemm (transa,transb,&d3,&d1,&d2,
+            &one,m2[0],&d3,m1[0],&d1,&zero,result[0],&d3);
+
+    return;
+    #else
+    int j,k,p;
+    float sum;
+    int  one = 1;
+
+    for (j = 0; j < d1; j++)
+        for (k = 0; k < d3; k++) {
+            sum = 0.0;
+        for (p = 0; p < d2; p++)
+            sum = sum + m1[p][j]*m2[p][k];
+        result[j][k] = sum;
+    }
+    return;
+    #endif
+}
+
+float **mne_matt_mat_mult_20 (float **m1,float **m2,int d1,int d2,int d3)
+
+{
+  float **result = ALLOC_CMATRIX_20(d1,d3);
+  mne_matt_mat_mult2_20(m1,m2,result,d1,d2,d3);
+  return result;
+}
 
 
 static void skip_comments(FILE *in)
@@ -693,6 +865,189 @@ FiffCoordTransOld *FiffCoordTransOld::mne_identity_transform(int from, int to)
                         { 0.0, 0.0, 1.0 } };
     float move[] = { 0.0, 0.0, 0.0 };
     return new FiffCoordTransOld(from,to,rot,move);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld * FiffCoordTransOld::fiff_make_transform_card (int from,int to,
+                                                                 float *rL,
+                                                                 float *rN,
+                                                                 float *rR)
+/* 'from' coordinate system
+* cardinal points expressed in
+* the 'to' system */
+
+{
+    FiffCoordTransOld* t = new FiffCoordTransOld();
+    float ex[3],ey[3],ez[3];	/* The unit vectors */
+    float alpha,alpha1,len;
+    float diff1[3],diff2[3];
+    int   k;
+    float r0[3];
+
+    t->from = from;
+    t->to   = to;
+    for (k = 0; k < 3; k++) {
+        diff1[k] = rN[k] - rL[k];
+        diff2[k] = rR[k] - rL[k];
+    }
+    alpha = VEC_DOT_20(diff1,diff2)/VEC_DOT_20(diff2,diff2);
+    len = VEC_LEN_20(diff2);
+    alpha1 = 1.0 - alpha;
+
+    for (k = 0; k < 3; k++) {
+        r0[k] = alpha1*rL[k] + alpha*rR[k];
+        ex[k] = diff2[k]/len;
+        ey[k] = rN[k] - r0[k];
+        t->move[k] = r0[k];
+    }
+
+    len = VEC_LEN_20(ey);
+
+    for (k = 0; k < 3; k++)
+        ey[k] = ey[k]/len;
+
+    CROSS_PRODUCT_20 (ex,ey,ez);
+
+    for (k = 0; k < 3; k++) {
+        t->rot(k,X_20) = ex[k];
+        t->rot(k,Y_20) = ey[k];
+        t->rot(k,Z_20) = ez[k];
+    }
+
+    add_inverse (t);
+
+    return (t);
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The coordinate frames */
+                       int   to_frame,
+                       float **fromp,     /* Point locations in these two coordinate frames */
+                       float **top,
+                       float *w,	  /* Optional weights */
+                       int   np,	  /* How many points */
+                       float max_diff)	  /* Maximum allowed difference */
+/*
+ * Perform an alignment using the the solution of the orthogonal (weighted) Procrustes problem
+ */
+{
+    float **from = ALLOC_CMATRIX_20(np,3);
+    float **to   = ALLOC_CMATRIX_20(np,3);
+    float from0[3],to0[3],rr[3],diff[3];
+    int   j,k,c,p;
+    float rot[3][3];
+    float move[3];
+
+    /*
+    * Calculate the centroids and subtract;
+    */
+    for (c = 0; c < 3; c++)
+        from0[c] = to0[c] = 0.0;
+    for (j = 0; j < np; j++) {
+        for (c = 0; c < 3; c++) {
+            from0[c] += fromp[j][c];
+            to0[c] += top[j][c];
+        }
+    }
+    for (c = 0; c < 3; c++) {
+        from0[c] = from0[c]/np;
+        to0[c] = to0[c]/np;
+    }
+    for (j = 0; j < np; j++) {
+        for (c = 0; c < 3; c++) {
+            from[j][c] = fromp[j][c] - from0[c];
+            to[j][c]   = top[j][c]    - to0[c];
+        }
+    }
+    /*
+    * Compute the solution of the orthogonal Proscrustes problem
+    */
+    {
+        float **S;
+        float **uu = ALLOC_CMATRIX_20(3,3);
+        float **vv = ALLOC_CMATRIX_20(3,3);
+        float **R = NULL;
+        float sing[3];
+
+        if (w) {
+            /*
+            * This is the weighted version which allows multiplicity of points
+            */
+            S = ALLOC_CMATRIX_20(3,3);
+            for (j = 0; j < 3; j++) {
+                for (k = 0; k < 3; k++) {
+                    S[j][k] = 0.0;
+                    for (p = 0; p < np; p++)
+                        S[j][k] += w[p]*from[p][j]*to[p][k];
+                }
+            }
+        }
+        else
+            S = mne_matt_mat_mult_20(from,to,3,np,3);
+        if (mne_svd_20(S,3,3,sing,uu,vv) != 0) {
+            FREE_CMATRIX_20(S);
+            FREE_CMATRIX_20(uu);
+            FREE_CMATRIX_20(vv);
+            goto bad;
+        }
+        R = mne_matt_mat_mult_20(vv,uu,3,3,3);
+        for (j = 0; j < 3; j++)
+            for (k = 0; k < 3; k++)
+                rot[j][k] = R[j][k];
+        FREE_CMATRIX_20(R);
+        FREE_CMATRIX_20(S);
+        FREE_CMATRIX_20(uu);
+        FREE_CMATRIX_20(vv);
+    }
+    /*
+    * Now we need to generate a transformed translation vector
+    */
+    for (j = 0; j < 3; j++) {
+        move[j] = to0[j];
+        for (k = 0; k < 3; k++)
+            move[j] = move[j] - rot[j][k]*from0[k];
+    }
+    /*
+    * Test the transformation and print the results
+    */
+    #ifdef DEBUG
+    fprintf(stderr,"Procrustes matching (desired vs. transformed) :\n");
+    #endif
+    for (p = 0; p < np; p++) {
+        for (j = 0; j < 3; j++) {
+            rr[j] = move[j];
+        for (k = 0; k < 3; k++)
+            rr[j] += rot[j][k]*fromp[p][k];
+        }
+        VEC_DIFF_20(top[p],rr,diff);
+        #ifdef DEBUG
+        fprintf(stderr,"\t%7.2f %7.2f %7.2f mm <-> %7.2f %7.2f %7.2f mm diff = %8.3f mm\n",
+        1000*top[p][0],1000*top[p][1],1000*top[p][2],
+        1000*rr[0],1000*rr[1],1000*rr[2],1000*VEC_LEN(diff));
+        #endif
+        if (VEC_LEN_20(diff) > max_diff) {
+            printf("To large difference in matching : %7.1f > %7.1f mm", 1000*VEC_LEN_20(diff),1000*max_diff);
+            goto bad;
+        }
+    }
+    #ifdef DEBUG
+    fprintf(stderr,"\n");
+    #endif
+
+    FREE_CMATRIX_20(from);
+    FREE_CMATRIX_20(to);
+
+    return new FiffCoordTransOld(from_frame,to_frame,rot,move);
+
+    bad : {
+        FREE_CMATRIX_20(from);
+        FREE_CMATRIX_20(to);
+        return NULL;
+    }
 }
 
 

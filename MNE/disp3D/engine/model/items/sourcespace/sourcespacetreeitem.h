@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstractsurfacetreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 #include "../common/types.h"
 
 
@@ -96,7 +96,7 @@ class Renderable3DEntity;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT SourceSpaceTreeItem : public AbstractSurfaceTreeItem
+class DISP3DNEWSHARED_EXPORT SourceSpaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
@@ -108,33 +108,19 @@ public:
     /**
     * Default constructor.
     *
+    * @param[in] p3DEntityParent    The parent 3D entity.
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit SourceSpaceTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~SourceSpaceTreeItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    void onCheckStateChanged(const Qt::CheckState& checkState);
+    explicit SourceSpaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0, int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
     * Adds source space data.
     *
     * @param[in] tHemisphere        The hemisphere data of the source space.
-    * @param[in] parent             The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
+    void addData(const MNELIB::MNEHemisphere& tHemisphere);
 
 protected:
     //=========================================================================================================
@@ -150,11 +136,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    void setVisible(bool state);
-
-    QList<QPointer<Renderable3DEntity> >        m_lSpheres;                 /**< The currently displayed source points as 3D spheres. */
-
 };
 
 } //NAMESPACE DISP3DLIB
