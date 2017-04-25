@@ -228,6 +228,38 @@ public:
     static bool read_eigen_matrix(Matrix<T, 1, Dynamic>& out, const QString& path);
     template<typename T>
     static bool read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path);
+
+    //=========================================================================================================
+    /**
+    * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
+    *
+    * @param[in] chNames    The channel names.
+    *
+    * @return The new channel names.
+    */
+    static QStringList get_new_chnames_conventions(const QStringList& chNames);
+
+    //=========================================================================================================
+    /**
+    * Returns the old channel naming conventions (whitespcae between channel type and number) for the input list.
+    *
+    * @param[in] chNames    The channel names.
+    *
+    * @return The new channel names.
+    */
+    static QStringList get_old_chnames_conventions(const QStringList& chNames);
+
+    //=========================================================================================================
+    /**
+    * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
+    *
+    * @param[in] chNamesA    The channel names.
+    * @param[in] chNamesB    The channel names which is to be compared to.
+    * @param[in] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
+    *
+    * @return True if all names in chNamesA are present in chNamesB, false otherwise.
+    */
+    static bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention = false);
 };
 
 //*************************************************************************************************************

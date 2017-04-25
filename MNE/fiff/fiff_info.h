@@ -235,38 +235,6 @@ public:
     */
     void apply_new_chnames_conventions();
 
-    //=========================================================================================================
-    /**
-    * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
-    *
-    * @param[in] chNames    The channel names
-    *
-    * @return The new ch names.
-    */
-    static QStringList get_new_chnames_conventions(const QStringList& chNames);
-
-    //=========================================================================================================
-    /**
-    * Returns the old channel naming conventions (whitespcae between channel type and number) for the input list.
-    *
-    * @param[in] chNames    The channel names
-    *
-    * @return The new ch names.
-    */
-    static QStringList get_old_chnames_conventions(const QStringList& chNames);
-
-    //=========================================================================================================
-    /**
-    * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
-    *
-    * @param[in] chNamesA    The channel names
-    * @param[in] chNamesB    The channel names which are to be compared to
-    * @param[in] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
-    *
-    * @return True if all names in chNamesA are present in chNamesB, false otherwise
-    */
-    static bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention = false);
-
 // ToDo
 //    //=========================================================================================================
 //    /**
