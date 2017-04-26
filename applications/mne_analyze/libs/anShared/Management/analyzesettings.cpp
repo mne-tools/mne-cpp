@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     analyzedata.h
+* @file     analyzesettings.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -72,4 +72,140 @@ AnalyzeSettings::AnalyzeSettings(QObject *parent)
 AnalyzeSettings::~AnalyzeSettings()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+QString AnalyzeSettings::bemName() const
+{
+    return m_BEMName;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setBEMName(const QString &BEMName)
+{
+    m_BEMName = BEMName;
+    emit bemNameChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QString AnalyzeSettings::mriName() const
+{
+    return m_MRIName;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setMRIName(const QString &MRIName)
+{
+    m_MRIName = MRIName;
+    emit mriNameChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QString AnalyzeSettings::surfName() const
+{
+    return m_SurfName;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setSurfName(const QString &SurfName)
+{
+    m_SurfName = SurfName;
+    emit surfNameChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QString AnalyzeSettings::noiseName() const
+{
+    return m_NoiseName;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setNoiseName(const QString &NoiseName)
+{
+    m_NoiseName = NoiseName;
+    emit noiseNameChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QString AnalyzeSettings::measName() const
+{
+    return m_MeasName;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setMeasName(const QString &MeasName)
+{
+    m_MeasName = MeasName;
+    emit measNameChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QStringList AnalyzeSettings::projNames() const
+{
+    return m_ProjNames;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setProjNames(const QStringList &ProjNames)
+{
+    m_ProjNames = ProjNames;
+    emit projNamesChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QString AnalyzeSettings::eegSphereModelName() const
+{
+    return m_EEGSphereModelName;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setEEGSphereModelName(const QString &EEGModelFile)
+{
+    m_EEGSphereModelName = EEGModelFile;
+    emit eegSphereModelNameChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+QString AnalyzeSettings::eegModelName() const
+{
+    return m_EEGModelName;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeSettings::setEEGModelName(const QString &EEGModelName)
+{
+    m_EEGModelName = EEGModelName;
+    emit eegModelNameChanged_signal();
 }

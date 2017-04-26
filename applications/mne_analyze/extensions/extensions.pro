@@ -39,10 +39,14 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     surfer \
-    fiffio
+    fiffio \
+    stcbrowser \
+    dipolefit \
+    music \
+    invmne
 
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SUBDIRS += \
         deepcntk \
-#        deepcntknets
+        deepcntknets
 }

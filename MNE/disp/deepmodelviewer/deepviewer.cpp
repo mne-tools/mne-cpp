@@ -87,33 +87,6 @@ DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 , m_pNetwork(new Network)
 {
     initScene();
-    updateSceneItems();
-
-    m_pView->getGraphicsView()->setScene(m_pScene);
-
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(m_pView);
-
-    if(embeddedControl) {
-        Controls *controls = new Controls(this, this);
-        layout->addWidget(controls);
-    }
-
-    setLayout(layout);
-
-    setWindowTitle(tr("Deep Model Viewer"));
-}
-
-
-//*************************************************************************************************************
-
-DeepViewer::DeepViewer(Deep::SPtr& model, bool embeddedControl, QWidget *parent)
-: QWidget(parent)
-, m_pView(new View)
-, m_pNetwork(new Network(model))
-{
-    initScene();
-    updateSceneItems();
 
     m_pView->getGraphicsView()->setScene(m_pScene);
 
@@ -151,7 +124,14 @@ Network* DeepViewer::getNetwork() const
 
 void DeepViewer::setModel(Deep::SPtr& model)
 {
-    Q_UNUSED(model)
+    if(model != m_pNetwork->model()) {
+        removeSceneItems();
+        m_pNetwork->setModel(model);
+        updateSceneItems();
+    }
+    else {
+        updateModel();
+    }
 }
 
 
@@ -174,6 +154,37 @@ void DeepViewer::initScene()
     connect(m_pNetwork, &Network::update_signal, this, &DeepViewer::redrawScene);
     connect(m_pNetwork, &Network::updateWeightThreshold_signal, this, &DeepViewer::updateSceneItems);
     connect(m_pNetwork, &Network::updateWeightStrength_signal, this, &DeepViewer::redrawScene);
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::removeSceneItems()
+{
+    if(!m_pNetwork->isSetup())
+        return;
+
+    //
+    // Remove layer nodes from scene
+    //
+    for (int i = 0; i < m_pNetwork->layerNodes().size(); ++i) {
+        for (int j = 0; j < m_pNetwork->layerNodes()[i].size(); ++j) {
+            if(m_pNetwork->layerNodes()[i][j]->scene()) {
+                m_pScene->removeItem(m_pNetwork->layerNodes()[i][j]);
+            }
+        }
+    }
+
+    //
+    // Remove edges from scene
+    //
+    for (int i = 0; i < m_pNetwork->edges().size(); ++i) {
+        for (int j = 0; j < m_pNetwork->edges()[i].size(); ++j) {
+            if(m_pNetwork->edges()[i][j]->scene()) {
+                m_pScene->removeItem(m_pNetwork->edges()[i][j]);
+            }
+        }
+    }
 }
 
 
@@ -211,6 +222,8 @@ void DeepViewer::updateSceneItems()
             }
         }
     }
+
+    redrawScene();
 }
 
 

@@ -59,6 +59,7 @@
 
 QT_BEGIN_NAMESPACE
 class QGroupBox;
+class QComboBox;
 QT_END_NAMESPACE
 
 
@@ -114,6 +115,14 @@ public:
     */
     void setDeepViewer(DeepViewer* v);
 
+    //=========================================================================================================
+    /**
+    * Returns the configuration combo box
+    *
+    * @return The configuration combo box
+    */
+    QComboBox* getConfigurationComboBox();
+
 signals:
     //=========================================================================================================
     /**
@@ -158,7 +167,10 @@ private:
     */
     void requestTraining();
 
+
+
 private:
+    QComboBox * m_pNetworkConfigs;              /**< The network configurations */
     DeepViewer* m_pDeepViewer;                  /**< The deep view which this control is connected to */
 };
 
