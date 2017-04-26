@@ -1164,6 +1164,14 @@ MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int whi
 
 //*************************************************************************************************************
 
+MneSurfaceOld* MneSurfaceOrVolume::mne_read_bem_surface2(char *name, int  which, int  add_geometry, float *sigmap)
+{
+  return read_bem_surface(name,which,add_geometry,sigmap,FALSE);
+}
+
+
+//*************************************************************************************************************
+
 MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int which, int add_geometry, float *sigmap, bool check_too_many_neighbors)
 /*
      * Read a Neuromag-style BEM surface description
@@ -3377,9 +3385,9 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
                                                              char *curv_file,
                                                              int  add_geometry,
                                                              int  check_too_many_neighbors)
-/*
-      * Load the surface and add the geometry information
-      */
+    /*
+    * Load the surface and add the geometry information
+    */
 {
     float **verts = Q_NULLPTR;
     float *curvs  = Q_NULLPTR;
@@ -3391,7 +3399,8 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
     MneSourceSpaceOld* s = Q_NULLPTR;
     void  *tags = Q_NULLPTR;
 
-    if (mne_read_triangle_file(surf_file,&nvert,
+    if (mne_read_triangle_file(surf_file,
+                               &nvert,
                                &ntri,
                                &verts,
                                &tris,
@@ -3470,7 +3479,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     int  magic;
     char c;
 
-    int  nvert,ntri,nquad;
+    qint32  nvert,ntri,nquad;
     float **vert = NULL;
     int   **tri  = NULL;
     int   k,p;
@@ -4067,8 +4076,8 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
 
 int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 /*
-      * Read the strange 3-byte integer
-      */
+* Read the strange 3-byte integer
+*/
 {
     unsigned int s = 0;
 
@@ -4087,13 +4096,13 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 
 //*************************************************************************************************************
 
-int MneSurfaceOrVolume::mne_read_int(FILE *in, int *ival)
+int MneSurfaceOrVolume::mne_read_int(FILE *in, qint32 *ival)
 /*
-      * Read a 32-bit integer
-      */
+* Read a 32-bit integer
+*/
 {
-    int s ;
-    if (fread (&s,sizeof(int),1,in) != 1) {
+    qint32 s ;
+    if (fread (&s,sizeof(qint32),1,in) != 1) {
         if (ferror(in))
             qCritical("mne_read_int");
         else

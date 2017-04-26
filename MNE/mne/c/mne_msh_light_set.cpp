@@ -60,7 +60,6 @@ using namespace MNELIB;
 MneMshLightSet::MneMshLightSet()
 {
     name = Q_NULLPTR;
-    lights = Q_NULLPTR;
     nlight = 0;
 }
 
@@ -70,5 +69,8 @@ MneMshLightSet::MneMshLightSet()
 MneMshLightSet::~MneMshLightSet()
 {
     FREE_50(name);
-    FREE_50(lights);
+
+    for(int i = 0; i < lights.size() ; ++i) {
+        delete lights[i];
+    }
 }

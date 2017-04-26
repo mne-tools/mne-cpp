@@ -45,18 +45,6 @@
 
 typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 
-typedef struct {		/* Definition of lighting */
-  int   state;			/* On or off? */
-  float pos[3];			/* Where is the light? */
-  float diff[3];		/* Diffuse intensity */
-} *mshLight,mshLightRec;	/* We are only using diffuse lights here */
-
-typedef struct {		/* Light set */
-  char     *name;		/* Name of this set */
-  mshLight lights;		/* Which lights */
-  int      nlight;		/* How many */
-} *mshLightSet,mshLightSetRec;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -117,7 +105,7 @@ public:
     /**
     * Constructs the MneMshDisplaySurfaceSet.
     */
-    MneMshDisplaySurfaceSet(int nsurf);
+    MneMshDisplaySurfaceSet(int nsurf = 0);
 
     //=========================================================================================================
     /**
@@ -135,6 +123,18 @@ public:
     static void decide_curv_display(const char *name,
                     MneMshDisplaySurface* s);
 
+    static int add_bem_surface(MneMshDisplaySurfaceSet* surfs,
+                        QString              filepath,
+                        int                  kind,
+                        QString              bemname,
+                        int                  full_geom,
+                        int                  check);
+
+    static void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
+                                                                        MneMshDisplaySurface*    newSurf,
+                                                                        int                  replace,
+                                                                        int                  drawable);
+
     //============================= vertex_colors.c =============================
 
     static void setup_curvature_colors(MneMshDisplaySurface* surf);
@@ -143,15 +143,17 @@ public:
 
     static void apply_left_right_eyes(MneMshDisplaySurfaceSet* surfs);
 
+    static void apply_left_eyes(MneMshDisplaySurfaceSet* surfs);
+
     //============================= lights.c =============================
 
     static void setup_current_surface_lights(MneMshDisplaySurfaceSet* surfs);
 
     static void initialize_custom_lights();
 
-    static mshLightSet dup_light_set(mshLightSet s);
+    static MneMshLightSet* dup_light_set(MneMshLightSet* s);
 
-    static void setup_these_surface_lights(MneMshDisplaySurfaceSet* surfs, mshLightSet set);
+    static void setup_these_surface_lights(MneMshDisplaySurfaceSet* surfs, MneMshLightSet* set);
 
 public:
     char              *subj;	       /* The name of the subject */
@@ -165,7 +167,7 @@ public:
     int               use_patches;       /* Use patches for display? */
     int               *active;	       /* Which surfaces are currently active */
     int               *drawable;	       /* Which surfaces could be drawn? */
-    mshLightSet       lights;            /* Lighting */
+    MneMshLightSet*       lights;            /* Lighting */
     float             rot[3];            /* Rotation angles of the MRI (in radians) */
     float             move[3];	       /* Possibly move the origin, too */
     float             fov;	       /* Field of view (extent of the surface) */
