@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "invmne_global.h"
-
 #include <anShared/Interfaces/IExtension.h>
 
 
@@ -82,7 +81,7 @@ namespace INVMNEEXTENSION
 /**
 * InvMNE Extension
 *
-* @brief The InvMNE class provides input and output capabilities for the fiff file format.
+* @brief The InvMNE class provides MNE based inverse estimation.
 */
 class INVMNESHARED_EXPORT InvMNE : public ANSHAREDLIB::IExtension
 {
@@ -104,10 +103,7 @@ public:
     */
     ~InvMNE();
 
-    //=========================================================================================================
-    /**
-    * IExtension functions
-    */
+    // IExtension functions
     virtual QSharedPointer<IExtension> clone() const;
     virtual void init();
     virtual void unload();
@@ -117,7 +113,10 @@ public:
     virtual QDockWidget* getControl();
     virtual QWidget* getView();
 
-
+    //=========================================================================================================
+    /**
+    * Called when calculation is requested
+    */
     void calculate();
 
 protected:

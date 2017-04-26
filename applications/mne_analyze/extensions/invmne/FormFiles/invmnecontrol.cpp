@@ -49,9 +49,9 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvMNEControl::InvMNEControl(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::InvMNEControl)
+InvMNEControl::InvMNEControl(QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::InvMNEControl)
 {
     ui->setupUi(this);
 }

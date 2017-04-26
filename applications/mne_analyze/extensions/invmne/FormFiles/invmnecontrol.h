@@ -65,29 +65,78 @@ class InvMNEControl : public QWidget
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructs the MNE Control.
+    *
+    * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
+    */
     explicit InvMNEControl(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the MNE Control.
+    */
     ~InvMNEControl();
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emmitted when the calculation button is pressed.
+    */
     void calculate_signal();
 
 private slots:
+    //=========================================================================================================
+    /**
+    * Called when fiff evoked path editing finished
+    */
     void on_m_qLineEditEvoked_editingFinished();
 
+    //=========================================================================================================
+    /**
+    * Called when event selection changed
+    *
+    * @param [in] arg1      the selected event
+    */
     void on_m_qComboBoxEventType_currentIndexChanged(const QString &arg1);
 
+    //=========================================================================================================
+    /**
+    * Called when inverse operator path editing finished
+    */
     void on_m_qLineEditInv_editingFinished();
 
+    //=========================================================================================================
+    /**
+    * Called when double spin box editing finished
+    *
+    * @param [in] arg1      the selected value
+    */
     void on_doubleSpinBox_valueChanged(double arg1);
 
+    //=========================================================================================================
+    /**
+    * Called when method spin box editing finished
+    *
+    * @param [in] arg1      the selected method
+    */
     void on_m_qComboBoxMethod_currentIndexChanged(const QString &arg1);
 
+    //=========================================================================================================
+    /**
+    * Called when STC path editing finished
+    */
     void on_m_qLineEditSTC_editingFinished();
 
+    //=========================================================================================================
+    /**
+    * Called when calculating button was pressed.
+    */
     void on_m_qPushButtonCalculate_released();
 
 private:
-    Ui::InvMNEControl *ui;
+    Ui::InvMNEControl *ui;  /**< The user interface */
 };
 
 #endif // INVMNECONTROL_H

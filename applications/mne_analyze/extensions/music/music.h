@@ -83,7 +83,7 @@ namespace MUSICEXTENSION
 /**
 * Music Extension
 *
-* @brief The Music class provides input and output capabilities for the fiff file format.
+* @brief The Music class provides MUSIC based estimations.
 */
 class MUSICSHARED_EXPORT Music : public ANSHAREDLIB::IExtension
 {
@@ -105,10 +105,7 @@ public:
     */
     ~Music();
 
-    //=========================================================================================================
-    /**
-    * IExtension functions
-    */
+    // IExtension functions
     virtual QSharedPointer<IExtension> clone() const;
     virtual void init();
     virtual void unload();
@@ -118,7 +115,10 @@ public:
     virtual QDockWidget* getControl();
     virtual QWidget* getView();
 
-
+    //=========================================================================================================
+    /**
+    * Called when calculation is requested
+    */
     void calculate();
 
 protected:
