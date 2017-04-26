@@ -130,10 +130,10 @@ public:
                         int                  full_geom,
                         int                  check);
 
-    static void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
-                                                                        MneMshDisplaySurface*    newSurf,
-                                                                        int                  replace,
-                                                                        int                  drawable);
+    static void add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
+                                                MneMshDisplaySurface*    newSurf,
+                                                int                  replace,
+                                                int                  drawable);
 
     //============================= vertex_colors.c =============================
 
