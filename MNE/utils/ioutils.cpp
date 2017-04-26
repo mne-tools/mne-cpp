@@ -253,3 +253,83 @@ void IOUtils::swap_doublep(double *source)
 }
 
 
+//*************************************************************************************************************
+
+QStringList IOUtils::get_new_chnames_conventions(const QStringList& chNames)
+{
+    QStringList result;
+    QString replaceString;
+
+    for(int i = 0; i < chNames.size(); ++i) {
+        replaceString = chNames.at(i);
+        replaceString.replace(" ","");
+        result.append(replaceString);
+    }
+
+    return result;
+}
+
+
+//*************************************************************************************************************
+
+QStringList IOUtils::get_old_chnames_conventions(const QStringList& chNames)
+{
+    QStringList result, xList;
+    QString replaceString;
+    QRegExp xRegExp;
+
+    for(int i = 0; i < chNames.size(); ++i) {
+        xRegExp = QRegExp("[0-9]{1,100}");
+        xRegExp.indexIn(chNames.at(i));
+        xList = xRegExp.capturedTexts();
+
+        for(int k = 0; k < xList.size(); ++k) {
+            replaceString = chNames.at(i);
+            replaceString.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+            result.append(replaceString);
+        }
+    }
+
+    return result;
+}
+
+
+//*************************************************************************************************************
+
+bool IOUtils::check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention)
+{
+    bool bMatching = false;
+    QString replaceStringOldConv, replaceStringNewConv;
+
+    for(int i = 0; i < chNamesA.size(); ++i) {
+        if(chNamesB.contains(chNamesA.at(i))) {
+            bMatching = true;
+        } else if(bCheckForNewNamingConvention) {
+            //Create new convention
+            replaceStringNewConv = chNamesA.at(i);
+            replaceStringNewConv.replace(" ","");
+
+            if(chNamesB.contains(replaceStringNewConv)) {
+                bMatching = true;
+            } else {
+                //Create old convention
+                QRegExp xRegExp("[0-9]{1,100}");
+                xRegExp.indexIn(chNamesA.at(i));
+                QStringList xList = xRegExp.capturedTexts();
+
+                for(int k = 0; k < xList.size(); ++k) {
+                    replaceStringOldConv = chNamesA.at(i);
+                    replaceStringOldConv.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+
+                    if(chNamesB.contains(replaceStringNewConv) || chNamesB.contains(replaceStringOldConv) ) {
+                        bMatching = true;
+                    } else {
+                        bMatching = false;
+                    }
+                }
+            }
+        }
+    }
+
+    return bMatching;
+}
