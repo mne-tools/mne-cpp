@@ -62,6 +62,20 @@ MneMshLight::MneMshLight()
 
 //*************************************************************************************************************
 
+MneMshLight::MneMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ)
+{
+    this->state = state;
+    this->pos[0] = posX;
+    this->pos[1] = posY;
+    this->pos[2] = posZ;
+    this->diff[0] = diffX;
+    this->diff[1] = diffY;
+    this->diff[2] = diffZ;
+}
+
+
+//*************************************************************************************************************
+
 MneMshLight::~MneMshLight()
 {
 }

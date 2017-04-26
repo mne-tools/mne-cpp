@@ -99,6 +99,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs the MneMshLight.
+    */
+    MneMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
+
+    //=========================================================================================================
+    /**
     * Destroys the MneMshLight.
     */
     ~MneMshLight();

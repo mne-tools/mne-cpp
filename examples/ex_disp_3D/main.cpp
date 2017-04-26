@@ -151,9 +151,15 @@ int main(int argc, char *argv[])
         bDoClustering = true;
     }
 
-    //MneMshDisplaySurfaceSet test
-    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = MneMshDisplaySurfaceSet::load_new_surface("subject","pial",NULL);
 
+    //MneMshDisplaySurfaceSet test
+    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
+    MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
+                                             "./MNE-sample-data/subjects/sample/bem/sample-head.fif",
+                                             FIFFV_BEM_SURF_ID_HEAD,
+                                             "head",
+                                             1,
+                                             1);
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
