@@ -447,7 +447,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
     double meanx,meany,meanz,normf;
 
     for(int i = 0; i < 15; ++i) {
-        // Calcualte mean translation for all points -> centroid of both data sets
+        // Calculate mean translation for all points -> centroid of both data sets
         xdiff = NH.col(0) - BT.col(0);
         ydiff = NH.col(1) - BT.col(1);
         zdiff = NH.col(2) - BT.col(2);
@@ -497,6 +497,8 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
         Trans(2,3) = meanz;
 
         // Safe rotation and translation to final matrix for next iteration step
+        // This step is safe to do since we change one of the input point sets (BT)
+        // ToDo: Replace this for loop with a least square solution process
         transFinal = Rot * Trans * transFinal;
     }
 
