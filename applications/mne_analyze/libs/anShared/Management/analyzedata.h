@@ -49,7 +49,6 @@
 #include <inverse/dipoleFit/ecd_set.h>
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -65,14 +64,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//namespace MNELIB {
-//    class MNESourceEstimate;
-//}
-
-//namespace INVERSELIB {
-//    class DipoleFitSettings;
-//    class ECDSet;
-//}
 
 
 //*************************************************************************************************************
@@ -88,14 +79,6 @@ namespace ANSHAREDLIB
 //=============================================================================================================
 // ENUMERATIONS
 //=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 
 //=========================================================================================================
@@ -124,10 +107,9 @@ public:
     virtual ~AnalyzeData();
 
 signals:
-    void stcChanged_signal();           /**< Emmited when the current STC changed.*/
-    void stcSampleChanged_signal(int sample);  /**< Emmited when the current STC sample point changed. @param [in] sample  The sample time point;*/
-
-    void ecdSetChanged_signal();        /**< Emmited when the current ECD Set changed.*/
+    void stcChanged_signal();                   /**< Emmited when the current STC changed.*/
+    void stcSampleChanged_signal(int sample);   /**< Emmited when the current STC sample point changed. @param [in] sample  The sample time point;*/
+    void ecdSetChanged_signal();                /**< Emmited when the current ECD Set changed.*/
 
 public:
 //STC
@@ -141,7 +123,8 @@ public:
     void addECDSet( INVERSELIB::DipoleFitSettings &ecdSettings,  INVERSELIB::ECDSet &ecdSet );  /*!< Sets the current ECD Set. @param [in] ecdSettings  Sets the settings corresponding to the current ECD Set; @param [in] ecdSet  Sets the current ECD Set;*/
     const QList< QPair< INVERSELIB::DipoleFitSettings, INVERSELIB::ECDSet > >& ecdSets() const; /*!< Returns a list of all past ECD Sets. @return All past ECD Sets.*/
 
-private: // Database -> Consierd using abstract item models or other datamanagement architecture
+// Database -> Consider using abstract item models or other datamanagement architecture
+private:
 // STCs
     QList<MNELIB::MNESourceEstimate>    m_qListEstimates;       /**< List of all Source Estimates.*/
     int                                 m_iCurrentEstimate;     /**< Current Estimate */
@@ -150,7 +133,6 @@ private: // Database -> Consierd using abstract item models or other datamanagem
 // ECDs
     QList< QPair< INVERSELIB::DipoleFitSettings, INVERSELIB::ECDSet > > m_qListECDSets;     /**< List of all past ECD Sets.*/
     int                                                                 m_iCurrentECDSet;   /**< Current ECD Set */
-
 };
 
 //*************************************************************************************************************

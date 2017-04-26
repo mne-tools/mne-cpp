@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FiffIO class.
+* @brief    Contains the declaration of the STCBrowser class.
 *
 */
 
@@ -83,7 +83,7 @@ namespace STCBROWSEREXTENSION
 /**
 * STCBrowser Extension
 *
-* @brief The STCBrowser class provides input and output capabilities for the fiff file format.
+* @brief The STCBrowser class provides stc browsing capabilities.
 */
 class STCBROWSERSHARED_EXPORT STCBrowser : public ANSHAREDLIB::IExtension
 {
@@ -105,10 +105,7 @@ public:
     */
     ~STCBrowser();
 
-    //=========================================================================================================
-    /**
-    * IExtension functions
-    */
+    // IExtension functions
     virtual QSharedPointer<IExtension> clone() const;
     virtual void init();
     virtual void unload();

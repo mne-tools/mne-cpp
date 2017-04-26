@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne.cpp
+* @file     invmne.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -80,7 +80,6 @@ InvMNE::InvMNE()
 : m_pControl(Q_NULLPTR)
 , m_pInvMNEControl(Q_NULLPTR)
 {
-
 }
 
 
@@ -88,7 +87,6 @@ InvMNE::InvMNE()
 
 InvMNE::~InvMNE()
 {
-
 }
 
 
@@ -116,7 +114,6 @@ void InvMNE::init()
 
 void InvMNE::unload()
 {
-
 }
 
 
@@ -163,13 +160,10 @@ QWidget *InvMNE::getView()
 
 void InvMNE::calculate()
 {
-
-
 //    printf("Data contains %d sets\n",evokedSet.evoked.size());
 //    for(qint32 i = 0; i < evokedSet.evoked.size(); ++i) {
 //        printf("%s\n", evokedSet.evoked[i].comment.toUtf8().constData());
 //    }
-
 
     //*********************************************************************************************************
     // MNE Settings
