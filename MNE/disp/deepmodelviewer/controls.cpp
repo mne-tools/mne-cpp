@@ -49,6 +49,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QComboBox>
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QVBoxLayout>
@@ -79,6 +80,7 @@ using namespace DISPLIB;
 
 Controls::Controls(QWidget* parent)
 : QWidget(parent)
+, m_pNetworkConfigs(Q_NULLPTR)
 , m_pDeepViewer(Q_NULLPTR)
 {
 
@@ -89,6 +91,7 @@ Controls::Controls(QWidget* parent)
 
 Controls::Controls(DeepViewer* v, QWidget* parent)
 : QWidget(parent)
+, m_pNetworkConfigs(Q_NULLPTR)
 , m_pDeepViewer(v)
 {
     createLayout();
@@ -114,11 +117,22 @@ void Controls::setDeepViewer(DeepViewer *v)
 
 //*************************************************************************************************************
 
+QComboBox *Controls::getConfigurationComboBox()
+{
+    return m_pNetworkConfigs;
+}
+
+
+//*************************************************************************************************************
+
 void Controls::createNetworkControls(QWidget *parent)
 {
     //
     // Create Controls
     //
+    if(!m_pNetworkConfigs) {
+        m_pNetworkConfigs = new QComboBox(parent);
+    }
     QPushButton *trainButton = new QPushButton(parent);
     trainButton->setText(tr("Train"));
 
@@ -126,6 +140,7 @@ void Controls::createNetworkControls(QWidget *parent)
     // Layouts
     //
     QVBoxLayout *networkGroupLayout = new QVBoxLayout(parent);
+    networkGroupLayout->addWidget(m_pNetworkConfigs);
     networkGroupLayout->addWidget(trainButton);
 
     //
@@ -233,7 +248,7 @@ void Controls::createAppearanceControls(QWidget* parent)
     openGlButton->setChecked(m_pDeepViewer->getView()->usesOpenGL());
 #endif
     weightStrength->setValue(5);
-    weightThreshold->setValue(200);
+    weightThreshold->setValue(450);
 }
 
 

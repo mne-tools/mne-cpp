@@ -198,13 +198,23 @@ void MainWindow::createMenus()
 
 void MainWindow::createDockWindows()
 {
+    setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
+    setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
+    setDockOptions(QMainWindow::ForceTabbedDocks);
+
     //Add Extension views to mdi
     for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
         IExtension* extension = m_pExtensionManager->getExtensions()[i];
-        if(extension->hasControl() && extension->getControl()) {
-            addDockWidget(Qt::LeftDockWidgetArea,extension->getControl());
+
+        qDebug() << "create dock" << extension->getName();
+
+        QDockWidget* control = extension->getControl();
+        if(control) {
+            addDockWidget(Qt::LeftDockWidgetArea,control);
         }
     }
+
+    tabifyDockWindows();
 }
 
 
@@ -218,12 +228,63 @@ void MainWindow::createMdiView()
     //Add Extension views to mdi
     for(int i = 0; i < m_pExtensionManager->getExtensions().size(); ++i) {
         IExtension* extension = m_pExtensionManager->getExtensions()[i];
-        if(extension->hasView() && extension->getView()) {
-            m_pMdiView->addSubWindow(extension->getView());
+
+        qDebug() << "create mdi" << extension->getName();
+
+        QWidget* view = extension->getView();
+        if(view) {
+            m_pMdiView->addSubWindow(view);
         }
     }
 
     m_pMdiView->cascadeSubWindows();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::tabifyDockWindows()
+{
+    //
+    // get a list of all the docks
+    //
+    QList<QDockWidget*> docks = findChildren<QDockWidget*>();
+
+    //
+    // first, un-float all the tabs
+    //
+    std::for_each(docks.begin(), docks.end(), std::bind(&QDockWidget::setFloating, std::placeholders::_1 /* the dock widget*/, false));
+
+    //
+    // sort them into dockWidget areas
+    //
+    QVector<QDockWidget*> topArea, leftArea, rightArea, bottomArea;
+    QVector<QVector<QDockWidget*>*> dockAreas;
+
+    dockAreas.push_back(&topArea);
+    dockAreas.push_back(&leftArea);
+    dockAreas.push_back(&rightArea);
+    dockAreas.push_back(&bottomArea);
+
+    std::for_each(docks.begin(), docks.end(), [&] (QDockWidget* dock)
+    {
+        if      (dockWidgetArea(dock) ==  Qt::TopDockWidgetArea     )   {topArea.   push_back(dock);    this->removeDockWidget(dock); dock->resize(dock->minimumSizeHint());    this->addDockWidget(Qt::TopDockWidgetArea   , dock); dock->setVisible(true);}
+        else if (dockWidgetArea(dock) ==  Qt::LeftDockWidgetArea    )   {leftArea.  push_back(dock);    this->removeDockWidget(dock); dock->resize(dock->minimumSizeHint());    this->addDockWidget(Qt::LeftDockWidgetArea  , dock); dock->setVisible(true);}
+        else if (dockWidgetArea(dock) ==  Qt::RightDockWidgetArea   )   {rightArea. push_back(dock);    this->removeDockWidget(dock); dock->resize(dock->minimumSizeHint());    this->addDockWidget(Qt::RightDockWidgetArea , dock); dock->setVisible(true);}
+        else if (dockWidgetArea(dock) ==  Qt::BottomDockWidgetArea  )   {bottomArea.push_back(dock);    this->removeDockWidget(dock); dock->resize(dock->minimumSizeHint());    this->addDockWidget(Qt::BottomDockWidgetArea, dock); dock->setVisible(true);}
+    });
+
+    //
+    // then, tab them all
+    //
+    for (QVector<QVector<QDockWidget*>*>::iterator areasItr = dockAreas.begin(); areasItr != dockAreas.end(); areasItr++)
+    {
+        // within each area, tab all the docks if there are more than 1
+        QVector<QDockWidget*> area = **areasItr;
+        for (int i = 1; i < area.size(); ++i) {
+            this->tabifyDockWidget(area[i-1], area[i]);
+        }
+    }
 }
 
 

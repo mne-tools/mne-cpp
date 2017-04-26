@@ -188,6 +188,14 @@ public:
     */
     MNESourceEstimate& operator= (const MNESourceEstimate &rhs);
 
+    //=========================================================================================================
+    /**
+    * Returns the number of samples.
+    *
+    * @return the number of samples
+    */
+    int samples() const;
+
 public:
     MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
     VectorXi vertices;      /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; in clustered case vertices holds the ROI idcs

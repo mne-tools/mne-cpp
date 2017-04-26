@@ -77,23 +77,10 @@ using namespace Eigen;
 Network::Network(QObject *parent)
 : QObject(parent)
 , m_penStyle(Qt::SolidLine)
-, m_weightThreshold(0.1f)
+, m_weightThreshold(0.45f)
 , m_weightStrength(5)
 {
 
-}
-
-
-//*************************************************************************************************************
-
-Network::Network(Deep::SPtr& model, QObject *parent)
-: QObject(parent)
-, m_pModel(model)
-, m_penStyle(Qt::SolidLine)
-, m_weightThreshold(0.2f)
-, m_weightStrength(5)
-{
-    generateNetwork();
 }
 
 
@@ -101,8 +88,14 @@ Network::Network(Deep::SPtr& model, QObject *parent)
 
 void Network::setModel(Deep::SPtr& model)
 {
-    m_pModel = model;
-    // TODO Update network
+    if(m_pModel != model) {
+        cleanNetwork();
+        m_pModel = model;
+        generateNetwork();
+    }
+    else {
+        updateWeights();
+    }
 }
 
 
@@ -271,6 +264,32 @@ void Network::updateWeights()
             }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void Network::cleanNetwork()
+{
+    //
+    // Remove layer nodes from scene
+    //
+    for (int i = 0; i < m_listLayerNodes.size(); ++i) {
+        for (int j = 0; j < m_listLayerNodes[i].size(); ++j) {
+            delete m_listLayerNodes[i][j];
+        }
+    }
+    m_listLayerNodes.clear();
+
+    //
+    // Remove edges from scene
+    //
+    for (int i = 0; i < m_listEdges.size(); ++i) {
+        for (int j = 0; j < m_listEdges[i].size(); ++j) {
+            delete m_listEdges[i][j];
+        }
+    }
+    m_listEdges.clear();
 }
 
 

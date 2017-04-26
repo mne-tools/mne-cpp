@@ -558,7 +558,7 @@ int MneCovMatrix::condition_cov(MneCovMatrix *c, float rank_threshold, int use_r
 
 //*************************************************************************************************************
 
-int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float small, int use_rank)
+int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float p_small, int use_rank)
 /*
           * Do the eigenvalue decomposition
           */
@@ -566,8 +566,8 @@ int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float small, in
     int   np,k,p,rank;
     float rank_threshold = 1e-6;
 
-    if (small < 0)
-        small = 1.0;
+    if (p_small < 0)
+        p_small = 1.0;
 
     if (!c)
         return OK;

@@ -120,14 +120,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns if extension provides its own menu
-    *
-    * @return true if provides menu, false otherwise
-    */
-    virtual bool hasMenu() const = 0;
-
-    //=========================================================================================================
-    /**
     * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
     *
     * @return the menu
@@ -136,27 +128,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns if extension provides its own control
-    *
-    * @return true if provides control, false otherwise
-    */
-    virtual bool hasControl() const = 0;
-
-    //=========================================================================================================
-    /**
     * Provides the control, in case no control is provided it returns a Q_NULLPTR
     *
     * @return the control
     */
     virtual QDockWidget* getControl() = 0;
-
-    //=========================================================================================================
-    /**
-    * Returns if extension provides its own view
-    *
-    * @return true if provides control, false otherwise
-    */
-    virtual bool hasView() const = 0;
 
     //=========================================================================================================
     /**

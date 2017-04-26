@@ -39,6 +39,8 @@
 //=============================================================================================================
 
 #include "deepcntk.h"
+#include "IDeepCNTKNet.h"
+#include "deepcntkmanager.h"
 
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
@@ -59,6 +61,7 @@
 #include <QtConcurrent>
 #include <QFutureWatcher>
 #include <QProgressDialog>
+#include <QComboBox>
 
 
 //*************************************************************************************************************
@@ -82,6 +85,14 @@ using namespace DISPLIB;
 using namespace DISPCHARTSLIB;
 //using namespace QtCharts;
 using namespace CNTK;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CONST
+//=============================================================================================================
+
+const char* deepCNTKNetsDir = "/mne_analyze_extensions/deepcntknets";        /**< holds path to the extensions.*/
 
 
 //*************************************************************************************************************
@@ -125,6 +136,7 @@ DeepCNTK::DeepCNTK()
 : m_pControlPanel(Q_NULLPTR)
 , m_pControl(Q_NULLPTR)
 , m_pDeepViewer(Q_NULLPTR)
+, m_pDeepCNTKManager(Q_NULLPTR)
 {
 
 }
@@ -151,31 +163,52 @@ QSharedPointer<IExtension> DeepCNTK::clone() const
 
 void DeepCNTK::init()
 {
-
-    setupModel();
+    //
+    // Deep Configuration Manager
+    //
+    if(!m_pDeepCNTKManager) {
+        m_pDeepCNTKManager = new DeepCNTKManager(this);
+        m_pDeepCNTKManager->loadDeepConfigurations(qApp->applicationDirPath()+deepCNTKNetsDir);
+        m_pDeepCNTKManager->initDeepConfigurations();
+    }
 
     //
     // Init view
     //
     if(!m_pControlPanel) {
         m_pControlPanel = new Controls;
-        connect(m_pControlPanel, &Controls::requestTraining_signal, this, &DeepCNTK::trainModel);
     }
 
     //
     // Create the viewer
     //
     if(!m_pDeepViewer) {
-        if(m_pDeep) {
-            m_pDeepViewer = new DeepViewer(m_pDeep, false);
+        qDebug() << "m_pDeepCNTKManager->currentDeepConfiguration()" << m_pDeepCNTKManager->currentDeepConfiguration();
+        m_pDeepCNTKManager->currentDeepConfiguration()->getModel()->print();
+
+        m_pDeepViewer = new DeepViewer(false);
+
+        if(m_pDeepCNTKManager->currentDeepConfiguration()->getName() != "BIO") {
+            // Don't display model when its too complex
+            m_pDeepViewer->setModel(m_pDeepCNTKManager->currentDeepConfiguration()->getModel());
         }
-        else {
-            m_pDeepViewer = new DeepViewer(false);
-        }
+
 
         m_pControlPanel->setDeepViewer(m_pDeepViewer);
         m_pDeepViewer->setWindowTitle("Deep CNTK");
     }
+
+    QComboBox *combo = m_pControlPanel->getConfigurationComboBox();
+    combo->addItems(m_pDeepCNTKManager->getDeepConfigurationNames());
+
+
+    connect(m_pControlPanel, &Controls::requestTraining_signal, m_pDeepCNTKManager, &DeepCNTKManager::trainCurrentConfiguration);
+    connect(combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), m_pDeepCNTKManager, &DeepCNTKManager::selectDeepConfiguration);
+
+
+    connect(m_pDeepCNTKManager, &DeepCNTKManager::finishedTraining_signal, this, &DeepCNTK::trainingFinished);
+    connect(m_pDeepCNTKManager, &DeepCNTKManager::currentConfigurationChanged_signal, this, &DeepCNTK::resetDeepViewer);
+
 }
 
 
@@ -197,25 +230,9 @@ QString DeepCNTK::getName() const
 
 //*************************************************************************************************************
 
-bool DeepCNTK::hasMenu() const
-{
-    return true;
-}
-
-
-//*************************************************************************************************************
-
 QMenu *DeepCNTK::getMenu()
 {
     return Q_NULLPTR;
-}
-
-
-//*************************************************************************************************************
-
-bool DeepCNTK::hasControl() const
-{
-    return true;
 }
 
 
@@ -236,14 +253,6 @@ QDockWidget *DeepCNTK::getControl()
 
 //*************************************************************************************************************
 
-bool DeepCNTK::hasView() const
-{
-    return true;
-}
-
-
-//*************************************************************************************************************
-
 // check with owner ship and mdi area for garbage collection
 QWidget *DeepCNTK::getView()
 {
@@ -253,79 +262,38 @@ QWidget *DeepCNTK::getView()
 
 //*************************************************************************************************************
 
-void DeepCNTK::setupModel()
+void DeepCNTK::trainingFinished()
 {
-    // Create a deep model
-    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
+    QString configName = m_pDeepCNTKManager->currentDeepConfiguration()->getName();
+    //Plot error
+    LinePlot *error_chartView = new LinePlot(m_pDeepCNTKManager->currentDeepConfiguration()->currentError(),QString("%1: Current Training Error").arg(configName));
+    error_chartView->show();
 
-    size_t input_dim = 4;
-    size_t num_output_classes = 3;
+    //Plot loss
+    LinePlot *loss_chartView = new LinePlot(m_pDeepCNTKManager->currentDeepConfiguration()->currentLoss(),QString("%1: Current Training Loss").arg(configName));
+    loss_chartView->show();
 
-    m_pDeep = Deep::SPtr(new Deep);
-    FunctionPtr model = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
-    m_pDeep->setModel(model);
-    m_pDeep->print();
+   // Update Deep Viewer
+    updateDeepViewer();
 }
 
 
 //*************************************************************************************************************
 
-void DeepCNTK::trainModel()
+void DeepCNTK::resetDeepViewer()
 {
-//    QFutureWatcher<bool> trainFutureWatcher;
-//    QProgressDialog progressDialog("Train model...", "Cancel Training", 0, 0, m_pDeepViewer, Qt::Dialog);
-
-    //progress.open(m_pDeep.data(),&Deep::cancelTraining);
-
-    //
-    // Training
-    //
-
-    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-
-    qDebug() << "\n Start training \n";
-
-    size_t input_dim = m_pDeep->inputDimensions();
-    size_t num_output_classes = m_pDeep->outputDimensions();
-
-    qDebug() << "input_dim" << input_dim;
-    qDebug() << "num_output_classes" << num_output_classes;
-
-    // Initialize the parameters for the trainer
-    int minibatch_size = 25;
-    int num_samples = 20000;
-
-    MatrixXf features, labels;
-
-    QVector<double> vecLoss, vecError;
-    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
+    m_pDeepViewer->setModel(m_pDeepCNTKManager->currentDeepConfiguration()->getModel());
+}
 
 
-//    progressDialog.setRange(0,num_samples/minibatch_size);
+//*************************************************************************************************************
 
-    //Run the training in seperate thread
-//    trainFutureWatcher.setFuture(QtConcurrent::run( m_pDeep.data(),
-//                                                    &Deep::trainModel,
-//                                                    features, labels, vecLoss, vecError, minibatch_size));
-    m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
-
-//    progressDialog.exec();
-
-//    trainFutureWatcher.waitForFinished();
-
-    qDebug() << "\n Finished training \n";
-
-    //Plot error
-    LinePlot *error_chartView = new LinePlot(vecError,"Training Error");
-    error_chartView->show();
-
-    //Plot loss
-    LinePlot *loss_chartView = new LinePlot(vecLoss,"Loss Error");
-    loss_chartView->show();
+void DeepCNTK::updateDeepViewer()
+{
+    qDebug() << "void DeepCNTK::modelUpdated()";
 
    // Update Deep Viewer
     if(m_pDeepViewer) {
         m_pDeepViewer->updateModel();
     }
-
 }
