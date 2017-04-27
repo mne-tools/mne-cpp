@@ -890,17 +890,12 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
     }
 
     //Add other information as default
-    char *res;
-    res = MALLOC_54(strlen(this->streamName().toLatin1().data())+1,char);
-    strcpy(res,this->streamName().toLatin1().data());
-    p_digData.filename    = res;
+    p_digData.filename    = this->streamName();
     p_digData.npoint      = npoint;
-    p_digData.active      = MALLOC_54(npoint,int);
-    p_digData.discard     = MALLOC_54(npoint,int);
 
     for (int k = 0; k < p_digData.npoint; k++) {
-        p_digData.active[k]  = TRUE;
-        p_digData.discard[k] = FALSE;
+        p_digData.active.append(TRUE);
+        p_digData.discard.append(FALSE);
     }
 
     return true;

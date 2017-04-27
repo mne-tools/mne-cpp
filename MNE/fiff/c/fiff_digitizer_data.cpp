@@ -79,12 +79,9 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffDigitizerData::FiffDigitizerData()
-: filename(Q_NULLPTR)
-, head_mri_t(Q_NULLPTR)
+: head_mri_t(Q_NULLPTR)
 , head_mri_t_adj(Q_NULLPTR)
 , coord_frame(FIFFV_COORD_UNKNOWN)
-, active(Q_NULLPTR)
-, discard(Q_NULLPTR)
 , npoint(0)
 , mri_fids(Q_NULLPTR)
 , nfids(0)
@@ -101,13 +98,10 @@ FiffDigitizerData::FiffDigitizerData()
 //*************************************************************************************************************
 
 FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData)
-:  filename(p_FiffDigitizerData.filename)
-, head_mri_t(p_FiffDigitizerData.head_mri_t)
+: head_mri_t(p_FiffDigitizerData.head_mri_t)
 , head_mri_t_adj(p_FiffDigitizerData.head_mri_t_adj)
 , points(p_FiffDigitizerData.points)
 , coord_frame(p_FiffDigitizerData.coord_frame)
-, active(p_FiffDigitizerData.active)
-, discard(p_FiffDigitizerData.discard)
 , npoint(p_FiffDigitizerData.npoint)
 , mri_fids(p_FiffDigitizerData.mri_fids)
 , nfids(p_FiffDigitizerData.nfids)
@@ -124,12 +118,9 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 //*************************************************************************************************************
 
 FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
-: filename(Q_NULLPTR)
-, head_mri_t(Q_NULLPTR)
+: head_mri_t(Q_NULLPTR)
 , head_mri_t_adj(Q_NULLPTR)
 , coord_frame(FIFFV_COORD_UNKNOWN)
-, active(Q_NULLPTR)
-, discard(Q_NULLPTR)
 , npoint(0)
 , mri_fids(Q_NULLPTR)
 , nfids(0)
@@ -170,15 +161,11 @@ FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
 
 FiffDigitizerData::~FiffDigitizerData()
 {
-    FREE_43(filename);
     FREE_43(head_mri_t);
     FREE_43(head_mri_t_adj);
     FREE_43(dist);
     FREE_43(closest);
-    FREE_43(active);
-    FREE_43(discard);
     FREE_CMATRIX_43(closest_point);
     FREE_43(mri_fids);
-
 }
 

@@ -56,10 +56,6 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 
-
-#include <fiff/c/fiff_digitizer_data.h>
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -136,22 +132,6 @@ int main(int argc, char *argv[])
     parser.addOption(snrOption);
     parser.addOption(evokedIndexOption);
     parser.process(a);
-
-
-
-    QFile t_fileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    FiffDigitizerData digDataLoaded (t_fileIn);
-
-    double sum = 0;
-    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
-        sum += digDataLoaded.points[i].r[0];
-        sum += digDataLoaded.points[i].r[1];
-        sum += digDataLoaded.points[i].r[2];
-    }
-
-    qDebug() << "sum points"<<sum;
-
-
 
     bool bAddRtSourceLoc = false;
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
