@@ -49,6 +49,7 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <QFile>
 
 
 //*************************************************************************************************************
@@ -81,18 +82,19 @@ private slots:
     void cleanupTestCase();
 
 private:
+    double      m_dEpsilon;
     double      m_dSumPointsDigDataResult;
     int         m_iCoordFrameDigDataResult;
     int         m_iNPointDigDataResult;
 
     FiffDigitizerData digDataLoaded;
-
 };
 
 
 //*************************************************************************************************************
 
 TestFiffDigitizer::TestFiffDigitizer()
+: m_dEpsilon(1.0e-04)
 {
 }
 
@@ -106,17 +108,6 @@ void TestFiffDigitizer::initTestCase()
     QFile t_fileIn(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
     digDataLoaded = FiffDigitizerData(t_fileIn);
 
-//    double sum = 0;
-//    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
-//        sum += digDataLoaded.points[i].r[0];
-//        sum += digDataLoaded.points[i].r[1];
-//        sum += digDataLoaded.points[i].r[2];
-//    }
-
-//    qDebug() << "sum points"<<sum;
-    qDebug() << "digDataLoaded.coord_frame"<<digDataLoaded.coord_frame;
-    qDebug() << "digDataLoaded.npoint"<<digDataLoaded.npoint;
-
     //Prepare reference result
     m_iCoordFrameDigDataResult = FIFFV_COORD_HEAD;
     m_iNPointDigDataResult = 146;
@@ -128,16 +119,16 @@ void TestFiffDigitizer::initTestCase()
 
 void TestFiffDigitizer::comparePoints()
 {
-    double sum = 0;
-//    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
-//        sum += digDataLoaded.points[i].r[0];
-//        sum += digDataLoaded.points[i].r[1];
-//        sum += digDataLoaded.points[i].r[2];
-//    }
-//    qDebug() << "TestFiffDigitizer::comparePoints() sum points"<<sum;
-    qDebug() << "TestFiffDigitizer::comparePoints() m_dSumPointsDigDataResult"<<m_dSumPointsDigDataResult;
+    double sum = 0.0;
+    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
+        sum += digDataLoaded.points[i].r[0];
+        sum += digDataLoaded.points[i].r[1];
+        sum += digDataLoaded.points[i].r[2];
+    }
 
-    QVERIFY( sum == m_dSumPointsDigDataResult );
+    double diff = sum - m_dSumPointsDigDataResult;
+
+    QVERIFY( diff < m_dEpsilon );
 }
 
 
