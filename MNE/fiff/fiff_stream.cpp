@@ -865,22 +865,7 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
         p_digData.coord_frame = FIFFV_COORD_HEAD;
     }
 
-    //Count digitizer points
-    for (int k = 0; k < t_qListDigData.first()->nent(); ++k) {
-        if (t_qListDigData.first()->dir[k]->kind = FIFF_DIG_POINT) {
-            npoint++;
-        }
-    }
-
-    if (npoint == 0) {
-        fprintf(stderr, "No digitizer data in %s", this->streamName().toLatin1().data());
-        return false;
-    }
-
     // Read actual data and store it
-    p_digData.points = MALLOC_54(npoint, FiffDigPoint);
-    npoint = 0;
-
     for (int k = 0; k < t_qListDigData.first()->nent(); ++k) {
         kind = t_qListDigData.first()->dir[k]->kind;
         pos  = t_qListDigData.first()->dir[k]->pos;
@@ -888,13 +873,20 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
         switch(kind) {
         case FIFF_DIG_POINT:
             this->read_tag(t_pTag, pos);
-            p_digData.points[npoint++] = t_pTag->toDigPoint();
+            p_digData.points.append(t_pTag->toDigPoint());
             break;
         case FIFF_MNE_COORD_FRAME:
             this->read_tag(t_pTag, pos);
             p_digData.coord_frame = *t_pTag->toInt();
             break;
         }
+    }
+
+    npoint = p_digData.points.size();
+
+    if (npoint == 0) {
+        fprintf(stderr, "No digitizer data in %s", this->streamName().toLatin1().data());
+        return false;
     }
 
     //Add other information as default

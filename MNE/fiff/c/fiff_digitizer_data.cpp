@@ -82,7 +82,6 @@ FiffDigitizerData::FiffDigitizerData()
 : filename(Q_NULLPTR)
 , head_mri_t(Q_NULLPTR)
 , head_mri_t_adj(Q_NULLPTR)
-, points(Q_NULLPTR)
 , coord_frame(FIFFV_COORD_UNKNOWN)
 , active(Q_NULLPTR)
 , discard(Q_NULLPTR)
@@ -128,7 +127,6 @@ FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
 : filename(Q_NULLPTR)
 , head_mri_t(Q_NULLPTR)
 , head_mri_t_adj(Q_NULLPTR)
-, points(Q_NULLPTR)
 , coord_frame(FIFFV_COORD_UNKNOWN)
 , active(Q_NULLPTR)
 , discard(Q_NULLPTR)
@@ -173,7 +171,6 @@ FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
 FiffDigitizerData::~FiffDigitizerData()
 {
     FREE_43(filename);
-    FREE_43(points);
     FREE_43(head_mri_t);
     FREE_43(head_mri_t_adj);
     FREE_43(dist);

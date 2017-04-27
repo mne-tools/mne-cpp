@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a test_fiff_cov
+* @brief    Example of the computation of a test_fiff_digitizer
 *
 */
 
@@ -39,10 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_cov.h>
-
-#include <iostream>
-#include <utils/ioutils.h>
+#include <fiff/fiff_dig_point.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 
 //*************************************************************************************************************
@@ -59,44 +57,42 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
-using namespace UTILSLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TestFiffCov
+* DECLARE CLASS TestFiffDigitizer
 *
-* @brief The TestFiffCov class provides covariance reading verification tests
+* @brief The TestFiffDigitizer class provides digitizer data reading verification tests
 *
 */
-class TestFiffCov: public QObject
+class TestFiffDigitizer: public QObject
 {
     Q_OBJECT
 
 public:
-    TestFiffCov();
+    TestFiffDigitizer();
 
 private slots:
     void initTestCase();
-    void compareData();
-    void compareKind();
-    void compareDiag();
-    void compareDim();
-    void compareNfree();
+    void comparePoints();
+    void compareCoordFrame();
+    void compareNPoint();
     void cleanupTestCase();
 
 private:
-    double epsilon;
+    double      m_dSumPointsDigDataResult;
+    int         m_iCoordFrameDigDataResult;
+    int         m_iNPointDigDataResult;
 
-    FiffCov covLoaded;
-    FiffCov covResult;
+    FiffDigitizerData digDataLoaded;
+
 };
 
 
 //*************************************************************************************************************
 
-TestFiffCov::TestFiffCov()
-: epsilon(0.000001)
+TestFiffDigitizer::TestFiffDigitizer()
 {
 }
 
@@ -104,78 +100,66 @@ TestFiffCov::TestFiffCov()
 
 //*************************************************************************************************************
 
-void TestFiffCov::initTestCase()
+void TestFiffDigitizer::initTestCase()
 {
-    qDebug() << "Epsilon" << epsilon;
-
     //Read the results produced with MNE-CPP
-    QFile t_fileIn(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif");
-    covLoaded = FiffCov(t_fileIn);
+    QFile t_fileIn(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    digDataLoaded = FiffDigitizerData(t_fileIn);
 
-    //Read the result data produced with mne_matlab
-    MatrixXd data;
-    IOUtils::read_eigen_matrix(data, QDir::currentPath()+"/mne-cpp-test-data/Result/ref_data_sample_audvis-cov.dat");
-    covResult.data = data;
+//    double sum = 0;
+//    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
+//        sum += digDataLoaded.points[i].r[0];
+//        sum += digDataLoaded.points[i].r[1];
+//        sum += digDataLoaded.points[i].r[2];
+//    }
 
-    covResult.kind = 1;
-    covResult.diag = 0;
-    covResult.dim = 366;
-    covResult.nfree = 15972;
+//    qDebug() << "sum points"<<sum;
+    qDebug() << "digDataLoaded.coord_frame"<<digDataLoaded.coord_frame;
+    qDebug() << "digDataLoaded.npoint"<<digDataLoaded.npoint;
 
+    //Prepare reference result
+    m_iCoordFrameDigDataResult = FIFFV_COORD_HEAD;
+    m_iNPointDigDataResult = 146;
+    m_dSumPointsDigDataResult = 13.6212;
 }
 
 
 //*************************************************************************************************************
 
-void TestFiffCov::compareData()
+void TestFiffDigitizer::comparePoints()
 {
-    //Make the values a little bit bigger
-    MatrixXd data_diff = covResult.data*1000000 - covLoaded.data*1000000;
+    double sum = 0;
+//    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
+//        sum += digDataLoaded.points[i].r[0];
+//        sum += digDataLoaded.points[i].r[1];
+//        sum += digDataLoaded.points[i].r[2];
+//    }
+//    qDebug() << "TestFiffDigitizer::comparePoints() sum points"<<sum;
+    qDebug() << "TestFiffDigitizer::comparePoints() m_dSumPointsDigDataResult"<<m_dSumPointsDigDataResult;
 
-//    qDebug()<<"abs(covResult.data.sum()) "<<covResult.data.normalized().sum();
-//    qDebug()<<"abs(covLoaded.data.sum()) "<<covLoaded.data.normalized().sum();
-//    qDebug()<<"abs(data_diff.sum()) "<<abs(data_diff.sum());
-//    qDebug()<<"epsilon "<<epsilon;
-
-    QVERIFY( abs(data_diff.sum()) < epsilon );
+    QVERIFY( sum == m_dSumPointsDigDataResult );
 }
 
 
 //*************************************************************************************************************
 
-void TestFiffCov::compareKind()
+void TestFiffDigitizer::compareCoordFrame()
 {
-    QVERIFY( covResult.kind == covLoaded.kind );
+    QVERIFY( m_iCoordFrameDigDataResult == digDataLoaded.coord_frame );
 }
 
 
 //*************************************************************************************************************
 
-void TestFiffCov::compareDiag()
+void TestFiffDigitizer::compareNPoint()
 {
-    QVERIFY( covResult.diag == covLoaded.diag );
+    QVERIFY( m_iNPointDigDataResult == digDataLoaded.npoint );
 }
 
 
 //*************************************************************************************************************
 
-void TestFiffCov::compareDim()
-{
-    QVERIFY( covResult.dim == covLoaded.dim );
-}
-
-
-//*************************************************************************************************************
-
-void TestFiffCov::compareNfree()
-{
-    QVERIFY( covResult.nfree == covLoaded.nfree );
-}
-
-
-//*************************************************************************************************************
-
-void TestFiffCov::cleanupTestCase()
+void TestFiffDigitizer::cleanupTestCase()
 {
 }
 
@@ -185,5 +169,5 @@ void TestFiffCov::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestFiffCov)
-#include "test_fiff_cov.moc"
+QTEST_APPLESS_MAIN(TestFiffDigitizer)
+#include "test_fiff_digitizer.moc"
