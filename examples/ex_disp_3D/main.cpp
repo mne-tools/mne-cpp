@@ -55,10 +55,6 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <iostream>
-
-#include <mne/c/mne_msh_display_surface_set.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -150,16 +146,6 @@ int main(int argc, char *argv[])
     } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClustering = true;
     }
-
-
-    //MneMshDisplaySurfaceSet test
-    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
-    MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
-                                             "./MNE-sample-data/subjects/sample/bem/sample-head.fif",
-                                             FIFFV_BEM_SURF_ID_HEAD,
-                                             "head",
-                                             1,
-                                             1);
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));

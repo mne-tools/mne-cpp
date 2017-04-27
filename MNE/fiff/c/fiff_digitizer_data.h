@@ -99,9 +99,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Default constructor
+    *
+    * @param[in] p_IODevice   Input device to read data from.
+    */
+    FiffDigitizerData(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Destroys the digitization point description
     */
-    ~FiffDigitizerData();
+    ~FiffDigitizerData();    
 
 public:
     char           *filename;                 /* Where did these come from */
