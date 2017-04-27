@@ -115,7 +115,7 @@ public:
     char           *filename;                 /* Where did these come from */
     FIFFLIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
     FIFFLIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
-    FIFFLIB::FiffDigPoint*   points;           /* The points */
+    QList<FIFFLIB::FiffDigPoint>   points;           /* The points */
     int            coord_frame;               /* The coordinate frame of the above points */
     int            *active;                   /* Which are active */
     int            *discard;                  /* Which should be discarded? */

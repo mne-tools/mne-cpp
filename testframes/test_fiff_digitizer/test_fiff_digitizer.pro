@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_fiff_rwr.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     test_fiff_cov.pro
+# @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     December, 2015
+# @date     April, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2015, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds the fiff read write read unit test
+# @brief    Builds the fiff digitizer read unit test
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ QT += testlib
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_fiff_rwr
+TARGET = test_fiff_digitizer
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -53,19 +53,17 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    test_fiff_rwr.cpp
+    test_fiff_digitizer.cpp
 
 HEADERS += \
 
