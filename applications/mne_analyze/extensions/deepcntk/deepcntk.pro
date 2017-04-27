@@ -63,7 +63,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lanSharedd \
-            -lCNTKLibrary-2.0
+            -lCntk.Core-2.0rc2d
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -78,17 +78,20 @@ else {
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lanShared \
-            -lCNTKLibrary-2.0
+            -lCntk.Core-2.0rc2
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
-    deepcntk.cpp
+    deepcntk.cpp \
+    deepcntkmanager.cpp
 
 HEADERS += \
     deepcntk_global.h \
-    deepcntk.h
+    deepcntk.h \
+    IDeepCNTKNet.h \
+    deepcntkmanager.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     analyzedata.h
+* @file     analyzedata.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "analyzedata.h"
-#include <inverse/dipoleFit/ecd_set.h>
 
 
 //*************************************************************************************************************
@@ -55,7 +54,7 @@
 
 using namespace ANSHAREDLIB;
 using namespace INVERSELIB;
-
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -65,6 +64,9 @@ using namespace INVERSELIB;
 
 AnalyzeData::AnalyzeData(QObject *parent)
 : QObject(parent)
+, m_iCurrentEstimate(-1)
+, m_iCurrentSample(0)
+, m_iCurrentECDSet(-1)
 {
 
 }
@@ -80,25 +82,63 @@ AnalyzeData::~AnalyzeData()
 
 //*************************************************************************************************************
 
-ECDSet::SPtr AnalyzeData::currentECDSet() const
+const MNESourceEstimate &AnalyzeData::currentSTC() const
 {
-    return m_pCurrentECDSet;
+    return m_qListEstimates[m_iCurrentEstimate];
 }
 
 
 //*************************************************************************************************************
 
-void AnalyzeData::setCurrentECDSet(const ECDSet::SPtr &ecdSet)
+void AnalyzeData::addSTC(const MNESourceEstimate &stc)
 {
-    m_pCurrentECDSet = ecdSet;
-    m_qListECDSets.append(m_pCurrentECDSet);
-    emit currentECDSetChanged_signal();
+    m_qListEstimates.append(stc);
+    m_iCurrentEstimate = m_qListEstimates.size() -1;
+    m_iCurrentSample = 0;
+    emit stcChanged_signal();
 }
 
 
 //*************************************************************************************************************
 
-QList<ECDSet::SPtr> AnalyzeData::ecdSets() const
+void AnalyzeData::setCurrentSTCSample(int sample)
+{
+    if(sample >= 0 && sample < m_qListEstimates[m_iCurrentEstimate].samples() && sample != m_iCurrentSample) {
+        m_iCurrentSample = sample;
+        emit stcSampleChanged_signal(sample);
+    }
+}
+
+
+//*************************************************************************************************************
+
+int AnalyzeData::currentSTCSample()
+{
+    return m_iCurrentSample;
+}
+
+
+//*************************************************************************************************************
+
+const ECDSet& AnalyzeData::currentECDSet() const
+{
+    return m_qListECDSets[m_iCurrentECDSet].second;
+}
+
+
+//*************************************************************************************************************
+
+void AnalyzeData::addECDSet( DipoleFitSettings &ecdSettings,  ECDSet &ecdSet)
+{
+    m_qListECDSets.append(qMakePair(ecdSettings, ecdSet));
+    m_iCurrentECDSet = m_qListECDSets.size() -1;
+    emit ecdSetChanged_signal();
+}
+
+
+//*************************************************************************************************************
+
+const QList< QPair< DipoleFitSettings, ECDSet > >& AnalyzeData::ecdSets() const
 {
     return m_qListECDSets;
 }

@@ -43,12 +43,19 @@
 
 #include "../anshared_global.h"
 
+#include <mne/mne_sourceestimate.h>
+
+#include <inverse/dipoleFit/dipole_fit_settings.h>
+#include <inverse/dipoleFit/ecd_set.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QPair>
+#include <QList>
 #include <QSharedPointer>
 
 
@@ -57,9 +64,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace INVERSELIB {
-    class ECDSet;
-}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,14 +79,6 @@ namespace ANSHAREDLIB
 //=============================================================================================================
 // ENUMERATIONS
 //=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 
 //=========================================================================================================
@@ -109,39 +106,33 @@ public:
     */
     virtual ~AnalyzeData();
 
-// Database Interface for now -> consider using a Abstract Item Model
 signals:
-    void currentECDSetChanged_signal();    /**< Emmited when the current ECD Set changed*/
+    void stcChanged_signal();                   /**< Emmited when the current STC changed.*/
+    void stcSampleChanged_signal(int sample);   /**< Emmited when the current STC sample point changed. @param [in] sample  The sample time point;*/
+    void ecdSetChanged_signal();                /**< Emmited when the current ECD Set changed.*/
 
 public:
-    //=========================================================================================================
-    /**
-    * Returns the current ECD Set
-    *
-    * @return The current ECD Set
-    */
-    QSharedPointer<INVERSELIB::ECDSet> currentECDSet() const;
-    //=========================================================================================================
-    /**
-    * Sets the current ECD Set
-    *
-    * @param [in] ecdSet    Sets the current ECD Set;
-    */
-    void setCurrentECDSet(const QSharedPointer<INVERSELIB::ECDSet> &ecdSet);
+//STC
+    const MNELIB::MNESourceEstimate& currentSTC() const;    /*!< Returns the current STC. @return The current STC.*/
+    void addSTC( const MNELIB::MNESourceEstimate &stc );    /*!< Adds a new STC. @param [in] stc    the new STC;*/
+    void setCurrentSTCSample(int sample);                   /*!< Sets the current stc sample;*/
+    int currentSTCSample();                                 /*!< Returns the current STC sample. @return The current STC sample.*/
 
-    //=========================================================================================================
-    /**
-    * Returns a list of all past ECD Sets
-    *
-    * @return All past ECD Sets
-    */
-    QList<QSharedPointer<INVERSELIB::ECDSet> > ecdSets() const;
+//ECD
+    const INVERSELIB::ECDSet& currentECDSet() const;                                            /*!< Returns the current ECD Set. @return The current ECD Set.*/
+    void addECDSet( INVERSELIB::DipoleFitSettings &ecdSettings,  INVERSELIB::ECDSet &ecdSet );  /*!< Sets the current ECD Set. @param [in] ecdSettings  Sets the settings corresponding to the current ECD Set; @param [in] ecdSet  Sets the current ECD Set;*/
+    const QList< QPair< INVERSELIB::DipoleFitSettings, INVERSELIB::ECDSet > >& ecdSets() const; /*!< Returns a list of all past ECD Sets. @return All past ECD Sets.*/
 
-// Database -> Consierd using abstract item models or other datamanagement architecture
+// Database -> Consider using abstract item models or other datamanagement architecture
 private:
-    // Dipole ECDs
-    QSharedPointer<INVERSELIB::ECDSet>          m_pCurrentECDSet;   /**< Current ECD Set.*/
-    QList< QSharedPointer<INVERSELIB::ECDSet> > m_qListECDSets;     /**< List of all past ECD Sets.*/
+// STCs
+    QList<MNELIB::MNESourceEstimate>    m_qListEstimates;       /**< List of all Source Estimates.*/
+    int                                 m_iCurrentEstimate;     /**< Current Estimate */
+    int                                 m_iCurrentSample;       /**< Current sample point of the current estimate */
+
+// ECDs
+    QList< QPair< INVERSELIB::DipoleFitSettings, INVERSELIB::ECDSet > > m_qListECDSets;     /**< List of all past ECD Sets.*/
+    int                                                                 m_iCurrentECDSet;   /**< Current ECD Set */
 };
 
 //*************************************************************************************************************

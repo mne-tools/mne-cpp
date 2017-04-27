@@ -273,3 +273,11 @@ MNESourceEstimate& MNESourceEstimate::operator= (const MNESourceEstimate &rhs)
     // to support chained assignment operators (a=b=c), always return *this
     return *this;
 }
+
+
+//*************************************************************************************************************
+
+int MNESourceEstimate::samples() const
+{
+    return data.cols();
+}

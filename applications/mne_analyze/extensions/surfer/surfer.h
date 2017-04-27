@@ -100,22 +100,14 @@ public:
     */
     ~Surfer();
 
-    //=========================================================================================================
-    /**
-    * IExtension functions
-    */
+    // IExtension functions
     virtual QSharedPointer<IExtension> clone() const;
     virtual void init();
     virtual void unload();
     virtual QString getName() const;
 
-    virtual bool hasMenu() const;
     virtual QMenu* getMenu();
-
-    virtual bool hasControl() const;
     virtual QDockWidget* getControl();
-
-    virtual bool hasView() const;
     virtual QWidget* getView();
 
 private:
