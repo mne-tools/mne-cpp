@@ -128,9 +128,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns vector containing all plugins.
+    * Returns vector containing all extensions.
     *
-    * @return reference to vector containing all plugins.
+    * @return reference to vector containing all extensions.
     */
     inline const QVector<IExtension*>& getExtensions();
 
