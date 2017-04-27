@@ -2976,7 +2976,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
     for (k = 0; k < head_dig->nfids; k++)
         VEC_COPY_17(head_dig->mri_fids[k].r,mri_fid[k]);
-    //FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After simple alignment : ",head_dig->head_mri_t_adj);
+    FiffCoordTransOld::mne_print_coord_transform_label(stderr,QString("After simple alignment : ").toLatin1().data(),head_dig->head_mri_t_adj);
 
     if (omit_dist > 0)
         discard_outlier_digitizer_points(head_dig,head_surf,omit_dist);
@@ -2992,7 +2992,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         fprintf(stderr,"%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
                 1000.0*rms_digitizer_distance(head_dig,head_surf));
-        //FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After refinement :",head_dig->head_mri_t_adj);
+        FiffCoordTransOld::mne_print_coord_transform_label(stderr,QString("After refinement :").toLatin1().data(),head_dig->head_mri_t_adj);
     }
 
     return OK;

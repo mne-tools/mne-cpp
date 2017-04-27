@@ -171,6 +171,8 @@ protected:
     */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
 
+    void alignFicuials(const QString& fileNameDigData);
+
     //=========================================================================================================
     /**
     * Load a Polhemus file name.

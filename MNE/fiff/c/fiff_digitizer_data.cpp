@@ -52,6 +52,8 @@
 
 #define FREE_43(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
 
+#define MALLOC_43(x,t) (t *)malloc((x)*sizeof(t))
+
 #define FREE_CMATRIX_43(m) mne_free_cmatrix_43((m))
 
 void mne_free_cmatrix_43(float **m)
@@ -122,6 +124,52 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 
 //*************************************************************************************************************
 
+FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
+: filename(Q_NULLPTR)
+, head_mri_t(Q_NULLPTR)
+, head_mri_t_adj(Q_NULLPTR)
+, points(Q_NULLPTR)
+, coord_frame(FIFFV_COORD_UNKNOWN)
+, active(Q_NULLPTR)
+, discard(Q_NULLPTR)
+, npoint(0)
+, mri_fids(Q_NULLPTR)
+, nfids(0)
+, show(FALSE)
+, show_minimal(FALSE)
+, dist(Q_NULLPTR)
+, closest(Q_NULLPTR)
+, closest_point(Q_NULLPTR)
+, dist_valid(FALSE)
+{
+    // Open the io device
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
+    bool open_here = false;
+
+    //Open if the device and stream have not been openend already
+    if (!t_pStream->device()->isOpen()) {
+        if(!t_pStream->open()) {
+            qWarning() << "Warning in FiffDigitizerData::FiffDigitizerData - Could not open the didigitzer data file"; // ToDo throw error
+            return;
+        }
+
+        open_here = true;
+    }
+
+    // If device is open read the data
+    if(!t_pStream->read_digitizer_data(t_pStream->dirtree(), *this)) {
+        qWarning() << "Warning in FiffDigitizerData::FiffDigitizerData - Could not read the FiffDigitizerData"; // ToDo throw error
+    }
+
+    // If stream has been opened in this function also close here again
+    if(open_here) {
+        t_pStream->close();
+    }
+}
+
+
+//*************************************************************************************************************
+
 FiffDigitizerData::~FiffDigitizerData()
 {
     FREE_43(filename);
@@ -136,3 +184,4 @@ FiffDigitizerData::~FiffDigitizerData()
     FREE_43(mri_fids);
 
 }
+

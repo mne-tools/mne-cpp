@@ -51,9 +51,21 @@
 #include "fiff_ch_pos.h"
 #include "fiff_dig_point.h"
 #include "fiff_id.h"
+#include "c/fiff_digitizer_data.h"
+#include "fiff_dig_point.h"
 
 #include <utils/mnemath.h>
 #include <utils/ioutils.h>
+
+#define MALLOC_54(x,t) (t *)malloc((x)*sizeof(t))
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 
 //*************************************************************************************************************
@@ -824,6 +836,82 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
         printf("\tRead %d compensation matrices\n",compdata.size());
 
     return compdata;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigitizerData& p_digData)
+{
+    p_digData.coord_frame = FIFFV_COORD_UNKNOWN;
+    fiff_int_t kind = -1;
+    fiff_int_t pos = -1;
+    int npoint = 0;
+    FiffTag::SPtr t_pTag;
+
+    QList<FiffDirNode::SPtr> t_qListDigData = p_Node->dir_tree_find(FIFFB_ISOTRAK);
+
+    //Check if digitizer data is available
+    if(t_qListDigData.isEmpty()) {
+        t_qListDigData = p_Node->dir_tree_find(FIFFB_MRI_SET);
+
+        if(t_qListDigData.isEmpty()) {
+            fprintf(stderr, "No Isotrak data found in %s", this->streamName().toLatin1().data());
+            return false;
+        } else {
+            p_digData.coord_frame = FIFFV_COORD_MRI;
+        }
+    } else {
+        p_digData.coord_frame = FIFFV_COORD_HEAD;
+    }
+
+    //Count digitizer points
+    for (int k = 0; k < t_qListDigData.first()->nent(); ++k) {
+        if (t_qListDigData.first()->dir[k]->kind = FIFF_DIG_POINT) {
+            npoint++;
+        }
+    }
+
+    if (npoint == 0) {
+        fprintf(stderr, "No digitizer data in %s", this->streamName().toLatin1().data());
+        return false;
+    }
+
+    // Read actual data and store it
+    p_digData.points = MALLOC_54(npoint, FiffDigPoint);
+    npoint = 0;
+
+    for (int k = 0; k < t_qListDigData.first()->nent(); ++k) {
+        kind = t_qListDigData.first()->dir[k]->kind;
+        pos  = t_qListDigData.first()->dir[k]->pos;
+
+        switch(kind) {
+        case FIFF_DIG_POINT:
+            this->read_tag(t_pTag, pos);
+            p_digData.points[npoint++] = t_pTag->toDigPoint();
+            break;
+        case FIFF_MNE_COORD_FRAME:
+            this->read_tag(t_pTag, pos);
+            p_digData.coord_frame = *t_pTag->toInt();
+            break;
+        }
+    }
+
+    //Add other information as default
+    char *res;
+    res = MALLOC_54(strlen(this->streamName().toLatin1().data())+1,char);
+    strcpy(res,this->streamName().toLatin1().data());
+    p_digData.filename    = res;
+    p_digData.npoint      = npoint;
+    p_digData.active      = MALLOC_54(npoint,int);
+    p_digData.discard     = MALLOC_54(npoint,int);
+
+    for (int k = 0; k < p_digData.npoint; k++) {
+        p_digData.active[k]  = TRUE;
+        p_digData.discard[k] = FALSE;
+    }
+
+    return true;
 }
 
 
