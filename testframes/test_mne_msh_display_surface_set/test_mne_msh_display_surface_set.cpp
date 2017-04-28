@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a test_mne_msh_display_surface_set
+* @brief    Test for I/O of a MneMshDisplaySurfaceSet
 *
 */
 

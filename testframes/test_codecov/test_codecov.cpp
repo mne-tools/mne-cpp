@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of codecov coverage analyser
+* @brief    Test for codecov coverage analyser
 *
 */
 
