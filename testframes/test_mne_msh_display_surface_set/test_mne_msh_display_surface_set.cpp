@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     test_fiff_mne_types_io.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     test_mne_msh_display_surface_set.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2015
+* @date     April, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    The fiff mne types io unit test
+* @brief    Example of the computation of a test_mne_msh_display_surface_set
 *
 */
 
@@ -39,8 +39,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include "fiff_types_ref.h"
+#include <mne/c/mne_msh_display_surface_set.h>
+#include <mne/c/mne_msh_display_surface.h>
+#include <mne/c/mne_surface_old.h>
+
+#include <fiff/fiff_file.h>
+
 #include <iostream>
 
 
@@ -57,118 +61,90 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace MNELIB;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TestFiffRWR
+* DECLARE CLASS TestMneMshDisplaySurfaceSet
 *
-* @brief The TestFiffRWR class provides read write read fiff verification tests
+* @brief The TestMneMshDisplaySurfaceSet class provides display surface set reading verification tests
 *
 */
-class TestFiffMneTypesIO: public QObject
+class TestMneMshDisplaySurfaceSet: public QObject
 {
     Q_OBJECT
 
 public:
-    TestFiffMneTypesIO();
+    TestMneMshDisplaySurfaceSet();
 
 private slots:
     void initTestCase();
-    void checkFiffCoordTrans();
+    void compareSurface();
     void cleanupTestCase();
 
 private:
     double epsilon;
 
-    QString rawName;
-    QString evokedName;
+    MneMshDisplaySurfaceSet* m_pSurfSetBemLoaded;
+    MneMshDisplaySurface* m_pSurfBemLoaded;
 };
 
 
 //*************************************************************************************************************
 
-TestFiffMneTypesIO::TestFiffMneTypesIO()
+TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 : epsilon(0.000001)
-, rawName("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif")
-, evokedName("./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")
+, m_pSurfSetBemLoaded(Q_NULLPTR)
+, m_pSurfBemLoaded(Q_NULLPTR)
 {
+}
+
+
+
+//*************************************************************************************************************
+
+void TestMneMshDisplaySurfaceSet::initTestCase()
+{
+    //qDebug() << "Epsilon" << epsilon;
+
+    //Read the results produced with MNE-CPP
+    //Calculate the alignment of the fiducials
+    m_pSurfSetBemLoaded = new MneMshDisplaySurfaceSet();
+    MneMshDisplaySurfaceSet::add_bem_surface(m_pSurfSetBemLoaded,
+                                             QDir::currentPath()+"/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
+                                             FIFFV_BEM_SURF_ID_BRAIN,
+                                             "5120",
+                                             1,
+                                             1);
+
+    QVERIFY( m_pSurfSetBemLoaded->nsurf == 1 );
+
+    if(m_pSurfSetBemLoaded->nsurf == 1) {
+        m_pSurfBemLoaded = m_pSurfSetBemLoaded->surfs[0];
+    }
 }
 
 
 //*************************************************************************************************************
 
-void TestFiffMneTypesIO::initTestCase()
+void TestMneMshDisplaySurfaceSet::compareSurface()
 {
-    qDebug() << "Epsilon" << epsilon;
-    qDebug() << "Raw File Name" << rawName;
-    qDebug() << "Evoked File Name" << evokedName;
-}
+    if(m_pSurfBemLoaded) {
+        int np = m_pSurfBemLoaded->s->np;
 
-//*************************************************************************************************************
-
-void TestFiffMneTypesIO::checkFiffCoordTrans()
-{
-    QFile file(evokedName);
-    FiffStream::SPtr stream(new FiffStream(&file));
-    if(!stream->open())
-        QFAIL("Failed to open data file.");
-
-    FiffTag::SPtr t_pTag;
-    fiffCoordTransRec_REF reference_trans;
-    FiffCoordTrans test_trans;
-
-    bool trans_found = false;
-
-    for (int k = 0; k < stream->dir().size(); k++) {
-        if(stream->dir()[k]->kind == FIFF_COORD_TRANS) {
-            if(!stream->read_tag(t_pTag, stream->dir()[k]->pos))
-                QFAIL("Failed to read FIFF_COORD_TRANS tag.");
-            reference_trans = *(fiffCoordTrans_REF)t_pTag->data();
-            test_trans = t_pTag->toCoordTrans();
-
-            //CHECKS
-            QVERIFY(reference_trans.from == test_trans.from);
-            QVERIFY(reference_trans.to == test_trans.to);
-            //Check rot
-            for (int i = 0; i < 3; ++i) {
-                for (int j = 0; j < 3; ++j) {
-//                    printf("rot %f == %f ", reference_trans.rot[i][j], test_trans.trans(i,j));
-                    QVERIFY(reference_trans.rot[i][j] == test_trans.trans(i,j));
-                }
-            }
-            //Check move
-            for (int i = 0; i < 3; ++i) {
-//                    printf("move %f == %f ", reference_trans.move[i], test_trans.trans(i,3));
-                    QVERIFY(reference_trans.move[i] == test_trans.trans(i,3));
-            }
-            //Check invrot
-            for (int i = 0; i < 3; ++i) {
-                for (int j = 0; j < 3; ++j) {
-//                    printf("invrot %f == %f ", reference_trans.invrot[i][j], test_trans.invtrans(i,j));
-                    QVERIFY(reference_trans.invrot[i][j] == test_trans.invtrans(i,j));
-                }
-            }
-            //Check invmove
-            for (int i = 0; i < 3; ++i) {
-//                    printf("invmove %f == %f ", reference_trans.invmove[i], test_trans.invtrans(i,3));
-                    QVERIFY(reference_trans.invmove[i] == test_trans.invtrans(i,3));
-            }
-
-            trans_found = true;
-        }
+        QVERIFY( np == 2562 );
     }
 
-    if(!trans_found)
-        QFAIL("No FIFF_COORD_TRANS found.");
-
-    stream->close();
 }
+
 
 //*************************************************************************************************************
 
-void TestFiffMneTypesIO::cleanupTestCase()
-{
+void TestMneMshDisplaySurfaceSet::cleanupTestCase()
+{    
+    delete m_pSurfSetBemLoaded;
+    delete m_pSurfBemLoaded;
 }
 
 
@@ -177,5 +153,5 @@ void TestFiffMneTypesIO::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestFiffMneTypesIO)
-#include "test_fiff_mne_types_io.moc"
+QTEST_APPLESS_MAIN(TestMneMshDisplaySurfaceSet)
+#include "test_mne_msh_display_surface_set.moc"
