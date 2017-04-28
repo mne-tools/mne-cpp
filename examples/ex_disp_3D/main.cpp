@@ -56,6 +56,15 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 
+
+
+
+#include <mne/c/mne_msh_display_surface_set.h>
+
+
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -132,6 +141,19 @@ int main(int argc, char *argv[])
     parser.addOption(snrOption);
     parser.addOption(evokedIndexOption);
     parser.process(a);
+
+    //Read and show sensor helmets
+    QFile bem("D:/Git/mne-cpp-lorenze/bin/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
+    MNEBem bemdata(bem);
+
+    MneMshDisplaySurfaceSet::SPtr m_pSurfBemSetLoaded = MneMshDisplaySurfaceSet::SPtr(new MneMshDisplaySurfaceSet());
+    MneMshDisplaySurfaceSet::add_bem_surface(m_pSurfBemSetLoaded.data(),
+                                             "./mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
+                                             FIFFV_BEM_SURF_ID_BRAIN,
+                                             "5120",
+                                             1,
+                                             1);
+    MneMshDisplaySurface* surface = m_pSurfBemSetLoaded->surfs[0];
 
     bool bAddRtSourceLoc = false;
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {

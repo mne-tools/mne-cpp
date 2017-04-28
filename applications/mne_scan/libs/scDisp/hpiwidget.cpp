@@ -380,7 +380,7 @@ void HPIWidget::alignFicuials(const QString& fileNameDigData)
     FiffDigPointSet testdata(test);
     m_pData3DModel->addDigitizerData("Head", "avr", testdata);
 
-    //Calcualte the alignment of the fiducials
+    //Calculate the alignment of the fiducials
     MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
     MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
                                              "./resources/hpiAlignment/fsaverage-head.fif",
