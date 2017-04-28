@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_fiff_msh_display_surface_set.pro
+# @file     test_mne_msh_display_surface_set.pro
 # @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -44,7 +44,7 @@ QT += testlib
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_fiff_msh_display_surface_set
+TARGET = test_mne_msh_display_surface_set
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
