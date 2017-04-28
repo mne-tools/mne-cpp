@@ -605,7 +605,7 @@ void RtSourceLocDataWorker::stop()
 
 void RtSourceLocDataWorker::run()
 {
-    VectorXd t_vecAverage(0,0);
+    VectorXd t_vecAverage;
 
     m_bIsRunning = true;
 
