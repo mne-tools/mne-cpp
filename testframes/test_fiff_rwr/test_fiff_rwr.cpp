@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a test_read_write_read
+* @brief    Test for reading writing reading a fiff raw file
 *
 */
 
