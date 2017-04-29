@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption invFileOption("inv", "Path to inverse <file>, which is to be loaded.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0f");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0;//0.1;//3.0;
     QCommandLineOption numberAveragesOption("numAve", "The <value> for the number of averages.", "value", "40");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
 

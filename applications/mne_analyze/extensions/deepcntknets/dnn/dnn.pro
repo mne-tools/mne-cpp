@@ -62,7 +62,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Deepd \
             -lanSharedd \
-            -lCntk.Core-2.0rc2d \
+            -lCntk.Core-2.0rc2 \
             -ldeepcntkd
 }
 else {

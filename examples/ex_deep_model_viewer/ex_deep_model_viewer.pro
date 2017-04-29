@@ -60,8 +60,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Deepd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lCntk.Eval-2.0rc2d \
-            -lCntk.Core-2.0rc2d
+            -lCntk.Eval-2.0rc2 \
+            -lCntk.Core-2.0rc2
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \

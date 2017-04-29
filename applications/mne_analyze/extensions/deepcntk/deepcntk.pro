@@ -63,7 +63,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lanSharedd \
-            -lCntk.Core-2.0rc2d
+            -lCntk.Core-2.0rc2
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
