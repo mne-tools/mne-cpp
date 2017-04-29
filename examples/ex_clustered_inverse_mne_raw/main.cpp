@@ -463,6 +463,9 @@ int main(int argc, char *argv[])
     //########################################################################################
     // Source Estimate
 
+    //
+    // Settings
+    //
     double snr = parser.value(snrOption).toDouble();
     QString method(parser.value(methodOption));
 
@@ -472,20 +475,18 @@ int main(int argc, char *argv[])
     double lambda2 = 1.0 / pow(snr, 2);
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
-//    // Load data
-//    fiff_int_t setno = 1;
-//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-//    FiffEvoked evoked(t_fileEvoked, setno, baseline);
-//    if(evoked.isEmpty())
-//        return 1;
-
+    //
+    // Load data
+    //
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
 
     FiffCov noise_cov(t_fileCov);
 
+    //
     // regularize noise covariance
+    //
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
     //
