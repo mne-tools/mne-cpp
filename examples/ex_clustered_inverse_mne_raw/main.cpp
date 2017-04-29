@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0;//0.1;//3.0;
     QCommandLineOption invFileOutOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
     QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");    
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
