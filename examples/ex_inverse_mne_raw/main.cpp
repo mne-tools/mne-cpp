@@ -174,7 +174,6 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
-
     //
     // Load files
     //
@@ -186,37 +185,13 @@ int main(int argc, char *argv[])
     SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
     AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //
+    // Settings
+    //
     qint32 event = parser.value(evokedIndexOption).toInt();
 
-    float tmin = -0.4f;
-    float tmax = 0.4f;
+    float tmin = -1.0f;
+    float tmax = 1.0f;
 
     bool keep_comp = false;
     if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
@@ -430,7 +405,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-
     fiff_int_t event_samp, from, to;
     MatrixXd timesDummy;
 
@@ -509,37 +483,12 @@ int main(int argc, char *argv[])
 
 //    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
 
-    std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
+//    std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
-//    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
+    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel, true); //FIFFLIB::defaultVectorXi
 
-    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    evoked.applyBaselineCorrection(baseline);
 
 
     //########################################################################################
@@ -551,10 +500,10 @@ int main(int argc, char *argv[])
     double snr = parser.value(snrOption).toDouble();
     QString method(parser.value(methodOption));
 
-    QString t_sFileNameClusteredInv(parser.value(invFileOutOption));
+    QString t_sFileNameInv(parser.value(invFileOutOption));
     QString t_sFileNameStc(parser.value(stcFileOutOption));
 
-    double lambda2 = 1.0 / pow(snr, 2);
+    float lambda2 = 1.0f / pow(snr, 2);
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
     //
@@ -580,10 +529,10 @@ int main(int argc, char *argv[])
     //
     // save clustered inverse
     //
-    if(!t_sFileNameClusteredInv.isEmpty())
+    if(!t_sFileNameInv.isEmpty())
     {
-        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
-        inverse_operator.write(t_fileClusteredInverse);
+        QFile t_fileInverse(t_sFileNameInv);
+        inverse_operator.write(t_fileInverse);
     }
 
     //
@@ -604,7 +553,7 @@ int main(int argc, char *argv[])
     std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     qDebug() << "Sampling frequency" << raw.info.sfreq;
-    qDebug() << "Number of Steps" << sourceEstimate.data.cols() << sourceEstimate.times.size();
+    qDebug() << "Number of Steps" << sourceEstimate.data.cols();
 
 
     VectorXd s;
@@ -646,7 +595,6 @@ int main(int argc, char *argv[])
         QFile t_fileStc(t_sFileNameStc);
         sourceEstimate.write(t_fileStc);
     }
-
 
     return a.exec();
 }
