@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
 
     qint32 event = parser.value(evokedIndexOption).toInt();
 
-    float tmin = -0.2f;
+    float tmin = -0.4f;
     float tmax = 0.4f;
 
     bool keep_comp = false;
@@ -511,7 +511,9 @@ int main(int argc, char *argv[])
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
-    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
+//    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
+
+    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5));
 
 
 
@@ -601,6 +603,9 @@ int main(int argc, char *argv[])
     std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
     std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
+    qDebug() << "Sampling frequency" << raw.info.sfreq;
+    qDebug() << "Number of Steps" << sourceEstimate.data.cols() << sourceEstimate.times.size();
+
 
     VectorXd s;
 
@@ -638,8 +643,8 @@ int main(int argc, char *argv[])
 
     if(!t_sFileNameStc.isEmpty())
     {
-        QFile t_fileClusteredStc(t_sFileNameStc);
-        sourceEstimate.write(t_fileClusteredStc);
+        QFile t_fileStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileStc);
     }
 
 
