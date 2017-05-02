@@ -190,8 +190,8 @@ int main(int argc, char *argv[])
     //
     qint32 event = parser.value(evokedIndexOption).toInt();
 
-    float tmin = -1.0f;
-    float tmax = 1.0f;
+    float tmin = -0.2f;
+    float tmax = 0.5f;
 
     bool keep_comp = false;
     if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
@@ -527,7 +527,7 @@ int main(int argc, char *argv[])
     MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
 
     //
-    // save clustered inverse
+    // save inverse operator
     //
     if(!t_sFileNameInv.isEmpty())
     {
