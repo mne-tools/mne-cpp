@@ -86,8 +86,7 @@ private slots:
 private:
     double epsilon;
 
-    MneMshDisplaySurfaceSet* m_pSurfSetBemLoaded;
-    MneMshDisplaySurface* m_pSurfBemLoaded;
+    MneMshDisplaySurfaceSet::SPtr m_pSurfSetBemLoaded;
 };
 
 
@@ -96,7 +95,6 @@ private:
 TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 : epsilon(0.000001)
 , m_pSurfSetBemLoaded(Q_NULLPTR)
-, m_pSurfBemLoaded(Q_NULLPTR)
 {
 }
 
@@ -110,8 +108,8 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
 
     //Read the results produced with MNE-CPP
     //Calculate the alignment of the fiducials
-    m_pSurfSetBemLoaded = new MneMshDisplaySurfaceSet();
-    MneMshDisplaySurfaceSet::add_bem_surface(m_pSurfSetBemLoaded,
+    m_pSurfSetBemLoaded = MneMshDisplaySurfaceSet::SPtr(new MneMshDisplaySurfaceSet());
+    MneMshDisplaySurfaceSet::add_bem_surface(m_pSurfSetBemLoaded.data(),
                                              QDir::currentPath()+"/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
                                              FIFFV_BEM_SURF_ID_BRAIN,
                                              "5120",
@@ -119,10 +117,6 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
                                              1);
 
     QVERIFY( m_pSurfSetBemLoaded->nsurf == 1 );
-
-    if(m_pSurfSetBemLoaded->nsurf == 1) {
-        m_pSurfBemLoaded = m_pSurfSetBemLoaded->surfs[0];
-    }
 }
 
 
@@ -130,8 +124,8 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
 
 void TestMneMshDisplaySurfaceSet::compareSurface()
 {
-    if(m_pSurfBemLoaded) {
-        int np = m_pSurfBemLoaded->s->np;
+    if(m_pSurfSetBemLoaded->nsurf >= 1) {
+        int np = m_pSurfSetBemLoaded->surfs[0]->s->np;
 
         QVERIFY( np == 2562 );
     }
@@ -143,8 +137,6 @@ void TestMneMshDisplaySurfaceSet::compareSurface()
 
 void TestMneMshDisplaySurfaceSet::cleanupTestCase()
 {    
-    delete m_pSurfSetBemLoaded;
-    delete m_pSurfBemLoaded;
 }
 
 
