@@ -225,6 +225,11 @@ MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
     delete morph_t;
     FREE_47(patch_rot);
     FREE_47(surfs);
+    FREE_47(subj);
+    FREE_47(morph_subj);
+    FREE_47(active);
+    FREE_47(drawable);
+
     delete lights;
     if (user_data_free)
         user_data_free(user_data);
