@@ -140,7 +140,15 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool addTriangleData();
+    bool addTriangleData();    
+
+    //=========================================================================================================
+    /**
+    * Add vertex normals and neighbourhood information
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool add_geometry_info();
 
     //=========================================================================================================
     /**
@@ -182,8 +190,8 @@ public:
     MatrixX3d tri_cent;         /**< Triangle centers */
     MatrixX3d tri_nn;           /**< Triangle normals */
     VectorXd tri_area;          /**< Triangle areas */
-    QList<QPair<int, QVector<int> > > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
-    QList<QPair<int, QVector<int> > > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
+    QMap<int, QVector<int> > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
+    QMap<int, QVector<int> > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
 };
 
 //*************************************************************************************************************
