@@ -70,7 +70,5 @@ MneMshLightSet::~MneMshLightSet()
 {
     FREE_50(name);
 
-    for(int i = 0; i < lights.size() ; ++i) {
-        delete lights[i];
-    }
+    qDeleteAll(lights.begin(), lights.end());
 }
