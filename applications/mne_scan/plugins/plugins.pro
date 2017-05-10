@@ -56,7 +56,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         babymeg \
         triggercontrol \
         # gusbamp \
-        eegosports \
+        # eegosports \
         # brainamp \
 
     #Algorithms
