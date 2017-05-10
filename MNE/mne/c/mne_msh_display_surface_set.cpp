@@ -676,7 +676,7 @@ MneMshLightSet* MneMshDisplaySurfaceSet::dup_light_set(MneMshLightSet* s)
         res->nlight = s->nlight;
 
         for (k = 0; k < s->nlight; k++)
-            res->lights.append(s->lights[k]);
+            res->lights.append(new MneMshLight(*s->lights[k]));
     }
     return res;
 }
