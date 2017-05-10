@@ -94,7 +94,6 @@ private:
 
 TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 : epsilon(0.000001)
-, m_pSurfSetBemLoaded(Q_NULLPTR)
 {
 }
 
@@ -125,9 +124,8 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
 void TestMneMshDisplaySurfaceSet::compareSurface()
 {
     if(m_pSurfSetBemLoaded->nsurf >= 1) {
-        int np = m_pSurfSetBemLoaded->surfs[0]->s->np;
-
-        QVERIFY( np == 2562 );
+        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->np == 2562 );
+        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->ntri == 5120 );
     }
 
 }
