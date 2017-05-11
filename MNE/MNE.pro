@@ -44,6 +44,8 @@ SUBDIRS += \
     fs \
     fiff \
     mne \
+    geometryInfo \
+    interpolation \
     fwd \
     inverse \
     connectivity \
