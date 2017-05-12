@@ -54,8 +54,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            #-lMNE$${MNE_LIB_VERSION}Fwdd \
-            #-lMNE$${MNE_LIB_VERSION}Inversed \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -63,8 +61,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            #-lMNE$${MNE_LIB_VERSION}Fwd \
-            #-lMNE$${MNE_LIB_VERSION}Inverse \
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -91,15 +87,11 @@ else {
 
 SOURCES += \
     geometryinfo.cpp \
-    projectingkdtree.cpp \
-    projectingnode.cpp
 
 
 HEADERS += \
     geometryinfo.h \
     geometryinfo_global.h \
-    projectingkdtree.h \
-    projectingnode.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
