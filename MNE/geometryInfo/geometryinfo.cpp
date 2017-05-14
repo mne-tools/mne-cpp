@@ -49,7 +49,9 @@
 
 #include <cmath>
 #include <fstream>
-#include <float.h>
+#include <limits>
+#include <set>
+#include <utility>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -155,15 +157,56 @@ QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface 
 }
 //*************************************************************************************************************
 
-QSharedPointer<MatrixXd> GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet) {
+void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet) {
+    // Initialization
+    // @todo if this copies neighbor_vert, a pointer might be the more efficient option
+    QList<QPair<int, QVector<int> > > adjacency = inSurface.neighbor_vert;
+
+    qint32 n = adjacency.size();
+    // have to use std::vector because QVector.resize takes only one argument
+    std::vector<double> minDists(n);
+    std::set< std::pair< double, qint32> > vertexQ;
+    double MAX_WEIGHT = std::numeric_limits<double>::infinity();
+
     for (qint32 i = 0; i < vertSubSet.size(); ++i) {
-        // calculate shortest paths from current vertex of subset
-        qint32 rootIndex = vertSubSet.at(i);
+        qint32 root = vertSubSet[i];
+
+        minDists.clear();
+        minDists.resize(n, MAX_WEIGHT);
+        minDists[root] = 0;
+        vertexQ.clear();
+
+        vertexQ.insert(std::make_pair(minDists[root], root));
+
+        while (vertexQ.empty() == false) {
+            // remove next vertex from queue
+            double dist = vertexQ.begin()->first;
+            qint32 u = vertexQ.begin()->second;
+            vertexQ.erase(vertexQ.begin());
+            // visit each neighbour of u
+            // @todo check whether the neighbours for vertexID x are stored at adjacency[x]
+            // or if a linear search for adjacency[i].first == x is necessary
+            QVector<int> neighbours = adjacency[u].second;
+            for (qint32 ne = 0; ne < neighbours.length(); ++ne) {
+                qint32 v = neighbours[ne];
+                // distance from source to v, using u as its predecessor
+                double distWithU = dist + distanceBetween(inSurface.rr, u, v);
+                if (distWithU < minDists[v]) {
+                    // this is a combination of insert and decreaseKey
+                    // @todo need an effort estimate for this (complexity ?)
+                    vertexQ.erase(std::make_pair(minDists[v], v));
+                    minDists[v] = distWithU;
+                    vertexQ.insert(std::make_pair(minDists[v], v));
+                }
+            }
+        }
+        for (qint32 m = 0; m < minDists.size(); ++m) {
+            (*ptr)(m , root) = minDists[m];
+        }
     }
-    return ptr;
 }
 //*************************************************************************************************************
 
-inline double distanceBetween(MatrixX3f nodes, qint32 u, qint32 v) {
+inline double GeometryInfo::distanceBetween(MatrixX3f nodes, qint32 u, qint32 v) {
     return sqrt(pow(nodes(u, 0) - nodes(v, 0), 2) +  pow(nodes(u, 1) - nodes(v, 1), 2) +  pow(nodes(u, 2) - nodes(v, 2), 2));
 }
