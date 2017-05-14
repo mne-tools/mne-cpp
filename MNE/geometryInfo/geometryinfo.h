@@ -134,6 +134,14 @@ public:
      */
     static QSharedPointer<QVector<qint32>> projectSensor(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3d> &sensorPositions);
 
+    //=========================================================================================================
+    /**
+     * @brief iterative Dijkstra
+     * @param inSurface
+     * @param vertSubSet
+     * @return
+     */
+    static QSharedPointer<Eigen::MatrixXd> iterativeDijkstra(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
 
 protected:
 
