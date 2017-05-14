@@ -136,12 +136,23 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief iterative Dijkstra
+     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubSet
+     * @param ptr The matrix in which the distances will be stored
      * @param inSurface
      * @param vertSubSet
      * @return
      */
-    static QSharedPointer<Eigen::MatrixXd> iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
+
+    //=========================================================================================================
+    /**
+     * @brief distanceBetween Returns the euclidian distance between nodes u and v
+     * @param nodes Absolute positions in 3D space
+     * @param u
+     * @param v
+     * @return
+     */
+    static double distanceBetween(Eigen::MatrixX3f nodes, qint32 u, qint32 v);
 
 protected:
 
