@@ -141,7 +141,7 @@ public:
      * @param vertSubSet
      * @return
      */
-    static QSharedPointer<Eigen::MatrixXd> iterativeDijkstra(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
+    static QSharedPointer<Eigen::MatrixXd> iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
 
 protected:
 

@@ -49,6 +49,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <float.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -154,11 +155,10 @@ QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface 
 }
 //*************************************************************************************************************
 
-QSharedPointer<MatrixXd> GeometryInfo::iterativeDijkstra(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet) {
+QSharedPointer<MatrixXd> GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet) {
     for (qint32 i = 0; i < vertSubSet.size(); ++i) {
         // calculate shortest paths from current vertex of subset
         qint32 rootIndex = vertSubSet.at(i);
-
     }
     return ptr;
 }
