@@ -85,25 +85,21 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
 QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet)
 {
     //start timer
     qint64 startTimeSecs = QDateTime::currentSecsSinceEpoch();
     qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
+
     size_t matColumns;
-    if(!vertSubSet.empty())
-    {
+    if(!vertSubSet.empty()) {
         matColumns = vertSubSet.size();
     }
-    else
-    {
+    else {
         matColumns = inSurface.rr.rows();
     }
-
+    // convention: first dimension in distance table is "from", second dimension "to"
     QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
-
-    // convention: first dimension in distance table is "to", second dimension "from"
 
     //QPair<int, QVector<int> > tempPair;
     //int tempID;
@@ -158,5 +154,16 @@ QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface 
 }
 //*************************************************************************************************************
 
+QSharedPointer<MatrixXd> GeometryInfo::iterativeDijkstra(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet) {
+    for (qint32 i = 0; i < vertSubSet.size(); ++i) {
+        // calculate shortest paths from current vertex of subset
+        qint32 rootIndex = vertSubSet.at(i);
 
+    }
+    return ptr;
+}
+//*************************************************************************************************************
 
+inline double distanceBetween(MatrixX3f nodes, qint32 u, qint32 v) {
+    return sqrt(pow(nodes(u, 0) - nodes(v, 0), 2) +  pow(nodes(u, 1) - nodes(v, 1), 2) +  pow(nodes(u, 2) - nodes(v, 2), 2));
+}
