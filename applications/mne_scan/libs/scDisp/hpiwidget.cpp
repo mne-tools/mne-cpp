@@ -366,7 +366,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
         m_vCoilFreqs << 155 << 165 << 190 << 220;
     }
 
-    alignFicuials(fileName);
+    alignFiducials(fileName);
 
     return lDigPoints;
 }
@@ -374,7 +374,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
 
 //*************************************************************************************************************
 
-void HPIWidget::alignFicuials(const QString& fileNameDigData)
+void HPIWidget::alignFiducials(const QString& fileNameDigData)
 {
     QFile test("./resources/hpiAlignment/fsaverage-fiducials.fif");
     FiffDigPointSet testdata(test);
