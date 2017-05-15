@@ -19,7 +19,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -144,6 +144,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Add vertex normals and neighbourhood information
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool add_geometry_info();
+
+    //=========================================================================================================
+    /**
     * Implementation of the addVertexNormals function in mne_add_geometry_info.c
     *
     * Completes triangulation info
@@ -182,8 +190,8 @@ public:
     MatrixX3d tri_cent;         /**< Triangle centers */
     MatrixX3d tri_nn;           /**< Triangle normals */
     VectorXd tri_area;          /**< Triangle areas */
-    QList<QPair<int, QVector<int> > > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
-    QList<QPair<int, QVector<int> > > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
+    QMap<int, QVector<int> > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
+    QMap<int, QVector<int> > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
 };
 
 //*************************************************************************************************************
