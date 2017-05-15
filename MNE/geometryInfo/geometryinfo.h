@@ -154,6 +154,14 @@ public:
      */
     static double distanceBetween(Eigen::MatrixX3f nodes, qint32 u, qint32 v);
 
+    //=========================================================================================================
+    /**
+     * @brief matrixDump Creates a file named 'filename' and writes the contents of ptr into it
+     * @param ptr The matrix to be written
+     * @param filename The file to be written to
+     */
+    static void matrixDump(QSharedPointer<Eigen::MatrixXd> ptr, std::string filename);
+
 protected:
 
 private:

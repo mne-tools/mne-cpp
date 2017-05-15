@@ -159,6 +159,7 @@ int main(int argc, char *argv[])
 
 
     MNEBemSurface &testSurface = t_sensorSurfaceVV[0];
+    std::cout << "Anzahl Datenpunkte: ";
     std::cout << testSurface.rr.rows() << std::endl;
 
     QVector<qint32> subSet;
