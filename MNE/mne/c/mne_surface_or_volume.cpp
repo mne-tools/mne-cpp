@@ -2931,16 +2931,17 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         for (k = 0; k < 3; k++) {
             fid[k] = NULL;
-            for (k = 0; k < dig->npoint; k++) {
-                p = dig->points.at(k);
-                if (p.kind == FIFFV_POINT_CARDINAL) {
-                    if (p.ident == FIFFV_POINT_LPA)
-                        fid[0] = p.r;
-                    else if (p.ident == FIFFV_POINT_NASION)
-                        fid[1] = p.r;
-                    else if (p.ident == FIFFV_POINT_RPA)
-                        fid[2] = p.r;
-                }
+        }
+
+        for (k = 0; k < dig->npoint; k++) {
+            p = dig->points.at(k);
+            if (p.kind == FIFFV_POINT_CARDINAL) {
+                if (p.ident == FIFFV_POINT_LPA)
+                    fid[0] = p.r;
+                else if (p.ident == FIFFV_POINT_NASION)
+                    fid[1] = p.r;
+                else if (p.ident == FIFFV_POINT_RPA)
+                    fid[2] = p.r;
             }
         }
     }
