@@ -52,6 +52,7 @@
 #include <limits>
 #include <set>
 #include <utility>
+#include <chrono>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,7 +92,6 @@ using namespace MNELIB;
 QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet)
 {
     //start timer
-    qint64 startTimeSecs = QDateTime::currentSecsSinceEpoch();
     qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
 
     size_t matColumns;
@@ -104,41 +104,11 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, cons
     // convention: first dimension in distance table is "from", second dimension "to"
     QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
 
-    //QPair<int, QVector<int> > tempPair;
-    //int tempID;
-    std::cout << inSurface.rr.rows() <<std::endl;
-    std::cout << inSurface.rr.cols() <<std::endl;
-    for (size_t i = 0; i < matColumns; ++i)
-    {
-        //ToDo bessere Lösung mit und ohne subset
-        size_t index = i;
-        if(!vertSubSet.empty())
-        {
-            index = vertSubSet[i];
-        }
+    iterativeDijkstra(ptr, inSurface, vertSubSet);
 
-        //std::cout << inSurface.rr.rows() <<std::endl;
-        float xFrom = inSurface.rr(index, 0);
-        float yFrom = inSurface.rr(index, 1);
-        float zFrom = inSurface.rr(index, 2);
-        //Vector3f currentVertex = inSurface.rr(i)
-        for (size_t j = 0; j < inSurface.rr.rows(); ++j)
-        {
-
-
-            float xTo = inSurface.rr(j, 0);
-            float yTo = inSurface.rr(j, 1);
-            float zTo = inSurface.rr(j, 2);
-            (*ptr)(  j, i) = sqrt(pow(xTo - xFrom, 2) + pow(yTo - yFrom, 2) + pow(zTo - zFrom, 2));
-        }
-    }
+    std::cout << "Iterative Dijkstra took ";
     std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
-    std::cout << "start writing to file" << std::endl;
-    std::ofstream file;
-    file.open("./matrixDump.txt");
-    file << *ptr;
-    std::cout << "writing to file ended!\n";
-    std::cout << QDateTime::currentSecsSinceEpoch()- startTimeSecs <<" s " << std::endl;
+
     return ptr;
 }
 //*************************************************************************************************************
@@ -160,37 +130,64 @@ QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface 
 void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet) {
     // Initialization
     // @todo if this copies neighbor_vert, a pointer might be the more efficient option
-    QList<QPair<int, QVector<int> > > adjacency = inSurface.neighbor_vert;
-
+    QMap<int, QVector<int> > adjacency = inSurface.neighbor_vert;
     qint32 n = adjacency.size();
     // have to use std::vector because QVector.resize takes only one argument
     std::vector<double> minDists(n);
     std::set< std::pair< double, qint32> > vertexQ;
     double MAX_WEIGHT = std::numeric_limits<double>::infinity();
 
+    // outer loop, iterated for each vertex in vertSubSet
+    qint64 aCounter = 0, b1Counter = 0, b2Counter = 0, nCounter = 0;
     for (qint32 i = 0; i < vertSubSet.size(); ++i) {
-        qint32 root = vertSubSet[i];
+        std::cout << "-- " << i << std::endl;
+        // set source node for current iteration and reset data fields
 
+        // begin block A
+        auto begin = std::chrono::high_resolution_clock::now();
+        qint32 root = vertSubSet[i];
         minDists.clear();
+        vertexQ.clear();
+        // init phase of dijkstra
         minDists.resize(n, MAX_WEIGHT);
         minDists[root] = 0;
-        vertexQ.clear();
-
         vertexQ.insert(std::make_pair(minDists[root], root));
+        auto end = std::chrono::high_resolution_clock::now();
+        // std::cout << "A " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << std::endl;
+        aCounter += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
 
+        // dijkstra main loop
         while (vertexQ.empty() == false) {
+
+            // begin block B1
+            auto begin = std::chrono::high_resolution_clock::now();
             // remove next vertex from queue
             double dist = vertexQ.begin()->first;
             qint32 u = vertexQ.begin()->second;
             vertexQ.erase(vertexQ.begin());
+            auto end = std::chrono::high_resolution_clock::now();
+            b1Counter += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+
+            // begin block B2
+            begin = std::chrono::high_resolution_clock::now();
             // visit each neighbour of u
-            // @todo check whether the neighbours for vertexID x are stored at adjacency[x]
-            // or if a linear search for adjacency[i].first == x is necessary
-            QVector<int> neighbours = adjacency[u].second;
+            QVector<int> neighbours = adjacency.find(u).value();
+            end = std::chrono::high_resolution_clock::now();
+            // std::cout << "\tB " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << std::endl;
+            b2Counter += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+
+            // begin block N
+            begin = std::chrono::high_resolution_clock::now();
             for (qint32 ne = 0; ne < neighbours.length(); ++ne) {
+                // auto begin = std::chrono::high_resolution_clock::now();
                 qint32 v = neighbours[ne];
                 // distance from source to v, using u as its predecessor
-                double distWithU = dist + distanceBetween(inSurface.rr, u, v);
+                // calculate inline since designated function was magnitudes slower (even when declared as inline)
+                double distX = inSurface.rr(u, 0) - inSurface.rr(v, 0);
+                double distY = inSurface.rr(u, 1) - inSurface.rr(v, 1);
+                double distZ = inSurface.rr(u, 2) - inSurface.rr(v, 2);
+
+                double distWithU = dist + sqrt(distX * distX + distY * distY + distZ * distZ);
                 if (distWithU < minDists[v]) {
                     // this is a combination of insert and decreaseKey
                     // @todo need an effort estimate for this (complexity ?)
@@ -198,15 +195,34 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
                     minDists[v] = distWithU;
                     vertexQ.insert(std::make_pair(minDists[v], v));
                 }
+                // auto end = std::chrono::high_resolution_clock::now();
+                // std::cout << "\t\tN " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << std::endl;
             }
+            end = std::chrono::high_resolution_clock::now();
+            nCounter += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
         }
-        for (qint32 m = 0; m < minDists.size(); ++m) {
+        // save results in matrix
+        /*for (qint32 m = 0; m < minDists.size(); ++m) {
             (*ptr)(m , root) = minDists[m];
-        }
+        }*/
     }
+    std::cout << "A     " << aCounter << std::endl;
+    std::cout << "B1  " << b1Counter << std::endl;
+    std::cout << "B2 " << b2Counter << std::endl;
+    std::cout << "N  " << nCounter << std::endl;
+}
+//*************************************************************************************************************
+// @todo why is this so slow ? maybe dont use pow
+inline double GeometryInfo::distanceBetween(MatrixX3f nodes, qint32 u, qint32 v) {
+    return sqrt(pow(nodes(u, 0) - nodes(v, 0), 2) +  pow(nodes(u, 1) - nodes(v, 1), 2) +  pow(nodes(u, 2) - nodes(v, 2), 2));
 }
 //*************************************************************************************************************
 
-inline double GeometryInfo::distanceBetween(MatrixX3f nodes, qint32 u, qint32 v) {
-    return sqrt(pow(nodes(u, 0) - nodes(v, 0), 2) +  pow(nodes(u, 1) - nodes(v, 1), 2) +  pow(nodes(u, 2) - nodes(v, 2), 2));
+void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> ptr, std::string filename) {
+    std::cout << "Start writing matrix to file: ";
+    std::cout << filename.c_str() << std::endl;
+    std::ofstream file;
+    file.open(filename.c_str());
+    file << *ptr;
+    std::cout << "Finished writing !" << std::endl;
 }

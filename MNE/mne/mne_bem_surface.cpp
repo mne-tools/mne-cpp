@@ -19,7 +19,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -174,7 +174,56 @@ bool MNEBemSurface::addTriangleData()
       doc.close();
     }
 
+    printf("Adding additional geometry info\n");
+    add_geometry_info();
+
     printf("[done]\n");
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool MNEBemSurface::add_geometry_info()
+{
+    int k,c,p,q;
+    bool found;
+
+    //Clear neighboring triangle list
+    this->neighbor_tri.clear();
+
+    //Create neighbor_tri information
+    for (p = 0; p < this->tris.rows(); p++)
+        for (k = 0; k < 3; k++)
+            this->neighbor_tri[this->tris(p,k)].append(p);
+
+    //Determine the neighboring vertices
+    this->neighbor_vert.clear();
+
+    for (k = 0; k < this->np; k++) {
+        for (p = 0; p < this->neighbor_tri[k].size(); p++) {
+            //Fit in the other vertices of the neighboring triangle
+            for (c = 0; c < 3; c++) {
+                int vert = this->tris(this->neighbor_tri[k][p], c);
+
+                if (vert != k) {
+                    found = false;
+
+                    for (q = 0; q < this->neighbor_vert[k].size(); q++) {
+                        if (this->neighbor_vert[k][q] == vert) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        this->neighbor_vert[k].append(vert);
+                    }
+                }
+            }
+        }
+    }
 
     return true;
 }
