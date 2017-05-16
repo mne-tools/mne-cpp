@@ -159,12 +159,13 @@ int main(int argc, char *argv[])
 
 
     MNEBemSurface &testSurface = t_sensorSurfaceVV[0];
-    std::cout << "Anzahl Datenpunkte: ";
+    std::cout << "Number of vertices: ";
     std::cout << testSurface.rr.rows() << std::endl;
 
     QVector<qint32> subSet;
-    subSet.reserve(300);
-    for(int i = 0; i < 300; ++i)
+    int nadsf = 10;
+    subSet.reserve(nadsf);
+    for(int i = 0; i < nadsf; ++i)
     {
         subSet.push_back(i);
     }

@@ -104,10 +104,12 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, cons
     // convention: first dimension in distance table is "from", second dimension "to"
     QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
 
-    iterativeDijkstra(ptr, inSurface, vertSubSet);
+    iterativeDijkstra(ptr, inSurface, 0.04,  vertSubSet);
 
     std::cout << "Iterative Dijkstra took ";
     std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
+
+    matrixDump(ptr, "output.txt");
 
     return ptr;
 }
@@ -202,9 +204,9 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
             nCounter += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
         }
         // save results in matrix
-        /*for (qint32 m = 0; m < minDists.size(); ++m) {
-            (*ptr)(m , root) = minDists[m];
-        }*/
+        for (qint32 m = 0; m < minDists.size(); ++m) {
+            (*ptr)(m , i) = minDists[m];
+        }
     }
     std::cout << "A     " << aCounter << std::endl;
     std::cout << "B1  " << b1Counter << std::endl;
@@ -212,6 +214,64 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
     std::cout << "N  " << nCounter << std::endl;
 }
 //*************************************************************************************************************
+
+void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, double cancelDist, const QVector<qint32> &vertSubSet) {
+    // Initialization
+    // @todo if this copies neighbor_vert, a pointer might be the more efficient option
+    QMap<int, QVector<int> > adjacency = inSurface.neighbor_vert;
+    qint32 n = adjacency.size();
+    // have to use std::vector because QVector.resize takes only one argument
+    std::vector<double> minDists(n);
+    std::set< std::pair< double, qint32> > vertexQ;
+    double MAX_WEIGHT = std::numeric_limits<double>::infinity();
+
+    // outer loop, iterated for each vertex in vertSubSet
+    for (qint32 i = 0; i < vertSubSet.size(); ++i) {
+        // init phase of dijkstra: set source node for current iteration and reset data fields
+        qint32 root = vertSubSet[i];
+        minDists.clear();
+        vertexQ.clear();
+        minDists.resize(n, MAX_WEIGHT);
+        minDists[root] = 0;
+        vertexQ.insert(std::make_pair(minDists[root], root));
+
+        // dijkstra main loop
+        while (vertexQ.empty() == false) {
+            // remove next vertex from queue
+            double dist = vertexQ.begin()->first;
+            qint32 u = vertexQ.begin()->second;
+            vertexQ.erase(vertexQ.begin());
+            // check if we are still below cancel distance
+            if (dist <= cancelDist) {
+                // visit each neighbour of u
+                QVector<int> neighbours = adjacency.find(u).value();
+                for (qint32 ne = 0; ne < neighbours.length(); ++ne) {
+                    qint32 v = neighbours[ne];
+                    // distance from source to v, using u as its predecessor
+                    // calculate inline since designated function was magnitudes slower (even when declared as inline)
+                    double distX = inSurface.rr(u, 0) - inSurface.rr(v, 0);
+                    double distY = inSurface.rr(u, 1) - inSurface.rr(v, 1);
+                    double distZ = inSurface.rr(u, 2) - inSurface.rr(v, 2);
+                    double distWithU = dist + sqrt(distX * distX + distY * distY + distZ * distZ);
+
+                    if (distWithU < minDists[v]) {
+                        // this is a combination of insert and decreaseKey
+                        // @todo need an effort estimate for this (complexity ?)
+                        vertexQ.erase(std::make_pair(minDists[v], v));
+                        minDists[v] = distWithU;
+                        vertexQ.insert(std::make_pair(minDists[v], v));
+                    }
+                }
+            }
+        }
+        // save results for current root in matrix
+        for (qint32 m = 0; m < minDists.size(); ++m) {
+            (*ptr)(m , i) = minDists[m];
+        }
+    }
+}
+//*************************************************************************************************************
+
 // @todo why is this so slow ? maybe dont use pow
 inline double GeometryInfo::distanceBetween(MatrixX3f nodes, qint32 u, qint32 v) {
     return sqrt(pow(nodes(u, 0) - nodes(v, 0), 2) +  pow(nodes(u, 1) - nodes(v, 1), 2) +  pow(nodes(u, 2) - nodes(v, 2), 2));

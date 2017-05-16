@@ -146,6 +146,16 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubSet
+     * @param ptr The matrix in which the distances will be stored
+     * @param inSurface
+     * @param cancelDist Vertices that have a distance to root that is higher than canceldist are ignored, i.e. set to MAX_WEIGHT
+     * @param vertSubSet
+     */
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, double cancelDist, const QVector<qint32> &vertSubSet = QVector<qint32>());
+
+    //=========================================================================================================
+    /**
      * @brief distanceBetween Returns the euclidian distance between nodes u and v
      * @param nodes Absolute positions in 3D space
      * @param u
