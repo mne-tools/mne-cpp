@@ -56,7 +56,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lEvalDll \
+            -lCntk.Eval-2.0rc2d \
+            -lCntk.Core-2.0rc2d
 
 }
 else {
@@ -65,8 +66,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lEvalDll \
-            -lCNTKLibrary-2.0
+            -lCntk.Eval-2.0rc2 \
+            -lCntk.Core-2.0rc2
 }
 
 # OpenMP

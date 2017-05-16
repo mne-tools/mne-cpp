@@ -57,6 +57,8 @@
 
 #include <iostream>
 
+#include <mne/c/mne_msh_display_surface_set.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,7 +106,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "pial");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
@@ -148,6 +150,10 @@ int main(int argc, char *argv[])
     } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClustering = true;
     }
+
+    //MneMshDisplaySurfaceSet test
+    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = MneMshDisplaySurfaceSet::load_new_surface("subject","pial",NULL);
+
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
@@ -268,7 +274,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(true);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
-            pRTDataItem->setVisualizationType("Annotation based");
+            pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColortable("Hot");
         }
     }

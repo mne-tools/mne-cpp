@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the fiffio plug-in.
+# @brief    This project file generates the makefile for the fiffio extension.
 #
 #--------------------------------------------------------------------------------------------------------------
 

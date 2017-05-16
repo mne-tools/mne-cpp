@@ -39,7 +39,9 @@
 //=============================================================================================================
 
 #include "controls.h"
+#include "deepviewer.h"
 #include "view.h"
+#include "network.h"
 
 
 //*************************************************************************************************************
@@ -47,6 +49,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QComboBox>
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QVBoxLayout>
@@ -58,6 +61,8 @@
 #else
 #include <QtWidgets>
 #endif
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -75,7 +80,8 @@ using namespace DISPLIB;
 
 Controls::Controls(QWidget* parent)
 : QWidget(parent)
-, m_pView(Q_NULLPTR)
+, m_pNetworkConfigs(Q_NULLPTR)
+, m_pDeepViewer(Q_NULLPTR)
 {
 
 }
@@ -83,9 +89,10 @@ Controls::Controls(QWidget* parent)
 
 //*************************************************************************************************************
 
-Controls::Controls(View* v, QWidget* parent)
+Controls::Controls(DeepViewer* v, QWidget* parent)
 : QWidget(parent)
-, m_pView(v)
+, m_pNetworkConfigs(Q_NULLPTR)
+, m_pDeepViewer(v)
 {
     createLayout();
 }
@@ -93,160 +100,95 @@ Controls::Controls(View* v, QWidget* parent)
 
 //*************************************************************************************************************
 
-void Controls::setView(View *v)
+void Controls::setDeepViewer(DeepViewer *v)
 {
-    if(m_pView) {
-        qDebug() << "TODO Make sure that the old view is dosconnected and destroyed later on.";
+    if(!v){
+        fprintf(stderr,"Error: The view to set is empty!");
+        return;
+    }
+    if( m_pDeepViewer ) {
+        qDebug() << "TODO Make sure that the old view is disconnected and destroyed later on.";
     }
 
-    m_pView = v;
+    m_pDeepViewer = v;
     createLayout();
 }
 
 
 //*************************************************************************************************************
 
-void Controls::createCommonControls(QWidget* parent)
+QComboBox *Controls::getConfigurationComboBox()
 {
-    m_pCapGroup = new QGroupBox(parent);
-    m_pCapGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *flatCap = new QRadioButton(m_pCapGroup);
-    QRadioButton *squareCap = new QRadioButton(m_pCapGroup);
-    QRadioButton *roundCap = new QRadioButton(m_pCapGroup);
-    m_pCapGroup->setTitle(tr("Cap Style"));
-    flatCap->setText(tr("Flat"));
-    squareCap->setText(tr("Square"));
-    roundCap->setText(tr("Round"));
-    flatCap->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    squareCap->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    roundCap->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    m_pJoinGroup = new QGroupBox(parent);
-    m_pJoinGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *bevelJoin = new QRadioButton(m_pJoinGroup);
-    QRadioButton *miterJoin = new QRadioButton(m_pJoinGroup);
-    QRadioButton *roundJoin = new QRadioButton(m_pJoinGroup);
-    m_pJoinGroup->setTitle(tr("Join Style"));
-    bevelJoin->setText(tr("Bevel"));
-    miterJoin->setText(tr("Miter"));
-    roundJoin->setText(tr("Round"));
-
-    m_pStyleGroup = new QGroupBox(parent);
-    m_pStyleGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *solidLine = new QRadioButton(m_pStyleGroup);
-    QRadioButton *dashLine = new QRadioButton(m_pStyleGroup);
-    QRadioButton *dotLine = new QRadioButton(m_pStyleGroup);
-    QRadioButton *dashDotLine = new QRadioButton(m_pStyleGroup);
-    QRadioButton *dashDotDotLine = new QRadioButton(m_pStyleGroup);
-    QRadioButton *customDashLine = new QRadioButton(m_pStyleGroup);
-    m_pStyleGroup->setTitle(tr("Pen Style"));
-
-    QPixmap line_solid(":res/images/line_solid.png");
-    solidLine->setIcon(line_solid);
-    solidLine->setIconSize(line_solid.size());
-    QPixmap line_dashed(":res/images/line_dashed.png");
-    dashLine->setIcon(line_dashed);
-    dashLine->setIconSize(line_dashed.size());
-    QPixmap line_dotted(":res/images/line_dotted.png");
-    dotLine->setIcon(line_dotted);
-    dotLine->setIconSize(line_dotted.size());
-    QPixmap line_dash_dot(":res/images/line_dash_dot.png");
-    dashDotLine->setIcon(line_dash_dot);
-    dashDotLine->setIconSize(line_dash_dot.size());
-    QPixmap line_dash_dot_dot(":res/images/line_dash_dot_dot.png");
-    dashDotDotLine->setIcon(line_dash_dot_dot);
-    dashDotDotLine->setIconSize(line_dash_dot_dot.size());
-    customDashLine->setText(tr("Custom"));
-
-    int fixedHeight = bevelJoin->sizeHint().height();
-    solidLine->setFixedHeight(fixedHeight);
-    dashLine->setFixedHeight(fixedHeight);
-    dotLine->setFixedHeight(fixedHeight);
-    dashDotLine->setFixedHeight(fixedHeight);
-    dashDotDotLine->setFixedHeight(fixedHeight);
-
-    m_pPathModeGroup = new QGroupBox(parent);
-    m_pPathModeGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    QRadioButton *curveMode = new QRadioButton(m_pPathModeGroup);
-    QRadioButton *lineMode = new QRadioButton(m_pPathModeGroup);
-    m_pPathModeGroup->setTitle(tr("Line Style"));
-    curveMode->setText(tr("Curves"));
-    lineMode->setText(tr("Lines"));
-
-
-    // Layouts
-    QVBoxLayout *capGroupLayout = new QVBoxLayout(m_pCapGroup);
-    capGroupLayout->addWidget(flatCap);
-    capGroupLayout->addWidget(squareCap);
-    capGroupLayout->addWidget(roundCap);
-
-    QVBoxLayout *joinGroupLayout = new QVBoxLayout(m_pJoinGroup);
-    joinGroupLayout->addWidget(bevelJoin);
-    joinGroupLayout->addWidget(miterJoin);
-    joinGroupLayout->addWidget(roundJoin);
-
-    QVBoxLayout *styleGroupLayout = new QVBoxLayout(m_pStyleGroup);
-    styleGroupLayout->addWidget(solidLine);
-    styleGroupLayout->addWidget(dashLine);
-    styleGroupLayout->addWidget(dotLine);
-    styleGroupLayout->addWidget(dashDotLine);
-    styleGroupLayout->addWidget(dashDotDotLine);
-    styleGroupLayout->addWidget(customDashLine);
-
-    QVBoxLayout *pathModeGroupLayout = new QVBoxLayout(m_pPathModeGroup);
-    pathModeGroupLayout->addWidget(curveMode);
-    pathModeGroupLayout->addWidget(lineMode);
-
-
-//    // Connections
-//    connect(flatCap, SIGNAL(clicked()), m_renderer, SLOT(setFlatCap()));
-//    connect(squareCap, SIGNAL(clicked()), m_renderer, SLOT(setSquareCap()));
-//    connect(roundCap, SIGNAL(clicked()), m_renderer, SLOT(setRoundCap()));
-
-//    connect(bevelJoin, SIGNAL(clicked()), m_renderer, SLOT(setBevelJoin()));
-//    connect(miterJoin, SIGNAL(clicked()), m_renderer, SLOT(setMiterJoin()));
-//    connect(roundJoin, SIGNAL(clicked()), m_renderer, SLOT(setRoundJoin()));
-
-//    connect(curveMode, SIGNAL(clicked()), m_renderer, SLOT(setCurveMode()));
-//    connect(lineMode, SIGNAL(clicked()), m_renderer, SLOT(setLineMode()));
-
-//    connect(solidLine, SIGNAL(clicked()), m_renderer, SLOT(setSolidLine()));
-//    connect(dashLine, SIGNAL(clicked()), m_renderer, SLOT(setDashLine()));
-//    connect(dotLine, SIGNAL(clicked()), m_renderer, SLOT(setDotLine()));
-//    connect(dashDotLine, SIGNAL(clicked()), m_renderer, SLOT(setDashDotLine()));
-//    connect(dashDotDotLine, SIGNAL(clicked()), m_renderer, SLOT(setDashDotDotLine()));
-//    connect(customDashLine, SIGNAL(clicked()), m_renderer, SLOT(setCustomDashLine()));
-
-    // Set the defaults:
-    flatCap->setChecked(true);
-    bevelJoin->setChecked(true);
-    curveMode->setChecked(true);
-    solidLine->setChecked(true);
+    return m_pNetworkConfigs;
 }
 
 
 //*************************************************************************************************************
 
-void Controls::createLayout()
+void Controls::createNetworkControls(QWidget *parent)
 {
-    QGroupBox *mainGroup = new QGroupBox(this);
-    mainGroup->setFixedWidth(180);
-    mainGroup->setTitle(tr("Deep Model Viewer"));
+    //
+    // Create Controls
+    //
+    if(!m_pNetworkConfigs) {
+        m_pNetworkConfigs = new QComboBox(parent);
+    }
+    QPushButton *trainButton = new QPushButton(parent);
+    trainButton->setText(tr("Train"));
 
-    createCommonControls(mainGroup);
+    //
+    // Layouts
+    //
+    QVBoxLayout *networkGroupLayout = new QVBoxLayout(parent);
+    networkGroupLayout->addWidget(m_pNetworkConfigs);
+    networkGroupLayout->addWidget(trainButton);
 
-    QGroupBox* penWidthGroup = new QGroupBox(mainGroup);
-    QSlider *penWidth = new QSlider(Qt::Horizontal, penWidthGroup);
-    penWidth->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    penWidthGroup->setTitle(tr("Pen Width"));
-    penWidth->setRange(0, 500);
+    //
+    // Set up connections
+    //
+    connect(trainButton, &QPushButton::clicked, this, &Controls::requestTraining);
 
-    QPushButton *antialiasButton = new QPushButton(mainGroup);
+}
+
+
+//*************************************************************************************************************
+
+void Controls::createAppearanceControls(QWidget* parent)
+{
+    //
+    // Create Controls
+    //
+    QGroupBox* penStyleGroup = new QGroupBox(parent);
+    penStyleGroup->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    QRadioButton *solidLine = new QRadioButton(penStyleGroup);
+    QRadioButton *dashLine = new QRadioButton(penStyleGroup);
+    QRadioButton *dotLine = new QRadioButton(penStyleGroup);
+    penStyleGroup->setTitle(tr("Pen Style"));
+    solidLine->setText(tr("Solid Line"));
+    dashLine->setText(tr("Dash Line"));
+    dotLine->setText(tr("Dot Line"));
+    solidLine->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    dashLine->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    dotLine->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    QGroupBox* weightStrengthGroup = new QGroupBox(parent);
+    QSlider *weightStrength = new QSlider(Qt::Horizontal, weightStrengthGroup);
+    weightStrength->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    weightStrengthGroup->setTitle(tr("Weight Strength"));
+    weightStrength->setRange(1, 12);
+
+    QGroupBox* weightThresholdGroup = new QGroupBox(parent);
+    QSlider *weightThreshold = new QSlider(Qt::Horizontal, weightThresholdGroup);
+    weightThreshold->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    weightThresholdGroup->setTitle(tr("Weight Threshold"));
+    weightThreshold->setTickInterval(5);
+    weightThreshold->setRange(0, 2000);
+
+    QPushButton *antialiasButton = new QPushButton(parent);
     antialiasButton->setText(tr("Antialiasing"));
     antialiasButton->setCheckable(true);
 
-
-    QPushButton *openGlButton = new QPushButton(mainGroup);
+    QPushButton *openGlButton = new QPushButton(parent);
     openGlButton->setText(tr("Use OpenGL"));
     openGlButton->setCheckable(true);
 
@@ -256,51 +198,155 @@ void Controls::createLayout()
     openGlButton->setEnabled(false);
 #endif
 
-    QPushButton *aboutButton = new QPushButton(mainGroup);
-    aboutButton->setText(tr("About"));
-    aboutButton->setCheckable(true);
+    //
+    // Layouts
+    //
+    QVBoxLayout *penStyleGroupLayout = new QVBoxLayout(penStyleGroup);
+    penStyleGroupLayout->addWidget(solidLine);
+    penStyleGroupLayout->addWidget(dashLine);
+    penStyleGroupLayout->addWidget(dotLine);
+
+    // Appearance Group
+    QVBoxLayout *appearanceGroupLayout = new QVBoxLayout(parent);
+    appearanceGroupLayout->setMargin(3);
+    appearanceGroupLayout->addWidget(penStyleGroup);
+    appearanceGroupLayout->addWidget(weightStrengthGroup);
+    appearanceGroupLayout->addWidget(weightThresholdGroup);
+    appearanceGroupLayout->addWidget(antialiasButton);
+#ifndef QT_NO_OPENGL
+    appearanceGroupLayout->addWidget(openGlButton);
+#endif
+    appearanceGroupLayout->addStretch(1);
+
+    QVBoxLayout *weightStrengthLayout = new QVBoxLayout(weightStrengthGroup);
+    weightStrengthLayout->addWidget(weightStrength);
+
+    QVBoxLayout *weightThresholdLayout = new QVBoxLayout(weightThresholdGroup);
+    weightThresholdLayout->addWidget(weightThreshold);
+
+    //
+    // Set up connections
+    //
+    connect(solidLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setSolidLine);
+    connect(dashLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDashLine);
+    connect(dotLine, &QRadioButton::clicked, m_pDeepViewer->getNetwork(), &Network::setDotLine);
+    connect(weightStrength, &QSlider::valueChanged, m_pDeepViewer->getNetwork(), &Network::setWeightStrength);
+    connect(weightThreshold, &QSlider::valueChanged, m_pDeepViewer->getNetwork(), &Network::setWeightThreshold);
+
+    connect(antialiasButton, &QPushButton::toggled, m_pDeepViewer->getView(), &View::enableAntialiasing);
+#ifndef QT_NO_OPENGL
+    connect(openGlButton, &QPushButton::clicked, m_pDeepViewer->getView(), &View::enableOpenGL);
+#endif
+
+    //
+    // Set the defaults
+    //
+    solidLine->setChecked(true);
+
+    antialiasButton->setChecked(m_pDeepViewer->getView()->usesAntialiasing());
+#ifndef QT_NO_OPENGL
+    openGlButton->setChecked(m_pDeepViewer->getView()->usesOpenGL());
+#endif
+    weightStrength->setValue(5);
+    weightThreshold->setValue(450);
+}
 
 
-    // Layouts:
-    QVBoxLayout *penWidthLayout = new QVBoxLayout(penWidthGroup);
-    penWidthLayout->addWidget(penWidth);
+//*************************************************************************************************************
 
+void Controls::createViewControls(QWidget *parent)
+{
+    QToolButton * selectModeButton = new QToolButton;//Pointer Mode
+    selectModeButton->setText(tr("Select"));
+    selectModeButton->setCheckable(true);
+    selectModeButton->setChecked(true);
+    QToolButton * dragModeButton = new QToolButton;
+    dragModeButton->setText(tr("Drag"));
+    dragModeButton->setCheckable(true);
+    dragModeButton->setChecked(false);
+
+    // TODO print button should go into the menu
+    QPushButton * printButton = new QPushButton;
+    printButton->setText(tr("Print"));
+    printButton->setIcon(QIcon(QPixmap(":/fileprint.png")));
+
+    QButtonGroup *pointerModeGroup = new QButtonGroup(parent);
+    pointerModeGroup->setExclusive(true);
+    pointerModeGroup->addButton(selectModeButton);
+    pointerModeGroup->addButton(dragModeButton);
+
+    QHBoxLayout *labelLayout = new QHBoxLayout;
+    labelLayout->addWidget(selectModeButton);
+    labelLayout->addWidget(dragModeButton);
+
+    QVBoxLayout *viewLayout = new QVBoxLayout(parent);
+
+    viewLayout->addLayout(labelLayout);
+    viewLayout->addWidget(printButton);
+
+    //
+    // Set up connections
+    //
+    connect(selectModeButton, &QToolButton::toggled, m_pDeepViewer->getView(), &View::enableSelectMode);
+    connect(printButton, &QPushButton::clicked, m_pDeepViewer->getView(), &View::print);
+
+    //
+    // Set the defaults
+    //
+}
+
+
+//*************************************************************************************************************
+
+void Controls::createLayout()
+{
+    //
+    // Group configuration
+    //
+
+    // Network
+    QGroupBox *networkGroup = new QGroupBox(this);
+    networkGroup->setFixedWidth(180);
+    networkGroup->setTitle(tr("Network"));
+
+    createNetworkControls(networkGroup);
+
+    // Appearance
+    QGroupBox *appearanceGroup = new QGroupBox(this);
+    appearanceGroup->setFixedWidth(180);
+    appearanceGroup->setTitle(tr("Appearance"));
+
+    createAppearanceControls(appearanceGroup);
+
+    // View
+    QGroupBox *viewGroup = new QGroupBox(this);
+    viewGroup->setFixedWidth(180);
+    viewGroup->setTitle(tr("View"));
+
+    createViewControls(viewGroup);
+
+    //
+    // Layouts
+    //
     QVBoxLayout * mainLayout = new QVBoxLayout(this);
     mainLayout->setMargin(0);
-    mainLayout->addWidget(mainGroup);
+    mainLayout->addWidget(networkGroup);
+    mainLayout->addWidget(appearanceGroup);
+    mainLayout->addWidget(viewGroup);
 
-    QVBoxLayout *mainGroupLayout = new QVBoxLayout(mainGroup);
-    mainGroupLayout->setMargin(3);
-    mainGroupLayout->addWidget(m_pCapGroup);
-    mainGroupLayout->addWidget(m_pJoinGroup);
-    mainGroupLayout->addWidget(m_pStyleGroup);
-    mainGroupLayout->addWidget(penWidthGroup);
-    mainGroupLayout->addWidget(m_pPathModeGroup);
-    mainGroupLayout->addWidget(antialiasButton);
-#ifndef QT_NO_OPENGL
-    mainGroupLayout->addWidget(openGlButton);
-#endif
-    mainGroupLayout->addStretch(1);
-    mainGroupLayout->addWidget(aboutButton);
-
-
+    //
     // Set up connections
-    connect(antialiasButton, &QPushButton::toggled, m_pView, &View::enableAntialiasing);
+    //
 
-//    connect(penWidth, SIGNAL(valueChanged(int)), m_renderer, SLOT(setPenWidth(int)));
-
-#ifndef QT_NO_OPENGL
-    connect(openGlButton, &QPushButton::clicked, m_pView, &View::enableOpenGL);
-#endif
-//    connect(aboutButton, SIGNAL(clicked(bool)), m_renderer, SLOT(setDescriptionEnabled(bool)));
-//    connect(m_renderer, SIGNAL(descriptionEnabledChanged(bool)),
-//            aboutButton, SLOT(setChecked(bool)));
+    //
+    // Set the defaults:
+    //
+}
 
 
-    // Set the defaults
-    antialiasButton->setChecked(m_pView->usesAntialiasing());
-#ifndef QT_NO_OPENGL
-    openGlButton->setChecked(m_pView->usesOpenGL());
-#endif
-    penWidth->setValue(50);
+//*************************************************************************************************************
+
+void Controls::requestTraining()
+{
+    emit requestTraining_signal();
 }

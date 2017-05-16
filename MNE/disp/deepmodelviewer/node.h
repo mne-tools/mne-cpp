@@ -71,7 +71,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class Edge;
-class DeepViewerWidget;
+class Network;
 
 
 //=============================================================================================================
@@ -87,9 +87,9 @@ public:
     /**
     * Constructs a Node representing a Neuron
     *
-    * @param [in] graphWidget   The viewer which holds the global properties
+    * @param [in] network   The network  of which this node is part of
     */
-    Node(DeepViewerWidget *graphWidget);
+    Node(Network *network);
 
     //=========================================================================================================
     /**
@@ -138,13 +138,17 @@ private:
     float m_fRadius;                /**< Half of diameter - for drawing speed already calculated beforehand */
 
     QList<Edge *> m_qListEdges;     /**< The list of connected edges */
-    DeepViewerWidget* m_pGraph;     /**< The viewer this node attached to */
+    Network* m_pNetwork;            /**< The network this node is part of */
+
+    bool m_bIsAttached;             /**< If node is attached to a scene  TODO: Move this to Edge, Node basis class*/
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+
 
 } // NAMESPACE
 

@@ -112,6 +112,7 @@ BabyMEG::BabyMEG()
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/babymeg/both.bad")
 , m_iRecordingMSeconds(5*60*1000)
 , m_iSplitCount(0)
+, m_bDoContinousHPI(false)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -146,11 +147,6 @@ BabyMEG::BabyMEG()
     connect(m_pActionComputeHPI, &QAction::triggered,
             this, &BabyMEG::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
-
-    connect(this, &BabyMEG::started,
-            this, &BabyMEG::sendStatusToHPI);
-    connect(this, &BabyMEG::finished,
-            this, &BabyMEG::sendStatusToHPI);
 
     //Init timers
     if(!m_pRecordTimer) {
@@ -347,59 +343,49 @@ QWidget* BabyMEG::setupWidget()
 
 void BabyMEG::run()
 {
-//    MatrixXf matValue;
-
+    MatrixXf matValue;
     qint32 size = 0;
 
-    while(m_bIsRunning)
-    {
-        if(m_pRawMatrixBuffer)
-        {
+    while(m_bIsRunning) {
+        if(m_pRawMatrixBuffer) {
             //pop matrix
-            m_matValue = m_pRawMatrixBuffer->pop();
+            matValue = m_pRawMatrixBuffer->pop();
 
-//            //Update and write the HPI information to the current data block
-//            QTime timer;
-//            timer.start();
-//            updateHPI();
-//            qDebug() << "BabyMEG::run() - updateHPI() timing" << timer.elapsed() << "msecs";
+            //Update HPI data (for single and continous HPI fitting)
+            updateHPI(matValue);
 
-            //create digital trigger information
-            //QElapsedTimer time;
-            //time.start();
-            createDigTrig(m_matValue);
-            //qDebug()<<"BabyMEG::run - createDigTrig took: "<<time.elapsed();
+            //Do continous HPI fitting and write result to data block
+            if(m_bDoContinousHPI) {
+                doContinousHPI(matValue);
+            }
+
+            //Create digital trigger information
+            createDigTrig(matValue);
 
             //Write raw data to fif file
-            if(m_bWriteToFile)
-            {
-                size += m_matValue.rows()*m_matValue.cols() * 4;
+            if(m_bWriteToFile) {
+                size += matValue.rows()*matValue.cols() * 4;
 
-                if(size > MAX_DATA_LEN)
-                {
+                if(size > MAX_DATA_LEN) {
                     size = 0;
                     this->splitRecordingFile();
                 }
 
                 m_mutex.lock();
-                m_pOutfid->write_raw_buffer(m_matValue.cast<double>());
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
                 m_mutex.unlock();
-            }
-            else
-            {
+            } else {
                 size = 0;
             }
 
-            if(m_pRTMSABabyMEG)
-            {
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(m_matValue));
+            if(m_pRTMSABabyMEG) {
+                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
             }
         }
     }
 
     //Close the fif output stream
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         this->toggleRecordingFile();
     }
 }
@@ -444,10 +430,11 @@ QString BabyMEG::getFilePath(bool currentTime) const
 
     QString sTimeStamp;
 
-    if(currentTime)
+    if(currentTime) {
         sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
-    else
+    } else {
         sTimeStamp = "<YYMMDD_HMS>";
+    }
 
     if(m_sCurrentParadigm.isEmpty())
         sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
@@ -559,15 +546,12 @@ void BabyMEG::setCMDData(QByteArray DATA)
 
 void BabyMEG::setFiffGainInfo(QStringList GainInfo)
 {
-    if(!m_pFiffInfo)
-    {
+    if(!m_pFiffInfo) {
         QMessageBox msgBox;
         msgBox.setText("FiffInfo missing!");
         msgBox.exec();
         return;
-    }
-    else
-    {
+    } else {
         //set up the gain info
         qDebug()<<"Set Gain Info";
         for(qint32 i = 0; i < m_pFiffInfo->nchan; i++) {
@@ -580,8 +564,9 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
         typedef Eigen::Triplet<double> T;
         std::vector<T> tripletList;
         tripletList.reserve(m_pFiffInfo->nchan);
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
             tripletList.push_back(T(i, i, this->m_cals[i]));
+        }
 
         m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
         m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
@@ -632,9 +617,8 @@ void BabyMEG::showHPIDialog()
         qDebug()<<" Start to load Polhemus File";
         if (!m_pHPIWidget) {
             m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-
-            connect(m_pHPIWidget.data(), &HPIWidget::needData,
-                    this, &BabyMEG::sendHPIData);
+            connect(m_pHPIWidget.data(), &HPIWidget::continousHPIToggled,
+                    this, &BabyMEG::onContinousHPIToggled);
         }
 
         if (!m_pHPIWidget->isVisible()) {
@@ -647,43 +631,64 @@ void BabyMEG::showHPIDialog()
 
 //*************************************************************************************************************
 
-void BabyMEG::sendHPIData()
+void BabyMEG::updateHPI(const MatrixXf& matData)
 {
     if(m_pFiffInfo && m_pHPIWidget) {
-        // Use SSP + SGM + calibration
-        Eigen::MatrixXd matProj;
-        m_pFiffInfo->make_projector(matProj);
-
-        //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
-            matProj.col(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j))).setZero();
-        }
-
-        // Setup Comps
-        FiffCtfComp newComp;
-        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-        Eigen::MatrixXd matComp = newComp.data->data;
-
-        m_pHPIWidget->setData(matProj * matComp * this->calibrate(m_matValue));
-
-        // Only use calibration
-        //m_pHPIWidget->setData(this->calibrate(m_matValue));
+        m_pHPIWidget->setData(this->calibrate(matData));
     }
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEG::sendStatusToHPI()
+void BabyMEG::doContinousHPI(MatrixXf& matData)
 {
-    if (!m_pHPIWidget) {
-        m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
+    //This only works with babyMEG HPI channels 400 ... 407
+    if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
+        //if(m_pHPIWidget->wasLastFitOk()) {
+            // Load device to head transformation matrix from Fiff info
+            QMatrix3x3 rot;
 
-        connect(m_pHPIWidget.data(), &HPIWidget::needData,
-                this, &BabyMEG::sendHPIData);
+            for(int ir = 0; ir < 3; ir++) {
+                for(int ic = 0; ic < 3; ic++) {
+                    rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
+                }
+            }
+
+            QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+
+            // Write goodness of fit (GOF)to HPI Ch #7
+//            float dpfitError = 0.0;
+//            float GOF = 1 - dpfitError;
+            QVector<double> vGof = m_pHPIWidget->getGOF();
+            float GOF = 0.0f;
+            for(int i = 0; i < vGof.size(); ++i) {
+                GOF += vGof.at(i);
+            }
+            GOF = GOF / vGof.size();
+
+            // Write rotation quaternion to HPI Ch #1~3
+            matData.row(401) = MatrixXf::Constant(1,matData.cols(), quatHPI.x());
+            matData.row(402) = MatrixXf::Constant(1,matData.cols(), quatHPI.y());
+            matData.row(403) = MatrixXf::Constant(1,matData.cols(), quatHPI.z());
+
+            // Write translation vector to HPI Ch #4~6
+            matData.row(404) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(0,3));
+            matData.row(405) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(1,3));
+            matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
+
+            // Write GOF to HPI Ch #7
+            matData.row(407) = MatrixXf::Constant(1,matData.cols(), GOF);
+        //}
     }
+}
 
-    m_pHPIWidget->setIsRunning(this->isRunning());
+
+//*************************************************************************************************************
+
+void BabyMEG::onContinousHPIToggled(bool bDoContinousHPI)
+{
+    m_bDoContinousHPI = bDoContinousHPI;
 }
 
 
@@ -728,11 +733,11 @@ void BabyMEG::showProjectDialog()
 void BabyMEG::showSqdCtrlDialog()
 {
     // Start Squid control widget
-    if (SQUIDCtrlDlg == NULL)
+    if(SQUIDCtrlDlg == NULL) {
         SQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
+    }
 
-    if (!SQUIDCtrlDlg->isVisible())
-    {
+    if(!SQUIDCtrlDlg->isVisible()) {
         SQUIDCtrlDlg->show();
         SQUIDCtrlDlg->raise();
         SQUIDCtrlDlg->Init();
@@ -744,14 +749,12 @@ void BabyMEG::showSqdCtrlDialog()
 
 void BabyMEG::splitRecordingFile()
 {
-    qDebug() << "Split recording file";
+    //qDebug() << "Split recording file";
     ++m_iSplitCount;
     QString nextFileName = m_sRecordFile.remove("_raw.fif");
     nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
 
-    /*
-    * Write the link to the next file
-    */
+    //Write the link to the next file
     qint32 data;
     m_pOutfid->start_block(FIFFB_REF);
     data = FIFFV_ROLE_NEXT_FILE;
@@ -778,8 +781,7 @@ void BabyMEG::splitRecordingFile()
 void BabyMEG::toggleRecordingFile()
 {
     //Setup writing to file
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         m_mutex.lock();
         m_pOutfid->finish_writing_raw();
         m_mutex.unlock();
@@ -793,13 +795,10 @@ void BabyMEG::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->stop();
 
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
-    }
-    else
-    {
+    } else {
         m_iSplitCount = 0;
 
-        if(!m_pFiffInfo)
-        {
+        if(!m_pFiffInfo) {
             QMessageBox msgBox;
             msgBox.setText("FiffInfo missing!");
             msgBox.exec();
@@ -809,20 +808,21 @@ void BabyMEG::toggleRecordingFile()
         //Initiate the stream for writing to the fif file
         m_sRecordFile = getFilePath(true);
         m_qFileOut.setFileName(m_sRecordFile);
-        if(m_qFileOut.exists())
-        {
+        if(m_qFileOut.exists()) {
             QMessageBox msgBox;
             msgBox.setText("The file you want to write already exists.");
             msgBox.setInformativeText("Do you want to overwrite this file?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
             int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
+            if(ret == QMessageBox::No) {
                 return;
+            }
         }
 
         //Set all projectors to zero before writing to file because we always write the raw data
-        for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
+        for(int i = 0; i<m_pFiffInfo->projs.size(); i++) {
             m_pFiffInfo->projs[i].active = false;
+        }
 
         //Start/Prepare writing process. Actual writing is done in run() method.
         m_mutex.lock();
@@ -838,101 +838,10 @@ void BabyMEG::toggleRecordingFile()
         m_recordingStartedTime.restart();
         m_pUpdateTimeInfoTimer->start(1000);
 
-        if(m_bUseRecordTimer)
+        if(m_bUseRecordTimer) {
             m_pRecordTimer->start(m_iRecordingMSeconds);
+        }
     }
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::updateHPI()
-{
-    QMatrix3x3 rot;
-    float t, r, s, qw, qx, qy, qz, norm2;
-    float GOF;
-
-    int bufsize = m_matValue.cols();
-    qDebug() << "bufsize = " << bufsize;
-
-    // Load device to head transformation matrix from Fiff info
-    qDebug() << "BabyMEG::updateHPI - before reading";
-    for (int ir = 0; ir < 3; ir++)
-        for (int ic = 0; ic < 3; ic++)
-            rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
-    qDebug() << "BabyMEG::updateHPI - after reading";
-
-    // Convert rotation matrix to quaternion (from Wikipedia)
-    t =rot(0,0) + rot(1,1) + rot(2,2);
-    r = sqrt(1 + t);
-    s = 0.5 / r;
-    qw = 0.5 * r;
-    qx = ( (rot(2,1) - rot(1,2)) / s );
-    qy = ( (rot(0,2) - rot(2,0)) / s );
-    qz = ( (rot(1,0) - rot(0,1)) / s );
-
-    // Normalize quaternion vectors
-    norm2 = sqrt(qx*qx + qy*qy + qz*qz);
-    qx = qx / norm2;
-    qy = qy / norm2;
-    qz = qz / norm2;
-
-    // Write goodness of fit (GOF)to HPI Ch #7
-    //
-    //  GOF = 1 - dpfitError
-    //
-    //      dpfitError was computed in the rthpis.cpp
-    //      dpfitError must be readable HERE.
-    //      Perhaps new fiff info structure needs to be implemented for the dpfitError,
-    //      so that this babymeg.cpp can read out the dpfitError HERE.
-    //
-    // Temporarily the GOF is set to 1.
-    // However,eventually the GOF must be loaded from rthpis.cpp, as described the baove.
-    float dpfitError = 0.0;
-    GOF = 1 - dpfitError;
-
-    // Write rotation quaternion to HPI Ch #1~3
-    m_matValue.row(401) = MatrixXf::Constant(1,bufsize, qx);
-    m_matValue.row(402) = MatrixXf::Constant(1,bufsize, qy);
-    m_matValue.row(403) = MatrixXf::Constant(1,bufsize, qz);
-
-    // Write translation vector to HPI Ch #4~6
-    m_matValue.row(404) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(0,3));
-    m_matValue.row(405) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(1,3));
-    m_matValue.row(406) = MatrixXf::Constant(1,bufsize, m_pFiffInfo->dev_head_t.trans(2,3));
-
-    // Write GOF to HPI Ch #7
-    m_matValue.row(407) = MatrixXf::Constant(1,bufsize, GOF);
-
-    //----------------------------------------------------------------------------------------
-    // debug purpose !   visualize in HPI channels
-    // can be commented out to speed up the babymeg plugin
-
-    bool DFLAG = true;
-    //bool DFLAG = false;
-
-    if (DFLAG)
-    {
-        qDebug() << rot(0,0) << " "  << rot(0,1) << " " << rot(0,2);
-        qDebug() << rot(1,0) << " "  << rot(1,1) << " " << rot(1,2);
-        qDebug() << rot(2,0) << " "  << rot(2,1) << " " << rot(2,2);
-
-//        qDebug() << "quaternion w: " << qw;
-        qDebug() << "quaternion x: " << qx;
-        qDebug() << "quaternion y: " << qy;
-        qDebug() << "quaternion z: " << qz;
-/*
-        m_matValue(401,100) = 1; m_matValue(401,101) = 1; m_matValue(401,102) = 1; m_matValue(401,103) = 1;
-        m_matValue(402,200) = 1; m_matValue(402,201) = 1; m_matValue(402,202) = 1; m_matValue(402,203) = 1;
-        m_matValue(403,300) = 1; m_matValue(403,301) = 1; m_matValue(403,302) = 1; m_matValue(403,303) = 1;
-        m_matValue(404,400) = 0; m_matValue(404,401) = 0; m_matValue(404,402) = 0; m_matValue(404,403) = 0;
-        m_matValue(405,500) = 0; m_matValue(405,501) = 0; m_matValue(405,502) = 0; m_matValue(405,503) = 0;
-        m_matValue(406,600) = 0; m_matValue(406,601) = 0; m_matValue(406,602) = 0; m_matValue(406,603) = 0;
-        m_matValue(407,700) = 0; m_matValue(407,701) = 0; m_matValue(407,702) = 0; m_matValue(407,703) = 0;
-*/
-    }
-    // end of debug
-    //----------------------------------------------------------------------------------------
 }
 
 
@@ -949,16 +858,13 @@ void BabyMEG::createDigTrig(MatrixXf& data)
     int counter = 0;
     int idxDigTrig = m_pFiffInfo->ch_names.indexOf("DTRG01");
 
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
         i.next();
 
         QList<QPair<int,double> > lDetectedTriggers = i.value();
 
-        for(int k = 0; k < lDetectedTriggers.size(); ++k)
-        {
-            if(lDetectedTriggers.at(k).first < data.cols() && lDetectedTriggers.at(k).first >= 0)
-            {
+        for(int k = 0; k < lDetectedTriggers.size(); ++k) {
+            if(lDetectedTriggers.at(k).first < data.cols() && lDetectedTriggers.at(k).first >= 0) {
                 data(idxDigTrig,lDetectedTriggers.at(k).first) = data(idxDigTrig,lDetectedTriggers.at(k).first) + pow(2,counter);
             }
         }
@@ -973,10 +879,11 @@ void BabyMEG::createDigTrig(MatrixXf& data)
 MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 {
     MatrixXd one;
-    if(m_pFiffInfo && m_sparseMatCals.cols() == m_pFiffInfo->nchan)
+    if(m_pFiffInfo && m_sparseMatCals.cols() == m_pFiffInfo->nchan) {
         one = m_sparseMatCals*data.cast<double>();
-    else
+    } else {
         one = data.cast<double>();
+    }
 
     return one;
 }
@@ -996,8 +903,9 @@ bool BabyMEG::readProjectors()
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
-    if(!t_pStream->open())
+    if(!t_pStream->open()) {
         return false;
+    }
 
     QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->dirtree());
 
@@ -1005,8 +913,7 @@ bool BabyMEG::readProjectors()
     for(int i = 0; i<q_ListProj.size(); i++)
         q_ListProj[i].active = false;
 
-    if (q_ListProj.size() == 0)
-    {
+    if (q_ListProj.size() == 0) {
         printf("Could not find projectors\n");
         return false;
     }
@@ -1034,13 +941,13 @@ bool BabyMEG::readCompensators()
 
     printf("Opening compensator data %s...\n",t_sFileName.toUtf8().constData());
 
-    if(!t_pStream->open())
+    if(!t_pStream->open()) {
         return false;
+    }
 
     QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_pStream->dirtree(), m_pFiffInfo->chs);
 
-    if (q_ListComp.size() == 0)
-    {
+    if (q_ListComp.size() == 0) {
         printf("Could not find compensators\n");
         return false;
     }
@@ -1106,13 +1013,10 @@ bool BabyMEG::readBadChannels()
 
 void BabyMEG::changeRecordingButton()
 {
-    if(m_iBlinkStatus == 0)
-    {
+    if(m_iBlinkStatus == 0) {
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
-    }
-    else
-    {
+    } else {
         m_pActionRecordFile->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }

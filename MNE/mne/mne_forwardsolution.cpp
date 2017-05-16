@@ -40,6 +40,8 @@
 
 #include "mne_forwardsolution.h"
 
+#include <utils/ioutils.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -178,9 +180,20 @@ void MNEForwardSolution::clear()
 
 MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, const FiffCov &p_pNoise_cov, const FiffInfo &p_pInfo, QString p_sMethod) const
 {
-    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
-
     printf("Cluster forward solution using %s.\n", p_sMethod.toUtf8().constData());
+
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);    
+
+    //Check if cov naming conventions are matching
+    if(!IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names)) {
+        if(IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names, true)) {
+            qWarning("MNEForwardSolution::cluster_forward_solution - Cov names do match with info channel names but have a different naming convention. Abort clustering.");
+            return p_fwdOut;
+        } else {
+            qWarning("MNEForwardSolution::cluster_forward_solution - Cov channel names do not match with info channel names. Abort clustering.");
+            return p_fwdOut;
+        }
+    }
 
 //    qDebug() << "this->sol->data" << this->sol->data.rows() << "x" << this->sol->data.cols();
 

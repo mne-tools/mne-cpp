@@ -41,6 +41,7 @@
 #include "sourcespacetreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_hemisphere.h>
 
@@ -51,7 +52,7 @@
 //=============================================================================================================
 
 #include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DCore/QTransform>
 
 
@@ -78,29 +79,10 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SourceSpaceTreeItem::SourceSpaceTreeItem(int iType, const QString& text)
-: AbstractSurfaceTreeItem(iType, text)
+SourceSpaceTreeItem::SourceSpaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-SourceSpaceTreeItem::~SourceSpaceTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-        m_pRenderable3DEntityNormals->deleteLater();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void SourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
 }
 
 
@@ -117,32 +99,17 @@ void SourceSpaceTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
+void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
 {
-    //Set parents
-    m_pRenderable3DEntity->setParent(parent);
-    m_pRenderable3DEntityNormals->setParent(parent);
-
-    m_pRenderable3DEntity->setRotX(40);
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tHemisphere.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tHemisphere.rr,
-                                                        tHemisphere.nn,
-                                                        tHemisphere.tris,
-                                                        matVertColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
-
-    //Render normals
-    if(m_bRenderNormals) {
-        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tHemisphere.rr,
-                                                                      tHemisphere.nn,
-                                                                      tHemisphere.tris,
-                                                                      matVertColor,
-                                                                      Qt3DRender::QGeometryRenderer::Triangles);
-    }
+    m_pCustomMesh->setMeshData(tHemisphere.rr,
+                                tHemisphere.nn,
+                                tHemisphere.tris,
+                                matVertColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
 
     //Add data which is held by this SourceSpaceTreeItem
     QVariant data;
@@ -165,7 +132,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 
     if(tHemisphere.isClustered()) {
         for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++) {
-            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
             sourcePos = tHemisphere.rr.row(tHemisphere.cluster_info.centroidVertno.at(i));
             pos.setX(sourcePos(0));
@@ -173,20 +140,18 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
             pos.setZ(sourcePos(2));
 
             Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.0015f);
+            sourceSphere->setRadius(0.001f);
             pSourceSphereEntity->addComponent(sourceSphere);
 
             pSourceSphereEntity->setPosition(pos);
 
-            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
             material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
-
-            m_lSpheres.append(pSourceSphereEntity);
         }
     } else {
         for(int i = 0; i < tHemisphere.vertno.rows(); i++) {
-            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
             sourcePos = tHemisphere.rr.row(tHemisphere.vertno(i));
             pos.setX(sourcePos(0));
@@ -199,23 +164,9 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 
             pSourceSphereEntity->setPosition(pos);
 
-            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
             material->setAmbient(defaultColor);
             pSourceSphereEntity->addComponent(material);
-
-            m_lSpheres.append(pSourceSphereEntity);
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-void SourceSpaceTreeItem::setVisible(bool state)
-{
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        m_lSpheres.at(i)->setEnabled(state);
-    }
-
-    m_pRenderable3DEntity->setEnabled(state);
 }

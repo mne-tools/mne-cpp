@@ -91,7 +91,9 @@ public:
     /**
     * Constructrs the ScreenKeyboard class.
     */
-    ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen> pSsvepBciScreen);
+    ScreenKeyboard(SsvepBci *pSsvepBci,
+                   SsvepBciSetupStimulusWidget *pSsvepBciSetupStimulusWidget,
+                   SsvepBciScreen *pSsvepBciScreen);
 
     //=========================================================================================================
     /**
@@ -182,9 +184,9 @@ private:
     void spellLetter(QString letter);
 
     // Pointer to other classes
-    QSharedPointer<SsvepBci>                        m_pSsvepBci;                        /**< pointer to the SsvepBci class */
-    QSharedPointer<SsvepBciSetupStimulusWidget>     m_pSsvepBciSetupStimulusWidget;     /**< pointer to SsvepBciSetupStimulusWidget class */
-    QSharedPointer<SsvepBciScreen>                  m_pSsvepBciScreen;                  /**< holds the pointer to the SsvepBciScreen class */
+    SsvepBci*                               m_pSsvepBci;                        /**< pointer to the SsvepBci class */
+    SsvepBciSetupStimulusWidget*            m_pSsvepBciSetupStimulusWidget;     /**< pointer to SsvepBciSetupStimulusWidget class */
+    SsvepBciScreen*                         m_pSsvepBciScreen;                  /**< holds the pointer to the SsvepBciScreen class */
 
     // displaying
     QPainter                                m_qPainter;             /**< Painter, holding paint device of SsvepBciScreen class */

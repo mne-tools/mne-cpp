@@ -40,7 +40,7 @@
 
 #include "edge.h"
 #include "node.h"
-#include "deepviewerwidget.h"
+#include "deepviewer.h"
 
 
 //*************************************************************************************************************
@@ -77,13 +77,12 @@ static double TwoPi = 2.0 * Pi;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Node::Node(DeepViewerWidget *graphWidget)
-: m_pGraph(graphWidget)
+Node::Node(Network *network)
+: m_pNetwork(network)
 , m_fDiameter(20)
 , m_fRadius(m_fDiameter/2)
+, m_bIsAttached(false)
 {
-
-
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);

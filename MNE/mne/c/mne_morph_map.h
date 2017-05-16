@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     deepviewerwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mne_morph_map.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2017
+* @date     April, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepViewerWidget class declaration.
+* @brief    MneMorphMap class declaration.
 *
 */
 
-#ifndef DEEPVIEWERWIDGET_H
-#define DEEPVIEWERWIDGET_H
+#ifndef MNEMORPHMAP_H
+#define MNEMORPHMAP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
+#include "../mne_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -49,15 +55,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// CNTK INCLUDES
-//=============================================================================================================
-
-#include <CNTKLibrary.h>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -65,53 +63,65 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-QT_BEGIN_NAMESPACE
-class QGraphicsScene;
-QT_END_NAMESPACE
+namespace FIFFLIB {
+    class FiffSparseMatrix;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace DISPLIB
+namespace MNELIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class Node;
-class Edge;
-class Controls;
 
 
 //=============================================================================================================
 /**
-* Implementing the CNTK Network Viewer
+* Replaces *morphMap,morphMapRec struct (analyze_types.c).
 *
-* @brief The CNTK Network Viewer
+* @brief The MneMorphMap class.
 */
-class DISPSHARED_EXPORT DeepViewerWidget : public QWidget
+class MNESHARED_EXPORT MneMorphMap
 {
-    Q_OBJECT
 public:
-    DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent = Q_NULLPTR);
+    typedef QSharedPointer<MneMorphMap> SPtr;              /**< Shared pointer type for MneMorphMap. */
+    typedef QSharedPointer<const MneMorphMap> ConstSPtr;   /**< Const shared pointer type for MneMorphMap. */
 
-    DeepViewerWidget(CNTK::FunctionPtr model, Controls *controls, QWidget *parent = Q_NULLPTR);
+    //=========================================================================================================
+    /**
+    * Constructs the MneMorphMap.
+    */
+    MneMorphMap();
 
+    //=========================================================================================================
+    /**
+    * Destroys the MneMorphMap.
+    */
+    ~MneMorphMap();
 
-private:
-    void populateScene();
+public:
+    FIFFLIB::FiffSparseMatrix* map;		/* Multiply the data in the from surface with this to get to
+                   * 'this' surface from the 'from' surface */
+    int *best;			/* For each point on 'this' surface, the closest point on 'from' surface */
+    int from_kind;		/* The kind field of the other surface */
+    char *from_subj;		/* Name of the subject of the other surface */
 
-    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
-
-    QGraphicsScene* m_pScene;
-
-    QList< QList<Node*> > m_listLayers;
-    QList< QList<Edge*> > m_listEdges;
+// ### OLD STRUCT ###
+//    typedef struct {
+//      FIFFLIB::FiffSparseMatrix* map;		/* Multiply the data in the from surface with this to get to
+//                     * 'this' surface from the 'from' surface */
+//      int *best;			/* For each point on 'this' surface, the closest point on 'from' surface */
+//      int from_kind;		/* The kind field of the other surface */
+//      char *from_subj;		/* Name of the subject of the other surface */
+//    } *morphMap,morphMapRec;
 };
 
 //*************************************************************************************************************
@@ -119,6 +129,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE
+} // NAMESPACE MNELIB
 
-#endif // DEEPVIEWERWIDGET_H
+#endif // MNEMORPHMAP_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     deepviewerwidget.cpp
+* @file     deepviewer.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    DeepViewerWidget class implementation.
+* @brief    DeepViewer class implementation.
 *
 */
 
@@ -38,11 +38,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "deepviewerwidget.h"
+#include "deepviewer.h"
 #include "view.h"
 #include "controls.h"
+#include "network.h"
+
 #include "node.h"
 #include "edge.h"
+
+#include <deep/deep.h>
 
 
 //*************************************************************************************************************
@@ -67,6 +71,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DEEPLIB;
 using namespace DISPLIB;
 using namespace Eigen;
 
@@ -76,20 +81,23 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
+DeepViewer::DeepViewer(bool embeddedControl, QWidget *parent)
 : QWidget(parent)
-, m_pModel(model)
+, m_pView(new View)
+, m_pNetwork(new Network)
 {
-    populateScene();
+    initScene();
 
-    View *view = new View;
-    view->getView()->setScene(m_pScene);
-
-    Controls *controls = new Controls(view, this);
+    m_pView->getGraphicsView()->setScene(m_pScene);
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(view);
-    layout->addWidget(controls);
+    layout->addWidget(m_pView);
+
+    if(embeddedControl) {
+        Controls *controls = new Controls(this, this);
+        layout->addWidget(controls);
+    }
+
     setLayout(layout);
 
     setWindowTitle(tr("Deep Model Viewer"));
@@ -98,126 +106,130 @@ DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, QWidget *parent)
 
 //*************************************************************************************************************
 
-DeepViewerWidget::DeepViewerWidget(CNTK::FunctionPtr model, Controls *controls, QWidget *parent)
-: QWidget(parent)
-, m_pModel(model)
+View *DeepViewer::getView() const
 {
-    populateScene();
-
-    View *view = new View;
-    view->getView()->setScene(m_pScene);
-
-    controls->setView(view);
-
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(view);
-    setLayout(layout);
-
-    setWindowTitle(tr("Deep Model Viewer"));
+    return m_pView;
 }
 
 
 //*************************************************************************************************************
 
-void DeepViewerWidget::populateScene()
+Network* DeepViewer::getNetwork() const
+{
+    return m_pNetwork;
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::setModel(Deep::SPtr& model)
+{
+    if(model != m_pNetwork->model()) {
+        removeSceneItems();
+        m_pNetwork->setModel(model);
+        updateSceneItems();
+    }
+    else {
+        updateModel();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::updateModel()
+{
+    qDebug() << "updateModel";
+    //TODO Consistency checks
+    m_pNetwork->updateWeights();
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::initScene()
 {
     m_pScene = new QGraphicsScene(this);
 
-    if(!m_pModel)
+    connect(m_pNetwork, &Network::update_signal, this, &DeepViewer::redrawScene);
+    connect(m_pNetwork, &Network::updateWeightThreshold_signal, this, &DeepViewer::updateSceneItems);
+    connect(m_pNetwork, &Network::updateWeightStrength_signal, this, &DeepViewer::redrawScene);
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::removeSceneItems()
+{
+    if(!m_pNetwork->isSetup())
         return;
 
     //
-    // Analyze CNTK Model Structure
+    // Remove layer nodes from scene
     //
-    QVector<int> layerDim;
-    QVector<MatrixXf> vecWeights;
-    int inDim = 0;
-    int outDim = 0;
-
-    MatrixXf weights;
-    VectorXf bias;
-    int bufferCount;
-
-    for (int i = static_cast<int>(m_pModel->Parameters().size()) - 1; i >= 0 ; --i) {
-        fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
-        fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
-
-
-        fprintf(stderr,"Value Dim: %ls\n",m_pModel->Parameters()[i].Value()->Shape().AsString().c_str());
-
-        QString param = QString::fromStdWString(m_pModel->Parameters()[i].Shape().AsString());
-
-        if(param.contains(" x ")) {
-            param.replace(QString("["), QString(""));param.replace(QString("]"), QString(""));
-            QStringList dimensions = param.split(" x ");
-            outDim = dimensions[0].toInt();
-            inDim = dimensions[1].toInt();
-
-            weights.resize(outDim,inDim);
-            bufferCount = 0;
-            for(int m = 0; m < outDim; ++m) {
-                for(int n = 0; n < inDim; ++n) {
-                    weights(m,n) = m_pModel->Parameters()[i].Value()->DataBuffer<float>()[bufferCount];
-                    ++bufferCount;
-                }
+    for (int i = 0; i < m_pNetwork->layerNodes().size(); ++i) {
+        for (int j = 0; j < m_pNetwork->layerNodes()[i].size(); ++j) {
+            if(m_pNetwork->layerNodes()[i][j]->scene()) {
+                m_pScene->removeItem(m_pNetwork->layerNodes()[i][j]);
             }
-
-            // ToDo put in one class
-            layerDim.append(inDim);
-            vecWeights.append(weights);
         }
     }
-    layerDim.append(outDim);
 
     //
-    // Create items according to the dimensions
+    // Remove edges from scene
     //
-    int numLayers = layerDim.size();
-
-    double layerDist = 400.0;
-    double nodeDist = 50.0;
-
-    double x_root = -((numLayers-1.0)*layerDist) / 2.0;
-
-    QList<Node*> listCurrentLayer;
-    QList<Edge*> listCurrentEdges;
-    QPointF layerRoot, currentPos;
-
-    for(int layer = 0; layer < layerDim.size(); ++layer) {
-        layerRoot = QPointF( x_root + layer*layerDist, - (layerDim[layer]/2) * nodeDist);
-
-        // Create Nodes
-        for(int i = 0; i < layerDim[layer]; ++i ) {
-            listCurrentLayer.append(new Node(this));
-            m_pScene->addItem(listCurrentLayer[i]);
-
-            currentPos = layerRoot + QPointF(0,nodeDist * i);
-            listCurrentLayer[i]->setPos(currentPos);
-        }
-        m_listLayers.append(listCurrentLayer);
-        listCurrentLayer.clear();
-
-        // Create Edges
-        if(layer - 1 >= 0) {
-
-            // Dimension check
-            if(vecWeights[layer-1].rows() != m_listLayers[layer].size() && vecWeights[layer-1].cols() != m_listLayers[layer-1].size()) {
-                qCritical("Dimensions do not match.\n");
-                return;
-//                qDebug() << "Dimension Check" << vecWeights[layer-1].rows() << "x" << vecWeights[layer-1].cols();
-//                qDebug() << "Check" << m_listLayers[layer].size() << "x" << m_listLayers[layer-1].size();
+    for (int i = 0; i < m_pNetwork->edges().size(); ++i) {
+        for (int j = 0; j < m_pNetwork->edges()[i].size(); ++j) {
+            if(m_pNetwork->edges()[i][j]->scene()) {
+                m_pScene->removeItem(m_pNetwork->edges()[i][j]);
             }
-
-            for(int i = 0; i < m_listLayers[layer-1].size(); ++i ) {
-                for(int j = 0; j < m_listLayers[layer].size(); ++j ) {
-                    listCurrentEdges.append(new Edge(m_listLayers[layer-1][i], m_listLayers[layer][j]));
-
-                    listCurrentEdges.last()->setWeight(vecWeights[layer-1](j,i));
-
-                    m_pScene->addItem(listCurrentEdges.last());
-                }
-            }
-            m_listEdges.append(listCurrentEdges);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::updateSceneItems()
+{
+
+    if(!m_pNetwork->isSetup())
+        return;
+
+    //
+    // Append layer nodes to scene
+    //
+    for (int i = 0; i < m_pNetwork->layerNodes().size(); ++i) {
+        for (int j = 0; j < m_pNetwork->layerNodes()[i].size(); ++j) {
+            if(!m_pNetwork->layerNodes()[i][j]->scene()) {
+                m_pScene->addItem(m_pNetwork->layerNodes()[i][j]);
+            }
+        }
+    }
+
+    //
+    // Append edges to scene
+    //
+    for (int i = 0; i < m_pNetwork->edges().size(); ++i) {
+        for (int j = 0; j < m_pNetwork->edges()[i].size(); ++j) {
+            if(fabs(m_pNetwork->edges()[i][j]->weight()) > m_pNetwork->weightThreshold()) {
+                if(!m_pNetwork->edges()[i][j]->scene()) {
+                    m_pScene->addItem(m_pNetwork->edges()[i][j]);
+                }
+            }
+            else if(m_pNetwork->edges()[i][j]->scene()) {
+                m_pScene->removeItem(m_pNetwork->edges()[i][j]);
+            }
+        }
+    }
+
+    redrawScene();
+}
+
+
+//*************************************************************************************************************
+
+void DeepViewer::redrawScene()
+{
+    m_pScene->update(m_pView->getGraphicsView()->sceneRect());
 }

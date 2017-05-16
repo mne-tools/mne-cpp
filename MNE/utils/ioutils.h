@@ -154,8 +154,6 @@ public:
     * swap integer
     *
     * @param[in, out] source     integer to swap
-    *
-    * @return swapped integer
     */
     static void swap_intp (qint32 *source);
 
@@ -174,8 +172,6 @@ public:
     * swap long
     *
     * @param[in, out] source     long to swap
-    *
-    * @return swapped long
     */
     static void swap_longp (qint64 *source);
 
@@ -183,9 +179,17 @@ public:
     /**
     * swap float
     *
-    * @param[in, out] source     float to swap
+    * @param[in] source     float to swap
     *
     * @return swapped float
+    */
+    static float swap_float (float source);
+
+    //=========================================================================================================
+    /**
+    * swap float
+    *
+    * @param[in, out] source     float to swap
     */
     static void swap_floatp (float *source);
 
@@ -194,8 +198,6 @@ public:
     * swap double
     *
     * @param[in, out] source     double to swap
-    *
-    * @return swapped double
     */
     static void swap_doublep(double *source);
 
@@ -226,6 +228,38 @@ public:
     static bool read_eigen_matrix(Matrix<T, 1, Dynamic>& out, const QString& path);
     template<typename T>
     static bool read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path);
+
+    //=========================================================================================================
+    /**
+    * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
+    *
+    * @param[in] chNames    The channel names.
+    *
+    * @return The new channel names.
+    */
+    static QStringList get_new_chnames_conventions(const QStringList& chNames);
+
+    //=========================================================================================================
+    /**
+    * Returns the old channel naming conventions (whitespcae between channel type and number) for the input list.
+    *
+    * @param[in] chNames    The channel names.
+    *
+    * @return The new channel names.
+    */
+    static QStringList get_old_chnames_conventions(const QStringList& chNames);
+
+    //=========================================================================================================
+    /**
+    * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
+    *
+    * @param[in] chNamesA    The channel names.
+    * @param[in] chNamesB    The channel names which is to be compared to.
+    * @param[in] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
+    *
+    * @return True if all names in chNamesA are present in chNamesB, false otherwise.
+    */
+    static bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention = false);
 };
 
 //*************************************************************************************************************

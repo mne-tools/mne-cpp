@@ -138,20 +138,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~MeasurementTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-    void init();
-
-    //=========================================================================================================
-    /**
     * Adds source space data to this item.
     *
     * @param[in] tSourceSpace       The source space data.
@@ -224,23 +210,15 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
     * Call this function whenever new colors for the activation data plotting are available.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
     void onRtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
 
-    MneEstimateTreeItem*                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
-    NetworkTreeItem*                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
-    EcdDataTreeItem*                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
+    QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
+    QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
+    QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 
 signals:
     //=========================================================================================================

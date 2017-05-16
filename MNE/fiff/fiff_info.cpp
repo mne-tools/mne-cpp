@@ -42,6 +42,8 @@
 #include "fiff_stream.h"
 #include "fiff_file.h"
 
+#include <utils/ioutils.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,6 +51,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -460,7 +463,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
         //    Scan numbers may have been messed up
         //
         chs[k].scanNo = k+1;//+1 because
-        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+//        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
         cals(0,k) = chs[k].cal; //ToDo whats going on with cals?
         p_pStream->write_ch_info(chs[k]);
     }

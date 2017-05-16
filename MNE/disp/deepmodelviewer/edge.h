@@ -58,6 +58,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class Node;
+class Network;
 
 
 //=============================================================================================================
@@ -74,10 +75,11 @@ public:
     /**
     * Constructs a Edge representing a weight
     *
+    * @param [in] network       The network of which this edge is part of
     * @param [in] sourceNode    The Source Node of this Edge
     * @param [in] destNode      The Destination Node of this Edge
     */
-    Edge(Node *sourceNode, Node *destNode);
+    Edge(Network *network, Node *sourceNode, Node *destNode);
 
     //=========================================================================================================
     /**
@@ -108,6 +110,13 @@ public:
     * @param [in] weight    The weight to set
     */
     void setWeight(float weight);
+    //=========================================================================================================
+    /**
+    * Returns the weight of the node
+    *
+    * @return Node weight
+    */
+    inline float weight() const;
 
     enum { Type = UserType + 2 };
     int type() const override { return Type; }
@@ -116,7 +125,10 @@ protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void updateLineWidth();
+    //=========================================================================================================
+    /**
+    * Updates the edge color based on the current weight
+    */
     void updateColor();
 
 private:
@@ -127,15 +139,21 @@ private:
     QPointF m_destPoint;        /**< The calculated Destination Point */
     qreal   m_arrowSize;        /**< The Arrow Size */
     QColor  m_color;            /**< The Color derived from the weight */
-    qreal   m_penWidth;         /**< The Edges width derived from the weight */
 
     float   m_weight;           /**< The Weight related to the edge */
+
+    Network* m_pNetwork;        /**< The network this edge is part of.*/
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+float Edge::weight() const
+{
+    return m_weight;
+}
 
 } // NAMESPACE
 

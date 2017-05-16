@@ -47,10 +47,15 @@
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/bem/bemtreeitem.h>
+#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
+#include <disp3D/engine/model/3dhelpers/renderable3Dentity.h>
 
-#include <rtProcessing/rthpis.h>
+#include <inverse/hpiFit/hpifit.h>
 
 #include <mne/mne_bem.h>
+#include <fwd/fwd_bem_model.h>
 
 
 //*************************************************************************************************************
@@ -62,6 +67,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -80,6 +86,7 @@ using namespace FIFFLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace RTPROCESSINGLIB;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -93,7 +100,13 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
-, m_bIsRunning(false)
+, m_pRtHPI(RtHPIS::SPtr(new RtHPIS(m_pFiffInfo)))
+, m_dMaxHPIFitError(0.01)
+, m_dMeanErrorDist(0.0)
+, m_iNubmerBadChannels(0)
+, m_bUseSSP(false)
+, m_bUseComp(true)
+, m_bLastFitGood(false)
 {
     ui->setupUi(this);
 
@@ -112,6 +125,21 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
             this, &HPIWidget::onFreqsChanged);
     connect(ui->m_spinBox_freqCoil4, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
             this, &HPIWidget::onFreqsChanged);
+
+    connect(ui->m_checkBox_continousHPI, &QCheckBox::clicked,
+            this, &HPIWidget::onDoContinousHPI);
+
+    connect(ui->m_doubleSpinBox_maxHPIContinousDist, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &HPIWidget::onContinousHPIMaxDistChanged);
+
+    connect(ui->m_checkBox_useSSP, &QCheckBox::clicked,
+            this, &HPIWidget::onSSPCompUsageChanged);
+    connect(ui->m_checkBox_useComp, &QCheckBox::clicked,
+            this, &HPIWidget::onSSPCompUsageChanged);
+
+    //Init from default values
+    ui->m_checkBox_useSSP->setChecked(m_bUseSSP);
+    ui->m_checkBox_useComp->setChecked(m_bUseComp);
 
     //Setup View3D
     m_pView3D->setModel(m_pData3DModel);
@@ -132,12 +160,25 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     //Add sensor surface
     QFile t_fileBabyMEGSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
     MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
-    m_pData3DModel->addBemData("Device", "BabyMEG", t_babyMEGsensorSurfaceBEM);
+    m_pData3DModel->addMegSensorData("Device", "BabyMEG", t_babyMEGsensorSurfaceBEM);
 
     QFile t_fileVVSensorSurfaceBEM("./resources/sensorSurfaces/306m.fif");
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
+
+
+    //FwdBemModel* bemModel =  fwd_bem_load_three_layer_surfaces(const QString& name);
+
+    QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_BemHeadKid(t_fileHeadKid);
+    m_pBemHeadKid = m_pData3DModel->addBemData("Head", "Child", t_BemHeadKid);
+    m_pBemHeadKid->setCheckState(Qt::Unchecked);
+
+    QFile t_fileHeadAdult("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_BemHeadAdult(t_fileHeadAdult);
+    m_pBemHeadAdult = m_pData3DModel->addBemData("Head", "Adult", t_BemHeadAdult);
+    m_pBemHeadAdult->setCheckState(Qt::Unchecked);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -147,6 +188,11 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 
     //Init data
     m_matValue.resize(0,0);
+
+    //Init RtHPIs
+    m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
+    connect(m_pRtHPI.data(), &RtHPIS::newFittingResultAvailable,
+            this, &HPIWidget::onNewFittingResultAvailable);
 }
 
 
@@ -160,17 +206,36 @@ HPIWidget::~HPIWidget()
 
 //*************************************************************************************************************
 
-void HPIWidget::setData(const Eigen::MatrixXd& data)
+void HPIWidget::setData(const Eigen::MatrixXd& matData)
 {
-    m_matValue = data;
+    //If bad channels changed, recalcluate projectors
+    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matCompProjectors.rows() == 0 || m_matCompProjectors.cols() == 0) {
+        updateProjections();
+        m_iNubmerBadChannels = m_pFiffInfo->bads.size();
+    }
+
+    m_matValue = m_matCompProjectors * matData;
+
+    //Do continous HPI if wanted
+    if(ui->m_checkBox_continousHPI->isChecked()) {
+        m_pRtHPI->append(m_matValue);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void HPIWidget::setIsRunning(bool bStatus)
+QVector<double> HPIWidget::getGOF()
 {
-    m_bIsRunning = bStatus;
+    return m_vGof;
+}
+
+
+//*************************************************************************************************************
+
+bool HPIWidget::wasLastFitOk()
+{
+    return m_bLastFitGood;
 }
 
 
@@ -184,70 +249,39 @@ void HPIWidget::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
-void HPIWidget::setDigitizerDataToView3D(const FiffDigPointSet& digPointSet,
-                                             const FiffDigPointSet& fittedPointSet,
-                                             const QVector<double>& vGof,
-                                             bool bSortOutAdditionalDigitizer)
+void HPIWidget::updateProjections()
 {
-    if(bSortOutAdditionalDigitizer) {
-        FiffDigPointSet t_digSetWithoutAdditional;
+    m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-        for(int i = 0; i < digPointSet.size(); ++i) {
-            switch(digPointSet[i].kind)
-            {
-                case FIFFV_POINT_HPI:
-                    t_digSetWithoutAdditional << digPointSet[i];
-                    break;
+    if(m_bUseSSP) {
+        // Use SSP + SGM + calibration
+        //Do a copy here because we are going to change the activity flags of the SSP's
+        FiffInfo infoTemp = *(m_pFiffInfo.data());
 
-                case FIFFV_POINT_CARDINAL:
-                    t_digSetWithoutAdditional << digPointSet[i];
-                    break;
-
-                case FIFFV_POINT_EEG:
-                    t_digSetWithoutAdditional << digPointSet[i];
-                    break;
-            }
+        //Turn on all SSP
+        for(int i = 0; i < infoTemp.projs.size(); ++i) {
+            infoTemp.projs[i].active = true;
         }
 
-        m_pData3DModel->addDigitizerData("Head", "Transformed", t_digSetWithoutAdditional);
-
-        t_digSetWithoutAdditional.clear();
-        for(int i = 0; i < fittedPointSet.size(); ++i) {
-            switch(fittedPointSet[i].kind)
-            {
-                case FIFFV_POINT_EEG:
-                    t_digSetWithoutAdditional << fittedPointSet[i];
-                    break;
-            }
+        //Create the projector for all SSP's on
+        infoTemp.make_projector(m_matProjectors);
+        //set columns of matrix to zero depending on bad channels indexes
+        for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+            m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
         }
-
-        m_pData3DModel->addDigitizerData("Head", "Fitted", t_digSetWithoutAdditional);
-
-        //Update gof labels and transform from m to mm
-        QString sGof("0mm");
-        if(vGof.size() > 0) {
-            sGof = QString("%1mm").arg(1000*vGof[0]);
-            ui->m_label_gofCoil1->setText(sGof);
-        }
-
-        if(vGof.size() > 1) {
-            sGof = QString("%1mm").arg(1000*vGof[1]);
-            ui->m_label_gofCoil2->setText(sGof);
-        }
-
-        if(vGof.size() > 2) {
-            sGof = QString("%1mm").arg(1000*vGof[2]);
-            ui->m_label_gofCoil3->setText(sGof);
-        }
-
-        if(vGof.size() > 3) {
-            sGof = QString("%1mm").arg(1000*vGof[3]);
-            ui->m_label_gofCoil4->setText(sGof);
-        }
-    } else {
-        m_pData3DModel->addDigitizerData("Head", "Transformed", digPointSet);
-        m_pData3DModel->addDigitizerData("Head", "Fitted", fittedPointSet);
     }
+
+    if(m_bUseComp) {
+        // Setup Comps
+        FiffCtfComp newComp;
+        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        matComp = newComp.data->data;
+    }
+
+    m_matCompProjectors = m_matProjectors * matComp;
+
+    m_pRtHPI->setProjectionMatrix(m_matProjectors);
 }
 
 
@@ -265,7 +299,7 @@ bool HPIWidget::hpiLoaded()
 
 //*************************************************************************************************************
 
-QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
+QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
 {
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
@@ -300,11 +334,9 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
         }
     }
 
-    //Add all digitizer but additional points to View3D
-    QVector<double> vGof;
-    vGof << 0.0 << 0.0 << 0.0 << 0.0;
-
-    this->setDigitizerDataToView3D(t_digSet, FiffDigPointSet(), vGof);
+    //Add all digitizer but additional points to the 3D view
+    FiffDigPointSet t_digSetWithoutAdditional = t_digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
+    m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -312,7 +344,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
     ui->m_label_numberLoadedFiducials->setNum(numFiducials);
     ui->m_label_numberLoadedEEG->setNum(numEEG);
 
-    //Hdie show frequencies and errors based on the number of coils
+    //Hide/show frequencies and errors based on the number of coils
     if(numHPI == 3) {
         ui->m_label_gofCoil4->hide();
         ui->m_label_gofCoil4Description->hide();
@@ -337,46 +369,36 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(QString fileName)
 
 //*************************************************************************************************************
 
+void HPIWidget::onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult)
+{
+    m_vGof = fitResult.errorDistances;
+
+    storeResults(fitResult.devHeadTrans, fitResult.fittedCoils);
+}
+
+
+//*************************************************************************************************************
+
 void HPIWidget::onBtnDoSingleFit()
 {    
     if(!this->hpiLoaded()) {
        QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at lesat 3 HPI coils first!");
+       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first!");
        msgBox.exec();
        return;
     }
 
-    if(!m_bIsRunning) {
+    if(m_matValue.rows() == 0 || m_matValue.cols() == 0) {
        QMessageBox msgBox;
-       msgBox.setText("Please start the measurement first!");
+       msgBox.setText("No data has been received yet! Please start the measurement first!");
        msgBox.exec();
        return;
     }
 
-    this->performHPIFitting(m_vCoilFreqs);
-
+    //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
+    //rt head motion correction will be performed using the rtHPI plugin.
     if(m_pFiffInfo) {
-        FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
-
-        ui->m_label_mat00->setNum(devHeadTrans.trans(0,0));
-        ui->m_label_mat01->setNum(devHeadTrans.trans(0,1));
-        ui->m_label_mat02->setNum(devHeadTrans.trans(0,2));
-        ui->m_label_mat03->setNum(devHeadTrans.trans(0,3));
-
-        ui->m_label_mat10->setNum(devHeadTrans.trans(1,0));
-        ui->m_label_mat11->setNum(devHeadTrans.trans(1,1));
-        ui->m_label_mat12->setNum(devHeadTrans.trans(1,2));
-        ui->m_label_mat13->setNum(devHeadTrans.trans(1,3));
-
-        ui->m_label_mat20->setNum(devHeadTrans.trans(2,0));
-        ui->m_label_mat21->setNum(devHeadTrans.trans(2,1));
-        ui->m_label_mat22->setNum(devHeadTrans.trans(2,2));
-        ui->m_label_mat23->setNum(devHeadTrans.trans(2,3));
-
-        ui->m_label_mat30->setNum(devHeadTrans.trans(3,0));
-        ui->m_label_mat31->setNum(devHeadTrans.trans(3,1));
-        ui->m_label_mat32->setNum(devHeadTrans.trans(3,2));
-        ui->m_label_mat33->setNum(devHeadTrans.trans(3,3));
+        m_pRtHPI->append(m_matValue);
     }
 }
 
@@ -421,64 +443,199 @@ void HPIWidget::onFreqsChanged()
     m_vCoilFreqs.append(ui->m_spinBox_freqCoil2->value());
     m_vCoilFreqs.append(ui->m_spinBox_freqCoil3->value());
     m_vCoilFreqs.append(ui->m_spinBox_freqCoil4->value());
+
+    m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
 }
 
 
 //*************************************************************************************************************
 
-void HPIWidget::performHPIFitting(const QVector<int>& vFreqs)
+void HPIWidget::onDoContinousHPI()
 {
-    //Generate/Update current dev/head transfomration. We do not need to make use of rtHPI plugin here since the fitting is only needed once here.
-    //rt head motion correction will be performed using the rtHPI plugin.
-    if(m_pFiffInfo) {
-        if(this->hpiLoaded()) {
-            // Wait for data
-            emit needData();
+    if(!this->hpiLoaded()) {
+       QMessageBox msgBox;
+       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first!");
+       msgBox.exec();
+       ui->m_checkBox_continousHPI->setChecked(!ui->m_checkBox_continousHPI->isChecked());
+       return;
+    }
 
-            while(m_matValue.rows() == 0 && m_matValue.cols() == 0) {
-                //Wait unti ldata was received
+    if(m_matValue.rows() == 0 || m_matValue.cols() == 0) {
+       QMessageBox msgBox;
+       msgBox.setText("No data has been received yet! Please start the measurement first!");
+       msgBox.exec();
+       ui->m_checkBox_continousHPI->setChecked(!ui->m_checkBox_continousHPI->isChecked());
+       return;
+    }
+
+    emit continousHPIToggled(ui->m_checkBox_continousHPI->isChecked());
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::onContinousHPIMaxDistChanged()
+{
+    m_dMaxHPIFitError = ui->m_doubleSpinBox_maxHPIContinousDist->value() * 0.001;
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::onSSPCompUsageChanged()
+{
+    m_bUseSSP = ui->m_checkBox_useSSP->isChecked();
+    m_bUseComp = ui->m_checkBox_useComp->isChecked();
+
+    updateProjections();
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::updateErrorLabels()
+{
+    //Update gof labels and transform from m to mm
+    QString sGof("0mm");
+    if(m_vGof.size() > 0) {
+        sGof = QString::number(m_vGof[0]*1000,'f',2)+QString("mm");
+        ui->m_label_gofCoil1->setText(sGof);
+    }
+
+    if(m_vGof.size() > 1) {
+        sGof = QString::number(m_vGof[1]*1000,'f',2)+QString("mm");
+        ui->m_label_gofCoil2->setText(sGof);
+    }
+
+    if(m_vGof.size() > 2) {
+        sGof = QString::number(m_vGof[2]*1000,'f',2)+QString("mm");
+        ui->m_label_gofCoil3->setText(sGof);
+    }
+
+    if(m_vGof.size() > 3) {
+        sGof = QString::number(m_vGof[3]*1000,'f',2)+QString("mm");
+        ui->m_label_gofCoil4->setText(sGof);
+    }
+
+    ui->m_label_averagedFitError->setText(QString::number(m_dMeanErrorDist*1000,'f',2)+QString("mm"));
+
+    //Update good/bad fit label
+    if(m_dMeanErrorDist > m_dMaxHPIFitError) {
+        ui->m_label_fitFeedback->setText("Bad Fit");
+        ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else {
+        ui->m_label_fitFeedback->setText("Good Fit");
+        ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : green;}");
+    }
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::updateTransLabels()
+{
+    //Update labels with new dev/trans matrix
+    FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
+
+    ui->m_label_mat00->setText(QString::number(devHeadTrans.trans(0,0),'f',4));
+    ui->m_label_mat01->setText(QString::number(devHeadTrans.trans(0,1),'f',4));
+    ui->m_label_mat02->setText(QString::number(devHeadTrans.trans(0,2),'f',4));
+    ui->m_label_mat03->setText(QString::number(devHeadTrans.trans(0,3),'f',4));
+
+    ui->m_label_mat10->setText(QString::number(devHeadTrans.trans(1,0),'f',4));
+    ui->m_label_mat11->setText(QString::number(devHeadTrans.trans(1,1),'f',4));
+    ui->m_label_mat12->setText(QString::number(devHeadTrans.trans(1,2),'f',4));
+    ui->m_label_mat13->setText(QString::number(devHeadTrans.trans(1,3),'f',4));
+
+    ui->m_label_mat20->setText(QString::number(devHeadTrans.trans(2,0),'f',4));
+    ui->m_label_mat21->setText(QString::number(devHeadTrans.trans(2,1),'f',4));
+    ui->m_label_mat22->setText(QString::number(devHeadTrans.trans(2,2),'f',4));
+    ui->m_label_mat23->setText(QString::number(devHeadTrans.trans(2,3),'f',4));
+
+    ui->m_label_mat30->setText(QString::number(devHeadTrans.trans(3,0),'f',4));
+    ui->m_label_mat31->setText(QString::number(devHeadTrans.trans(3,1),'f',4));
+    ui->m_label_mat32->setText(QString::number(devHeadTrans.trans(3,2),'f',4));
+    ui->m_label_mat33->setText(QString::number(devHeadTrans.trans(3,3),'f',4));
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPointSet& fittedCoils)
+{
+    //Check if git meets distance requirement (GOF)
+    if(m_vGof.size() > 0) {
+        m_dMeanErrorDist = 0;
+        for(int i = 0; i < m_vGof.size(); ++i) {
+            m_dMeanErrorDist += m_vGof.at(i);
+        }
+        m_dMeanErrorDist = m_dMeanErrorDist/m_vGof.size();
+    }
+
+    //Update error labels
+    updateErrorLabels();
+
+    //If distance is to big, do not store results
+    if(m_dMeanErrorDist > m_dMaxHPIFitError) {
+        m_bLastFitGood = false;
+        return;
+    }
+
+    //Update transformation labels
+    updateTransLabels();
+
+    m_bLastFitGood = true;
+
+    //If fit was good, set newly calculated transformation matrix to fiff info
+    m_pFiffInfo->dev_head_t = devHeadTrans;
+
+    //Add and update items to 3D view
+    m_pData3DModel->addDigitizerData("Head", "Fitted", fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
+
+    update3DView();
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::update3DView()
+{
+    if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAdult && m_pBemHeadKid) {
+        //Prepare new transform
+        QMatrix4x4 mat;
+        for(int r = 0; r < 4; ++r) {
+            for(int c = 0; c < 4; ++c) {
+                mat(r,c) = m_pFiffInfo->dev_head_t.invtrans(r,c);
             }
+        }
 
-            //Perform actual fitting
-            QVector<double> vGof;
-            FiffDigPointSet t_fittedSet;
-            RtHPIS::SPtr pRtHpis = RtHPIS::SPtr(new RtHPIS(m_pFiffInfo));
-            FiffCoordTrans transDevHead;
-            transDevHead.from = 1;
-            transDevHead.to = 4;
+        Qt3DCore::QTransform transform;
+        transform.setMatrix(mat);
 
-            pRtHpis->singleHPIFit(m_matValue,
-                                  transDevHead,
-                                  vFreqs,
-                                  vGof,
-                                  t_fittedSet);
-
-            m_matValue.resize(0,0);
-
-            //Set newly calculated transformation matrix to fiff info
-            m_pFiffInfo->dev_head_t = transDevHead;
-
-            //Apply new dev/head matrix to current digitizer and update in 3D view in HPI control widget
-            FiffDigPointSet t_digSet;
-
-            for(int i = 0; i < m_pFiffInfo->dig.size(); ++i) {
-                FiffDigPoint digPoint = m_pFiffInfo->dig.at(i);
-
-                MatrixX3f matPos(1,3);
-                matPos(0,0) = digPoint.r[0];
-                matPos(0,1) = digPoint.r[1];
-                matPos(0,2) = digPoint.r[2];
-
-                MatrixX3f matPosTrans = m_pFiffInfo->dev_head_t.apply_inverse_trans(matPos);
-
-                digPoint.r[0] = matPosTrans(0,0);
-                digPoint.r[1] = matPosTrans(0,1);
-                digPoint.r[2] = matPosTrans(0,2);
-
-                t_digSet << digPoint;
+        //Update fast scan / tracked digitizer
+        QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+        for(int j = 0; j < itemList.size(); ++j) {
+            if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
+                pDigItem->setTransform(transform);
             }
+        }
 
-            this->setDigitizerDataToView3D(t_digSet, t_fittedSet, vGof);
+        //Update adult head surface
+        itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+        for(int j = 0; j < itemList.size(); ++j) {
+            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                pBemItem->setTransform(transform);
+            }
+        }
+
+        //Update kid's head surface
+        itemList = m_pBemHeadKid->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+        for(int j = 0; j < itemList.size(); ++j) {
+            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                //If it is the kid's model scale it
+                pBemItem->setTransform(transform);
+                pBemItem->setScale(0.65f);
+            }
         }
     }
 }

@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "deepcntk_global.h"
-
 #include <anShared/Interfaces/IExtension.h>
 
 
@@ -54,15 +53,6 @@
 
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// CNTK INCLUDES
-//=============================================================================================================
-
-#include <CNTKLibrary.h>
 
 
 //*************************************************************************************************************
@@ -72,13 +62,8 @@
 
 namespace DISPLIB
 {
-    class DeepViewerWidget;
+    class DeepViewer;
     class Controls;
-}
-
-namespace DEEPLIB
-{
-    class Deep;
 }
 
 
@@ -94,6 +79,8 @@ namespace DEEPCNTKEXTENSION
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class DeepCNTKManager;
 
 
 //=============================================================================================================
@@ -122,36 +109,46 @@ public:
     */
     ~DeepCNTK();
 
-    //=========================================================================================================
-    /**
-    * IExtension functions
-    */
+    // IExtension functions
     virtual QSharedPointer<IExtension> clone() const;
     virtual void init();
     virtual void unload();
     virtual QString getName() const;
 
-    virtual bool hasMenu() const;
     virtual QMenu* getMenu();
-
-    virtual bool hasControl() const;
     virtual QDockWidget* getControl();
-
-    virtual bool hasView() const;
     virtual QWidget* getView();
 
 private:
-    // Deep Model
-    QSharedPointer<DEEPLIB::Deep>   m_pDeep;            /**< CNTK Wrapper */
-    CNTK::FunctionPtr               m_pModel;           /**< CNTK Model */
+    //=========================================================================================================
+    /**
+    * Called when the network configuration finished training
+    */
+    void trainingFinished();
 
+    //=========================================================================================================
+    /**
+    * Reset the current model
+    */
+    void resetDeepViewer();
+
+    //=========================================================================================================
+    /**
+    * Update the current model
+    */
+    void updateDeepViewer();
+
+private:
     DISPLIB::Controls*              m_pControlPanel;    /**< View Control Panel */
 
     // Control
     QDockWidget*                    m_pControl;         /**< Control Widget */
 
     // View
-    DISPLIB::DeepViewerWidget*      m_pView;            /**< View */
+    DISPLIB::DeepViewer*            m_pDeepViewer;      /**< Viewer */
+
+    DeepCNTKManager*                m_pDeepCNTKManager; /**< Deep Networks */
+
 };
 
 } // NAMESPACE
