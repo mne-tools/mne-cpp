@@ -55,6 +55,7 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <iostream>
+#include <random>
 
 #include <geometryInfo/geometryinfo.h>
 
@@ -169,9 +170,62 @@ int main(int argc, char *argv[])
     }
 
     qint64 startTime = QDateTime::currentSecsSinceEpoch();
-    QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet);
+    //QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet);
     std::cout << startTime - QDateTime::currentSecsSinceEpoch() <<" s " << std::endl;
 
+    //test Projecting
+    ///generate random sensor positions
+    std::random_device seed;
+    std::mt19937 rndEngine(seed());
+    std::uniform_real_distribution<double>uniDist(-100, 100);
+    QVector<Vector3d> sensorPositions;
+    for(qint32 i = 0; i < 300; ++i)
+    {
+        sensorPositions.push_back(Vector3d(uniDist(rndEngine),uniDist(rndEngine),uniDist(rndEngine)));
+    }
+    qint64 startTimeKd = QDateTime::currentMSecsSinceEpoch();
+    QSharedPointer<QVector<qint32>> mappedSensors = GeometryInfo::projectSensor(testSurface, sensorPositions);
+    std::cout << QDateTime::currentMSecsSinceEpoch() - startTimeKd <<" ms " << std::endl;
+    for(const qint32 &idx : *mappedSensors)
+    {
+        std::cout << idx << " ";
+    }
+    std::cout << "\n";
+
+    ///lin search sensor positions
+    QVector<qint32> linMappedSensors;
+    linMappedSensors.reserve(sensorPositions.size());
+    qint64 startTimeLin = QDateTime::currentMSecsSinceEpoch();
+    for(const Vector3d &sensor : sensorPositions)
+    {
+        qint32 champion;
+        double champDist = std::numeric_limits<double>::max();
+        for(qint32 i = 0; i < testSurface.rr.rows(); ++i)
+        {
+            double dist = sqrt(pow(testSurface.rr(i, 0) - sensor[0], 2)  // x-cord
+                    + pow(testSurface.rr(i, 1) - sensor[1], 2)    // y-cord
+                    + pow(testSurface.rr(i, 2) - sensor[2], 2));  // z-cord
+            if(dist < champDist)
+            {
+                champion = i;
+                champDist = dist;
+            }
+        }
+        linMappedSensors.push_back(champion);
+    }
+    std::cout << QDateTime::currentMSecsSinceEpoch() - startTimeLin <<" ms " << std::endl;
+    for(const qint32 &idx : linMappedSensors)
+    {
+        std::cout << idx << " ";
+    }
+    std::cout << "\n";
+    for(qint32 i = 0; i < mappedSensors->size(); ++i)
+    {
+        double dist = sqrt(pow(testSurface.rr(mappedSensors->at(i), 0) - testSurface.rr(linMappedSensors[i], 0), 2) // x-cord
+                + pow(testSurface.rr(mappedSensors->at(i), 1) - testSurface.rr(linMappedSensors[i], 1), 2)   // y-cord
+                + pow(testSurface.rr(mappedSensors->at(i), 2) - testSurface.rr(linMappedSensors[i], 2), 2));  // z-cord
+        std::cout << dist << "\t";
+    }
     //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
