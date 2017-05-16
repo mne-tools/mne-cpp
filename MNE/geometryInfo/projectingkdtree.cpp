@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     geometryinfo.cpp
+* @file     projectingkdtree.cpp
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2017
+* @date     May, 2017
 *
 * @section  LICENSE
 *
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    GeometryInfo class definition.
+* @brief    ProjectingKdTree class definition.
 *
 */
 
@@ -38,26 +38,24 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include "geometryinfo.h"
-#include "geometryInfo/projectingkdtree.h"
-#include<mne/mne_bem_surface.h>
 
+#include "projectingkdtree.h"
+#include<mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
-#include <fstream>
+#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDateTime>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,8 +69,6 @@
 //=============================================================================================================
 
 using namespace GEOMETRYINFO;
-using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -87,85 +83,118 @@ using namespace MNELIB;
 //=============================================================================================================
 
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet)
+
+
+ProjectingKdTree::ProjectingKdTree(const MNELIB::MNEBemSurface &inSurface, quint32 bucketSize) : m_surface(inSurface)
 {
-    //start timer
-    qint64 startTimeSecs = QDateTime::currentSecsSinceEpoch();
-    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
-    size_t matColumns;
-    if(!vertSubSet.empty())
+    m_vertIndices = QVector<qint32>(inSurface.rr.rows());
+    std::iota(m_vertIndices.begin(), m_vertIndices.end(), 0);
+
+    if(bucketSize > 0 )
     {
-        matColumns = vertSubSet.size();
+        const qint32 maxDepth = std::ceil(log2(inSurface.rr.rows() / bucketSize));
+        m_root = recursiveBuild(m_vertIndices.data(), m_vertIndices.size(), 0, maxDepth);
     }
     else
     {
-        matColumns = inSurface.rr.rows();
+        std::cout << "ERROR: BucketSize of projecting tree is = 0\n";
     }
-
-    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
-
-    // convention: first dimension in distance table is "to", second dimension "from"
-
-    //QPair<int, QVector<int> > tempPair;
-    //int tempID;
-    std::cout << inSurface.rr.rows() <<std::endl;
-    std::cout << inSurface.rr.cols() <<std::endl;
-    for (size_t i = 0; i < matColumns; ++i)
-    {
-        //ToDo bessere Lösung mit und ohne subset
-        size_t index = i;
-        if(!vertSubSet.empty())
-        {
-            index = vertSubSet[i];
-        }
-
-        //std::cout << inSurface.rr.rows() <<std::endl;
-        float xFrom = inSurface.rr(index, 0);
-        float yFrom = inSurface.rr(index, 1);
-        float zFrom = inSurface.rr(index, 2);
-        //Vector3f currentVertex = inSurface.rr(i)
-        for (size_t j = 0; j < inSurface.rr.rows(); ++j)
-        {
-
-
-            float xTo = inSurface.rr(j, 0);
-            float yTo = inSurface.rr(j, 1);
-            float zTo = inSurface.rr(j, 2);
-            (*ptr)(  j, i) = sqrt(pow(xTo - xFrom, 2) + pow(yTo - yFrom, 2) + pow(zTo - zFrom, 2));
-        }
-    }
-    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
-    std::cout << "start writing to file" << std::endl;
-    std::ofstream file;
-    file.open("./matrixDump.txt");
-    file << *ptr;
-    std::cout << "writing to file ended!\n";
-    std::cout << QDateTime::currentSecsSinceEpoch()- startTimeSecs <<" s " << std::endl;
-    return ptr;
 }
-//*************************************************************************************************************
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface  &inSurface, double cancelDistance, const QVector<qint32> &vertSubSet)
+qint32 ProjectingKdTree::findNearestNeighbor(const Eigen::Vector3d &sensorPosition) const
 {
-    QSharedPointer<MatrixXd> outputMat = QSharedPointer<MatrixXd>::create();
-    return outputMat;
+    qint32 champion = -1;
+    double minDistance = std::numeric_limits<double>::max();
+    recursiveSearch(sensorPosition, m_root, champion, minDistance);
+    if(champion < 0)
+    {
+        std::cout << "ERROR: No neighbor found!\n";
+    }
+    return champion;
 }
+
+
+
 //*************************************************************************************************************
 
-QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface &inSurface, const QVector<Vector3d> &sensorPositions)
+QSharedPointer<ProjectingKdTree::ProjectingKdTreeNode> ProjectingKdTree::recursiveBuild(qint32 *vertIndices, qint32 numPoints, qint32 depth, qint32 maxDepth)
 {
-    QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
-    outputArray->reserve(sensorPositions.size());
-    ProjectingKdTree kdTree(inSurface, 20);
-
-    for(const Vector3d &tempSensor : sensorPositions)
+    if( numPoints <= 0 || depth > maxDepth)
     {
-        outputArray->push_back(kdTree.findNearestNeighbor(tempSensor));
+        return nullptr;
     }
 
-    return outputArray;
+    const qint8 axis = depth % 3;
+    QSharedPointer<ProjectingKdTreeNode> nodePtr = QSharedPointer<ProjectingKdTreeNode>::create(axis);
+
+    //this node is a leaf: bucket + no subtrees
+    if(depth == maxDepth)
+    {
+        nodePtr->m_bucketPtr = vertIndices;
+        nodePtr->m_bucketSize = numPoints;
+        nodePtr->m_subTrees[0] = nullptr;
+        nodePtr->m_subTrees[1] = nullptr;
+    }
+    //subtrees + no bucket
+    else
+    {
+
+        //TO DO  pivot element with random
+        const qint32 pivot = (numPoints - 1) / 2;
+
+        //partition
+        std::nth_element(vertIndices, vertIndices + pivot, vertIndices + numPoints, [&](qint32 lhs, qint32 rhs)
+        {
+            return m_surface.rr(lhs, axis) < m_surface.rr(rhs, axis);
+        });
+
+
+        nodePtr->m_vertIndex = vertIndices[pivot];
+
+        //left subtree
+        nodePtr->m_subTrees[0] = recursiveBuild(vertIndices, pivot, depth + 1, maxDepth);
+        //right subtree
+        nodePtr->m_subTrees[1] = recursiveBuild(vertIndices + pivot, numPoints - pivot - 1, depth + 1, maxDepth);
+    }
+
+    return nodePtr;
+
 }
-//*************************************************************************************************************
 
+void ProjectingKdTree::recursiveSearch(const Eigen::Vector3d &sensorPosition, QSharedPointer<ProjectingKdTree::ProjectingKdTreeNode> node, qint32 &champion, double &minDistance) const
+{
+    const qint32 index = node->m_vertIndex;
+    //Leaf reached?
+    if(index == -1)
+    {
+        //lin search in bucket
+        for(qint32 i = 0; i < node->m_bucketSize; ++i)
+        {
+            const double dist = distance3D(sensorPosition, *node->m_bucketPtr + i);
+            if(dist < minDistance)
+            {
+                champion = *node->m_bucketPtr + i;
+                minDistance = dist;
+            }
+        }
+        return;
+    }
 
+    const double dist = distance3D(sensorPosition, index);
+    if(dist < minDistance)
+    {
+        minDistance = dist;
+        champion = index;
+    }
+    const qint8 axis = node->m_axis;
+    // left or right first ?
+    const qint8 subTreeIndx = sensorPosition[axis] < m_surface.rr(index, axis) ? 0 : 1;
+    recursiveSearch(sensorPosition, node->m_subTrees[subTreeIndx], champion, minDistance);
 
+    const double diff = std::fabs(sensorPosition[axis] - m_surface.rr(index, axis));
+    //search the other subtree if needed
+    if(diff < minDistance)
+    {
+        recursiveSearch(sensorPosition, node->m_subTrees[!subTreeIndx], champion, minDistance);
+    }
+}

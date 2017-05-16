@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     geometryinfo.cpp
+* @file     projectingkdtree.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2017
+* @date     May, 2017
 *
 * @section  LICENSE
 *
@@ -29,18 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    GeometryInfo class definition.
+* @brief     ProjectingKdTree class declaration.
 *
 */
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-#include "geometryinfo.h"
-#include "geometryInfo/projectingkdtree.h"
-#include<mne/mne_bem_surface.h>
+#ifndef GEOMETRYINFO_PROJECTINGKDTREE_H
+#define GEOMETRYINFO_PROJECTINGKDTREE_H
 
 
 //*************************************************************************************************************
@@ -48,124 +42,124 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <cmath>
-#include <fstream>
+#include "geometryinfo_global.h"
+#include <mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDateTime>
+#include <QSharedPointer>
+#include <QVector>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/core>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace GEOMETRYINFO;
-using namespace Eigen;
-using namespace MNELIB;
+//namespace MNELIB {
+//    class MNEBemSurface;
+//}
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE GEOMETRYINFO
+//=============================================================================================================
+
+namespace GEOMETRYINFO {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
+// GEOMETRYINFO FORWARD DECLARATIONS
 //=============================================================================================================
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
+/**
+* Description of what this class is intended to do (in detail).
+*
+* @brief Brief description of this class.
+*/
 
-
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet)
+class GEOMETRYINFOSHARED_EXPORT ProjectingKdTree
 {
-    //start timer
-    qint64 startTimeSecs = QDateTime::currentSecsSinceEpoch();
-    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
-    size_t matColumns;
-    if(!vertSubSet.empty())
+
+public:
+    typedef QSharedPointer<ProjectingKdTree> SPtr;            /**< Shared pointer type for ProjectingKdTree. */
+    typedef QSharedPointer<const ProjectingKdTree> ConstSPtr; /**< Const shared pointer type for ProjectingKdTree. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a ProjectingKdTree object.
+    */
+    ProjectingKdTree(const MNELIB::MNEBemSurface &inSurface, quint32 bucketSize);
+
+    ~ProjectingKdTree() = default;
+
+    //copy operations
+    ProjectingKdTree(const ProjectingKdTree&) = delete;
+    ProjectingKdTree& operator=(ProjectingKdTree&) = delete;
+
+    /**
+     * @brief findNearestNeighbor
+     * @param sensorPosition
+     * @return index of the nearest neighbor
+     */
+    //return -1 if m_root == nullptr
+    qint32 findNearestNeighbor(const Eigen::Vector3d &sensorPosition) const;
+
+
+protected:
+
+private:
+
+    //declares the nodes the tree is made of
+    struct ProjectingKdTreeNode
     {
-        matColumns = vertSubSet.size();
-    }
-    else
-    {
-        matColumns = inSurface.rr.rows();
-    }
+        ProjectingKdTreeNode(qint8 axis) : m_axis(axis), m_vertIndex(-1), m_bucketPtr(nullptr), m_bucketSize(0) {}
+        // array of pointers to both subtrees
+        QSharedPointer<ProjectingKdTreeNode> m_subTrees[2];
+        // index of the vertice in the MNEBemSurface saved in this node -1 if there are buckets in the node
+        qint32 m_vertIndex;
+        //pointer to the start of the bucket of this node. nullptr if there is no bucket
+        qint32 *m_bucketPtr;
+        //size of the bucket
+        qint32 m_bucketSize;
+        qint8 m_axis;
+    };
+    inline double distance3D(const Eigen::Vector3d &sensorPosition, qint32 vertIndex) const;
+    QSharedPointer<ProjectingKdTreeNode> recursiveBuild(qint32 *vertIndices, qint32 numPoints, qint32 depth, qint32 maxDepth);
+    void recursiveSearch(const Eigen::Vector3d &sensorPosition, QSharedPointer<ProjectingKdTreeNode> node, qint32 &champion, double &minDistance) const;
+    //saves a pointer to the root node of the search tree
+    QSharedPointer<ProjectingKdTreeNode> m_root;
+    const MNELIB::MNEBemSurface &m_surface;
+    //all indices of the MENBemSurface rr are stored here
+    QVector<qint32> m_vertIndices;
 
-    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
-
-    // convention: first dimension in distance table is "to", second dimension "from"
-
-    //QPair<int, QVector<int> > tempPair;
-    //int tempID;
-    std::cout << inSurface.rr.rows() <<std::endl;
-    std::cout << inSurface.rr.cols() <<std::endl;
-    for (size_t i = 0; i < matColumns; ++i)
-    {
-        //ToDo bessere Lösung mit und ohne subset
-        size_t index = i;
-        if(!vertSubSet.empty())
-        {
-            index = vertSubSet[i];
-        }
-
-        //std::cout << inSurface.rr.rows() <<std::endl;
-        float xFrom = inSurface.rr(index, 0);
-        float yFrom = inSurface.rr(index, 1);
-        float zFrom = inSurface.rr(index, 2);
-        //Vector3f currentVertex = inSurface.rr(i)
-        for (size_t j = 0; j < inSurface.rr.rows(); ++j)
-        {
+};
 
 
-            float xTo = inSurface.rr(j, 0);
-            float yTo = inSurface.rr(j, 1);
-            float zTo = inSurface.rr(j, 2);
-            (*ptr)(  j, i) = sqrt(pow(xTo - xFrom, 2) + pow(yTo - yFrom, 2) + pow(zTo - zFrom, 2));
-        }
-    }
-    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
-    std::cout << "start writing to file" << std::endl;
-    std::ofstream file;
-    file.open("./matrixDump.txt");
-    file << *ptr;
-    std::cout << "writing to file ended!\n";
-    std::cout << QDateTime::currentSecsSinceEpoch()- startTimeSecs <<" s " << std::endl;
-    return ptr;
-}
 //*************************************************************************************************************
-
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface  &inSurface, double cancelDistance, const QVector<qint32> &vertSubSet)
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+inline double ProjectingKdTree::distance3D(const Eigen::Vector3d &sensorPosition, qint32 vertIndex) const
 {
-    QSharedPointer<MatrixXd> outputMat = QSharedPointer<MatrixXd>::create();
-    return outputMat;
+    return sqrt(pow(m_surface.rr(vertIndex, 0) - sensorPosition[0], 2)  // x-cord
+            + pow(m_surface.rr(vertIndex, 1) - sensorPosition[1], 2)    // y-cord
+            + pow(m_surface.rr(vertIndex, 2) - sensorPosition[2], 2));  // z-cord
 }
-//*************************************************************************************************************
 
-QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface &inSurface, const QVector<Vector3d> &sensorPositions)
-{
-    QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
-    outputArray->reserve(sensorPositions.size());
-    ProjectingKdTree kdTree(inSurface, 20);
+} // namespace GEOMETRYINFO
 
-    for(const Vector3d &tempSensor : sensorPositions)
-    {
-        outputArray->push_back(kdTree.findNearestNeighbor(tempSensor));
-    }
-
-    return outputArray;
-}
-//*************************************************************************************************************
-
-
-
+#endif // GEOMETRYINFO_PROJECTINGKDTREE_H
