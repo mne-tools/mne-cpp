@@ -39,6 +39,7 @@ include(../../../mne-cpp.pri)
 TEMPLATE = app
 
 QT += gui widgets 3dextras
+qtHaveModule(printsupport): QT += printsupport
 
 TARGET = mne_analyze
 
@@ -92,12 +93,12 @@ else {
     LIBS += -L$${CNTK_LIBRARY_DIR}
     CONFIG(debug, debug|release) {
         LIBS += -lMNE$${MNE_LIB_VERSION}Deepd \
-                -lCNTKLibrary-2.0 \
+                -lCntk.Core-2.0rc2d \
 
     }
     else {
         LIBS += -lMNE$${MNE_LIB_VERSION}Deep \
-                -lCNTKLibrary-2.0 \
+                -lCntk.Core-2.0rc2 \
     }
 }
 

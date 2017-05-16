@@ -229,3 +229,7 @@ lib
 /bin/mne_analyze_extensions/*.ilk
 /bin/mne_analyze_extensions/*.lib
 /bin/mne_analyze_extensions/*.pdb
+/bin/mne_analyze_extensions/deepcntknets/*.dll
+/bin/mne_analyze_extensions/deepcntknets/*.exp
+/bin/mne_analyze_extensions/deepcntknets/*.lib
+/applications/mne_analyze/extensions/deepcntknets/bio

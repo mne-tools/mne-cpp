@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "sensorpositiontreeitem.h"
-#include "../../3dhelpers/renderable3Dentity.h"
 #include "../common/metatreeitem.h"
 
 #include <fiff/fiff_constants.h>
@@ -77,21 +76,10 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorPositionTreeItem::SensorPositionTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
-, m_pRenderable3DEntity(new Renderable3DEntity())
+SensorPositionTreeItem::SensorPositionTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-SensorPositionTreeItem::~SensorPositionTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-    }
 }
 
 
@@ -103,60 +91,13 @@ void SensorPositionTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip(this->text());
-
-    //Add color picker item as meta information item
-    QVariant data;
-    QList<QStandardItem*> list;
-
-    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
-    connect(pItemColor, &MetaTreeItem::colorChanged,
-            this, &SensorPositionTreeItem::onSurfaceColorChanged);
-    list.clear();
-    list << pItemColor;
-    list << new QStandardItem(pItemColor->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
-    pItemColor->setData(data, Qt::DecorationRole);
-
-    float fAlpha = 1.0f;
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
-    connect(itemAlpha, &MetaTreeItem::alphaChanged,
-            this, &SensorPositionTreeItem::onSurfaceAlphaChanged);
-    list.clear();
-    list << itemAlpha;
-    list << new QStandardItem(itemAlpha->toolTip());
-    this->appendRow(list);
-    data.setValue(fAlpha);
-    itemAlpha->setData(data, MetaTreeItemRoles::AlphaValue);
 }
 
 
 //*************************************************************************************************************
 
-QVariant SensorPositionTreeItem::data(int role) const
+void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo)
 {
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* parent)
-{
-    //Clear all data
-    m_lRects.clear();
-
-    m_pRenderable3DEntity->setParent(parent);
-
     plotSensors(lChInfo);
 }
 
@@ -175,7 +116,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         pos.setZ(lChInfo[i].chpos.r0(2));
 
         //Create plane mesh
-        Renderable3DEntity* pSensorRectEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+        Renderable3DEntity* pSensorRectEntity = new Renderable3DEntity(this);
         Qt3DExtras::QCuboidMesh* pSensorRect = new Qt3DExtras::QCuboidMesh();
         pSensorRect->setXExtent(0.01f);
         pSensorRect->setYExtent(0.01f);
@@ -202,8 +143,6 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         material->setAmbient(colDefault);
         material->setAlpha(1.0);
         pSensorRectEntity->addComponent(material);
-
-        m_lRects.append(pSensorRectEntity);
     }
 
     //Update colors in color item
@@ -213,61 +152,8 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
             data.setValue(colDefault);
-            item->setData(data, MetaTreeItemRoles::PointColor);
+            item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
-        }
-    }
-}
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::setVisible(bool state)
-{
-    if(!m_pRenderable3DEntity.isNull()) {
-        for(int i = 0; i < m_lRects.size(); ++i) {
-            m_lRects.at(i)->setEnabled(state);
-        }
-
-        m_pRenderable3DEntity->setEnabled(state);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::onSurfaceColorChanged(const QColor& color)
-{
-    for(int i = 0; i < m_lRects.size(); ++i) {
-        for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
-            Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
-
-            if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
-                pMaterial->setAmbient(color);
-            }
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void SensorPositionTreeItem::onSurfaceAlphaChanged(float fAlpha)
-{
-    for(int i = 0; i < m_lRects.size(); ++i) {
-        for(int j = 0; j < m_lRects.at(i)->components().size(); ++j) {
-            Qt3DCore::QComponent* pComponent = m_lRects.at(i)->components().at(j);
-
-            if(Qt3DExtras::QPhongAlphaMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongAlphaMaterial*>(pComponent)) {
-                pMaterial->setAlpha(fAlpha);
-            }
         }
     }
 }

@@ -85,13 +85,6 @@ SensorSetTreeItem::SensorSetTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-SensorSetTreeItem::~SensorSetTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void SensorSetTreeItem::initItem()
 {
     this->setEditable(false);
@@ -103,35 +96,12 @@ void SensorSetTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant SensorSetTreeItem::data(int role) const
-{
-    switch(role) {
-        case Data3DTreeModelItemRoles::BemName:
-            return QVariant();
-        default: // do nothing;
-            break;
-    }
-
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  SensorSetTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
 void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate sensor surfaces as childs
     for(int i = 0; i < tSensor.size(); ++i) {
-        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(Data3DTreeModelItemTypes::SensorSurfaceItem);
-        pSurfItem->addData(tSensor[i], p3DEntityParent);
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorSurfaceItem);
+        pSurfItem->addData(tSensor[i]);
 
         QList<QStandardItem*> list;
         list << pSurfItem;
@@ -153,8 +123,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
 
     //Add sensor locations as child items
     if(!lChInfoGrad.isEmpty()) {
-        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
-        pSensorPosItem->addData(lChInfoGrad, p3DEntityParent);
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
+        pSensorPosItem->addData(lChInfoGrad);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -163,8 +133,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
     }
 
     if(!lChInfoMag.isEmpty()) {
-        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
-        pSensorPosItem->addData(lChInfoMag, p3DEntityParent);
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
+        pSensorPosItem->addData(lChInfoMag);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -172,18 +142,3 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
         this->appendRow(list);
     }
 }
-
-
-//*************************************************************************************************************
-
-void SensorSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
-        }
-    }
-}
-
-
-

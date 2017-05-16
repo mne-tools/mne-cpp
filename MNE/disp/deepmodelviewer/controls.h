@@ -59,6 +59,7 @@
 
 QT_BEGIN_NAMESPACE
 class QGroupBox;
+class QComboBox;
 QT_END_NAMESPACE
 
 
@@ -76,7 +77,7 @@ namespace DISPLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class View;
+class DeepViewer;
 
 
 //=============================================================================================================
@@ -88,7 +89,6 @@ class View;
 class DISPSHARED_EXPORT Controls : public QWidget
 {
     Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
@@ -105,24 +105,55 @@ public:
     * @param [in] v         The view which should be controled by this
     * @param [in] parent    The parent widgetarent widget
     */
-    Controls(View* v, QWidget *parent = Q_NULLPTR);
+    Controls(DeepViewer* v, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Sets the associated view if none was set before
+    * Sets the associated viewer if none was set before
     *
-    * @param [in] v     The view to set
+    * @param [in] v     The viewer to set
     */
-    void setView(View* v);
+    void setDeepViewer(DeepViewer* v);
+
+    //=========================================================================================================
+    /**
+    * Returns the configuration combo box
+    *
+    * @return The configuration combo box
+    */
+    QComboBox* getConfigurationComboBox();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emmitted when training of the network is requested
+    */
+    void requestTraining_signal();
 
 private:
     //=========================================================================================================
     /**
-    * Create the common controls
+    * Create the Network controls
     *
-    * @param [in] parent    the group box where the controls should be attached to
+    * @param [in] parent    the group box where the Network controls should be attached to
     */
-    void createCommonControls(QWidget* parent);
+    void createNetworkControls(QWidget* parent);
+
+    //=========================================================================================================
+    /**
+    * Create the Appearance controls
+    *
+    * @param [in] parent    the group box where the Appearance controls should be attached to
+    */
+    void createAppearanceControls(QWidget* parent);
+
+    //=========================================================================================================
+    /**
+    * Create the View controls
+    *
+    * @param [in] parent    the group box where the View controls should be attached to
+    */
+    void createViewControls(QWidget* parent);
 
     //=========================================================================================================
     /**
@@ -130,13 +161,17 @@ private:
     */
     void createLayout();
 
-private:
-    View* m_pView;                  /**< The view which this control is connected to */
+    //=========================================================================================================
+    /**
+    * Request training after training button was pushed
+    */
+    void requestTraining();
 
-    QGroupBox *m_pCapGroup;         /**< The Cap Group */
-    QGroupBox *m_pJoinGroup;        /**< The Join Group */
-    QGroupBox *m_pStyleGroup;       /**< The Style Group */
-    QGroupBox *m_pPathModeGroup;    /**< The Path Mode Group */
+
+
+private:
+    QComboBox * m_pNetworkConfigs;              /**< The network configurations */
+    DeepViewer* m_pDeepViewer;                  /**< The deep view which this control is connected to */
 };
 
 //*************************************************************************************************************

@@ -66,6 +66,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -93,17 +94,20 @@ namespace DEEPLIB
 *
 * @brief Deep CNTK wrapper to train and evaluate models
 */
-class DEEPSHARED_EXPORT Deep
+class DEEPSHARED_EXPORT Deep : public QObject
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<Deep> SPtr;            /**< Shared pointer type for Deep. */
     typedef QSharedPointer<const Deep> ConstSPtr; /**< Const shared pointer type for Deep. */
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Constructs Deep which is a child of parent
+    *
+    * @param [in] parent    The parent QObject
     */
-    Deep();
+    Deep(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -164,7 +168,15 @@ public:
     * @param [out] output   The ouptuts (rows = samples, cols = output results)
     * @param [in] device    Device to use for evaluation
     */
-    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Returns the CNTK Model v2
+    *
+    * @return the CNTK Model
+    */
+    CNTK::FunctionPtr getModel();
 
     //=========================================================================================================
     /**
@@ -183,7 +195,7 @@ public:
     *
     * @return true when successfully loaded, false otherwise.
     */
-    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
@@ -205,7 +217,7 @@ public:
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    bool evalModel(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool evalModel(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
@@ -220,7 +232,7 @@ public:
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    bool trainModel(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, QVector<double>& loss, QVector<double>& error, int minibatch_size = 25, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool trainModel(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, QVector<double>& loss, QVector<double>& error, int minibatch_size = 25, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
@@ -234,13 +246,22 @@ public:
     *
     * @return true when successfully evaluated, false otherwise.
     */
-    bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::DefaultDevice());
+    bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Cancel the current training session
+    */
+    void cancelTraining();
 
     //=========================================================================================================
     /**
     * Print the model structure
     */
     void print();
+
+signals:
+
 
 protected:
     //=========================================================================================================
@@ -286,7 +307,6 @@ protected:
     * @return true when variable was found, false otherwise.
     */
     inline static bool getOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
-
 
 private:
 

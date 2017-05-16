@@ -217,10 +217,12 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     qint32 ncomp = p_Info.make_projector(proj, p_ChNames);
 
     //Create the projection operator
-    if (ncomp > 0)
+    if (ncomp > 0 && proj.rows() == count)
     {
         printf("Created an SSP operator (subspace dimension = %d)\n", ncomp);
         C = proj * (C * proj.transpose());
+    } else {
+        qWarning("Warning in FiffCov::prepare_noise_cov: No projections applied since no projectors specified or projector dimensions do not match!");
     }
 
     RowVectorXi pick_meg = p_Info.pick_types(true, false, false, defaultQStringList, p_Info.bads);

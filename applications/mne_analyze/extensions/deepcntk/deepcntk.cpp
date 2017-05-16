@@ -39,16 +39,37 @@
 //=============================================================================================================
 
 #include "deepcntk.h"
+#include "IDeepCNTKNet.h"
+#include "deepcntkmanager.h"
 
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <disp/lineplot.h>
-#include <disp/deepmodelviewer/deepviewerwidget.h>
+#include <dispCharts/lineplot.h>
+#include <disp/deepmodelviewer/deepviewer.h>
 #include <disp/deepmodelviewer/controls.h>
 
 #include <iostream>
 #include <random>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtConcurrent>
+#include <QFutureWatcher>
+#include <QProgressDialog>
+#include <QComboBox>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CNTK INCLUDES
+//=============================================================================================================
+
+#include <CNTKLibrary.h>
 
 
 //*************************************************************************************************************
@@ -61,8 +82,17 @@ using namespace ANSHAREDLIB;
 using namespace Eigen;
 using namespace DEEPLIB;
 using namespace DISPLIB;
+using namespace DISPCHARTSLIB;
 //using namespace QtCharts;
 using namespace CNTK;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CONST
+//=============================================================================================================
+
+const char* deepCNTKNetsDir = "/mne_analyze_extensions/deepcntknets";        /**< holds path to the extensions.*/
 
 
 //*************************************************************************************************************
@@ -105,7 +135,8 @@ void generateRandomDataSamples(int sample_size, int feature_dim, int num_classes
 DeepCNTK::DeepCNTK()
 : m_pControlPanel(Q_NULLPTR)
 , m_pControl(Q_NULLPTR)
-, m_pView(Q_NULLPTR)
+, m_pDeepViewer(Q_NULLPTR)
+, m_pDeepCNTKManager(Q_NULLPTR)
 {
 
 }
@@ -132,44 +163,52 @@ QSharedPointer<IExtension> DeepCNTK::clone() const
 
 void DeepCNTK::init()
 {
-    // Create a deep model
-    DeviceDescriptor device = DeviceDescriptor::CPUDevice();
-    size_t input_dim = 4;
-    size_t num_output_classes = 3;
-    m_pDeep = Deep::SPtr(new Deep);
-    m_pModel = DeepModelCreator::FFN_1(input_dim, num_output_classes, device);
-    m_pDeep->setModel(m_pModel);
-    m_pDeep->print();
-
     //
-    // Training
+    // Deep Configuration Manager
     //
-    qDebug() << "\n Start training \n";
-
-    // Initialize the parameters for the trainer
-    int minibatch_size = 25;
-    int num_samples = 20000;
-
-    MatrixXf features, labels;
-
-    QVector<double> vecLoss, vecError;
-    generateRandomDataSamples(num_samples, static_cast<int>(input_dim), static_cast<int>(num_output_classes), features, labels);
-    m_pDeep->trainModel(features, labels, vecLoss, vecError, minibatch_size, device);
+    if(!m_pDeepCNTKManager) {
+        m_pDeepCNTKManager = new DeepCNTKManager(this);
+        m_pDeepCNTKManager->loadDeepConfigurations(qApp->applicationDirPath()+deepCNTKNetsDir);
+        m_pDeepCNTKManager->initDeepConfigurations();
+    }
 
     //
     // Init view
     //
     if(!m_pControlPanel) {
-        m_pControlPanel = new Controls();
+        m_pControlPanel = new Controls;
     }
 
     //
     // Create the viewer
     //
-    if(!m_pView) {
-        m_pView = new DeepViewerWidget(m_pModel, m_pControlPanel);
-        m_pView->setWindowTitle("Deep CNTK");
+    if(!m_pDeepViewer) {
+        qDebug() << "m_pDeepCNTKManager->currentDeepConfiguration()" << m_pDeepCNTKManager->currentDeepConfiguration();
+        m_pDeepCNTKManager->currentDeepConfiguration()->getModel()->print();
+
+        m_pDeepViewer = new DeepViewer(false);
+
+        if(m_pDeepCNTKManager->currentDeepConfiguration()->getName() != "BIO") {
+            // Don't display model when its too complex
+            m_pDeepViewer->setModel(m_pDeepCNTKManager->currentDeepConfiguration()->getModel());
+        }
+
+
+        m_pControlPanel->setDeepViewer(m_pDeepViewer);
+        m_pDeepViewer->setWindowTitle("Deep CNTK");
     }
+
+    QComboBox *combo = m_pControlPanel->getConfigurationComboBox();
+    combo->addItems(m_pDeepCNTKManager->getDeepConfigurationNames());
+
+
+    connect(m_pControlPanel, &Controls::requestTraining_signal, m_pDeepCNTKManager, &DeepCNTKManager::trainCurrentConfiguration);
+    connect(combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), m_pDeepCNTKManager, &DeepCNTKManager::selectDeepConfiguration);
+
+
+    connect(m_pDeepCNTKManager, &DeepCNTKManager::finishedTraining_signal, this, &DeepCNTK::trainingFinished);
+    connect(m_pDeepCNTKManager, &DeepCNTKManager::currentConfigurationChanged_signal, this, &DeepCNTK::resetDeepViewer);
+
 }
 
 
@@ -191,25 +230,9 @@ QString DeepCNTK::getName() const
 
 //*************************************************************************************************************
 
-bool DeepCNTK::hasMenu() const
-{
-    return true;
-}
-
-
-//*************************************************************************************************************
-
 QMenu *DeepCNTK::getMenu()
 {
     return Q_NULLPTR;
-}
-
-
-//*************************************************************************************************************
-
-bool DeepCNTK::hasControl() const
-{
-    return true;
 }
 
 
@@ -221,7 +244,6 @@ QDockWidget *DeepCNTK::getControl()
         m_pControl = new QDockWidget(tr("Deep CNTK"));
         m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_pControl->setMinimumWidth(180);
-
         m_pControl->setWidget(m_pControlPanel);
     }
 
@@ -231,24 +253,47 @@ QDockWidget *DeepCNTK::getControl()
 
 //*************************************************************************************************************
 
-bool DeepCNTK::hasView() const
+// check with owner ship and mdi area for garbage collection
+QWidget *DeepCNTK::getView()
 {
-    return true;
+    return m_pDeepViewer;
 }
 
 
 //*************************************************************************************************************
 
-// check with owner ship and mdi area for garbage collection
-QWidget *DeepCNTK::getView()
+void DeepCNTK::trainingFinished()
 {
-    if(!m_pView) {
-        //
-        // Create the viewer
-        //
-        m_pView = new DeepViewerWidget(m_pModel);
-        m_pView->setWindowTitle("Deep CNTK");
-    }
+    QString configName = m_pDeepCNTKManager->currentDeepConfiguration()->getName();
+    //Plot error
+    LinePlot *error_chartView = new LinePlot(m_pDeepCNTKManager->currentDeepConfiguration()->currentError(),QString("%1: Current Training Error").arg(configName));
+    error_chartView->show();
 
-    return m_pView;
+    //Plot loss
+    LinePlot *loss_chartView = new LinePlot(m_pDeepCNTKManager->currentDeepConfiguration()->currentLoss(),QString("%1: Current Training Loss").arg(configName));
+    loss_chartView->show();
+
+   // Update Deep Viewer
+    updateDeepViewer();
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTK::resetDeepViewer()
+{
+    m_pDeepViewer->setModel(m_pDeepCNTKManager->currentDeepConfiguration()->getModel());
+}
+
+
+//*************************************************************************************************************
+
+void DeepCNTK::updateDeepViewer()
+{
+    qDebug() << "void DeepCNTK::modelUpdated()";
+
+   // Update Deep Viewer
+    if(m_pDeepViewer) {
+        m_pDeepViewer->updateModel();
+    }
 }
