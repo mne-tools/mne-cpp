@@ -104,12 +104,12 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, cons
     // convention: first dimension in distance table is "from", second dimension "to"
     QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
 
-    iterativeDijkstra(ptr, inSurface, 0.04,  vertSubSet);
+    iterativeDijkstra(ptr, inSurface, 0.04, vertSubSet);
 
     std::cout << "Iterative Dijkstra took ";
     std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
 
-    matrixDump(ptr, "output.txt");
+    // matrixDump(ptr, "output.txt");
 
     return ptr;
 }
@@ -215,11 +215,28 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
 }
 //*************************************************************************************************************
 
+// @todo maybe improve this: the algorithm relies on the assumption that the adjacency list is complete (size of adjacency list = biggest id + 1)
+
 void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, double cancelDist, const QVector<qint32> &vertSubSet) {
-    // Initialization
+    // initialization
     // @todo if this copies neighbor_vert, a pointer might be the more efficient option
     QMap<int, QVector<int> > adjacency = inSurface.neighbor_vert;
-    qint32 n = adjacency.size();
+
+    // sort adjacency information so that we can access it later in constant time (instead of logarithmic)
+    QVector<QPair<int, QVector<int> > > versuch;
+    while (adjacency.empty() == false) {
+        versuch.push_back(qMakePair(adjacency.firstKey(), adjacency.first()));
+        // @todo does this empty the original QMap in inSurface ? could be a problem
+        adjacency.erase(adjacency.begin());
+    }
+
+//    qint64 edges = 0;
+//    for (QPair<int, QVector<int> > a : versuch) {
+//        edges += a.second.size();
+//    }
+//    std::cout << edges << std::endl;
+
+    qint32 n = versuch.size();
     // have to use std::vector because QVector.resize takes only one argument
     std::vector<double> minDists(n);
     std::set< std::pair< double, qint32> > vertexQ;
@@ -244,7 +261,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
             // check if we are still below cancel distance
             if (dist <= cancelDist) {
                 // visit each neighbour of u
-                QVector<int> neighbours = adjacency.find(u).value();
+                QVector<int> neighbours = versuch[u].second;
                 for (qint32 ne = 0; ne < neighbours.length(); ++ne) {
                     qint32 v = neighbours[ne];
                     // distance from source to v, using u as its predecessor
@@ -256,7 +273,6 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
 
                     if (distWithU < minDists[v]) {
                         // this is a combination of insert and decreaseKey
-                        // @todo need an effort estimate for this (complexity ?)
                         vertexQ.erase(std::make_pair(minDists[v], v));
                         minDists[v] = distWithU;
                         vertexQ.insert(std::make_pair(minDists[v], v));
