@@ -163,16 +163,15 @@ int main(int argc, char *argv[])
     std::cout << testSurface.rr.rows() << std::endl;
 
     QVector<qint32> subSet;
-    int nadsf = 10;
-    subSet.reserve(nadsf);
-    for(int i = 0; i < nadsf; ++i)
+    int n_sub = 10;
+    subSet.reserve(n_sub);
+    int stepsize = 4;
+    for(int i = 0; i < n_sub; ++i)
     {
-        subSet.push_back(i);
+        subSet.push_back(i * stepsize);
     }
 
-    qint64 startTime = QDateTime::currentSecsSinceEpoch();
     QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet);
-    std::cout << startTime - QDateTime::currentSecsSinceEpoch() <<" s " << std::endl;
 
     //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
