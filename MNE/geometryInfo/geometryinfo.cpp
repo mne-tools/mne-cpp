@@ -104,7 +104,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, cons
     // convention: first dimension in distance table is "from", second dimension "to"
     QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
 
-    iterativeDijkstra(ptr, inSurface, 0.04, vertSubSet);
+    iterativeDijkstra(ptr, inSurface, 0.033, vertSubSet);
 
     std::cout << "Iterative Dijkstra took ";
     std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
@@ -224,6 +224,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
 
     // sort adjacency information so that we can access it later in constant time (instead of logarithmic)
     QVector<QPair<int, QVector<int> > > versuch;
+    versuch.reserve(adjacency.size());
     while (adjacency.empty() == false) {
         versuch.push_back(qMakePair(adjacency.firstKey(), adjacency.first()));
         // @todo does this empty the original QMap in inSurface ? could be a problem
