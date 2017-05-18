@@ -434,8 +434,8 @@ void RtSourceLocDataWorker::clear()
 
 void RtSourceLocDataWorker::setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
                                            const Eigen::VectorXi& vecVertNoRightHemi,
-                                           const QMap<int, QVector<int> > &mapVertexNeighborsLeftHemi,
-                                           const QMap<int, QVector<int> > &mapVertexNeighborsRightHemi,
+                                           const QVector<QVector<int> > &mapVertexNeighborsLeftHemi,
+                                           const QVector<QVector<int> > &mapVertexNeighborsRightHemi,
                                            const MatrixX3f &matVertPosLeftHemi,
                                            const MatrixX3f &matVertPosRightHemi)
 {

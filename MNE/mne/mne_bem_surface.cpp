@@ -190,16 +190,18 @@ bool MNEBemSurface::add_geometry_info()
     int k,c,p,q;
     bool found;
 
-    //Clear neighboring triangle list
-    this->neighbor_tri.clear();
+    //Create neighboring triangle vector
+    neighbor_tri = QVector<QVector<int> >(this->tris.rows());
 
     //Create neighbor_tri information
-    for (p = 0; p < this->tris.rows(); p++)
-        for (k = 0; k < 3; k++)
+    for (p = 0; p < this->tris.rows(); p++) {
+        for (k = 0; k < 3; k++) {
             this->neighbor_tri[this->tris(p,k)].append(p);
+        }
+    }
 
-    //Determine the neighboring vertices
-    this->neighbor_vert.clear();
+    //Create the neighboring vertices vector
+    neighbor_vert = QVector<QVector<int> >(this->np);
 
     for (k = 0; k < this->np; k++) {
         for (p = 0; p < this->neighbor_tri[k].size(); p++) {
