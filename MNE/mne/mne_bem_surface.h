@@ -190,8 +190,8 @@ public:
     MatrixX3d tri_cent;         /**< Triangle centers */
     MatrixX3d tri_nn;           /**< Triangle normals */
     VectorXd tri_area;          /**< Triangle areas */
-    QMap<int, QVector<int> > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
-    QMap<int, QVector<int> > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
+    QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex */
+    QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex */
 };
 
 //*************************************************************************************************************
