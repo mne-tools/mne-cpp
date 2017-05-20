@@ -41,10 +41,14 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "geometryinfo_global.h"
 
-#include"geometryinfo_global.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
-
+#include <limits>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,6 +83,8 @@ namespace MNELIB {
 //=============================================================================================================
 
 namespace GEOMETRYINFO {
+
+#define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -140,29 +146,9 @@ public:
      * @param ptr The matrix in which the distances will be stored
      * @param inSurface
      * @param vertSubSet
-     * @return
+     * @param cancelDist Vertices that have a distance to root that is higher than canceldist are ignored, i.e. their distances are set to infinity
      */
-    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
-
-    //=========================================================================================================
-    /**
-     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubSet
-     * @param ptr The matrix in which the distances will be stored
-     * @param inSurface
-     * @param cancelDist Vertices that have a distance to root that is higher than canceldist are ignored, i.e. set to MAX_WEIGHT
-     * @param vertSubSet
-     */
-    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, double cancelDist, const QVector<qint32> &vertSubSet = QVector<qint32>());
-
-    //=========================================================================================================
-    /**
-     * @brief distanceBetween Returns the euclidian distance between nodes u and v
-     * @param nodes Absolute positions in 3D space
-     * @param u
-     * @param v
-     * @return
-     */
-    static double distanceBetween(Eigen::MatrixX3f nodes, qint32 u, qint32 v);
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>(), double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
