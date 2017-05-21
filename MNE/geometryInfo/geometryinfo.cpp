@@ -40,6 +40,7 @@
 //=============================================================================================================
 #include "geometryinfo.h"
 #include<mne/mne_bem_surface.h>
+#include "FiboHeap.hpp"
 
 
 //*************************************************************************************************************
@@ -60,6 +61,7 @@
 
 #include <QFile>
 #include <QDateTime>
+#include <QtConcurrent/QtConcurrent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,27 +90,60 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet)
+QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubset)
 {
-    //start timer
-    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
-
-    size_t matColumns;
-    if(!vertSubSet.empty()) {
-        matColumns = vertSubSet.size();
+    // create matrix:
+    size_t cols;
+    if(!vertSubset.empty()) {
+        cols = vertSubset.size();
     }
     else {
-        matColumns = inSurface.rr.rows();
+        cols = inSurface.rr.rows();
     }
     // convention: first dimension in distance table is "from", second dimension "to"
-    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
+    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), cols);
 
-    iterativeDijkstra(ptr, inSurface, vertSubSet, 0.03);
+    // distribute on cores
+    int cores = QThread::idealThreadCount();
+    if (cores <= 0) {
+        // assume that we have at least two available cores
+        cores = 2;
+    }
+    // split the subset into equal parts
+    // @todo check if original subset size is below number of cores (assign each core a single vertex in this case)
+    QVector<QVector<qint32>> parts(cores);
+    size_t partSize = vertSubset.size() / cores;
+    for (int i = 0; i < cores - 1; ++i) {
+        parts[i] = QVector<qint32>(partSize);
+        for (int q = 0; q < parts[i].size(); ++q) {
+            parts[i][q] = vertSubset[i * partSize + q];
+        }
+    }
+    parts[cores - 1] = QVector<qint32>(vertSubset.size() - (cores - 1) * partSize);
+    for (int q = 0; q < parts[cores - 1].size(); ++q) {
+        parts[cores - 1][q] = vertSubset[(cores - 1) * partSize + q];
+    }
 
-    std::cout << "Iterative Dijkstra took ";
-    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
+    // start threads with their respective parts of the subset
+    QVector<QFuture<void> > threads(cores);
+    int offset = 0;
+    for (int i = 0; i < threads.size(); ++i) {
+        threads[i] = QtConcurrent::run(iterativeDijkstra, ptr, inSurface, parts[i], offset, 0.03);
+        offset += parts[i].size();
+    }
 
-    // matrixDump(ptr, "output.txt");
+    // wait for all threads to finish
+    bool finished = false;
+    while (finished == false) {
+        finished = true;
+        for (QFuture<void> f : threads) {
+            if (f.isFinished() == false) {
+                finished = false;
+            }
+        }
+        // @todo optimal value for this ?
+        QThread::msleep(20);
+    }
 
     return ptr;
 }
@@ -130,7 +165,7 @@ QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface 
 
 // @todo maybe improve this: the algorithm relies on the assumption that the adjacency list is complete (size of adjacency list = biggest id + 1)
 
-void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, double cancelDist) {
+void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, int offset,  double cancelDist) {
     // initialization
     // @todo if this copies neighbor_vert, a pointer might be the more efficient option
     QVector<QVector<int> > adjacency = inSurface.neighbor_vert;
@@ -180,7 +215,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
         }
         // save results for current root in matrix
         for (qint32 m = 0; m < minDists.size(); ++m) {
-            (*ptr)(m , i) = minDists[m];
+            (*ptr)(m , i + offset) = minDists[m];
         }
     }
 }

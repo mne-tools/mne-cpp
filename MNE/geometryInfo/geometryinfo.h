@@ -146,9 +146,10 @@ public:
      * @param ptr The matrix in which the distances will be stored
      * @param inSurface
      * @param vertSubSet
+     * @param offset The offset of vertSubset within a potential larger subset
      * @param cancelDist Vertices that have a distance to root that is higher than canceldist are ignored, i.e. their distances are set to infinity
      */
-    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>(), double cancelDist = DOUBLE_INFINITY);
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>(), int offset = 0, double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
