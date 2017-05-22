@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include"interpolation_global.h"
+#include <limits>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +73,10 @@
 //=============================================================================================================
 
 namespace INTERPOLATION {
+
+#define LINEAR  0
+
+#define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,7 +111,7 @@ public:
      * @param distanceTable
      * @param interpolationType
      */
-    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const Eigen::MatrixXd &distanceTable, qint32 interpolationType);
+    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, qint32 interpolationType = LINEAR);
 
     //=========================================================================================================
     /**
@@ -121,6 +126,20 @@ public:
      * @brief clearInterpolateMatrix
      */
     static void clearInterpolateMatrix();
+
+    //=========================================================================================================
+    /**
+     * @brief   calculateLinear Creates a weight matrix using linear distance interpolation and stores it inside
+     *          m_interpolationMatrix
+     */
+    static void calculateLinear(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable);
+
+    //=========================================================================================================
+    /**
+     * @brief getResult Debugging only
+     * @return
+     */
+    static QSharedPointer<Eigen::MatrixXd> getResult();
 
 protected:
 

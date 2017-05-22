@@ -84,9 +84,16 @@ using namespace Eigen;
 QSharedPointer<MatrixXd> Interpolation::m_interpolationMatrix = nullptr;
 
 
-void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const MatrixXd &distanceTable, qint32 interpolationType)
+void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, qint32 interpolationType)
 {
-    m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable.rows(), projectedSensors.size());
+    m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable->rows(), projectedSensors.size());
+    switch (interpolationType) {
+    case LINEAR:
+        calculateLinear(projectedSensors, distanceTable);
+        break;
+    default:
+        std::cout << "[WARNING] Unknown interpolation type" << std::endl;
+    }
 }
 //*************************************************************************************************************
 
@@ -100,7 +107,49 @@ QSharedPointer<VectorXd> Interpolation::interpolateSignals(const MatrixXd &measu
 
 void Interpolation::clearInterpolateMatrix()
 {
-    m_interpolationMatrix.clear();
+    // @todo why does the compiler say the there is no member clear ?
+    // m_interpolationMatrix->clear();
 }
 //*************************************************************************************************************
+
+void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable) {
+    size_t n = m_interpolationMatrix->rows();
+    size_t m = projectedSensors.length();
+    double INF = DOUBLE_INFINITY;
+    for (int i = 0; i < n; ++i) {
+        int indexInSubset = projectedSensors.indexOf(i);
+        if (indexInSubset == -1) {
+            // "normal" node
+            // notInf: stores the indizes that are not infinity (i.e. the ones we have to consider when interpolating)
+            QVector<double> notInf;
+            notInf.reserve(m);
+            double distSum = 0;
+            for (int q = 0; q < m; ++q) {
+                const double temp = (*distanceTable)(i, q);
+                if (temp != INF) {
+                    distSum += temp;
+                    notInf.push_back(q);
+                }
+                // @todo replace this with a one time function call for the whole row, outside of loop (see next @todo)
+                (*m_interpolationMatrix)(i, q) = 0;
+            }
+            for (int q : notInf) {
+                // @todo we do not need to access distanceTable again, we could store the value of the notInf indizes as a pair
+                (*m_interpolationMatrix)(i, q) = (*distanceTable)(i, q) / distSum;
+            }
+        } else {
+            // a sensor has been assigned to this node
+            // @todo find the function for this (setting a row to zero)
+            // or even zero out the whole matrix when created
+            for (int q = 0; q < m; ++q) {
+                (*m_interpolationMatrix)(i, q) = 0;
+            }
+            (*m_interpolationMatrix)(i, indexInSubset) = 1;
+        }
+    }
+}
+
+QSharedPointer<MatrixXd> Interpolation::getResult() {
+    return m_interpolationMatrix;
+}
 
