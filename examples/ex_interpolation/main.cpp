@@ -55,8 +55,10 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <iostream>
+#include <limits>
 
 #include <geometryInfo/geometryinfo.h>
+#include <interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,7 +68,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
-#include<QDateTime>
+#include <QDateTime>
 
 
 //*************************************************************************************************************
@@ -80,7 +82,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace GEOMETRYINFO;
-//using namespace INTERPOLATION;
+using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************
@@ -161,17 +163,37 @@ int main(int argc, char *argv[])
     MNEBemSurface &testSurface = t_sensorSurfaceVV[0];
     std::cout << testSurface.rr.rows() << std::endl;
 
-    QVector<qint32> subSet;
-    subSet.reserve(300);
-    for(int i = 0; i < 300; ++i)
-    {
-        subSet.push_back(i);
-    }
 
+    QVector<qint32> subSet;
+    subSet.push_back(0);
+    subSet.push_back(1);
+    subSet.push_back(3);
+    subSet.push_back(5);
+
+    double I = std::numeric_limits<double>::infinity();
+
+    QSharedPointer<MatrixXd> distTable = QSharedPointer<MatrixXd>::create(8, 4);
+    (*distTable) <<     0, 1, 2, 1,
+                        1, 0, 3, I,
+                        1, I, 2, 3,
+                        2, 3, 0, 2,
+                        3, 2, I, 1,
+                        1, I, 2, 0,
+                        6, 7, 1, I,
+                        1, 1, 2, 1;
+    std::cout << "dist table:" << std::endl << (*distTable) << std::endl;
+
+    Interpolation::createInterpolationMat(subSet, distTable, 0);
+
+    QSharedPointer<MatrixXd> res = Interpolation::getResult();
+
+    std::cout << "result:" << std::endl << (*res) << std::endl;
+
+    /*
     qint64 startTime = QDateTime::currentSecsSinceEpoch();
     QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet);
     std::cout << startTime - QDateTime::currentSecsSinceEpoch() <<" s " << std::endl;
-
+    */
     //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
