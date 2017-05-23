@@ -58,6 +58,7 @@
 
 #include <QFile>
 #include <QDateTime>
+#include <QtConcurrent/QtConcurrent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -156,14 +157,105 @@ QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface 
 {
     QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
     outputArray->reserve(sensorPositions.size());
-    ProjectingKdTree kdTree(inSurface, 20);
-
+    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
+    ProjectingKdTree kdTree(inSurface, 110);
+    //kdTree.saveToFile("kdTreeDump.txt");
+    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
     for(const Vector3d &tempSensor : sensorPositions)
     {
         outputArray->push_back(kdTree.findNearestNeighbor(tempSensor));
     }
 
     return outputArray;
+}
+
+QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurface &inSurface, const QVector<Vector3d> &sensorPositions)
+{
+    QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
+    //outputArray->reserve(sensorPositions.size());
+
+    qint32 cores = QThread::idealThreadCount();
+    if (cores <= 0)
+    {
+        // assume that we have at least two available cores
+        cores = 2;
+    }
+    std::cout << "cores: " << cores << std::endl;
+    // split input array + thread start
+    const qint32 subArraySize = ceil(sensorPositions.size() / cores);
+
+    //small input size no threads needed
+    // @todo best method ?? 16 thread prozessor
+    if(subArraySize <= 1)
+    {
+        *outputArray = nearestNeighbor(inSurface, sensorPositions.constBegin(),sensorPositions.constEnd());
+        return outputArray;
+    }
+    QVector<QFuture<QVector<qint32>>> threads(cores - 1);
+    qint32 beginOffset = subArraySize;
+    qint32 endOffset = beginOffset + subArraySize;
+    for(qint32 i = 0; i < threads.size(); ++i)
+    {
+        //last round
+        if(i == threads.size() -1)
+        {
+            threads[i] = QtConcurrent::run(nearestNeighbor, inSurface, sensorPositions.constBegin() + beginOffset, sensorPositions.constEnd());
+            break;
+        }
+        else
+        {
+            threads[i] = QtConcurrent::run(nearestNeighbor, inSurface, sensorPositions.constBegin() + beginOffset, sensorPositions.constBegin() + endOffset);
+            beginOffset = endOffset;
+            endOffset += subArraySize;
+        }
+    }
+    //calc on main thread
+    outputArray->append(nearestNeighbor(inSurface, sensorPositions.constBegin(), sensorPositions.constBegin() + subArraySize));
+
+    //wait for threads to finish
+    bool finished = false;
+        while (!finished) {
+            finished = true;
+            for (const auto &f : threads) {
+                if (f.isFinished() == false) {
+                    finished = false;
+                }
+            }
+            // @todo optimal value for this ?
+            QThread::msleep(2);
+    }
+    for(qint32 i = 0; i < threads.size(); ++i)
+    {
+        outputArray->append(threads[i].result());
+    }
+
+    return outputArray;
+}
+
+QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &inSurface,  QVector<Vector3d>::const_iterator sensorBegin, QVector<Vector3d>::const_iterator sensorEnd)
+{
+    ///lin search sensor positions
+    QVector<qint32> mappedSensors;
+    mappedSensors.reserve(std::distance(sensorBegin, sensorEnd));
+
+    for(auto sensor = sensorBegin; sensor != sensorEnd; ++sensor)
+    {
+        qint32 championId;
+        double champDist = std::numeric_limits<double>::max();
+        for(qint32 i = 0; i < inSurface.rr.rows(); ++i)
+        {
+            double dist = sqrt(pow2(inSurface.rr(i, 0) - (*sensor)[0])  // x-cord
+                    + pow2(inSurface.rr(i, 1) - (*sensor)[1])    // y-cord
+                    + pow2(inSurface.rr(i, 2) - (*sensor)[2]));  // z-cord
+            if(dist < champDist)
+            {
+                championId = i;
+                champDist = dist;
+            }
+        }
+        mappedSensors.push_back(championId);
+    }
+    return mappedSensors;
 }
 //*************************************************************************************************************
 

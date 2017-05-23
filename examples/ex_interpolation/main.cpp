@@ -67,7 +67,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
-#include<QDateTime>
+#include <QDateTime>
 
 
 //*************************************************************************************************************
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 
     QVector<qint32> subSet;
     subSet.reserve(300);
-    for(int i = 0; i < 300; ++i)
+    for(int i = 0; i < 500; ++i)
     {
         subSet.push_back(i);
     }
@@ -184,7 +184,8 @@ int main(int argc, char *argv[])
         sensorPositions.push_back(Vector3d(uniDist(rndEngine),uniDist(rndEngine),uniDist(rndEngine)));
     }
     qint64 startTimeKd = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<QVector<qint32>> mappedSensors = GeometryInfo::projectSensor(testSurface, sensorPositions);
+    //QSharedPointer<QVector<qint32>> mappedSensors = GeometryInfo::projectSensor(testSurface, sensorPositions);
+    QSharedPointer<QVector<qint32>> mappedSensors = GeometryInfo::linProjectSensor(testSurface, sensorPositions);
     std::cout << QDateTime::currentMSecsSinceEpoch() - startTimeKd <<" ms " << std::endl;
     for(const qint32 &idx : *mappedSensors)
     {
