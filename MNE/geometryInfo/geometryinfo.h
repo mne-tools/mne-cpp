@@ -134,11 +134,15 @@ public:
      */
     static QSharedPointer<QVector<qint32>> projectSensor(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3d> &sensorPositions);
 
+    static QSharedPointer<QVector<qint32>> linProjectSensor(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3d> &sensorPositions);
+
 
 protected:
 
 private:
 
+    static inline  double pow2(double base);
+    static QVector<qint32> nearestNeighbor(const MNELIB::MNEBemSurface &inSurface,  QVector<Eigen::Vector3d>::const_iterator sensorBegin, QVector<Eigen::Vector3d>::const_iterator sensorEnd);
 };
 
 
@@ -147,6 +151,10 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline double GeometryInfo::pow2(double base)
+{
+    return base * base;
+}
 
 } // namespace GEOMETRYINFO
 
