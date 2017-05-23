@@ -180,17 +180,18 @@ QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurf
         // assume that we have at least two available cores
         cores = 2;
     }
-    std::cout << "cores: " << cores << std::endl;
-    // split input array + thread start
+    //std::cout << "cores: " << cores << std::endl;
+
     const qint32 subArraySize = ceil(sensorPositions.size() / cores);
 
     //small input size no threads needed
-    // @todo best method ?? 16 thread prozessor
+    // @todo best method ?? 16 thread prozessor ?
     if(subArraySize <= 1)
     {
         *outputArray = nearestNeighbor(inSurface, sensorPositions.constBegin(),sensorPositions.constEnd());
         return outputArray;
     }
+    // split input array + thread start
     QVector<QFuture<QVector<qint32>>> threads(cores - 1);
     qint32 beginOffset = subArraySize;
     qint32 endOffset = beginOffset + subArraySize;
@@ -209,7 +210,7 @@ QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurf
             endOffset += subArraySize;
         }
     }
-    //calc on main thread
+    //calc while waiting for other threads
     outputArray->append(nearestNeighbor(inSurface, sensorPositions.constBegin(), sensorPositions.constBegin() + subArraySize));
 
     //wait for threads to finish
@@ -224,6 +225,7 @@ QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurf
             // @todo optimal value for this ?
             QThread::msleep(2);
     }
+    //move sub arrays back into output
     for(qint32 i = 0; i < threads.size(); ++i)
     {
         outputArray->append(threads[i].result());
@@ -244,9 +246,9 @@ QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &inSurface,  Q
         double champDist = std::numeric_limits<double>::max();
         for(qint32 i = 0; i < inSurface.rr.rows(); ++i)
         {
-            double dist = sqrt(pow2(inSurface.rr(i, 0) - (*sensor)[0])  // x-cord
-                    + pow2(inSurface.rr(i, 1) - (*sensor)[1])    // y-cord
-                    + pow2(inSurface.rr(i, 2) - (*sensor)[2]));  // z-cord
+            double dist = sqrt(squared(inSurface.rr(i, 0) - (*sensor)[0])  // x-cord
+                    + squared(inSurface.rr(i, 1) - (*sensor)[1])    // y-cord
+                    + squared(inSurface.rr(i, 2) - (*sensor)[2]));  // z-cord
             if(dist < champDist)
             {
                 championId = i;
