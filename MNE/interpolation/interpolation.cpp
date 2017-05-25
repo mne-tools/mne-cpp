@@ -121,32 +121,24 @@ void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, con
         // @todo improve this operation (is linear right now, should be logarithmic)
         int indexInSubset = projectedSensors.indexOf(i);
         if (indexInSubset == -1) {
-            // "normal" node
+            // "normal" node, i.e. one which was not assigned a sensor
             // notInf: stores the indizes that are not infinity (i.e. the ones we have to consider when interpolating)
             QVector<QPair<qint32, double> > notInf;
             notInf.reserve(m);
-            double distSum = 0;
+            double invDistSum = 0;
             const Eigen::RowVectorXd row = distanceTable->row(i);
             for (int q = 0; q < m; ++q) {
                 const double d = row[q];
                 if (d != INF) {
-                    distSum += d;
+                    invDistSum += (1 / d);
                     notInf.push_back(qMakePair<qint32, double> (q, d));
                 }
-                // @todo replace this with a one time function call for the whole row, outside of loop (see next @todo)
-                (*m_interpolationMatrix)(i, q) = 0;
             }
             for (QPair<qint32, double> qp : notInf) {
-                const qint32 index = qp.first;
-                (*m_interpolationMatrix)(i, index) = qp.second / distSum;
+                (*m_interpolationMatrix)(i, qp.first) = 1 / (qp.second * invDistSum);
             }
         } else {
-            // a sensor has been assigned to this node
-            // @todo find the function for this (setting a row to zero)
-            // or even zero out the whole matrix when created
-            for (int q = 0; q < m; ++q) {
-                (*m_interpolationMatrix)(i, q) = 0;
-            }
+            // a sensor has been assigned to this node, we do not need to interpolate anything
             (*m_interpolationMatrix)(i, indexInSubset) = 1;
         }
     }

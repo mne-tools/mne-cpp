@@ -172,15 +172,15 @@ int main(int argc, char *argv[])
 
     double I = std::numeric_limits<double>::infinity();
 
-    QSharedPointer<MatrixXd> distTable = QSharedPointer<MatrixXd>::create(8, 4);
+    QSharedPointer<MatrixXd> distTable = QSharedPointer<MatrixXd>::create(7, 4);
     (*distTable) <<     0, 1, 2, 1,
-                        1, 0, 3, I,
-                        1, I, 2, 3,
-                        2, 3, 0, 2,
-                        3, 2, I, 1,
-                        1, I, 2, 0,
-                        6, 7, 1, I,
-                        1, 1, 2, 1;
+                        1, 0, 2, 2,
+                        2, 2, I, 4,
+                        1, 2, 0, 2,
+                        1, 2, 2, 2,
+                        1, 1, 1, 0,
+                        1, 1, 2, 3;
+
     std::cout << "dist table:" << std::endl << (*distTable) << std::endl;
 
     Interpolation::createInterpolationMat(subSet, distTable, 0);
