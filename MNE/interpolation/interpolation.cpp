@@ -87,6 +87,7 @@ QSharedPointer<MatrixXd> Interpolation::m_interpolationMatrix = nullptr;
 void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, qint32 interpolationType)
 {
     m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable->rows(), projectedSensors.size());
+    m_interpolationMatrix->setZero();
     switch (interpolationType) {
     case LINEAR:
         calculateLinear(projectedSensors, distanceTable);
@@ -117,25 +118,27 @@ void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, con
     size_t m = projectedSensors.length();
     double INF = DOUBLE_INFINITY;
     for (int i = 0; i < n; ++i) {
+        // @todo improve this operation (is linear right now, should be logarithmic)
         int indexInSubset = projectedSensors.indexOf(i);
         if (indexInSubset == -1) {
             // "normal" node
             // notInf: stores the indizes that are not infinity (i.e. the ones we have to consider when interpolating)
-            QVector<double> notInf;
+            QVector<QPair<qint32, double> > notInf;
             notInf.reserve(m);
             double distSum = 0;
+            const Eigen::RowVectorXd row = distanceTable->row(i);
             for (int q = 0; q < m; ++q) {
-                const double temp = (*distanceTable)(i, q);
-                if (temp != INF) {
-                    distSum += temp;
-                    notInf.push_back(q);
+                const double d = row[q];
+                if (d != INF) {
+                    distSum += d;
+                    notInf.push_back(qMakePair<qint32, double> (q, d));
                 }
                 // @todo replace this with a one time function call for the whole row, outside of loop (see next @todo)
                 (*m_interpolationMatrix)(i, q) = 0;
             }
-            for (int q : notInf) {
-                // @todo we do not need to access distanceTable again, we could store the value of the notInf indizes as a pair
-                (*m_interpolationMatrix)(i, q) = (*distanceTable)(i, q) / distSum;
+            for (QPair<qint32, double> qp : notInf) {
+                const qint32 index = qp.first;
+                (*m_interpolationMatrix)(i, index) = qp.second / distSum;
             }
         } else {
             // a sensor has been assigned to this node
