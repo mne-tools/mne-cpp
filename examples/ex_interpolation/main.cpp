@@ -181,13 +181,20 @@ int main(int argc, char *argv[])
                         1, 1, 1, 0,
                         1, 1, 2, 3;
 
-    std::cout << "dist table:" << std::endl << (*distTable) << std::endl;
+    std::cout << std::endl << "distance table:" << std::endl << (*distTable) << std::endl;
 
     Interpolation::createInterpolationMat(subSet, distTable, 0);
 
     QSharedPointer<MatrixXd> res = Interpolation::getResult();
 
-    std::cout << "result:" << std::endl << (*res) << std::endl;
+    std::cout << std::endl << "weight matrix:" << std::endl << (*res) << std::endl;
+
+    VectorXd signal(4);
+    signal << 1, 1, 3, 2;
+
+    std::cout << std::endl << "example signal:" << std::endl << signal << std::endl;
+
+    std::cout << std::endl << "interpolated:" << std::endl << (*Interpolation::interpolateSignal(signal)) << std::endl;
 
     /*
     qint64 startTime = QDateTime::currentSecsSinceEpoch();
