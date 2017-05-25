@@ -163,9 +163,9 @@ int main(int argc, char *argv[])
     std::cout << testSurface.rr.rows() << std::endl;
 
     QVector<qint32> subSet;
-    int n_sub = 900;
+    int n_sub = 10;
     subSet.reserve(n_sub);
-    int stepsize = 7;
+    int stepsize = 1;
     for(int i = 0; i < n_sub; ++i)
     {
         subSet.push_back(i * stepsize);
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 
     qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
 
-    QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet);
+    QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet, 0.04);
 
     std::cout << "SCDC took ";
     std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;

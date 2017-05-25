@@ -116,20 +116,11 @@ public:
     /**
      * @brief scdc
      * @param inSurface
-     * @param vertSubSet
-     * @return
-     */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
-
-    //=========================================================================================================
-    /**
-     * @brief scdc
-     * @param inSurface
      * @param cancelDistance
      * @param vertSubSet
      * @return
      */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, double cancelDistance, const QVector<qint32> &vertSubSet = QVector<qint32>());
+    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubset = QVector<qint32>(), double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
@@ -142,14 +133,15 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubSet
+     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubset between index begin and index end
      * @param ptr The matrix in which the distances will be stored
-     * @param inSurface
-     * @param vertSubSet
-     * @param offset The offset of vertSubset within a potential larger subset
-     * @param cancelDist Vertices that have a distance to root that is higher than canceldist are ignored, i.e. their distances are set to infinity
+     * @param inSurface The surface on which distances should be calculated
+     * @param vertSubSet The subset of vertices
+     * @param begin Start index of distance calculation
+     * @param end   End indes of distance calculation
+     * @param cancelDist Distance thresold: all vertices that have a higher distance to the origin vertex are set to infinity
      */
-    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>(), int offset = 0, double cancelDist = DOUBLE_INFINITY);
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end, double cancelDist);
 
     //=========================================================================================================
     /**
