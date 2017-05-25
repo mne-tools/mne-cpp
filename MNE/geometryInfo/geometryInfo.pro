@@ -86,14 +86,12 @@ else {
 }
 
 SOURCES += \
-    geometryinfo.cpp \
-    projectingkdtree.cpp
+    geometryinfo.cpp
 
 
 HEADERS += \
     geometryinfo.h \
-    geometryinfo_global.h \
-    projectingkdtree.h
+    geometryinfo_global.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
