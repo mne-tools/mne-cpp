@@ -98,9 +98,10 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
 }
 //*************************************************************************************************************
 
-QSharedPointer<VectorXd> Interpolation::interpolateSignals(const MatrixXd &measurementData)
+QSharedPointer<VectorXd> Interpolation::interpolateSignal(const VectorXd &measurementData)
 {
     QSharedPointer<VectorXd> interpolatedVec = QSharedPointer<VectorXd>::create();
+    (*interpolatedVec) = (*m_interpolationMatrix) * measurementData;
     return interpolatedVec;
 
 }

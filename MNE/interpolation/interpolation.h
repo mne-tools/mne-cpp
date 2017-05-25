@@ -119,7 +119,7 @@ public:
      * @param measurementData
      * @return
      */
-    static QSharedPointer<Eigen::VectorXd> interpolateSignals(const Eigen::MatrixXd &measurementData);
+    static QSharedPointer<Eigen::VectorXd> interpolateSignal(const Eigen::VectorXd &measurementData);
 
     //=========================================================================================================
     /**
