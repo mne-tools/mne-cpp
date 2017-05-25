@@ -39,8 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 #include "geometryinfo.h"
-#include "geometryInfo/projectingkdtree.h"
-#include<mne/mne_bem_surface.h>
+#include <mne/mne_bem_surface.h>
 
 
 //*************************************************************************************************************
@@ -49,15 +48,12 @@
 //=============================================================================================================
 
 #include <cmath>
-#include <fstream>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDateTime>
 #include <QtConcurrent/QtConcurrent>
 
 //*************************************************************************************************************
@@ -88,91 +84,10 @@ using namespace MNELIB;
 //=============================================================================================================
 
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet)
-{
-    //start timer
-    qint64 startTimeSecs = QDateTime::currentSecsSinceEpoch();
-    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
-    size_t matColumns;
-    if(!vertSubSet.empty())
-    {
-        matColumns = vertSubSet.size();
-    }
-    else
-    {
-        matColumns = inSurface.rr.rows();
-    }
 
-    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
-
-    // convention: first dimension in distance table is "to", second dimension "from"
-
-    //QPair<int, QVector<int> > tempPair;
-    //int tempID;
-    std::cout << inSurface.rr.rows() <<std::endl;
-    std::cout << inSurface.rr.cols() <<std::endl;
-    for (size_t i = 0; i < matColumns; ++i)
-    {
-        //ToDo bessere Lösung mit und ohne subset
-        size_t index = i;
-        if(!vertSubSet.empty())
-        {
-            index = vertSubSet[i];
-        }
-
-        //std::cout << inSurface.rr.rows() <<std::endl;
-        float xFrom = inSurface.rr(index, 0);
-        float yFrom = inSurface.rr(index, 1);
-        float zFrom = inSurface.rr(index, 2);
-        //Vector3f currentVertex = inSurface.rr(i)
-        for (size_t j = 0; j < inSurface.rr.rows(); ++j)
-        {
-
-
-            float xTo = inSurface.rr(j, 0);
-            float yTo = inSurface.rr(j, 1);
-            float zTo = inSurface.rr(j, 2);
-            (*ptr)(  j, i) = sqrt(pow(xTo - xFrom, 2) + pow(yTo - yFrom, 2) + pow(zTo - zFrom, 2));
-        }
-    }
-    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
-    std::cout << "start writing to file" << std::endl;
-    std::ofstream file;
-    file.open("./matrixDump.txt");
-    file << *ptr;
-    std::cout << "writing to file ended!\n";
-    std::cout << QDateTime::currentSecsSinceEpoch()- startTimeSecs <<" s " << std::endl;
-    return ptr;
-}
-//*************************************************************************************************************
-
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface  &inSurface, double cancelDistance, const QVector<qint32> &vertSubSet)
-{
-    QSharedPointer<MatrixXd> outputMat = QSharedPointer<MatrixXd>::create();
-    return outputMat;
-}
-//*************************************************************************************************************
-
-QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface &inSurface, const QVector<Vector3d> &sensorPositions)
+QSharedPointer<QVector<qint32> > GeometryInfo::projectSensor(const MNEBemSurface &inSurface, const QVector<Vector3d> &sensorPositions)
 {
     QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
-    outputArray->reserve(sensorPositions.size());
-    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
-    ProjectingKdTree kdTree(inSurface, 110);
-    //kdTree.saveToFile("kdTreeDump.txt");
-    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
-    for(const Vector3d &tempSensor : sensorPositions)
-    {
-        outputArray->push_back(kdTree.findNearestNeighbor(tempSensor));
-    }
-
-    return outputArray;
-}
-
-QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurface &inSurface, const QVector<Vector3d> &sensorPositions)
-{
-    QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
-    //outputArray->reserve(sensorPositions.size());
 
     qint32 cores = QThread::idealThreadCount();
     if (cores <= 0)
@@ -180,7 +95,6 @@ QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurf
         // assume that we have at least two available cores
         cores = 2;
     }
-    //std::cout << "cores: " << cores << std::endl;
 
     const qint32 subArraySize = ceil(sensorPositions.size() / cores);
 
@@ -233,6 +147,7 @@ QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurf
 
     return outputArray;
 }
+//*************************************************************************************************************
 
 QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &inSurface,  QVector<Vector3d>::const_iterator sensorBegin, QVector<Vector3d>::const_iterator sensorEnd)
 {

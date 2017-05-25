@@ -148,7 +148,22 @@ protected:
 
 private:
 
+    //=========================================================================================================
+    /**
+     * @brief squared
+     * @param base
+     * @return
+     */
     static inline  double squared(double base);
+
+    //=========================================================================================================
+    /**
+     * @brief nearestNeighbor
+     * @param inSurface
+     * @param sensorBegin
+     * @param sensorEnd
+     * @return
+     */
     static QVector<qint32> nearestNeighbor(const MNELIB::MNEBemSurface &inSurface,  QVector<Eigen::Vector3d>::const_iterator sensorBegin, QVector<Eigen::Vector3d>::const_iterator sensorEnd);
 };
 
