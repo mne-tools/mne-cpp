@@ -124,12 +124,12 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief projectSensor
-     * @param inSurface
-     * @param sensorPositions
-     * @return
+     * @brief calcualtes the nearest neighbor (euclidian distance) vertex to each sensor
+     * @param inSurface: holds all vertex information that is needed for the claculation in its public member rr
+     * @param sensorPositions: each sensor postion in saved in an Eigen vector with x, y & z cord.
+     * @return  pointer to output vector where the vecotr index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
      */
-    static QSharedPointer<QVector<qint32>> projectSensor(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3d> &sensorPositions);
+    static QSharedPointer<QVector<qint32>> linProjectSensor(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3d> &sensorPositions);
 
     //=========================================================================================================
     /**
@@ -143,6 +143,7 @@ public:
      */
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end, double cancelDist);
 
+
     //=========================================================================================================
     /**
      * @brief matrixDump Creates a file named 'filename' and writes the contents of ptr into it
@@ -155,6 +156,23 @@ protected:
 
 private:
 
+    //=========================================================================================================
+    /**
+     * @brief squared
+     * @param base
+     * @return
+     */
+    static inline  double squared(double base);
+
+    //=========================================================================================================
+    /**
+     * @brief nearestNeighbor
+     * @param inSurface
+     * @param sensorBegin
+     * @param sensorEnd
+     * @return
+     */
+    static QVector<qint32> nearestNeighbor(const MNELIB::MNEBemSurface &inSurface,  QVector<Eigen::Vector3d>::const_iterator sensorBegin, QVector<Eigen::Vector3d>::const_iterator sensorEnd);
 };
 
 
@@ -163,6 +181,10 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline double GeometryInfo::squared(double base)
+{
+    return base * base;
+}
 
 } // namespace GEOMETRYINFO
 

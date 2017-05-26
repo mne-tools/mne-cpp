@@ -86,12 +86,12 @@ else {
 }
 
 SOURCES += \
-    geometryinfo.cpp \
+    geometryinfo.cpp
 
 
 HEADERS += \
     geometryinfo.h \
-    geometryinfo_global.h \
+    geometryinfo_global.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
