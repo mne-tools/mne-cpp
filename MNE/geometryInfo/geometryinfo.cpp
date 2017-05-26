@@ -55,8 +55,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDateTime>
 #include <QtConcurrent/QtConcurrent>
 
 
