@@ -58,6 +58,7 @@
 
 #include <geometryInfo/geometryinfo.h>
 #include <interpolation/interpolation.h>
+#include <fiff/fiff_constants.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -113,12 +114,14 @@ int main(int argc, char *argv[])
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
     parser.addOption(surfOption);
     parser.addOption(annotOption);
     parser.addOption(hemiOption);
     parser.addOption(subjectOption);
     parser.addOption(subjectPathOption);
+    parser.addOption(sampleEvokedFileOption);
 
     parser.process(a);
 
@@ -155,79 +158,58 @@ int main(int argc, char *argv[])
 //    MNEBem t_Bem(t_fileBem);
 //    p3DDataModel->addBemData("testData", "BEM", t_Bem);
 
+
+
+    //acquire sensor positions
+    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
+    /// Load data
+    fiff_int_t setno = 0;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+    {
+        return 1;
+    }
+
+    // positions of EEG and MEG sensors
+    QVector<Vector3f> eegSensors;
+    QVector<Vector3f> megSensors; //currently not used
+    //fill both QVectors with the right sensor positions
+    for( const FiffChInfo &info : evoked.info.chs)
+    {
+        //EEG
+        if(info.kind == FIFFV_EEG_CH)
+        {
+            eegSensors.push_back(info.chpos.r0);
+        }
+        //MEG
+        if(info.kind == FIFFV_MEG_CH)
+        {
+            megSensors.push_back(info.chpos.r0);
+        }
+    }
+    std::cout << "Number EEG sensors: " << eegSensors.size() << std::endl;
+    std::cout << "Number MEG sensors: " << megSensors.size() << std::endl;
+
+    //acquire surface data
     QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-
 
     MNEBemSurface &testSurface = t_sensorSurfaceVV[0];
     std::cout << "Number of vertices: ";
     std::cout << testSurface.rr.rows() << std::endl;
 
-    QVector<qint32> subSet;
-    subSet.reserve(300);
-    for(int i = 0; i < 300; ++i)
-    {
-        subSet.push_back(i);
-    }
+    //projecting with EEG
+    qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(testSurface, megSensors);
+    std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
 
-    qint64 startTime = QDateTime::currentSecsSinceEpoch();
-    QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet, 0.03);
-    std::cout << startTime - QDateTime::currentSecsSinceEpoch() <<" s " << std::endl;
+    //SCDC with cancel distance 0.03
+    qint64 startTimeScdc = QDateTime::currentMSecsSinceEpoch();
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, *mappedSubSet, 0.03);
+    std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
-    //test Projecting
-    ///generate random sensor positions
-    std::random_device seed;
-    std::mt19937 rndEngine(seed());
-    std::uniform_real_distribution<double>uniDist(-100, 100);
-    QVector<Vector3d> sensorPositions;
-    for(qint32 i = 0; i < 300; ++i)
-    {
-        sensorPositions.push_back(Vector3d(uniDist(rndEngine),uniDist(rndEngine),uniDist(rndEngine)));
-    }
-    qint64 startTimeKd = QDateTime::currentMSecsSinceEpoch();
-    //QSharedPointer<QVector<qint32>> mappedSensors = GeometryInfo::projectSensor(testSurface, sensorPositions);
-    QSharedPointer<QVector<qint32>> mappedSensors = GeometryInfo::linProjectSensor(testSurface, sensorPositions);
-    std::cout << QDateTime::currentMSecsSinceEpoch() - startTimeKd <<" ms " << std::endl;
-    for(const qint32 &idx : *mappedSensors)
-    {
-        std::cout << idx << " ";
-    }
-    std::cout << "\n";
 
-    ///lin search sensor positions
-    QVector<qint32> linMappedSensors;
-    linMappedSensors.reserve(sensorPositions.size());
-    qint64 startTimeLin = QDateTime::currentMSecsSinceEpoch();
-    for(const Vector3d &sensor : sensorPositions)
-    {
-        qint32 champion;
-        double champDist = std::numeric_limits<double>::max();
-        for(qint32 i = 0; i < testSurface.rr.rows(); ++i)
-        {
-            double dist = sqrt(pow(testSurface.rr(i, 0) - sensor[0], 2)  // x-cord
-                    + pow(testSurface.rr(i, 1) - sensor[1], 2)    // y-cord
-                    + pow(testSurface.rr(i, 2) - sensor[2], 2));  // z-cord
-            if(dist < champDist)
-            {
-                champion = i;
-                champDist = dist;
-            }
-        }
-        linMappedSensors.push_back(champion);
-    }
-    std::cout << QDateTime::currentMSecsSinceEpoch() - startTimeLin <<" ms " << std::endl;
-    for(const qint32 &idx : linMappedSensors)
-    {
-        std::cout << idx << " ";
-    }
-    std::cout << "\n";
-    for(qint32 i = 0; i < mappedSensors->size(); ++i)
-    {
-        double dist = sqrt(pow(testSurface.rr(mappedSensors->at(i), 0) - testSurface.rr(linMappedSensors[i], 0), 2) // x-cord
-                + pow(testSurface.rr(mappedSensors->at(i), 1) - testSurface.rr(linMappedSensors[i], 1), 2)   // y-cord
-                + pow(testSurface.rr(mappedSensors->at(i), 2) - testSurface.rr(linMappedSensors[i], 2), 2));  // z-cord
-        std::cout << dist << "\t";
-    }
     //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
