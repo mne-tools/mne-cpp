@@ -209,6 +209,18 @@ int main(int argc, char *argv[])
     QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, *mappedSubSet, 0.03);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
+    // linear weight matrix
+    qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
+    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
+    std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
+
+    // realtime interpolation (1 iteration)
+    VectorXd signal = VectorXd::Random(megSensors.size());
+    qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
+    Interpolation::interpolateSignal(signal);
+    std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
+
+
 
     //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
