@@ -161,46 +161,28 @@ int main(int argc, char *argv[])
 
 
     MNEBemSurface &testSurface = t_sensorSurfaceVV[0];
+    std::cout << "Number of vertices: ";
     std::cout << testSurface.rr.rows() << std::endl;
 
 
     QVector<qint32> subSet;
-    subSet.push_back(0);
-    subSet.push_back(1);
-    subSet.push_back(3);
-    subSet.push_back(5);
+    int n_sub = 10;
+    subSet.reserve(n_sub);
+    int stepsize = 1;
+    for(int i = 0; i < n_sub; ++i)
+    {
+        subSet.push_back(i * stepsize);
+    }
 
-    double I = std::numeric_limits<double>::infinity();
+    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
 
-    QSharedPointer<MatrixXd> distTable = QSharedPointer<MatrixXd>::create(7, 4);
-    (*distTable) <<     0, 1, 2, 1,
-                        1, 0, 2, 2,
-                        2, 2, I, 4,
-                        1, 2, 0, 2,
-                        1, 2, 2, 2,
-                        1, 1, 1, 0,
-                        1, 1, 2, 3;
+    QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet, 0.04);
 
-    std::cout << std::endl << "distance table:" << std::endl << (*distTable) << std::endl;
+    std::cout << "SCDC took ";
+    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
 
-    Interpolation::createInterpolationMat(subSet, distTable, 0);
+    // GeometryInfo::matrixDump(ptr, "output.txt");
 
-    QSharedPointer<MatrixXd> res = Interpolation::getResult();
-
-    std::cout << std::endl << "weight matrix:" << std::endl << (*res) << std::endl;
-
-    VectorXd signal(4);
-    signal << 1, 1, 3, 2;
-
-    std::cout << std::endl << "example signal:" << std::endl << signal << std::endl;
-
-    std::cout << std::endl << "interpolated:" << std::endl << (*Interpolation::interpolateSignal(signal)) << std::endl;
-
-    /*
-    qint64 startTime = QDateTime::currentSecsSinceEpoch();
-    QSharedPointer<MatrixXd> ptr = GeometryInfo::scdc(testSurface, subSet);
-    std::cout << startTime - QDateTime::currentSecsSinceEpoch() <<" s " << std::endl;
-    */
     //Read and show sensor helmets
 //    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
 //    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);

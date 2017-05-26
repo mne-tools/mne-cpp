@@ -78,6 +78,9 @@
 /bin/ex_st_clustered_inverse_pwl_rap_music
 /bin/ex_st_clustered_inverse_pwl_rap_musicd
 
+/bin/ex_interpolation
+/bin/test_fiff_cov
+
 # Binaries Tests
 /bin/test_codecov
 /bin/test_codecovd
