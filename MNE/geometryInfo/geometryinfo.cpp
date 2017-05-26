@@ -39,8 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 #include "geometryinfo.h"
-#include<mne/mne_bem_surface.h>
-
+#include <mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,14 +48,14 @@
 
 #include <cmath>
 #include <fstream>
+#include <set>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDateTime>
+#include <QtConcurrent/QtConcurrent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,69 +84,51 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet)
+QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubset, double cancelDist)
 {
-    //start timer
-    qint64 startTimeSecs = QDateTime::currentSecsSinceEpoch();
-    qint64 startTimeMsecs = QDateTime::currentMSecsSinceEpoch();
-    size_t matColumns;
-    if(!vertSubSet.empty())
-    {
-        matColumns = vertSubSet.size();
+    // create matrix:
+    size_t cols;
+    if(!vertSubset.empty()) {
+        cols = vertSubset.size();
     }
-    else
-    {
-        matColumns = inSurface.rr.rows();
+    else {
+        cols = inSurface.rr.rows();
     }
+    // convention: first dimension in distance table is "from", second dimension "to"
+    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), cols);
 
-    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), matColumns);
+    // distribute calculation on cores
+    int cores = QThread::idealThreadCount();
+    if (cores <= 0) {
+        // assume that we have at least two available cores
+        cores = 2;
+    }
+    // start threads with their respective parts of the subset
+    qint32 subArraySize = ceil(vertSubset.size() / cores);
+    QVector<QFuture<void> > threads(cores - 1);
+    qint32 begin = 0;
+    qint32 end = subArraySize;
+    for (int i = 0; i < threads.size(); ++i) {
+        threads[i] = QtConcurrent::run(std::bind(iterativeDijkstra, ptr, std::cref(inSurface), std::cref(vertSubset), begin, end, cancelDist));
+        begin += subArraySize;
+        end += subArraySize;
+    }
+    // use main thread to calculate last part of the vertSubset
+    iterativeDijkstra(ptr, inSurface, vertSubset, begin, vertSubset.size(), cancelDist);
 
-    // convention: first dimension in distance table is "to", second dimension "from"
-
-    //QPair<int, QVector<int> > tempPair;
-    //int tempID;
-    std::cout << inSurface.rr.rows() <<std::endl;
-    std::cout << inSurface.rr.cols() <<std::endl;
-    for (size_t i = 0; i < matColumns; ++i)
-    {
-        //ToDo bessere Lösung mit und ohne subset
-        size_t index = i;
-        if(!vertSubSet.empty())
-        {
-            index = vertSubSet[i];
+    // wait for all other threads to finish
+    bool finished = false;
+    while (finished == false) {
+        finished = true;
+        for (const QFuture<void>& f : threads) {
+            if (f.isFinished() == false) {
+                finished = false;
+            }
         }
-
-        //std::cout << inSurface.rr.rows() <<std::endl;
-        float xFrom = inSurface.rr(index, 0);
-        float yFrom = inSurface.rr(index, 1);
-        float zFrom = inSurface.rr(index, 2);
-        //Vector3f currentVertex = inSurface.rr(i)
-        for (size_t j = 0; j < inSurface.rr.rows(); ++j)
-        {
-
-
-            float xTo = inSurface.rr(j, 0);
-            float yTo = inSurface.rr(j, 1);
-            float zTo = inSurface.rr(j, 2);
-            (*ptr)(  j, i) = sqrt(pow(xTo - xFrom, 2) + pow(yTo - yFrom, 2) + pow(zTo - zFrom, 2));
-        }
+        QThread::msleep(2);
     }
-    std::cout << QDateTime::currentMSecsSinceEpoch()- startTimeMsecs <<" ms " << std::endl;
-    std::cout << "start writing to file" << std::endl;
-    std::ofstream file;
-    file.open("./matrixDump.txt");
-    file << *ptr;
-    std::cout << "writing to file ended!\n";
-    std::cout << QDateTime::currentSecsSinceEpoch()- startTimeSecs <<" s " << std::endl;
+
     return ptr;
-}
-//*************************************************************************************************************
-
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface  &inSurface, double cancelDistance, const QVector<qint32> &vertSubSet)
-{
-    QSharedPointer<MatrixXd> outputMat = QSharedPointer<MatrixXd>::create();
-    return outputMat;
 }
 //*************************************************************************************************************
 
@@ -158,5 +139,65 @@ QSharedPointer<QVector<qint32>> GeometryInfo::projectSensor(const MNEBemSurface 
 }
 //*************************************************************************************************************
 
+void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end,  double cancelDist) {
+    // initialization
+    const QVector<QVector<int> > &adjacency = inSurface.neighbor_vert;
+    qint32 n = adjacency.size();
+    QVector<double> minDists(n);
+    std::set< std::pair< double, qint32> > vertexQ;
+    double INF = DOUBLE_INFINITY;
 
+    // outer loop, iterated for each vertex of 'vertSubset' between 'begin' and 'end'
+    for (qint32 i = begin; i < end; ++i) {
+        // init phase of dijkstra: set source node for current iteration and reset data fields
+        qint32 root = vertSubSet[i];
+        vertexQ.clear();
+        minDists.fill(INF);
+        minDists[root] = 0.0;
+        vertexQ.insert(std::make_pair(minDists[root], root));
 
+        // dijkstra main loop
+        while (vertexQ.empty() == false) {
+            // remove next vertex from queue
+            const double dist = vertexQ.begin()->first;
+            const qint32 u = vertexQ.begin()->second;
+            vertexQ.erase(vertexQ.begin());
+            // check if we are still below cancel distance
+            if (dist <= cancelDist) {
+                // visit each neighbour of u
+                const QVector<int>& neighbours = adjacency[u];
+                for (qint32 ne = 0; ne < neighbours.length(); ++ne) {
+                    qint32 v = neighbours[ne];
+                    // distance from source (i.e. root) to v, using u as its predecessor
+                    // calculate inline since designated function was magnitudes slower (even when declared as inline)
+                    const double distX = inSurface.rr(u, 0) - inSurface.rr(v, 0);
+                    const double distY = inSurface.rr(u, 1) - inSurface.rr(v, 1);
+                    const double distZ = inSurface.rr(u, 2) - inSurface.rr(v, 2);
+                    const double distWithU = dist + sqrt(distX * distX + distY * distY + distZ * distZ);
+
+                    if (distWithU < minDists[v]) {
+                        // this is a combination of insert and decreaseKey
+                        vertexQ.erase(std::make_pair(minDists[v], v));
+                        minDists[v] = distWithU;
+                        vertexQ.insert(std::make_pair(minDists[v], v));
+                    }
+                }
+            }
+        }
+        // save results for current root in matrix
+        for (qint32 m = 0; m < minDists.size(); ++m) {
+            (*ptr)(m , i) = minDists[m];
+        }
+    }
+}
+
+//*************************************************************************************************************
+
+void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> ptr, std::string filename) {
+    std::cout << "Start writing matrix to file: ";
+    std::cout << filename.c_str() << std::endl;
+    std::ofstream file;
+    file.open(filename.c_str());
+    file << *ptr;
+    std::cout << "Finished writing !" << std::endl;
+}

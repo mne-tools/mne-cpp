@@ -41,10 +41,14 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "geometryinfo_global.h"
 
-#include"geometryinfo_global.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
-
+#include <limits>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,6 +84,8 @@ namespace MNELIB {
 
 namespace GEOMETRYINFO {
 
+#define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
+
 //*************************************************************************************************************
 //=============================================================================================================
 // SWP FORWARD DECLARATIONS
@@ -110,20 +116,11 @@ public:
     /**
      * @brief scdc
      * @param inSurface
-     * @param vertSubSet
-     * @return
-     */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet = QVector<qint32>());
-
-    //=========================================================================================================
-    /**
-     * @brief scdc
-     * @param inSurface
      * @param cancelDistance
      * @param vertSubSet
      * @return
      */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, double cancelDistance, const QVector<qint32> &vertSubSet = QVector<qint32>());
+    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubset = QVector<qint32>(), double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
@@ -134,6 +131,25 @@ public:
      */
     static QSharedPointer<QVector<qint32>> projectSensor(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3d> &sensorPositions);
 
+    //=========================================================================================================
+    /**
+     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubset between index begin and index end
+     * @param ptr The matrix in which the distances will be stored
+     * @param inSurface The surface on which distances should be calculated
+     * @param vertSubSet The subset of vertices
+     * @param begin Start index of distance calculation
+     * @param end   End indes of distance calculation
+     * @param cancelDist Distance thresold: all vertices that have a higher distance to the origin vertex are set to infinity
+     */
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end, double cancelDist);
+
+    //=========================================================================================================
+    /**
+     * @brief matrixDump Creates a file named 'filename' and writes the contents of ptr into it
+     * @param ptr The matrix to be written
+     * @param filename The file to be written to
+     */
+    static void matrixDump(QSharedPointer<Eigen::MatrixXd> ptr, std::string filename);
 
 protected:
 
