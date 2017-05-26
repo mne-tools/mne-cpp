@@ -133,7 +133,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, cons
 }
 //*************************************************************************************************************
 
-QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurface &inSurface, const QVector<Vector3d> &sensorPositions)
+QSharedPointer<QVector<qint32> > GeometryInfo::projectSensor(const MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPositions)
 {
     QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
 
@@ -197,7 +197,7 @@ QSharedPointer<QVector<qint32> > GeometryInfo::linProjectSensor(const MNEBemSurf
 }
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &inSurface,  QVector<Vector3d>::const_iterator sensorBegin, QVector<Vector3d>::const_iterator sensorEnd)
+QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &inSurface,  QVector<Vector3f>::const_iterator sensorBegin, QVector<Vector3f>::const_iterator sensorEnd)
 {
     ///lin search sensor positions
     QVector<qint32> mappedSensors;
