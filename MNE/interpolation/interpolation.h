@@ -132,7 +132,7 @@ public:
      * @brief   calculateLinear Creates a weight matrix using linear distance interpolation and stores it inside
      *          m_interpolationMatrix
      */
-    static void calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*f) (double));
+    static void calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*f) (double), double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
