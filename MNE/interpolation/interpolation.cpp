@@ -118,10 +118,14 @@ void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, con
     size_t n = m_interpolationMatrix->rows();
     size_t m = projectedSensors.length();
     double INF = DOUBLE_INFINITY;
+    // insert all sensor nodes into set for faster lookup during later computation
+    QSet<qint32> sensorLookup;
+    for (qint32 sen : projectedSensors){
+        sensorLookup.insert (sen);
+    }
+    // main loop: go through all rows of distance table and calculate weights
     for (int i = 0; i < n; ++i) {
-        // @todo improve this operation (is linear right now, should be logarithmic)
-        int indexInSubset = projectedSensors.indexOf(i);
-        if (indexInSubset == -1) {
+        if (sensorLookup.contains(i) == false) {
             // "normal" node, i.e. one which was not assigned a sensor
             // notInf: stores the indizes that are not infinity (i.e. the ones we have to consider when interpolating)
             QVector<QPair<qint32, double> > notInf;
@@ -140,6 +144,7 @@ void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, con
             }
         } else {
             // a sensor has been assigned to this node, we do not need to interpolate anything
+            const int indexInSubset = projectedSensors.indexOf(i);
             (*m_interpolationMatrix)(i, indexInSubset) = 1;
         }
     }
