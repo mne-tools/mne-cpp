@@ -89,7 +89,7 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
     m_interpolationMatrix->setZero();
     switch (interpolationType) {
     case LINEAR:
-        calculateWeights(projectedSensors, distanceTable, identity);
+        calculateWeights(projectedSensors, distanceTable, identity, cancelDist);
         break;
     default:
         std::cout << "[WARNING] Unknown interpolation type" << std::endl;
@@ -113,10 +113,10 @@ void Interpolation::clearInterpolateMatrix()
 }
 //*************************************************************************************************************
 
-void Interpolation::calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double)) {
+void Interpolation::calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double), double cancelDist) {
     size_t n = m_interpolationMatrix->rows();
     size_t m = projectedSensors.length();
-    double INF = DOUBLE_INFINITY;
+    //double INF = DOUBLE_INFINITY;
     // insert all sensor nodes into set for faster lookup during later computation
     QSet<qint32> sensorLookup;
     for (qint32 sen : projectedSensors){
@@ -133,7 +133,7 @@ void Interpolation::calculateWeights(const QVector<qint32> &projectedSensors, co
             const Eigen::RowVectorXd row = distanceTable->row(i);
             for (int q = 0; q < m; ++q) {
                 const double d = row[q];
-                if (d != INF) {
+                if (d < cancelDist) {
                     const double f_d = f(d);
                     invDistSum += (1 / f_d);
                     notInf.push_back(qMakePair<qint32, double> (q, f_d));
