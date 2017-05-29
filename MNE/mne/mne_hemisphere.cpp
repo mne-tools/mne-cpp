@@ -137,18 +137,18 @@ bool MNEHemisphere::add_geometry_info()
     int k,c,p,q;
     bool found;
 
-    //Clear neighboring triangle list
-    this->neighbor_tri.clear();
+    //Create neighboring triangle vector
+    neighbor_tri = QVector<QVector<int> >(this->tris.rows());
 
     //Create neighbor_tri information
-    for (p = 0; p < this->tris.rows(); p++)
-        for (k = 0; k < 3; k++)
+    for (p = 0; p < this->tris.rows(); p++) {
+        for (k = 0; k < 3; k++) {
             this->neighbor_tri[this->tris(p,k)].append(p);
+        }
+    }
 
-    //std::cout<<"MNESourceSpace::add_geometry_info() - this->neighbor_tri[100].size(): "<<this->neighbor_tri[100].size()<<std::endl;
-
-    //Determine the neighboring vertices
-    this->neighbor_vert.clear();
+    //Create the neighboring vertices vector
+    neighbor_vert = QVector<QVector<int> >(this->np);
 
     for (k = 0; k < this->np; k++) {
         for (p = 0; p < this->neighbor_tri[k].size(); p++) {
@@ -167,7 +167,6 @@ bool MNEHemisphere::add_geometry_info()
                     }
 
                     if(!found) {
-//                        std::cout<<"MNESourceSpace::add_geometry_info() - Found vert: "<<vert<<std::endl;
                         this->neighbor_vert[k].append(vert);
                     }
                 }
@@ -209,8 +208,8 @@ void MNEHemisphere::clear()
     use_tri_nn = MatrixX3d::Zero(0,3);
     use_tri_area = VectorXd::Zero(0);
 
-    neighbor_tri = QMap<int, QVector<int> >();
-    neighbor_vert = QMap<int, QVector<int> >();
+    neighbor_tri.clear();
+    neighbor_vert.clear();
 
     cluster_info.clear();
 

@@ -240,7 +240,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pDoubleSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateX: {
+        case MetaTreeItemTypes::TranslateX: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -248,11 +248,11 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.001);
             pDoubleSpinBox->setDecimals(5);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateX).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::TranslateX).toDouble());
             return pDoubleSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateY: {
+        case MetaTreeItemTypes::TranslateY: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -260,11 +260,11 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.001);
             pDoubleSpinBox->setDecimals(5);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateY).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::TranslateY).toDouble());
             return pDoubleSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateZ: {
+        case MetaTreeItemTypes::TranslateZ: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -272,7 +272,19 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.001);
             pDoubleSpinBox->setDecimals(5);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateZ).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::TranslateZ).toDouble());
+            return pDoubleSpinBox;
+        }
+
+        case MetaTreeItemTypes::Scale: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(-10000.0);
+            pDoubleSpinBox->setMaximum(10000.0);
+            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setDecimals(3);
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::Scale).toDouble());
             return pDoubleSpinBox;
         }
 
@@ -456,26 +468,33 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateX: {
-            double value = index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateX).toDouble();
+        case MetaTreeItemTypes::TranslateX: {
+            double value = index.model()->data(index, MetaTreeItemRoles::TranslateX).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateY: {
-            double value = index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateY).toDouble();
+        case MetaTreeItemTypes::TranslateY: {
+            double value = index.model()->data(index, MetaTreeItemRoles::TranslateY).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateZ: {
-            double value = index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateZ).toDouble();
+        case MetaTreeItemTypes::TranslateZ: {
+            double value = index.model()->data(index, MetaTreeItemRoles::TranslateZ).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
-        }        
+        }
+
+        case MetaTreeItemTypes::Scale: {
+            double value = index.model()->data(index, MetaTreeItemRoles::Scale).toDouble();
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            pDoubleSpinBox->setValue(value);
+            break;
+        }
 
         case MetaTreeItemTypes::NetworkThreshold: {
             if(Spline* pSpline = static_cast<Spline*>(editor)) {
@@ -666,32 +685,42 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateX: {
+        case MetaTreeItemTypes::TranslateX: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateX);
+            model->setData(index, data, MetaTreeItemRoles::TranslateX);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateY: {
+        case MetaTreeItemTypes::TranslateY: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateY);
+            model->setData(index, data, MetaTreeItemRoles::TranslateY);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateZ: {
+        case MetaTreeItemTypes::TranslateZ: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateZ);
+            model->setData(index, data, MetaTreeItemRoles::TranslateZ);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case MetaTreeItemTypes::Scale: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+
+            model->setData(index, data, MetaTreeItemRoles::Scale);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
