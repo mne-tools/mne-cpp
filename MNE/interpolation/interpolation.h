@@ -111,7 +111,7 @@ public:
      * @param distanceTable
      * @param interpolationType
      */
-    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, qint32 interpolationType = LINEAR);
+    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double cancelDist = DOUBLE_INFINITY, qint32 interpolationType = LINEAR);
 
     //=========================================================================================================
     /**
@@ -132,7 +132,7 @@ public:
      * @brief   calculateLinear Creates a weight matrix using linear distance interpolation and stores it inside
      *          m_interpolationMatrix
      */
-    static void calculateLinear(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable);
+    static void calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*f) (double));
 
     //=========================================================================================================
     /**
@@ -140,6 +140,14 @@ public:
      * @return
      */
     static QSharedPointer<Eigen::MatrixXd> getResult();
+
+    //=========================================================================================================
+    /**
+     * @brief identity Returns passed argument unchanged
+     * @param d
+     * @return
+     */
+    static double identity(const double d);
 
 protected:
 
