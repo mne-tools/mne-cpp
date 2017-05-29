@@ -88,6 +88,7 @@ using namespace Qt3DRender;
 
 Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
+, m_fScale(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
@@ -194,6 +195,14 @@ void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterN
 
 //*************************************************************************************************************
 
+float Renderable3DEntity::scaleValue() const
+{
+    return m_fScale;
+}
+
+
+//*************************************************************************************************************
+
 float Renderable3DEntity::rotX() const
 {
     return m_fRotX;
@@ -295,12 +304,13 @@ void Renderable3DEntity::setVisible(bool state)
 
 void Renderable3DEntity::setScale(float scale)
 {
-    if(!m_pTransform) {
-        m_pTransform = new Qt3DCore::QTransform();
-        this->addComponent(m_pTransform);
+    if(m_fScale == scale) {
+        return;
     }
 
-    m_pTransform->setScale(scale);
+    m_fScale = scale;
+    emit scaleChanged(scale);
+    updateTransform();
 }
 
 
@@ -311,10 +321,11 @@ void Renderable3DEntity::updateTransform()
     QMatrix4x4 m;
 
     //Do the translation after rotating, otherwise rotation around the x,y,z axis would be screwed up
-    m.translate(m_position);
+    m.scale(m_fScale);
     m.rotate(m_fRotX, QVector3D(1.0f, 0.0f, 0.0f));
     m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
     m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
+    m.translate(m_position);
 
     if(!m_pTransform) {
         m_pTransform = new Qt3DCore::QTransform();
