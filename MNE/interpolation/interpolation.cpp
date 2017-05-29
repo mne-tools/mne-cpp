@@ -83,14 +83,13 @@ using namespace Eigen;
 //=============================================================================================================
 QSharedPointer<MatrixXd> Interpolation::m_interpolationMatrix = nullptr;
 
-
-void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, qint32 interpolationType)
+void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, const double cancelDist, qint32 interpolationType)
 {
     m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable->rows(), projectedSensors.size());
     m_interpolationMatrix->setZero();
     switch (interpolationType) {
     case LINEAR:
-        calculateLinear(projectedSensors, distanceTable);
+        calculateWeights(projectedSensors, distanceTable, identity);
         break;
     default:
         std::cout << "[WARNING] Unknown interpolation type" << std::endl;
@@ -114,7 +113,7 @@ void Interpolation::clearInterpolateMatrix()
 }
 //*************************************************************************************************************
 
-void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable) {
+void Interpolation::calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double)) {
     size_t n = m_interpolationMatrix->rows();
     size_t m = projectedSensors.length();
     double INF = DOUBLE_INFINITY;
@@ -135,8 +134,9 @@ void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, con
             for (int q = 0; q < m; ++q) {
                 const double d = row[q];
                 if (d != INF) {
-                    invDistSum += (1 / d);
-                    notInf.push_back(qMakePair<qint32, double> (q, d));
+                    const double f_d = f(d);
+                    invDistSum += (1 / f_d);
+                    notInf.push_back(qMakePair<qint32, double> (q, f_d));
                 }
             }
             for (QPair<qint32, double> qp : notInf) {
@@ -152,5 +152,9 @@ void Interpolation::calculateLinear(const QVector<qint32> &projectedSensors, con
 
 QSharedPointer<MatrixXd> Interpolation::getResult() {
     return m_interpolationMatrix;
+}
+
+double Interpolation::identity(const double d) {
+    return d;
 }
 
