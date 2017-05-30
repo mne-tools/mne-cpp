@@ -87,13 +87,16 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
 {
     m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable->rows(), projectedSensors.size());
     m_interpolationMatrix->setZero();
+    double (*function) (double);
     switch (interpolationType) {
     case LINEAR:
-        calculateWeights(projectedSensors, distanceTable, identity, cancelDist);
+        function = identity;
         break;
     default:
         std::cout << "[WARNING] Unknown interpolation type" << std::endl;
+        return;
     }
+    calculateWeights(projectedSensors, distanceTable, function, cancelDist);
 }
 //*************************************************************************************************************
 
@@ -115,37 +118,36 @@ void Interpolation::clearInterpolateMatrix()
 
 void Interpolation::calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double), double cancelDist) {
     size_t n = m_interpolationMatrix->rows();
-    size_t m = projectedSensors.length();
-    //double INF = DOUBLE_INFINITY;
+    size_t m = m_interpolationMatrix->cols();
     // insert all sensor nodes into set for faster lookup during later computation
     QSet<qint32> sensorLookup;
     for (qint32 sen : projectedSensors){
         sensorLookup.insert (sen);
     }
     // main loop: go through all rows of distance table and calculate weights
-    for (int i = 0; i < n; ++i) {
-        if (sensorLookup.contains(i) == false) {
+    for (int r = 0; r < n; ++r) {
+        if (sensorLookup.contains(r) == false) {
             // "normal" node, i.e. one which was not assigned a sensor
-            // notInf: stores the indizes that are not infinity (i.e. the ones we have to consider when interpolating)
-            QVector<QPair<qint32, double> > notInf;
-            notInf.reserve(m);
+            // bLoThresold: stores the indizes that point to distances which are below the passed distance threshold (cancelDist)
+            QVector<QPair<qint32, double> > bLoTreshold;
+            bLoTreshold.reserve(m);
             double invDistSum = 0;
-            const Eigen::RowVectorXd row = distanceTable->row(i);
+            const RowVectorXd row = distanceTable->row(r);
             for (int q = 0; q < m; ++q) {
-                const double d = row[q];
-                if (d < cancelDist) {
-                    const double f_d = f(d);
+                const double dist = row[q];
+                if (dist < cancelDist) {
+                    const double f_d = f(dist);
                     invDistSum += (1 / f_d);
-                    notInf.push_back(qMakePair<qint32, double> (q, f_d));
+                    bLoTreshold.push_back(qMakePair<qint32, double> (q, f_d));
                 }
             }
-            for (QPair<qint32, double> qp : notInf) {
-                (*m_interpolationMatrix)(i, qp.first) = 1 / (qp.second * invDistSum);
+            for (QPair<qint32, double> qp : bLoTreshold) {
+                (*m_interpolationMatrix)(r, qp.first) = 1 / (qp.second * invDistSum);
             }
         } else {
             // a sensor has been assigned to this node, we do not need to interpolate anything
-            const int indexInSubset = projectedSensors.indexOf(i);
-            (*m_interpolationMatrix)(i, indexInSubset) = 1;
+            const int indexInSubset = projectedSensors.indexOf(r);
+            (*m_interpolationMatrix)(r, indexInSubset) = 1;
         }
     }
 }
