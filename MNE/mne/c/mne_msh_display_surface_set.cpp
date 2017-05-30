@@ -56,12 +56,22 @@
 
 #define FREE_47(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
 
+#define REALLOC_47(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+
 #ifndef TRUE
 #define TRUE 1
 #endif
 
 #ifndef FALSE
 #define FALSE 0
+#endif
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
 #endif
 
 #define X_47 0
@@ -94,36 +104,15 @@ static int          neyes        = 0;
 static int          current_eyes = -1;
 static int         ndefault         = 8;
 
-static mshLightSet custom_lights = Q_NULLPTR;
-static mshLightRec default_lights[] = { { TRUE, { 0.0,   0.0,  1.0 } , { 0.8, 0.8, 0.8 } },
-                    { TRUE, { 0.0,   0.0, -1.0 } , { 0.8, 0.8, 0.8 } },
-                    { TRUE, { 0.6,  -1.0, -1.0 } , { 0.6, 0.6, 0.6 } },
-                    { TRUE, { -0.6, -1.0, -1.0 } , { 0.6, 0.6, 0.6 } },
-                    { TRUE, { 1.0,   0.0, 0.0 }  , { 0.8, 0.8, 0.8 } },
-                    { TRUE, { -1.0,  0.0, 0.0 }  , { 0.8, 0.8, 0.8 } },
-                    { TRUE, { 0.0,   1.0, 0.5 }  , { 0.6, 0.6, 0.6 } },
-                    { FALSE, { 0.0,   0.0, -1.0 } , { 1.0, 1.0, 1.0 } }} ;
+static MNELIB::MneMshLightSet* custom_lights = Q_NULLPTR;
 
-mshLightSet new_light_set()
-{
-  mshLightSet s = MALLOC_47(1,mshLightSetRec);
 
-  s->name = NULL;
-  s->lights = NULL;
-  s->nlight = 0;
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
 
-  return s;
-}
-
-void free_light_set(mshLightSet s)
-{
-  if (!s)
-    return;
-  FREE_47(s->name);
-  FREE_47(s->lights);
-  FREE_47(s);
-  return;
-}
+#include <qmath.h>
 
 
 //*************************************************************************************************************
@@ -143,21 +132,21 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
 {
     default_eyes.name = Q_NULLPTR;
 
-    default_eyes.left[0] = -0.2;
-    default_eyes.left[0] = 0.0;
-    default_eyes.left[0] = 0.0;
+    default_eyes.left[0] = -0.2f;
+    default_eyes.left[0] = 0.0f;
+    default_eyes.left[0] = 0.0f;
 
-    default_eyes.right[0] = 0.2;
-    default_eyes.right[0] = 0.0;
-    default_eyes.right[0] = 0.0;
+    default_eyes.right[0] = 0.2f;
+    default_eyes.right[0] = 0.0f;
+    default_eyes.right[0] = 0.0f;
 
-    default_eyes.left_up[0] = 0.0;
-    default_eyes.left_up[0] = 0.0;
-    default_eyes.left_up[0] = 1.0;
+    default_eyes.left_up[0] = 0.0f;
+    default_eyes.left_up[0] = 0.0f;
+    default_eyes.left_up[0] = 1.0f;
 
-    default_eyes.right_up[0] = 0.0;
-    default_eyes.right_up[0] = 0.0;
-    default_eyes.right_up[0] = 1.0;
+    default_eyes.right_up[0] = 0.0f;
+    default_eyes.right_up[0] = 0.0f;
+    default_eyes.right_up[0] = 1.0f;
 
     int k;
 
@@ -236,6 +225,11 @@ MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
     delete morph_t;
     FREE_47(patch_rot);
     FREE_47(surfs);
+    FREE_47(subj);
+    FREE_47(morph_subj);
+    FREE_47(active);
+    FREE_47(drawable);
+
     delete lights;
     if (user_data_free)
         user_data_free(user_data);
@@ -344,8 +338,9 @@ bad : {
         FREE_47(right_file);
         delete left;
         delete right;
-        FREE_47(this_surf);
-        FREE_47(this_curv);
+        //The following deletes are obsolete since the two char* are point to data of the QStrings which are deleted automatically
+//        FREE_47(this_surf);
+//        FREE_47(this_curv);
         return Q_NULLPTR;
     }
 }
@@ -408,6 +403,112 @@ void MneMshDisplaySurfaceSet::decide_curv_display(const char *name,
     /*
   s->overlay_color_mode = SHOW_OVERLAY_NEGPOS;
   */
+    return;
+}
+
+
+//*************************************************************************************************************
+
+int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
+                                                QString              filepath,
+                                                int                  kind,
+                                                QString              bemname,
+                                                int                  full_geom,
+                                                int                  check)
+{
+    MneSurfaceOld*           surf = Q_NULLPTR;
+    MneMshDisplaySurface*    newSurf = new MneMshDisplaySurface();
+
+    //Transform from QString to char*
+    QByteArray baFilepath = filepath.toLatin1();
+    char* filename = baFilepath.data();
+
+    QByteArray baBemname = bemname.toLatin1();
+    char* name = baBemname.data();
+
+    if (!surfs) {
+        qWarning("Cannot add to nonexisting surface set.");
+        goto bad;
+    }
+
+    fprintf(stderr,"Loading BEM surface %s (id = %d) from %s ...\n",name,kind,filename);
+    if ((surf = MneSurfaceOld::mne_read_bem_surface2(filename,kind,full_geom,Q_NULLPTR)) == Q_NULLPTR)
+        goto bad;
+    if (check) {
+        double sum;
+        MneSurfaceOld::mne_compute_surface_cm(surf);
+        sum = MneSurfaceOld::sum_solids(surf->cm,surf)/(4*M_PI);
+        if (fabs(sum-1.0) > 1e-4) {
+            fprintf(stderr, "%s surface is not closed "
+                                 "(sum of solid angles = %g * 4*PI).",name,sum);
+            return FAIL;
+        }
+    }
+
+    newSurf->filename    = MneSurfaceOld::mne_strdup(filename);
+    //newSurf->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
+    newSurf->s           = surf;
+    newSurf->s->id       = kind;
+    newSurf->subj        = Q_NULLPTR;
+    newSurf->surf_name   = MneSurfaceOld::mne_strdup(name);
+
+    newSurf->curvature_color_mode = SHOW_CURVATURE_NONE;
+    newSurf->overlay_color_mode   = SHOW_OVERLAY_HEAT;
+
+    decide_surface_extent(newSurf,name);
+    add_replace_display_surface(surfs,newSurf,TRUE,TRUE);
+    apply_left_eyes(surfs);
+    setup_current_surface_lights(surfs);
+
+    return OK;
+
+bad : {
+        delete surf;
+        return FAIL;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
+                                                          MneMshDisplaySurface*    newSurf,
+                                                          int                  replace,
+                                                          int                  drawable)
+{
+    int k;
+    MneMshDisplaySurface* surf = new MneMshDisplaySurface();
+
+    if (replace) {
+        for (k = 0; k < surfs->nsurf; k++) {
+            surf = surfs->surfs[k];
+            if (surf->s->id == newSurf->s->id) {
+                newSurf->transparent   = surf->transparent;
+                newSurf->show_aux_data = surf->show_aux_data;
+                delete surf;
+                surfs->surfs[k] = newSurf;
+                if (!drawable) {
+                    surfs->active[k]   = FALSE;
+                    surfs->drawable[k] = FALSE;
+                }
+                newSurf             = Q_NULLPTR;
+                break;
+            }
+        }
+    }
+    if (newSurf) {		/* New surface */
+        surfs->surfs     = REALLOC_47(surfs->surfs,surfs->nsurf+1,MneMshDisplaySurface*);
+        surfs->patches   = REALLOC_47(surfs->patches,surfs->nsurf+1,MneSurfacePatch*);
+        surfs->patch_rot = REALLOC_47(surfs->patch_rot,surfs->nsurf+1,float);
+        surfs->active    = REALLOC_47(surfs->active,surfs->nsurf+1,int);
+        surfs->drawable  = REALLOC_47(surfs->drawable,surfs->nsurf+1,int);
+        surfs->surfs[surfs->nsurf]     = newSurf;
+        surfs->active[surfs->nsurf]    = drawable;
+        surfs->drawable[surfs->nsurf]  = drawable;
+        surfs->patches[surfs->nsurf]   = NULL;
+        surfs->patch_rot[surfs->nsurf] = 0.0;
+        surfs->nsurf++;
+    }
     return;
 }
 
@@ -503,6 +604,29 @@ void MneMshDisplaySurfaceSet::apply_left_right_eyes(MneMshDisplaySurfaceSet* sur
 
 //*************************************************************************************************************
 
+void MneMshDisplaySurfaceSet::apply_left_eyes(MneMshDisplaySurfaceSet* surfs)
+{
+    int k;
+
+    if (surfs == Q_NULLPTR)
+        return;
+
+    for (k = 0; k < surfs->nsurf; k++) {
+        if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1) {
+            VEC_COPY_47(surfs->surfs[k]->eye,default_eyes.left);
+            VEC_COPY_47(surfs->surfs[k]->up,default_eyes.left_up);
+        }
+        else {
+            VEC_COPY_47(surfs->surfs[k]->eye,all_eyes[current_eyes].left);
+            VEC_COPY_47(surfs->surfs[k]->up,all_eyes[current_eyes].left_up);
+        }
+    }
+    return;
+}
+
+
+//*************************************************************************************************************
+
 void MneMshDisplaySurfaceSet::setup_current_surface_lights(MneMshDisplaySurfaceSet* surfs)
 {
     if (!surfs)
@@ -518,29 +642,41 @@ void MneMshDisplaySurfaceSet::setup_current_surface_lights(MneMshDisplaySurfaceS
 void MneMshDisplaySurfaceSet::initialize_custom_lights()
 {
     if (!custom_lights) {
-        mshLightSet s = new_light_set();
+        MneMshLightSet* s = new MneMshLightSet();
         s->nlight = ndefault;
+
+        QList<MneMshLight*> default_lights;
+        default_lights << new MneMshLight(TRUE, 0.0f, 0.0f,  1.0f, 0.8f, 0.8f, 0.8f);
+        default_lights << new MneMshLight(TRUE, 0.0f, 0.0f, -1.0f, 0.8f, 0.8f, 0.8f);
+        default_lights << new MneMshLight(TRUE, 0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f);
+        default_lights << new MneMshLight(TRUE, -0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f);
+        default_lights << new MneMshLight(TRUE, 1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f);
+        default_lights << new MneMshLight(TRUE, -1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f);
+        default_lights << new MneMshLight(TRUE, 0.0f, 1.0f, 0.5f, 0.6f, 0.6f, 0.6f);
+        default_lights << new MneMshLight(FALSE, 0.0f, 0.0f, -1.0, 1.0f, 1.0f, 1.0f);
+
         s->lights = default_lights;
+
         custom_lights = dup_light_set(s);
-        free_light_set(s);
+        delete s;
     }
 }
 
 
 //*************************************************************************************************************
 
-mshLightSet MneMshDisplaySurfaceSet::dup_light_set(mshLightSet s)
+MneMshLightSet* MneMshDisplaySurfaceSet::dup_light_set(MneMshLightSet* s)
 {
-    mshLightSet res = NULL;
+    MneMshLightSet* res = Q_NULLPTR;
     int k;
 
     if (s) {
-        res = new_light_set();
-        res->lights = MALLOC_47(s->nlight,mshLightRec);
+        res = new MneMshLightSet();
+        //res->lights = MALLOC_47(s->nlight,mshLightRec);
         res->nlight = s->nlight;
 
         for (k = 0; k < s->nlight; k++)
-            res->lights[k] = s->lights[k];
+            res->lights.append(new MneMshLight(*s->lights[k]));
     }
     return res;
 }
@@ -548,11 +684,12 @@ mshLightSet MneMshDisplaySurfaceSet::dup_light_set(mshLightSet s)
 
 //*************************************************************************************************************
 
-void MneMshDisplaySurfaceSet::setup_these_surface_lights(MneMshDisplaySurfaceSet* surfs, mshLightSet set)
+void MneMshDisplaySurfaceSet::setup_these_surface_lights(MneMshDisplaySurfaceSet* surfs, MneMshLightSet* set)
 {
     if (!surfs || !set)
         return;
-    free_light_set(surfs->lights);
+    delete surfs->lights;
+    surfs->lights = Q_NULLPTR;
     surfs->lights = dup_light_set(set);
     return;
 }

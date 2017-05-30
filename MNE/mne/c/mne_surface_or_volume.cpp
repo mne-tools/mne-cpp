@@ -1164,6 +1164,14 @@ MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int whi
 
 //*************************************************************************************************************
 
+MneSurfaceOld* MneSurfaceOrVolume::mne_read_bem_surface2(char *name, int  which, int  add_geometry, float *sigmap)
+{
+  return read_bem_surface(name,which,add_geometry,sigmap,FALSE);
+}
+
+
+//*************************************************************************************************************
+
 MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int which, int add_geometry, float *sigmap, bool check_too_many_neighbors)
 /*
      * Read a Neuromag-style BEM surface description
@@ -2901,9 +2909,9 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
  * Align the MEG fiducials to the MRI fiducials
  */
 {
-    float          *head_fid[3],*mri_fid[3],**fid;
-    int            j,k;
-    FiffDigPoint*  p = NULL;
+    float           *head_fid[3],*mri_fid[3],**fid;
+    int             j,k;
+    FiffDigPoint    p;
     FiffDigitizerData*  dig = NULL;
     float          nasion_weight = 5.0;
     float          scales[3];
@@ -2923,15 +2931,17 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         for (k = 0; k < 3; k++) {
             fid[k] = NULL;
-            for (k = 0, p = dig->points; k < dig->npoint; k++,p++) {
-                if (p->kind == FIFFV_POINT_CARDINAL) {
-                    if (p->ident == FIFFV_POINT_LPA)
-                        fid[0] = p->r;
-                    else if (p->ident == FIFFV_POINT_NASION)
-                        fid[1] = p->r;
-                    else if (p->ident == FIFFV_POINT_RPA)
-                        fid[2] = p->r;
-                }
+        }
+
+        for (k = 0; k < dig->npoint; k++) {
+            p = dig->points.at(k);
+            if (p.kind == FIFFV_POINT_CARDINAL) {
+                if (p.ident == FIFFV_POINT_LPA)
+                    fid[0] = p.r;
+                else if (p.ident == FIFFV_POINT_NASION)
+                    fid[1] = p.r;
+                else if (p.ident == FIFFV_POINT_RPA)
+                    fid[2] = p.r;
             }
         }
     }
@@ -2968,7 +2978,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
     for (k = 0; k < head_dig->nfids; k++)
         VEC_COPY_17(head_dig->mri_fids[k].r,mri_fid[k]);
-    //FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After simple alignment : ",head_dig->head_mri_t_adj);
+    FiffCoordTransOld::mne_print_coord_transform_label(stderr,QString("After simple alignment : ").toLatin1().data(),head_dig->head_mri_t_adj);
 
     if (omit_dist > 0)
         discard_outlier_digitizer_points(head_dig,head_surf,omit_dist);
@@ -2984,7 +2994,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         fprintf(stderr,"%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
                 1000.0*rms_digitizer_distance(head_dig,head_surf));
-        //FiffCoordTransOld::mne_print_coord_transform_label(stderr,"After refinement :",head_dig->head_mri_t_adj);
+        FiffCoordTransOld::mne_print_coord_transform_label(stderr,QString("After refinement :").toLatin1().data(),head_dig->head_mri_t_adj);
     }
 
     return OK;
@@ -3106,7 +3116,7 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
     int               k,nactive;
     int               *closest;
     float             *dist;
-    FiffDigPoint*     point = NULL;
+    FiffDigPoint      point;
     FiffCoordTransOld*    t = dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t;
     int               nstep = 4;
 
@@ -3128,9 +3138,10 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
     closest            = MALLOC_17(dig->npoint,int);
     dist               = MALLOC_17(dig->npoint,float);
 
-    for (k = 0, nactive = 0, point = dig->points; k < dig->npoint; k++, point++) {
+    for (k = 0, nactive = 0; k < dig->npoint; k++) {
         if ((dig->active[k] && !dig->discard[k]) || do_all) {
-            VEC_COPY_17(rr[nactive],point->r);
+            point = dig->points.at(k);
+            VEC_COPY_17(rr[nactive],point.r);
             FiffCoordTransOld::fiff_coord_trans(rr[nactive],t,FIFFV_MOVE);
             if (do_approx) {
                 closest[nactive] = dig->closest[k];
@@ -3196,7 +3207,7 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
     float **rr_mri  = NULL;
     float *w        = NULL;
     int             k,nactive;
-    FiffDigPoint*    point = NULL;
+    FiffDigPoint    point;
     FiffCoordTransOld* t = NULL;
     float           max_diff = 40e-3;
 
@@ -3216,15 +3227,16 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
     rr_mri  = ALLOC_CMATRIX_17(dig->npoint,3);
     w       = MALLOC_17(dig->npoint,float);
 
-    for (k = 0, nactive = 0, point = dig->points; k < dig->npoint; k++, point++) {
+    for (k = 0, nactive = 0; k < dig->npoint; k++) {
         if (dig->active[k] && !dig->discard[k]) {
-            VEC_COPY_17(rr_head[nactive],point->r);
+            point = dig->points.at(k);
+            VEC_COPY_17(rr_head[nactive],point.r);
             VEC_COPY_17(rr_mri[nactive],dig->closest_point[k]);
             /*
             * Special handling for the nasion
             */
-            if (point->kind == FIFFV_POINT_CARDINAL &&
-                    point->ident == FIFFV_POINT_NASION) {
+            if (point.kind == FIFFV_POINT_CARDINAL &&
+                    point.ident == FIFFV_POINT_NASION) {
                 w[nactive] = nasion_weight;
                 if (nasion_mri) {
                     VEC_COPY_17(rr_mri[nactive],nasion_mri);
@@ -3377,9 +3389,9 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
                                                              char *curv_file,
                                                              int  add_geometry,
                                                              int  check_too_many_neighbors)
-/*
-      * Load the surface and add the geometry information
-      */
+    /*
+    * Load the surface and add the geometry information
+    */
 {
     float **verts = Q_NULLPTR;
     float *curvs  = Q_NULLPTR;
@@ -3391,7 +3403,8 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
     MneSourceSpaceOld* s = Q_NULLPTR;
     void  *tags = Q_NULLPTR;
 
-    if (mne_read_triangle_file(surf_file,&nvert,
+    if (mne_read_triangle_file(surf_file,
+                               &nvert,
                                &ntri,
                                &verts,
                                &tris,
@@ -3470,7 +3483,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     int  magic;
     char c;
 
-    int  nvert,ntri,nquad;
+    qint32  nvert,ntri,nquad;
     float **vert = NULL;
     int   **tri  = NULL;
     int   k,p;
@@ -4067,8 +4080,8 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
 
 int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 /*
-      * Read the strange 3-byte integer
-      */
+* Read the strange 3-byte integer
+*/
 {
     unsigned int s = 0;
 
@@ -4087,13 +4100,13 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 
 //*************************************************************************************************************
 
-int MneSurfaceOrVolume::mne_read_int(FILE *in, int *ival)
+int MneSurfaceOrVolume::mne_read_int(FILE *in, qint32 *ival)
 /*
-      * Read a 32-bit integer
-      */
+* Read a 32-bit integer
+*/
 {
-    int s ;
-    if (fread (&s,sizeof(int),1,in) != 1) {
+    qint32 s ;
+    if (fread (&s,sizeof(qint32),1,in) != 1) {
         if (ferror(in))
             qCritical("mne_read_int");
         else
