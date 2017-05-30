@@ -299,6 +299,15 @@ QStringList IOUtils::get_old_chnames_conventions(const QStringList& chNames)
 bool IOUtils::check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention)
 {
     bool bMatching = false;
+
+    if(chNamesA.isEmpty()) {
+        qWarning("Warning in IOUtils::check_matching_chnames_conventions - chNamesA list is empty. Nothing to compare");
+    }
+
+    if(chNamesB.isEmpty()) {
+        qWarning("Warning in IOUtils::check_matching_chnames_conventions - chNamesB list is empty. Nothing to compare");
+    }
+
     QString replaceStringOldConv, replaceStringNewConv;
 
     for(int i = 0; i < chNamesA.size(); ++i) {

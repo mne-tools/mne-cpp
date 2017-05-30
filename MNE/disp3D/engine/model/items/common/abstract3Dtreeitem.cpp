@@ -97,31 +97,43 @@ void Abstract3DTreeItem::initItem()
     list << new QStandardItem("The transformation options");
     this->appendRow(list);
 
-    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
+    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::TranslateX, QString::number(0));
     itemXTrans->setEditable(true);
     connect(itemXTrans, &MetaTreeItem::dataChanged,
-            this, &Abstract3DTreeItem::onSurfaceTranslationXChanged);
+            this, &Abstract3DTreeItem::onTranslationXChanged);
     list.clear();
     list << itemXTrans;
     list << new QStandardItem(itemXTrans->toolTip());
     m_pItemTransformationOptions->appendRow(list);
 
-    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
+    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::TranslateY, QString::number(0));
     itemYTrans->setEditable(true);
     connect(itemYTrans, &MetaTreeItem::dataChanged,
-            this, &Abstract3DTreeItem::onSurfaceTranslationYChanged);
+            this, &Abstract3DTreeItem::onTranslationYChanged);
     list.clear();
     list << itemYTrans;
     list << new QStandardItem(itemYTrans->toolTip());
     m_pItemTransformationOptions->appendRow(list);
 
-    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
+    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::TranslateZ, QString::number(0));
     itemZTrans->setEditable(true);
     connect(itemZTrans, &MetaTreeItem::dataChanged,
-            this, &Abstract3DTreeItem::onSurfaceTranslationZChanged);
+            this, &Abstract3DTreeItem::onTranslationZChanged);
     list.clear();
     list << itemZTrans;
     list << new QStandardItem(itemZTrans->toolTip());
+    m_pItemTransformationOptions->appendRow(list);
+
+    float fScale = 1.0f;
+    MetaTreeItem *itemScale = new MetaTreeItem(MetaTreeItemTypes::Scale, QString::number(fScale));
+    itemScale->setEditable(true);
+    connect(itemScale, &MetaTreeItem::dataChanged,
+            this, &Abstract3DTreeItem::onScaleChanged);
+    list.clear();
+    list << itemScale;
+    list << new QStandardItem(itemZTrans->toolTip());
+    data.setValue(fScale);
+    itemScale->setData(data, MetaTreeItemRoles::Scale);
     m_pItemTransformationOptions->appendRow(list);
 
     //Color
@@ -262,7 +274,7 @@ void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void Abstract3DTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
+void Abstract3DTreeItem::onTranslationXChanged(const QVariant& fTransX)
 {
     if(fTransX.canConvert<float>()) {
         QVector3D position = this->position();
@@ -274,7 +286,7 @@ void Abstract3DTreeItem::onSurfaceTranslationXChanged(const QVariant& fTransX)
 
 //*************************************************************************************************************
 
-void Abstract3DTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
+void Abstract3DTreeItem::onTranslationYChanged(const QVariant& fTransY)
 {
     if(fTransY.canConvert<float>()) {
         QVector3D position = this->position();
@@ -286,12 +298,22 @@ void Abstract3DTreeItem::onSurfaceTranslationYChanged(const QVariant& fTransY)
 
 //*************************************************************************************************************
 
-void Abstract3DTreeItem::onSurfaceTranslationZChanged(const QVariant& fTransZ)
+void Abstract3DTreeItem::onTranslationZChanged(const QVariant& fTransZ)
 {
     if(fTransZ.canConvert<float>()) {
         QVector3D position = this->position();
         position.setZ(fTransZ.toFloat());
         this->setPosition(position);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Abstract3DTreeItem::onScaleChanged(const QVariant& fScale)
+{
+    if(fScale.canConvert<float>()) {
+        this->setScale(fScale.toFloat());
     }
 }
 

@@ -97,6 +97,7 @@ namespace DISP3DLIB
 class DISP3DNEWSHARED_EXPORT Renderable3DEntity : public Qt3DCore::QEntity
 {
     Q_OBJECT
+    Q_PROPERTY(float scale READ scaleValue WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(float rotX READ rotX WRITE setRotX NOTIFY rotXChanged)
     Q_PROPERTY(float rotY READ rotY WRITE setRotY NOTIFY rotYChanged)
     Q_PROPERTY(float rotZ READ rotZ WRITE setRotZ NOTIFY rotZChanged)
@@ -150,6 +151,14 @@ public:
     * @param[in] sParameterName   The name of the parameter to be set.
     */
     virtual void setMaterialParameter(QVariant data, QString sParameterName);
+
+    //=========================================================================================================
+    /**
+    * Returns the current scaling value.
+    *
+    * @return The scaling value.
+    */
+    virtual float scaleValue() const;
 
     //=========================================================================================================
     /**
@@ -234,6 +243,7 @@ public:
 protected: 
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
 
+    float                                       m_fScale;                /**< The scaling value. */
     float                                       m_fRotX;                 /**< The x axis rotation value. */
     float                                       m_fRotY;                 /**< The y axis rotation value. */
     float                                       m_fRotZ;                 /**< The z axis rotation value. */
@@ -246,6 +256,14 @@ protected:
     virtual void updateTransform();
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the scaling changed.
+    *
+    * @param[in] scale     The scaling value.
+    */
+    void scaleChanged(float scale);
+
     //=========================================================================================================
     /**
     * Emit this signal whenever the x-axis rotation changed.
