@@ -288,7 +288,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorSetTreeItem* addMegSensorData(const QString& sSubject,
+    SensorSetTreeItem* addMegSensorInfo(const QString& sSubject,
                                         const QString& sSensorSetName,
                                         const MNELIB::MNEBem& sensor,
                                         const QList<FIFFLIB::FiffChInfo>& lChInfo = QList<FIFFLIB::FiffChInfo>());

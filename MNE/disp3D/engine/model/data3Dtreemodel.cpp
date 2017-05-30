@@ -358,7 +358,7 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString&
 
 //*************************************************************************************************************
 
-SensorSetTreeItem* Data3DTreeModel::addMegSensorData(const QString& sSubject,
+SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
                                                        const QString& sSensorSetName,
                                                        const MNELIB::MNEBem& sensor,
                                                        const QList<FIFFLIB::FiffChInfo>& lChInfo)
