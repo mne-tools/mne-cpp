@@ -129,8 +129,10 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief   calculateLinear Creates a weight matrix using linear distance interpolation and stores it inside
-     *          m_interpolationMatrix
+     * @brief calculateWeights Calculate interpolation coefficients for weight matrix
+     * @param projectedSensors Vector of indizes of sensor vertices
+     * @param distanceTable Result of SCDC
+     * @param cancelDist Distances higher than this are ignored, i.e. the respective coefficients are set to zero
      */
     static void calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*f) (double), double cancelDist = DOUBLE_INFINITY);
 
