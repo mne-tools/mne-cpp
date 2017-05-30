@@ -131,6 +131,7 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
     return Sphere(center, R);
 }
 
+
 //*************************************************************************************************************
 
 bool Sphere::fit_sphere_to_points ( float **rr, int np, float simplex_size, float *r0, float *R )
@@ -143,6 +144,12 @@ bool Sphere::fit_sphere_to_points ( float **rr, int np, float simplex_size, floa
         rr_eigen(k, 0) = rr[k][0];
         rr_eigen(k, 1) = rr[k][1];
         rr_eigen(k, 2) = rr[k][2];
+    }
+
+    if(rr_eigen.rows() > 0) {
+        std::cout << "Sphere::fit_sphere_to_points - No points were passed." << std::endl;
+
+        return false;
     }
 
     r0_eigen(0) = r0[0];
