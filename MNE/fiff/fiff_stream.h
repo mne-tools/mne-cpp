@@ -99,6 +99,7 @@ class FiffDigPoint;
 class FiffChInfo;
 class FiffChPos;
 class FiffCoordTrans;
+class FiffDigitizerData;
 
 static FiffId defaultFiffId;
 
@@ -321,6 +322,21 @@ public:
     * @return the CTF software compensation data
     */
     QList<FiffCtfComp> read_ctf_comp(const FiffDirNode::SPtr& p_Node, const QList<FiffChInfo>& p_Chs);
+
+    //=========================================================================================================
+    /**
+    * Reimplemntation of load_digitizer_data (digitizer.c)
+    *
+    * ### MNE-C root function ###
+    *
+    * Read the digitizer data from the given node.
+    *
+    * @param[in] p_Node     The node of interest
+    * @param[out] p_digData  The read digitizer data
+    *
+    * @return rue if succeeded, false otherwise
+    */
+    bool read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigitizerData& p_digData);
 
     //=========================================================================================================
     /**

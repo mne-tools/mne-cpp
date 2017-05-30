@@ -215,8 +215,8 @@ void EEGoSports::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    QList<QVector<double> > elcLocation3D;
-    QList<QVector<double> > elcLocation2D;
+    QList<QVector<float> > elcLocation3D;
+    QList<QVector<float> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
@@ -266,8 +266,8 @@ void EEGoSports::setUpFiffInfo()
     //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
     if(numberEEGCh > elcLocation3D.size()) {
         qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
-        QVector<double> tempA(3, 0.0);
-        QVector<double> tempB(2, 0.0);
+        QVector<float> tempA(3, 0.0);
+        QVector<float> tempB(2, 0.0);
         int size = numberEEGCh-elcLocation3D.size();
 
         for(int i = 0; i<size; i++) {
@@ -280,8 +280,8 @@ void EEGoSports::setUpFiffInfo()
     //
     //Append cardinal points LPA RPA Nasion
     //
-    QList<QVector<double> > cardinals3D;
-    QList<QVector<double> > cardinals2D;
+    QList<QVector<float> > cardinals3D;
+    QList<QVector<float> > cardinals2D;
     QStringList cardinalNames;
 
     if(!LayoutLoader::readAsaElcFile(m_sCardinalFilePath, cardinalNames, cardinals3D, cardinals2D, unit)) {
@@ -424,11 +424,8 @@ void EEGoSports::setUpFiffInfo()
             //Set channel type
             fChInfo.kind = FIFFV_EEG_CH;
 
-            //Set coil type
-            fChInfo.coil_type = FIFFV_COIL_EEG;
-
             //Set logno
-            fChInfo.logno = i;
+            fChInfo.logNo = i;
 
             //Set coord frame
             fChInfo.coord_frame = FIFFV_COORD_HEAD;
@@ -448,21 +445,21 @@ void EEGoSports::setUpFiffInfo()
             fChInfo.eeg_loc(2,1) = center_pos.z()*0.001;
 
             //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
-            fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
-            fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
-            fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
+            fChInfo.chpos.r0(0) = elcLocation3D[i][0]*0.001;
+            fChInfo.chpos.r0(1) = elcLocation3D[i][1]*0.001;
+            fChInfo.chpos.r0(2) = elcLocation3D[i][2]*0.001;
 
-            fChInfo.loc(3,0) = center_pos.x()*0.001;
-            fChInfo.loc(4,0) = center_pos.y()*0.001;
-            fChInfo.loc(5,0) = center_pos.z()*0.001;
+            fChInfo.chpos.ex(0) = center_pos.x()*0.001;
+            fChInfo.chpos.ex(1) = center_pos.y()*0.001;
+            fChInfo.chpos.ex(2) = center_pos.z()*0.001;
 
-            fChInfo.loc(6,0) = 0;
-            fChInfo.loc(7,0) = 1;
-            fChInfo.loc(8,0) = 0;
+            fChInfo.chpos.ey(0) = 0;
+            fChInfo.chpos.ey(1) = 1;
+            fChInfo.chpos.ey(2) = 0;
 
-            fChInfo.loc(9,0) = 0;
-            fChInfo.loc(10,0) = 0;
-            fChInfo.loc(11,0) = 1;
+            fChInfo.chpos.ez(0) = 0;
+            fChInfo.chpos.ez(1) = 0;
+            fChInfo.chpos.ez(2) = 1;
 
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
@@ -526,7 +523,7 @@ bool EEGoSports::start()
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);
+    m_pRMTSA_EEGoSports->data()->setMultiArraySize(10);
     m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer

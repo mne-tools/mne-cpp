@@ -57,6 +57,11 @@
 #include <mne/mne_bem.h>
 #include <fwd/fwd_bem_model.h>
 
+#include <mne/c/mne_msh_display_surface_set.h>
+#include <mne/c/mne_msh_display_surface.h>
+#include <mne/c/mne_surface_or_volume.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -166,9 +171,6 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
-
-
-    //FwdBemModel* bemModel =  fwd_bem_load_three_layer_surfaces(const QString& name);
 
     QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadKid(t_fileHeadKid);
@@ -337,6 +339,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
     //Add all digitizer but additional points to the 3D view
     FiffDigPointSet t_digSetWithoutAdditional = t_digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
     m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
+    m_pData3DModel->addDigitizerData("Head", "Tracked_No_Trans", t_digSetWithoutAdditional);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -363,7 +366,66 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
         m_vCoilFreqs << 155 << 165 << 190 << 220;
     }
 
+    alignFiducials(fileName);
+
     return lDigPoints;
+}
+
+
+//*************************************************************************************************************
+
+void HPIWidget::alignFiducials(const QString& fileNameDigData)
+{
+    QFile test("./resources/hpiAlignment/fsaverage-fiducials.fif");
+    FiffDigPointSet testdata(test);
+    m_pData3DModel->addDigitizerData("Head", "avr", testdata);
+
+    //Calculate the alignment of the fiducials
+    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
+    MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
+                                             "./resources/hpiAlignment/fsaverage-head.fif",
+                                             FIFFV_BEM_SURF_ID_HEAD,
+                                             "head",
+                                             1,
+                                             1);
+    MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0];
+
+    QFile t_fileDigData(fileNameDigData);
+    FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
+
+    QFile t_fileDigDataReference("./resources/hpiAlignment/fsaverage-fiducials.fif");
+    FiffDigitizerData* t_digDataReference = new FiffDigitizerData(t_fileDigDataReference);
+
+    MneSurfaceOrVolume::align_fiducials(t_digData,
+                                        t_digDataReference,
+                                        surface,
+                                        10,
+                                        1,
+                                        0);
+
+    QMatrix4x4 mat;
+    for(int r = 0; r < 3; ++r) {
+        for(int c = 0; c < 3; ++c) {
+            mat(r,c) = t_digData->head_mri_t_adj->rot(r,c);
+        }
+    }
+    mat(0,3) = t_digData->head_mri_t_adj->move(0);
+    mat(1,3) = t_digData->head_mri_t_adj->move(1);
+    mat(2,3) = t_digData->head_mri_t_adj->move(2);
+
+    Qt3DCore::QTransform transform;
+    transform.setMatrix(mat);
+
+    //Update fast scan / tracked digitizer
+    QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
+            pDigItem->setTransform(transform);
+        }
+    }
+
+    std::cout<<"rot:"<<std::endl<<t_digData->head_mri_t_adj->rot;
+    std::cout<<std::endl<<"move:"<<std::endl<<t_digData->head_mri_t_adj->move;
 }
 
 

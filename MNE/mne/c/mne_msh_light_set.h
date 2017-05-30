@@ -107,7 +107,7 @@ public:
 
 public:
     char     *name;		/* Name of this set */
-    MneMshLight* lights;		/* Which lights */
+    QList<MneMshLight*> lights;		/* Which lights */
     int      nlight;		/* How many */
 
 // ### OLD STRUCT ###
