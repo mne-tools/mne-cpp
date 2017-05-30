@@ -83,40 +83,11 @@ using namespace Eigen;
 //=============================================================================================================
 QSharedPointer<MatrixXd> Interpolation::m_interpolationMatrix = nullptr;
 
-void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, const double cancelDist, qint32 interpolationType)
+void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double), const double cancelDist)
 {
+    // initialization
     m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable->rows(), projectedSensors.size());
     m_interpolationMatrix->setZero();
-    double (*function) (double);
-    switch (interpolationType) {
-    case LINEAR:
-        function = identity;
-        break;
-    default:
-        std::cout << "[WARNING] Unknown interpolation type" << std::endl;
-        return;
-    }
-    calculateWeights(projectedSensors, distanceTable, function, cancelDist);
-}
-//*************************************************************************************************************
-
-QSharedPointer<VectorXd> Interpolation::interpolateSignal(const VectorXd &measurementData)
-{
-    QSharedPointer<VectorXd> interpolatedVec = QSharedPointer<VectorXd>::create();
-    (*interpolatedVec) = (*m_interpolationMatrix) * measurementData;
-    return interpolatedVec;
-
-}
-//*************************************************************************************************************
-
-void Interpolation::clearInterpolateMatrix()
-{
-    // @todo why does the compiler say the there is no member clear ?
-    // m_interpolationMatrix->clear();
-}
-//*************************************************************************************************************
-
-void Interpolation::calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double), double cancelDist) {
     size_t n = m_interpolationMatrix->rows();
     size_t m = m_interpolationMatrix->cols();
     // insert all sensor nodes into set for faster lookup during later computation
@@ -151,12 +122,28 @@ void Interpolation::calculateWeights(const QVector<qint32> &projectedSensors, co
         }
     }
 }
+//*************************************************************************************************************
+
+QSharedPointer<VectorXd> Interpolation::interpolateSignal(const VectorXd &measurementData)
+{
+    QSharedPointer<VectorXd> interpolatedVec = QSharedPointer<VectorXd>::create();
+    (*interpolatedVec) = (*m_interpolationMatrix) * measurementData;
+    return interpolatedVec;
+
+}
+//*************************************************************************************************************
+
+void Interpolation::clearInterpolateMatrix()
+{
+    m_interpolationMatrix.clear();
+}
+//*************************************************************************************************************
+
+double Interpolation::linear(const double d) {
+    return d;
+}
+//*************************************************************************************************************
 
 QSharedPointer<MatrixXd> Interpolation::getResult() {
     return m_interpolationMatrix;
 }
-
-double Interpolation::identity(const double d) {
-    return d;
-}
-

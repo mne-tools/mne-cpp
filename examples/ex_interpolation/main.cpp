@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 
     // linear weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
+    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix, Interpolation::linear);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
     // realtime interpolation (1 iteration)
