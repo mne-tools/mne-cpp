@@ -106,12 +106,13 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief createInterpolationMat
-     * @param projectedSensors
-     * @param distanceTable
-     * @param interpolationType
+     * @brief createInterpolationMat Calculate weight matrix for later interpolation
+     * @param projectedSensors Vector of IDs of sensor vertices
+     * @param distanceTable Matrix that contains all needed distances
+     * @param f Function that computes interpolation coefficients using the distance values
+     * @param cancelDist Distances higher than this are ignored, i.e. the respective coefficients are set to zero
      */
-    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double cancelDist = DOUBLE_INFINITY, qint32 interpolationType = LINEAR);
+    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*f) (double), const double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
@@ -123,18 +124,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief clearInterpolateMatrix
+     * @brief clearInterpolateMatrix Clears the last computation and frees all memory that was allocated for the weight matrix
      */
     static void clearInterpolateMatrix();
-
-    //=========================================================================================================
-    /**
-     * @brief calculateWeights Calculate interpolation coefficients for weight matrix
-     * @param projectedSensors Vector of indizes of sensor vertices
-     * @param distanceTable Result of SCDC
-     * @param cancelDist Distances higher than this are ignored, i.e. the respective coefficients are set to zero
-     */
-    static void calculateWeights(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*f) (double), double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
@@ -145,11 +137,11 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief identity Returns passed argument unchanged
+     * @brief linear Returns passed argument unchanged
      * @param d
      * @return
      */
-    static double identity(const double d);
+    static double linear(const double d);
 
 protected:
 
