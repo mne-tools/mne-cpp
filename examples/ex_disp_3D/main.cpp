@@ -55,10 +55,6 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <iostream>
-
-#include <mne/c/mne_msh_display_surface_set.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -150,10 +146,6 @@ int main(int argc, char *argv[])
     } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClustering = true;
     }
-
-    //MneMshDisplaySurfaceSet test
-    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = MneMshDisplaySurfaceSet::load_new_surface("subject","pial",NULL);
-
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
@@ -272,7 +264,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingActive(true);
+            pRTDataItem->setStreamingActive(false);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
             pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColortable("Hot");

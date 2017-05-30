@@ -121,9 +121,9 @@ namespace MetaTreeItemTypes
                     VisualizationType = QStandardItem::UserType + 114,
                     Color = QStandardItem::UserType + 115,
                     UnknownItem = QStandardItem::UserType + 116,
-                    SurfaceTranslateX = QStandardItem::UserType + 117,
-                    SurfaceTranslateY = QStandardItem::UserType + 118,
-                    SurfaceTranslateZ = QStandardItem::UserType + 119,
+                    TranslateX = QStandardItem::UserType + 117,
+                    TranslateY = QStandardItem::UserType + 118,
+                    TranslateZ = QStandardItem::UserType + 119,
                     NetworkThreshold = QStandardItem::UserType + 120,
                     NetworkMatrix = QStandardItem::UserType + 121,
                     SurfaceTessInner = QStandardItem::UserType + 122,
@@ -131,7 +131,8 @@ namespace MetaTreeItemTypes
                     SurfaceTriangleScale = QStandardItem::UserType + 124,
                     NumberDipoles = QStandardItem::UserType + 125,
                     MaterialType = QStandardItem::UserType + 126,
-                    ShowNormals = QStandardItem::UserType + 127  };
+                    ShowNormals = QStandardItem::UserType + 127,
+                    Scale = QStandardItem::UserType + 128  };
 }
 
 // Model item roles
@@ -190,14 +191,15 @@ namespace MetaTreeItemRoles
                     DistributedSourceLocThreshold = Qt::UserRole + 15,
                     VisualizationType = Qt::UserRole + 16,
                     Color = Qt::UserRole + 17,
-                    SurfaceTranslateX = Qt::UserRole + 18,
-                    SurfaceTranslateY = Qt::UserRole + 19,
-                    SurfaceTranslateZ = Qt::UserRole + 20,
+                    TranslateX = Qt::UserRole + 18,
+                    TranslateY = Qt::UserRole + 19,
+                    TranslateZ = Qt::UserRole + 20,
                     NetworkThreshold = Qt::UserRole + 22,
                     SurfaceTessInner = Qt::UserRole + 23,
                     SurfaceTessOuter = Qt::UserRole + 24,
                     SurfaceTriangleScale = Qt::UserRole + 25,
-                    SurfaceMaterial = Qt::UserRole + 26};
+                    SurfaceMaterial = Qt::UserRole + 26,
+                    Scale = Qt::UserRole + 27};
 }
 
 } //NAMESPACE DISP3DLIB
