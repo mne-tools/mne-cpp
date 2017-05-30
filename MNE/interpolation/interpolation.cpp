@@ -144,6 +144,11 @@ double Interpolation::linear(const double d) {
 }
 //*************************************************************************************************************
 
+double Interpolation::gaussian(const double d) {
+    return exp(-((d*d)/2.));
+}
+//*************************************************************************************************************
+
 QSharedPointer<MatrixXd> Interpolation::getResult() {
     return m_interpolationMatrix;
 }
