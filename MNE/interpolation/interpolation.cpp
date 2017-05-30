@@ -149,6 +149,11 @@ double Interpolation::gaussian(const double d) {
 }
 //*************************************************************************************************************
 
+double Interpolation::square(const double d){
+    return (d*d);
+}
+
+//*************************************************************************************************************
 QSharedPointer<MatrixXd> Interpolation::getResult() {
     return m_interpolationMatrix;
 }
