@@ -261,7 +261,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, con
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {            
             //If measurement data has already been created but in conjunction with a different data type (i.e. connectivity, dipole fitting, etc.), do the connects here
             if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).isEmpty()) {
-                connectMeasurementToMriItems(pSubjectItem, pMeasurementItem);
+                pSubjectItem->connectMeasurementToMriItems(pMeasurementItem);
             }
 
             pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
@@ -271,7 +271,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, con
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
 
-        connectMeasurementToMriItems(pSubjectItem, pMeasurementItem);
+        pSubjectItem->connectMeasurementToMriItems(pMeasurementItem);
     }
 
     return pReturnItem;
@@ -482,21 +482,3 @@ void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStanda
 }
 
 
-//*************************************************************************************************************
-
-void Data3DTreeModel::connectMeasurementToMriItems(SubjectTreeItem* pSubjectItem, MeasurementTreeItem* pMeasurementItem)
-{
-    //Connect mri item with all measurement tree items in case the real time color changes (i.e. rt source loc)
-    //or the user changes the color origin
-    QList<QStandardItem*> mriItemList = pSubjectItem->findChildren(Data3DTreeModelItemTypes::MriItem);
-
-    for(int i = 0; i < mriItemList.size(); ++i) {
-        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(mriItemList.at(i))) {
-            connect(pMeasurementItem, &MeasurementTreeItem::rtVertColorChanged,
-                pMriItem, &MriTreeItem::setRtVertColor);
-
-            connect(pMriItem, &MriTreeItem::colorOriginChanged,
-                pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
-        }
-    }
-}
