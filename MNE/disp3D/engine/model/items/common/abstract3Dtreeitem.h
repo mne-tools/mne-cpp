@@ -164,7 +164,7 @@ protected:
     *
     * @param[in] fTransX        The current x translation.
     */
-    virtual void onSurfaceTranslationXChanged(const QVariant& fTransX);
+    virtual void onTranslationXChanged(const QVariant& fTransX);
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ protected:
     *
     * @param[in] fTransY        The current y translation.
     */
-    virtual void onSurfaceTranslationYChanged(const QVariant& fTransY);
+    virtual void onTranslationYChanged(const QVariant& fTransY);
 
     //=========================================================================================================
     /**
@@ -180,7 +180,15 @@ protected:
     *
     * @param[in] fTransZ        The current z translation.
     */
-    virtual void onSurfaceTranslationZChanged(const QVariant& fTransZ);
+    virtual void onTranslationZChanged(const QVariant& fTransZ);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever the the scaling of this item changed.
+    *
+    * @param[in] fScale        The current scale value for all axis.
+    */
+    virtual void onScaleChanged(const QVariant& fScale);
 
     //=========================================================================================================
     /**

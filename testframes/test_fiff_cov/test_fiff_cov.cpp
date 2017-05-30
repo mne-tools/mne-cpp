@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     test_fiff_cov.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a test_read_cov
+* @brief    Test for I/O of a FiffCov
 *
 */
 

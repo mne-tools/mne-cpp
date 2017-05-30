@@ -182,16 +182,16 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
 {
     printf("Cluster forward solution using %s.\n", p_sMethod.toUtf8().constData());
 
-    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);    
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
     //Check if cov naming conventions are matching
-    if(!IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names)) {
+    if(!IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names) && !p_pNoise_cov.names.isEmpty() && !p_pInfo.ch_names.isEmpty()) {
         if(IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names, true)) {
-            qWarning("MNEForwardSolution::cluster_forward_solution - Cov names do match with info channel names but have a different naming convention. Abort clustering.");
-            return p_fwdOut;
+            qWarning("MNEForwardSolution::cluster_forward_solution - Cov names do match with info channel names but have a different naming convention.");
+            //return p_fwdOut;
         } else {
-            qWarning("MNEForwardSolution::cluster_forward_solution - Cov channel names do not match with info channel names. Abort clustering.");
-            return p_fwdOut;
+            qWarning("MNEForwardSolution::cluster_forward_solution - Cov channel names do not match with info channel names.");
+            //return p_fwdOut;
         }
     }
 

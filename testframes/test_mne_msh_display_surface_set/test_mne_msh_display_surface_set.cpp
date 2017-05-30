@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_msh_light.h
+* @file     test_mne_msh_display_surface_set.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,111 +29,119 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneMshLight class declaration.
+* @brief    Test for I/O of a MneMshDisplaySurfaceSet
 *
 */
 
-#ifndef MNEMSHLIGHT_H
-#define MNEMSHLIGHT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_global.h"
+#include <mne/c/mne_msh_display_surface_set.h>
+#include <mne/c/mne_msh_display_surface.h>
+#include <mne/c/mne_surface_old.h>
+
+#include <fiff/fiff_file.h>
+
+#include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QtTest>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QSharedPointer>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace MNELIB
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+using namespace MNELIB;
 
 
 //=============================================================================================================
 /**
-* Replaces *mshLight,mshLightRec struct (analyze_types.c).
+* DECLARE CLASS TestMneMshDisplaySurfaceSet
 *
-* @brief The MneMshLight class.
+* @brief The TestMneMshDisplaySurfaceSet class provides display surface set reading verification tests
+*
 */
-class MNESHARED_EXPORT MneMshLight
+class TestMneMshDisplaySurfaceSet: public QObject
 {
-public:
-    typedef QSharedPointer<MneMshLight> SPtr;              /**< Shared pointer type for MneMshLight. */
-    typedef QSharedPointer<const MneMshLight> ConstSPtr;   /**< Const shared pointer type for MneMshLight. */
-
-    //=========================================================================================================
-    /**
-    * Constructs the MneMshLight.
-    */
-    MneMshLight();
-
-    //=========================================================================================================
-    /**
-    * Copy Constructs of the MneMshLight.
-    */
-    MneMshLight(const MneMshLight &p_mneMshLight);
-
-    //=========================================================================================================
-    /**
-    * Constructs the MneMshLight.
-    */
-    MneMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
-
-    //=========================================================================================================
-    /**
-    * Destroys the MneMshLight.
-    */
-    ~MneMshLight();
+    Q_OBJECT
 
 public:
-    int   state;			/* On or off? */
-    float pos[3];			/* Where is the light? */
-    float diff[3];		/* Diffuse intensity */
+    TestMneMshDisplaySurfaceSet();
 
-// ### OLD STRUCT ###
-//    typedef struct {		/* Definition of lighting */
-//      int   state;			/* On or off? */
-//      float pos[3];			/* Where is the light? */
-//      float diff[3];		/* Diffuse intensity */
-//    } *mshLight,mshLightRec;	/* We are only using diffuse lights here */
+private slots:
+    void initTestCase();
+    void compareSurface();
+    void cleanupTestCase();
 
+private:
+    double epsilon;
+
+    MneMshDisplaySurfaceSet::SPtr m_pSurfSetBemLoaded;
 };
+
+
+//*************************************************************************************************************
+
+TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
+: epsilon(0.000001)
+{
+}
+
+
+
+//*************************************************************************************************************
+
+void TestMneMshDisplaySurfaceSet::initTestCase()
+{
+    //qDebug() << "Epsilon" << epsilon;
+
+    //Read the results produced with MNE-CPP
+    //Calculate the alignment of the fiducials
+    m_pSurfSetBemLoaded = MneMshDisplaySurfaceSet::SPtr(new MneMshDisplaySurfaceSet());
+    MneMshDisplaySurfaceSet::add_bem_surface(m_pSurfSetBemLoaded.data(),
+                                             QDir::currentPath()+"/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
+                                             FIFFV_BEM_SURF_ID_BRAIN,
+                                             "5120",
+                                             1,
+                                             1);
+
+    QVERIFY( m_pSurfSetBemLoaded->nsurf == 1 );
+}
+
+
+//*************************************************************************************************************
+
+void TestMneMshDisplaySurfaceSet::compareSurface()
+{
+    if(m_pSurfSetBemLoaded->nsurf >= 1) {
+        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->np == 2562 );
+        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->ntri == 5120 );
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+void TestMneMshDisplaySurfaceSet::cleanupTestCase()
+{    
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INLINE DEFINITIONS
+// MAIN
 //=============================================================================================================
 
-} // NAMESPACE MNELIB
-
-#endif // MNEMSHLIGHT_H
+QTEST_APPLESS_MAIN(TestMneMshDisplaySurfaceSet)
+#include "test_mne_msh_display_surface_set.moc"

@@ -116,7 +116,7 @@ struct VisualizationInfo {
     VectorXi                    vVertNo;
     QList<FSLIB::Label>         lLabels;
     QMap<qint32, qint32>        mapLabelIdSources;
-    QMap<int, QVector<int> >    mapVertexNeighbors;
+    QVector<QVector<int> >      mapVertexNeighbors;
     SparseMatrix<double>        matWDistSmooth;
     double                      dThresholdX;
     double                      dThresholdZ;
@@ -178,15 +178,15 @@ public:
     *
     * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
     * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
-    * @param[in] mapVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
-    * @param[in] mapVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
+    * @param[in] vecVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
+    * @param[in] vecVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
     * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
     * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
     */
     void setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
                         const Eigen::VectorXi& vecVertNoRightHemi,
-                        const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
-                        const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
+                        const QVector<QVector<int> >& vecVertexNeighborsLeftHemi,
+                        const QVector<QVector<int> >& vecVertexNeighborsRightHemi,
                         const MatrixX3f& matVertPosLeftHemi,
                         const MatrixX3f& matVertPosRightHemi);
 
