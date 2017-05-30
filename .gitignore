@@ -186,6 +186,8 @@
 
 # Compiled Dynamic libraries
 *.so
+*.so.debug
+*.debug
 
 # Compiled Static libraries
 *.lai
