@@ -111,7 +111,6 @@ SOURCES += \
     engine/model/items/bem/bemtreeitem.cpp \
     engine/model/items/bem/bemsurfacetreeitem.cpp \
     engine/model/items/sensorspace/sensorsettreeitem.cpp \
-    engine/model/items/sensordata/sensordatatreeitem.cpp \
     engine/model/items/sensorspace/sensorsurfacetreeitem.cpp \
     engine/model/items/sensorspace/sensorpositiontreeitem.cpp \
     engine/model/items/digitizer/digitizertreeitem.cpp \
@@ -133,7 +132,7 @@ SOURCES += \
     adapters/ecdview.cpp \
     adapters/abstractview.cpp \
     adapters/networkview.cpp \
-    engine/model/items/sensordatatreeitem.cpp
+    engine/model/items/sensordata/sensordatatreeitem.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -150,7 +149,6 @@ HEADERS += \
     engine/model/items/network/networktreeitem.h \
     engine/model/items/bem/bemtreeitem.h \
     engine/model/items/bem/bemsurfacetreeitem.h \
-    engine/model/items/sensordata/sensordatatreeitem.h \
     engine/model/items/sensorspace/sensorsettreeitem.h \
     engine/model/items/sensorspace/sensorsurfacetreeitem.h \
     engine/model/items/sensorspace/sensorpositiontreeitem.h \
@@ -176,7 +174,7 @@ HEADERS += \
     adapters/abstractview.h \
     adapters/networkview.h \
     disp3D_global.h \
-    engine/model/items/sensordatatreeitem.h
+    engine/model/items/sensordata/sensordatatreeitem.h
 
 FORMS += \
     engine/control/control3dwidget.ui \

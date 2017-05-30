@@ -136,7 +136,7 @@ public:
     /**
     * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] tSourceEstimate    The MNESourceEstimate data.
+    * @param[in] tSensorData    The MNESourceEstimate data.
     */
     //void addData(const MNELIB::SensorData& tSensorData);
 
