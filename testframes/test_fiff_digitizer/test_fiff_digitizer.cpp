@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_msh_light.h
+* @file     test_fiff_digitizer.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,111 +29,136 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneMshLight class declaration.
+* @brief    Test for I/O of a FiffDigitizerData
 *
 */
 
-#ifndef MNEMSHLIGHT_H
-#define MNEMSHLIGHT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_global.h"
+#include <fiff/fiff_dig_point.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QtTest>
+#include <QFile>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QSharedPointer>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace MNELIB
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+using namespace FIFFLIB;
 
 
 //=============================================================================================================
 /**
-* Replaces *mshLight,mshLightRec struct (analyze_types.c).
+* DECLARE CLASS TestFiffDigitizer
 *
-* @brief The MneMshLight class.
+* @brief The TestFiffDigitizer class provides digitizer data reading verification tests
+*
 */
-class MNESHARED_EXPORT MneMshLight
+class TestFiffDigitizer: public QObject
 {
-public:
-    typedef QSharedPointer<MneMshLight> SPtr;              /**< Shared pointer type for MneMshLight. */
-    typedef QSharedPointer<const MneMshLight> ConstSPtr;   /**< Const shared pointer type for MneMshLight. */
-
-    //=========================================================================================================
-    /**
-    * Constructs the MneMshLight.
-    */
-    MneMshLight();
-
-    //=========================================================================================================
-    /**
-    * Copy Constructs of the MneMshLight.
-    */
-    MneMshLight(const MneMshLight &p_mneMshLight);
-
-    //=========================================================================================================
-    /**
-    * Constructs the MneMshLight.
-    */
-    MneMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
-
-    //=========================================================================================================
-    /**
-    * Destroys the MneMshLight.
-    */
-    ~MneMshLight();
+    Q_OBJECT
 
 public:
-    int   state;			/* On or off? */
-    float pos[3];			/* Where is the light? */
-    float diff[3];		/* Diffuse intensity */
+    TestFiffDigitizer();
 
-// ### OLD STRUCT ###
-//    typedef struct {		/* Definition of lighting */
-//      int   state;			/* On or off? */
-//      float pos[3];			/* Where is the light? */
-//      float diff[3];		/* Diffuse intensity */
-//    } *mshLight,mshLightRec;	/* We are only using diffuse lights here */
+private slots:
+    void initTestCase();
+    void comparePoints();
+    void compareCoordFrame();
+    void compareNPoint();
+    void cleanupTestCase();
 
+private:
+    double      m_dEpsilon;
+    double      m_dSumPointsDigDataResult;
+    int         m_iCoordFrameDigDataResult;
+    int         m_iNPointDigDataResult;
+
+    FiffDigitizerData digDataLoaded;
 };
+
+
+//*************************************************************************************************************
+
+TestFiffDigitizer::TestFiffDigitizer()
+: m_dEpsilon(1.0e-04)
+{
+}
+
+
+
+//*************************************************************************************************************
+
+void TestFiffDigitizer::initTestCase()
+{
+    //Read the results produced with MNE-CPP
+    QFile t_fileIn(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    digDataLoaded = FiffDigitizerData(t_fileIn);
+
+    //Prepare reference result
+    m_iCoordFrameDigDataResult = FIFFV_COORD_HEAD;
+    m_iNPointDigDataResult = 146;
+    m_dSumPointsDigDataResult = 13.6212;
+}
+
+
+//*************************************************************************************************************
+
+void TestFiffDigitizer::comparePoints()
+{
+    double sum = 0.0;
+    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
+        sum += digDataLoaded.points[i].r[0];
+        sum += digDataLoaded.points[i].r[1];
+        sum += digDataLoaded.points[i].r[2];
+    }
+
+    double diff = sum - m_dSumPointsDigDataResult;
+
+    QVERIFY( diff < m_dEpsilon );
+}
+
+
+//*************************************************************************************************************
+
+void TestFiffDigitizer::compareCoordFrame()
+{
+    QVERIFY( m_iCoordFrameDigDataResult == digDataLoaded.coord_frame );
+}
+
+
+//*************************************************************************************************************
+
+void TestFiffDigitizer::compareNPoint()
+{
+    QVERIFY( m_iNPointDigDataResult == digDataLoaded.npoint );
+}
+
+
+//*************************************************************************************************************
+
+void TestFiffDigitizer::cleanupTestCase()
+{
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INLINE DEFINITIONS
+// MAIN
 //=============================================================================================================
 
-} // NAMESPACE MNELIB
-
-#endif // MNEMSHLIGHT_H
+QTEST_APPLESS_MAIN(TestFiffDigitizer)
+#include "test_fiff_digitizer.moc"

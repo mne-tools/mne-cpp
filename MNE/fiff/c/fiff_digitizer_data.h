@@ -73,7 +73,7 @@ class FiffDigPoint;
 
 //=============================================================================================================
 /**
-* Replaces digitizerData, digitizerDataRec struct (analyze_types.c).
+* Replaces *digitizerData, digitizerDataRec struct (analyze_types.c).
 *
 * @brief Digitization points container and description.
 */
@@ -99,18 +99,26 @@ public:
 
     //=========================================================================================================
     /**
+    * Default constructor
+    *
+    * @param[in] p_IODevice   Input device to read data from.
+    */
+    FiffDigitizerData(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Destroys the digitization point description
     */
-    ~FiffDigitizerData();
+    ~FiffDigitizerData();    
 
 public:
-    char           *filename;                 /* Where did these come from */
+    QString        filename;                 /* Where did these come from */
     FIFFLIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
     FIFFLIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
-    FIFFLIB::FiffDigPoint*   points;           /* The points */
+    QList<FIFFLIB::FiffDigPoint>   points;           /* The points */
     int            coord_frame;               /* The coordinate frame of the above points */
-    int            *active;                   /* Which are active */
-    int            *discard;                  /* Which should be discarded? */
+    QList<int>     active;                   /* Which are active */
+    QList<int>     discard;                  /* Which should be discarded? */
     int            npoint;                    /* How many? */
     FIFFLIB::FiffDigPoint*   mri_fids;         /* MRI coordinate system fiducials picked here */
     int            nfids;                     /* How many? */
