@@ -143,6 +143,14 @@ public:
      */
     static double linear(const double d);
 
+    //=========================================================================================================
+    /**
+     * @brief gaussian Returns gaussian function with sigma set to 1
+     * @param d
+     * @return
+     */
+    static double gaussian(const double d);
+
 protected:
 
 private:
