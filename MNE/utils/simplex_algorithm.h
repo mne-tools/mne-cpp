@@ -105,9 +105,14 @@ public:
     * @return True when setup was successful, false otherwise
     */
     template <typename T>
-    static bool simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<T,Dynamic, 1>& y, T ftol,
+    static bool simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p,
+                                    Matrix<T,Dynamic, 1>& y,
+                                    T ftol,
                                     T (*func)(const Matrix<T,Dynamic, 1>& x, const void *user_data),
-                                    const void *user_data, int max_eval, int &neval, int report,
+                                    const void *user_data,
+                                    int max_eval,
+                                    int &neval,
+                                    int report,
                                     bool (*report_func)(int loop, const Matrix<T,Dynamic, 1>& fitpar, double fval));
 
 private:

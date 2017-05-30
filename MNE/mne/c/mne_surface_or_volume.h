@@ -165,9 +165,6 @@ public:
                                         int nspace,
                                         FILE *filtered);
 
-
-
-
     //============================= mne_patches.c =============================
 
     static int mne_add_patch_stats(MneSourceSpaceOld* s);
@@ -175,9 +172,7 @@ public:
 
     //============================= filter_source_sapces.c =============================
 
-
     static void rearrange_source_space(MneSourceSpaceOld* s);
-
 
     static void *filter_source_space(void *arg);
 
@@ -189,25 +184,16 @@ public:
                              FILE           *filtered,                      /* Output the coordinates of the filtered points here */
                              bool           use_threads);
 
-
-
-
-
-
     //============================= make_volume_source_space.c =============================
-
-
 
     static MneSourceSpaceOld* make_volume_source_space(MneSurfaceOld* surf,
                                                                          float grid,
                                                                          float exclude,
                                                                          float mindist);
 
-
     //============================= mne_source_space.c =============================
+
     static MneSourceSpaceOld* mne_new_source_space(int np);
-
-
 
     //============================= mne_bem_surface_io.c =============================
 
@@ -217,6 +203,10 @@ public:
                                          int  add_geometry,      /* Add the geometry information */
                                          float *sigmap);
 
+    static MneSurfaceOld* mne_read_bem_surface2(char *name,	        /* Filename */
+                                     int  which,		/* Which surface are we looking for (-1 loads the first one)*/
+                                     int  add_geometry,	/* Add the geometry information */
+                                     float *sigmap);		/* Conductivity? */
 
     //Refactored: read_bem_surface (mne_bem_surface_io.c)
     static MneSurfaceOld* read_bem_surface( const QString& name,    /* Filename */
@@ -235,9 +225,6 @@ public:
                                     float       *x,       /* Coordinates of the point on the triangle */
                                     float       *y,
                                     float       *z);
-
-
-
 
     static int nearest_triangle_point(float       *r,    /* Location of a point */
                                       MneSurfaceOld*  s,     /* The surface */
@@ -439,7 +426,7 @@ public:
 
     static int mne_read_int3(FILE *in, int *ival);
 
-    static int mne_read_int(FILE *in, int *ival);
+    static int mne_read_int(FILE *in, qint32 *ival);
 
     static int mne_read_int2(FILE *in, int *ival);
 
