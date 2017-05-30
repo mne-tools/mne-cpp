@@ -104,6 +104,10 @@ public:
     */
     void connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem);
 
+    void connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem);
+
+    void connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem);
+
 protected:
     //=========================================================================================================
     /**

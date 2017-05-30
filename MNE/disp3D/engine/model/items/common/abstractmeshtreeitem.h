@@ -138,7 +138,7 @@ public:
     *
     * @return The costum mesh.
     */
-    virtual void setVertColor(const MatrixX3f& matVertColor);
+    virtual void setVertColor(const QVariant &vertColor);
 
 protected:
     //=========================================================================================================

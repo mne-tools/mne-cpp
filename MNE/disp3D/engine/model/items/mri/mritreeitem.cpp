@@ -164,15 +164,18 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
 
 void MriTreeItem::setRtVertColor(const QVariant& sourceColorSamples)
 {
+    QVariant data;
     QPair<MatrixX3f, MatrixX3f> colorsPerHemi = sourceColorSamples.value<QPair<MatrixX3f, MatrixX3f> >();
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     for(int j = 0; j < itemList.size(); ++j) {
         if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                pHemiItem->getSurfaceItem()->setVertColor(colorsPerHemi.first);
+                data.setValue(colorsPerHemi.first);
+                pHemiItem->getSurfaceItem()->setVertColor(data);
             } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                pHemiItem->getSurfaceItem()->setVertColor(colorsPerHemi.second);
+                data.setValue(colorsPerHemi.second);
+                pHemiItem->getSurfaceItem()->setVertColor(data);
             }
         }
     }
