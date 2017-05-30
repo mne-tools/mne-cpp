@@ -138,7 +138,7 @@ public:
     *
     * @param[in] tSensorData    The MNESourceEstimate data.
     */
-    //void addData(const MNELIB::SensorData& tSensorData);
+    void addData(const MNELIB::SensorData& tSensorData);
 
     //=========================================================================================================
     /**
