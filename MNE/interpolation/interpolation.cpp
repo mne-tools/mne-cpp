@@ -81,13 +81,14 @@ using namespace Eigen;
 //=============================================================================================================
 // INITIALIZE STATIC MEMBER
 //=============================================================================================================
-QSharedPointer<MatrixXd> Interpolation::m_interpolationMatrix = nullptr;
+QSharedPointer<SparseMatrix<double> > Interpolation::m_interpolationMatrix = nullptr;
 
 void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double), const double cancelDist)
 {
     // initialization
-    m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable->rows(), projectedSensors.size());
-    m_interpolationMatrix->setZero();
+    m_interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors.size());
+    // temporary helper structure for filling sparse matrix
+    std::vector<SparseEntry> nonZeroEntries;
     size_t n = m_interpolationMatrix->rows();
     size_t m = m_interpolationMatrix->cols();
     // insert all sensor nodes into set for faster lookup during later computation
@@ -113,23 +114,23 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
                 }
             }
             for (QPair<qint32, double> qp : bLoTreshold) {
-                (*m_interpolationMatrix)(r, qp.first) = 1 / (qp.second * invDistSum);
+                nonZeroEntries.push_back(SparseEntry(r, qp.first, 1 / (qp.second * invDistSum)));
             }
         } else {
             // a sensor has been assigned to this node, we do not need to interpolate anything
             const int indexInSubset = projectedSensors.indexOf(r);
-            (*m_interpolationMatrix)(r, indexInSubset) = 1;
+            nonZeroEntries.push_back(SparseEntry(r, indexInSubset, 1));
         }
     }
+    m_interpolationMatrix->setFromTriplets(nonZeroEntries.begin(), nonZeroEntries.end());
 }
 //*************************************************************************************************************
 
-QSharedPointer<VectorXd> Interpolation::interpolateSignal(const VectorXd &measurementData)
+QSharedPointer<VectorXf> Interpolation::interpolateSignal(const VectorXd &measurementData)
 {
-    QSharedPointer<VectorXd> interpolatedVec = QSharedPointer<VectorXd>::create();
-    (*interpolatedVec) = (*m_interpolationMatrix) * measurementData;
+    QSharedPointer<VectorXf> interpolatedVec = QSharedPointer<VectorXf>::create();
+    (*interpolatedVec) = ((*m_interpolationMatrix) * measurementData).cast<float> ();
     return interpolatedVec;
-
 }
 //*************************************************************************************************************
 
@@ -152,8 +153,8 @@ double Interpolation::gaussian(const double d) {
 double Interpolation::square(const double d) {
     return (d * d);
 }
-
 //*************************************************************************************************************
-QSharedPointer<MatrixXd> Interpolation::getResult() {
+
+QSharedPointer<SparseMatrix<double> > Interpolation::getResult() {
     return m_interpolationMatrix;
 }
