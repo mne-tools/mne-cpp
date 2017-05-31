@@ -106,6 +106,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MneEstimateTreeItem;
+class SensorDataTreeItem;
 class NetworkTreeItem;
 class EcdDataTreeItem;
 class FsSurfaceTreeItem;
@@ -157,6 +158,16 @@ public:
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds interpolated activation data to this item.
+    *
+    * @param[in] tSourceEstimate    The SensorData.
+    *
+    * @return                       Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+    */
+    SensorDataTreeItem* addData(const MatrixXd& tSensorData);
 
     //=========================================================================================================
     /**
@@ -217,6 +228,7 @@ protected:
     void onRtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
+    QPointer<SensorDataTreeItem>                 m_pSensorDataTreeItem;         /**< The rt sensor data item of this item. */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 

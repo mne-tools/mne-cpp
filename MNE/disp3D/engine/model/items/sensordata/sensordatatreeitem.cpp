@@ -82,7 +82,7 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 SensorDataTreeItem::SensorDataTreeItem(int iType, const QString &text)
-: MeasurementTreeItem(iType,text)
+: AbstractTreeItem(iType,text)
 , m_bIsDataInit(false)
 {
     initItem();
@@ -186,36 +186,18 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::init(const MNEForwardSolution& tForwardSolution,
-                                const MatrixX3f& matSurfaceVertColorLeftHemi,
-                                const MatrixX3f& matSurfaceVertColorRightHemi,
-                                const VectorXi& vecLabelIdsLeftHemi,
-                                const VectorXi& vecLabelIdsRightHemi,
-                                const QList<FSLIB::Label>& lLabelsLeftHemi,
-                                const QList<FSLIB::Label>& lLabelsRightHemi)
+void SensorDataTreeItem::init(  const MatrixX3f& matSurfaceVertColor,
+                                const VectorXi& vecLabelIds,
+                                const QList<FSLIB::Label>& lLabels)
 {
-    if(tForwardSolution.src.size() < 2) {
-        return;
-    }
 
-    //Set data based on clusterd or full source space
-    bool isClustered = tForwardSolution.src[0].isClustered();
 
-    if(isClustered) {
         //Source Space IS clustered
         this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
+        this->setData(matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
 
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    } else {
-        //Source Space is NOT clustered
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
-
-        this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    }
+        this->setData(matSurfaceVertColor.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
+        this->setData(matSurfaceVertColor.size() + matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
 
     QVariant data;
 
@@ -280,7 +262,7 @@ void SensorDataTreeItem::init(const MNEForwardSolution& tForwardSolution,
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::addData(const MNESourceSpace& tSensorData)
+void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
 {
     if(!m_bIsDataInit) {
         qDebug() << "SensorDataTreeItem::addData - Rt source loc item has not been initialized yet!";

@@ -47,6 +47,7 @@
 #include "items/measurement/measurementtreeitem.h"
 #include "items/mri/mritreeitem.h"
 #include "items/digitizer/digitizertreeitem.h"
+#include "items/sensordata/sensordatatreeitem.h"
 #include "3dhelpers/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
@@ -499,4 +500,41 @@ void Data3DTreeModel::connectMeasurementToMriItems(SubjectTreeItem* pSubjectItem
                 pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
         }
     }
+}
+
+//*************************************************************************************************************
+
+SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const MatrixXd& matSensorData, const QString sDataType = QString("MEG"))
+{
+    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
+
+    //Handle subject item
+    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
+
+    //Find already existing surface items and add the new data to the first search result
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
+
+    //Find the "set" items and add the sensor data as items
+    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
+            //If measurement data has already been created but in conjunction with a different data type (i.e. connectivity, dipole fitting, etc.), do the connects here
+            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).isEmpty()) {
+                if(sDataType == "EEG") {
+                    pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+                } else if (sDataType == "MEG") {
+                    pSubjectItem->connectMeasurementToSensorItems(pMeasurementItem);
+                }
+            }
+
+            pReturnItem = pMeasurementItem->addData(matSensorData);
+        }
+    } else {
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        pReturnItem = pMeasurementItem->addData(matSensorData);
+
+        pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+    }
+
+    return pReturnItem;
 }
