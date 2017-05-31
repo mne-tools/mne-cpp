@@ -299,9 +299,9 @@ signals:
     /**
     * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    * @param[in] sourceColors     The color values for each estimated source for left and right hemisphere.
     */
-    void rtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
+    void sourceVertColorChanged(const QVariant& sourceColors);
 };
 
 //*************************************************************************************************************
