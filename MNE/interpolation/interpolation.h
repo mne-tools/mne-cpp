@@ -151,11 +151,11 @@ public:
      */
     static double gaussian(const double d);
     //=========================================================================================================
-     +    /**
-     +     * @brief square Returns squared input
-     +     * @param d
-     +     * @return
-     +     */
+    /**
+     * @brief square Returns squared input
+     * @param d
+     * @return
+     */
     static double square(const double d);
 
 protected:
