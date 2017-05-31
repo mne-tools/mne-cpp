@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include"interpolation_global.h"
+#include "interpolation_global.h"
 #include <limits>
 
 //*************************************************************************************************************
@@ -58,7 +58,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include<Eigen/Core>
+#include <Eigen/Core>
+#include <Eigen/Sparse>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,8 +74,6 @@
 //=============================================================================================================
 
 namespace INTERPOLATION {
-
-#define LINEAR  0
 
 #define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
 
@@ -120,7 +119,7 @@ public:
      * @param measurementData
      * @return
      */
-    static QSharedPointer<Eigen::VectorXd> interpolateSignal(const Eigen::VectorXd &measurementData);
+    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const Eigen::VectorXd &measurementData);
 
     //=========================================================================================================
     /**
@@ -133,7 +132,7 @@ public:
      * @brief getResult Debugging only
      * @return
      */
-    static QSharedPointer<Eigen::MatrixXd> getResult();
+    static QSharedPointer<Eigen::SparseMatrix<double> > getResult();
 
     //=========================================================================================================
     /**
@@ -162,7 +161,9 @@ protected:
 
 private:
 
-    static QSharedPointer<Eigen::MatrixXd> m_interpolationMatrix;   /**< Matrix holds the result of the last
+    typedef Eigen::Triplet<double> SparseEntry;
+
+    static QSharedPointer<Eigen::SparseMatrix<double> > m_interpolationMatrix;   /**< Matrix holds the result of the last
                                                             createInterpolationMat() for further computations. */
 
 
