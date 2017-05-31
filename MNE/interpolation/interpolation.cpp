@@ -145,12 +145,12 @@ double Interpolation::linear(const double d) {
 //*************************************************************************************************************
 
 double Interpolation::gaussian(const double d) {
-    return exp(-((d*d)/2.));
+    return exp(-((d * d) / 2.0));
 }
 //*************************************************************************************************************
 
-double Interpolation::square(const double d){
-    return (d*d);
+double Interpolation::square(const double d) {
+    return (d * d);
 }
 
 //*************************************************************************************************************
