@@ -124,13 +124,9 @@ public:
     * @param[in] lLabelsLeftHemi                    The label list for the left hemisphere.
     * @param[in] lLabelsRightHemi                   The label list for the right hemisphere.
     */
-    void init(const MNELIB::MNEForwardSolution& tForwardSolution,
-            const MatrixX3f &matSurfaceVertColorLeftHemi,
-            const MatrixX3f &matSurfaceVertColorRightHemi,
-            const Eigen::VectorXi& vecLabelIdsLeftHemi = FIFFLIB::defaultVectorXi,
-            const Eigen::VectorXi &vecLabelIdsRightHemi = FIFFLIB::defaultVectorXi,
-            const QList<FSLIB::Label> &lLabelsRightHemi = QList<FSLIB::Label>(),
-            const QList<FSLIB::Label>& lLabelsLeftHemi = QList<FSLIB::Label>());
+    void init(const MatrixX3f &matSurfaceVertColor,
+            const VectorXi &vecLabelIds,
+            const QList<FSLIB::Label> &lLabels);
 
     //=========================================================================================================
     /**
@@ -138,7 +134,7 @@ public:
     *
     * @param[in] tSensorData    The MNESourceEstimate data.
     */
-    void addData(const MNELIB::SensorData& tSensorData);
+    void addData(const MatrixXd& tSensorData);
 
     //=========================================================================================================
     /**

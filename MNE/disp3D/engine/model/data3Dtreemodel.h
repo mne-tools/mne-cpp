@@ -117,6 +117,7 @@ class SensorSetTreeItem;
 class DigitizerSetTreeItem;
 class SubjectTreeItem;
 class MeasurementTreeItem;
+class SensorDataTreeItem;
 
 
 //=============================================================================================================
@@ -306,6 +307,19 @@ public:
     DigitizerSetTreeItem* addDigitizerData(const QString& sSubject,
                                            const QString& sMeasurementSetName,
                                            const FIFFLIB::FiffDigPointSet &digitizer);
+
+    //=========================================================================================================
+    /**
+    * Adds live sensor data.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] matSensorData          The Sensor Data.
+    * @param[in] sDataType              The data type ("MEG").
+     *
+    * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const Eigen::MatrixXd& matSensorData, const QString sDataType = QString("MEG"));
 
     //=========================================================================================================
     /**

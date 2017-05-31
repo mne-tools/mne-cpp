@@ -132,7 +132,7 @@ SOURCES += \
     adapters/ecdview.cpp \
     adapters/abstractview.cpp \
     adapters/networkview.cpp \
-    #engine/model/items/sensordata/sensordatatreeitem.cpp
+    engine/model/items/sensordata/sensordatatreeitem.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -174,7 +174,7 @@ HEADERS += \
     adapters/abstractview.h \
     adapters/networkview.h \
     disp3D_global.h \
-    #engine/model/items/sensordata/sensordatatreeitem.h
+    engine/model/items/sensordata/sensordatatreeitem.h
 
 FORMS += \
     engine/control/control3dwidget.ui \

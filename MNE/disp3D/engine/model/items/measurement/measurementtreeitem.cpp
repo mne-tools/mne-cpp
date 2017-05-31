@@ -50,6 +50,7 @@
 #include "../digitizer/digitizertreeitem.h"
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
+#include "../sensordata/sensordatatreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -245,6 +246,90 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
     }
 
     return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData)
+{
+    if(!tSensorData.size()==0) {
+        //Add source estimation data as child
+        if(this->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() == 0) {
+            //If rt data item does not exists yet, create it here!
+                if(!m_pSensorDataTreeItem) {
+                    m_pSensorDataTreeItem = new SensorDataTreeItem();
+                }
+
+                QList<QStandardItem*> list;
+                list << m_pSensorDataTreeItem;
+                list << new QStandardItem(m_pSensorDataTreeItem->toolTip());
+                this->appendRow(list);
+
+                connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
+                        this, &MeasurementTreeItem::onRtVertColorChanged);
+
+                //Divide into left right hemi
+                if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
+                    QList<QStandardItem*> lMRIChildren = pParent->findChildren(Data3DTreeModelItemTypes::MriItem);
+                    MriTreeItem* pMriItem = Q_NULLPTR;
+
+                    //Find MRI data set and hemisphere from parent item
+                    //Option 1 - Choose first found MRI set
+                    if(!lMRIChildren.isEmpty()) {
+                        pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.first());
+                    }
+
+//                    //Option 2 - Choose MRI set by its name
+//                    QString sMRISetName = "MRI";
+
+//                    for(int i = 0; i < lMRIChildren.size(); ++i) {
+//                        if(lMRIChildren.at(i)->text() == sMRISetName) {
+//                            if(pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.at(i))) {
+//                                i = lMRIChildren.size();
+//                            }
+//                        }
+//                    }
+
+                    if(pMriItem) {
+                        QList<QStandardItem*> itemList = pMriItem->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
+
+                        FsSurfaceTreeItem* pSurfaceTreeItem = Q_NULLPTR;
+
+                        FsAnnotationTreeItem* pAnnotTreeItem = Q_NULLPTR;
+
+
+                        for(int j = 0; j < itemList.size(); ++j) {
+                            if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
+                                if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
+                                    pSurfaceTreeItem = pHemiItem->getSurfaceItem();
+                                    pAnnotTreeItem = pHemiItem->getAnnotItem();
+                                } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
+                                    pSurfaceTreeItem = pHemiItem->getSurfaceItem();
+                                    pAnnotTreeItem = pHemiItem->getAnnotItem();
+                                }
+                            }
+                        }
+
+                        if(pSurfaceTreeItem && pAnnotTreeItem) {
+                            m_pSensorDataTreeItem->init(pSurfaceTreeItem->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
+                                                        pAnnotTreeItem->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                        pAnnotTreeItem->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
+                        }
+                    }
+                }
+
+                m_pSensorDataTreeItem->addData(tSensorData);
+            } else {
+                qDebug() << "MeasurementTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
+            }
+        } else {
+            if(m_pSensorDataTreeItem) {
+                m_pSensorDataTreeItem->addData(tSensorData);
+            }
+        }
+
+        return m_pSensorDataTreeItem;
 }
 
 
