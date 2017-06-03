@@ -93,7 +93,7 @@ class RtSourceLocDataWorker;
 * @brief Brief description of this class.
 */
 
-class DISP3DNEWSHARED_EXPORT SensorDataTreeItem : public MeasurementTreeItem
+class DISP3DNEWSHARED_EXPORT SensorDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
