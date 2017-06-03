@@ -86,3 +86,16 @@ void SubjectTreeItem::initItem()
     this->setToolTip("Subject");
 }
 
+void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem) {
+    QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
+
+    for (int i = 0; i < bemItemList.size(); ++i) {
+        if (BemItem* pBemItem = dynamic_cast<BemItem*> (bemItemList.at(i))) {
+            // connect
+        }
+    }
+}
+
+void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem) {
+
+}

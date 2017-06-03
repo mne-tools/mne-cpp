@@ -319,7 +319,7 @@ public:
      *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const Eigen::MatrixXd& matSensorData, const QString sDataType = QString("MEG"));
+    SensorDataTreeItem* addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const Eigen::MatrixXd& matSensorData, const QString sDataType = QString("MEG"));
 
     //=========================================================================================================
     /**

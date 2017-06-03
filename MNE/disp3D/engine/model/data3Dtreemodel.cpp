@@ -458,11 +458,13 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
+        std::cout << ">>>>>>>> a1 <<<<<<<<<<<<<" << std::endl;
         pReturnItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, sSubject);
         itemSubjectList << pReturnItem;
         itemSubjectList << new QStandardItem(pReturnItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     } else {
+        std::cout << ">>>>>>>> a2 <<<<<<<<<<<<<" << std::endl;
         pReturnItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.first());
     }
 
@@ -504,7 +506,7 @@ void Data3DTreeModel::connectMeasurementToMriItems(SubjectTreeItem* pSubjectItem
 
 //*************************************************************************************************************
 
-SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const MatrixXd& matSensorData, const QString sDataType = QString("MEG"))
+SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const MatrixXd& matSensorData, const QString sDataType)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
