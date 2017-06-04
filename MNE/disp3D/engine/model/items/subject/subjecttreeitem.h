@@ -97,6 +97,13 @@ public:
     */
     explicit SubjectTreeItem(int iType = Data3DTreeModelItemTypes::SubjectItem, const QString& text = "");
 
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
+    void connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem);
 
     //=========================================================================================================
     /**
