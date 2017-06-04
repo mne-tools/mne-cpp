@@ -129,20 +129,7 @@ public:
      * @param sensorPositions: each sensor postion in saved in an Eigen vector with x, y & z cord.
      * @return  pointer to output vector where the vecotr index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
      */
-    static QSharedPointer<QVector<qint32>> projectSensor(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3f> &sensorPositions);
-
-    //=========================================================================================================
-    /**
-     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubset between index begin and index end
-     * @param ptr The matrix in which the distances will be stored
-     * @param inSurface The surface on which distances should be calculated
-     * @param vertSubSet The subset of vertices
-     * @param begin Start index of distance calculation
-     * @param end   End indes of distance calculation
-     * @param cancelDist Distance thresold: all vertices that have a higher distance to the origin vertex are set to infinity
-     */
-    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end, double cancelDist);
-
+    static QSharedPointer<QVector<qint32>> projectSensors(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3f> &sensorPositions);
 
     //=========================================================================================================
     /**
@@ -173,6 +160,18 @@ private:
      * @return
      */
     static QVector<qint32> nearestNeighbor(const MNELIB::MNEBemSurface &inSurface,  QVector<Eigen::Vector3f>::const_iterator sensorBegin, QVector<Eigen::Vector3f>::const_iterator sensorEnd);
+
+    //=========================================================================================================
+    /**
+     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubset between index begin and index end
+     * @param ptr The matrix in which the distances will be stored
+     * @param inSurface The surface on which distances should be calculated
+     * @param vertSubSet The subset of vertices
+     * @param begin Start index of distance calculation
+     * @param end   End indes of distance calculation
+     * @param cancelDist Distance thresold: all vertices that have a higher distance to the origin vertex are set to infinity
+     */
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end, double cancelDist);
 };
 
 

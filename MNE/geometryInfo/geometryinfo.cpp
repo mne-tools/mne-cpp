@@ -133,7 +133,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, cons
 }
 //*************************************************************************************************************
 
-QSharedPointer<QVector<qint32> > GeometryInfo::projectSensor(const MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPositions)
+QSharedPointer<QVector<qint32> > GeometryInfo::projectSensors(const MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPositions)
 {
     QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
 

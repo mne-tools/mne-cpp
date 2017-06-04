@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 
     //projecting with EEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(testSurface, megSensors);
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(testSurface, megSensors);
     std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
 
     //SCDC with cancel distance 0.03
