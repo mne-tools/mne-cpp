@@ -194,14 +194,14 @@ void SensorDataTreeItem::init(  const MatrixX3f& matSurfaceVertColor,
 
         //Source Space IS clustered
         this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
+        // this->setData(matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
 
-        this->setData(matSurfaceVertColor.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(matSurfaceVertColor.size() + matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
+        // this->setData(matSurfaceVertColor.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
+        // this->setData(matSurfaceVertColor.size() + matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
 
     QVariant data;
 
-    for(int i = 0; i < tForwardSolution.src.size(); ++i) {
+    /*for(int i = 0; i < tForwardSolution.src.size(); ++i) {
         if(isClustered) {
             //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
             VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
@@ -218,12 +218,13 @@ void SensorDataTreeItem::init(  const MatrixX3f& matSurfaceVertColor,
         } else if (i == 1) {
             this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
         }
-    }
+    }*/
 
     //Add meta information as item children
     QList<QStandardItem*> list;
 
-    QString sIsClustered = isClustered ? "Clustered" : "Full";
+    // QString sIsClustered = isClustered ? "Clustered" : "Full";
+    QString sIsClustered("asdf");
     MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::SourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
     list.clear();
@@ -241,7 +242,7 @@ void SensorDataTreeItem::init(  const MatrixX3f& matSurfaceVertColor,
     connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
             this, &SensorDataTreeItem::onNewRtData);
 
-    m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
+   /* m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
                                              this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>(),
                                              tForwardSolution.src[0].neighbor_vert,
                                              tForwardSolution.src[1].neighbor_vert,
@@ -255,7 +256,7 @@ void SensorDataTreeItem::init(  const MatrixX3f& matSurfaceVertColor,
                                                 vecLabelIdsRightHemi,
                                                 lLabelsLeftHemi,
                                                 lLabelsRightHemi);
-
+*/
     m_bIsDataInit = true;
 }
 
@@ -271,11 +272,11 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
 
     //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
     QVariant data;
-    data.setValue(tSensorData.data);
+    // data.setValue(tSensorData.data);
     this->setData(data, Data3DTreeModelItemRoles::RTData);
 
     if(m_pSourceLocRtDataWorker) {
-        m_pSourceLocRtDataWorker->addData(tSensorData.data);
+       //  m_pSourceLocRtDataWorker->addData(tSensorData.data);
     }
 }
 
