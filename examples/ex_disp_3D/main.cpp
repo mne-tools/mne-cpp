@@ -258,6 +258,11 @@ int main(int argc, char *argv[])
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
+    MatrixXd temp(2, 2);
+    temp << 1, 2,
+            3, 4;
+    p3DDataModel->addSensorData("Deppen", "SWP", temp);
+
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
         if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
