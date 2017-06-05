@@ -430,7 +430,9 @@ void SensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkSt
 
 void SensorDataTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
 {
-    emit rtVertColorChanged(sourceColorSamples);
+    QVariant data;
+    data.setValue(sourceColorSamples);
+    emit rtVertColorChanged(data);
 }
 
 
