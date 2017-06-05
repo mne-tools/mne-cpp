@@ -71,6 +71,8 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MeasurementTreeItem;
+
 
 //=============================================================================================================
 /**
@@ -95,7 +97,28 @@ public:
     */
     explicit SubjectTreeItem(int iType = Data3DTreeModelItemTypes::SubjectItem, const QString& text = "");
 
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
+    void connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem);
+
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded head BEM data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
     void connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem);
+
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded sensor BEM data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
     void connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem);
 
 protected:

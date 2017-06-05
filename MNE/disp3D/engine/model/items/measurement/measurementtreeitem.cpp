@@ -173,8 +173,8 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                 list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
                 this->appendRow(list);
 
-                connect(m_pMneEstimateTreeItem.data(), &MneEstimateTreeItem::rtVertColorChanged,
-                        this, &MeasurementTreeItem::onRtVertColorChanged);
+                connect(m_pMneEstimateTreeItem.data(), &MneEstimateTreeItem::sourceVertColorChanged,
+                        this, &MeasurementTreeItem::onVertColorChanged);
 
                 //Divide into left right hemi
                 if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
@@ -440,8 +440,8 @@ void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const M
 
 //*************************************************************************************************************
 
-void MeasurementTreeItem::onRtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
+void MeasurementTreeItem::onVertColorChanged(const QVariant &vertColors)
 {
-    emit rtVertColorChanged(sourceColorSamples);
+    emit vertColorChanged(vertColors);
 }
 
