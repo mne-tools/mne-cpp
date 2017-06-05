@@ -440,10 +440,12 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
-{
-    std::cout << "i got new values" << std::endl;
-    emit rtVertColorChanged(sourceColorSamples);
+void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColors)
+{    
+    QVariant data;
+    data.setValue(sourceColors);
+
+    emit sourceVertColorChanged(data);
 }
 
 
