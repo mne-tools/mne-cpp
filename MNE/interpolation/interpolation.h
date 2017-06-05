@@ -108,14 +108,14 @@ public:
      * @brief createInterpolationMat Calculate weight matrix for later interpolation
      * @param projectedSensors Vector of IDs of sensor vertices
      * @param distanceTable Matrix that contains all needed distances
-     * @param f Function that computes interpolation coefficients using the distance values
+     * @param interpolationFunction Function that computes interpolation coefficients using the distance values
      * @param cancelDist Distances higher than this are ignored, i.e. the respective coefficients are set to zero
      */
-    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*f) (double), const double cancelDist = DOUBLE_INFINITY);
+    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
-     * @brief interpolateSignals
+     * @brief interpolateSignal
      * @param measurementData
      * @return
      */

@@ -40,14 +40,13 @@
 //=============================================================================================================
 
 #include "interpolation.h"
-#include <mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
+#include <QSet>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,27 +69,26 @@ using namespace Eigen;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INITIALIZE STATIC MEMBER
+//=============================================================================================================
+
+QSharedPointer<SparseMatrix<double> > Interpolation::m_interpolationMatrix = nullptr;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INITIALIZE STATIC MEMBER
-//=============================================================================================================
-QSharedPointer<SparseMatrix<double> > Interpolation::m_interpolationMatrix = nullptr;
-
-void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*f) (double), const double cancelDist)
+void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist)
 {
     // initialization
     m_interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors.size());
     // temporary helper structure for filling sparse matrix
-    std::vector<SparseEntry> nonZeroEntries;
-    size_t n = m_interpolationMatrix->rows();
-    size_t m = m_interpolationMatrix->cols();
+    QVector<SparseEntry> nonZeroEntries;
+    const size_t n = m_interpolationMatrix->rows();
+    const size_t m = m_interpolationMatrix->cols();
     // insert all sensor nodes into set for faster lookup during later computation
     QSet<qint32> sensorLookup;
     for (qint32 sen : projectedSensors){
@@ -100,7 +98,7 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
     for (int r = 0; r < n; ++r) {
         if (sensorLookup.contains(r) == false) {
             // "normal" node, i.e. one which was not assigned a sensor
-            // bLoThresold: stores the indizes that point to distances which are below the passed distance threshold (cancelDist)
+            // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (cancelDist)
             QVector<QPair<qint32, double> > bLoTreshold;
             bLoTreshold.reserve(m);
             double invDistSum = 0;
@@ -108,12 +106,12 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
             for (int q = 0; q < m; ++q) {
                 const double dist = row[q];
                 if (dist < cancelDist) {
-                    const double f_d = f(dist);
+                    const double f_d = interpolationFunction(dist);
                     invDistSum += (1 / f_d);
                     bLoTreshold.push_back(qMakePair<qint32, double> (q, f_d));
                 }
             }
-            for (QPair<qint32, double> qp : bLoTreshold) {
+            for (const QPair<qint32, double> &qp : bLoTreshold) {
                 nonZeroEntries.push_back(SparseEntry(r, qp.first, 1 / (qp.second * invDistSum)));
             }
         } else {
@@ -151,7 +149,7 @@ double Interpolation::gaussian(const double d) {
 //*************************************************************************************************************
 
 double Interpolation::square(const double d) {
-    return (d * d);
+    return (-(1.0f / 9.0f) * (d * d) + 1);
 }
 //*************************************************************************************************************
 
