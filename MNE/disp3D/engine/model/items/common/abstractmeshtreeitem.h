@@ -132,6 +132,14 @@ public:
     */
     virtual QPointer<CustomMesh> getCustomMesh();
 
+    //=========================================================================================================
+    /**
+    * Set new vertices colors to the mesh.
+    *
+    * @return The costum mesh.
+    */
+    virtual void setVertColor(const QVariant &vertColor);
+
 protected:
     //=========================================================================================================
     /**
