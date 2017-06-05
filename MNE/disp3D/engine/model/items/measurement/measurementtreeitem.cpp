@@ -267,7 +267,7 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData)
                 this->appendRow(list);
 
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
-                        this, &MeasurementTreeItem::onRtVertColorChanged);
+                        this, &MeasurementTreeItem::onVertColorChanged);
 
                 //Divide into left right hemi
                 if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
