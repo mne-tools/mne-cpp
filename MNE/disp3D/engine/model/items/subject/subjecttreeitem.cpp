@@ -98,8 +98,8 @@ void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasure
     //or the user changes the color origin
     QList<QStandardItem*> mriItemList = this->findChildren(Data3DTreeModelItemTypes::MriItem);
 
-    for(int i = 0; i < mriItemList.size(); ++i) {
-        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(mriItemList.at(i))) {
+    foreach(QStandardItem* item, mriItemList) {
+        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(item)) {
             connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
                 pMriItem, &MriTreeItem::setRtVertColor);
 
@@ -118,12 +118,12 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
     QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
     QList<QStandardItem*> bemSurfacesItemList;
 
-    for(int i = 0; i < bemItemList.size(); ++i) {
-        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(bemItemList.at(i))) {
+    foreach(QStandardItem* item, bemItemList) {
+        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(item)) {
             bemSurfacesItemList = pMriItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
 
-            for(int k = 0; k < bemSurfacesItemList.size(); ++k) {
-                if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(bemSurfacesItemList.at(i))) {
+            foreach(QStandardItem* itemBemSurf, bemSurfacesItemList) {
+                if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(itemBemSurf)) {
                     if(pBemSurfItem->text() == "Head") {
                         connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
                             pBemSurfItem, &BemSurfaceTreeItem::setVertColor);

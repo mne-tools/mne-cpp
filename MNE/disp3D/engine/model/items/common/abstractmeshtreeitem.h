@@ -136,6 +136,8 @@ public:
     /**
     * Set new vertices colors to the mesh.
     *
+    * @param[in] vertColor New color matrix MatrixX3f in form of a QVariant.
+    *
     * @return The costum mesh.
     */
     virtual void setVertColor(const QVariant &vertColor);
