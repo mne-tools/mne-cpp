@@ -85,9 +85,14 @@ namespace INTERPOLATION {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* Calculates and stores a matrix which provides the information how much each vertex is influenced by every sensor.
+* On this basis, the user can use sensor data to calculate interpolated values for each sensor of the mesh.
+* The user can choose the function that is used in the interpolation. Three functions are provided.
+* Interpolation weights are calculated using the following formula:
+* ![weight matrix](./interpolation_formula.png)
+* where w are interpolation weights, d are distances, m is the number of columsn and f is the used function.
 *
-* @brief Brief description of this class.
+* @brief This class holds methods for creating distance-based weight matrices and for interpolating signals
 */
 
 class INTERPOLATIONSHARED_EXPORT Interpolation
@@ -105,7 +110,14 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief createInterpolationMat Calculate weight matrix for later interpolation
+     * This method calculates the weight matrix that is later needed for the interpolation of signals.
+     * The matrix will have n rows, where n is the number of rows of the passed distance table (i.e. the number of vertices of the mesh that the table is based on),
+     * and m columns, where m is the number of mapped sensors on the mesh (based on a prior sensor-to-mesh mapping).
+     * <i>createInterplationMat</i> calculates the matrix according to the following scheme:
+     *    -# if the vertex belongs to a sensor: The value at the position of the sensor is 1 and all other values in this row are set to 0
+     *    -# if not: the values are calculated to give a total of 1 (a lot of values will stay 0, because they are too far away to influence) by using the above mentioned formula
+     *
+     * @brief <i>createInterpolationMat</i> Calculate weight matrix for later interpolation
      * @param projectedSensors Vector of IDs of sensor vertices
      * @param distanceTable Matrix that contains all needed distances
      * @param interpolationFunction Function that computes interpolation coefficients using the distance values
@@ -115,45 +127,56 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief interpolateSignal
-     * @param measurementData
-     * @return
+     * The interpolation essentially corresponds to a matrix * vector multiplication. A vector of sensor data (i.e. a vector of double-values)
+     * is multiplied with the result of the <i>createInterpolationMat</i>.
+     * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
+     * i.e. in first instance the distance table that the weight matrix is based on.
+     *
+     * @brief <i>interpolateSignals</i> Interpolate sensor data
+     * @param measurementData A vector with measured sensor data
+     * @return Interpolated values for all vertices of the mesh
      */
     static QSharedPointer<Eigen::VectorXf> interpolateSignal(const Eigen::VectorXd &measurementData);
 
     //=========================================================================================================
     /**
-     * @brief clearInterpolateMatrix Clears the last computation and frees all memory that was allocated for the weight matrix
+     * @brief <i>clearInterpolateMatrix</i> Clears the last computation and frees all memory that was allocated for the weight matrix
      */
     static void clearInterpolateMatrix();
 
     //=========================================================================================================
     /**
-     * @brief getResult Debugging only
-     * @return
+     * @brief <i>getResult</i> Getter, Debugging only
+     * @return m_interpolationMatrix
      */
     static QSharedPointer<Eigen::SparseMatrix<double> > getResult();
 
     //=========================================================================================================
     /**
-     * @brief linear Returns passed argument unchanged
-     * @param d
-     * @return
+     * Serves as a placeholder for other functions and is needed in case a linear interpolation is wanted when calling <i>createInterplationMat</i>.
+     *
+     * @brief linear Returns input argument unchanged
+     * @param d Distance value
+     * @return Same value interpreted as a interpolation weight
      */
     static double linear(const double d);
 
     //=========================================================================================================
     /**
-     * @brief gaussian Returns gaussian function with sigma set to 1
-     * @param d
-     * @return
+     * Calculates interpolation weights based on distance values
+     *
+     * @brief <i>gaussian</i> Returns interpolation weight that corresponds to gauss curve with sigma set to 1
+     * @param d Distance value
+     * @return The function value of the gauss curve at d
      */
     static double gaussian(const double d);
     //=========================================================================================================
     /**
-     * @brief square Returns squared input
-     * @param d
-     * @return
+     * Calculates interpolation weights based on distance values
+     *
+     * @brief <i>square</i> Returns interpolation weight that corresponds to negative parabel with an y-offset of 1.
+     * @param d Distance value
+     * @return The function value of the negative parabel at d
      */
     static double square(const double d);
 
