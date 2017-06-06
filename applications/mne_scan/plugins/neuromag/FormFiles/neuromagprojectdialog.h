@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
-* @file     neuromagaboutwidget.h
+* @file     neuromagprojectdialog.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh, Lorenz Esch, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,20 +31,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NeuromagAboutWidget class.
+* @brief    NeuromagProjectDialog class declaration.
 *
 */
 
-#ifndef NEUROMAGABOUTWIDGET_H
-#define NEUROMAGABOUTWIDGET_H
-
+#ifndef NEUROMAGPROJECTDIALOG_H
+#define NEUROMAGPROJECTDIALOG_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_neuromagabout.h"
+#include "neuromag_global.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +51,24 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QDialog>
+#include <QStringList>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui {
+    class NeuromagProjectDialog;
+}
 
 
 //*************************************************************************************************************
@@ -67,38 +85,59 @@ namespace NEUROMAGPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class Neuromag;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NeuromagAboutWidget
+* The NeuromagProjectDialog class provides a dialog to setup the project.
 *
-* @brief The NeuromagAboutWidget class provides the about dialog for the Neuromag.
+* @brief The NeuromagProjectDialog class provides a dialog to setup the project.
 */
-class NeuromagAboutWidget : public QDialog
+class NEUROMAGSHARED_EXPORT NeuromagProjectDialog : public QDialog
 {
     Q_OBJECT
 
 public:
+    explicit NeuromagProjectDialog(Neuromag* p_pNeuromag, QWidget *parent = 0);
+    ~NeuromagProjectDialog();
 
-    //=========================================================================================================
-    /**
-    * Constructs a NeuromagAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NeuromagAboutWidget becomes a window. If parent is another widget, NeuromagAboutWidget becomes a child window inside parent. NeuromagAboutWidget is deleted when its parent is deleted.
-    */
-    NeuromagAboutWidget(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the NeuromagAboutWidget.
-    * All NeuromagAboutWidget's children are deleted first. The application exits if NeuromagAboutWidget is the main widget.
-    */
-    ~NeuromagAboutWidget();
+    void setRecordingElapsedTime(int mSecsElapsed);
 
 private:
-    Ui::NeuromagAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+    void addProject();
+    void addSubject();
+
+    void deleteProject();
+    void deleteSubject();
+
+    void paradigmChanged(const QString &newParadigm);
+
+    void scanForProjects();
+    void scanForSubjects();
+
+    void selectNewProject(const QString &newProject);
+    void selectNewSubject(const QString &newSubject);
+
+    void updateFileName();
+
+    void onTimeChanged();
+    void onRecordingTimerStateChanged(bool state);
+
+    Neuromag*                       m_pNeuromag;
+
+    Ui::NeuromagProjectDialog*      ui;
+
+    QStringList                     m_sListProjects;
+    QStringList                     m_sListSubjects;
+
+    int                             m_iRecordingTime;       /**< recording time in ms.*/
+
+signals:
+    void timerChanged(int secs);
+    void recordingTimerStateChanged(bool state);
 };
 
 } // NAMESPACE
 
-#endif // NEUROMAGABOUTWIDGET_H
+#endif // NEUROMAGPROJECTDIALOG_H

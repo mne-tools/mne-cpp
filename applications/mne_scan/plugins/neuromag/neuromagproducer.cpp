@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MneRtClientPlugin;
+using namespace NEUROMAGPLUGIN;
 
 
 //*************************************************************************************************************
@@ -89,7 +89,7 @@ void NeuromagProducer::connectDataClient(QString p_sRtSeverIP)
 
     if(m_pRtDataClient->state() == QTcpSocket::ConnectedState)
     {
-        producerMutex.lock();
+        m_mutex.lock();
         if(!m_bDataClientIsConnected)
         {
             //
@@ -108,7 +108,7 @@ void NeuromagProducer::connectDataClient(QString p_sRtSeverIP)
             m_bDataClientIsConnected = true;
             emit dataConnectionChanged(m_bDataClientIsConnected);
         }
-        producerMutex.unlock();
+        m_mutex.unlock();
     }
 }
 
@@ -121,10 +121,10 @@ void NeuromagProducer::disconnectDataClient()
     {
         m_pRtDataClient->disconnectFromHost();
         m_pRtDataClient->waitForDisconnected();
-        producerMutex.lock();
+        m_mutex.lock();
         m_iDataClientId = -1;
         m_bDataClientIsConnected = false;
-        producerMutex.unlock();
+        m_mutex.unlock();
         emit dataConnectionChanged(m_bDataClientIsConnected);
     }
 }
@@ -196,14 +196,14 @@ void NeuromagProducer::run()
     {
         if(m_bFlagInfoRequest)
         {
-            m_pNeuromag->rtServerMutex.lock();
+            m_pNeuromag->m_mutex.lock();
             m_pNeuromag->m_pFiffInfo = m_pRtDataClient->readInfo();
             emit m_pNeuromag->fiffInfoAvailable();
-            m_pNeuromag->rtServerMutex.unlock();
+            m_pNeuromag->m_mutex.unlock();
 
-            producerMutex.lock();
+            m_mutex.lock();
             m_bFlagInfoRequest = false;
-            producerMutex.unlock();
+            m_mutex.unlock();
         }
 
         if(m_bFlagMeasuring)

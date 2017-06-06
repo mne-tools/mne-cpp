@@ -78,23 +78,24 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
-        directrecord.cpp \
-    neuromag.cpp \
-    neuromagproducer.cpp \
-    FormFiles/neuromagsetupwidget.cpp \
-    FormFiles/neuromagaboutwidget.cpp
+        neuromag.cpp \
+        neuromagproducer.cpp \
+        FormFiles/neuromagsetupwidget.cpp \
+        FormFiles/neuromagaboutwidget.cpp \
+        FormFiles/neuromagprojectdialog.cpp \
 
 HEADERS += \
-        directrecord.h \
-    neuromag_global.h \
-    neuromag.h \
-    neuromagproducer.h \
-    FormFiles/neuromagsetupwidget.h \
-    FormFiles/neuromagaboutwidget.h
+        neuromag_global.h \
+        neuromag.h \
+        neuromagproducer.h \
+        FormFiles/neuromagsetupwidget.h \
+        FormFiles/neuromagaboutwidget.h \
+        FormFiles/neuromagprojectdialog.h \
 
 FORMS += \
     FormFiles/neuromagsetup.ui \
-    FormFiles/neuromagabout.ui
+    FormFiles/neuromagabout.ui \
+    FormFiles/neuromagprojectdialog.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
