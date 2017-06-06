@@ -112,7 +112,7 @@ public:
     *
     * @param [in] deepModel     CNTK Model Wrapper
     */
-    void setModel(QSharedPointer<DEEPLIB::Deep>& deepModel);
+    void setModel(const QSharedPointer<DEEPLIB::Deep>& deepModel);
 
     //=========================================================================================================
     /**
