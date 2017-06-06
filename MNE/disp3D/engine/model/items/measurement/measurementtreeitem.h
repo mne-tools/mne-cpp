@@ -212,9 +212,9 @@ protected:
     /**
     * Call this function whenever new colors for the activation data plotting are available.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
     */
-    void onRtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
+    void onVertColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
@@ -225,9 +225,9 @@ signals:
     /**
     * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
     *
-    * @param[in] sourceColorSamples        Real tiem colors for both hemispheres.
+    * @param[in] vertColors        Real tiem colors for both hemispheres.
     */
-    void rtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
+    void vertColorChanged(const QVariant& vertColors);
 
 };
 

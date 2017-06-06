@@ -288,7 +288,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorSetTreeItem* addMegSensorData(const QString& sSubject,
+    SensorSetTreeItem* addMegSensorInfo(const QString& sSubject,
                                         const QString& sSensorSetName,
                                         const MNELIB::MNEBem& sensor,
                                         const QList<FIFFLIB::FiffChInfo>& lChInfo = QList<FIFFLIB::FiffChInfo>());
@@ -340,15 +340,6 @@ protected:
     * @param[in] pItemAdd            The item which is added as a row to the parent item.
     */
     void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
-
-    //=========================================================================================================
-    /**
-    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
-    *
-    * @param[in] pSubjectItem           The subject item which holds the MRI data items.
-    * @param[in] pMeasurementItem       The measurement item which is to be connected.
-    */
-    void connectMeasurementToMriItems(SubjectTreeItem* pSubjectItem, MeasurementTreeItem* pMeasurementItem);
 
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
