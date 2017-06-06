@@ -50,8 +50,28 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_evoked_set.h>
+#include <fs/label.h>
+#include <fs/surface.h>
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff.h>
+
 #include <mne/mne.h>
+#include <mne/mne_epoch_data_list.h>
+#include <mne/mne_sourceestimate.h>
+
+#include <time.h>
+
+#include <inverse/minimumNorm/minimumnorm.h>
+
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+
+#include <utils/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -59,7 +79,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 
 
@@ -68,8 +88,12 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace INVERSELIB;
+using namespace DISP3DLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -88,149 +112,488 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Compute Inverse MNE Example");
+    parser.setApplicationDescription("Compute Raw Inverse MNE Example");
     parser.addHelpOption();
-    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption invFileOption("inv", "Path to inverse <file>, which is to be loaded.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0f");//3.0f;//0.1f;//3.0f;
+
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
+    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+
+
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+
+
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0;//0.1;//3.0;
     QCommandLineOption numberAveragesOption("numAve", "The <value> for the number of averages.", "value", "40");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
 
-    parser.addOption(sampleEvokedFileOption);
-    parser.addOption(invFileOption);
+    QCommandLineOption invFileOutOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
+    QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+
+
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
+
+
+    parser.addOption(inputOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(fwdOption);
+    parser.addOption(covFileOption);
+    parser.addOption(evokedIndexOption);
+    parser.addOption(eventsFileOption);
     parser.addOption(snrOption);
     parser.addOption(numberAveragesOption);
+
+    parser.addOption(hemiOption);
+
     parser.addOption(methodOption);
 
-    //Load data
-    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
-    QFile t_fileInv(parser.value(invFileOption));
+    parser.addOption(invFileOutOption);
+    parser.addOption(stcFileOutOption);
 
-    qint32 nave = parser.value(numberAveragesOption).toInt();
-    float snr = parser.value(snrOption).toFloat();
-    float lambda2 = pow(1.0f / snr, 2.0f);
+    parser.addOption(keepCompOption);
+    parser.addOption(pickAllOption);
+    parser.addOption(destCompsOption);
 
-    QString method = parser.value(methodOption);
+    parser.process(a);
 
-    bool dSPM = false;
-    bool sLORETA = false;
+    //
+    // Load files
+    //
+    QFile t_fileFwd(parser.value(fwdOption));
+    QFile t_fileCov(parser.value(covFileOption));
+    QFile t_fileRaw(parser.value(inputOption));
+    QString t_sEventName = parser.value(eventsFileOption);
 
-    if(method == "dSPM") {
-        dSPM = true;
-    } else if(method == "sLORETA") {
-        sLORETA = true;
+    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+
+    //
+    // Settings
+    //
+    qint32 event = parser.value(evokedIndexOption).toInt();
+
+    float tmin = -0.2f;
+    float tmax = 0.5f;
+
+    bool keep_comp = false;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
+
+    fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
+
+    bool pick_all = false;
+    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+        pick_all = true;
+    }
+
+    qint32 k, p;
+
+    //
+    //   Setup for reading the raw data
+    //
+    FiffRawData raw(t_fileRaw);
+
+    RowVectorXi picks;
+    if (pick_all)
+    {
+        //
+        // Pick all
+        //
+        picks.resize(raw.info.nchan);
+
+        for(k = 0; k < raw.info.nchan; ++k)
+            picks(k) = k;
+        //
+    }
+    else
+    {
+        QStringList include;
+        include << "STI 014";
+        bool want_meg   = true;
+        bool want_eeg   = false;
+        bool want_stim  = false;
+
+//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
+        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);//prefer member function
+    }
+
+    QStringList ch_names;
+    for(k = 0; k < picks.cols(); ++k)
+        ch_names << raw.info.ch_names[picks(0,k)];
+
+    //
+    //   Set up projection
+    //
+    if (raw.info.projs.size() == 0)
+        printf("No projector specified for these data\n");
+    else
+    {
+        //
+        //   Activate the projection items
+        //
+        for (k = 0; k < raw.info.projs.size(); ++k)
+            raw.info.projs[k].active = true;
+
+        printf("%d projection items activated\n",raw.info.projs.size());
+        //
+        //   Create the projector
+        //
+//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
+        fiff_int_t nproj = raw.info.make_projector(raw.proj);
+
+        if (nproj == 0)
+        {
+            printf("The projection vectors do not apply to these channels\n");
+        }
+        else
+        {
+            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+        }
     }
 
     //
-    //   Read the data first
+    //   Set up the CTF compensator
     //
-    FiffEvokedSet evokedSet(t_fileEvoked);
+//    qint32 current_comp = MNE::get_current_comp(raw.info);
+    qint32 current_comp = raw.info.get_current_comp();
+    if (current_comp > 0)
+        printf("Current compensation grade : %d\n",current_comp);
 
-    //
-    //   Then the inverse operator
-    //
-    MNEInverseOperator inv_raw(t_fileInv);
+    if (keep_comp)
+        dest_comp = current_comp;
 
-    //
-    //   Iterate over found data sets
-    //
-    for(qint32 setno = 0; setno < evokedSet.evoked.size(); ++setno)
+    if (current_comp != dest_comp)
     {
-        printf(">> Computing inverse for %s data set <<\n", evokedSet.evoked[setno].comment.toUtf8().constData());
-        //
-        //   Set up the inverse according to the parameters
-        //
-        if (nave < 0)
-            nave = evokedSet.evoked[setno].nave;
-
-        MNEInverseOperator inv = inv_raw.prepare_inverse_operator(nave,lambda2,dSPM,sLORETA);
-        //
-        //   Pick the correct channels from the data
-        //
-        FiffEvokedSet newEvokedSet = evokedSet.pick_channels(inv.noise_cov->names);
-
-        evokedSet = newEvokedSet;
-
-        printf("Picked %d channels from the data\n",evokedSet.info.nchan);
-        printf("Computing inverse...");
-        //
-        //   Simple matrix multiplication followed by combination of the
-        //   three current components
-        //
-        //   This does all the data transformations to compute the weights for the
-        //   eigenleads
-        //
-        SparseMatrix<double> reginv(inv.reginv.rows(),inv.reginv.rows());
-        // put this in the MNE algorithm class derived from inverse algorithm
-        //ToDo put this into a function of inv data
-        qint32 i;
-        for(i = 0; i < inv.reginv.rows(); ++i)
-            reginv.insert(i,i) = inv.reginv(i,0);
-
-        MatrixXd trans = reginv*inv.eigen_fields->data*inv.whitener*inv.proj*evokedSet.evoked[setno].data;
-        //
-        //   Transformation into current distributions by weighting the eigenleads
-        //   with the weights computed above
-        //
-        MatrixXd sol;
-        if (inv.eigen_leads_weighted)
+        qDebug() << "This part needs to be debugged";
+        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
         {
-            //
-            //     R^0.5 has been already factored in
-            //
-            printf("(eigenleads already weighted)...");
-            sol = inv.eigen_leads->data*trans;
+//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
+            raw.info.set_current_comp(dest_comp);
+            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+        }
+        else
+        {
+            printf("Could not make the compensator\n");
+            return 0;
+        }
+    }
+    //
+    //  Read the events
+    //
+    QFile t_EventFile;
+    MatrixXi events;
+    if (t_sEventName.size() == 0)
+    {
+        p = t_fileRaw.fileName().indexOf(".fif");
+        if (p > 0)
+        {
+            t_sEventName = t_fileRaw.fileName().replace(p, 4, "-eve.fif");
+        }
+        else
+        {
+            printf("Raw file name does not end properly\n");
+            return 0;
+        }
+//        events = mne_read_events(t_sEventName);
+
+        t_EventFile.setFileName(t_sEventName);
+        MNE::read_events(t_EventFile, events);
+        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
+    }
+    else
+    {
+        //
+        //   Binary file
+        //
+        p = t_fileRaw.fileName().indexOf(".fif");
+        if (p > 0)
+        {
+            t_EventFile.setFileName(t_sEventName);
+            if(!MNE::read_events(t_EventFile, events))
+            {
+                printf("Error while read events.\n");
+                return 0;
+            }
+            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
         }
         else
         {
             //
-            //     R^0.5 has to factored in
+            //   Text file
             //
-           printf("(eigenleads need to be weighted)...");
-
-           SparseMatrix<double> sourceCov(inv.source_cov->data.rows(),inv.source_cov->data.rows());
-           for(i = 0; i < inv.source_cov->data.rows(); ++i)
-               sourceCov.insert(i,i) = sqrt(inv.source_cov->data(i,0));
-
-           sol   = sourceCov*inv.eigen_leads->data*trans;
+            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
+//            try
+//                events = load(eventname);
+//            catch
+//                error(me,mne_omit_first_line(lasterr));
+//            end
+//            if size(events,1) < 1
+//                error(me,'No data in the event file');
+//            end
+//            //
+//            //   Convert time to samples if sample number is negative
+//            //
+//            for p = 1:size(events,1)
+//                if events(p,1) < 0
+//                    events(p,1) = events(p,2)*raw.info.sfreq;
+//                end
+//            end
+//            //
+//            //    Select the columns of interest (convert to integers)
+//            //
+//            events = int32(events(:,[1 3 4]));
+//            //
+//            //    New format?
+//            //
+//            if events(1,2) == 0 && events(1,3) == 0
+//                fprintf(1,'The text event file %s is in the new format\n',eventname);
+//                if events(1,1) ~= raw.first_samp
+//                    error(me,'This new format event file is not compatible with the raw data');
+//                end
+//            else
+//                fprintf(1,'The text event file %s is in the old format\n',eventname);
+//                //
+//                //   Offset with first sample
+//                //
+//                events(:,1) = events(:,1) + raw.first_samp;
+//            end
         }
+    }
 
-        if (inv.source_ori == FIFFV_MNE_FREE_ORI)
+    //
+    //    Select the desired events
+    //
+    qint32 count = 0;
+    MatrixXi selected = MatrixXi::Zero(1, events.rows());
+    for (p = 0; p < events.rows(); ++p)
+    {
+        if (events(p,1) == 0 && events(p,2) == event)
         {
-            printf("combining the current components...");
-            MatrixXd sol1(sol.rows()/3,sol.cols());
-            for(i = 0; i < sol.cols(); ++i)
+            selected(0,count) = p;
+            ++count;
+        }
+    }
+    selected.conservativeResize(1, count);
+    if (count > 0)
+        printf("%d matching events found\n",count);
+    else
+    {
+        printf("No desired events found.\n");
+        return 0;
+    }
+
+    fiff_int_t event_samp, from, to;
+    MatrixXd timesDummy;
+
+    MNEEpochDataList data;
+
+    MNEEpochData* epoch = NULL;
+
+    MatrixXd times;
+
+    for (p = 0; p < count; ++p)
+    {
+        //
+        //       Read a data segment
+        //
+        event_samp = events(selected(p),0);
+        from = event_samp + tmin*raw.info.sfreq;
+        to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
+
+        epoch = new MNEEpochData();
+
+        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picks))
+        {
+            if (p == 0)
             {
-                VectorXd* tmp = MNE::combine_xyz(sol.block(0,i,sol.rows(),1));
-                sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
-                delete tmp;
+                times.resize(1, to-from+1);
+                for (qint32 i = 0; i < times.cols(); ++i)
+                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
             }
-            sol.resize(sol1.rows(),sol1.cols());
-            sol = sol1;
-        }
-        if (dSPM)
-        {
-            printf("(dSPM)...");
-            sol = inv.noisenorm*sol;
-        }
-        else if (sLORETA)
-        {
-            printf("(sLORETA)...");
-            sol = inv.noisenorm*sol;
-        }
-        printf("[done]\n");
 
-        //Results
-        float tmin = ((float)evokedSet.evoked[setno].first) / evokedSet.info.sfreq;
-        float tstep = 1/evokedSet.info.sfreq;
+            epoch->event = event;
+            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
 
-        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sol.block(0,0,10,10) << std::endl;
-        printf("tmin = %f s\n", tmin);
-        printf("tstep = %f s\n", tstep);
+            data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
+        }
+        else
+        {
+            printf("Can't read the event data segments");
+            return 0;
+        }
+    }
+
+    if(data.size() > 0)
+    {
+        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
+
+        //DEBUG
+        std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;
+        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
+
+        std::cout << times.block(0,0,1,10) << std::endl;
+        qDebug() << times.rows() << " x " << times.cols();
+    }
+
+    // Calculate the average
+    // Option 1 - Random selection
+    VectorXi vecSel(50);
+    srand (time(NULL)); // initialize random seed
+
+    for(qint32 i = 0; i < vecSel.size(); ++i)
+    {
+        qint32 val = rand() % count;
+        vecSel(i) = val;
+    }
+
+//    //Option 3 - Take all epochs
+//    VectorXi vecSel(data.size());
+
+//    for(qint32 i = 0; i < vecSel.size(); ++i)
+//    {
+//        vecSel(i) = i;
+//    }
+
+//    //Option 3 - Manual selection
+//    VectorXi vecSel(20);
+
+//    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
+
+//    std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
+
+    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel, true); //FIFFLIB::defaultVectorXi
+
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    evoked.applyBaselineCorrection(baseline);
+
+
+    //########################################################################################
+    // Source Estimate
+
+    //
+    // Settings
+    //
+    double snr = parser.value(snrOption).toDouble();
+    QString method(parser.value(methodOption));
+
+    QString t_sFileNameInv(parser.value(invFileOutOption));
+    QString t_sFileNameStc(parser.value(stcFileOutOption));
+
+    float lambda2 = 1.0f / pow(snr, 2);
+    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
+
+    //
+    // Load data
+    //
+    MNEForwardSolution t_Fwd(t_fileFwd);
+    if(t_Fwd.isEmpty())
+        return 1;
+
+    FiffCov noise_cov(t_fileCov);
+
+    //
+    // regularize noise covariance
+    //
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+
+    //
+    // make an inverse operators
+    //
+    FiffInfo info = evoked.info;
+    MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
+
+    //
+    // save inverse operator
+    //
+    if(!t_sFileNameInv.isEmpty())
+    {
+        QFile t_fileInverse(t_sFileNameInv);
+        inverse_operator.write(t_fileInverse);
+    }
+
+    //
+    // Compute inverse solution
+    //
+    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+
+    if(sourceEstimate.isEmpty())
+        return 1;
+
+    // View activation time-series
+    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+
+    qDebug() << "Sampling frequency" << raw.info.sfreq;
+    qDebug() << "Number of Steps" << sourceEstimate.data.cols();
+
+
+    VectorXd s;
+
+    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
+
+    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
+    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+
+
+    //Source Estimate end
+    //########################################################################################
+
+
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    testWindow->setModel(p3DDataModel);
+
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", t_surfSet, t_annotationSet);
+
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_Fwd)) {
+        pRTDataItem->setLoopState(true);
+        pRTDataItem->setTimeInterval(17);
+        pRTDataItem->setNumberAverages(1);
+        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setNormalization(QVector3D(0.0,0.5,20.0));
+        pRTDataItem->setVisualizationType("Smoothing based");
+        pRTDataItem->setColortable("Hot");
+    }
+
+    testWindow->show();
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->init(p3DDataModel, testWindow);
+    control3DWidget->show();
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileStc);
     }
 
     return a.exec();

@@ -218,6 +218,14 @@ public:
     */
     FiffEvoked & operator+=(const MatrixXd &newData);
 
+    //=========================================================================================================
+    /**
+    * Inputs a new data set and recalculates the average. This function also iterates the nave parameter by one.
+    *
+    * @param[in] p_baseline     time definition of the baseline in seconds [from, to]
+    */
+    void applyBaselineCorrection(QPair<QVariant,QVariant>& p_baseline);
+
 public:
     FiffInfo    info;               /**< Measurement info. */
     fiff_int_t  nave;               /**< Number of averaged epochs. */
@@ -228,7 +236,7 @@ public:
     RowVectorXf times;              /**< Vector of time instants in seconds. */
     MatrixXd    data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
     MatrixXd    proj;               /**< SSP projection */
-    QPair<QVariant,QVariant>    baseline;    /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>    baseline;   /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 };
 
 //*************************************************************************************************************
