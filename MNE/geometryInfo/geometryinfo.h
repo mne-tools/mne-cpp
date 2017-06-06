@@ -94,9 +94,13 @@ namespace GEOMETRYINFO {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class allows sensor-to-mesh mapping and calculation of surface constrained distances.
+* Given the positions of a row of sensors in 3D space, it finds the best fitting vertex of an underlying mesh.
+* This can be used for later signal interpolation (see class Interpolation for more details).
+* Given a mesh, the class can calculate shortest path on said mesh. It outputs a distance table.
 *
-* @brief Brief description of this class.
+* @brief This class holds static methods for sensor-to-mesh mapping and surface constrained distance calculation on a mesh
+*
 */
 
 class GEOMETRYINFOSHARED_EXPORT GeometryInfo
@@ -114,20 +118,20 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief scdc
-     * @param inSurface
-     * @param cancelDistance
-     * @param vertSubSet
-     * @return
+     * @brief scdc Calculates surface constrained distances on the mesh that is held by the passed MNEBemSurface
+     * @param inSurface The surface on which distances should be calculated
+     * @param vertSubSet The subset of IDs for which the distances should be calculated
+     * @param cancelDistance Distances higher than this are ignored, i.e. set to infinity
+     * @return A shared pointer to a double matrix. One column represents the distances for one vertex inside of the passed subset
      */
     static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubset = QVector<qint32>(), double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**
-     * @brief calcualtes the nearest neighbor (euclidian distance) vertex to each sensor
-     * @param inSurface: holds all vertex information that is needed for the claculation in its public member rr
-     * @param sensorPositions: each sensor postion in saved in an Eigen vector with x, y & z cord.
-     * @return  pointer to output vector where the vecotr index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
+     * @brief Calculates the nearest neighbor (euclidian distance) vertex to each sensor
+     * @param inSurface: Holds all vertex information that is needed (public member rr)
+     * @param sensorPositions: Each sensor postion in saved in an Eigen vector with x, y & z coord.
+     * @return  Pointer to output vector where the vector index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
      */
     static QSharedPointer<QVector<qint32>> projectSensors(const MNELIB::MNEBemSurface &inSurface, const QVector<Eigen::Vector3f> &sensorPositions);
 
@@ -145,31 +149,31 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief squared
-     * @param base
-     * @return
+     * @brief squared Implemented for better readability only
+     * @param base Base double value
+     * @return Base squared
      */
     static inline  double squared(double base);
 
     //=========================================================================================================
     /**
-     * @brief nearestNeighbor
-     * @param inSurface
-     * @param sensorBegin
-     * @param sensorEnd
-     * @return
+     * @brief nearestNeighbor Calculates the nearest vertex of an MNEBemSurface for each position between the two iterators
+     * @param inSurface The MNEBemSurface that holds the vertex information
+     * @param sensorBegin The iterator that indicates the start of the wanted section of positions
+     * @param sensorEnd The iterator that indicates the end of the wanted section of positions
+     * @return A vector of nearest vertex IDs that corresponds to the subvector between the two iterators
      */
     static QVector<qint32> nearestNeighbor(const MNELIB::MNEBemSurface &inSurface,  QVector<Eigen::Vector3f>::const_iterator sensorBegin, QVector<Eigen::Vector3f>::const_iterator sensorEnd);
 
     //=========================================================================================================
     /**
-     * @brief iterativeDijkstra Calculates shortest distances for each vertex of vertSubset between index begin and index end
+     * @brief iterativeDijkstra Calculates shortest distances on the mesh that is held by the MNEBemsurface for each vertex of the passed vector that lies between the two indices
      * @param ptr The matrix in which the distances will be stored
      * @param inSurface The surface on which distances should be calculated
      * @param vertSubSet The subset of vertices
      * @param begin Start index of distance calculation
-     * @param end   End indes of distance calculation
-     * @param cancelDist Distance thresold: all vertices that have a higher distance to the origin vertex are set to infinity
+     * @param end   End index of distance calculation
+     * @param cancelDist Distance threshold: all vertices that have a higher distance to the respective root vertex are set to infinity
      */
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end, double cancelDist);
 };
