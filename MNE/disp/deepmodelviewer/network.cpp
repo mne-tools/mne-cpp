@@ -86,7 +86,7 @@ Network::Network(QObject *parent)
 
 //*************************************************************************************************************
 
-void Network::setModel(Deep::SPtr& model)
+void Network::setModel(const Deep::SPtr& model)
 {
     if(m_pModel != model) {
         cleanNetwork();

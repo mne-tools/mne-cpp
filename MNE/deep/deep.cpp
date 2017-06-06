@@ -288,7 +288,7 @@ bool Deep::loadModel(const QString& modelFileName, const DeviceDescriptor &devic
 
     fprintf(stderr, "Loading model %s.\n",modelFileName.toUtf8().constData());
 
-    m_pModel = Function::LoadModel(modelFileName.toStdWString(), device);
+    m_pModel = Function::Load(modelFileName.toStdWString(), device);
 
     return true;
 }
@@ -301,7 +301,7 @@ bool Deep::saveModel(const QString &fileName)
     if(!m_pModel)
         return false;
 
-    m_pModel->SaveModel(fileName.toStdWString());
+    m_pModel->Save(fileName.toStdWString());
 
     return true;
 }

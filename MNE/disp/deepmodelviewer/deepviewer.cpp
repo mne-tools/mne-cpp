@@ -122,7 +122,7 @@ Network* DeepViewer::getNetwork() const
 
 //*************************************************************************************************************
 
-void DeepViewer::setModel(Deep::SPtr& model)
+void DeepViewer::setModel(const Deep::SPtr& model)
 {
     if(model != m_pNetwork->model()) {
         removeSceneItems();
