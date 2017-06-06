@@ -45,7 +45,6 @@ SUBDIRS += \
     ex_fiff_io \
     ex_find_evoked \
     ex_inverse_mne \
-    ex_inverse_mne_raw \
     ex_make_inverse_operator \
     ex_make_layout \
     ex_read_bem \
@@ -67,6 +66,7 @@ SUBDIRS += \
             ex_disp_3D \
             ex_fs_surface \
             ex_histogram \
+            ex_inverse_mne_raw \
             ex_inverse_pwl_rap_music \
             ex_inverse_rap_music \
             ex_read_fwd_disp_3D \
