@@ -61,8 +61,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Deepd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
-            -lCntk.Eval-2.0rc2d \
-            -lCntk.Core-2.0rc2d
+            -lCntk.Eval-2.0 \
+            -lCntk.Core-2.0
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -74,8 +74,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Deep \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
-            -lCntk.Eval-2.0rc2 \
-            -lCntk.Core-2.0rc2
+            -lCntk.Eval-2.0 \
+            -lCntk.Core-2.0
 }
 
 DESTDIR = $${MNE_BINARY_DIR}

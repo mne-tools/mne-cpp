@@ -110,7 +110,7 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
 
     p_evoked.setInfo(info, proj);
 
-    p_evoked.aspect_kind = FIFFV_ASPECT_STD_ERR;
+    p_evoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
 
     p_evoked.first = first;
     p_evoked.last = last;
@@ -121,6 +121,12 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
     p_evoked.times = times;
 
     p_evoked.comment = QString::number(this->at(0)->event);
+
+    if(p_evoked.proj.rows() > 0)
+    {
+        matAverage = p_evoked.proj * matAverage;
+        printf("\tSSP projectors applied to the evoked data\n");
+    }
 
     p_evoked.data = matAverage;
 
