@@ -172,7 +172,7 @@ private:
      * @param inSurface The surface on which distances should be calculated
      * @param vertSubSet The subset of vertices
      * @param begin Start index of distance calculation
-     * @param end   End index of distance calculation
+     * @param end   End index of distance calculation, exclusive
      * @param cancelDist Distance threshold: all vertices that have a higher distance to the respective root vertex are set to infinity
      */
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> ptr, const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end, double cancelDist);
