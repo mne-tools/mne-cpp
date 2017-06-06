@@ -129,7 +129,7 @@ public:
     *
     * @param[in] model      The CNTK model which should be represented by the viewer
     */
-    void setModel(QSharedPointer<DEEPLIB::Deep>& model);
+    void setModel(const QSharedPointer<DEEPLIB::Deep>& model);
 
     //=========================================================================================================
     /**
