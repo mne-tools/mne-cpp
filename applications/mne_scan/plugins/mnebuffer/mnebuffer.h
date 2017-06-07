@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mnebuffer.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;;
+*           Eric Larson <larson.eric.d@gmail.com>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Christoph Dinh, Eric Larson and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyToolbox class.
+* @brief    Contains the declaration of the MneBuffer class.
 *
 */
 
-#ifndef DUMMYTOOLBOX_H
-#define DUMMYTOOLBOX_H
+#ifndef MNEBUFFER_H
+#define MNEBUFFER_H
 
 
 //*************************************************************************************************************
@@ -42,13 +43,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummytoolbox_global.h"
+#include "mnebuffer_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
-#include "FormFiles/dummysetupwidget.h"
-#include "FormFiles/dummyyourwidget.h"
+#include "FormFiles/mnebuffersetupwidget.h"
+#include "FormFiles/mnebufferwidget.h"
+
+#include "sender.h"
+#include "receiver.h"
 
 
 //*************************************************************************************************************
@@ -63,10 +67,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE MNEBUFFERPLUGIN
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+namespace MNEBUFFERPLUGIN
 {
 
 
@@ -86,29 +90,29 @@ using namespace SCSHAREDLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyToolbox
+* The MneBuffer provides a raw data streamer, whereas the API is compatible to the  FieldTrip buffer
 *
-* @brief The DummyToolbox class provides a dummy algorithm structure.
+* @brief The MneBuffer class provides a raw data streamer.
 */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
+class MNEBUFFERSHARED_EXPORT MneBuffer : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "dummytoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "mnebuffer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a DummyToolbox.
+    * Constructs a MneBuffer.
     */
-    DummyToolbox();
+    MneBuffer();
 
     //=========================================================================================================
     /**
-    * Destroys the DummyToolbox.
+    * Destroys the MneBuffer.
     */
-    ~DummyToolbox();
+    ~MneBuffer();
 
     //=========================================================================================================
     /**
@@ -145,21 +149,24 @@ protected:
     */
     virtual void run();
 
-    void showYourWidget();
+    void showMneBufferWidget();
 
 private:
     bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
 
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
-    QSharedPointer<DummyYourWidget>                 m_pYourWidget;          /**< flag whether thread is running.*/
-    QAction*                                        m_pActionShowYourWidget;/**< flag whether thread is running.*/
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<MneBufferWidget>                 m_pMneBufferWidget;             /**< flag whether thread is running.*/
+    QAction*                                        m_pActionShowMneBufferWidget;   /**< flag whether thread is running.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pDataBuffer;          /**< Holds incoming data.*/
 
-    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The NewRealTimeMultiSampleArray of the DummyToolbox input.*/
-    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The NewRealTimeMultiSampleArray of the DummyToolbox output.*/
+    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pMneBufferInput;      /**< The NewRealTimeMultiSampleArray of the DummyToolbox input.*/
+    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pMneBufferOutput;     /**< The NewRealTimeMultiSampleArray of the DummyToolbox output.*/
+
+    QSharedPointer<Sender> sender;
+    QSharedPointer<Receiver> receiver;
 };
 
 } // NAMESPACE
 
-#endif // DUMMYTOOLBOX_H
+#endif // MNEBUFFER_H

@@ -44,6 +44,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
     SUBDIRS += \
         babymeg \
         fiffsimulator \
+        mnebuffer
 
     #Algorithms
     SUBDIRS += \
@@ -51,7 +52,8 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
     #Sensors
     SUBDIRS += \
         ecgsimulator \
-        fiffsimulator \
+        fiffsimulator  \
+        mnebuffer \
         neuromag \
         babymeg \
         triggercontrol \
