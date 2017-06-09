@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "geometryinfo_global.h"
+#include <fiff/fiff_evoked.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -142,6 +143,14 @@ public:
      * @param filename The file to be written to
      */
     static void matrixDump(QSharedPointer<Eigen::MatrixXd> ptr, std::string filename);
+
+    /**
+     * @brief filterBadChannels Filters bad channels from distance table
+     * @param distanceTable Result of SCDC
+     * @param evoked Container for sensors
+     * @param sensorType Sensor type to be filtered out, use fiff constants
+     */
+    static void filterBadChannels(QSharedPointer<Eigen::MatrixXd> distanceTable, const FIFFLIB::FiffEvoked& evoked, qint32 sensorType);
 
 protected:
 
