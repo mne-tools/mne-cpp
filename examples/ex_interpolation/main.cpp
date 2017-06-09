@@ -209,6 +209,8 @@ int main(int argc, char *argv[])
     QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, *mappedSubSet, 0.03);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
+    GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
+
     // linear weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
     Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix, Interpolation::linear);

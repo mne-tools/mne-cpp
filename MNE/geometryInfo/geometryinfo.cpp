@@ -286,3 +286,27 @@ void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> ptr, std::string filename
     file << *ptr;
     std::cout << "Finished writing !" << std::endl;
 }
+//*************************************************************************************************************
+
+void GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> distanceTable, const FIFFLIB::FiffEvoked& evoked, qint32 sensorType){
+    // use pointer to avoid copying of FiffChInfo objects
+    QVector<const FiffChInfo*> sensors;
+    for(const FiffChInfo& s : evoked.info.chs){
+        if(s.kind == sensorType){
+           sensors.push_back(&s);
+        }
+    }
+
+    // inefficient: going through all bad sensors, i.e. also the ones which are of different type than the passed one
+    for(const QString& b : evoked.info.bads){
+        for(int col = 0; col < sensors.size(); ++col){
+            if(sensors[col]->ch_name == b){
+                // found index of our bad channel, set whole column to infinity
+                for(int row = 0; row < distanceTable->rows(); ++row){
+                    (*distanceTable)(row, col) = DOUBLE_INFINITY;
+                }
+                break;
+            }
+        }
+    }
+}
