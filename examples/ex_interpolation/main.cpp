@@ -209,7 +209,19 @@ int main(int argc, char *argv[])
     QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, *mappedSubSet, 0.03);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
-    GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
+    QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
+
+    for (qint32 col : erasedColums) {
+        qint64 notInfCount = 0;
+        for (qint32 row = 0; row < distanceMatrix->rows(); ++row) {
+            if ((*distanceMatrix)(row, col) != DOUBLE_INFINITY) {
+                notInfCount++;
+            }
+        }
+        if (notInfCount != 0) {
+           std::cout << "[WARNING] Inconsistent filtering of bad channels in column " << col << std::endl;
+        }
+    }
 
     // linear weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
