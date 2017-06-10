@@ -150,7 +150,7 @@ public:
      * @param evoked Container for sensors
      * @param sensorType Sensor type to be filtered out, use fiff constants
      */
-    static void filterBadChannels(QSharedPointer<Eigen::MatrixXd> distanceTable, const FIFFLIB::FiffEvoked& evoked, qint32 sensorType);
+    static QVector<qint32> filterBadChannels(QSharedPointer<Eigen::MatrixXd> distanceTable, const FIFFLIB::FiffEvoked& evoked, qint32 sensorType);
 
 protected:
 
