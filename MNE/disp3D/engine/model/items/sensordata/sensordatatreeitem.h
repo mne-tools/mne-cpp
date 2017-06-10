@@ -65,10 +65,12 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+namespace FIFFLIB{
+    class FiffEvoked;
+}
 
-namespace MNELIB {
-    class MNEForwardSolution;
-    class MNESensorData;
+namespace MNELIB{
+    class MNEBemSurface;
 }
 
 //*************************************************************************************************************
@@ -115,18 +117,9 @@ public:
     //=========================================================================================================
     /**
     * Initializes the rt data item with neccessary information for visualization computations.
-    *
-    * @param[in] tForwardSolution                   The MNEForwardSolution.
-    * @param[in] matSurfaceVertColorLeftHemi        The vertex colors for the left hemisphere surface where the data is to be plotted on.
-    * @param[in] matSurfaceVertColorRightHemi       The vertex colors for the right hemisphere surface where the data is to be plotted on.
-    * @param[in] vecLabelIdsLeftHemi                The label ids for each left hemisphere surface vertex index.
-    * @param[in] vecLabelIdsRightHemi               The label ids for each right hemispheresurface vertex index.
-    * @param[in] lLabelsLeftHemi                    The label list for the left hemisphere.
-    * @param[in] lLabelsRightHemi                   The label list for the right hemisphere.
+
     */
-    void init(const MatrixX3f &matSurfaceVertColor,
-            const VectorXi &vecLabelIds,
-            const QList<FSLIB::Label> &lLabels);
+    void init(const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const qint32 sensorType);
 
     //=========================================================================================================
     /**
@@ -186,14 +179,6 @@ public:
 
     //=========================================================================================================
     /**
-    * This function sets the visualization type.
-    *
-    * @param[in] sVisualizationType     The new visualization type ("Annotation based" etc.).
-    */
-    void setVisualizationType(const QString& sVisualizationType);
-
-    //=========================================================================================================
-    /**
     * This function set the normalization value.
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
@@ -230,7 +215,7 @@ protected:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void onNewRtData(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
+    void onNewRtData(const MatrixXd &sensorData);
 
     //=========================================================================================================
     /**
@@ -258,14 +243,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the preferred visualization type changes (single vertex, smoothing, annotation based). This functions translates from QString to m_iVisualizationType.
-    *
-    * @param[in] sVisType     The new visualization type.
-    */
-    void onVisualizationTypeChanged(const QVariant& sVisType);
-
-    //=========================================================================================================
-    /**
     * This function gets called whenever the check/actiation state of the looped streaming state changed.
     *
     * @param[in] checkState     The check state of the looped streaming state.
@@ -282,7 +259,7 @@ protected:
 
     bool                                m_bIsDataInit;                      /**< The init flag. */
 
-    QPointer<RtSourceLocDataWorker>     m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSourceLocDataWorker>     m_pSensorRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
     //=========================================================================================================
