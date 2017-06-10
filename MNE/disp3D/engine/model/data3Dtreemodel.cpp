@@ -517,7 +517,11 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, cons
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(matSensorData);
 
-        pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+        if(sDataType == "EEG") {
+            pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+        } else if (sDataType == "MEG") {
+            pSubjectItem->connectMeasurementToSensorItems(pMeasurementItem);
+        }
     }
 
     return pReturnItem;

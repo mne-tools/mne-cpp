@@ -45,6 +45,10 @@
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
+#include <mne/mne_bem_surface.h>
+#include <fiff/fiff_evoked.h>
+#include <geometryInfo/geometryinfo.h>
+#include <interpolation/interpolation.h>
 
 
 //*************************************************************************************************************
@@ -67,7 +71,10 @@
 
 using namespace Eigen;
 using namespace MNELIB;
+using namespace FIFFLIB;
 using namespace DISP3DLIB;
+using namespace GEOMETRYINFO;
+using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************
@@ -92,9 +99,9 @@ SensorDataTreeItem::SensorDataTreeItem(int iType, const QString &text)
 
 SensorDataTreeItem::~SensorDataTreeItem()
 {
-    if(m_pSourceLocRtDataWorker->isRunning()) {
-        m_pSourceLocRtDataWorker->stop();
-        delete m_pSourceLocRtDataWorker;
+    if(m_pSensorRtDataWorker->isRunning()) {
+        m_pSensorRtDataWorker->stop();
+        delete m_pSensorRtDataWorker;
     }
 }
 
@@ -121,16 +128,6 @@ void SensorDataTreeItem::initItem()
 
     data.setValue(false);
     pItemStreamStatus->setData(data, MetaTreeItemRoles::StreamStatus);
-
-    MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::VisualizationType, "Vertex based");
-    connect(pItemVisuaizationType, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onVisualizationTypeChanged);
-    list.clear();
-    list << pItemVisuaizationType;
-    list << new QStandardItem(pItemVisuaizationType->toolTip());
-    this->appendRow(list);
-    data.setValue(QString("Vertex based"));
-    pItemVisuaizationType->setData(data, MetaTreeItemRoles::VisualizationType);
 
     MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot");
     connect(pItemColormapType, &MetaTreeItem::dataChanged,
@@ -186,77 +183,48 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::init(  const MatrixX3f& matSurfaceVertColor,
-                                const VectorXi& vecLabelIds,
-                                const QList<FSLIB::Label>& lLabels)
+void SensorDataTreeItem::init(const MNEBemSurface &inSurface, const FiffEvoked &evoked, const qint32 sensorType)
 {
 
-
         //Source Space IS clustered
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        // this->setData(matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
+       //@todo wich item do we use here ????????????????????????
+       this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
 
-        // this->setData(matSurfaceVertColor.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        // this->setData(matSurfaceVertColor.size() + matSurfaceVertColor.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-
-    QVariant data;
-
-    /*for(int i = 0; i < tForwardSolution.src.size(); ++i) {
-        if(isClustered) {
-            //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
-            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
-            for(int j = 0; j < clustVertNo.rows(); ++j) {
-                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
-            }
-            data.setValue(clustVertNo);
-        } else {
-            data.setValue(tForwardSolution.src[i].vertno);
-        }
-
-        if(i == 0) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
-        } else if (i == 1) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
-        }
-    }*/
-
-    //Add meta information as item children
-    QList<QStandardItem*> list;
-
-    // QString sIsClustered = isClustered ? "Clustered" : "Full";
-    QString sIsClustered("asdf");
-    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::SourceSpaceType, sIsClustered);
-    pItemSourceSpaceType->setEditable(false);
-    list.clear();
-    list << pItemSourceSpaceType;
-    list << new QStandardItem(pItemSourceSpaceType->toolTip());
-    this->appendRow(list);
-    data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
     //set rt data corresponding to the hemisphere
-    if(!m_pSourceLocRtDataWorker) {
-        m_pSourceLocRtDataWorker = new RtSourceLocDataWorker();
+    if(!m_pSensorRtDataWorker) {
+        m_pSensorRtDataWorker = new RtSourceLocDataWorker();
     }
 
-    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
-            this, &SensorDataTreeItem::onNewRtData);
 
-   /* m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
-                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>(),
-                                             tForwardSolution.src[0].neighbor_vert,
-                                             tForwardSolution.src[1].neighbor_vert,
-                                             tForwardSolution.src[0].rr,
-                                             tForwardSolution.src[1].rr);
+    // positions of EEG and MEG sensors
+    QVector<Vector3f> sensors;
+    //fill QVectors with the right sensor positions
+    for( const FiffChInfo &info : evoked.info.chs)
+    {
+        if(info.kind == sensorType)
+        {
+            sensors.push_back(info.chpos.r0);
+        }
+    }
 
-    m_pSourceLocRtDataWorker->setSurfaceColor(matSurfaceVertColorLeftHemi,
-                                             matSurfaceVertColorRightHemi);
+    std::cout << "Number of vertices: ";
+    std::cout << inSurface.rr.rows() << std::endl;
 
-    m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIdsLeftHemi,
-                                                vecLabelIdsRightHemi,
-                                                lLabelsLeftHemi,
-                                                lLabelsRightHemi);
-*/
+    //sensor projecting
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(inSurface, sensors);
+
+    //SCDC with cancel distance 0.03m
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(inSurface, *mappedSubSet, 0.03);
+    //@todo missing filtering of bad channles
+
+    // linear weight matrix
+    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
+
+    //@todo adapt to new worker wich is to be implemented
+//    connect(m_pSensorRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
+//            this, &SensorDataTreeItem::onNewRtData);
+
     m_bIsDataInit = true;
 }
 
@@ -266,17 +234,18 @@ void SensorDataTreeItem::init(  const MatrixX3f& matSurfaceVertColor,
 void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
 {
     if(!m_bIsDataInit) {
-        qDebug() << "SensorDataTreeItem::addData - Rt source loc item has not been initialized yet!";
+        qDebug() << "SensorDataTreeItem::addData - sensor data item has not been initialized yet!";
         return;
     }
 
-    //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
+    //Set new data into item's data.
     QVariant data;
-    // data.setValue(tSensorData.data);
+    data.setValue(tSensorData);
+    //@todo RTData correct ??
     this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-    if(m_pSourceLocRtDataWorker) {
-       //  m_pSourceLocRtDataWorker->addData(tSensorData.data);
+    if(m_pSensorRtDataWorker) {
+         m_pSensorRtDataWorker->addData(tSensorData);
     }
 }
 
@@ -334,6 +303,7 @@ void SensorDataTreeItem::setTimeInterval(int iMSec)
 
 //*************************************************************************************************************
 
+//@ do we need this ??
 void SensorDataTreeItem::setNumberAverages(int iNumberAverages)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::NumberAverages);
@@ -368,46 +338,10 @@ void SensorDataTreeItem::setColortable(const QString& sColortable)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setVisualizationType(const QString& sVisualizationType)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::VisualizationType);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(sVisualizationType);
-            pAbstractItem->setData(data, MetaTreeItemRoles::VisualizationType);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void SensorDataTreeItem::setNormalization(const QVector3D& vecThresholds)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DistributedSourceLocThreshold);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(vecThresholds);
-            pAbstractItem->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
-
-            QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
-            data.setValue(sTemp);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
+//@ if needed change signature
 void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere)
 {
-    m_pSourceLocRtDataWorker->setSurfaceColor(matVertColorLeftHemisphere,
+    m_pSensorRtDataWorker->setSurfaceColor(matVertColorLeftHemisphere,
                                              matVertColorRightHemisphere);
 }
 
@@ -416,11 +350,11 @@ void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisph
 
 void SensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
-    if(m_pSourceLocRtDataWorker) {
+    if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
-            m_pSourceLocRtDataWorker->start();
+            m_pSensorRtDataWorker->start();
         } else if(checkState == Qt::Unchecked) {
-            m_pSourceLocRtDataWorker->stop();
+            m_pSensorRtDataWorker->stop();
         }
     }
 }
@@ -428,10 +362,10 @@ void SensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkSt
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
+void SensorDataTreeItem::onNewRtData(const MatrixXd &sensorData)
 {
     QVariant data;
-    data.setValue(sourceColorSamples);
+    data.setValue(sensorData);
     emit rtVertColorChanged(data);
 }
 
@@ -441,8 +375,8 @@ void SensorDataTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceCo
 void SensorDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setColormapType(sColormapType.toString());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setColormapType(sColormapType.toString());
         }
     }
 }
@@ -453,8 +387,8 @@ void SensorDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 void SensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 {
     if(iMSec.canConvert<int>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setInterval(iMSec.toInt());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setInterval(iMSec.toInt());
         }
     }
 }
@@ -465,30 +399,8 @@ void SensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 void SensorDataTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void SensorDataTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
-{
-    if(sVisType.canConvert<QString>()) {
-        int iVisType = Data3DTreeModelItemRoles::VertexBased;
-
-        if(sVisType.toString() == "Annotation based") {
-            iVisType = Data3DTreeModelItemRoles::AnnotationBased;
-        }
-
-        if(sVisType.toString() == "Smoothing based") {
-            iVisType = Data3DTreeModelItemRoles::SmoothingBased;
-        }
-
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
         }
     }
 }
@@ -498,11 +410,11 @@ void SensorDataTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
 
 void SensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
-    if(m_pSourceLocRtDataWorker) {
+    if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
-            m_pSourceLocRtDataWorker->setLoop(true);
+            m_pSensorRtDataWorker->setLoop(true);
         } else if(checkState == Qt::Unchecked) {
-            m_pSourceLocRtDataWorker->setLoop(false);
+            m_pSensorRtDataWorker->setLoop(false);
         }
     }
 }
@@ -513,8 +425,8 @@ void SensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& ch
 void SensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr.toInt());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
         }
     }
 }
