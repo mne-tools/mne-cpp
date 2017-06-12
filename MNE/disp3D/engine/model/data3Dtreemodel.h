@@ -82,6 +82,7 @@ namespace MNELIB {
     class MNESourceSpace;
     class MNEBem;
     class MNESourceEstimate;
+    class MNEBemSurface;
 }
 
 namespace FIFFLIB{
@@ -319,7 +320,7 @@ public:
      *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorDataTreeItem* addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const Eigen::MatrixXd& matSensorData, const QString sDataType = QString("MEG"));
+    SensorDataTreeItem* addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const Eigen::MatrixXd& matSensorData, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sDataType = QString("MEG"));
 
     //=========================================================================================================
     /**

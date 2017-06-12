@@ -119,7 +119,7 @@ public:
     * Initializes the rt data item with neccessary information for visualization computations.
 
     */
-    void init(const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const qint32 sensorType);
+    void init(const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
 
     //=========================================================================================================
     /**
