@@ -183,7 +183,7 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::init(const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
+void SensorDataTreeItem::init(const MNEBemSurface &inSurface, const FiffEvoked &evoked, const qint32 sensorType)
 {
 
         //Source Space IS clustered
