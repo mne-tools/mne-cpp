@@ -58,7 +58,6 @@
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_sourcespace.h>
-#include <mne/mne_bem_surface.h>
 
 #include <fiff/fiff_dig_point_set.h>
 
@@ -252,9 +251,9 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
 //*************************************************************************************************************
 
-SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData, const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
+SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData)
 {
-    if(!tSensorData.size() == 0) {
+    if(!tSensorData.size()==0) {
         if(m_pSensorDataTreeItem) {
             m_pSensorDataTreeItem->addData(tSensorData);
         }
@@ -270,11 +269,8 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData, co
                 list << new QStandardItem(m_pSensorDataTreeItem->toolTip());
                 this->appendRow(list);
 
-                m_pSensorDataTreeItem->init(inSurface, evoked, sensorType);
-
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onVertColorChanged);
-
 
                 m_pSensorDataTreeItem->addData(tSensorData);
             } else {

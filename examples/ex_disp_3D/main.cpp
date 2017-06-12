@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
     MatrixXd temp(2, 2);
     temp << 1, 2,
             3, 4;
-    p3DDataModel->addSensorData(parser.value(subjectOption), "SWP", temp, t_sensorSurfaceVV[0], evoked);
+    p3DDataModel->addSensorData("Deppen", "SWP", temp);
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values

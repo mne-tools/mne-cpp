@@ -125,7 +125,6 @@ SOURCES += \
     engine/model/items/common/metatreeitem.cpp \
     engine/model/items/common/abstractmeshtreeitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
-    engine/model/workers/rtSensorData/rtsensordataworker.cpp \
     engine/model/3dhelpers/renderable3Dentity.cpp \
     engine/model/3dhelpers/custommesh.cpp \
     engine/model/materials/pervertexphongalphamaterial.cpp \
@@ -137,7 +136,7 @@ SOURCES += \
     adapters/ecdview.cpp \
     adapters/abstractview.cpp \
     adapters/networkview.cpp \
-    engine/model/items/sensordata/sensordatatreeitem.cpp \
+    engine/model/items/sensordata/sensordatatreeitem.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -166,7 +165,6 @@ HEADERS += \
     engine/model/items/common/abstractmeshtreeitem.h \
     engine/model/items/common/types.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
-    engine/model/workers/rtSensorData/rtsensordataworker.h \
     engine/model/3dhelpers/renderable3Dentity.h \
     engine/model/3dhelpers/custommesh.h \
     engine/model/items/common/types.h \
@@ -180,7 +178,7 @@ HEADERS += \
     adapters/abstractview.h \
     adapters/networkview.h \
     disp3D_global.h \
-    engine/model/items/sensordata/sensordatatreeitem.h \
+    engine/model/items/sensordata/sensordatatreeitem.h
 
 FORMS += \
     engine/control/control3dwidget.ui \
