@@ -488,7 +488,13 @@ void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStanda
 
 //*************************************************************************************************************
 
-SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const MatrixXd& matSensorData, const QString sDataType)
+SensorDataTreeItem* Data3DTreeModel::addSensorData(
+                                        const QString& sSubject,
+                                        const QString& sMeasurementSetName,
+                                        const MatrixXd& matSensorData,
+                                        const MNEBemSurface& inSurface,
+                                        const FiffEvoked& evoked,
+                                        const QString sDataType)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -510,12 +516,12 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject, cons
                 }
             }
 
-            pReturnItem = pMeasurementItem->addData(matSensorData);
+            pReturnItem = pMeasurementItem->addData(matSensorData, inSurface, evoked, sDataType);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData);
+        pReturnItem = pMeasurementItem->addData(matSensorData, inSurface, evoked, sDataType);
 
         if(sDataType == "EEG") {
             pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
