@@ -86,7 +86,7 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtSourceLocDataWorker;
+class RtSensorDataWorker;
 
 //=============================================================================================================
 /**
@@ -192,7 +192,7 @@ public:
     * @param[in] matVertColorLeftHemisphere       The new vertex colors for the left hemisphere.
     * @param[in] matVertColorRightHemisphere      The new vertex colors for the right hemisphere.
     */
-    void setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere);
+    void setColorOrigin(const MatrixX3f& matVertColor);
 
 protected:
     //=========================================================================================================
@@ -259,7 +259,7 @@ protected:
 
     bool                                m_bIsDataInit;                      /**< The init flag. */
 
-    QPointer<RtSourceLocDataWorker>     m_pSensorRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
     //=========================================================================================================

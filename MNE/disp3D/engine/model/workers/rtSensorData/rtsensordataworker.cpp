@@ -100,7 +100,7 @@ void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, d
     //timer.start();
 
     if(data.rows() != matFinalVertColor.rows()) {
-        qDebug() << "RtSourceLocDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
+        qDebug() << "RtSensorDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
     }
 
     float dSample;
@@ -134,7 +134,7 @@ void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, d
     }
 
     //int elapsed = timer.elapsed();
-    //qDebug()<<"RtSourceLocDataWorker::transformDataToColor - elapsed"<<elapsed;
+    //qDebug()<<"RtSensorLocDataWorker::transformDataToColor - elapsed"<<elapsed;
 }
 
 
@@ -250,7 +250,7 @@ void RtSensorDataWorker::setSurfaceData(const Eigen::VectorXi& vecVertNo,
     QMutexLocker locker(&m_qMutex);
 
     if(vecVertNo.rows() == 0) {
-        qDebug() << "RtSourceLocDataWorker::setSurfaceData - Surface data is empty. Returning ...";
+        qDebug() << "RtSensorDataWorker::setSurfaceData - Surface data is empty. Returning ...";
         return;
     }
 
@@ -271,7 +271,7 @@ void RtSensorDataWorker::setSurfaceColor(const MatrixX3f& matSurfaceVertColor)
     QMutexLocker locker(&m_qMutex);
 
     if(matSurfaceVertColor.size() == 0) {
-        qDebug() << "RtSourceLocDataWorker::setSurfaceColor - Surface color data is empty. Returning ...";
+        qDebug() << "RtSensorDataWorker::setSurfaceColor - Surface color data is empty. Returning ...";
         return;
     }
 
@@ -428,7 +428,7 @@ void RtSensorDataWorker::run()
 
         //Sleep specified amount of time - also take into account processing time from before
         int iTimerElapsed = timer.elapsed();
-        //qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
+        //qDebug() << "RtSensorDataWorker::run()" << timer.elapsed() << "msecs";
 
         if(m_iMSecIntervall-iTimerElapsed > 0) {
             QThread::msleep(m_iMSecIntervall-iTimerElapsed);
@@ -446,13 +446,13 @@ MatrixX3f RtSensorDataWorker::performVisualizationTypeCalculation(const VectorXd
 //    allTimer.start();
 
     if(vSourceColorSamples.rows() != m_lVisualizationInfo.vVertNo.rows()) {
-        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << vSourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_lVisualizationInfo.vVertNo.rows() << "). Returning...";
+        qDebug() << "RtSensorDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << vSourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_lVisualizationInfo.vVertNo.rows() << "). Returning...";
         MatrixX3f color = m_lVisualizationInfo.matOriginalVertColor;
         return color;
     }
 
     if(!m_bSurfaceDataIsInit) {
-        qDebug() << "RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
+        qDebug() << "RtSensorDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
         MatrixX3f color = m_lVisualizationInfo.matOriginalVertColor;
         return color;
     }
