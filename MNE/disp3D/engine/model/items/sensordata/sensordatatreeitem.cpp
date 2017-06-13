@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "sensordatatreeitem.h"
-#include "../../workers/rtSourceLoc/rtsourcelocdataworker.h"
+#include "../../workers/rtSensorData/rtsensordataworker.h"
 #include "../common/metatreeitem.h"
 
 #include <mne/mne_sourceestimate.h>
@@ -193,7 +193,7 @@ void SensorDataTreeItem::init(const MNEBemSurface &inSurface, const FiffEvoked &
 
     //set rt data corresponding to the hemisphere
     if(!m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker = new RtSourceLocDataWorker();
+        m_pSensorRtDataWorker = new RtSensorDataWorker();
     }
 
 
@@ -339,10 +339,9 @@ void SensorDataTreeItem::setColortable(const QString& sColortable)
 //*************************************************************************************************************
 
 //@ if needed change signature
-void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere)
+void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColor)
 {
-    m_pSensorRtDataWorker->setSurfaceColor(matVertColorLeftHemisphere,
-                                             matVertColorRightHemisphere);
+    m_pSensorRtDataWorker->setSurfaceColor(matVertColor);
 }
 
 

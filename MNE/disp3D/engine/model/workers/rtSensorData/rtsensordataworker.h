@@ -118,8 +118,8 @@ class DISP3DNEWSHARED_EXPORT RtSensorDataWorker : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RtSensorDataWorker> SPtr;            /**< Shared pointer type for RtSourceLocDataWorker class. */
-    typedef QSharedPointer<const RtSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtSourceLocDataWorker class. */
+    typedef QSharedPointer<RtSensorDataWorker> SPtr;            /**< Shared pointer type for RtSensorDataWorker class. */
+    typedef QSharedPointer<const RtSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtSensorDataWorker class. */
 
     //=========================================================================================================
     /**
