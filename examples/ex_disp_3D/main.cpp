@@ -43,6 +43,7 @@
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
@@ -258,10 +259,21 @@ int main(int argc, char *argv[])
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
-    MatrixXd temp(2, 2);
-    temp << 1, 2,
-            3, 4;
-    p3DDataModel->addSensorData(parser.value(subjectOption), "SWP", temp, t_sensorSurfaceVV[0], evoked);
+    // example matrix, for 60 sensors (passed fiff evoked object holds 60 EEG sensors) and for 1000 values per sensor
+    MatrixXd temp(60, 1000);
+    for (int row = 0; row < temp.rows(); ++row) {
+        for (int col = 0; col < temp.cols(); ++col) {
+            temp(row, col) = (sin((float) col * (2 * 3.141592f / 500)) + 1) / 2;
+        }
+    }
+    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData(parser.value(subjectOption), "SWP", temp, t_sensorSurfaceVV[0], evoked, "EEG")) {
+        ourItem->setLoopState(true);
+        ourItem->setTimeInterval(17);
+        ourItem->setNumberAverages(1);
+        ourItem->setStreamingActive(false);
+        ourItem->setNormalization(QVector3D(0.0, 1.0, 42));
+        ourItem->setColortable("Hot");
+    }
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values

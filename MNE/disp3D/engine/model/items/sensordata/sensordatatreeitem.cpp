@@ -111,7 +111,7 @@ SensorDataTreeItem::~SensorDataTreeItem()
 void SensorDataTreeItem::initItem()
 {
     this->setEditable(false);
-    this->setToolTip("MNE Sensordata item");
+    this->setToolTip("MNE SensorData item");
 
     //Add items
     QList<QStandardItem*> list;
@@ -183,7 +183,7 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::init(const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
+void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
 {
 
         //Source Space IS clustered
@@ -191,39 +191,15 @@ void SensorDataTreeItem::init(const MNEBemSurface &inSurface, const FiffEvoked &
        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
 
 
-    //set rt data corresponding to the hemisphere
     if(!m_pSensorRtDataWorker) {
         m_pSensorRtDataWorker = new RtSensorDataWorker();
     }
 
+    connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtData,
+            this, &SensorDataTreeItem::onNewRtData);
 
-    // positions of EEG and MEG sensors
-    QVector<Vector3f> sensors;
-    //fill QVectors with the right sensor positions
-    for( const FiffChInfo &info : evoked.info.chs)
-    {
-        if(info.kind == sensorType)
-        {
-            sensors.push_back(info.chpos.r0);
-        }
-    }
-
-    std::cout << "Number of vertices: ";
-    std::cout << inSurface.rr.rows() << std::endl;
-
-    //sensor projecting
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(inSurface, sensors);
-
-    //SCDC with cancel distance 0.03m
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(inSurface, *mappedSubSet, 0.03);
-    //@todo missing filtering of bad channles
-
-    // linear weight matrix
-    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
-
-    //@todo adapt to new worker wich is to be implemented
-//    connect(m_pSensorRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
-//            this, &SensorDataTreeItem::onNewRtData);
+    m_pSensorRtDataWorker->calculateSurfaceData(inSurface, evoked, sensorType);
+    m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
     m_bIsDataInit = true;
 }
@@ -335,6 +311,14 @@ void SensorDataTreeItem::setColortable(const QString& sColortable)
     }
 }
 
+//*************************************************************************************************************
+
+void SensorDataTreeItem::setNormalization(const QVector3D& tresholds)
+{
+    if (m_pSensorRtDataWorker) {
+        m_pSensorRtDataWorker->setNormalization(tresholds);
+    }
+}
 
 //*************************************************************************************************************
 
@@ -361,10 +345,11 @@ void SensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkSt
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::onNewRtData(const MatrixXd &sensorData)
+void SensorDataTreeItem::onNewRtData(const MatrixX3f &sensorData)
 {
     QVariant data;
     data.setValue(sensorData);
+    // printf("%f\t\t%f\t\t%f\n", sensorData(13, 0), sensorData(13, 1), sensorData(13, 2));
     emit rtVertColorChanged(data);
 }
 

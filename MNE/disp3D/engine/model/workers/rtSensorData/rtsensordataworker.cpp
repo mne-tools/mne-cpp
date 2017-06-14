@@ -45,6 +45,12 @@
 #include <utils/ioutils.h>
 #include <fs/label.h>
 #include <fs/annotation.h>
+#include <interpolation/interpolation.h>
+#include <geometryInfo/geometryinfo.h>
+#include <mne/mne_bem_surface.h>
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_types.h>
 
 #include <iostream>
 
@@ -79,7 +85,11 @@ using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace DISPLIB;
 using namespace FSLIB;
+using namespace MNELIB;
+using namespace FIFFLIB;
 using namespace UTILSLIB;
+using namespace GEOMETRYINFO;
+using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************
@@ -87,11 +97,7 @@ using namespace UTILSLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-
-
-
-//*************************************************************************************************************
-
+// @todo this is copid from rt source loc worker and renamed because of linking and stuff. Find a better solution for this.
 void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
@@ -135,56 +141,6 @@ void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, d
 
     //int elapsed = timer.elapsed();
     //qDebug()<<"RtSensorLocDataWorker::transformDataToColor - elapsed"<<elapsed;
-}
-
-
-//*************************************************************************************************************
-
-void _transformDataToColor(float fSample, QColor& finalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
-{
-    //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
-    //      Otherwise we would have to check which color map to take for each vertex.
-    double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
-
-    //Check lower and upper thresholds and normalize to one
-    if(fSample >= dTrehsoldZ) {
-        fSample = 1.0f;
-    } else if(fSample < dTrehsoldX) {
-        fSample = 0.0f;
-    } else {
-        if(dTresholdDiff != 0.0) {
-            fSample = (fSample - dTrehsoldX) / dTresholdDiff;
-        } else {
-            fSample = 0.0f;
-        }
-    }
-
-    QRgb qRgb;
-    qRgb = (functionHandlerColorMap)(fSample);
-
-    finalVertColor.setRedF((float)qRed(qRgb)/255.0f);
-    finalVertColor.setGreenF((float)qGreen(qRgb)/255.0f);
-    finalVertColor.setBlueF((float)qBlue(qRgb)/255.0f);
-}
-
-
-//*************************************************************************************************************
-
-
-void _generateColorsPerVertex(VisualizationInfo& input)
-{
-    QColor color;
-
-    //Fill final QByteArray with colors based on the current anatomical information
-    for(int i = 0; i < input.vVertNo.rows(); ++i) {
-        if(input.vSourceColorSamples(i) >= input.dThresholdX) {
-            _transformDataToColor(input.vSourceColorSamples(i), color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
-
-            input.matFinalVertColor(input.vVertNo(i),0) = color.redF();
-            input.matFinalVertColor(input.vVertNo(i),1) = color.greenF();
-            input.matFinalVertColor(input.vVertNo(i),2) = color.blueF();
-        }
-    }
 }
 
 //*************************************************************************************************************
@@ -243,22 +199,48 @@ void RtSensorDataWorker::clear()
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setSurfaceData(const Eigen::VectorXi& vecVertNo,
-                                           const QVector<QVector<int> > &mapVertexNeighbors,
-                                           const MatrixX3f &matVertPosLeftHemi)
+void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
 {
     QMutexLocker locker(&m_qMutex);
 
-    if(vecVertNo.rows() == 0) {
+    if(inSurface.rr.rows() == 0) {
         qDebug() << "RtSensorDataWorker::setSurfaceData - Surface data is empty. Returning ...";
         return;
     }
 
-    m_lVisualizationInfo.vVertNo = vecVertNo;
+    // map passed sensor type string to fiff constant
+    fiff_int_t sensorTypeFiffConstant;
+    if (sensorType.toStdString() == std::string("MEG")) {
+        sensorTypeFiffConstant = FIFFV_MEG_CH;
+    } else if (sensorType.toStdString() == std::string("EEG")) {
+        sensorTypeFiffConstant = FIFFV_EEG_CH;
+    } else {
+        qDebug() << "RtSensorDataWorker::setSurfaceData - unknown sensor type. Returning ...";
+        return;
+    }
 
-    m_lVisualizationInfo.mapVertexNeighbors = mapVertexNeighbors;
+    //fill QVector with the right sensor positions
+    QVector<Vector3f> sensorPos;
+    for( const FiffChInfo &info : evoked.info.chs) {
+        if(info.kind == sensorTypeFiffConstant) {
+            sensorPos.push_back(info.chpos.r0);
+        }
+    }
 
-    // createSmoothingOperator(matVertPosLeftHemi, matVertPosRightHemi);
+    m_numSensors = sensorPos.size();
+
+    //sensor projecting
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(inSurface, sensorPos);
+
+    //SCDC with cancel distance 0.03m
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(inSurface, *mappedSubSet, 0.03);
+    //@todo missing filtering of bad channels, add after merge
+
+    qDebug() << "vertices: " << distanceMatrix->rows();
+    qDebug() << "sensors:  " << distanceMatrix->cols();
+
+    // linear weight matrix
+    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
 
     m_bSurfaceDataIsInit = true;
 }
@@ -322,7 +304,6 @@ void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
 {
     QMutexLocker locker(&m_qMutex);
     m_lVisualizationInfo.dThresholdX = vecThresholds.x();
-
     m_lVisualizationInfo.dThresholdZ = vecThresholds.z();
 }
 
@@ -419,7 +400,7 @@ void RtSensorDataWorker::run()
             if((m_iCurrentSample/1)%m_iAverageSamples == 0) {
                 t_vecAverage /= (double)m_iAverageSamples;
 
-                emit newRtData(performVisualizationTypeCalculation(t_vecAverage));
+                emit newRtData(generateColorsFromSensorValues(t_vecAverage));
                 t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
             }
 
@@ -439,36 +420,42 @@ void RtSensorDataWorker::run()
 
 //*************************************************************************************************************
 
-MatrixX3f RtSensorDataWorker::performVisualizationTypeCalculation(const VectorXd& vSourceColorSamples)
+MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sensorValues)
 {
-    //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-//    QTime allTimer;
-//    allTimer.start();
+    // NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
+    // QTime allTimer;
+    // allTimer.start();
 
-    if(vSourceColorSamples.rows() != m_lVisualizationInfo.vVertNo.rows()) {
-        qDebug() << "RtSensorDataWorker::performVisualizationTypeCalculation - Number of new vertex colors (" << vSourceColorSamples.rows() << ") do not match with previously set number of vertices (" << m_lVisualizationInfo.vVertNo.rows() << "). Returning...";
+    if(sensorValues.rows() != m_numSensors) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << sensorValues.rows() << ") do not match with previously set number of vertices (" << m_numSensors << "). Returning...";
         MatrixX3f color = m_lVisualizationInfo.matOriginalVertColor;
         return color;
     }
 
     if(!m_bSurfaceDataIsInit) {
-        qDebug() << "RtSensorDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Surface data was not initialized. Returning ...";
         MatrixX3f color = m_lVisualizationInfo.matOriginalVertColor;
         return color;
     }
 
-    // copy source data
-    m_lVisualizationInfo.vSourceColorSamples = vSourceColorSamples;
+    // interpolate sensor signals
+    VectorXd intrpltdVals = *Interpolation::interpolateSignal(sensorValues);
 
-    //Reset to original color as default
-    m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
+    // Reset to original color as default
+    // m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
+    // use an empty matrix for starters, fix this. Still have no idea how to acquire a default color matrix
+    m_lVisualizationInfo.matFinalVertColor = MatrixX3f(intrpltdVals.rows(), 3);
 
     //Generate color data for vertices
-    QFuture<void> future = QtConcurrent::run(_generateColorsPerVertex, m_lVisualizationInfo);
-    future.waitForFinished();
+    _transformDataToColor(
+                intrpltdVals,
+                m_lVisualizationInfo.matFinalVertColor,
+                m_lVisualizationInfo.dThresholdX,
+                m_lVisualizationInfo.dThresholdZ,
+                m_lVisualizationInfo.functionHandlerColorMap);
 
-//    int iAllTimer = allTimer.elapsed();
-//    qDebug() << "All time" << iAllTimer;
+    // int iAllTimer = allTimer.elapsed();
+    // qDebug() << "All time" << iAllTimer;
 
     MatrixX3f color;
     color = m_lVisualizationInfo.matFinalVertColor;
@@ -477,4 +464,3 @@ MatrixX3f RtSensorDataWorker::performVisualizationTypeCalculation(const VectorXd
 
 
 //*************************************************************************************************************
-

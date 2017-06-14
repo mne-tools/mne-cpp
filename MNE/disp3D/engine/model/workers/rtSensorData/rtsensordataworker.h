@@ -68,6 +68,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB {
+    class MNEBemSurface;
+}
+
+namespace FIFFLIB {
+    class FiffEvoked;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -151,18 +158,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Set surface data.
-    *
-    * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
-    * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
-    * @param[in] vecVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
-    * @param[in] vecVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
-    * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
-    * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
-    */
-    void setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
-                        const QVector<QVector<int> >& vecVertexNeighborsLeftHemi,
-                        const MatrixX3f& matVertPosLeftHemi);
+     * @brief setSurfaceData
+     * @param inSurface
+     * @param evoked
+     * @param sensorType
+     */
+    void calculateSurfaceData(const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
 
     //=========================================================================================================
     /**
@@ -216,6 +217,14 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief generateColorsFromSensorValues Produces the final color matrix that is to be emitted
+     * @param sensorValues A vector of sensor signals
+     * @return The final color values
+     */
+    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& sensorValues);
+
+    //=========================================================================================================
+    /**
     * QThread functions
     */
     void stop();
@@ -248,7 +257,7 @@ private:
     bool                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-
+    int                     m_numSensors;                       /**< Number of sensors that this worker does expect when receiving rt data. */
     int                     m_iAverageSamples;                  /**< Number of average to compute. */
     int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
