@@ -119,7 +119,7 @@ public:
     * Initializes the rt data item with neccessary information for visualization computations.
 
     */
-    void init(const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
+    void init(const MatrixX3f &matSurfaceVertColor, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
 
     //=========================================================================================================
     /**
@@ -183,7 +183,7 @@ public:
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void setNormalization(const QVector3D& vecThresholds);
+    void setNormalization(const QVector3D& tresholds);
 
     //=========================================================================================================
     /**
@@ -215,7 +215,7 @@ protected:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void onNewRtData(const MatrixXd &sensorData);
+    void onNewRtData(const MatrixX3f &sensorData);
 
     //=========================================================================================================
     /**
