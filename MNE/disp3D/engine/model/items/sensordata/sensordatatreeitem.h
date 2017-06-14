@@ -107,7 +107,7 @@ public:
     /**
     * Constructs a sensordatatreeitem object.
     */
-    explicit SensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "MNE data");
+    explicit SensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
 
     //=========================================================================================================
     /**

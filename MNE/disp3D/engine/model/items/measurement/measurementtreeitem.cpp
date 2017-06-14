@@ -270,8 +270,10 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData, co
                 list << new QStandardItem(m_pSensorDataTreeItem->toolTip());
                 this->appendRow(list);
 
-                // @todo pass a real surface color matrix
-                m_pSensorDataTreeItem->init(MatrixX3f(), inSurface, evoked, sensorType);
+                // @todo change this
+                MatrixX3f black(inSurface.rr.rows(), 3);
+                black.setZero();
+                m_pSensorDataTreeItem->init(black, inSurface, evoked, sensorType);
 
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onVertColorChanged);
@@ -397,6 +399,7 @@ void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const M
 
 void MeasurementTreeItem::onVertColorChanged(const QVariant &vertColors)
 {
+    qDebug() << "measure: data passes";
     emit vertColorChanged(vertColors);
 }
 

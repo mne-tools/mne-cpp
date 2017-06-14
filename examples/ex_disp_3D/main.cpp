@@ -241,40 +241,49 @@ int main(int argc, char *argv[])
     //Create 3D data model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
+    /*
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
+    */
 
     //Read and show BEM
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
+    /*
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     p3DDataModel->addMegSensorInfo("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
+    */
 
+    /*
     // Read & show digitizer points
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    */
 
     // example matrix, for 60 sensors (passed fiff evoked object holds 60 EEG sensors) and for 1000 values per sensor
     MatrixXd temp(60, 1000);
     for (int row = 0; row < temp.rows(); ++row) {
         for (int col = 0; col < temp.cols(); ++col) {
-            temp(row, col) = (sin((float) col * (2 * 3.141592f / 500)) + 1) / 2;
+            temp(row, col) = (10 * sin((float) col * (2 * 3.141592f / 500)) + 10) / 2;
         }
     }
-    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData(parser.value(subjectOption), "SWP", temp, t_sensorSurfaceVV[0], evoked, "EEG")) {
+    qDebug() << "-------------------------------------";
+    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData(parser.value(subjectOption), evoked.comment, temp, t_Bem[0], evoked, "EEG")) {
         ourItem->setLoopState(true);
-        ourItem->setTimeInterval(17);
-        ourItem->setNumberAverages(1);
+        ourItem->setTimeInterval(1);
+        ourItem->setNumberAverages(5);
         ourItem->setStreamingActive(false);
         ourItem->setNormalization(QVector3D(0.0, 1.0, 42));
         ourItem->setColortable("Hot");
     }
+    qDebug() << "--------------------------------------";
 
+    /*
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
         if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
@@ -286,7 +295,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColortable("Hot");
         }
-    }
+    }*/
 
     //Create the 3D view
     View3D::SPtr testWindow = View3D::SPtr(new View3D());

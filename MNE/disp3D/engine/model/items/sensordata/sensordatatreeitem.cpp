@@ -188,7 +188,7 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBem
 
         //Source Space IS clustered
        //@todo wich item do we use here ????????????????????????
-       this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
+    // this->setData(0, Data3DTreeModelItemRoles::B);
 
 
     if(!m_pSensorRtDataWorker) {
