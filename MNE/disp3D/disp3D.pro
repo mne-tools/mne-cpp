@@ -137,8 +137,6 @@ SOURCES += \
     adapters/ecdview.cpp \
     adapters/abstractview.cpp \
     adapters/networkview.cpp \
-    ../geometryInfo/geometryinfo.cpp \
-    ../interpolation/interpolation.cpp \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
 
 HEADERS += \
@@ -182,8 +180,6 @@ HEADERS += \
     adapters/abstractview.h \
     adapters/networkview.h \
     disp3D_global.h \
-    ../geometryInfo/geometryinfo.h \
-    ../interpolation/interpolation.h \
     engine/model/items/sensordata/sensordatatreeitem.h \
 
 FORMS += \
