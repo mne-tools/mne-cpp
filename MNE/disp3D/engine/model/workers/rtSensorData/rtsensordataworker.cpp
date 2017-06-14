@@ -97,7 +97,7 @@ using namespace INTERPOLATION;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-// @todo this is copid from rt source loc worker and renamed because of linking and stuff. Find a better solution for this.
+// @todo this is copied from rt source loc worker and renamed because of linking and stuff. Find a better solution for this.
 void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
@@ -107,11 +107,12 @@ void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, d
 
     if(data.rows() != matFinalVertColor.rows()) {
         qDebug() << "RtSensorDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
+        return;
     }
 
     float dSample;
     QRgb qRgb;
-    double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
+    const double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
 
     for(int r = 0; r < data.rows(); ++r) {
         dSample = data(r);
@@ -158,6 +159,7 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
 , m_iCurrentSample(0)
 , m_iMSecIntervall(50)
 , m_bSurfaceDataIsInit(false)
+, m_numSensors(0)
 {
     m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
@@ -171,6 +173,7 @@ RtSensorDataWorker::~RtSensorDataWorker()
     if(this->isRunning()) {
         stop();
     }
+    Interpolation::clearInterpolateMatrix();
 }
 
 
@@ -204,7 +207,7 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, co
     QMutexLocker locker(&m_qMutex);
 
     if(inSurface.rr.rows() == 0) {
-        qDebug() << "RtSensorDataWorker::setSurfaceData - Surface data is empty. Returning ...";
+        qDebug() << "RtSensorDataWorker::calculateSurfaceData - Surface data is empty. Returning ...";
         return;
     }
 
@@ -439,12 +442,10 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
     }
 
     // interpolate sensor signals
-    VectorXd intrpltdVals = *Interpolation::interpolateSignal(sensorValues);
+    const VectorXd &intrpltdVals = *Interpolation::interpolateSignal(sensorValues);
 
     // Reset to original color as default
-    // m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
-    // use an empty matrix for starters, fix this. Still have no idea how to acquire a default color matrix
-    m_lVisualizationInfo.matFinalVertColor = MatrixX3f(intrpltdVals.rows(), 3);
+    m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
 
     //Generate color data for vertices
     _transformDataToColor(
@@ -457,9 +458,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
     // int iAllTimer = allTimer.elapsed();
     // qDebug() << "All time" << iAllTimer;
 
-    MatrixX3f color;
-    color = m_lVisualizationInfo.matFinalVertColor;
-    return color;
+    return m_lVisualizationInfo.matFinalVertColor;
 }
 
 
