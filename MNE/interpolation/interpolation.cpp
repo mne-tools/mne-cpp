@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QSet>
+#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -126,9 +127,16 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
 
 QSharedPointer<VectorXf> Interpolation::interpolateSignal(const VectorXd &measurementData)
 {
-    QSharedPointer<VectorXf> interpolatedVec = QSharedPointer<VectorXf>::create();
-    (*interpolatedVec) = ((*m_interpolationMatrix) * measurementData).cast<float> ();
-    return interpolatedVec;
+    //test if a pointer exists
+    if(m_interpolationMatrix){
+        QSharedPointer<VectorXf> interpolatedVec = QSharedPointer<VectorXf>::create();
+        (*interpolatedVec) = ((*m_interpolationMatrix) * measurementData).cast<float> ();
+        return interpolatedVec;
+    }
+    else{
+        std::cout << "no pointer for m_interpolationMatrix!" << std::endl;
+        return nullptr;
+    }
 }
 //*************************************************************************************************************
 
