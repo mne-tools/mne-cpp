@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 #include <QSet>
-#include <iostream>
+#include <QtDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -134,7 +134,7 @@ QSharedPointer<VectorXf> Interpolation::interpolateSignal(const VectorXd &measur
         return interpolatedVec;
     }
     else{
-        std::cout << "no pointer for m_interpolationMatrix!" << std::endl;
+        qDebug() << "no pointer for m_interpolationMatrix!";
         return nullptr;
     }
 }
