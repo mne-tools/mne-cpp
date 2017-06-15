@@ -86,6 +86,7 @@ namespace MNELIB {
 }
 
 namespace FIFFLIB{
+    class FiffEvoked;
     class FiffDigPointSet;
 }
 

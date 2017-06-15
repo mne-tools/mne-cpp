@@ -254,7 +254,6 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, co
 void RtSensorDataWorker::setSurfaceColor(const MatrixX3f& matSurfaceVertColor)
 {
     QMutexLocker locker(&m_qMutex);
-
     if(matSurfaceVertColor.size() == 0) {
         qDebug() << "RtSensorDataWorker::setSurfaceColor - Surface color data is empty. Returning ...";
         return;
@@ -402,9 +401,8 @@ void RtSensorDataWorker::run()
 
             if((m_iCurrentSample/1)%m_iAverageSamples == 0) {
                 t_vecAverage /= (double)m_iAverageSamples;
-
                 emit newRtData(generateColorsFromSensorValues(t_vecAverage));
-                t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
+                t_vecAverage.setZero(t_vecAverage.rows());
             }
 
             m_qMutex.unlock();
@@ -442,7 +440,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
     }
 
     // interpolate sensor signals
-    const VectorXd &intrpltdVals = *Interpolation::interpolateSignal(sensorValues);
+    VectorXd intrpltdVals = *Interpolation::interpolateSignal(sensorValues);
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
@@ -456,8 +454,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
                 m_lVisualizationInfo.functionHandlerColorMap);
 
     // int iAllTimer = allTimer.elapsed();
-    // qDebug() << "All time" << iAllTimer;
-
+    //qDebug() << "All time" << iAllTimer;
     return m_lVisualizationInfo.matFinalVertColor;
 }
 
