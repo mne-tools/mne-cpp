@@ -188,7 +188,7 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBem
 
         //Source Space IS clustered
        //@todo wich item do we use here ????????????????????????
-    // this->setData(0, Data3DTreeModelItemRoles::B);
+    //this->setData(0, Data3DTreeModelItemRoles::RTData);
 
 
     if(!m_pSensorRtDataWorker) {
@@ -215,10 +215,10 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
     }
 
     //Set new data into item's data.
-    QVariant data;
-    data.setValue(tSensorData);
+    //QVariant data;
+    //data.setValue(tSensorData);
     //@todo RTData correct ??
-    this->setData(data, Data3DTreeModelItemRoles::RTData);
+    //this->setData(data, Data3DTreeModelItemRoles::RTData);
 
     if(m_pSensorRtDataWorker) {
          m_pSensorRtDataWorker->addData(tSensorData);
