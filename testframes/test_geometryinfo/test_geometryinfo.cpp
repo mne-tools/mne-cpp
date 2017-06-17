@@ -38,29 +38,112 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <geometryInfo/geometryinfo.h>
+#include <mne/mne_bem.h>
+#include <mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
+#include <QtTest>
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace GEOMETRYINFO;
+using namespace MNELIB;
 
+//=============================================================================================================
+/**
+* DECLARE CLASS TestGeometryInfo
+*
+* @brief The TestGeometryInfo class provides basic verification tests
+*
+*/
+class TestGeometryInfo: public QObject
+{
+    Q_OBJECT
+
+public:
+    TestGeometryInfo();
+
+private slots:
+    void initTestCase();
+    void testEmptyInputsForProjecting();
+    void testEmptyInputsForSCDC();
+    void cleanupTestCase();
+
+private:
+    MNEBemSurface testSurface;
+};
 
 //*************************************************************************************************************
+
+TestGeometryInfo::TestGeometryInfo() {
+
+}
+
+//*************************************************************************************************************
+void TestGeometryInfo::initTestCase() {
+    //acquire surface data
+    QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+    testSurface = t_sensorSurfaceVV[0];
+}
+
+//*************************************************************************************************************
+
+void TestGeometryInfo::testEmptyInputsForProjecting() {
+    // sensor projecting:
+    QVector<Vector3f> emptySensors;
+    QVector<qint32> emptyMapping = *GeometryInfo::projectSensors(testSurface, emptySensors);
+    QVERIFY(emptyMapping.size() == 0);
+}
+
+//*************************************************************************************************************
+
+void TestGeometryInfo::testEmptyInputsForSCDC() {
+    // scdc:
+    // generate small test mesh with 100 vertices:
+    MNEBemSurface smallMesh;
+    // generate random vertex positions
+    MatrixX3f vertPos(100, 3);
+    for(qint8 i = 0; i < 100; i++) {
+        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+        vertPos(i, 0) = x;
+        vertPos(i, 1) = y;
+        vertPos(i, 2) = z;
+    }
+    smallMesh.rr = vertPos;
+
+    // generate random adjacency, assume that every vertex has 4 neighbors
+    for (int i = 0; i < 100; ++i) {
+        QVector<int> neighborList;
+        for (int a = 0; a < 4; ++a) {
+            // this allows duplicates, probably is not a problem
+            neighborList.push_back(rand() % 100);
+        }
+        smallMesh.neighbor_vert.push_back(neighborList);
+    }
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallMesh);
+    QVERIFY(distTable->rows() == distTable->cols());
+}
+
+//*************************************************************************************************************
+
+void TestGeometryInfo::cleanupTestCase() {
+
+}
+
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 
-void test_geometryinfo(){
-
-}
-
-int main(){
-
-}
+QTEST_APPLESS_MAIN(TestGeometryInfo)
+#include "test_geometryinfo.moc"
