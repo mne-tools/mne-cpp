@@ -139,7 +139,7 @@ void SensorDataTreeItem::initItem()
     data.setValue(QString("Hot"));
     pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0,5.5,15");
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0, 0.5,10.0");
     connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
             this, &SensorDataTreeItem::onDataNormalizationValueChanged);
     list.clear();
@@ -185,11 +185,7 @@ void SensorDataTreeItem::initItem()
 
 void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
 {
-
-        //Source Space IS clustered
-       //@todo wich item do we use here ????????????????????????
-    //this->setData(0, Data3DTreeModelItemRoles::RTData);
-
+    this->setData(0, Data3DTreeModelItemRoles::RTData);
 
     if(!m_pSensorRtDataWorker) {
         m_pSensorRtDataWorker = new RtSensorDataWorker();
@@ -215,10 +211,9 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
     }
 
     //Set new data into item's data.
-    //QVariant data;
-    //data.setValue(tSensorData);
-    //@todo RTData correct ??
-    //this->setData(data, Data3DTreeModelItemRoles::RTData);
+    QVariant data;
+    data.setValue(tSensorData);
+    this->setData(data, Data3DTreeModelItemRoles::RTData);
 
     if(m_pSensorRtDataWorker) {
          m_pSensorRtDataWorker->addData(tSensorData);
@@ -279,7 +274,6 @@ void SensorDataTreeItem::setTimeInterval(int iMSec)
 
 //*************************************************************************************************************
 
-//@ do we need this ??
 void SensorDataTreeItem::setNumberAverages(int iNumberAverages)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::NumberAverages);
@@ -313,16 +307,25 @@ void SensorDataTreeItem::setColortable(const QString& sColortable)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setNormalization(const QVector3D& tresholds)
+void SensorDataTreeItem::setNormalization(const QVector3D& vecThresholds)
 {
-    if (m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker->setNormalization(tresholds);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DistributedSourceLocThreshold);
+
+    for(int i = 0; i < lItems.size(); i++) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
+            QVariant data;
+            data.setValue(vecThresholds);
+            pAbstractItem->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
+
+            QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
+            data.setValue(sTemp);
+            pAbstractItem->setData(data, Qt::DisplayRole);
+        }
     }
 }
 
 //*************************************************************************************************************
 
-//@ if needed change signature
 void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColor)
 {
     m_pSensorRtDataWorker->setSurfaceColor(matVertColor);
@@ -349,7 +352,6 @@ void SensorDataTreeItem::onNewRtData(const MatrixX3f &sensorData)
 {
     QVariant data;
     data.setValue(sensorData);
-    // printf("%f\t\t%f\t\t%f\n", sensorData(13, 0), sensorData(13, 1), sensorData(13, 2));
     emit rtVertColorChanged(data);
 }
 

@@ -98,7 +98,7 @@ using namespace INTERPOLATION;
 //=============================================================================================================
 
 // @todo this is copied from rt source loc worker and renamed because of linking and stuff. Find a better solution for this.
-void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dTrehsoldX, double dTrehsoldZ, QRgb (*functionHandlerColorMap)(double v))
+void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
     //      Otherwise we would have to check which color map to take for each vertex.
@@ -112,20 +112,20 @@ void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, d
 
     float dSample;
     QRgb qRgb;
-    const double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
+    const double dTresholdDiff = dThreholdZ - dThresholdX;
 
     for(int r = 0; r < data.rows(); ++r) {
         dSample = data(r);
 
-        if(dSample >= dTrehsoldX) {
+        if(dSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
-            if(dSample >= dTrehsoldZ) {
+            if(dSample >= dThreholdZ) {
                 dSample = 1.0;
-            } else if(dSample < dTrehsoldX) {
+            } else if(dSample < dThresholdX) {
                 dSample = 0.0;
             } else {
                 if(dTresholdDiff != 0.0) {
-                    dSample = (dSample - dTrehsoldX) / (dTresholdDiff);
+                    dSample = (dSample - dThresholdX) / (dTresholdDiff);
                 } else {
                     dSample = 0.0f;
                 }
@@ -182,8 +182,9 @@ RtSensorDataWorker::~RtSensorDataWorker()
 void RtSensorDataWorker::addData(const MatrixXd& data)
 {
     QMutexLocker locker(&m_qMutex);
-    if(data.rows() == 0)
+    if(data.rows() == 0) {
         return;
+    }
 
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
@@ -409,11 +410,10 @@ void RtSensorDataWorker::run()
         }
 
         //Sleep specified amount of time - also take into account processing time from before
-        int iTimerElapsed = timer.elapsed();
-        //qDebug() << "RtSensorDataWorker::run()" << timer.elapsed() << "msecs";
+        const int iTimeLeft = m_iMSecIntervall - timer.elapsed();
 
-        if(m_iMSecIntervall-iTimerElapsed > 0) {
-            QThread::msleep(m_iMSecIntervall-iTimerElapsed);
+        if(iTimeLeft > 0) {
+            QThread::msleep(iTimeLeft);
         }
     }
 }

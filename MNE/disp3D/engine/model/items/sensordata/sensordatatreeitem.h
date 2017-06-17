@@ -183,7 +183,7 @@ public:
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void setNormalization(const QVector3D& tresholds);
+    void setNormalization(const QVector3D& vecThresholds);
 
     //=========================================================================================================
     /**
