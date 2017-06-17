@@ -399,7 +399,6 @@ void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const M
 
 void MeasurementTreeItem::onVertColorChanged(const QVariant &vertColors)
 {
-    qDebug() << "measure: data passes";
     emit vertColorChanged(vertColors);
 }
 
