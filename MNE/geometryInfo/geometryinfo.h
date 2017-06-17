@@ -125,7 +125,7 @@ public:
      * @param cancelDistance Distances higher than this are ignored, i.e. set to infinity
      * @return A shared pointer to a double matrix. One column represents the distances for one vertex inside of the passed subset
      */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, const QVector<qint32> &vertSubset = QVector<qint32>(), double cancelDist = DOUBLE_INFINITY);
+    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &inSurface, QVector<qint32> vertSubset = QVector<qint32>(), double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
     /**

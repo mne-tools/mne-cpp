@@ -85,22 +85,16 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QVector<qint32> &vertSubset, double cancelDist)
+QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, QVector<qint32> vertSubset, double cancelDist)
 {
     // create matrix and check for empty subset:
-    size_t cols;
-    QVector<qint32> finalSubset;
-    if(!vertSubset.empty()) {
-        // caller has provided a valid subset
-        finalSubset = vertSubset;
-        cols = vertSubset.size();
-    }
-    else {
+    size_t cols = vertSubset.size();
+    if(vertSubset.empty()) {
         // caller passed an empty subset, need to fill in all vertex IDs
         qDebug() << "[WARNING] SCDC received empty subset, calculating full distance table, make sure you have enough memory !";
-        finalSubset.reserve(inSurface.rr.rows());
+        vertSubset.reserve(inSurface.rr.rows());
         for(qint32 id = 0; id < inSurface.rr.rows(); ++id) {
-            finalSubset.push_back(id);
+            vertSubset.push_back(id);
         }
         cols = inSurface.rr.rows();
     }
@@ -114,17 +108,17 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, cons
         cores = 2;
     }
     // start threads with their respective parts of the final subset
-    qint32 subArraySize = ceil(finalSubset.size() / cores);
+    qint32 subArraySize = ceil(vertSubset.size() / cores);
     QVector<QFuture<void> > threads(cores - 1);
     qint32 begin = 0;
     qint32 end = subArraySize;
     for (int i = 0; i < threads.size(); ++i) {
-        threads[i] = QtConcurrent::run(std::bind(iterativeDijkstra, ptr, std::cref(inSurface), std::cref(finalSubset), begin, end, cancelDist));
+        threads[i] = QtConcurrent::run(std::bind(iterativeDijkstra, ptr, std::cref(inSurface), std::cref(vertSubset), begin, end, cancelDist));
         begin += subArraySize;
         end += subArraySize;
     }
     // use main thread to calculate last part of the final subset
-    iterativeDijkstra(ptr, inSurface, finalSubset, begin, finalSubset.size(), cancelDist);
+    iterativeDijkstra(ptr, inSurface, vertSubset, begin, vertSubset.size(), cancelDist);
 
     // wait for all other threads to finish
     bool finished = false;
