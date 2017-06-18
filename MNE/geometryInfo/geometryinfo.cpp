@@ -282,12 +282,11 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
 //*************************************************************************************************************
 
 void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> ptr, std::string filename) {
-    std::cout << "Start writing matrix to file: ";
-    std::cout << filename.c_str() << std::endl;
+    qDebug() << "Start writing matrix to file: " << filename.c_str();
     std::ofstream file;
     file.open(filename.c_str());
     file << *ptr;
-    std::cout << "Finished writing !" << std::endl;
+    qDebug() << "Finished writing !";
 }
 //*************************************************************************************************************
 

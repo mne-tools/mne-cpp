@@ -134,7 +134,7 @@ QSharedPointer<VectorXf> Interpolation::interpolateSignal(const VectorXd &measur
         return interpolatedVec;
     }
     else{
-        qDebug() << "no pointer for m_interpolationMatrix!";
+        qDebug() << "[WARNING] Null pointer for m_interpolationMatrix, weight matrix was not created. Return null pointer...";
         return nullptr;
     }
 }
