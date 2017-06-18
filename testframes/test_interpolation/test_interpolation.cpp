@@ -77,6 +77,7 @@ public:
 private slots:
     void initTestCase();
     void testDimensionsForInterpolation();
+    void testSumOfRow();
     void cleanupTestCase();
 
 };
@@ -147,6 +148,67 @@ void Test_interpolation::testDimensionsForInterpolation() {
     QVERIFY(testInterpolatedSignal->rows() == testMesh.rr.rows());
     QVERIFY(testInterpolatedSignal->cols() == 1);
 }
+
+void Test_interpolation:: testSumOfRow()
+{
+    // scdc:
+    // generate small test mesh with 100 vertices:
+    MNEBemSurface testMesh;
+    // generate random vertex positions
+    MatrixX3f vertPos(100, 3);
+    for(qint8 i = 0; i < 100; i++) {
+        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+        vertPos(i, 0) = x;
+        vertPos(i, 1) = y;
+        vertPos(i, 2) = z;
+    }
+    testMesh.rr = vertPos;
+
+    // generate random adjacency, assume that every vertex has 4 neighbors
+    for (int i = 0; i < 100; ++i) {
+        QVector<int> neighborList;
+        for (int a = 0; a < 4; ++a) {
+            // this allows duplicates, probably is not a problem
+            neighborList.push_back(rand() % 100);
+        }
+        testMesh.neighbor_vert.push_back(neighborList);
+    }
+
+    // generate random subset of test mesh of size subsetSize
+    int subsetSize = rand() % 100;
+    QVector<qint32> testSubset;
+    for (int b = 0; b <= subsetSize; b++) {
+        // this allows duplicates, probably is not a problem
+        testSubset.push_back(rand() % 100);
+    }
+
+    // create weight matrix from distance table
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(testMesh, testSubset);
+    Interpolation::createInterpolationMat(testSubset, distTable, Interpolation::linear);
+    QSharedPointer<SparseMatrix<double>> testWeightMatrix = Interpolation::getResult();
+    //GeometryInfo::matrixDump(testWeightMatrix, "./matrixDump.txt");
+
+    const size_t n = testWeightMatrix->rows();
+    const size_t m = testWeightMatrix->cols();
+
+    double sumCols = 0;
+    for (int r = 0; r < n; ++r) {
+        double sumRow = 0;
+        VectorXd row = testWeightMatrix->row(r);
+        for (int q = 0; q < m; ++q) {
+            //std::cout << "Cell: " << r << " " << q << " " << row[q] << "\n";
+            sumRow += row[q];
+        }
+        sumCols += sumRow;
+        //std::cout << "sum of Row: " << sumRow << "\n";
+    }
+    qDebug() << "Calculated sum of Columns: " << sumCols << " Colums of testWeightMatrix: " << n << "\n";
+    QVERIFY(double(sumCols) == double(n));
+}
+
 
 //*************************************************************************************************************
 void Test_interpolation::cleanupTestCase() {
