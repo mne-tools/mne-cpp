@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <QtTest>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -74,6 +75,7 @@ private slots:
     void initTestCase();
     void testEmptyInputsForProjecting();
     void testEmptyInputsForSCDC();
+    void testDimensionsForSCDC();
     void cleanupTestCase();
 
 private:
@@ -133,6 +135,48 @@ void TestGeometryInfo::testEmptyInputsForSCDC() {
     }
     QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallMesh);
     QVERIFY(distTable->rows() == distTable->cols());
+}
+
+//*************************************************************************************************************
+
+void TestGeometryInfo::testDimensionsForSCDC() {
+    // scdc:
+    // generate small test mesh with 100 vertices:
+    MNEBemSurface testMesh;
+    // generate random vertex positions
+    MatrixX3f vertPos(100, 3);
+    for(qint8 i = 0; i < 100; i++) {
+        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+        vertPos(i, 0) = x;
+        vertPos(i, 1) = y;
+        vertPos(i, 2) = z;
+    }
+    testMesh.rr = vertPos;
+
+    // generate random adjacency, assume that every vertex has 4 neighbors
+    for (int i = 0; i < 100; ++i) {
+        QVector<int> neighborList;
+        for (int a = 0; a < 4; ++a) {
+            // this allows duplicates, probably is not a problem
+            neighborList.push_back(rand() % 100);
+        }
+        testMesh.neighbor_vert.push_back(neighborList);
+    }
+
+    //generate random subset of test mesh of size subsetSize
+    int subsetSize = rand() % 100;
+    QVector<qint32> testSubset;
+    for (int b = 0; b <= subsetSize; b++) {
+        // this allows duplicates, probably is not a problem
+        testSubset.push_back(rand() % 100);
+    }
+
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(testMesh, testSubset);
+    QVERIFY(distTable->rows() == testMesh.rr.rows());
+    QVERIFY(distTable->cols() == testSubset.size());
 }
 
 //*************************************************************************************************************
