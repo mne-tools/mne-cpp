@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     test_interpolation.cpp
 * @author   Sugandha Sachdeva <sugandha.sachdeva@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -39,14 +39,16 @@
 // INCLUDES
 //=============================================================================================================
 
-
+#include <geometryInfo/geometryinfo.h>
+#include <interpolation/interpolation.h>
+#include <mne/mne_bem.h>
+#include <mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
 #include <QtTest>
 
 //*************************************************************************************************************
@@ -54,13 +56,15 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-
+using namespace INTERPOLATION;
+using namespace GEOMETRYINFO;
+using namespace MNELIB;
 
 //=============================================================================================================
 /**
 * DECLARE CLASS interpolation
 *
-* @brief
+* @brief The test_interpolation class provides basic verification tests
 *
 */
 class Test_interpolation : public QObject
@@ -70,25 +74,88 @@ class Test_interpolation : public QObject
 public:
     Test_interpolation();
 
-private Q_SLOTS:
-    void testCase1();
+private slots:
+    void initTestCase();
+    void testDimensionsForInterpolation();
+    void cleanupTestCase();
+
 };
 
-Test_interpolation::Test_interpolation()
-{
-}
+Test_interpolation::Test_interpolation() {
 
-void Test_interpolation::testCase1()
-{
-    QVERIFY2(true, "Failure");
 }
-
 
 //*************************************************************************************************************
+
+void Test_interpolation::initTestCase() {
+
+}
+
+//*************************************************************************************************************
+
+void Test_interpolation::testDimensionsForInterpolation() {
+    // scdc:
+    // generate small test mesh with 100 vertices:
+    MNEBemSurface testMesh;
+    // generate random vertex positions
+    MatrixX3f vertPos(100, 3);
+    for(qint8 i = 0; i < 100; i++) {
+        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+        vertPos(i, 0) = x;
+        vertPos(i, 1) = y;
+        vertPos(i, 2) = z;
+    }
+    testMesh.rr = vertPos;
+
+    // generate random adjacency, assume that every vertex has 4 neighbors
+    for (int i = 0; i < 100; ++i) {
+        QVector<int> neighborList;
+        for (int a = 0; a < 4; ++a) {
+            // this allows duplicates, probably is not a problem
+            neighborList.push_back(rand() % 100);
+        }
+        testMesh.neighbor_vert.push_back(neighborList);
+    }
+
+    // generate random subset of test mesh of size subsetSize
+    int subsetSize = rand() % 100;
+    QVector<qint32> testSubset;
+    for (int b = 0; b <= subsetSize; b++) {
+        // this allows duplicates, probably is not a problem
+        testSubset.push_back(rand() % 100);
+    }
+
+    // create weight matrix from distance table
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(testMesh, testSubset);
+    Interpolation::createInterpolationMat(testSubset, distTable, Interpolation::linear);
+    QSharedPointer<SparseMatrix<double>> testWeightMatrix = Interpolation::getResult();
+
+    QVERIFY(testWeightMatrix->rows() == testMesh.rr.rows());
+    QVERIFY(testWeightMatrix->cols() == testSubset.size());
+
+    // random data set
+    VectorXd testSignal = VectorXd::Random(testSubset.size());
+
+    QVERIFY(testWeightMatrix->cols() == testSignal.rows());
+
+    // interpolate with random data set
+    QSharedPointer<VectorXf> testInterpolatedSignal = Interpolation::interpolateSignal(testSignal);
+
+    QVERIFY(testInterpolatedSignal->rows() == testMesh.rr.rows());
+    QVERIFY(testInterpolatedSignal->cols() == 1);
+}
+
+//*************************************************************************************************************
+void Test_interpolation::cleanupTestCase() {
+
+}
+
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 
 QTEST_APPLESS_MAIN(Test_interpolation)
-
 #include "test_interpolation.moc"
