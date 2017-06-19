@@ -458,13 +458,11 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
-        std::cout << ">>>>>>>> a1 <<<<<<<<<<<<<" << std::endl;
         pReturnItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, sSubject);
         itemSubjectList << pReturnItem;
         itemSubjectList << new QStandardItem(pReturnItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     } else {
-        std::cout << ">>>>>>>> a2 <<<<<<<<<<<<<" << std::endl;
         pReturnItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.first());
     }
 

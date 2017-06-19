@@ -94,17 +94,14 @@ void SubjectTreeItem::initItem()
 
 void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem)
 {
-    qDebug() << "mri connect called";
     //Connect mri item with the measurement tree items in case the real time color changes (i.e. rt source loc)
     //or the user changes the color origin
     QList<QStandardItem*> mriItemList = this->findChildren(Data3DTreeModelItemTypes::MriItem);
 
     foreach(QStandardItem* item, mriItemList) {
-        qDebug() << "qstandard item";
         if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(item)) {
             connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
                 pMriItem, &MriTreeItem::setRtVertColor);
-            qDebug() << "mri connect";
             connect(pMriItem, &MriTreeItem::colorOriginChanged,
                 pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
         }
@@ -116,24 +113,19 @@ void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasure
 
 void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem)
 {
-    qDebug() << "Bemhead called";
     //Connect bem head item with the measurement tree items in case the real time color changes (i.e. rt source loc)
     QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
     QList<QStandardItem*> bemSurfacesItemList;
 
     foreach(QStandardItem* item, bemItemList) {
-        qDebug() << "qstandard item";
         if(BemTreeItem* pBemItem = dynamic_cast<BemTreeItem*>(item)) {
-            qDebug() << "cast worked";
             bemSurfacesItemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
 
             foreach(QStandardItem* itemBemSurf, bemSurfacesItemList) {
-                qDebug() << "bem surface item";
                 if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(itemBemSurf)) {
                     if(pBemSurfItem->text() == "Head") {
                         connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
                             pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
-                        qDebug() << "bemsurf connect";
                     }
                 }
             }
@@ -146,23 +138,19 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
 
 void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem)
 {
-    qDebug() << "sensor called";
     //Connect bem sensor surface item with the measurement tree items in case the real time color changes (i.e. rt source loc)
     QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
     QList<QStandardItem*> bemSurfacesItemList;
 
     for(int i = 0; i < bemItemList.size(); ++i) {
-        qDebug() << "qstandard";
         if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(bemItemList.at(i))) {
             bemSurfacesItemList = pMriItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
 
             for(int k = 0; k < bemSurfacesItemList.size(); ++k) {
-                qDebug() << "BemSurfaceItem";
                 if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(bemSurfacesItemList.at(i))) {
                     if(pBemSurfItem->text() == "Sensor Surface") {
                         connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
                             pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
-                        qDebug() << "bemsurf connect";
                     }
                 }
             }
