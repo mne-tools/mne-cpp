@@ -152,16 +152,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Clear this worker.
+    * Clear this worker, empties the m_lData field that holds the current block of sensor activity
     */
     void clear();
 
     //=========================================================================================================
     /**
-     * @brief setSurfaceData
-     * @param inSurface
-     * @param evoked
-     * @param sensorType
+     * @brief setSurfaceData    Prepares the necessary data for the later ongoing interpolation of signals.
+     *                          Calculates a weight matrix which is based on surfaced constrained distances.
+     * @param inSurface         The MNEBemSurface that holds the mesh information
+     * @param evoked            The FiffEvoked that holds the sensor information
+     * @param sensorType        The sensortype which is to be used (most commonly either EEG or MEG sensors, see FIFF constants)
      */
     void calculateSurfaceData(const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
 
@@ -169,10 +170,9 @@ public:
     /**
     * Set surface color data which the streamed data is plotted on.
     *
-    * @param[in] matSurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
-    * @param[in] matSurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
+    * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted
     */
-    void setSurfaceColor(const MatrixX3f &matSurfaceVert);
+    void setSurfaceColor(const MatrixX3f &matSurfaceVertColor);
 
 
     //=========================================================================================================
@@ -217,37 +217,45 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief generateColorsFromSensorValues Produces the final color matrix that is to be emitted
-     * @param sensorValues A vector of sensor signals
-     * @return The final color values
-     */
-    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& sensorValues);
+    * Sets the running flag to false and waits for the worker to stop
+    */
+    void stop();
 
     //=========================================================================================================
     /**
-    * QThread functions
+    * Resets the index of the current sample and starts the worker
     */
-    void stop();
     void start();
 
 protected:
     //=========================================================================================================
     /**
-    * QThread functions
+    * This method checks whether it is time for the worker to output new data for visualization.
+    * If so, it averages the specified amount of data samples and calculates the output.
     */
     virtual void run() override;
 
 private:
     //=========================================================================================================
     /**
-    * Perfrom the needed visualization type computations.
-    *
-    * @param[in] vSourceColorSamples        The color data for the sources.
-    *
-    * @return                               Returns the final colors in for the left and right hemisphere.
-    */
-    Eigen::MatrixX3f performVisualizationTypeCalculation(const Eigen::VectorXd& vSourceColorSamples);
+     * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
+     * @param data                          The final values for each vertex of the surface
+     * @param matFinalVertColor             The color matrix which the results are to be written to
+     * @param dThresholdX                   Lower threshold for normalizing
+     * @param dThreholdZ                    Upper threshold for normalizing
+     * @param functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
+     */
+    void normalizeAndTransformToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v));
 
+    //=========================================================================================================
+    /**
+     * @brief generateColorsFromSensorValues Produces the final color matrix that is to be emitted
+     * @param sensorValues A vector of sensor signals
+     * @return The final color values for the underlying mesh surface
+     */
+    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& sensorValues);
+
+    //=========================================================================================================
 
     QMutex                  m_qMutex;                           /**< The thread's mutex. */
 
@@ -262,14 +270,14 @@ private:
     int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
 
-    VisualizationInfo       m_lVisualizationInfo;
+    VisualizationInfo       m_lVisualizationInfo;               /**< Container for the visualization info. */
 
 signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever this item should send new colors to its listeners.
     *
-    * @param[in] colorPair     The samples data in form of a QPair rgb colors for each (left, right) hemisphere.
+    * @param[in] colorMatrix     The samples data in form of rgb colors for the mesh.
     */
     void newRtData(const Eigen::MatrixX3f &colorMatrix);
 };
