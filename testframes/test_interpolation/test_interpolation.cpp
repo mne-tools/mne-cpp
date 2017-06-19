@@ -67,34 +67,35 @@ using namespace MNELIB;
 * @brief The test_interpolation class provides basic verification tests
 *
 */
-class Test_interpolation : public QObject
+class TestInterpolation : public QObject
 {
     Q_OBJECT
 
 public:
-    Test_interpolation();
+    TestInterpolation();
 
 private slots:
     void initTestCase();
     void testDimensionsForInterpolation();
     void testSumOfRow();
+    void testEmptyInputsForWeightMatrix();
     void cleanupTestCase();
 
 };
 
-Test_interpolation::Test_interpolation() {
+TestInterpolation::TestInterpolation() {
 
 }
 
 //*************************************************************************************************************
 
-void Test_interpolation::initTestCase() {
+void TestInterpolation::initTestCase() {
 
 }
 
 //*************************************************************************************************************
 
-void Test_interpolation::testDimensionsForInterpolation() {
+void TestInterpolation::testDimensionsForInterpolation() {
     // scdc:
     // generate small test mesh with 100 vertices:
     MNEBemSurface testMesh;
@@ -149,7 +150,9 @@ void Test_interpolation::testDimensionsForInterpolation() {
     QVERIFY(testInterpolatedSignal->cols() == 1);
 }
 
-void Test_interpolation:: testSumOfRow()
+//*************************************************************************************************************
+
+void TestInterpolation::testSumOfRow()
 {
     // scdc:
     // generate small test mesh with 100 vertices:
@@ -209,9 +212,56 @@ void Test_interpolation:: testSumOfRow()
     QVERIFY(double(sumCols) == double(n));
 }
 
+//*************************************************************************************************************
+
+void TestInterpolation::testEmptyInputsForWeightMatrix() {
+    //acquire surface data
+    QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+
+    //acquire sensor positions
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    fiff_int_t setno = 0;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+    {
+        return;
+    }
+    QVector<Vector3f> eegSensors;
+    QVector<Vector3f> megSensors; //currently not used
+    for( const FiffChInfo &info : evoked.info.chs) {
+        if(info.kind == FIFFV_EEG_CH) {
+            eegSensors.push_back(info.chpos.r0);
+        }
+        if(info.kind == FIFFV_MEG_CH) {
+            megSensors.push_back(info.chpos.r0);
+        }
+    }
+
+    // projecting with EEG:
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0], megSensors);
+    // SCDC with cancel distance 0.03:
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(t_sensorSurfaceVV[0], *mappedSubSet, 0.03);
+
+
+    // ---------- empty sensor indices ----------
+    QVector<qint32> emptySensors;
+    Interpolation::createInterpolationMat(emptySensors, distTable, Interpolation::linear, 0.03);
+    QVERIFY(Interpolation::getResult()->size() == 0);
+    Interpolation::clearInterpolateMatrix();
+
+
+    // ---------- empty distance table ----------
+    QSharedPointer<MatrixXd> emptyDistTable;
+    Interpolation::createInterpolationMat(*mappedSubSet, emptyDistTable, Interpolation::linear, 0.03);
+    QVERIFY(Interpolation::getResult() == NULL);
+    Interpolation::clearInterpolateMatrix();
+}
 
 //*************************************************************************************************************
-void Test_interpolation::cleanupTestCase() {
+
+void TestInterpolation::cleanupTestCase() {
 
 }
 
@@ -219,5 +269,5 @@ void Test_interpolation::cleanupTestCase() {
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(Test_interpolation)
+QTEST_APPLESS_MAIN(TestInterpolation)
 #include "test_interpolation.moc"
