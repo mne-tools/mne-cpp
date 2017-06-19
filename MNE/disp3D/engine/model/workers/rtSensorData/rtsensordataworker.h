@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtSensorDataWorker class declaration.
+* @brief     This worker calculates interpolated signals and provides SensorData items with the output
 *
 */
 

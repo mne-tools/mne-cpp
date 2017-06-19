@@ -27,10 +27,6 @@
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief     sensordatatreeitem class declaration.
-*
 */
 
 #ifndef DISP3DLIB_SENSORDATATREEITEM_H
@@ -90,9 +86,10 @@ class RtSensorDataWorker;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This item allows on-the-fly changes to parameters of visualization. It integrates the features provided in
+* GeometryInfo and Interpolation.
 *
-* @brief Brief description of this class.
+* @brief This item integrates GeometryInfo and Interpolation into Disp3D structure
 */
 
 class DISP3DNEWSHARED_EXPORT SensorDataTreeItem : public AbstractTreeItem
@@ -105,25 +102,29 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a sensordatatreeitem object.
+    * Constructs a sensordatatreeitem object, calls initItem
     */
     explicit SensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Destructor, stops and deletes rtsensordata worker
     */
     ~SensorDataTreeItem();
     //=========================================================================================================
     /**
-    * Initializes the rt data item with neccessary information for visualization computations.
-
-    */
+     * @brief init  Initializes the sensor data item with neccessary information for visualization computations.
+     *              Constructs and initalizes the worker for this item.
+     * @param matSurfaceVertColor The color for the vertices which the streamed data is later plotted on
+     * @param inSurface MNEBemSurface that holds the mesh that should be visualized
+     * @param evoked FiffEvoked that holds the sensors information
+     * @param sensorType The sensor type that is later used for live interpolation
+     */
     void init(const MatrixX3f &matSurfaceVertColor, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
 
     //=========================================================================================================
     /**
-    * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
+    * Adds a block actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
     * @param[in] tSensorData    The MNESourceEstimate data.
     */
@@ -131,8 +132,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates the rt data which is streamed by this item's worker thread item.
-    *
     * @return                       Returns true if this item is initialized.
     */
     inline bool isDataInit() const;
@@ -189,15 +188,14 @@ public:
     /**
     * This function gets called whenever the origin of the surface vertex color changed.
     *
-    * @param[in] matVertColorLeftHemisphere       The new vertex colors for the left hemisphere.
-    * @param[in] matVertColorRightHemisphere      The new vertex colors for the right hemisphere.
+    * @param[in] matVertColor The matrix that holds the origin colors for all vertices of the surface
     */
     void setColorOrigin(const MatrixX3f& matVertColor);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
+    * This adds all meta tree items and connects them fittingly
     */
     void initItem();
 
@@ -266,10 +264,9 @@ signals:
     /**
     * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    * @param[in] vertColors     The colors for the underlying mesh surface
     */
     void rtVertColorChanged(const QVariant &vertColors);
-
 
 };
 
