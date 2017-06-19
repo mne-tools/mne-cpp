@@ -183,19 +183,15 @@ void TestInterpolation::testSumOfRow() {
 
     const double LOWER_TRESH = 0.99999999;
     const double UPPER_TRESH = 1.000000001;
-    qint32 overallSum = 0;
 
     for (int r = 0; r < n; ++r) {
         double rowSum = 0.0;
         for (int c = 0; c < m; ++c) {
             rowSum += w->coeff(r, c);
         }
-        if (rowSum >= LOWER_TRESH && rowSum <= UPPER_TRESH) {
-            overallSum += 1;
-        }
+        // either 1.0 (within range or some sensors) or 0.0 (outside of range for all sensors)
+        QVERIFY((rowSum >= LOWER_TRESH && rowSum <= UPPER_TRESH) || rowSum == 0.0);
     }
-
-    QVERIFY(overallSum == n);
 }
 
 //*************************************************************************************************************
