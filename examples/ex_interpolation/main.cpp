@@ -125,41 +125,6 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
-
-    //Inits
-    //surfaceSet = 2x Surface
-    // a Surface loads the vertexdata from a file and holds it in :
-     ///   MatrixX3f m_matRR;      Vertex coordinates in meters
-     /// MatrixX3i m_matTris;    The triangle descriptions
-    //SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-
-    //contains Annotations
-    ///https://surfer.nmr.mgh.harvard.edu/fswiki/LabelsClutsAnnotationFiles
-    /// In FreeSurfer jargon, "annotation" refers to a collection of labels (ie: sets of vertices marked by label values)
-    /// vertices are grouped by giving them the same label
-    /// Annotations van contain a colortable
-    //AnnotationSet tAnnotSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
-
-
-    //########################################################################################
-    //
-    //Source Estimate END
-    //
-    //########################################################################################
-
-    //Create 3D data model
-//    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-//    //Add fressurfer surface set including both hemispheres
-//    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
-
-    ///von lorenz für MNEBemSurface
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bem(t_fileBem);
-//    p3DDataModel->addBemData("testData", "BEM", t_Bem);
-
-
-
     //acquire sensor positions
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
     /// Load data
@@ -199,7 +164,7 @@ int main(int argc, char *argv[])
     std::cout << "Number of vertices: ";
     std::cout << testSurface.rr.rows() << std::endl;
 
-    //projecting with EEG
+    //projecting with MEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
     QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(testSurface, megSensors);
     std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
@@ -208,20 +173,6 @@ int main(int argc, char *argv[])
     qint64 startTimeScdc = QDateTime::currentMSecsSinceEpoch();
     QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, *mappedSubSet, 0.03);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
-
-    QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
-
-    for (qint32 col : erasedColums) {
-        qint64 notInfCount = 0;
-        for (qint32 row = 0; row < distanceMatrix->rows(); ++row) {
-            if ((*distanceMatrix)(row, col) != DOUBLE_INFINITY) {
-                notInfCount++;
-            }
-        }
-        if (notInfCount != 0) {
-           std::cout << "[WARNING] Inconsistent filtering of bad channels in column " << col << std::endl;
-        }
-    }
 
     // linear weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
@@ -233,29 +184,6 @@ int main(int argc, char *argv[])
     qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
     Interpolation::interpolateSignal(signal);
     std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
-
-
-
-    //Read and show sensor helmets
-//    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-//    p3DDataModel->addMegSensorData("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
-
-    // Read & show digitizer points
-//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    FiffDigPointSet t_Dig(t_fileDig);
-//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
-
-
-
-    //Create the 3D view
-//    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-//    testWindow->setModel(p3DDataModel);
-//    testWindow->show();
-
-//    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-//    control3DWidget->init(p3DDataModel, testWindow);
-//    control3DWidget->show();
 
     return a.exec();
 }
