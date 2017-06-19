@@ -73,6 +73,7 @@ public:
 
 private slots:
     void initTestCase();
+    void testBadChannelFiltering();
     void testEmptyInputsForProjecting();
     void testEmptyInputsForSCDC();
     void testDimensionsForSCDC();
@@ -94,6 +95,43 @@ void TestGeometryInfo::initTestCase() {
     QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     testSurface = t_sensorSurfaceVV[0];
+}
+
+//*************************************************************************************************************
+
+void TestGeometryInfo::testBadChannelFiltering() {
+    //acquire sensor positions
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    fiff_int_t setno = 0;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+    {
+        return;
+    }
+    QVector<Vector3f> megSensors;
+    for( const FiffChInfo &info : evoked.info.chs) {
+        if(info.kind == FIFFV_MEG_CH) {
+            megSensors.push_back(info.chpos.r0);
+        }
+    }
+
+    // projecting with MEG:
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(testSurface, megSensors);
+    // SCDC with cancel distance 0.03:
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, *mappedSubSet, 0.03);
+    // filter for bad MEG channels:
+    QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
+
+    for (qint32 col : erasedColums) {
+        qint64 notInfCount = 0;
+        for (qint32 row = 0; row < distanceMatrix->rows(); ++row) {
+            if ((*distanceMatrix)(row, col) != DOUBLE_INFINITY) {
+                notInfCount++;
+            }
+        }
+        QVERIFY(notInfCount == 0);
+    }
 }
 
 //*************************************************************************************************************
