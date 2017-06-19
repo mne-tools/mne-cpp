@@ -91,61 +91,6 @@ using namespace UTILSLIB;
 using namespace GEOMETRYINFO;
 using namespace INTERPOLATION;
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
-
-// @todo this is copied from rt source loc worker and renamed because of linking and stuff. Find a better solution for this.
-void _transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v))
-{
-    //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
-    //      Otherwise we would have to check which color map to take for each vertex.
-    //QElapsedTimer timer;
-    //timer.start();
-
-    if(data.rows() != matFinalVertColor.rows()) {
-        qDebug() << "RtSensorDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
-        return;
-    }
-
-    float dSample;
-    QRgb qRgb;
-    const double dTresholdDiff = dThreholdZ - dThresholdX;
-
-    for(int r = 0; r < data.rows(); ++r) {
-        dSample = data(r);
-
-        if(dSample >= dThresholdX) {
-            //Check lower and upper thresholds and normalize to one
-            if(dSample >= dThreholdZ) {
-                dSample = 1.0;
-            } else if(dSample < dThresholdX) {
-                dSample = 0.0;
-            } else {
-                if(dTresholdDiff != 0.0) {
-                    dSample = (dSample - dThresholdX) / (dTresholdDiff);
-                } else {
-                    dSample = 0.0f;
-                }
-
-            }
-
-            qRgb = functionHandlerColorMap(dSample);
-
-            matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
-            matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
-            matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
-        }
-    }
-
-    //int elapsed = timer.elapsed();
-    //qDebug()<<"RtSensorLocDataWorker::transformDataToColor - elapsed"<<elapsed;
-}
-
-//*************************************************************************************************************
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -198,6 +143,7 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 void RtSensorDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
+    m_lData.clear();
 }
 
 
@@ -397,7 +343,7 @@ void RtSensorDataWorker::run()
             m_qMutex.lock();
             m_iCurrentSample++;
 
-            if((m_iCurrentSample/1)%m_iAverageSamples == 0) {
+            if((m_iCurrentSample/1) % m_iAverageSamples == 0) {
                 t_vecAverage /= (double)m_iAverageSamples;
                 emit newRtData(generateColorsFromSensorValues(t_vecAverage));
                 t_vecAverage.setZero(t_vecAverage.rows());
@@ -421,9 +367,6 @@ void RtSensorDataWorker::run()
 MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sensorValues)
 {
     // NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-    // QTime allTimer;
-    // allTimer.start();
-
     if(sensorValues.rows() != m_numSensors) {
         qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << sensorValues.rows() << ") do not match with previously set number of vertices (" << m_numSensors << "). Returning...";
         MatrixX3f color = m_lVisualizationInfo.matOriginalVertColor;
@@ -443,17 +386,56 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
 
     //Generate color data for vertices
-    _transformDataToColor(
+    normalizeAndTransformToColor(
                 intrpltdVals,
                 m_lVisualizationInfo.matFinalVertColor,
                 m_lVisualizationInfo.dThresholdX,
                 m_lVisualizationInfo.dThresholdZ,
                 m_lVisualizationInfo.functionHandlerColorMap);
 
-    // int iAllTimer = allTimer.elapsed();
-    //qDebug() << "All time" << iAllTimer;
     return m_lVisualizationInfo.matFinalVertColor;
 }
 
+//*************************************************************************************************************
+
+void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v))
+{
+    //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
+    //      Otherwise we would have to check which color map to take for each vertex.
+
+    if(data.rows() != matFinalVertColor.rows()) {
+        qDebug() << "RtSensorDataWorker::transformDataToColor - Sizes of input data (" <<data.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
+        return;
+    }
+
+    float dSample;
+    QRgb qRgb;
+    const double dTresholdDiff = dThreholdZ - dThresholdX;
+
+    for(int r = 0; r < data.rows(); ++r) {
+        dSample = data(r);
+
+        if(dSample >= dThresholdX) {
+            //Check lower and upper thresholds and normalize to one
+            if(dSample >= dThreholdZ) {
+                dSample = 1.0;
+            } else if(dSample < dThresholdX) {
+                dSample = 0.0;
+            } else {
+                if(dTresholdDiff != 0.0) {
+                    dSample = (dSample - dThresholdX) / (dTresholdDiff);
+                } else {
+                    dSample = 0.0f;
+                }
+            }
+
+            qRgb = functionHandlerColorMap(dSample);
+
+            matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
+            matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
+            matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
+        }
+    }
+}
 
 //*************************************************************************************************************
