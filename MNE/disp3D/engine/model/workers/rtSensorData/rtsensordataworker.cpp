@@ -240,9 +240,6 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, co
     QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(inSurface, *mappedSubSet, 0.03);
     //@todo missing filtering of bad channels, add after merge
 
-    qDebug() << "vertices: " << distanceMatrix->rows();
-    qDebug() << "sensors:  " << distanceMatrix->cols();
-
     // linear weight matrix
     Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
 

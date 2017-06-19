@@ -682,7 +682,6 @@ void RtSourceLocDataWorker::run()
 
 QPair<MatrixX3f, MatrixX3f> RtSourceLocDataWorker::performVisualizationTypeCalculation(const VectorXd& vSourceColorSamples)
 {
-    qDebug() << vSourceColorSamples.rows();
     //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
 //    QTime allTimer;
 //    allTimer.start();
