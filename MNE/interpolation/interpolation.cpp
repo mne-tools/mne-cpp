@@ -84,6 +84,10 @@ QSharedPointer<SparseMatrix<double> > Interpolation::m_interpolationMatrix = nul
 
 void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist)
 {
+    if (! distanceTable) {
+        qDebug() << "[WARNING] Interpolation received an empty distance table. Returning...";
+        return;
+    }
     // initialization
     m_interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors.size());
     // temporary helper structure for filling sparse matrix
