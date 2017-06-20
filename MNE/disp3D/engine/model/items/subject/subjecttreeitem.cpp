@@ -43,6 +43,8 @@
 #include "../mri/mritreeitem.h"
 #include "../bem/bemsurfacetreeitem.h"
 #include "../bem/bemtreeitem.h"
+#include "../sensorspace/sensorsettreeitem.h"
+#include "../sensorspace/sensorsurfacetreeitem.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -138,19 +140,20 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
 
 void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem)
 {
+
     //Connect bem sensor surface item with the measurement tree items in case the real time color changes (i.e. rt source loc)
-    QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
-    QList<QStandardItem*> bemSurfacesItemList;
+    QList<QStandardItem*> sensoSetItemList = this->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
+    QList<QStandardItem*> sensorSurfacesItemList;
 
-    for(int i = 0; i < bemItemList.size(); ++i) {
-        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(bemItemList.at(i))) {
-            bemSurfacesItemList = pMriItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+    for(int i = 0; i < sensoSetItemList.size(); ++i) {
+        if(SensorSetTreeItem* pSensorSetItem = dynamic_cast<SensorSetTreeItem*>(sensoSetItemList.at(i))) {
+            sensorSurfacesItemList = pSensorSetItem->findChildren(Data3DTreeModelItemTypes::SensorSurfaceItem);
 
-            for(int k = 0; k < bemSurfacesItemList.size(); ++k) {
-                if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(bemSurfacesItemList.at(i))) {
-                    if(pBemSurfItem->text() == "Sensor Surface") {
+            for(int k = 0; k < sensorSurfacesItemList.size(); ++k) {
+                if(SensorSurfaceTreeItem* pSensorSetSurfItem = dynamic_cast<SensorSurfaceTreeItem*>(sensorSurfacesItemList.at(i))) {
+                    if(pSensorSetSurfItem->text() == "Sensor Surface") {
                         connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
-                            pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
+                            pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
                     }
                 }
             }
