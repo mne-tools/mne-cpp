@@ -164,7 +164,7 @@ public:
      * @param evoked            The FiffEvoked that holds the sensor information
      * @param sensorType        The sensortype which is to be used (most commonly either EEG or MEG sensors, see FIFF constants)
      */
-    void calculateSurfaceData(const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
+    void calculateSurfaceData(const MNELIB::MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPos, const QString sensorType);
 
     //=========================================================================================================
     /**

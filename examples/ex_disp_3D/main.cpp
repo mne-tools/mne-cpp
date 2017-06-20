@@ -265,24 +265,32 @@ int main(int argc, char *argv[])
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
 
-    // example matrix, for 60 sensors (passed fiff evoked object holds 60 EEG sensors) and for 1000 values per sensor
-    MatrixXd temp(60, 1000);
-    for (int row = 0; row < temp.rows(); ++row) {
-        for (int col = 0; col < temp.cols(); ++col) {
-            temp(row, col) = (10 * sin((float) col * (2 * 3.141592f / 500)) + 10) / 2;
-        }
-    }
-    qDebug() << "-------------------------------------";
-    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData(parser.value(subjectOption), evoked.comment, temp, t_Bem[0], evoked, "EEG")) {
+//    // example matrix, for 60 sensors (passed fiff evoked object holds 60 EEG sensors) and for 1000 values per sensor
+//    MatrixXd temp(306, 1000);
+//    for (int row = 0; row < temp.rows(); ++row) {
+//        for (int col = 0; col < temp.cols(); ++col) {
+//            temp(row, col) = (10 * sin((float) col * (2 * 3.141592f / 500)) + 10) / 2;
+//        }
+//    }
+    //    //add sensor item for MEG data
+    //    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0], evoked, "MEG")) {
+    //        ourItem->setLoopState(true);
+    //        ourItem->setTimeInterval(17);
+    //        ourItem->setNumberAverages(1);
+    //        ourItem->setStreamingActive(false);
+    //        ourItem->setNormalization(QVector3D(0.0, 0.5, 1.0));
+    //        ourItem->setColortable("Hot");
+    //    }
+
+    //add sensor item for EEG data
+    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData(parser.value(subjectOption), evoked.comment, evoked.data, t_Bem[0], evoked, "EEG")) {
         ourItem->setLoopState(true);
         ourItem->setTimeInterval(17);
         ourItem->setNumberAverages(1);
         ourItem->setStreamingActive(false);
-        ourItem->setNormalization(QVector3D(0.0, 0.5, 10.0));
+        ourItem->setNormalization(QVector3D(0.0, 0.5, 1.0));
         ourItem->setColortable("Hot");
     }
-    qDebug() << "--------------------------------------";
-
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
