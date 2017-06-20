@@ -56,6 +56,7 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
+#include <geometryInfo/geometryinfo.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,6 +78,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace GEOMETRYINFO;
 
 
 //*************************************************************************************************************
@@ -264,6 +266,41 @@ int main(int argc, char *argv[])
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
+    //###############################################
+    FiffDigPointSet testPointSet;
+
+    // positions of EEG and MEG sensors
+    QVector<Vector3f> eegSensors;
+    QVector<Vector3f> megSensors; //currently not used
+    //fill both QVectors with the right sensor positions
+    for( const FiffChInfo &info : evoked.info.chs)
+    {
+        //EEG
+        if(info.kind == FIFFV_EEG_CH)
+        {
+            eegSensors.push_back(info.chpos.r0);
+        }
+        //MEG
+        if(info.kind == FIFFV_MEG_CH)
+        {
+            megSensors.push_back(info.chpos.r0);
+        }
+    }
+
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(t_Bem[0], eegSensors);
+    for(int i = 0; i < mappedSubSet->size(); i++)
+    {
+        FiffDigPoint tempPoint;
+        tempPoint.r[0] = t_Bem[0].rr(mappedSubSet->at(i), 0);
+        tempPoint.r[1] = t_Bem[0].rr(mappedSubSet->at(i), 1);
+        tempPoint.r[2] = t_Bem[0].rr(mappedSubSet->at(i), 2);
+        tempPoint.kind = FIFFV_POINT_HPI;
+        testPointSet << tempPoint;
+    }
+    p3DDataModel->addDigitizerData("test", evoked.comment, testPointSet);
+
+    //###############################################
+
 
 //    // example matrix, for 60 sensors (passed fiff evoked object holds 60 EEG sensors) and for 1000 values per sensor
 //    MatrixXd temp(306, 1000);
@@ -273,23 +310,23 @@ int main(int argc, char *argv[])
 //        }
 //    }
     //    //add sensor item for MEG data
-    //    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0], evoked, "MEG")) {
-    //        ourItem->setLoopState(true);
-    //        ourItem->setTimeInterval(17);
-    //        ourItem->setNumberAverages(1);
-    //        ourItem->setStreamingActive(false);
-    //        ourItem->setNormalization(QVector3D(0.0, 0.5, 1.0));
-    //        ourItem->setColortable("Hot");
+    //    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0], evoked, "MEG")) {
+    //        pMegSensorTreeItem->setLoopState(true);
+    //        pMegSensorTreeItem->setTimeInterval(17);
+    //        pMegSensorTreeItem->setNumberAverages(1);
+    //        pMegSensorTreeItem->setStreamingActive(false);
+    //        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 0.5, 1.0));
+    //        pMegSensorTreeItem->setColortable("Hot");
     //    }
 
     //add sensor item for EEG data
-    if (SensorDataTreeItem* ourItem = p3DDataModel->addSensorData(parser.value(subjectOption), evoked.comment, evoked.data, t_Bem[0], evoked, "EEG")) {
-        ourItem->setLoopState(true);
-        ourItem->setTimeInterval(17);
-        ourItem->setNumberAverages(1);
-        ourItem->setStreamingActive(false);
-        ourItem->setNormalization(QVector3D(0.0, 0.5, 1.0));
-        ourItem->setColortable("Hot");
+    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption), evoked.comment, evoked.data, t_Bem[0], evoked, "EEG")) {
+        pEegSensorTreeItem->setLoopState(true);
+        pEegSensorTreeItem->setTimeInterval(17);
+        pEegSensorTreeItem->setNumberAverages(1);
+        pEegSensorTreeItem->setStreamingActive(false);
+        pEegSensorTreeItem->setNormalization(QVector3D(-8.09203e-13, -5.54059e-13, 8.22682e-13));
+        pEegSensorTreeItem->setColortable("Hot");
     }
 
     if(bAddRtSourceLoc) {
