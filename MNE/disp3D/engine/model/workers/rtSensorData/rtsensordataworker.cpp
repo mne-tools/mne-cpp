@@ -149,32 +149,13 @@ void RtSensorDataWorker::clear()
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
+void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPos, const QString sensorType)
 {
     QMutexLocker locker(&m_qMutex);
 
     if(inSurface.rr.rows() == 0) {
         qDebug() << "RtSensorDataWorker::calculateSurfaceData - Surface data is empty. Returning ...";
         return;
-    }
-
-    // map passed sensor type string to fiff constant
-    fiff_int_t sensorTypeFiffConstant;
-    if (sensorType.toStdString() == std::string("MEG")) {
-        sensorTypeFiffConstant = FIFFV_MEG_CH;
-    } else if (sensorType.toStdString() == std::string("EEG")) {
-        sensorTypeFiffConstant = FIFFV_EEG_CH;
-    } else {
-        qDebug() << "RtSensorDataWorker::setSurfaceData - unknown sensor type. Returning ...";
-        return;
-    }
-
-    //fill QVector with the right sensor positions
-    QVector<Vector3f> sensorPos;
-    for( const FiffChInfo &info : evoked.info.chs) {
-        if(info.kind == sensorTypeFiffConstant) {
-            sensorPos.push_back(info.chpos.r0);
-        }
     }
 
     m_numSensors = sensorPos.size();

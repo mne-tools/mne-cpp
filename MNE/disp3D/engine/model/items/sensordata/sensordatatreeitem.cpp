@@ -194,7 +194,31 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBem
     connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtData,
             this, &SensorDataTreeItem::onNewRtData);
 
-    m_pSensorRtDataWorker->calculateSurfaceData(inSurface, evoked, sensorType);
+    // map passed sensor type string to fiff constant
+    fiff_int_t sensorTypeFiffConstant;
+    if (sensorType.toStdString() == std::string("MEG")) {
+        sensorTypeFiffConstant = FIFFV_MEG_CH;
+    } else if (sensorType.toStdString() == std::string("EEG")) {
+        sensorTypeFiffConstant = FIFFV_EEG_CH;
+    } else {
+        qDebug() << "SensorDataTreeItem::init - unknown sensor type. Returning ...";
+        return;
+    }
+
+    //fill QVector with the right sensor positions
+    QVector<Vector3f> sensorPos;
+    m_iUsedSensors.clear();
+    int counter = 0;
+    for( const FiffChInfo &info : evoked.info.chs) {
+        if(info.kind == sensorTypeFiffConstant) {
+            sensorPos.push_back(info.chpos.r0);
+            //save the number of the sensor
+            m_iUsedSensors.push_back(counter);
+            counter++;
+        }
+    }
+
+    m_pSensorRtDataWorker->calculateSurfaceData(inSurface, sensorPos, sensorType);
     m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
     m_bIsDataInit = true;
@@ -210,13 +234,35 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
         return;
     }
 
-    //Set new data into item's data.
-    QVariant data;
-    data.setValue(tSensorData);
-    this->setData(data, Data3DTreeModelItemRoles::RTData);
+    //if more data then needed is provided
+    const int sensorSize = m_iUsedSensors.size();
+    if(tSensorData.rows() > sensorSize)
+    {
+        qDebug() << "SensorDataTreeItem::addData";
+        MatrixXd dSmallSensorData(sensorSize, tSensorData.cols());
+        for(int i = 0 ; i < sensorSize; ++i)
+        {
+            dSmallSensorData.row(i)  = tSensorData.row(m_iUsedSensors[i]);
+        }
+        //Set new data into item's data.
+        QVariant data;
+        data.setValue(dSmallSensorData);
+        this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-    if(m_pSensorRtDataWorker) {
-         m_pSensorRtDataWorker->addData(tSensorData);
+        if(m_pSensorRtDataWorker) {
+             m_pSensorRtDataWorker->addData(dSmallSensorData);
+        }
+    }
+    else
+    {
+        //Set new data into item's data.
+        QVariant data;
+        data.setValue(tSensorData);
+        this->setData(data, Data3DTreeModelItemRoles::RTData);
+
+        if(m_pSensorRtDataWorker) {
+             m_pSensorRtDataWorker->addData(tSensorData);
+        }
     }
 }
 

@@ -258,6 +258,7 @@ protected:
     bool                                m_bIsDataInit;                      /**< The init flag. */
 
     QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
+    QVector<int>                     m_iUsedSensors;
 
 signals:
     //=========================================================================================================
