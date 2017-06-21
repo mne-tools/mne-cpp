@@ -84,7 +84,7 @@ using namespace Eigen;
 QSharedPointer<MatrixXd> Interpolation::m_interpolationMatrix = nullptr;
 
 
-void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, qint32 interpolationType)
+QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, qint32 interpolationType)
 {
     m_interpolationMatrix = QSharedPointer<MatrixXd>::create(distanceTable->rows(), projectedSensors.size());
     m_interpolationMatrix->setZero();
@@ -95,6 +95,8 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
     default:
         std::cout << "[WARNING] Unknown interpolation type" << std::endl;
     }
+    // CAUTION !! This is only for buildability. Yes this is a word.
+    return NULL;
 }
 //*************************************************************************************************************
 

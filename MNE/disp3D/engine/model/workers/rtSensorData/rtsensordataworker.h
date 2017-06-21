@@ -257,20 +257,22 @@ private:
 
     //=========================================================================================================
 
-    QMutex                  m_qMutex;                           /**< The thread's mutex. */
+    QMutex                                  m_qMutex;                           /**< The thread's mutex. */
 
-    QList<Eigen::VectorXd>  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QList<Eigen::VectorXd>                  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
-    bool                    m_bIsRunning;                       /**< Flag if this thread is running. */
-    bool                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
-    bool                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    QSharedPointer<SparseMatrix<double> >   m_weightMatrix;                      /**< Weight matrix that holds all coefficients for a signal interpolation */
 
-    int                     m_numSensors;                       /**< Number of sensors that this worker does expect when receiving rt data. */
-    int                     m_iAverageSamples;                  /**< Number of average to compute. */
-    int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
-    int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
+    bool                                    m_bIsRunning;                       /**< Flag if this thread is running. */
+    bool                                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
+    bool                                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    VisualizationInfo       m_lVisualizationInfo;               /**< Container for the visualization info. */
+    int                                     m_numSensors;                       /**< Number of sensors that this worker does expect when receiving rt data. */
+    int                                     m_iAverageSamples;                  /**< Number of average to compute. */
+    int                                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
+    int                                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
+
+    VisualizationInfo                       m_lVisualizationInfo;               /**< Container for the visualization info. */
 
 signals:
     //=========================================================================================================
