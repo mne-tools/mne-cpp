@@ -122,34 +122,23 @@ public:
      * @param distanceTable Matrix that contains all needed distances
      * @param interpolationFunction Function that computes interpolation coefficients using the distance values
      * @param cancelDist Distances higher than this are ignored, i.e. the respective coefficients are set to zero
+     * @return A shared pointer to the distance matrix created
      */
-    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist = DOUBLE_INFINITY);
+    static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
-    /**
-     * The interpolation essentially corresponds to a matrix * vector multiplication. A vector of sensor data (i.e. a vector of double-values)
-     * is multiplied with the result of the <i>createInterpolationMat</i>.
-     * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
-     * i.e. in first instance the distance table that the weight matrix is based on.
-     *
-     * @brief <i>interpolateSignals</i> Interpolate sensor data
-     * @param measurementData A vector with measured sensor data
-     * @return Interpolated values for all vertices of the mesh
-     */
-    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const Eigen::VectorXd &measurementData);
-
-    //=========================================================================================================
-    /**
-     * @brief <i>clearInterpolateMatrix</i> Clears the last computation and frees all memory that was allocated for the weight matrix
-     */
-    static void clearInterpolateMatrix();
-
-    //=========================================================================================================
-    /**
-     * @brief <i>getResult</i> Getter, Debugging only
-     * @return m_interpolationMatrix
-     */
-    static QSharedPointer<Eigen::SparseMatrix<double> > getResult();
+        /**
+         * The interpolation essentially corresponds to a matrix * vector multiplication. A vector of sensor data (i.e. a vector of double-values)
+         * is multiplied with the result of the <i>createInterpolationMat</i>.
+         * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
+         * i.e. in first instance the distance table that the weight matrix is based on.
+         *
+         * @brief <i>interpolateSignals</i> Interpolate sensor data
+         * @param interpolationMatrix The weight matrix which should be used for multiplying
+         * @param measurementData A vector with measured sensor data
+         * @return Interpolated values for all vertices of the mesh
+         */
+    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<double> > interpolationMatrix, const Eigen::VectorXd &measurementData);
 
     //=========================================================================================================
     /**
@@ -185,10 +174,6 @@ protected:
 private:
 
     typedef Eigen::Triplet<double> SparseEntry;
-
-    static QSharedPointer<Eigen::SparseMatrix<double> > m_interpolationMatrix;   /**< Matrix holds the result of the last
-                                                            createInterpolationMat() for further computations. */
-
 
 };
 
