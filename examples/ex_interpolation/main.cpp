@@ -178,13 +178,13 @@ int main(int argc, char *argv[])
 
     // linear weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix, Interpolation::linear);
+    QSharedPointer<SparseMatrix<double> > interpolationMatrix = Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix, Interpolation::linear);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
     // realtime interpolation (1 iteration)
     VectorXd signal = VectorXd::Random(megSensors.size());
     qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
-    Interpolation::interpolateSignal(signal);
+    Interpolation::interpolateSignal(interpolationMatrix, signal);
     std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
 
     return a.exec();
