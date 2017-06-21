@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     renderable3Dentity.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     sensordatatreeitem.h
+* @author   Felix Griesau <felix.griesau@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     Month, Year
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) Year, Felix Griesau and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -27,14 +27,10 @@
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Renderable3DEntity class declaration
-*
 */
 
-#ifndef RENDERABLE3DENTITY_H
-#define RENDERABLE3DENTITY_H
+#ifndef DISP3DLIB_SENSORDATATREEITEM_H
+#define DISP3DLIB_SENSORDATATREEITEM_H
 
 
 //*************************************************************************************************************
@@ -42,16 +38,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../disp3D_global.h"
-
+#include "../../../../disp3D_global.h"
+#include "../common/abstracttreeitem.h"
+#include "../measurement/measurementtreeitem.h"
+#include <fiff/fiff_types.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DCore/QEntity>
-#include <QVector3D>
 #include <QPointer>
 
 
@@ -60,244 +56,231 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace Qt3DCore {
-    class QTransform;
+namespace FIFFLIB{
+    class FiffEvoked;
 }
 
+namespace MNELIB{
+    class MNEBemSurface;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
+namespace DISP3DLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class RtSensorDataWorker;
 
 //=============================================================================================================
 /**
-* Base class for renederable 3D QEntities.
+* This item allows on-the-fly changes to parameters of visualization. It integrates the features provided in
+* GeometryInfo and Interpolation.
 *
-* @brief Base class for renederable 3D QEntities.
+* @brief This item integrates GeometryInfo and Interpolation into Disp3D structure
 */
-class DISP3DNEWSHARED_EXPORT Renderable3DEntity : public Qt3DCore::QEntity
+
+class DISP3DNEWSHARED_EXPORT SensorDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
-    Q_PROPERTY(float scale READ scaleValue WRITE setScale NOTIFY scaleChanged)
-    Q_PROPERTY(float rotX READ rotX WRITE setRotX NOTIFY rotXChanged)
-    Q_PROPERTY(float rotY READ rotY WRITE setRotY NOTIFY rotYChanged)
-    Q_PROPERTY(float rotZ READ rotZ WRITE setRotZ NOTIFY rotZChanged)
-    Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
 
 public:
-    typedef QSharedPointer<Renderable3DEntity> SPtr;             /**< Shared pointer type for Renderable3DEntity class. */
-    typedef QSharedPointer<const Renderable3DEntity> ConstSPtr;  /**< Const shared pointer type for Renderable3DEntity class. */
+    typedef QSharedPointer<SensorDataTreeItem> SPtr;            /**< Shared pointer type for sensordatatreeitem. */
+    typedef QSharedPointer<const SensorDataTreeItem> ConstSPtr; /**< Const shared pointer type for sensordatatreeitem. */
 
     //=========================================================================================================
     /**
-    * Default constructor.
+    * Constructs a sensordatatreeitem object, calls initItem
+    */
+    explicit SensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
+
+    //=========================================================================================================
+    /**
+    * Destructor, stops and deletes rtsensordata worker
+    */
+    ~SensorDataTreeItem();
+    //=========================================================================================================
+    /**
+     * @brief init  Initializes the sensor data item with neccessary information for visualization computations.
+     *              Constructs and initalizes the worker for this item.
+     * @param matSurfaceVertColor The color for the vertices which the streamed data is later plotted on
+     * @param inSurface MNEBemSurface that holds the mesh that should be visualized
+     * @param evoked FiffEvoked that holds the sensors information
+     * @param sensorType The sensor type that is later used for live interpolation
+     */
+    void init(const MatrixX3f &matSurfaceVertColor, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
+
+    //=========================================================================================================
+    /**
+    * Adds a block actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] parent         The parent of this entity.
+    * @param[in] tSensorData    The MNESourceEstimate data.
     */
-    explicit Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
+    void addData(const MatrixXd& tSensorData);
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * @return                       Returns true if this item is initialized.
     */
-    virtual ~Renderable3DEntity();
+    inline bool isDataInit() const;
 
     //=========================================================================================================
     /**
-    * Manual garbage collection, since Qt3D is still a bit buggy when it come to memory handling.
-    */
-    //void releaseNode(Qt3DCore::QNode *node);
-
-    //=========================================================================================================
-    /**
-    * Sets the entity's transformation. This will clear the old transformation.
+    * This function sets the loop flag.
     *
-    * @param[in] transform     The new entity's transform.
+    * @param[in] state     Whether to loop the data or not.
     */
-    virtual void setTransform(const Qt3DCore::QTransform &transform);
+    void setLoopState(bool state);
 
     //=========================================================================================================
     /**
-    * Applies a transformation o ntop of the present one.
+    * This function sets the data streaming.
     *
-    * @param[in] transform     The new entity's transform.
+    * @param[in] state     Whether to stream the data to the display or not.
     */
-    virtual void applyTransform(const Qt3DCore::QTransform& transform);
+    void setStreamingActive(bool state);
 
     //=========================================================================================================
     /**
-    * Sets the value of a specific paramater of the materials for this entity.
+    * This function sets the time interval for streaming.
     *
-    * @param[in] data             The value to be set.
-    * @param[in] sParameterName   The name of the parameter to be set.
+    * @param[in] iMSec     The waiting time inbetween samples.
     */
-    virtual void setMaterialParameter(QVariant data, QString sParameterName);
+    void setTimeInterval(int iMSec);
 
     //=========================================================================================================
     /**
-    * Returns the current scaling value.
+    * This function sets the number of averages.
     *
-    * @return The scaling value.
+    * @param[in] iNumberAverages     The new number of averages.
     */
-    virtual float scaleValue() const;
+    void setNumberAverages(int iNumberAverages);
 
     //=========================================================================================================
     /**
-    * Returns the current rotation around the x-axis.
+    * This function sets the colortable type.
     *
-    * @return The x-axis rotation value.
+    * @param[in] sColortable     The new colortable ("Hot Negative 1" etc.).
     */
-    virtual float rotX() const;
+    void setColortable(const QString& sColortable);
 
     //=========================================================================================================
     /**
-    * Returns the current rotation around the y-axis.
+    * This function set the normalization value.
     *
-    * @return The y-axis rotation value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    virtual float rotY() const;
+    void setNormalization(const QVector3D& vecThresholds);
 
     //=========================================================================================================
     /**
-    * Returns the current rotation around the z-axis.
+    * This function gets called whenever the origin of the surface vertex color changed.
     *
-    * @return The z-axis rotation value.
+    * @param[in] matVertColor The matrix that holds the origin colors for all vertices of the surface
     */
-    virtual float rotZ() const;
+    void setColorOrigin(const MatrixX3f& matVertColor);
+
+protected:
+    //=========================================================================================================
+    /**
+    * This adds all meta tree items and connects them fittingly
+    */
+    void initItem();
 
     //=========================================================================================================
     /**
-    * Returns the current position/translation.
+    * This function gets called whenever the check/actiation state of the rt data worker changed.
     *
-    * @return The position/translation value.
+    * @param[in] checkState     The check state of the worker.
     */
-    virtual QVector3D position() const;
+    void onCheckStateWorkerChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**
-    * Sets the current rotation around the x-axis.
+    * This function gets called whenever this item receives new color values for each estimated source.
     *
-    * @param[in] rotX     The x-axis rotation value.
+    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    virtual void setRotX(float rotX);
+    void onNewRtData(const MatrixX3f &sensorData);
 
     //=========================================================================================================
     /**
-    * Sets the current rotation around the y-axis.
+    * This function gets called whenever the used colormap type changed.
     *
-    * @param[in] rotY     The y-axis rotation value.
+    * @param[in] sColormapType     The name of the new colormap type.
     */
-    virtual void setRotY(float rotY);
+    void onColormapTypeChanged(const QVariant& sColormapType);
 
     //=========================================================================================================
     /**
-    * Sets the current rotation around the z-axis.
+    * This function gets called whenever the time interval in between the streamed samples changed.
     *
-    * @param[in] rotZ     The z-axis rotation value.
+    * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
     */
-    virtual void setRotZ(float rotZ);
+    void onTimeIntervalChanged(const QVariant &iMSec);
 
     //=========================================================================================================
     /**
-    * Sets the current position/translation.
+    * This function gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
     *
-    * @param[in] position     The position/translation value.
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    virtual void setPosition(QVector3D position);
+    void onDataNormalizationValueChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
+    * This function gets called whenever the check/actiation state of the looped streaming state changed.
     *
-    * @param[in] state     The visiblity flag.
+    * @param[in] checkState     The check state of the looped streaming state.
     */
-    virtual void setVisible(bool state);
+    void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**
-    * Sets the current scale.
+    * This function gets called whenever the number of averages of the streamed samples changed.
     *
-    * @param[in] scale     The new scaling value.
+    * @param[in] iNumAvr     The new number of averages.
     */
-    virtual void setScale(float scale);
+    void onNumberAveragesChanged(const QVariant& iNumAvr);
 
-protected: 
-    QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
+    bool                                m_bIsDataInit;                      /**< The init flag. */
 
-    float                                       m_fScale;                /**< The scaling value. */
-    float                                       m_fRotX;                 /**< The x axis rotation value. */
-    float                                       m_fRotY;                 /**< The y axis rotation value. */
-    float                                       m_fRotZ;                 /**< The z axis rotation value. */
-    QVector3D                                   m_position;              /**< The position/translation value. */
-
-    //=========================================================================================================
-    /**
-    * Update the set transformation with the currently set translation and rotation values.
-    */
-    virtual void updateTransform();
+    QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
+    QVector<int>                     m_iUsedSensors;
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the scaling changed.
+    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
     *
-    * @param[in] scale     The scaling value.
+    * @param[in] vertColors     The colors for the underlying mesh surface
     */
-    void scaleChanged(float scale);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the x-axis rotation changed.
-    *
-    * @param[in] rotX     The x-axis rotation value.
-    */
-    void rotXChanged(float rotX);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the y-axis rotation changed.
-    *
-    * @param[in] rotY     The y-axis rotation value.
-    */
-    void rotYChanged(float rotY);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the z-axis rotation changed.
-    *
-    * @param[in] rotZ     The z-axis rotation value.
-    */
-    void rotZChanged(float rotZ);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the position/translation changed.
-    *
-    * @param[in] position     The position/translation value.
-    */
-    void positionChanged(QVector3D position);
+    void rtVertColorChanged(const QVariant &vertColors);
 
 };
 
-} // NAMESPACE
 
-#endif // RENDERABLE3DENTITY_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+inline bool SensorDataTreeItem::isDataInit() const
+{
+    return m_bIsDataInit;
+}
+
+} // namespace DISP3DLIB
+
+#endif // DISP3DLIB_SENSORDATATREEITEM_H

@@ -77,6 +77,7 @@ namespace FSLIB {
 namespace MNELIB {
     class MNESourceSpace;
     class MNESourceEstimate;
+    class MNEBemSurface;
 }
 
 namespace FIFFLIB{
@@ -106,6 +107,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MneEstimateTreeItem;
+class SensorDataTreeItem;
 class NetworkTreeItem;
 class EcdDataTreeItem;
 class FsSurfaceTreeItem;
@@ -157,6 +159,16 @@ public:
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds interpolated activation data to this item.
+    *
+    * @param[in] tSourceEstimate    The SensorData.
+    *
+    * @return                       Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+    */
+    SensorDataTreeItem* addData(const MatrixXd& tSensorData, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
 
     //=========================================================================================================
     /**
@@ -212,11 +224,12 @@ protected:
     /**
     * Call this function whenever new colors for the activation data plotting are available.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
     */
-    void onRtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
+    void onVertColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
+    QPointer<SensorDataTreeItem>                 m_pSensorDataTreeItem;         /**< The rt sensor data item of this item. */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 
@@ -225,9 +238,9 @@ signals:
     /**
     * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
     *
-    * @param[in] sourceColorSamples        Real tiem colors for both hemispheres.
+    * @param[in] vertColors        Real tiem colors for both hemispheres.
     */
-    void rtVertColorChanged(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples);
+    void vertColorChanged(const QVariant& vertColors);
 
 };
 

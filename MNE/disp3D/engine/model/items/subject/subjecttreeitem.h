@@ -43,6 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 #include "../common/abstracttreeitem.h"
+#include "../measurement/measurementtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -70,6 +71,8 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MeasurementTreeItem;
+
 
 //=============================================================================================================
 /**
@@ -93,6 +96,30 @@ public:
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
     explicit SubjectTreeItem(int iType = Data3DTreeModelItemTypes::SubjectItem, const QString& text = "");
+
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
+    void connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem);
+
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded head BEM data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
+    void connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem);
+
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded sensor BEM data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    */
+    void connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem);
 
 protected:
     //=========================================================================================================

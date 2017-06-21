@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     mneestimatetreeitem.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     sensordatatreeitem.cpp
+* @author   Felix Griesau <felix.griesau@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2016
+* @date     Month, Year
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) Year, Felix Griesau and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,21 +29,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneEstimateTreeItem class definition.
+* @brief    sensordatatreeitem class definition.
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mneestimatetreeitem.h"
-#include "../../workers/rtSourceLoc/rtsourcelocdataworker.h"
+#include "sensordatatreeitem.h"
+#include "../../workers/rtSensorData/rtsensordataworker.h"
 #include "../common/metatreeitem.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
+#include <mne/mne_bem_surface.h>
+#include <fiff/fiff_evoked.h>
+#include <geometryInfo/geometryinfo.h>
+#include <interpolation/interpolation.h>
 
 
 //*************************************************************************************************************
@@ -59,7 +64,6 @@
 
 #include <Eigen/Core>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,7 +71,16 @@
 
 using namespace Eigen;
 using namespace MNELIB;
+using namespace FIFFLIB;
 using namespace DISP3DLIB;
+using namespace GEOMETRYINFO;
+using namespace INTERPOLATION;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -75,31 +88,30 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
-: AbstractTreeItem(iType, text)
+SensorDataTreeItem::SensorDataTreeItem(int iType, const QString &text)
+: AbstractTreeItem(iType,text)
 , m_bIsDataInit(false)
 {
     initItem();
 }
 
-
 //*************************************************************************************************************
 
-MneEstimateTreeItem::~MneEstimateTreeItem()
+SensorDataTreeItem::~SensorDataTreeItem()
 {
-    if(m_pSourceLocRtDataWorker->isRunning()) {
-        m_pSourceLocRtDataWorker->stop();
-        delete m_pSourceLocRtDataWorker;
+    if(m_pSensorRtDataWorker->isRunning()) {
+        m_pSensorRtDataWorker->stop();
+        delete m_pSensorRtDataWorker;
     }
 }
 
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::initItem()
+void SensorDataTreeItem::initItem()
 {
     this->setEditable(false);
-    this->setToolTip("MNE Estimate item");
+    this->setToolTip("MNE SensorData item");
 
     //Add items
     QList<QStandardItem*> list;
@@ -107,7 +119,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem* pItemStreamStatus = new MetaTreeItem(MetaTreeItemTypes::StreamStatus, "Stream data on/off");
     connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
-            this, &MneEstimateTreeItem::onCheckStateWorkerChanged);
+            this, &SensorDataTreeItem::onCheckStateWorkerChanged);
     list << pItemStreamStatus;
     list << new QStandardItem(pItemStreamStatus->toolTip());
     this->appendRow(list);
@@ -117,19 +129,9 @@ void MneEstimateTreeItem::initItem()
     data.setValue(false);
     pItemStreamStatus->setData(data, MetaTreeItemRoles::StreamStatus);
 
-    MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::VisualizationType, "Vertex based");
-    connect(pItemVisuaizationType, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onVisualizationTypeChanged);
-    list.clear();
-    list << pItemVisuaizationType;
-    list << new QStandardItem(pItemVisuaizationType->toolTip());
-    this->appendRow(list);
-    data.setValue(QString("Vertex based"));
-    pItemVisuaizationType->setData(data, MetaTreeItemRoles::VisualizationType);
-
     MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot");
     connect(pItemColormapType, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onColormapTypeChanged);
+            this, &SensorDataTreeItem::onColormapTypeChanged);
     list.clear();
     list << pItemColormapType;
     list << new QStandardItem(pItemColormapType->toolTip());
@@ -137,9 +139,9 @@ void MneEstimateTreeItem::initItem()
     data.setValue(QString("Hot"));
     pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0,5.5,15");
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0, 0.5,10.0");
     connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onDataNormalizationValueChanged);
+            this, &SensorDataTreeItem::onDataNormalizationValueChanged);
     list.clear();
     list << pItemSourceLocNormValue;
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
@@ -149,7 +151,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "50");
     connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onTimeIntervalChanged);
+            this, &SensorDataTreeItem::onTimeIntervalChanged);
     list.clear();
     list << pItemStreamingInterval;
     list << new QStandardItem(pItemStreamingInterval->toolTip());
@@ -159,7 +161,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
     connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
-            this, &MneEstimateTreeItem::onCheckStateLoopedStateChanged);
+            this, &SensorDataTreeItem::onCheckStateLoopedStateChanged);
     pItemLoopedStreaming->setCheckable(true);
     pItemLoopedStreaming->setCheckState(Qt::Checked);
     list.clear();
@@ -169,7 +171,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
     connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onNumberAveragesChanged);
+            this, &SensorDataTreeItem::onNumberAveragesChanged);
     list.clear();
     list << pItemAveragedStreaming;
     list << new QStandardItem(pItemAveragedStreaming->toolTip());
@@ -181,93 +183,43 @@ void MneEstimateTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
-                                const MatrixX3f& matSurfaceVertColorLeftHemi,
-                                const MatrixX3f& matSurfaceVertColorRightHemi,
-                                const VectorXi& vecLabelIdsLeftHemi,
-                                const VectorXi& vecLabelIdsRightHemi,
-                                const QList<FSLIB::Label>& lLabelsLeftHemi,
-                                const QList<FSLIB::Label>& lLabelsRightHemi)
-{   
-    if(tForwardSolution.src.size() < 2) {
+void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
+{
+    this->setData(0, Data3DTreeModelItemRoles::RTData);
+
+    if(!m_pSensorRtDataWorker) {
+        m_pSensorRtDataWorker = new RtSensorDataWorker();
+    }
+
+    connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtData,
+            this, &SensorDataTreeItem::onNewRtData);
+
+    // map passed sensor type string to fiff constant
+    fiff_int_t sensorTypeFiffConstant;
+    if (sensorType.toStdString() == std::string("MEG")) {
+        sensorTypeFiffConstant = FIFFV_MEG_CH;
+    } else if (sensorType.toStdString() == std::string("EEG")) {
+        sensorTypeFiffConstant = FIFFV_EEG_CH;
+    } else {
+        qDebug() << "SensorDataTreeItem::init - unknown sensor type. Returning ...";
         return;
     }
 
-    //Set data based on clusterd or full source space
-    bool isClustered = tForwardSolution.src[0].isClustered();
-
-    if(isClustered) {
-        //Source Space IS clustered        
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
-
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    } else {
-        //Source Space is NOT clustered
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
-
-        this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    }
-
-    QVariant data;
-
-    for(int i = 0; i < tForwardSolution.src.size(); ++i) {
-        if(isClustered) {
-            //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
-            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
-            for(int j = 0; j < clustVertNo.rows(); ++j) {
-                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
-            }
-            data.setValue(clustVertNo);
-        } else {
-            data.setValue(tForwardSolution.src[i].vertno);
-        }
-
-        if(i == 0) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
-        } else if (i == 1) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
+    //fill QVector with the right sensor positions
+    QVector<Vector3f> sensorPos;
+    m_iUsedSensors.clear();
+    int counter = 0;
+    for( const FiffChInfo &info : evoked.info.chs) {
+        if(info.kind == sensorTypeFiffConstant) {
+            sensorPos.push_back(info.chpos.r0);
+            //save the number of the sensor
+            m_iUsedSensors.push_back(counter);
+            counter++;
         }
     }
 
-    //Add meta information as item children
-    QList<QStandardItem*> list;
-
-    QString sIsClustered = isClustered ? "Clustered" : "Full";
-    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::SourceSpaceType, sIsClustered);
-    pItemSourceSpaceType->setEditable(false);
-    list.clear();
-    list << pItemSourceSpaceType;
-    list << new QStandardItem(pItemSourceSpaceType->toolTip());
-    this->appendRow(list);
-    data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
-
-    //set rt data corresponding to the hemisphere
-    if(!m_pSourceLocRtDataWorker) {
-        m_pSourceLocRtDataWorker = new RtSourceLocDataWorker();
-    }
-
-    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
-            this, &MneEstimateTreeItem::onNewRtData);
-
-    m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
-                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>(),
-                                             tForwardSolution.src[0].neighbor_vert,
-                                             tForwardSolution.src[1].neighbor_vert,
-                                             tForwardSolution.src[0].rr,
-                                             tForwardSolution.src[1].rr);
-
-    m_pSourceLocRtDataWorker->setSurfaceColor(matSurfaceVertColorLeftHemi,
-                                             matSurfaceVertColorRightHemi);
-
-    m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIdsLeftHemi,
-                                                vecLabelIdsRightHemi,
-                                                lLabelsLeftHemi,
-                                                lLabelsRightHemi);
+    m_pSensorRtDataWorker->calculateSurfaceData(inSurface, sensorPos, sensorType);
+    m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
     m_bIsDataInit = true;
 }
@@ -275,27 +227,49 @@ void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
+void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
 {
     if(!m_bIsDataInit) {
-        qDebug() << "MneEstimateTreeItem::addData - Rt source loc item has not been initialized yet!";
+        qDebug() << "SensorDataTreeItem::addData - sensor data item has not been initialized yet!";
         return;
     }
 
-    //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
-    QVariant data;
-    data.setValue(tSourceEstimate.data);
-    this->setData(data, Data3DTreeModelItemRoles::RTData);
+    //if more data then needed is provided
+    const int sensorSize = m_iUsedSensors.size();
+    if(tSensorData.rows() > sensorSize)
+    {
+        qDebug() << "SensorDataTreeItem::addData";
+        MatrixXd dSmallSensorData(sensorSize, tSensorData.cols());
+        for(int i = 0 ; i < sensorSize; ++i)
+        {
+            dSmallSensorData.row(i)  = tSensorData.row(m_iUsedSensors[i]);
+        }
+        //Set new data into item's data.
+        QVariant data;
+        data.setValue(dSmallSensorData);
+        this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-    if(m_pSourceLocRtDataWorker) {
-        m_pSourceLocRtDataWorker->addData(tSourceEstimate.data);
+        if(m_pSensorRtDataWorker) {
+             m_pSensorRtDataWorker->addData(dSmallSensorData);
+        }
+    }
+    else
+    {
+        //Set new data into item's data.
+        QVariant data;
+        data.setValue(tSensorData);
+        this->setData(data, Data3DTreeModelItemRoles::RTData);
+
+        if(m_pSensorRtDataWorker) {
+             m_pSensorRtDataWorker->addData(tSensorData);
+        }
     }
 }
 
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setLoopState(bool state)
+void SensorDataTreeItem::setLoopState(bool state)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::LoopedStreaming);
 
@@ -312,7 +286,7 @@ void MneEstimateTreeItem::setLoopState(bool state)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setStreamingActive(bool state)
+void SensorDataTreeItem::setStreamingActive(bool state)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
 
@@ -329,7 +303,7 @@ void MneEstimateTreeItem::setStreamingActive(bool state)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setTimeInterval(int iMSec)
+void SensorDataTreeItem::setTimeInterval(int iMSec)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamingTimeInterval);
 
@@ -346,7 +320,7 @@ void MneEstimateTreeItem::setTimeInterval(int iMSec)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setNumberAverages(int iNumberAverages)
+void SensorDataTreeItem::setNumberAverages(int iNumberAverages)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::NumberAverages);
 
@@ -363,7 +337,7 @@ void MneEstimateTreeItem::setNumberAverages(int iNumberAverages)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setColortable(const QString& sColortable)
+void SensorDataTreeItem::setColortable(const QString& sColortable)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ColormapType);
 
@@ -377,27 +351,9 @@ void MneEstimateTreeItem::setColortable(const QString& sColortable)
     }
 }
 
-
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::VisualizationType);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(sVisualizationType);
-            pAbstractItem->setData(data, MetaTreeItemRoles::VisualizationType);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
+void SensorDataTreeItem::setNormalization(const QVector3D& vecThresholds)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DistributedSourceLocThreshold);
 
@@ -414,25 +370,23 @@ void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
     }
 }
 
-
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere)
+void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColor)
 {
-    m_pSourceLocRtDataWorker->setSurfaceColor(matVertColorLeftHemisphere,
-                                             matVertColorRightHemisphere);
+    m_pSensorRtDataWorker->setSurfaceColor(matVertColor);
 }
 
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
+void SensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
-    if(m_pSourceLocRtDataWorker) {
+    if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
-            m_pSourceLocRtDataWorker->start();
+            m_pSensorRtDataWorker->start();
         } else if(checkState == Qt::Unchecked) {
-            m_pSourceLocRtDataWorker->stop();
+            m_pSensorRtDataWorker->stop();
         }
     }
 }
@@ -440,22 +394,21 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColors)
-{    
+void SensorDataTreeItem::onNewRtData(const MatrixX3f &sensorData)
+{
     QVariant data;
-    data.setValue(sourceColors);
-
-    emit sourceVertColorChanged(data);
+    data.setValue(sensorData);
+    emit rtVertColorChanged(data);
 }
 
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
+void SensorDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setColormapType(sColormapType.toString());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setColormapType(sColormapType.toString());
         }
     }
 }
@@ -463,11 +416,11 @@ void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
+void SensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 {
     if(iMSec.canConvert<int>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setInterval(iMSec.toInt());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setInterval(iMSec.toInt());
         }
     }
 }
@@ -475,11 +428,11 @@ void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
+void SensorDataTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
         }
     }
 }
@@ -487,35 +440,13 @@ void MneEstimateTreeItem::onDataNormalizationValueChanged(const QVariant& vecThr
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
+void SensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
-    if(sVisType.canConvert<QString>()) {
-        int iVisType = Data3DTreeModelItemRoles::VertexBased;
-
-        if(sVisType.toString() == "Annotation based") {
-            iVisType = Data3DTreeModelItemRoles::AnnotationBased;
-        }
-
-        if(sVisType.toString() == "Smoothing based") {
-            iVisType = Data3DTreeModelItemRoles::SmoothingBased;
-        }
-
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
-{
-    if(m_pSourceLocRtDataWorker) {
+    if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
-            m_pSourceLocRtDataWorker->setLoop(true);
+            m_pSensorRtDataWorker->setLoop(true);
         } else if(checkState == Qt::Unchecked) {
-            m_pSourceLocRtDataWorker->setLoop(false);
+            m_pSensorRtDataWorker->setLoop(false);
         }
     }
 }
@@ -523,11 +454,11 @@ void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
+void SensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr.toInt());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
         }
     }
 }

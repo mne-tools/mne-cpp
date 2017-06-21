@@ -47,6 +47,7 @@
 #include "items/measurement/measurementtreeitem.h"
 #include "items/mri/mritreeitem.h"
 #include "items/digitizer/digitizertreeitem.h"
+#include "items/sensordata/sensordatatreeitem.h"
 #include "3dhelpers/renderable3Dentity.h"
 
 #include <mne/mne_bem.h>
@@ -261,7 +262,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, con
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {            
             //If measurement data has already been created but in conjunction with a different data type (i.e. connectivity, dipole fitting, etc.), do the connects here
             if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).isEmpty()) {
-                connectMeasurementToMriItems(pSubjectItem, pMeasurementItem);
+                pSubjectItem->connectMeasurementToMriItems(pMeasurementItem);
             }
 
             pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
@@ -271,7 +272,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, con
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
 
-        connectMeasurementToMriItems(pSubjectItem, pMeasurementItem);
+        pSubjectItem->connectMeasurementToMriItems(pMeasurementItem);
     }
 
     return pReturnItem;
@@ -358,7 +359,7 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString&
 
 //*************************************************************************************************************
 
-SensorSetTreeItem* Data3DTreeModel::addMegSensorData(const QString& sSubject,
+SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
                                                        const QString& sSensorSetName,
                                                        const MNELIB::MNEBem& sensor,
                                                        const QList<FIFFLIB::FiffChInfo>& lChInfo)
@@ -482,21 +483,50 @@ void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStanda
 }
 
 
+
 //*************************************************************************************************************
 
-void Data3DTreeModel::connectMeasurementToMriItems(SubjectTreeItem* pSubjectItem, MeasurementTreeItem* pMeasurementItem)
+SensorDataTreeItem* Data3DTreeModel::addSensorData(
+                                        const QString& sSubject,
+                                        const QString& sMeasurementSetName,
+                                        const MatrixXd& matSensorData,
+                                        const MNEBemSurface& inSurface,
+                                        const FiffEvoked& evoked,
+                                        const QString sDataType)
 {
-    //Connect mri item with all measurement tree items in case the real time color changes (i.e. rt source loc)
-    //or the user changes the color origin
-    QList<QStandardItem*> mriItemList = pSubjectItem->findChildren(Data3DTreeModelItemTypes::MriItem);
+    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
-    for(int i = 0; i < mriItemList.size(); ++i) {
-        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(mriItemList.at(i))) {
-            connect(pMeasurementItem, &MeasurementTreeItem::rtVertColorChanged,
-                pMriItem, &MriTreeItem::setRtVertColor);
+    //Handle subject item
+    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
 
-            connect(pMriItem, &MriTreeItem::colorOriginChanged,
-                pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
+    //Find already existing surface items and add the new data to the first search result
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
+
+    //Find the "set" items and add the sensor data as items
+    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
+            //If measurement data has already been created but in conjunction with a different data type (i.e. connectivity, dipole fitting, etc.), do the connects here
+            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).isEmpty()) {
+                if(sDataType == "EEG") {
+                    pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+                } else if (sDataType == "MEG") {
+                    pSubjectItem->connectMeasurementToSensorItems(pMeasurementItem);
+                }
+            }
+
+            pReturnItem = pMeasurementItem->addData(matSensorData, inSurface, evoked, sDataType);
+        }
+    } else {
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        pReturnItem = pMeasurementItem->addData(matSensorData, inSurface, evoked, sDataType);
+
+        if(sDataType == "EEG") {
+            pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+        } else if (sDataType == "MEG") {
+            pSubjectItem->connectMeasurementToSensorItems(pMeasurementItem);
         }
     }
+
+    return pReturnItem;
 }
