@@ -168,7 +168,7 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, co
     //@todo missing filtering of bad channels, add after merge
 
     // linear weight matrix
-    Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
+    m_weightMatrix = Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
 
     m_bSurfaceDataIsInit = true;
 }
@@ -361,7 +361,10 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
     }
 
     // interpolate sensor signals
-    VectorXd intrpltdVals = *Interpolation::interpolateSignal(sensorValues);
+    if(! m_weightMatrix) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - weight matrix is no initialized. Returning ...";
+    }
+    VectorXd intrpltdVals = (* m_weightMatrix) * sensorValues;
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;

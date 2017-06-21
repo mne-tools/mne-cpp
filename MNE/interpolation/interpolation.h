@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 #include<Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,7 +112,7 @@ public:
      * @param distanceTable
      * @param interpolationType
      */
-    static void createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, qint32 interpolationType = LINEAR);
+    static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, qint32 interpolationType = LINEAR);
 
     //=========================================================================================================
     /**
