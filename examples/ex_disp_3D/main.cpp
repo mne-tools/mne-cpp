@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
-        pEegSensorTreeItem->setNormalization(QVector3D(-8.09203e-13, -5.54059e-13, 8.22682e-13));
+        pEegSensorTreeItem->setNormalization(QVector3D(0.0, -5.54059e-13, 8.22682e-13));//-8.09203e-13
         pEegSensorTreeItem->setColortable("Hot");
     }
 

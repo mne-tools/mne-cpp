@@ -271,9 +271,8 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData, co
                 this->appendRow(list);
 
                 // @todo change this
-                MatrixX3f black(inSurface.rr.rows(), 3);
-                black.setZero();
-                m_pSensorDataTreeItem->init(black, inSurface, evoked, sensorType);
+                MatrixX3f greyColor = MatrixX3f::Constant(inSurface.rr.rows(), 3, 100.0f);
+                m_pSensorDataTreeItem->init(greyColor, inSurface, evoked, sensorType);
 
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onVertColorChanged);
