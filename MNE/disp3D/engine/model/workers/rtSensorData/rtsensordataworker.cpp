@@ -392,7 +392,7 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXd& data, Matr
         return;
     }
 
-    float dSample;
+    double dSample;
     QRgb qRgb;
     const double dTresholdDiff = dThreholdZ - dThresholdX;
 
@@ -403,13 +403,12 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXd& data, Matr
             //Check lower and upper thresholds and normalize to one
             if(dSample >= dThreholdZ) {
                 dSample = 1.0;
-            } else if(dSample < dThresholdX) {
-                dSample = 0.0;
-            } else {
-                if(dTresholdDiff != 0.0) {
+            }
+            else {
+                if(dSample != 0.0 && dTresholdDiff != 0.0 ) {
                     dSample = (dSample - dThresholdX) / (dTresholdDiff);
                 } else {
-                    dSample = 0.0f;
+                    dSample = 0.0;
                 }
             }
 
