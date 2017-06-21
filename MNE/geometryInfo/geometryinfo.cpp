@@ -85,16 +85,16 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, QVector<qint32> vertSubset, double cancelDist)
+QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QSharedPointer<QVector<qint32>> vertSubset, double cancelDist)
 {
     // create matrix and check for empty subset:
-    size_t cols = vertSubset.size();
-    if(vertSubset.empty()) {
+    size_t cols = vertSubset->size();
+    if(vertSubset->empty()) {
         // caller passed an empty subset, need to fill in all vertex IDs
         qDebug() << "[WARNING] SCDC received empty subset, calculating full distance table, make sure you have enough memory !";
-        vertSubset.reserve(inSurface.rr.rows());
+        vertSubset->reserve(inSurface.rr.rows());
         for(qint32 id = 0; id < inSurface.rr.rows(); ++id) {
-            vertSubset.push_back(id);
+            vertSubset->push_back(id);
         }
         cols = inSurface.rr.rows();
     }
@@ -108,7 +108,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, QVec
         cores = 2;
     }
     // start threads with their respective parts of the final subset
-    qint32 subArraySize = ceil(vertSubset.size() / cores);
+    qint32 subArraySize = ceil(vertSubset->size() / cores);
     QVector<QFuture<void> > threads(cores - 1);
     qint32 begin = 0;
     qint32 end = subArraySize;
@@ -118,7 +118,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, QVec
         end += subArraySize;
     }
     // use main thread to calculate last part of the final subset
-    iterativeDijkstra(ptr, inSurface, vertSubset, begin, vertSubset.size(), cancelDist);
+    iterativeDijkstra(ptr, inSurface, vertSubset, begin, vertSubset->size(), cancelDist);
 
     // wait for all other threads to finish
     bool finished = false;
@@ -227,7 +227,7 @@ QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &inSurface,  Q
 }
 //*************************************************************************************************************
 
-void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QVector<qint32> &vertSubSet, qint32 begin, qint32 end,  double cancelDist) {
+void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QSharedPointer<QVector<qint32>> vertSubSet, qint32 begin, qint32 end,  double cancelDist) {
     // initialization
     const QVector<QVector<int> > &adjacency = inSurface.neighbor_vert;
     qint32 n = adjacency.size();
@@ -238,7 +238,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemS
     // outer loop, iterated for each vertex of 'vertSubset' between 'begin' and 'end'
     for (qint32 i = begin; i < end; ++i) {
         // init phase of dijkstra: set source node for current iteration and reset data fields
-        qint32 root = vertSubSet[i];
+        qint32 root = vertSubSet->at(i);
         vertexQ.clear();
         minDists.fill(INF);
         minDists[root] = 0.0;

@@ -238,7 +238,6 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
     const int sensorSize = m_iUsedSensors.size();
     if(tSensorData.rows() > sensorSize)
     {
-        qDebug() << "SensorDataTreeItem::addData";
         MatrixXd dSmallSensorData(sensorSize, tSensorData.cols());
         for(int i = 0 ; i < sensorSize; ++i)
         {

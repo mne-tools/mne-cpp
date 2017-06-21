@@ -88,7 +88,7 @@ private:
     QVector<Vector3f> megSensors;
     // random data (keep computation times short)
     MNEBemSurface smallSurface;
-    QVector<qint32> smallSubset;
+    QSharedPointer<QVector<qint32>> smallSubset;
 };
 
 TestInterpolation::TestInterpolation() {
@@ -140,9 +140,10 @@ void TestInterpolation::initTestCase() {
 
     // generate random subset of test mesh of size subsetSize
     int subsetSize = rand() % 100;
+    smallSubset =  QSharedPointer<QVector<qint32>>::create();
     for (int b = 0; b <= subsetSize; b++) {
         // this allows duplicates, probably is not a problem
-        smallSubset.push_back(rand() % 100);
+        smallSubset->push_back(rand() % 100);
     }
 }
 
@@ -157,7 +158,7 @@ void TestInterpolation::testDimensionsForInterpolation() {
     QVERIFY(testWeightMatrix->cols() == distTable->cols());
 
     // random data set
-    VectorXd testSignal = VectorXd::Random(smallSubset.size());
+    VectorXd testSignal = VectorXd::Random(smallSubset->size());
 
     QVERIFY(testWeightMatrix->cols() == testSignal.rows());
 
@@ -174,9 +175,9 @@ void TestInterpolation::testSumOfRow() {
     // projecting with MEG:
     QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(realSurface, megSensors);
     // SCDC with cancel distance 0.03:
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface, *mappedSubSet, 0.03);
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface, mappedSubSet, 0.03);
     // weight matrix creation
-    QSharedPointer<SparseMatrix<double> > w = Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix, Interpolation::linear, 0.03);
+    QSharedPointer<SparseMatrix<double> > w = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, 0.03);
 
     qint32 n = w->rows();
     qint32 m = w->cols();
@@ -201,7 +202,7 @@ void TestInterpolation::testEmptyInputsForWeightMatrix() {
     QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface, smallSubset, 0.03);
 
     // ---------- empty sensor indices ----------
-    QVector<qint32> emptySensors;
+    QSharedPointer<QVector<qint32>> emptySensors = QSharedPointer<QVector<qint32>>::create();
     QVERIFY(Interpolation::createInterpolationMat(emptySensors, distTable, Interpolation::linear, 0.03)->size() == 0);
 
     // ---------- empty distance table ----------

@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(t_Bem[0], eegSensors);
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(t_Bem[0], eegSensors);
     for(int i = 0; i < mappedSubSet->size(); i++)
     {
         FiffDigPoint tempPoint;

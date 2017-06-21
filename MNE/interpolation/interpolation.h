@@ -124,7 +124,7 @@ public:
      * @param cancelDist Distances higher than this are ignored, i.e. the respective coefficients are set to zero
      * @return A shared pointer to the distance matrix created
      */
-    static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist = DOUBLE_INFINITY);
+    static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QSharedPointer<QVector<qint32>> projectedSensors, const QSharedPointer<Eigen::MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
         /**
