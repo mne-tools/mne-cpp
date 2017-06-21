@@ -80,7 +80,11 @@ private slots:
     void cleanupTestCase();
 
 private:
-    MNEBemSurface testSurface;
+    // real data
+    MNEBemSurface realSurface;
+    // random data (keep computation times short)
+    MNEBemSurface smallSurface;
+    QVector<qint32> smallSubset;
 };
 
 //*************************************************************************************************************
@@ -91,16 +95,46 @@ TestGeometryInfo::TestGeometryInfo() {
 
 //*************************************************************************************************************
 void TestGeometryInfo::initTestCase() {
-    //acquire surface data
+    //acquire real surface data
     QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    testSurface = t_sensorSurfaceVV[0];
+    realSurface = t_sensorSurfaceVV[0];
+
+    // generate small test mesh with 100 vertices:
+    MatrixX3f vertPos(100, 3);
+    for(qint8 i = 0; i < 100; i++) {
+        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+        vertPos(i, 0) = x;
+        vertPos(i, 1) = y;
+        vertPos(i, 2) = z;
+    }
+    smallSurface.rr = vertPos;
+
+    // generate random adjacency, assume that every vertex has 4 neighbors
+    for (int i = 0; i < 100; ++i) {
+        QVector<int> neighborList;
+        for (int a = 0; a < 4; ++a) {
+            // this allows duplicates, probably is not a problem
+            neighborList.push_back(rand() % 100);
+        }
+        smallSurface.neighbor_vert.push_back(neighborList);
+    }
+
+    //generate random subset of test mesh of size subsetSize
+    int subsetSize = rand() % 100;
+    for (int b = 0; b <= subsetSize; b++) {
+        // this allows duplicates, probably is not a problem
+        smallSubset.push_back(rand() % 100);
+    }
 }
 
 //*************************************************************************************************************
 
 void TestGeometryInfo::testBadChannelFiltering() {
-    //acquire sensor positions
+    //acquire real sensor positions
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
@@ -117,9 +151,9 @@ void TestGeometryInfo::testBadChannelFiltering() {
     }
 
     // projecting with MEG:
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(testSurface, megSensors);
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(realSurface, megSensors);
     // SCDC with cancel distance 0.03:
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, *mappedSubSet, 0.03);
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface, *mappedSubSet, 0.03);
     // filter for bad MEG channels:
     QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
 
@@ -139,82 +173,23 @@ void TestGeometryInfo::testBadChannelFiltering() {
 void TestGeometryInfo::testEmptyInputsForProjecting() {
     // sensor projecting:
     QVector<Vector3f> emptySensors;
-    QVector<qint32> emptyMapping = *GeometryInfo::projectSensors(testSurface, emptySensors);
+    QVector<qint32> emptyMapping = *GeometryInfo::projectSensors(realSurface, emptySensors);
     QVERIFY(emptyMapping.size() == 0);
 }
 
 //*************************************************************************************************************
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
-    // scdc:
-    // generate small test mesh with 100 vertices:
-    MNEBemSurface smallMesh;
-    // generate random vertex positions
-    MatrixX3f vertPos(100, 3);
-    for(qint8 i = 0; i < 100; i++) {
-        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-        vertPos(i, 0) = x;
-        vertPos(i, 1) = y;
-        vertPos(i, 2) = z;
-    }
-    smallMesh.rr = vertPos;
-
-    // generate random adjacency, assume that every vertex has 4 neighbors
-    for (int i = 0; i < 100; ++i) {
-        QVector<int> neighborList;
-        for (int a = 0; a < 4; ++a) {
-            // this allows duplicates, probably is not a problem
-            neighborList.push_back(rand() % 100);
-        }
-        smallMesh.neighbor_vert.push_back(neighborList);
-    }
-    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallMesh);
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface);
     QVERIFY(distTable->rows() == distTable->cols());
 }
 
 //*************************************************************************************************************
 
 void TestGeometryInfo::testDimensionsForSCDC() {
-    // scdc:
-    // generate small test mesh with 100 vertices:
-    MNEBemSurface testMesh;
-    // generate random vertex positions
-    MatrixX3f vertPos(100, 3);
-    for(qint8 i = 0; i < 100; i++) {
-        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-        vertPos(i, 0) = x;
-        vertPos(i, 1) = y;
-        vertPos(i, 2) = z;
-    }
-    testMesh.rr = vertPos;
-
-    // generate random adjacency, assume that every vertex has 4 neighbors
-    for (int i = 0; i < 100; ++i) {
-        QVector<int> neighborList;
-        for (int a = 0; a < 4; ++a) {
-            // this allows duplicates, probably is not a problem
-            neighborList.push_back(rand() % 100);
-        }
-        testMesh.neighbor_vert.push_back(neighborList);
-    }
-
-    //generate random subset of test mesh of size subsetSize
-    int subsetSize = rand() % 100;
-    QVector<qint32> testSubset;
-    for (int b = 0; b <= subsetSize; b++) {
-        // this allows duplicates, probably is not a problem
-        testSubset.push_back(rand() % 100);
-    }
-
-    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(testMesh, testSubset);
-    QVERIFY(distTable->rows() == testMesh.rr.rows());
-    QVERIFY(distTable->cols() == testSubset.size());
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface, smallSubset);
+    QVERIFY(distTable->rows() == smallSurface.rr.rows());
+    QVERIFY(distTable->cols() == smallSubset.size());
 }
 
 //*************************************************************************************************************
