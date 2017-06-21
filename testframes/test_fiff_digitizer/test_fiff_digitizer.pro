@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_deep_eval.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     test_fiff_digitizer.pro
+# @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     January, 2017
+# @date     April, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the deep learning evaluation example.
+# @brief    Builds the fiff digitizer read unit test
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,52 +39,40 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets charts
+QT += testlib
 
 CONFIG   += console
+CONFIG   -= app_bundle
 
-TARGET = ex_deep_eval
+TARGET = test_fiff_digitizer
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
-LIBS += -L$${CNTK_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Deepd \
-            -lCntk.Eval-2.0 \
-            -lCntk.Core-2.0
+            -lMNE$${MNE_LIB_VERSION}Fiffd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Deep \
-            -lCntk.Eval-2.0 \
-            -lCntk.Core-2.0
+            -lMNE$${MNE_LIB_VERSION}Fiff
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+DESTDIR =  $${MNE_BINARY_DIR}
 
-SOURCES += main.cpp
+SOURCES += \
+    test_fiff_digitizer.cpp
 
-HEADERS  +=
-
-FORMS    +=
+HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD
+contains(MNECPP_CONFIG, withCodeCov) {
+    LIBS += -lgcov
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+}

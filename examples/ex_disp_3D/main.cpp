@@ -43,6 +43,7 @@
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
@@ -55,10 +56,7 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <iostream>
-
-#include <mne/c/mne_msh_display_surface_set.h>
-
+#include <geometryInfo/geometryinfo.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,6 +78,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace GEOMETRYINFO;
 
 
 //*************************************************************************************************************
@@ -118,7 +117,7 @@ int main(int argc, char *argv[])
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0;//0.1;//3.0;
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
 
     parser.addOption(surfOption);
@@ -150,10 +149,6 @@ int main(int argc, char *argv[])
     } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClustering = true;
     }
-
-    //MneMshDisplaySurfaceSet test
-    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = MneMshDisplaySurfaceSet::load_new_surface("subject","pial",NULL);
-
 
     //Inits
     SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
@@ -248,23 +243,91 @@ int main(int argc, char *argv[])
     //Create 3D data model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
+
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
+
 
     //Read and show BEM
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
+
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    p3DDataModel->addMegSensorData("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
+    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
+
+
 
     // Read & show digitizer points
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+
+    //###############################################
+    FiffDigPointSet testPointSet;
+
+    // positions of EEG and MEG sensors
+    QVector<Vector3f> eegSensors;
+    QVector<Vector3f> megSensors; //currently not used
+    //fill both QVectors with the right sensor positions
+    for( const FiffChInfo &info : evoked.info.chs)
+    {
+        //EEG
+        if(info.kind == FIFFV_EEG_CH)
+        {
+            eegSensors.push_back(info.chpos.r0);
+        }
+        //MEG
+        if(info.kind == FIFFV_MEG_CH)
+        {
+            megSensors.push_back(info.chpos.r0);
+        }
+    }
+
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(t_Bem[0], eegSensors);
+    for(int i = 0; i < mappedSubSet->size(); i++)
+    {
+        FiffDigPoint tempPoint;
+        tempPoint.r[0] = t_Bem[0].rr(mappedSubSet->at(i), 0);
+        tempPoint.r[1] = t_Bem[0].rr(mappedSubSet->at(i), 1);
+        tempPoint.r[2] = t_Bem[0].rr(mappedSubSet->at(i), 2);
+        tempPoint.kind = FIFFV_POINT_HPI;
+        testPointSet << tempPoint;
+    }
+    p3DDataModel->addDigitizerData("test", evoked.comment, testPointSet);
+
+    //###############################################
+
+
+//    // example matrix, for 60 sensors (passed fiff evoked object holds 60 EEG sensors) and for 1000 values per sensor
+//    MatrixXd temp(306, 1000);
+//    for (int row = 0; row < temp.rows(); ++row) {
+//        for (int col = 0; col < temp.cols(); ++col) {
+//            temp(row, col) = (10 * sin((float) col * (2 * 3.141592f / 500)) + 10) / 2;
+//        }
+//    }
+    //    //add sensor item for MEG data
+    //    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0], evoked, "MEG")) {
+    //        pMegSensorTreeItem->setLoopState(true);
+    //        pMegSensorTreeItem->setTimeInterval(17);
+    //        pMegSensorTreeItem->setNumberAverages(1);
+    //        pMegSensorTreeItem->setStreamingActive(false);
+    //        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 0.5, 1.0));
+    //        pMegSensorTreeItem->setColortable("Hot");
+    //    }
+
+    //add sensor item for EEG data
+    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption), evoked.comment, evoked.data, t_Bem[0], evoked, "EEG")) {
+        pEegSensorTreeItem->setLoopState(true);
+        pEegSensorTreeItem->setTimeInterval(17);
+        pEegSensorTreeItem->setNumberAverages(1);
+        pEegSensorTreeItem->setStreamingActive(false);
+        pEegSensorTreeItem->setNormalization(QVector3D(0.0, -5.54059e-13, 8.22682e-13));//-8.09203e-13
+        pEegSensorTreeItem->setColortable("Hot");
+    }
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
@@ -272,7 +335,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingActive(true);
+            pRTDataItem->setStreamingActive(false);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
             pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColortable("Hot");

@@ -152,7 +152,7 @@ public:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void setRtVertColor(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
+    void setRtVertColor(const QVariant& sourceColorSamples);
 
 protected:
     //=========================================================================================================

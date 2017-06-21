@@ -39,7 +39,12 @@
 //=============================================================================================================
 
 #include "subjecttreeitem.h"
-
+#include "../measurement/measurementtreeitem.h"
+#include "../mri/mritreeitem.h"
+#include "../bem/bemsurfacetreeitem.h"
+#include "../bem/bemtreeitem.h"
+#include "../sensorspace/sensorsettreeitem.h"
+#include "../sensorspace/sensorsurfacetreeitem.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,3 +91,72 @@ void SubjectTreeItem::initItem()
     this->setToolTip("Subject");
 }
 
+
+//*************************************************************************************************************
+
+void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem)
+{
+    //Connect mri item with the measurement tree items in case the real time color changes (i.e. rt source loc)
+    //or the user changes the color origin
+    QList<QStandardItem*> mriItemList = this->findChildren(Data3DTreeModelItemTypes::MriItem);
+
+    foreach(QStandardItem* item, mriItemList) {
+        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(item)) {
+            connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
+                pMriItem, &MriTreeItem::setRtVertColor);
+            connect(pMriItem, &MriTreeItem::colorOriginChanged,
+                pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem)
+{
+    //Connect bem head item with the measurement tree items in case the real time color changes (i.e. rt source loc)
+    QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
+    QList<QStandardItem*> bemSurfacesItemList;
+
+    foreach(QStandardItem* item, bemItemList) {
+        if(BemTreeItem* pBemItem = dynamic_cast<BemTreeItem*>(item)) {
+            bemSurfacesItemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+
+            foreach(QStandardItem* itemBemSurf, bemSurfacesItemList) {
+                if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(itemBemSurf)) {
+                    if(pBemSurfItem->text() == "Head") {
+                        connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
+                            pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem)
+{
+
+    //Connect bem sensor surface item with the measurement tree items in case the real time color changes (i.e. rt source loc)
+    QList<QStandardItem*> sensoSetItemList = this->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
+    QList<QStandardItem*> sensorSurfacesItemList;
+
+    for(int i = 0; i < sensoSetItemList.size(); ++i) {
+        if(SensorSetTreeItem* pSensorSetItem = dynamic_cast<SensorSetTreeItem*>(sensoSetItemList.at(i))) {
+            sensorSurfacesItemList = pSensorSetItem->findChildren(Data3DTreeModelItemTypes::SensorSurfaceItem);
+
+            for(int k = 0; k < sensorSurfacesItemList.size(); ++k) {
+                if(SensorSurfaceTreeItem* pSensorSetSurfItem = dynamic_cast<SensorSurfaceTreeItem*>(sensorSurfacesItemList.at(i))) {
+                    if(pSensorSetSurfItem->text() == "Sensor Surface") {
+                        connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
+                            pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
+                    }
+                }
+            }
+        }
+    }
+}

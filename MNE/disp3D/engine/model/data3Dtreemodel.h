@@ -82,9 +82,11 @@ namespace MNELIB {
     class MNESourceSpace;
     class MNEBem;
     class MNESourceEstimate;
+    class MNEBemSurface;
 }
 
 namespace FIFFLIB{
+    class FiffEvoked;
     class FiffDigPointSet;
 }
 
@@ -117,6 +119,7 @@ class SensorSetTreeItem;
 class DigitizerSetTreeItem;
 class SubjectTreeItem;
 class MeasurementTreeItem;
+class SensorDataTreeItem;
 
 
 //=============================================================================================================
@@ -288,7 +291,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorSetTreeItem* addMegSensorData(const QString& sSubject,
+    SensorSetTreeItem* addMegSensorInfo(const QString& sSubject,
                                         const QString& sSensorSetName,
                                         const MNELIB::MNEBem& sensor,
                                         const QList<FIFFLIB::FiffChInfo>& lChInfo = QList<FIFFLIB::FiffChInfo>());
@@ -306,6 +309,19 @@ public:
     DigitizerSetTreeItem* addDigitizerData(const QString& sSubject,
                                            const QString& sMeasurementSetName,
                                            const FIFFLIB::FiffDigPointSet &digitizer);
+
+    //=========================================================================================================
+    /**
+    * Adds live sensor data.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] matSensorData          The Sensor Data.
+    * @param[in] sDataType              The data type ("MEG").
+     *
+    * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    SensorDataTreeItem* addSensorData(const QString& sSubject, const QString& sMeasurementSetName, const Eigen::MatrixXd& matSensorData, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sDataType = QString("MEG"));
 
     //=========================================================================================================
     /**
@@ -340,15 +356,6 @@ protected:
     * @param[in] pItemAdd            The item which is added as a row to the parent item.
     */
     void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
-
-    //=========================================================================================================
-    /**
-    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
-    *
-    * @param[in] pSubjectItem           The subject item which holds the MRI data items.
-    * @param[in] pMeasurementItem       The measurement item which is to be connected.
-    */
-    void connectMeasurementToMriItems(SubjectTreeItem* pSubjectItem, MeasurementTreeItem* pMeasurementItem);
 
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */

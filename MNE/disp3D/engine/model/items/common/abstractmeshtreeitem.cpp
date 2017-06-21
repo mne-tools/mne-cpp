@@ -95,6 +95,14 @@ QPointer<CustomMesh> AbstractMeshTreeItem::getCustomMesh()
 
 //*************************************************************************************************************
 
+void AbstractMeshTreeItem::setVertColor(const QVariant& vertColor)
+{
+    this->setData(vertColor, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+}
+
+
+//*************************************************************************************************************
+
 void AbstractMeshTreeItem::initItem()
 {
     this->setEditable(false);
