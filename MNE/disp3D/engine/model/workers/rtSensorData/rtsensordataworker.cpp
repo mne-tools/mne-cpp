@@ -118,7 +118,6 @@ RtSensorDataWorker::~RtSensorDataWorker()
     if(this->isRunning()) {
         stop();
     }
-    Interpolation::clearInterpolateMatrix();
 }
 
 
@@ -161,14 +160,14 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, co
     m_numSensors = sensorPos.size();
 
     //sensor projecting
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensor(inSurface, sensorPos);
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(inSurface, sensorPos);
 
     //SCDC with cancel distance 0.03m
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(inSurface, *mappedSubSet, 0.03);
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(inSurface, mappedSubSet, 0.03);
     //@todo missing filtering of bad channels, add after merge
 
     // linear weight matrix
-    m_weightMatrix = Interpolation::createInterpolationMat(*mappedSubSet, distanceMatrix);
+    m_weightMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear);
 
     m_bSurfaceDataIsInit = true;
 }

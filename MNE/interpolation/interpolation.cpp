@@ -78,22 +78,22 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist)
+QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist)
 {
     if (! distanceTable) {
         qDebug() << "[WARNING] Interpolation received an empty distance table. Returning null pointer...";
-        return NULL;
+        return nullptr;
     }
     // initialization
-    QSharedPointer<SparseMatrix<double> > interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors.size());
+    QSharedPointer<SparseMatrix<double> > interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors->size());
     // temporary helper structure for filling sparse matrix
     QVector<SparseEntry> nonZeroEntries;
     const size_t n = interpolationMatrix->rows();
     const size_t m = interpolationMatrix->cols();
     // insert all sensor nodes into set for faster lookup during later computation
     QSet<qint32> sensorLookup;
-    for (qint32 sen : projectedSensors){
-        sensorLookup.insert (sen);
+    for (qint32 i = 0; i < projectedSensors->size(); ++i){
+        sensorLookup.insert (projectedSensors->at(i));
     }
     // main loop: go through all rows of distance table and calculate weights
     for (int r = 0; r < n; ++r) {
@@ -117,7 +117,7 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             }
         } else {
             // a sensor has been assigned to this node, we do not need to interpolate anything
-            const int indexInSubset = projectedSensors.indexOf(r);
+            const int indexInSubset = projectedSensors->indexOf(r);
             nonZeroEntries.push_back(SparseEntry(r, indexInSubset, 1));
         }
     }
