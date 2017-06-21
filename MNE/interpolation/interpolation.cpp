@@ -63,8 +63,6 @@
 using namespace INTERPOLATION;
 using namespace Eigen;
 
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -75,25 +73,23 @@ using namespace Eigen;
 // INITIALIZE STATIC MEMBER
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<double> > Interpolation::m_interpolationMatrix = nullptr;
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist)
+QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QVector<qint32> &projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist)
 {
     if (! distanceTable) {
-        qDebug() << "[WARNING] Interpolation received an empty distance table. Returning...";
-        return;
+        qDebug() << "[WARNING] Interpolation received an empty distance table. Returning null pointer...";
+        return NULL;
     }
     // initialization
-    m_interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors.size());
+    QSharedPointer<SparseMatrix<double> > interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors.size());
     // temporary helper structure for filling sparse matrix
     QVector<SparseEntry> nonZeroEntries;
-    const size_t n = m_interpolationMatrix->rows();
-    const size_t m = m_interpolationMatrix->cols();
+    const size_t n = interpolationMatrix->rows();
+    const size_t m = interpolationMatrix->cols();
     // insert all sensor nodes into set for faster lookup during later computation
     QSet<qint32> sensorLookup;
     for (qint32 sen : projectedSensors){
@@ -125,28 +121,26 @@ void Interpolation::createInterpolationMat(const QVector<qint32> &projectedSenso
             nonZeroEntries.push_back(SparseEntry(r, indexInSubset, 1));
         }
     }
-    m_interpolationMatrix->setFromTriplets(nonZeroEntries.begin(), nonZeroEntries.end());
+    interpolationMatrix->setFromTriplets(nonZeroEntries.begin(), nonZeroEntries.end());
+    return interpolationMatrix;
 }
 //*************************************************************************************************************
 
-QSharedPointer<VectorXf> Interpolation::interpolateSignal(const VectorXd &measurementData)
+QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<double> > interpolationMatrix, const VectorXd &measurementData)
 {
-    //test if a pointer exists
-    if(m_interpolationMatrix){
+    if(interpolationMatrix){
         QSharedPointer<VectorXf> interpolatedVec = QSharedPointer<VectorXf>::create();
-        (*interpolatedVec) = ((*m_interpolationMatrix) * measurementData).cast<float> ();
+        if (interpolationMatrix->cols() != measurementData.rows()) {
+            qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
+            return nullptr;
+        }
+        (*interpolatedVec) = ((*interpolationMatrix) * measurementData).cast<float> ();
         return interpolatedVec;
     }
     else{
-        qDebug() << "[WARNING] Null pointer for m_interpolationMatrix, weight matrix was not created. Return null pointer...";
+        qDebug() << "[WARNING] Interpolation::interpolateSignal - Null pointer for interpolationMatrix, weight matrix was not created. Return null pointer...";
         return nullptr;
     }
-}
-//*************************************************************************************************************
-
-void Interpolation::clearInterpolateMatrix()
-{
-    m_interpolationMatrix.clear();
 }
 //*************************************************************************************************************
 
@@ -164,7 +158,3 @@ double Interpolation::square(const double d) {
     return (-(1.0f / 9.0f) * (d * d) + 1);
 }
 //*************************************************************************************************************
-
-QSharedPointer<SparseMatrix<double> > Interpolation::getResult() {
-    return m_interpolationMatrix;
-}
