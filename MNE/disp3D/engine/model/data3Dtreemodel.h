@@ -321,7 +321,7 @@ public:
     * @param[in] fiffEvoked             The Fiff Evoked, holds all information about the sensors.
     * @param[in] sDataType              The data type ("MEG" or "EEG").
     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
-    * @param[in] interpolationFunction  Function that computes interpolation coefficients using the distance values
+    * @param[in] sInterpolationFunction  Function that computes interpolation coefficients using the distance values
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
@@ -332,7 +332,7 @@ public:
                                       const FIFFLIB::FiffEvoked& fiffEvoked,
                                       const QString &sDataType,
                                       const double dCancelDist,
-                                      double (*interpolationFunction) (double));
+                                      const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**

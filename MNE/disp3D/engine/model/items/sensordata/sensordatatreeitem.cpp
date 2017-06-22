@@ -177,15 +177,25 @@ void SensorDataTreeItem::initItem()
     data.setValue(1);
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
 
-    MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.045");
+    MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.05");
     connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
             this, &SensorDataTreeItem::onCancelDistanceChanged);
     list.clear();
     list << pItemCancelDistance;
     list << new QStandardItem(pItemCancelDistance->toolTip());
     this->appendRow(list);
-    data.setValue(0.045);
+    data.setValue(0.05);
     pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
+
+    MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Qubic");
+    connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
+            this, &SensorDataTreeItem::onInterpolationFunctionChanged);
+    list.clear();
+    list << pInterpolationFunction;
+    list << new QStandardItem(pInterpolationFunction->toolTip());
+    this->appendRow(list);
+    data.setValue(QString("Qubic"));
+    pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
 }
 
 
@@ -196,7 +206,7 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
                               const FiffEvoked& fiffEvoked,
                               const QString& sSensorType,
                               const double dCancelDist,
-                              double (*interpolationFunction)(double))
+                              const QString& sInterpolationFunction)
 {
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
@@ -232,14 +242,13 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
         iCounter++;
     }
 
-    this->setCancelDistance(dCancelDist);
-    //m_pSensorRtDataWorker->setCancelDistance(dCancelDist);
+    setCancelDistance(dCancelDist);
+    setInterpolationFunction(sInterpolationFunction);
 
     m_pSensorRtDataWorker->calculateSurfaceData(bemSurface,
                                                 vecSensorPos,
                                                 fiffEvoked,
-                                                sensorTypeFiffConstant,
-                                                interpolationFunction);
+                                                sensorTypeFiffConstant);
 
     m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
@@ -418,10 +427,17 @@ void SensorDataTreeItem::setCancelDistance(double dCancelDist)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setInterpolationFunction(double (*interpolationFunction)(double))
+void SensorDataTreeItem::setInterpolationFunction(const QString &sInterpolationFunction)
 {
-    if(m_pSensorRtDataWorker){
-        m_pSensorRtDataWorker->setInterpolationFunction(interpolationFunction);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::InterpolationFunction);
+
+    for(int i = 0; i < lItems.size(); i++) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
+            QVariant data;
+            data.setValue(sInterpolationFunction);
+            pAbstractItem->setData(data, MetaTreeItemRoles::InterpolationFunction);
+            pAbstractItem->setData(data, Qt::DisplayRole);
+        }
     }
 }
 
@@ -525,6 +541,15 @@ void SensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
     if(dCancelDist.canConvert<double>()) {
         if(m_pSensorRtDataWorker) {
             m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
+        }
+    }
+}
+
+void SensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
+{
+    if(sInterpolationFunction.canConvert<QString>()) {
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setInterpolationFunction(sInterpolationFunction.toString());
         }
     }
 }

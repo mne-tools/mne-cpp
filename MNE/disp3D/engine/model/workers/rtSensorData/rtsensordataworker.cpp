@@ -170,8 +170,7 @@ void RtSensorDataWorker::calculateSurfaceData()
 void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface,
                                               const QVector<Vector3f> &vecSensorPos,
                                               const FIFFLIB::FiffEvoked &fiffEvoked,
-                                              int iSensorType,
-                                              double (*interpolationFunction)(double))
+                                              int iSensorType)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -185,7 +184,6 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface,
     m_lInterpolationData.bemSurface = bemSurface;
     m_lInterpolationData.fiffEvoked = fiffEvoked;
     m_lInterpolationData.iSensorType = iSensorType;
-    m_lInterpolationData.interpolationFunction = interpolationFunction;
     
     //sensor projecting: One time operation because surface and sensors can not change 
     m_lInterpolationData.pVecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.bemSurface, vecSensorPos);
@@ -263,9 +261,8 @@ void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
 void RtSensorDataWorker::setCancelDistance(double dCancelDist)
 {
     QMutexLocker locker(&m_qMutex);
-    //m_qMutex.lock();
     m_lInterpolationData.dCancelDistance = dCancelDist;
-    //m_qMutex.unlock();
+
 
     if(m_bSurfaceDataIsInit == true){
         //recalculate because parameters changed
@@ -276,12 +273,22 @@ void RtSensorDataWorker::setCancelDistance(double dCancelDist)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setInterpolationFunction(double (*interpolationFunction)(double))
+void RtSensorDataWorker::setInterpolationFunction(const QString &sInterpolationFunction)
 {
     QMutexLocker locker(&m_qMutex);
-    //m_qMutex.lock();
-    m_lInterpolationData.interpolationFunction = interpolationFunction;
-    //m_qMutex.unlock();
+    if(sInterpolationFunction == "Linear") {
+        m_lInterpolationData.interpolationFunction =Interpolation::linear;
+    }
+    else if(sInterpolationFunction == "Square") {
+        m_lInterpolationData.interpolationFunction =Interpolation::square;
+    }
+    else if(sInterpolationFunction == "Qubic") {
+        m_lInterpolationData.interpolationFunction =Interpolation::qubic;
+    }
+    else if(sInterpolationFunction == "Gaussian") {
+        m_lInterpolationData.interpolationFunction =Interpolation::gaussian;
+    }
+
 
     if(m_bSurfaceDataIsInit == true){
         //recalculate because parameters changed
