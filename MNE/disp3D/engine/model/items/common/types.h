@@ -132,8 +132,7 @@ namespace MetaTreeItemTypes
                     NumberDipoles = QStandardItem::UserType + 125,
                     MaterialType = QStandardItem::UserType + 126,
                     ShowNormals = QStandardItem::UserType + 127,
-                    Scale = QStandardItem::UserType + 128,
-                    CancelDistance = QStandardItem::UserType + 129};
+                    Scale = QStandardItem::UserType + 128  };
 }
 
 // Model item roles
@@ -200,8 +199,7 @@ namespace MetaTreeItemRoles
                     SurfaceTessOuter = Qt::UserRole + 24,
                     SurfaceTriangleScale = Qt::UserRole + 25,
                     SurfaceMaterial = Qt::UserRole + 26,
-                    Scale = Qt::UserRole + 27,
-                    CancelDistance = Qt::UserRole + 28};
+                    Scale = Qt::UserRole + 27};
 }
 
 } //NAMESPACE DISP3DLIB

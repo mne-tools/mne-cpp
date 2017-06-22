@@ -4,11 +4,11 @@
 * @author   Felix Griesau <felix.griesau@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2017
+* @date     Month, Year
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Felix Griesau and Matti Hamalainen. All rights reserved.
+* Copyright (C) Year, Felix Griesau and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,6 +43,8 @@
 #include "../../workers/rtSensorData/rtsensordataworker.h"
 #include "../common/metatreeitem.h"
 
+#include <mne/mne_sourceestimate.h>
+#include <mne/mne_forwardsolution.h>
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_evoked.h>
 #include <geometryInfo/geometryinfo.h>
@@ -176,16 +178,6 @@ void SensorDataTreeItem::initItem()
     this->appendRow(list);
     data.setValue(1);
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
-
-    MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.045");
-    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onCancelDistanceChanged);
-    list.clear();
-    list << pItemCancelDistance;
-    list << new QStandardItem(pItemCancelDistance->toolTip());
-    this->appendRow(list);
-    data.setValue(0.045);
-    pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
 }
 
 
@@ -221,26 +213,18 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
     //fill QVector with the right sensor positions
     QVector<Vector3f> vecSensorPos;
     m_iUsedSensors.clear();
-    int iCounter = 0;
+    int counter = 0;
     for( const FiffChInfo &info : fiffEvoked.info.chs) {
         if(info.kind == sensorTypeFiffConstant) {
             vecSensorPos.push_back(info.chpos.r0);
-
             //save the number of the sensor
-            m_iUsedSensors.push_back(iCounter);
+            m_iUsedSensors.push_back(counter);
+            counter++;
         }
-        iCounter++;
     }
 
-    this->setCancelDistance(dCancelDist);
-    //m_pSensorRtDataWorker->setCancelDistance(dCancelDist);
-
-    m_pSensorRtDataWorker->calculateSurfaceData(bemSurface,
-                                                vecSensorPos,
-                                                fiffEvoked,
-                                                sensorTypeFiffConstant,
-                                                interpolationFunction);
-
+    m_pSensorRtDataWorker->calculateSurfaceData(bemSurface, vecSensorPos, fiffEvoked,
+                                                sensorTypeFiffConstant, dCancelDist, interpolationFunction);
     m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
     m_bIsDataInit = true;
@@ -265,7 +249,6 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
         {
             dSmallSensorData.row(i)  = tSensorData.row(m_iUsedSensors[i]);
         }
-
         //Set new data into item's data.
         QVariant data;
         data.setValue(dSmallSensorData);
@@ -273,9 +256,6 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
 
         if(m_pSensorRtDataWorker) {
              m_pSensorRtDataWorker->addData(dSmallSensorData);
-        }
-        else {
-            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
         }
     }
     else
@@ -287,9 +267,6 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
 
         if(m_pSensorRtDataWorker) {
              m_pSensorRtDataWorker->addData(tSensorData);
-        }
-        else {
-            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
         }
     }
 }
@@ -398,25 +375,12 @@ void SensorDataTreeItem::setNormalization(const QVector3D& vecThresholds)
     }
 }
 
-
-//*************************************************************************************************************
-
-void SensorDataTreeItem::setCancelDistance(double dCancelDist)
+void SensorDataTreeItem::setCancelDistance(const double dCancelDist)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::CancelDistance);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(dCancelDist);
-            pAbstractItem->setData(data, MetaTreeItemRoles::CancelDistance);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
+    if(m_pSensorRtDataWorker){
+        m_pSensorRtDataWorker->setCancelDistance(dCancelDist);
     }
 }
-
-
-//*************************************************************************************************************
 
 void SensorDataTreeItem::setInterpolationFunction(double (*interpolationFunction)(double))
 {
@@ -429,9 +393,7 @@ void SensorDataTreeItem::setInterpolationFunction(double (*interpolationFunction
 
 void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColor)
 {
-    if(m_pSensorRtDataWorker){
-        m_pSensorRtDataWorker->setSurfaceColor(matVertColor);
-    }
+    m_pSensorRtDataWorker->setSurfaceColor(matVertColor);
 }
 
 
@@ -516,15 +478,6 @@ void SensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
     if(iNumAvr.canConvert<int>()) {
         if(m_pSensorRtDataWorker) {
             m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
-        }
-    }
-}
-
-void SensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
-{
-    if(dCancelDist.canConvert<double>()) {
-        if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
         }
     }
 }
