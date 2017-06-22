@@ -78,66 +78,64 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> projectedSensors, const QSharedPointer<MatrixXd> distanceTable, double (*interpolationFunction) (double), const double cancelDist)
+QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors, const QSharedPointer<MatrixXd> pDistanceTable, double (*interpolationFunction) (double), const double dCancelDist)
 {
-    if (! distanceTable) {
-        qDebug() << "[WARNING] Interpolation received an empty distance table. Returning null pointer...";
+    if (! pDistanceTable) {
+        qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table. Returning null pointer...";
         return nullptr;
     }
     // initialization
-    QSharedPointer<SparseMatrix<double> > interpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(distanceTable->rows(), projectedSensors->size());
+    QSharedPointer<SparseMatrix<double> > pInterpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(pDistanceTable->rows(), pProjectedSensors->size());
     // temporary helper structure for filling sparse matrix
-    QVector<SparseEntry> nonZeroEntries;
-    const size_t n = interpolationMatrix->rows();
-    const size_t m = interpolationMatrix->cols();
+    QVector<Eigen::Triplet<double> > vecNonZeroEntries;
+    const qint32 iRows = pInterpolationMatrix->rows();
+    const qint32 iCols = pInterpolationMatrix->cols();
     // insert all sensor nodes into set for faster lookup during later computation
     QSet<qint32> sensorLookup;
-    for (qint32 i = 0; i < projectedSensors->size(); ++i){
-        sensorLookup.insert (projectedSensors->at(i));
+    for (qint32 i = 0; i < pProjectedSensors->size(); ++i){
+        sensorLookup.insert (pProjectedSensors->at(i));
     }
     // main loop: go through all rows of distance table and calculate weights
-    for (int r = 0; r < n; ++r) {
+    for (qint32 r = 0; r < iRows; ++r) {
         if (sensorLookup.contains(r) == false) {
             // "normal" node, i.e. one which was not assigned a sensor
-            // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (cancelDist)
-            QVector<QPair<qint32, double> > bLoTreshold;
-            bLoTreshold.reserve(m);
+            // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
+            QVector<QPair<qint32, double> > vecBelowThresh;
+            vecBelowThresh.reserve(iCols);
             double dWeightsSum = 0;
-            const RowVectorXd row = distanceTable->row(r);
-            for (int q = 0; q < m; ++q) {
-                const double dist = row[q];
-                if (dist < cancelDist) {
-                    //           valueWeight = fabs(1.0/pow(dist,input.iDistPow));
+            const RowVectorXd row = pDistanceTable->row(r);
+            for (qint32 c = 0; c < iCols; ++c) {
+                const double dist = row[c];
+                if (dist < dCancelDist) {
                     const double valueWeight = fabs(1.0 / interpolationFunction(dist));
                     dWeightsSum += valueWeight;
-                    // input.lTriplets.append(Eigen::Triplet<double>(input.iVertIdx, j, valueWeight));
-                    bLoTreshold.push_back(qMakePair<qint32, double> (q, valueWeight));
+                    vecBelowThresh.push_back(qMakePair<qint32, double> (c, valueWeight));
                 }
             }
-            for (const QPair<qint32, double> &qp : bLoTreshold) {
-                nonZeroEntries.push_back(SparseEntry(r, qp.first, qp.second / dWeightsSum));
+            for (const QPair<qint32, double> &qp : vecBelowThresh) {
+                vecNonZeroEntries.push_back(Eigen::Triplet<double> (r, qp.first, qp.second / dWeightsSum));
             }
         } else {
-            // a sensor has been assigned to this node, we do not need to interpolate anything
-            const int indexInSubset = projectedSensors->indexOf(r);
-            nonZeroEntries.push_back(SparseEntry(r, indexInSubset, 1));
+            // a sensor has been assigned to this node, we do not need to interpolate anything (final vertex signal is equal to sensor input signal, thus factor 1)
+            const int iIndexInSubset = pProjectedSensors->indexOf(r);
+            vecNonZeroEntries.push_back(Eigen::Triplet<double> (r, iIndexInSubset, 1));
         }
     }
-    interpolationMatrix->setFromTriplets(nonZeroEntries.begin(), nonZeroEntries.end());
-    return interpolationMatrix;
+    pInterpolationMatrix->setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
+    return pInterpolationMatrix;
 }
 //*************************************************************************************************************
 
-QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<double> > interpolationMatrix, const VectorXd &measurementData)
+QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<double> > pInterpolationMatrix, const VectorXd &vecMeasurementData)
 {
-    if(interpolationMatrix){
-        QSharedPointer<VectorXf> interpolatedVec = QSharedPointer<VectorXf>::create();
-        if (interpolationMatrix->cols() != measurementData.rows()) {
+    if(pInterpolationMatrix){
+        QSharedPointer<VectorXf> pOut = QSharedPointer<VectorXf>::create();
+        if (pInterpolationMatrix->cols() != vecMeasurementData.rows()) {
             qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
             return nullptr;
         }
-        (*interpolatedVec) = ((*interpolationMatrix) * measurementData).cast<float> ();
-        return interpolatedVec;
+        (*pOut) = ((*pInterpolationMatrix) * vecMeasurementData).cast<float> ();
+        return pOut;
     }
     else{
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Null pointer for interpolationMatrix, weight matrix was not created. Return null pointer...";
@@ -146,22 +144,22 @@ QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<S
 }
 //*************************************************************************************************************
 
-double Interpolation::linear(const double d) {
-    return d;
+double Interpolation::linear(const double dIn) {
+    return dIn;
 }
 //*************************************************************************************************************
 
-double Interpolation::gaussian(const double d) {
-    return exp(-((d * d) / 2.0));
+double Interpolation::gaussian(const double dIn) {
+    return exp(-((dIn * dIn) / 2.0));
 }
 //*************************************************************************************************************
 
-double Interpolation::square(const double d) {
-    return (-(1.0f / 9.0f) * (d * d) + 1);
+double Interpolation::square(const double dIn) {
+    return std::max((-(1.0f / 9.0f) * (dIn * dIn) + 1), 0.0);
 }
 //*************************************************************************************************************
 
-double Interpolation::qubic(const double d) {
-    return d * d * d;
+double Interpolation::qubic(const double dIn) {
+    return dIn * dIn * dIn;
 }
 //*************************************************************************************************************
