@@ -111,7 +111,7 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
     //10cm cancel distance
     m_lInterpolationData = InterpolationData();
     m_lInterpolationData.dCancelDistance = 0.1;
-    m_lInterpolationData.fInterpolationFunction = Interpolation::linear;
+    m_lInterpolationData.fInterpolationFunction = Interpolation::qubic;
 }
 
 
