@@ -4,11 +4,11 @@
 * @author   Felix Griesau <felix.griesau@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     June, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Felix Griesau and Matti Hamalainen. All rights reserved.
+* Copyright (2017) Year, Felix Griesau and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -117,9 +117,9 @@ public:
      * Initializes the sensor data item with neccessary information for visualization computations.
      * Constructs and initalizes the worker for this item.
      *
-     * @param[in] matSurfaceVertColor       The color for the vertices which the streamed data is later plotted on
+     * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on
      * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized
-     * @param[in] fiifEvoked                FiffEvoked that holds the sensors information
+     * @param[in] fiffEvoked                FiffEvoked that holds the sensors information
      * @param[in] sSensorType               The sensor type that is later used for live interpolation
      * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
      * @param[in] interpolationFunction     Function that computes interpolation coefficients using the distance values
@@ -135,13 +135,15 @@ public:
     /**
     * Adds a block actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] tSensorData    The MNESourceEstimate data.
+    * @param[in] tSensorData                The matrix that holds rt measurement data.
     */
     void addData(const MatrixXd& tSensorData);
 
     //=========================================================================================================
-    /**
-    * @return                       Returns true if this item is initialized.
+    /**      
+    * Returns true if this item is initialized.
+    *
+    * @return                               Returns true if this item is initialized.
     */
     inline bool isDataInit() const;
 
@@ -149,23 +151,23 @@ public:
     /**
     * This function sets the loop flag.
     *
-    * @param[in] state     Whether to loop the data or not.
+    * @param[in] bState                      Whether to loop the data or not.
     */
-    void setLoopState(bool state);
+    void setLoopState(bool bState);
 
     //=========================================================================================================
     /**
     * This function sets the data streaming.
     *
-    * @param[in] state     Whether to stream the data to the display or not.
+    * @param[in] bState                      Whether to stream the data to the display or not.
     */
-    void setStreamingActive(bool state);
+    void setStreamingActive(bool bState);
 
     //=========================================================================================================
     /**
     * This function sets the time interval for streaming.
     *
-    * @param[in] iMSec     The waiting time inbetween samples.
+    * @param[in] iMSec                      The waiting time inbetween samples.
     */
     void setTimeInterval(int iMSec);
 
@@ -173,7 +175,7 @@ public:
     /**
     * This function sets the number of averages.
     *
-    * @param[in] iNumberAverages     The new number of averages.
+    * @param[in] iNumberAverages            The new number of averages.
     */
     void setNumberAverages(int iNumberAverages);
 
@@ -181,7 +183,7 @@ public:
     /**
     * This function sets the colortable type.
     *
-    * @param[in] sColortable     The new colortable ("Hot Negative 1" etc.).
+    * @param[in] sColortable                The new colortable ("Hot Negative 1" etc.).
     */
     void setColortable(const QString& sColortable);
 
@@ -189,7 +191,7 @@ public:
     /**
     * This function set the normalization value.
     *
-    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
+    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
     */
     void setNormalization(const QVector3D& vecThresholds);
     
@@ -198,7 +200,7 @@ public:
      * This function sets the cancel distance used in distance calculations for the interpolation.
      * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
      * 
-     * @param[in] dCancelDist   the new cancel distance value in meters. 
+     * @param[in] dCancelDist               The new cancel distance value in meters.
      */
     void setCancelDistance(const double dCancelDist);
     
@@ -206,7 +208,7 @@ public:
     /**
      * This function sets the function object that is used in the interpolation process.
      * 
-     * @param interpolationFunction     Function that computes interpolation coefficients using the distance values.
+     * @param interpolationFunction         Function that computes interpolation coefficients using the distance values.
      */
     void setInterpolationFunction(double (*interpolationFunction) (double));
 
@@ -214,7 +216,7 @@ public:
     /**
     * This function gets called whenever the origin of the surface vertex color changed.
     *
-    * @param[in] matVertColor The matrix that holds the origin colors for all vertices of the surface
+    * @param[in] matVertColor               The matrix that holds the origin colors for all vertices of the surface
     */
     void setColorOrigin(const MatrixX3f& matVertColor);
 
@@ -229,7 +231,7 @@ protected:
     /**
     * This function gets called whenever the check/actiation state of the rt data worker changed.
     *
-    * @param[in] checkState     The check state of the worker.
+    * @param[in] checkState                 The check state of the worker.
     */
     void onCheckStateWorkerChanged(const Qt::CheckState& checkState);
 
@@ -237,7 +239,7 @@ protected:
     /**
     * This function gets called whenever this item receives new color values for each estimated source.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    * @param[in] sourceColorSamples         The color values for each estimated source for left and right hemisphere.
     */
     void onNewRtData(const MatrixX3f &sensorData);
 
@@ -245,7 +247,7 @@ protected:
     /**
     * This function gets called whenever the used colormap type changed.
     *
-    * @param[in] sColormapType     The name of the new colormap type.
+    * @param[in] sColormapType              The name of the new colormap type.
     */
     void onColormapTypeChanged(const QVariant& sColormapType);
 
@@ -253,7 +255,7 @@ protected:
     /**
     * This function gets called whenever the time interval in between the streamed samples changed.
     *
-    * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
+    * @param[in] iMSec                      The new time in milliseconds waited in between each streamed sample.
     */
     void onTimeIntervalChanged(const QVariant &iMSec);
 
@@ -261,7 +263,7 @@ protected:
     /**
     * This function gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
     *
-    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
+    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
     */
     void onDataNormalizationValueChanged(const QVariant &vecThresholds);
 
@@ -269,7 +271,7 @@ protected:
     /**
     * This function gets called whenever the check/actiation state of the looped streaming state changed.
     *
-    * @param[in] checkState     The check state of the looped streaming state.
+    * @param[in] checkState                 The check state of the looped streaming state.
     */
     void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
 
@@ -277,22 +279,22 @@ protected:
     /**
     * This function gets called whenever the number of averages of the streamed samples changed.
     *
-    * @param[in] iNumAvr     The new number of averages.
+    * @param[in] iNumAvr                    The new number of averages.
     */
     void onNumberAveragesChanged(const QVariant& iNumAvr);
 
 
-    bool                             m_bIsDataInit;                      /**< The init flag. */
+    bool                             m_bIsDataInit;                     /**< The init flag. */
 
-    QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
-    QVector<int>                     m_iUsedSensors;
+    QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
+    QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation
 
 signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
     *
-    * @param[in] vertColors     The colors for the underlying mesh surface
+    * @param[in] vertColors                 The colors for the underlying mesh surface
     */
     void rtVertColorChanged(const QVariant &vertColors);
 

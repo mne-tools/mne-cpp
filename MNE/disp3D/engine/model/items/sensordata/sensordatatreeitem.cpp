@@ -274,15 +274,15 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setLoopState(bool state)
+void SensorDataTreeItem::setLoopState(bool bState)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::LoopedStreaming);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
+            pAbstractItem->setCheckState(bState == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
-            data.setValue(state);
+            data.setValue(bState);
             pAbstractItem->setData(data, MetaTreeItemRoles::LoopedStreaming);
         }
     }
@@ -291,15 +291,15 @@ void SensorDataTreeItem::setLoopState(bool state)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setStreamingActive(bool state)
+void SensorDataTreeItem::setStreamingActive(bool bState)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
+            pAbstractItem->setCheckState(bState == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
-            data.setValue(state);
+            data.setValue(bState);
             pAbstractItem->setData(data, MetaTreeItemRoles::StreamStatus);
         }
     }
