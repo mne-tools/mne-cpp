@@ -39,20 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_bem.h>
-
-#include <fiff/fiff_dig_point_set.h>
-
-#include <inverse/minimumNorm/minimumnorm.h>
 
 #include <iostream>
 
@@ -76,11 +64,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
 using namespace MNELIB;
-using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
 using namespace GEOMETRYINFO;
 using namespace INTERPOLATION;
 
@@ -127,7 +112,8 @@ int main(int argc, char *argv[])
 
     //acquire sensor positions
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
-    /// Load data
+
+    // Load data
     fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
@@ -138,7 +124,7 @@ int main(int argc, char *argv[])
 
     // positions of EEG and MEG sensors
     QVector<Vector3f> eegSensors;
-    QVector<Vector3f> megSensors; //currently not used
+    QVector<Vector3f> megSensors;
     //fill both QVectors with the right sensor positions
     for( const FiffChInfo &info : evoked.info.chs)
     {
@@ -153,35 +139,30 @@ int main(int argc, char *argv[])
             megSensors.push_back(info.chpos.r0);
         }
     }
-    std::cout << "Number EEG sensors: " << eegSensors.size() << std::endl;
-    std::cout << "Number MEG sensors: " << megSensors.size() << std::endl;
 
     //acquire surface data
     QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 
-    MNEBemSurface &testSurface = t_sensorSurfaceVV[0];
-    std::cout << "Number of vertices: ";
-    std::cout << testSurface.rr.rows() << std::endl;
-
     //projecting with MEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(testSurface, megSensors);
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0], megSensors);
     std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
 
     //SCDC with cancel distance 0.03
     qint64 startTimeScdc = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(testSurface, mappedSubSet, 0.03);
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0], mappedSubSet, 0.03);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
+    //filter out bad MEG channels
     GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
 
-    // linear weight matrix
+    //weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
     QSharedPointer<SparseMatrix<double> > interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
-    // realtime interpolation (1 iteration)
+    //realtime interpolation (1 iteration)
     VectorXd signal = VectorXd::Random(megSensors.size());
     qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
     Interpolation::interpolateSignal(interpolationMatrix, signal);
