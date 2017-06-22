@@ -252,7 +252,12 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
 //*************************************************************************************************************
 
-SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData, const MNEBemSurface &bemSurface, const FiffEvoked &fiffEvoked, const QString sSensorType)
+SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
+                                                 const MNEBemSurface &bemSurface,
+                                                 const FiffEvoked &fiffEvoked,
+                                                 const QString sSensorType,
+                                                 const double dCancelDist,
+                                                 double (*interpolationFunction)(double))
 {
     if(!tSensorData.size() == 0) {
         if(m_pSensorDataTreeItem) {
@@ -260,7 +265,6 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData, co
         }
         else {
             //Add sensor data as child
-            //@todo if we find a child do we want to replace the data ?
             if(this->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() == 0) {
                 //If rt data item does not exists yet, create it here!
                 m_pSensorDataTreeItem = new SensorDataTreeItem();
@@ -272,7 +276,7 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData, co
 
                 // @todo change this
                 MatrixX3f greyColor = MatrixX3f::Constant(bemSurface.rr.rows(), 3, 100.0f);
-                m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffEvoked, sSensorType);
+                m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffEvoked, sSensorType, dCancelDist, interpolationFunction);
 
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onVertColorChanged);

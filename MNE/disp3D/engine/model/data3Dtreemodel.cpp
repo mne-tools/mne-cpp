@@ -486,13 +486,14 @@ void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStanda
 
 //*************************************************************************************************************
 
-SensorDataTreeItem* Data3DTreeModel::addSensorData(
-                                        const QString& sSubject,
+SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                         const QString& sMeasurementSetName,
                                         const MatrixXd& matSensorData,
-                                        const MNEBemSurface& inSurface,
-                                        const FiffEvoked& evoked,
-                                        const QString sDataType)
+                                        const MNEBemSurface& tBemSurface,
+                                        const FiffEvoked& fiffEvoked,
+                                        const QString& sDataType,
+                                        const double dCancelDist,
+                                        double (*interpolationFunction)(double))
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -505,7 +506,8 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(
     //Find the "set" items and add the sensor data as items
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            //If measurement data has already been created but in conjunction with a different data type (i.e. connectivity, dipole fitting, etc.), do the connects here
+            //If measurement data has already been created but in conjunction with a different data type
+            //(i.e. connectivity, dipole fitting, etc.), do the connects here
             if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).isEmpty()) {
                 if(sDataType == "EEG") {
                     pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
@@ -514,12 +516,12 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(
                 }
             }
 
-            pReturnItem = pMeasurementItem->addData(matSensorData, inSurface, evoked, sDataType);
+            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffEvoked, sDataType, dCancelDist, interpolationFunction);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData, inSurface, evoked, sDataType);
+        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffEvoked, sDataType, dCancelDist, interpolationFunction);
 
         if(sDataType == "EEG") {
             pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);

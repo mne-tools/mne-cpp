@@ -183,7 +183,12 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBemSurface &bemSurface, const FiffEvoked &fiffEvoked, const QString &sSensorType)
+void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
+                              const MNEBemSurface& bemSurface,
+                              const FiffEvoked& fiffEvoked,
+                              const QString& sSensorType,
+                              const double dCancelDist,
+                              double (*interpolationFunction)(double))
 {
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
@@ -218,7 +223,8 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBem
         }
     }
 
-    m_pSensorRtDataWorker->calculateSurfaceData(bemSurface, vecSensorPos, fiffEvoked, sensorTypeFiffConstant);
+    m_pSensorRtDataWorker->calculateSurfaceData(bemSurface, vecSensorPos, fiffEvoked,
+                                                sensorTypeFiffConstant, dCancelDist, interpolationFunction);
     m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
     m_bIsDataInit = true;

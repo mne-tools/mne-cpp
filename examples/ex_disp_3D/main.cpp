@@ -325,15 +325,16 @@ int main(int argc, char *argv[])
     //    }
 
     //add sensor item for EEG data
-    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption), evoked.comment, evoked.data, t_Bem[0], evoked, "EEG")) {
+    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+                                                                             evoked.comment, evoked.data, t_Bem[0],
+                                                                             evoked, "EEG", 0.045, Interpolation::qubic)) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
         pEegSensorTreeItem->setNormalization(QVector3D(-12.09203e-13, -5.54059e-13, 12.22682e-13));
         pEegSensorTreeItem->setColortable("Hot");
-        pEegSensorTreeItem->setCancelDistance(0.03);
-        pEegSensorTreeItem->setInterpolationFunction(Interpolation::linear);
+
     }
 
     if(bAddRtSourceLoc) {
