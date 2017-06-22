@@ -102,18 +102,20 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (cancelDist)
             QVector<QPair<qint32, double> > bLoTreshold;
             bLoTreshold.reserve(m);
-            double invDistSum = 0;
+            double dWeightsSum = 0;
             const RowVectorXd row = distanceTable->row(r);
             for (int q = 0; q < m; ++q) {
                 const double dist = row[q];
                 if (dist < cancelDist) {
-                    const double f_d = interpolationFunction(dist);
-                    invDistSum += (1 / f_d);
-                    bLoTreshold.push_back(qMakePair<qint32, double> (q, f_d));
+                    //           valueWeight = fabs(1.0/pow(dist,input.iDistPow));
+                    const double valueWeight = fabs(1.0 / interpolationFunction(dist));
+                    dWeightsSum += valueWeight;
+                    // input.lTriplets.append(Eigen::Triplet<double>(input.iVertIdx, j, valueWeight));
+                    bLoTreshold.push_back(qMakePair<qint32, double> (q, valueWeight));
                 }
             }
             for (const QPair<qint32, double> &qp : bLoTreshold) {
-                nonZeroEntries.push_back(SparseEntry(r, qp.first, 1 / (qp.second * invDistSum)));
+                nonZeroEntries.push_back(SparseEntry(r, qp.first, qp.second / dWeightsSum));
             }
         } else {
             // a sensor has been assigned to this node, we do not need to interpolate anything
