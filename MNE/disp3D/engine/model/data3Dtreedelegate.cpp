@@ -332,6 +332,18 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pComboBox->addItem("Phong Alpha");
             return pComboBox;
         }
+        
+        case MetaTreeItemTypes::CancelDistance: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(0.001);
+            pDoubleSpinBox->setMaximum(1.0);
+            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSuffix("m");
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::CancelDistance).toDouble());
+            return pDoubleSpinBox;
+    }
 
         default: // do nothing;
             break;
@@ -536,6 +548,12 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             QComboBox* pComboBox = static_cast<QComboBox*>(editor);
             pComboBox->setCurrentText(materialType);
             return;
+        }
+        case MetaTreeItemTypes::CancelDistance: {
+            int value = index.model()->data(index, MetaTreeItemRoles::CancelDistance).toDouble();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
+            break;
         }
 
         default: // do nothing;
@@ -752,6 +770,17 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             model->setData(index, data, Qt::DisplayRole);
             return;
         }
+        
+        case MetaTreeItemTypes::CancelDistance: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+    
+            model->setData(index, data, MetaTreeItemRoles::CancelDistance);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+        
 
         default: // do nothing;
             break;
