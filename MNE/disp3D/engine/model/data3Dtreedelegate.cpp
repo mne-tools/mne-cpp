@@ -351,7 +351,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                     this, &Data3DTreeDelegate::onEditorEdited);
             pComboBox->addItem("Linear");
             pComboBox->addItem("Square");
-            pComboBox->addItem("Qubic");
+            pComboBox->addItem("Cubic");
             pComboBox->addItem("Gaussian");
             return pComboBox;
         }

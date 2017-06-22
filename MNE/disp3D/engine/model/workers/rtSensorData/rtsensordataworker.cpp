@@ -105,7 +105,7 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
     m_lInterpolationData = InterpolationData();
     //5cm cancel distance
     m_lInterpolationData.dCancelDistance = 0.05;
-    m_lInterpolationData.interpolationFunction = Interpolation::qubic;
+    m_lInterpolationData.interpolationFunction = Interpolation::cubic;
 }
 
 
@@ -263,7 +263,6 @@ void RtSensorDataWorker::setCancelDistance(double dCancelDist)
     QMutexLocker locker(&m_qMutex);
     m_lInterpolationData.dCancelDistance = dCancelDist;
 
-
     if(m_bSurfaceDataIsInit == true){
         //recalculate because parameters changed
         calculateSurfaceData();
@@ -277,18 +276,17 @@ void RtSensorDataWorker::setInterpolationFunction(const QString &sInterpolationF
 {
     QMutexLocker locker(&m_qMutex);
     if(sInterpolationFunction == "Linear") {
-        m_lInterpolationData.interpolationFunction =Interpolation::linear;
+        m_lInterpolationData.interpolationFunction = Interpolation::linear;
     }
     else if(sInterpolationFunction == "Square") {
-        m_lInterpolationData.interpolationFunction =Interpolation::square;
+        m_lInterpolationData.interpolationFunction = Interpolation::square;
     }
-    else if(sInterpolationFunction == "Qubic") {
-        m_lInterpolationData.interpolationFunction =Interpolation::qubic;
+    else if(sInterpolationFunction == "Cubic") {
+        m_lInterpolationData.interpolationFunction = Interpolation::cubic;
     }
     else if(sInterpolationFunction == "Gaussian") {
-        m_lInterpolationData.interpolationFunction =Interpolation::gaussian;
+        m_lInterpolationData.interpolationFunction = Interpolation::gaussian;
     }
-
 
     if(m_bSurfaceDataIsInit == true){
         //recalculate because parameters changed

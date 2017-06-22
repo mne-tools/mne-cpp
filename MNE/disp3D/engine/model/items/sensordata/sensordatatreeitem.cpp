@@ -187,14 +187,14 @@ void SensorDataTreeItem::initItem()
     data.setValue(0.05);
     pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
 
-    MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Qubic");
+    MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Cubic");
     connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
             this, &SensorDataTreeItem::onInterpolationFunctionChanged);
     list.clear();
     list << pInterpolationFunction;
     list << new QStandardItem(pInterpolationFunction->toolTip());
     this->appendRow(list);
-    data.setValue(QString("Qubic"));
+    data.setValue(QString("Cubic"));
     pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
 }
 

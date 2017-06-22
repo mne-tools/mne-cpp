@@ -162,7 +162,7 @@ double Interpolation::square(const double dIn) {
 }
 //*************************************************************************************************************
 
-double Interpolation::qubic(const double dIn) {
+double Interpolation::cubic(const double dIn) {
     return dIn * dIn * dIn;
 }
 //*************************************************************************************************************
