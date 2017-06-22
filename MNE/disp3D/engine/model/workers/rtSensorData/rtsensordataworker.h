@@ -43,6 +43,8 @@
 
 #include "../../../../disp3D_global.h"
 #include "../../items/common/types.h"
+#include <mne/mne_bem_surface.h>
+#include <fiff/fiff_evoked.h>
 
 
 //*************************************************************************************************************
@@ -68,13 +70,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB {
-    class MNEBemSurface;
-}
-
-namespace FIFFLIB {
-    class FiffEvoked;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,21 +87,35 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 /**
-* The strucut specifing the smoothing visualization info.
+* The strucut specifing visualization info.
 */
 struct VisualizationInfo {
-    VectorXd                    vSourceColorSamples;
-    VectorXi                    vVertNo;
-    QList<FSLIB::Label>         lLabels;
-    QMap<qint32, qint32>        mapLabelIdSources;
-    QVector<QVector<int> >      mapVertexNeighbors;
-    SparseMatrix<double>        matWDistSmooth;
     double                      dThresholdX;
     double                      dThresholdZ;
     QRgb (*functionHandlerColorMap)(double v);
     MatrixX3f                   matOriginalVertColor;
     MatrixX3f                   matFinalVertColor;
 };
+
+//=============================================================================================================
+/**
+ * The struct specifing all data that is used in the interpolation process
+ */
+struct InterpolationData {
+    int                                     iSensorType;                      /**< Type of the sensor FIFFV_EEG_CH or FIFFV_MEG_CH. */
+
+    double                                  dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
+    
+    QSharedPointer<SparseMatrix<double> >   pWeightMatrix;                    /**< Weight matrix that holds all coefficients for a signal interpolation. */
+    QSharedPointer<MatrixXd>                pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+    QSharedPointer<QVector<qint32>>         pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+
+    MNELIB::MNEBemSurface                   bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
+    FIFFLIB::FiffEvoked                     fiffEvoked;                       /**< Contains all information about th sensors. */
+    
+    double (*fInterpolationFunction) (double);                                /**< Function that computes interpolation coefficients using the distance values. */
+};
+
 //=============================================================================================================
 
 //*************************************************************************************************************
@@ -155,17 +164,19 @@ public:
     * Clear this worker, empties the m_lData field that holds the current block of sensor activity
     */
     void clear();
-
+    
     //=========================================================================================================
     /**
-     * @brief setSurfaceData    Prepares the necessary data for the later ongoing interpolation of signals.
-     *                          Calculates a weight matrix which is based on surfaced constrained distances.
-     * @param inSurface         The MNEBemSurface that holds the mesh information
-     * @param evoked            The FiffEvoked that holds the sensor information
-     * @param sensorType        The sensortype which is to be used (most commonly either EEG or MEG sensors, see FIFF constants)
+     * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
+     * In the end it calls calculateSurfaceData().
+     * 
+     * @param[in] bemSurface         The MNEBemSurface that holds the mesh information
+     * @param[in] vecSensorPos       The QVector that holds the sensor positons in x, y and z coordinates.
+     * @param[in] fiffEvoked         Holds all information about the sensors.
+     * @param[in] iSensorType        Type of the sensor FIFFV_EEG_CH or FIFFV_MEG_CH.
      */
-    void calculateSurfaceData(const MNELIB::MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPos, const QString sensorType);
-
+    void calculateSurfaceData(const MNELIB::MNEBemSurface &bemSurface, const QVector<Vector3f> &vecSensorPos, const FIFFLIB::FiffEvoked &fiffEvoked, int iSensorType);
+   
     //=========================================================================================================
     /**
     * Set surface color data which the streamed data is plotted on.
@@ -206,6 +217,23 @@ public:
     * @param[in] dValue                 The new threshold values used for normalizing the data.
     */
     void setNormalization(const QVector3D &vecThresholds);
+    
+    //=========================================================================================================
+    /**
+     * This function sets the cancel distance used in distance calculations for the interpolation.
+     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     * 
+     * @param[in] dCancelDist   the new cancel distance value in meters. 
+     */
+    void setCancelDistance(const double dCancelDist);
+    
+    //=========================================================================================================
+    /**
+     * This function sets the function object that is used in the interpolation process.
+     * 
+     * @param interpolationFunction     Function that computes interpolation coefficients using the distance values.
+     */
+    void setInterpolationFunction(double (*interpolationFunction) (double));
 
     //=========================================================================================================
     /**
@@ -245,15 +273,22 @@ private:
      * @param dThreholdZ                    Upper threshold for normalizing
      * @param functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
      */
-    void normalizeAndTransformToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v));
+    void normalizeAndTransformToColor(const VectorXf &data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v));
 
     //=========================================================================================================
     /**
      * @brief generateColorsFromSensorValues Produces the final color matrix that is to be emitted
-     * @param sensorValues A vector of sensor signals
+     * @param dSensorValues A vector of sensor signals
      * @return The final color values for the underlying mesh surface
      */
-    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& sensorValues);
+    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& dSensorValues);
+
+    //=========================================================================================================
+    /**
+     * Prepares the necessary data for the later ongoing interpolation of signals.
+     * Calculates a weight matrix which is based on surfaced constrained distances.
+     */
+    void calculateSurfaceData();
 
     //=========================================================================================================
 
@@ -261,18 +296,19 @@ private:
 
     QList<Eigen::VectorXd>                  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
-    QSharedPointer<SparseMatrix<double> >   m_weightMatrix;                      /**< Weight matrix that holds all coefficients for a signal interpolation */
-
     bool                                    m_bIsRunning;                       /**< Flag if this thread is running. */
     bool                                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    int                                     m_numSensors;                       /**< Number of sensors that this worker does expect when receiving rt data. */
+    int                                     m_iNumSensors;                       /**< Number of sensors that this worker does expect when receiving rt data. */
     int                                     m_iAverageSamples;                  /**< Number of average to compute. */
     int                                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
-
+    
     VisualizationInfo                       m_lVisualizationInfo;               /**< Container for the visualization info. */
+
+    InterpolationData                       m_lInterpolationData;               /**< Container for the interpolation data. */
+    
 
 signals:
     //=========================================================================================================

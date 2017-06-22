@@ -164,11 +164,14 @@ public:
     /**
     * Adds interpolated activation data to this item.
     *
-    * @param[in] tSourceEstimate    The SensorData.
+    * @param[in] tSensorData        The SensorData.
+    * @param[in] bemSurface         Holds all Bem data used in this item.
+    * @param[in] fiffEvoked         Holds all information needed about the sensors.
+    * @param[in] sSensorType        Name of the sensor type EEG or MEG.
     *
     * @return                       Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
-    SensorDataTreeItem* addData(const MatrixXd& tSensorData, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
+    SensorDataTreeItem* addData(const MatrixXd& tSensorData, const MNELIB::MNEBemSurface &bemSurface, const FIFFLIB::FiffEvoked &fiffEvoked, const QString sSensorType);
 
     //=========================================================================================================
     /**

@@ -183,7 +183,7 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBemSurface &inSurface, const FiffEvoked &evoked, const QString sensorType)
+void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBemSurface &bemSurface, const FiffEvoked &fiffEvoked, const QString &sSensorType)
 {
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
@@ -196,9 +196,9 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBem
 
     // map passed sensor type string to fiff constant
     fiff_int_t sensorTypeFiffConstant;
-    if (sensorType.toStdString() == std::string("MEG")) {
+    if (sSensorType.toStdString() == std::string("MEG")) {
         sensorTypeFiffConstant = FIFFV_MEG_CH;
-    } else if (sensorType.toStdString() == std::string("EEG")) {
+    } else if (sSensorType.toStdString() == std::string("EEG")) {
         sensorTypeFiffConstant = FIFFV_EEG_CH;
     } else {
         qDebug() << "SensorDataTreeItem::init - unknown sensor type. Returning ...";
@@ -206,19 +206,19 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor, const MNEBem
     }
 
     //fill QVector with the right sensor positions
-    QVector<Vector3f> sensorPos;
+    QVector<Vector3f> vecSensorPos;
     m_iUsedSensors.clear();
     int counter = 0;
-    for( const FiffChInfo &info : evoked.info.chs) {
+    for( const FiffChInfo &info : fiffEvoked.info.chs) {
         if(info.kind == sensorTypeFiffConstant) {
-            sensorPos.push_back(info.chpos.r0);
+            vecSensorPos.push_back(info.chpos.r0);
             //save the number of the sensor
             m_iUsedSensors.push_back(counter);
             counter++;
         }
     }
 
-    m_pSensorRtDataWorker->calculateSurfaceData(inSurface, sensorPos, sensorType);
+    m_pSensorRtDataWorker->calculateSurfaceData(bemSurface, vecSensorPos, fiffEvoked, sensorTypeFiffConstant);
     m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
     m_bIsDataInit = true;
@@ -366,6 +366,20 @@ void SensorDataTreeItem::setNormalization(const QVector3D& vecThresholds)
             data.setValue(sTemp);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
+    }
+}
+
+void SensorDataTreeItem::setCancelDistance(const double dCancelDist)
+{
+    if(m_pSensorRtDataWorker){
+        m_pSensorRtDataWorker->setCancelDistance(dCancelDist);
+    }
+}
+
+void SensorDataTreeItem::setInterpolationFunction(double (*interpolationFunction)(double))
+{
+    if(m_pSensorRtDataWorker){
+        m_pSensorRtDataWorker->setInterpolationFunction(interpolationFunction);
     }
 }
 
