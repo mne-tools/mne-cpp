@@ -85,233 +85,234 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &inSurface, const QSharedPointer<QVector<qint32>> vertSubset, double cancelDist)
+QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &tBemSurface, const QSharedPointer<QVector<qint32>> pVecVertSubset, double dCancelDist)
 {
     // create matrix and check for empty subset:
-    size_t cols = vertSubset->size();
-    if(vertSubset->empty()) {
+    qint32 iCols = pVecVertSubset->size();
+    if(pVecVertSubset->empty()) {
         // caller passed an empty subset, need to fill in all vertex IDs
         qDebug() << "[WARNING] SCDC received empty subset, calculating full distance table, make sure you have enough memory !";
-        vertSubset->reserve(inSurface.rr.rows());
-        for(qint32 id = 0; id < inSurface.rr.rows(); ++id) {
-            vertSubset->push_back(id);
+        pVecVertSubset->reserve(tBemSurface.rr.rows());
+        for(qint32 id = 0; id < tBemSurface.rr.rows(); ++id) {
+            pVecVertSubset->push_back(id);
         }
-        cols = inSurface.rr.rows();
+        iCols = tBemSurface.rr.rows();
     }
     // convention: first dimension in distance table is "from", second dimension "to"
-    QSharedPointer<MatrixXd> ptr = QSharedPointer<MatrixXd>::create(inSurface.rr.rows(), cols);
+    QSharedPointer<MatrixXd> pReturnMat = QSharedPointer<MatrixXd>::create(tBemSurface.rr.rows(), iCols);
 
     // distribute calculation on cores
-    int cores = QThread::idealThreadCount();
-    if (cores <= 0) {
+    int iCores = QThread::idealThreadCount();
+    if (iCores <= 0) {
         // assume that we have at least two available cores
-        cores = 2;
+        iCores = 2;
     }
     // start threads with their respective parts of the final subset
-    qint32 subArraySize = ceil(vertSubset->size() / cores);
-    QVector<QFuture<void> > threads(cores - 1);
-    qint32 begin = 0;
-    qint32 end = subArraySize;
-    for (int i = 0; i < threads.size(); ++i) {
-        threads[i] = QtConcurrent::run(std::bind(iterativeDijkstra, ptr, std::cref(inSurface), std::cref(vertSubset), begin, end, cancelDist));
-        begin += subArraySize;
-        end += subArraySize;
+    qint32 iSubArraySize = ceil(pVecVertSubset->size() / iCores);
+    QVector<QFuture<void> > vecThreads(iCores - 1);
+    qint32 iBegin = 0;
+    qint32 iEnd = iSubArraySize;
+    for (int i = 0; i < vecThreads.size(); ++i) {
+        vecThreads[i] = QtConcurrent::run(std::bind(iterativeDijkstra, pReturnMat, std::cref(tBemSurface), std::cref(pVecVertSubset), iBegin, iEnd, dCancelDist));
+        iBegin += iSubArraySize;
+        iEnd += iSubArraySize;
     }
     // use main thread to calculate last part of the final subset
-    iterativeDijkstra(ptr, inSurface, vertSubset, begin, vertSubset->size(), cancelDist);
+    iterativeDijkstra(pReturnMat, tBemSurface, pVecVertSubset, iBegin, pVecVertSubset->size(), dCancelDist);
 
     // wait for all other threads to finish
-    bool finished = false;
-    while (finished == false) {
-        finished = true;
-        for (const QFuture<void>& f : threads) {
+    bool bFinished = false;
+    while (bFinished == false) {
+        bFinished = true;
+        for (const QFuture<void>& f : vecThreads) {
             if (f.isFinished() == false) {
-                finished = false;
+                bFinished = false;
             }
         }
         QThread::msleep(2);
     }
 
-    return ptr;
+    return pReturnMat;
 }
 //*************************************************************************************************************
 
-QSharedPointer<QVector<qint32> > GeometryInfo::projectSensors(const MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPositions)
+QSharedPointer<QVector<qint32> > GeometryInfo::projectSensors(const MNEBemSurface &tBemSurface, const QVector<Vector3f> &vecSensorPositions)
 {
-    QSharedPointer<QVector<qint32>> outputArray = QSharedPointer<QVector<qint32>>::create();
+    QSharedPointer<QVector<qint32>> pOutputArray = QSharedPointer<QVector<qint32>>::create();
 
-    qint32 cores = QThread::idealThreadCount();
-    if (cores <= 0)
+    qint32 iCores = QThread::idealThreadCount();
+    if (iCores <= 0)
     {
         // assume that we have at least two available cores
-        cores = 2;
+        iCores = 2;
     }
 
-    const qint32 subArraySize = ceil(sensorPositions.size() / cores);
+    const qint32 iSubArraySize = ceil(vecSensorPositions.size() / iCores);
 
     //small input size no threads needed
-    // @todo best method ?? 16 thread prozessor ?
-    if(subArraySize <= 1)
+    if(iSubArraySize <= 1)
     {
-        *outputArray = nearestNeighbor(inSurface, sensorPositions.constBegin(),sensorPositions.constEnd());
-        return outputArray;
+        pOutputArray->append(nearestNeighbor(tBemSurface, vecSensorPositions.constBegin(),vecSensorPositions.constEnd()));
+        return pOutputArray;
     }
     // split input array + thread start
-    QVector<QFuture<QVector<qint32>>> threads(cores - 1);
-    qint32 beginOffset = subArraySize;
-    qint32 endOffset = beginOffset + subArraySize;
-    for(qint32 i = 0; i < threads.size(); ++i)
+    QVector<QFuture<QVector<qint32>>> vecThreads(iCores - 1);
+    qint32 iBeginOffset = iSubArraySize;
+    qint32 iEndOffset = iBeginOffset + iSubArraySize;
+    for(qint32 i = 0; i < vecThreads.size(); ++i)
     {
         //last round
-        if(i == threads.size() -1)
+        if(i == vecThreads.size() -1)
         {
-            threads[i] = QtConcurrent::run(nearestNeighbor, inSurface, sensorPositions.constBegin() + beginOffset, sensorPositions.constEnd());
+            vecThreads[i] = QtConcurrent::run(nearestNeighbor, tBemSurface, vecSensorPositions.constBegin() + iBeginOffset, vecSensorPositions.constEnd());
             break;
         }
         else
         {
-            threads[i] = QtConcurrent::run(nearestNeighbor, inSurface, sensorPositions.constBegin() + beginOffset, sensorPositions.constBegin() + endOffset);
-            beginOffset = endOffset;
-            endOffset += subArraySize;
+            vecThreads[i] = QtConcurrent::run(nearestNeighbor, tBemSurface, vecSensorPositions.constBegin() + iBeginOffset, vecSensorPositions.constBegin() + iEndOffset);
+            iBeginOffset = iEndOffset;
+            iEndOffset += iSubArraySize;
         }
     }
     //calc while waiting for other threads
-    outputArray->append(nearestNeighbor(inSurface, sensorPositions.constBegin(), sensorPositions.constBegin() + subArraySize));
+    pOutputArray->append(nearestNeighbor(tBemSurface, vecSensorPositions.constBegin(), vecSensorPositions.constBegin() + iSubArraySize));
 
     //wait for threads to finish
-    bool finished = false;
-        while (!finished) {
-            finished = true;
-            for (const auto &f : threads) {
+    bool iFinished = false;
+        while (!iFinished) {
+            iFinished = true;
+            for (const auto &f : vecThreads) {
                 if (f.isFinished() == false) {
-                    finished = false;
+                    iFinished = false;
                 }
             }
             // @todo optimal value for this ?
             QThread::msleep(2);
     }
     //move sub arrays back into output
-    for(qint32 i = 0; i < threads.size(); ++i)
+    for(qint32 i = 0; i < vecThreads.size(); ++i)
     {
-        outputArray->append(threads[i].result());
+        pOutputArray->append(std::move(vecThreads[i].result()));
     }
 
-    return outputArray;
+    return pOutputArray;
 }
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &inSurface,  QVector<Vector3f>::const_iterator sensorBegin, QVector<Vector3f>::const_iterator sensorEnd)
+QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &tBemSurface,  QVector<Vector3f>::const_iterator itSensorBegin, QVector<Vector3f>::const_iterator itSensorEnd)
 {
     ///lin search sensor positions
-    QVector<qint32> mappedSensors;
-    mappedSensors.reserve(std::distance(sensorBegin, sensorEnd));
+    QVector<qint32> vecMappedSensors;
+    vecMappedSensors.reserve(std::distance(itSensorBegin, itSensorEnd));
 
-    for(auto sensor = sensorBegin; sensor != sensorEnd; ++sensor)
+    for(auto sensor = itSensorBegin; sensor != itSensorEnd; ++sensor)
     {
-        qint32 championId;
-        double champDist = std::numeric_limits<double>::max();
-        for(qint32 i = 0; i < inSurface.rr.rows(); ++i)
+        qint32 iChampionId;
+        double iChampDist = std::numeric_limits<double>::max();
+        for(qint32 i = 0; i < tBemSurface.rr.rows(); ++i)
         {
-            double dist = sqrt(squared(inSurface.rr(i, 0) - (*sensor)[0])  // x-cord
-                    + squared(inSurface.rr(i, 1) - (*sensor)[1])    // y-cord
-                    + squared(inSurface.rr(i, 2) - (*sensor)[2]));  // z-cord
-            if(dist < champDist)
+            //calculate 3d euclidian distance
+            double dDist = sqrt(squared(tBemSurface.rr(i, 0) - (*sensor)[0])  // x-cord
+                    + squared(tBemSurface.rr(i, 1) - (*sensor)[1])    // y-cord
+                    + squared(tBemSurface.rr(i, 2) - (*sensor)[2]));  // z-cord
+            if(dDist < iChampDist)
             {
-                championId = i;
-                champDist = dist;
+                iChampionId = i;
+                iChampDist = dDist;
             }
         }
-        mappedSensors.push_back(championId);
+        vecMappedSensors.push_back(iChampionId);
     }
-    return mappedSensors;
+    return vecMappedSensors;
 }
 //*************************************************************************************************************
 
-void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> ptr, const MNEBemSurface &inSurface, const QSharedPointer<QVector<qint32>> vertSubSet, qint32 begin, qint32 end,  double cancelDist) {
+void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> pOutputDistMatrix, const MNEBemSurface &tBemSurface,
+                                     const QSharedPointer<QVector<qint32>> vecVertSubset, qint32 iBegin, qint32 iEnd,  double dCancelDistance) {
     // initialization
-    const QVector<QVector<int> > &adjacency = inSurface.neighbor_vert;
-    qint32 n = adjacency.size();
-    QVector<double> minDists(n);
+    const QVector<QVector<int> > &vecAdjacency = tBemSurface.neighbor_vert;
+    qint32 n = vecAdjacency.size();
+    QVector<double> vecMinDists(n);
     std::set< std::pair< double, qint32> > vertexQ;
-    double INF = DOUBLE_INFINITY;
+    const double INF = DOUBLE_INFINITY;
 
     // outer loop, iterated for each vertex of 'vertSubset' between 'begin' and 'end'
-    for (qint32 i = begin; i < end; ++i) {
+    for (qint32 i = iBegin; i < iEnd; ++i) {
         // init phase of dijkstra: set source node for current iteration and reset data fields
-        qint32 root = vertSubSet->at(i);
+        qint32 iRoot = vecVertSubset->at(i);
         vertexQ.clear();
-        minDists.fill(INF);
-        minDists[root] = 0.0;
-        vertexQ.insert(std::make_pair(minDists[root], root));
+        vecMinDists.fill(INF);
+        vecMinDists[iRoot] = 0.0;
+        vertexQ.insert(std::make_pair(vecMinDists[iRoot], iRoot));
 
         // dijkstra main loop
         while (vertexQ.empty() == false) {
             // remove next vertex from queue
-            const double dist = vertexQ.begin()->first;
+            const double dDist = vertexQ.begin()->first;
             const qint32 u = vertexQ.begin()->second;
             vertexQ.erase(vertexQ.begin());
             // check if we are still below cancel distance
-            if (dist <= cancelDist) {
+            if (dDist <= dCancelDistance) {
                 // visit each neighbour of u
-                const QVector<int>& neighbours = adjacency[u];
-                for (qint32 ne = 0; ne < neighbours.length(); ++ne) {
-                    qint32 v = neighbours[ne];
+                const QVector<int>& vecNeighbours = vecAdjacency[u];
+                for (qint32 ne = 0; ne < vecNeighbours.length(); ++ne) {
+                    qint32 v = vecNeighbours[ne];
                     // distance from source (i.e. root) to v, using u as its predecessor
                     // calculate inline since designated function was magnitudes slower (even when declared as inline)
-                    const double distX = inSurface.rr(u, 0) - inSurface.rr(v, 0);
-                    const double distY = inSurface.rr(u, 1) - inSurface.rr(v, 1);
-                    const double distZ = inSurface.rr(u, 2) - inSurface.rr(v, 2);
-                    const double distWithU = dist + sqrt(distX * distX + distY * distY + distZ * distZ);
+                    const double dDistX = tBemSurface.rr(u, 0) - tBemSurface.rr(v, 0);
+                    const double dDistY = tBemSurface.rr(u, 1) - tBemSurface.rr(v, 1);
+                    const double dDistZ = tBemSurface.rr(u, 2) - tBemSurface.rr(v, 2);
+                    const double dDistWithU = dDist + sqrt(dDistX * dDistX + dDistY * dDistY + dDistZ * dDistZ);
 
-                    if (distWithU < minDists[v]) {
+                    if (dDistWithU < vecMinDists[v]) {
                         // this is a combination of insert and decreaseKey
-                        vertexQ.erase(std::make_pair(minDists[v], v));
-                        minDists[v] = distWithU;
-                        vertexQ.insert(std::make_pair(minDists[v], v));
+                        vertexQ.erase(std::make_pair(vecMinDists[v], v));
+                        vecMinDists[v] = dDistWithU;
+                        vertexQ.insert(std::make_pair(vecMinDists[v], v));
                     }
                 }
             }
         }
         // save results for current root in matrix
-        for (qint32 m = 0; m < minDists.size(); ++m) {
-            (*ptr)(m , i) = minDists[m];
+        for (qint32 m = 0; m < vecMinDists.size(); ++m) {
+            (*pOutputDistMatrix)(m , i) = vecMinDists[m];
         }
     }
 }
 
 //*************************************************************************************************************
 
-void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> ptr, std::string filename) {
-    qDebug() << "Start writing matrix to file: " << filename.c_str();
-    std::ofstream file;
-    file.open(filename.c_str());
-    file << *ptr;
+void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> pMatrix, std::string sFilename) {
+    qDebug() << "Start writing matrix to file: " << sFilename.c_str();
+    std::ofstream oFileStream;
+    oFileStream.open(sFilename.c_str());
+    oFileStream << *pMatrix;
     qDebug() << "Finished writing !";
 }
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> distanceTable, const FIFFLIB::FiffEvoked& evoked, qint32 sensorType){
+QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> pDistanceTable, const FIFFLIB::FiffEvoked& fiffEvoked, qint32 iSensorType){
     // use pointer to avoid copying of FiffChInfo objects
-    QVector<qint32> badColumns;
-    QVector<const FiffChInfo*> sensors;
-    for(const FiffChInfo& s : evoked.info.chs){
-        if(s.kind == sensorType){
-           sensors.push_back(&s);
+    QVector<qint32> vecBadColumns;
+    QVector<const FiffChInfo*> vecSensors;
+    for(const FiffChInfo& s : fiffEvoked.info.chs){
+        if(s.kind == iSensorType){
+           vecSensors.push_back(&s);
         }
     }
 
     // inefficient: going through all bad sensors, i.e. also the ones which are of different type than the passed one
-    for(const QString& b : evoked.info.bads){
-        for(int col = 0; col < sensors.size(); ++col){
-            if(sensors[col]->ch_name == b){
+    for(const QString& b : fiffEvoked.info.bads){
+        for(int col = 0; col < vecSensors.size(); ++col){
+            if(vecSensors[col]->ch_name == b){
                 // found index of our bad channel, set whole column to infinity
-                badColumns.push_back(col);
-                for(int row = 0; row < distanceTable->rows(); ++row){
-                    (*distanceTable)(row, col) = DOUBLE_INFINITY;
+                vecBadColumns.push_back(col);
+                for(int row = 0; row < pDistanceTable->rows(); ++row){
+                    (*pDistanceTable)(row, col) = DOUBLE_INFINITY;
                 }
                 break;
             }
         }
     }
-    return badColumns;
+    return vecBadColumns;
 }
