@@ -104,10 +104,14 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
 , m_iCurrentSample(0)
 , m_iMSecIntervall(50)
 , m_bSurfaceDataIsInit(false)
-, m_numSensors(0)
+, m_iNumSensors(0)
 {
     m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
+    //10cm cancel distance
+    m_lInterpolationData = InterpolationData();
+    m_lInterpolationData.dCancelDistance = 0.1;
+    m_lInterpolationData.fInterpolationFunction = Interpolation::linear;
 }
 
 
@@ -145,29 +149,42 @@ void RtSensorDataWorker::clear()
     m_lData.clear();
 }
 
+//*************************************************************************************************************
+
+void RtSensorDataWorker::calculateSurfaceData()
+{
+    //SCDC with cancel distance 
+    m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface, m_lInterpolationData.pVecMappedSubset, m_lInterpolationData.dCancelDistance);
+
+    //filtering of bad channels out of the distance table
+    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,m_lInterpolationData.fiffEvoked,m_lInterpolationData.iSensorType);
+
+    // linear weight matrix
+    m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset, m_lInterpolationData.pDistanceMatrix,
+                                                                            m_lInterpolationData.fInterpolationFunction, m_lInterpolationData.dCancelDistance);
+}
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &inSurface, const QVector<Vector3f> &sensorPos, const QString sensorType)
+void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface, const QVector<Vector3f> &vecSensorPos, const FIFFLIB::FiffEvoked &fiffEvoked, int iSensorType)
 {
     QMutexLocker locker(&m_qMutex);
 
-    if(inSurface.rr.rows() == 0) {
+    if(bemSurface.rr.rows() == 0) {
         qDebug() << "RtSensorDataWorker::calculateSurfaceData - Surface data is empty. Returning ...";
         return;
     }
 
-    m_numSensors = sensorPos.size();
-
-    //sensor projecting
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(inSurface, sensorPos);
-
-    //SCDC with cancel distance 0.03m
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(inSurface, mappedSubSet, 0.03);
-    //@todo missing filtering of bad channels, add after merge
-
-    // linear weight matrix
-    m_weightMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear);
+    //set members
+    m_iNumSensors = vecSensorPos.size();
+    m_lInterpolationData.bemSurface = bemSurface;
+    m_lInterpolationData.fiffEvoked = fiffEvoked;
+    m_lInterpolationData.iSensorType = iSensorType;
+    
+    //sensor projecting: One time operation because surface and sensors can not change 
+    m_lInterpolationData.pVecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.bemSurface, vecSensorPos);
+    
+    calculateSurfaceData();
 
     m_bSurfaceDataIsInit = true;
 }
@@ -231,6 +248,24 @@ void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
     QMutexLocker locker(&m_qMutex);
     m_lVisualizationInfo.dThresholdX = vecThresholds.x();
     m_lVisualizationInfo.dThresholdZ = vecThresholds.z();
+}
+
+void RtSensorDataWorker::setCancelDistance(const double dCancelDist)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_lInterpolationData.dCancelDistance = dCancelDist;
+
+    //recalulate because parameters changed
+    calculateSurfaceData();
+}
+
+void RtSensorDataWorker::setInterpolationFunction(double (*interpolationFunction)(double))
+{
+    QMutexLocker locker(&m_qMutex);
+    m_lInterpolationData.fInterpolationFunction = interpolationFunction;
+
+    //recalulate because parameters changed
+    calculateSurfaceData();
 }
 
 
@@ -344,11 +379,11 @@ void RtSensorDataWorker::run()
 
 //*************************************************************************************************************
 
-MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sensorValues)
+MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& dSensorValues)
 {
     // NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-    if(sensorValues.rows() != m_numSensors) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << sensorValues.rows() << ") do not match with previously set number of vertices (" << m_numSensors << "). Returning...";
+    if(dSensorValues.rows() != m_iNumSensors) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << dSensorValues.rows() << ") do not match with previously set number of vertices (" << m_iNumSensors << "). Returning...";
         MatrixX3f color = m_lVisualizationInfo.matOriginalVertColor;
         return color;
     }
@@ -360,10 +395,10 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
     }
 
     // interpolate sensor signals
-    if(! m_weightMatrix) {
+    if(!m_lInterpolationData.pWeightMatrix) {
         qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - weight matrix is no initialized. Returning ...";
     }
-    VectorXd intrpltdVals = (* m_weightMatrix) * sensorValues;
+    VectorXf intrpltdVals = *Interpolation::interpolateSignal(m_lInterpolationData.pWeightMatrix, dSensorValues);
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
@@ -381,7 +416,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& sen
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v))
+void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& data, MatrixX3f& matFinalVertColor, double dThresholdX, double dThreholdZ, QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
     //      Otherwise we would have to check which color map to take for each vertex.
@@ -391,27 +426,27 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXd& data, Matr
         return;
     }
 
-    double dSample;
+    float fSample;
     QRgb qRgb;
     const double dTresholdDiff = dThreholdZ - dThresholdX;
 
     for(int r = 0; r < data.rows(); ++r) {
-        dSample = data(r);
+        fSample = data(r);
 
-        if(dSample >= dThresholdX) {
+        if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
-            if(dSample >= dThreholdZ) {
-                dSample = 1.0;
+            if(fSample >= dThreholdZ) {
+                fSample = 1.0f;
             }
             else {
-                if(dSample != 0.0 && dTresholdDiff != 0.0 ) {
-                    dSample = (dSample - dThresholdX) / (dTresholdDiff);
+                if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
+                    fSample = (fSample - dThresholdX) / (dTresholdDiff);
                 } else {
-                    dSample = 0.0;
+                    fSample = 0.0f;
                 }
             }
 
-            qRgb = functionHandlerColorMap(dSample);
+            qRgb = functionHandlerColorMap(fSample);
 
             matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
             matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;

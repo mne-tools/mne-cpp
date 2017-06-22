@@ -116,11 +116,11 @@ public:
      * @brief init  Initializes the sensor data item with neccessary information for visualization computations.
      *              Constructs and initalizes the worker for this item.
      * @param matSurfaceVertColor The color for the vertices which the streamed data is later plotted on
-     * @param inSurface MNEBemSurface that holds the mesh that should be visualized
-     * @param evoked FiffEvoked that holds the sensors information
-     * @param sensorType The sensor type that is later used for live interpolation
+     * @param bemSurface MNEBemSurface that holds the mesh that should be visualized
+     * @param fiifEvoked FiffEvoked that holds the sensors information
+     * @param sSensorType The sensor type that is later used for live interpolation
      */
-    void init(const MatrixX3f &matSurfaceVertColor, const MNELIB::MNEBemSurface &inSurface, const FIFFLIB::FiffEvoked &evoked, const QString sensorType);
+    void init(const MatrixX3f &matSurfaceVertColor, const MNELIB::MNEBemSurface &bemSurface, const FIFFLIB::FiffEvoked &fiffEvoked, const QString &sSensorType);
 
     //=========================================================================================================
     /**
@@ -183,6 +183,23 @@ public:
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
     void setNormalization(const QVector3D& vecThresholds);
+    
+    //=========================================================================================================
+    /**
+     * This function sets the cancel distance used in distance calculations for the interpolation.
+     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     * 
+     * @param[in] dCancelDist   the new cancel distance value in meters. 
+     */
+    void setCancelDistance(const double dCancelDist);
+    
+    //=========================================================================================================
+    /**
+     * This function sets the function object that is used in the interpolation process.
+     * 
+     * @param interpolationFunction     Function that computes interpolation coefficients using the distance values.
+     */
+    void setInterpolationFunction(double (*interpolationFunction) (double));
 
     //=========================================================================================================
     /**
@@ -255,7 +272,8 @@ protected:
     */
     void onNumberAveragesChanged(const QVariant& iNumAvr);
 
-    bool                                m_bIsDataInit;                      /**< The init flag. */
+
+    bool                             m_bIsDataInit;                      /**< The init flag. */
 
     QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
     QVector<int>                     m_iUsedSensors;

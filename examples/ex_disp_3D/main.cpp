@@ -57,6 +57,7 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <geometryInfo/geometryinfo.h>
+#include <interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,6 +80,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace GEOMETRYINFO;
+using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************
@@ -317,6 +319,9 @@ int main(int argc, char *argv[])
     //        pMegSensorTreeItem->setStreamingActive(false);
     //        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 0.5, 1.0));
     //        pMegSensorTreeItem->setColortable("Hot");
+    //        pMegSensorTreeItem->setCancelDistance(0.04);
+    //        pMegSensorTreeItem->setInterpolationFunction(Interpolation::linear);
+    //
     //    }
 
     //add sensor item for EEG data
@@ -325,8 +330,10 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
-        pEegSensorTreeItem->setNormalization(QVector3D(0.0, -5.54059e-13, 8.22682e-13));//-8.09203e-13
+        pEegSensorTreeItem->setNormalization(QVector3D(-8.09203e-13, -5.54059e-13, 8.22682e-13));
         pEegSensorTreeItem->setColortable("Hot");
+        pEegSensorTreeItem->setCancelDistance(0.1);
+        pEegSensorTreeItem->setInterpolationFunction(Interpolation::linear);
     }
 
     if(bAddRtSourceLoc) {
