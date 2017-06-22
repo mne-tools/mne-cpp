@@ -170,12 +170,19 @@ public:
      * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
      * In the end it calls calculateSurfaceData().
      * 
-     * @param[in] bemSurface         The MNEBemSurface that holds the mesh information
-     * @param[in] vecSensorPos       The QVector that holds the sensor positons in x, y and z coordinates.
-     * @param[in] fiffEvoked         Holds all information about the sensors.
-     * @param[in] iSensorType        Type of the sensor FIFFV_EEG_CH or FIFFV_MEG_CH.
+     * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
+     * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
+     * @param[in] fiffEvoked                Holds all information about the sensors.
+     * @param[in] iSensorType               Type of the sensor FIFFV_EEG_CH or FIFFV_MEG_CH.
+     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
+     * @param[in] interpolationFunction     Function that computes interpolation coefficients using the distance values
      */
-    void calculateSurfaceData(const MNELIB::MNEBemSurface &bemSurface, const QVector<Vector3f> &vecSensorPos, const FIFFLIB::FiffEvoked &fiffEvoked, int iSensorType);
+    void calculateSurfaceData(const MNELIB::MNEBemSurface &bemSurface,
+                              const QVector<Vector3f> &vecSensorPos,
+                              const FIFFLIB::FiffEvoked &fiffEvoked,
+                              int iSensorType,
+                              const double dCancelDist,
+                              double (*interpolationFunction)(double));
    
     //=========================================================================================================
     /**
@@ -222,6 +229,7 @@ public:
     /**
      * This function sets the cancel distance used in distance calculations for the interpolation.
      * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     * Warning: Using this function can take some seconds because recalculation are required.
      * 
      * @param[in] dCancelDist   the new cancel distance value in meters. 
      */
@@ -230,8 +238,9 @@ public:
     //=========================================================================================================
     /**
      * This function sets the function object that is used in the interpolation process.
+     * Warning: Using this function can take some seconds because recalculation are required.
      * 
-     * @param interpolationFunction     Function that computes interpolation coefficients using the distance values.
+     * @param[i] interpolationFunction     Function that computes interpolation coefficients using the distance values.
      */
     void setInterpolationFunction(double (*interpolationFunction) (double));
 

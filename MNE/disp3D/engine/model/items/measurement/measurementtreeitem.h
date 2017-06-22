@@ -164,14 +164,21 @@ public:
     /**
     * Adds interpolated activation data to this item.
     *
-    * @param[in] tSensorData        The SensorData.
-    * @param[in] bemSurface         Holds all Bem data used in this item.
-    * @param[in] fiffEvoked         Holds all information needed about the sensors.
-    * @param[in] sSensorType        Name of the sensor type EEG or MEG.
+    * @param[in] tSensorData            The SensorData.
+    * @param[in] bemSurface             Holds all Bem data used in this item.
+    * @param[in] fiffEvoked             Holds all information needed about the sensors.
+    * @param[in] sSensorType            Name of the sensor type EEG or MEG.
+    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
+    * @param[in] interpolationFunction  Function that computes interpolation coefficients using the distance values
     *
-    * @return                       Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+    * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
-    SensorDataTreeItem* addData(const MatrixXd& tSensorData, const MNELIB::MNEBemSurface &bemSurface, const FIFFLIB::FiffEvoked &fiffEvoked, const QString sSensorType);
+    SensorDataTreeItem* addData(const MatrixXd& tSensorData,
+                                const MNELIB::MNEBemSurface &bemSurface,
+                                const FIFFLIB::FiffEvoked &fiffEvoked,
+                                const QString sSensorType,
+                                const double dCancelDist,
+                                double (*interpolationFunction)(double));
 
     //=========================================================================================================
     /**

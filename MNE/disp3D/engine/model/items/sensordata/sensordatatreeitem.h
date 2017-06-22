@@ -111,16 +111,25 @@ public:
     * Destructor, stops and deletes rtsensordata worker
     */
     ~SensorDataTreeItem();
+
     //=========================================================================================================
     /**
-     * @brief init  Initializes the sensor data item with neccessary information for visualization computations.
-     *              Constructs and initalizes the worker for this item.
-     * @param matSurfaceVertColor The color for the vertices which the streamed data is later plotted on
-     * @param bemSurface MNEBemSurface that holds the mesh that should be visualized
-     * @param fiifEvoked FiffEvoked that holds the sensors information
-     * @param sSensorType The sensor type that is later used for live interpolation
+     * Initializes the sensor data item with neccessary information for visualization computations.
+     * Constructs and initalizes the worker for this item.
+     *
+     * @param[in] matSurfaceVertColor       The color for the vertices which the streamed data is later plotted on
+     * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized
+     * @param[in] fiifEvoked                FiffEvoked that holds the sensors information
+     * @param[in] sSensorType               The sensor type that is later used for live interpolation
+     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
+     * @param[in] interpolationFunction     Function that computes interpolation coefficients using the distance values
      */
-    void init(const MatrixX3f &matSurfaceVertColor, const MNELIB::MNEBemSurface &bemSurface, const FIFFLIB::FiffEvoked &fiffEvoked, const QString &sSensorType);
+    void init(const MatrixX3f& matSurfaceVertColor,
+              const MNELIB::MNEBemSurface& bemSurface,
+              const FIFFLIB::FiffEvoked& fiffEvoked,
+              const QString& sSensorType,
+              const double dCancelDist,
+              double (*interpolationFunction)(double));
 
     //=========================================================================================================
     /**

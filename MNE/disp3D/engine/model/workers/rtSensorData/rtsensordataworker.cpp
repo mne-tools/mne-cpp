@@ -166,7 +166,11 @@ void RtSensorDataWorker::calculateSurfaceData()
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface, const QVector<Vector3f> &vecSensorPos, const FIFFLIB::FiffEvoked &fiffEvoked, int iSensorType)
+void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface,
+                                              const QVector<Vector3f> &vecSensorPos,
+                                              const FIFFLIB::FiffEvoked &fiffEvoked,
+                                              int iSensorType, const double dCancelDist,
+                                              double (*interpolationFunction)(double))
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -180,6 +184,8 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface, c
     m_lInterpolationData.bemSurface = bemSurface;
     m_lInterpolationData.fiffEvoked = fiffEvoked;
     m_lInterpolationData.iSensorType = iSensorType;
+    m_lInterpolationData.dCancelDistance = dCancelDist;
+    m_lInterpolationData.fInterpolationFunction = interpolationFunction;
     
     //sensor projecting: One time operation because surface and sensors can not change 
     m_lInterpolationData.pVecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.bemSurface, vecSensorPos);
