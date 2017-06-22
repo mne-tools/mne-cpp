@@ -343,7 +343,18 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setSuffix("m");
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::CancelDistance).toDouble());
             return pDoubleSpinBox;
-    }
+        }
+
+        case MetaTreeItemTypes::InterpolationFunction: {
+            QComboBox* pComboBox = new QComboBox(parent);
+            connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pComboBox->addItem("Linear");
+            pComboBox->addItem("Square");
+            pComboBox->addItem("Qubic");
+            pComboBox->addItem("Gaussian");
+            return pComboBox;
+        }
 
         default: // do nothing;
             break;
@@ -779,6 +790,16 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             model->setData(index, data, MetaTreeItemRoles::CancelDistance);
             model->setData(index, data, Qt::DisplayRole);
             break;
+        }
+
+        case MetaTreeItemTypes::InterpolationFunction: {
+            QComboBox* pColorMapType = static_cast<QComboBox*>(editor);
+            QVariant data;
+            data.setValue(pColorMapType->currentText());
+
+            model->setData(index, data, MetaTreeItemRoles::InterpolationFunction);
+            model->setData(index, data, Qt::DisplayRole);
+            return;
         }
         
 

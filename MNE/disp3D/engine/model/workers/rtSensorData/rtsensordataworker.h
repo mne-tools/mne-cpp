@@ -177,13 +177,11 @@ public:
      * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
      * @param[in] fiffEvoked                Holds all information about the sensors.
      * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
-     * @param[in] interpolationFunction     Function that computes interpolation coefficients using the distance values
      */
     void calculateSurfaceData(const MNELIB::MNEBemSurface &bemSurface,
                               const QVector<Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffEvoked &fiffEvoked,
-                              int iSensorType,
-                              double (*interpolationFunction)(double));
+                              int iSensorType);
    
     //=========================================================================================================
     /**
@@ -238,12 +236,12 @@ public:
     
     //=========================================================================================================
     /**
-     * This function sets the function pointer that is used in the interpolation process.
+     * This function sets the function that is used in the interpolation process.
      * Warning: Using this function can take some seconds because recalculation are required.
      * 
-     * @param[in] interpolationFunction     Function that computes interpolation coefficients using the distance values.
+     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
      */
-    void setInterpolationFunction(double (*interpolationFunction) (double));
+    void setInterpolationFunction(const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**

@@ -271,12 +271,12 @@ int main(int argc, char *argv[])
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0],
-                                                                              evoked, "MEG", 0.045, Interpolation::qubic)) {
+                                                                              evoked, "MEG", 0.05, "Qubic")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
         pMegSensorTreeItem->setStreamingActive(false);
-        pMegSensorTreeItem->setNormalization(QVector3D(-4.786611e-6, -5.54059e-13, 5.359454e6));
+        pMegSensorTreeItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
         pMegSensorTreeItem->setColortable("Hot Negative 2");
 
     }
@@ -284,12 +284,12 @@ int main(int argc, char *argv[])
     //add sensor item for EEG data
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment, evoked.data, t_Bem[0],
-                                                                             evoked, "EEG", 0.045, Interpolation::qubic)) {
+                                                                             evoked, "EEG", 0.05, "Qubic")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
-        pEegSensorTreeItem->setNormalization(QVector3D(-4.786611e-6, -5.54059e-13, 5.359454e6));
+        pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
         pEegSensorTreeItem->setColortable("Hot Negative 2");
 
     }

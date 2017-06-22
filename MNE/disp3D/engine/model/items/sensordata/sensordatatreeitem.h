@@ -122,14 +122,14 @@ public:
      * @param[in] fiffEvoked                FiffEvoked that holds the sensors information
      * @param[in] sSensorType               The sensor type that is later used for live interpolation
      * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
-     * @param[in] interpolationFunction     Function that computes interpolation coefficients using the distance values
+     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values
      */
     void init(const MatrixX3f& matSurfaceVertColor,
               const MNELIB::MNEBemSurface& bemSurface,
               const FIFFLIB::FiffEvoked& fiffEvoked,
               const QString& sSensorType,
               const double dCancelDist,
-              double (*interpolationFunction)(double));
+              const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -206,11 +206,11 @@ public:
     
     //=========================================================================================================
     /**
-     * This function sets the function object that is used in the interpolation process.
+     * This function sets the function that is used in the interpolation process.
      * 
-     * @param interpolationFunction         Function that computes interpolation coefficients using the distance values.
+     * @param sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
      */
-    void setInterpolationFunction(double (*interpolationFunction) (double));
+    void setInterpolationFunction(const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -290,6 +290,14 @@ protected:
     * @param[in] dCancelDist     The new cancel distance.
     */
     void onCancelDistanceChanged(const QVariant& dCancelDist);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the function of the interpolation changed.
+    *
+    * @param[in] sInterpolationFunction     The new function name.
+    */
+    void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
 
 
     bool                             m_bIsDataInit;                     /**< The init flag. */
