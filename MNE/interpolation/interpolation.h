@@ -168,6 +168,16 @@ public:
      * @return The function value of the negative parabel at d
      */
     static double square(const double d);
+    //=========================================================================================================
+
+    /**
+     * Calculates interpolation weights based on distance values
+     *
+     * @brief <i>square</i> Returns interpolation weight that corresponds to qubic hyperbel
+     * @param d Distance value
+     * @return The function value of the qubic hyperbel at d
+     */
+    static double qubic(const double d);
 
 protected:
 
