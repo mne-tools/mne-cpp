@@ -181,12 +181,12 @@ public:
     /**
      * Calculates interpolation weights based on distance values
      *
-     * @brief <i>square</i>                 Returns interpolation weight that corresponds to qubic hyperbel
+     * @brief <i>square</i>                 Returns interpolation weight that corresponds to cubic hyperbel
      * @param dIn                           Distance value
      *
-     * @return                              The function value of the qubic hyperbel at d
+     * @return                              The function value of the cubic hyperbel at d
      */
-    static double qubic(const double dIn);
+    static double cubic(const double dIn);
 
 protected:
 

@@ -169,7 +169,7 @@ public:
     * @param[in] fiffEvoked             Holds all information needed about the sensors.
     * @param[in] sSensorType            Name of the sensor type EEG or MEG.
     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
-    * @param[in] sInterpolationFunction  Function that computes interpolation coefficients using the distance values
+    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
     *
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
