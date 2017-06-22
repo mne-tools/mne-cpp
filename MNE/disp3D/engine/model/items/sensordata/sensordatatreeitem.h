@@ -202,7 +202,7 @@ public:
      * 
      * @param[in] dCancelDist               The new cancel distance value in meters.
      */
-    void setCancelDistance(double dCancelDist);
+    void setCancelDistance(const double dCancelDist);
     
     //=========================================================================================================
     /**
@@ -283,19 +283,11 @@ protected:
     */
     void onNumberAveragesChanged(const QVariant& iNumAvr);
 
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the cancel distance of the interpolation changed.
-    *
-    * @param[in] dCancelDist     The new cancel distance.
-    */
-    void onCancelDistanceChanged(const QVariant& dCancelDist);
-
 
     bool                             m_bIsDataInit;                     /**< The init flag. */
 
     QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
-    QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
+    QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation
 
 signals:
     //=========================================================================================================
