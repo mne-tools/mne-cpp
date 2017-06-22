@@ -274,7 +274,6 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                 list << new QStandardItem(m_pSensorDataTreeItem->toolTip());
                 this->appendRow(list);
 
-                // @todo change this
                 MatrixX3f greyColor = MatrixX3f::Constant(bemSurface.rr.rows(), 3, 100.0f);
                 m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffEvoked, sSensorType, dCancelDist, interpolationFunction);
 

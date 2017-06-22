@@ -78,7 +78,10 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors, const QSharedPointer<MatrixXd> pDistanceTable, double (*interpolationFunction) (double), const double dCancelDist)
+QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
+                                                                            const QSharedPointer<MatrixXd> pDistanceTable,
+                                                                            double (*interpolationFunction) (double),
+                                                                            const double dCancelDist)
 {
     if (! pDistanceTable) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table. Returning null pointer...";
@@ -103,13 +106,13 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             QVector<QPair<qint32, double> > vecBelowThresh;
             vecBelowThresh.reserve(iCols);
             double dWeightsSum = 0;
-            const RowVectorXd row = pDistanceTable->row(r);
+            const RowVectorXd rowVec = pDistanceTable->row(r);
             for (qint32 c = 0; c < iCols; ++c) {
-                const double dist = row[c];
-                if (dist < dCancelDist) {
-                    const double valueWeight = fabs(1.0 / interpolationFunction(dist));
-                    dWeightsSum += valueWeight;
-                    vecBelowThresh.push_back(qMakePair<qint32, double> (c, valueWeight));
+                const double dDist = rowVec[c];
+                if (dDist < dCancelDist) {
+                    const double dValueWeight = fabs(1.0 / interpolationFunction(dDist));
+                    dWeightsSum += dValueWeight;
+                    vecBelowThresh.push_back(qMakePair<qint32, double> (c, dValueWeight));
                 }
             }
             for (const QPair<qint32, double> &qp : vecBelowThresh) {
@@ -129,13 +132,13 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
 QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<double> > pInterpolationMatrix, const VectorXd &vecMeasurementData)
 {
     if(pInterpolationMatrix){
-        QSharedPointer<VectorXf> pOut = QSharedPointer<VectorXf>::create();
+        QSharedPointer<VectorXf> pOutVec = QSharedPointer<VectorXf>::create();
         if (pInterpolationMatrix->cols() != vecMeasurementData.rows()) {
             qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
             return nullptr;
         }
-        (*pOut) = ((*pInterpolationMatrix) * vecMeasurementData).cast<float> ();
-        return pOut;
+        (*pOutVec) = ((*pInterpolationMatrix) * vecMeasurementData).cast<float> ();
+        return pOutVec;
     }
     else{
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Null pointer for interpolationMatrix, weight matrix was not created. Return null pointer...";

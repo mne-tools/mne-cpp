@@ -117,36 +117,42 @@ public:
      *    -# if the vertex belongs to a sensor: The value at the position of the sensor is 1 and all other values in this row are set to 0
      *    -# if not: the values are calculated to give a total of 1 (a lot of values will stay 0, because they are too far away to influence) by using the above mentioned formula
      *
-     * @brief <i>createInterpolationMat</i> Calculate weight matrix for later interpolation
-     * @param pProjectedSensors Vector of IDs of sensor vertices
-     * @param pDistanceTable Matrix that contains all needed distances
-     * @param interpolationFunction Function that computes interpolation coefficients using the distance values
-     * @param dcancelDist Distances higher than this are ignored, i.e. the respective coefficients are set to zero
-     * @return A shared pointer to the distance matrix created
+     * @brief <i>createInterpolationMat</i>     Calculate weight matrix for later interpolation
+     * @param pProjectedSensors                 Vector of IDs of sensor vertices
+     * @param pDistanceTable                    Matrix that contains all needed distances
+     * @param interpolationFunction             Function that computes interpolation coefficients using the distance values
+     * @param dCancelDist                       Distances higher than this are ignored, i.e. the respective coefficients are set to zero
+     *
+     * @return                                  A shared pointer to the distance matrix created
      */
-    static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors, const QSharedPointer<Eigen::MatrixXd> pDistanceTable, double (*interpolationFunction) (double), const double dCancelDist = DOUBLE_INFINITY);
+    static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
+                                                                               const QSharedPointer<Eigen::MatrixXd> pDistanceTable,
+                                                                               double (*interpolationFunction) (double),
+                                                                               const double dCancelDist = DOUBLE_INFINITY);
 
     //=========================================================================================================
-        /**
-         * The interpolation essentially corresponds to a matrix * vector multiplication. A vector of sensor data (i.e. a vector of double-values)
-         * is multiplied with the result of the <i>createInterpolationMat</i>.
-         * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
-         * i.e. in first instance the distance table that the weight matrix is based on.
-         *
-         * @brief <i>interpolateSignals</i> Interpolate sensor data
-         * @param pInterpolationMatrix The weight matrix which should be used for multiplying
-         * @param vecMeasurementData A vector with measured sensor data
-         * @return Interpolated values for all vertices of the mesh
-         */
+    /**
+     * The interpolation essentially corresponds to a matrix * vector multiplication. A vector of sensor data (i.e. a vector of double-values)
+     * is multiplied with the result of the <i>createInterpolationMat</i>.
+     * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
+     * i.e. in first instance the distance table that the weight matrix is based on.
+     *
+     * @brief <i>interpolateSignals</i>     Interpolate sensor data
+     * @param pInterpolationMatrix          The weight matrix which should be used for multiplying
+     * @param vecMeasurementData            A vector with measured sensor data
+     *
+     * @return                              Interpolated values for all vertices of the mesh
+     */
     static QSharedPointer<Eigen::VectorXf> interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<double> > pInterpolationMatrix, const Eigen::VectorXd &vecMeasurementData);
 
     //=========================================================================================================
     /**
      * Serves as a placeholder for other functions and is needed in case a linear interpolation is wanted when calling <i>createInterplationMat</i>.
      *
-     * @brief linear Returns input argument unchanged
-     * @param dIn Distance value
-     * @return Same value interpreted as a interpolation weight
+     * @brief linear                        Returns input argument unchanged
+     * @param dIn                           Distance value
+     *
+     * @return                              Same value interpreted as a interpolation weight
      */
     static double linear(const double dIn);
 
@@ -154,18 +160,20 @@ public:
     /**
      * Calculates interpolation weights based on distance values
      *
-     * @brief <i>gaussian</i> Returns interpolation weight that corresponds to gauss curve with sigma set to 1
-     * @param dIn Distance value
-     * @return The function value of the gauss curve at d
+     * @brief <i>gaussian</i>               Returns interpolation weight that corresponds to gauss curve with sigma set to 1
+     * @param dIn                           Distance value
+     *
+     * @return                              The function value of the gauss curve at d
      */
     static double gaussian(const double dIn);
     //=========================================================================================================
     /**
      * Calculates interpolation weights based on distance values
      *
-     * @brief <i>square</i> Returns interpolation weight that corresponds to negative parabel with an y-offset of 1.
-     * @param dIn Distance value
-     * @return The function value of the negative parabel at d
+     * @brief <i>square</i>                 Returns interpolation weight that corresponds to negative parabel with an y-offset of 1.
+     * @param dIn                           Distance value
+     *
+     * @return                              The function value of the negative parabel at d
      */
     static double square(const double dIn);
     //=========================================================================================================
@@ -173,9 +181,10 @@ public:
     /**
      * Calculates interpolation weights based on distance values
      *
-     * @brief <i>square</i> Returns interpolation weight that corresponds to qubic hyperbel
-     * @param dIn Distance value
-     * @return The function value of the qubic hyperbel at d
+     * @brief <i>square</i>                 Returns interpolation weight that corresponds to qubic hyperbel
+     * @param dIn                           Distance value
+     *
+     * @return                              The function value of the qubic hyperbel at d
      */
     static double qubic(const double dIn);
 
