@@ -85,7 +85,7 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
 {
     if (! pDistanceTable) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table. Returning null pointer...";
-        return nullptr;
+        return QSharedPointer<SparseMatrix<double> >(nullptr);
     }
     // initialization
     QSharedPointer<SparseMatrix<double> > pInterpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(pDistanceTable->rows(), pProjectedSensors->size());
@@ -135,14 +135,14 @@ QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<S
         QSharedPointer<VectorXf> pOutVec = QSharedPointer<VectorXf>::create();
         if (pInterpolationMatrix->cols() != vecMeasurementData.rows()) {
             qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
-            return nullptr;
+            return QSharedPointer<VectorXf>(nullptr);
         }
         (*pOutVec) = ((*pInterpolationMatrix) * vecMeasurementData).cast<float> ();
         return pOutVec;
     }
     else{
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Null pointer for interpolationMatrix, weight matrix was not created. Return null pointer...";
-        return nullptr;
+        return QSharedPointer<VectorXf>(nullptr);
     }
 }
 //*************************************************************************************************************
