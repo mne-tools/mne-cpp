@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets 3dextras
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
