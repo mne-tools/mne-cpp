@@ -45,7 +45,9 @@ SUBDIRS += \
     test_forward_solution \
     test_fiff_cov \
     test_geometryinfo \
-    test_interpolation
+    test_interpolation \
+    test_fiff_digitizer \
+    test_mne_msh_display_surface_set
 
 !contains(MNECPP_CONFIG, minimalVersion) {
 #    SUBDIRS += \
