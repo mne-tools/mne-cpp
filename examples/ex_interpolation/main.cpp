@@ -54,8 +54,7 @@
 //=============================================================================================================
 
 #include <QFile>
-#include <QApplication>
-#include <QMainWindow>
+#include <QtCore/QCoreApplication>
 #include <QCommandLineParser>
 #include <QDateTime>
 
@@ -88,7 +87,7 @@ using namespace INTERPOLATION;
 */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -169,5 +168,5 @@ int main(int argc, char *argv[])
     Interpolation::interpolateSignal(interpolationMatrix, signal);
     std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
 
-    return a.exec();
+    return 0;
 }
