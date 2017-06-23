@@ -53,6 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFile>
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
