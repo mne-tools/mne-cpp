@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0],
-                                                                              evoked, "MEG", 0.05, "Cubic")) {
+                                                                              evoked.info, "MEG", 0.05, "Cubic")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
     //add sensor item for EEG data
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment, evoked.data, t_Bem[0],
-                                                                             evoked, "EEG", 0.05, "Cubic")) {
+                                                                             evoked.info, "EEG", 0.05, "Cubic")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);

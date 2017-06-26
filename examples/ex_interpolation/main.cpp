@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
     //filter out bad MEG channels
-    GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
+    GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
 
     //weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
