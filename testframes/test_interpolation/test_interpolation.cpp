@@ -99,7 +99,7 @@ TestInterpolation::TestInterpolation() {
 
 void TestInterpolation::initTestCase() {
     //acquire real data
-    QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     realSurface = t_sensorSurfaceVV[0];
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
