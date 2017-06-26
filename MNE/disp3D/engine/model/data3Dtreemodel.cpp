@@ -483,7 +483,6 @@ void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStanda
 }
 
 
-
 //*************************************************************************************************************
 
 SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
@@ -508,11 +507,11 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
             //If measurement data has already been created but in conjunction with a different data type
             //(i.e. connectivity, dipole fitting, etc.), do the connects here
-            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).isEmpty()) {
+            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() < 2) { // <2 because we can store MEG and EEG
                 if(sDataType == "EEG") {
-                    pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+                    pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
                 } else if (sDataType == "MEG") {
-                    pSubjectItem->connectMeasurementToSensorItems(pMeasurementItem);
+                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem);
                 }
             }
 
@@ -524,9 +523,9 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
         pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, sDataType);
 
         if(sDataType == "EEG") {
-            pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);
+            pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
         } else if (sDataType == "MEG") {
-            pSubjectItem->connectMeasurementToSensorItems(pMeasurementItem);
+            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem);
         }
     }
 

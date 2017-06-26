@@ -111,7 +111,7 @@ public:
     *
     * @param[in] pMeasurementItem       The measurement item which is to be connected.
     */
-    void connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem);
+    void connectEEGMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem);
 
     //=========================================================================================================
     /**
@@ -119,7 +119,7 @@ public:
     *
     * @param[in] pMeasurementItem       The measurement item which is to be connected.
     */
-    void connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem);
+    void connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem);
 
 protected:
     //=========================================================================================================
