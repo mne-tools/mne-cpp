@@ -109,7 +109,7 @@ struct SmoothVertexInfo {
 
 //=========================================================================================================
 /**
-* The strucut specifing the smoothing visualization info.
+* The struct specifing the smoothing visualization info.
 */
 struct VisualizationInfo {
     VectorXd                    vSourceColorSamples;
