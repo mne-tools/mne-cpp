@@ -449,8 +449,10 @@ private:
     QSharedPointer<DISP3DLIB::View3D>           m_p3DView;                      /**< The Disp3D view. */
     QSharedPointer<DISP3DLIB::Control3DWidget>  m_pControl3DView;               /**< The Disp3D control. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;                 /**< The Disp3D model. */
-    DISP3DLIB::SensorDataTreeItem*              m_pRtSensorDataItem;            /**< The Disp3D real time item for sensor data. */
-    QSharedPointer<MNELIB::MNEBem>              m_pBem;                         /**< The Disp3D Bem data. */
+    DISP3DLIB::SensorDataTreeItem*              m_pRtEEGSensorDataItem;         /**< The Disp3D real time item for EEG sensor data. */
+    DISP3DLIB::SensorDataTreeItem*              m_pRtMEGSensorDataItem;         /**< The Disp3D real time item for MEG sensor data. */
+    QSharedPointer<MNELIB::MNEBem>              m_pBemHead;                     /**< The Disp3D Bem head data. */
+    QSharedPointer<MNELIB::MNEBem>              m_pBemSensor;                   /**< The Disp3D BEM sensor data. */
 
     QAction*                                    m_pActionSelectSensors;         /**< show roi select widget */
     QAction*                                    m_pActionHideBad;               /**< Hide bad channels. */

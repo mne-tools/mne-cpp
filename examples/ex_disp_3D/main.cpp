@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0],
+    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurement Data", evoked.data, t_sensorSurfaceVV[0],
                                                                               evoked.info, "MEG", 0.05, "Cubic")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);

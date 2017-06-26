@@ -94,7 +94,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_pChInfoModel(Q_NULLPTR)
 , m_pSelectionManagerWindow(Q_NULLPTR)
 , m_pFilterWindow(Q_NULLPTR)
-, m_pRtSensorDataItem(Q_NULLPTR)
+, m_pRtEEGSensorDataItem(Q_NULLPTR)
+, m_pRtMEGSensorDataItem(Q_NULLPTR)
 {
     Q_UNUSED(pTime)
 
@@ -152,9 +153,15 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
                                                                  Qt::Window));
     m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
+    //Add BEM head
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    m_pBem = MNEBem::SPtr(new MNEBem(t_fileBem));
-    m_pData3DModel->addBemData("Subject", "BEM", *m_pBem.data());
+    m_pBemHead = MNEBem::SPtr(new MNEBem(t_fileBem));
+    m_pData3DModel->addBemData("Subject", "BEM", *m_pBemHead.data());
+
+    //Add MEG helmet
+    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+    m_pBemSensor = MNEBem::SPtr(new MNEBem(t_filesensorSurfaceVV));
+    m_pData3DModel->addMegSensorInfo("Sensors", "VectorView", *m_pBemSensor.data());
 
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
 
@@ -272,31 +279,68 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
             init();
         }
-    }
-    else {
+    } else {
         //Add data to table view
         m_pRTMSAModel->addData(m_pRTMSA->getMultiSampleArray());
 
-        //Add data to itnerpolation
-//        if(!m_pRtSensorDataItem) {
-////            m_pRtSensorDataItem = m_pData3DModel->addSensorData("Subject",
-////                                                                "Sensor Data",
-////                                                                m_pRTMSA->getMultiSampleArray().first(),
-////                                                                *m_pBem.data()[0],
-////                                                                m_pFiffInfo,
-////                                                                "EEG",
-////                                                                0.05,
-////                                                                "Cubic");
+        //Add EEG data to interpolation
+        if(!m_pRtEEGSensorDataItem) {
+            m_pRtEEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
+                                                                "EEG Data",
+                                                                m_pRTMSA->getMultiSampleArray().first(),
+                                                                (*m_pBemHead.data())[0],
+                                                                *m_pFiffInfo.data(),
+                                                                "EEG",
+                                                                0.18,
+                                                                "Cubic");
 
-////            for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
-////                m_pRtSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
-////            }
-//        } else {
-////            for(MatrixXd data : m_pRTMSA->getMultiSampleArray()) {
-////                m_pRtSensorDataItem->addData(data);
-////            }
-//        }
+            if(m_pRtEEGSensorDataItem) {
+                m_pRtEEGSensorDataItem->setLoopState(false);
+                m_pRtEEGSensorDataItem->setTimeInterval(17);
+                m_pRtEEGSensorDataItem->setNumberAverages(17);
+                m_pRtEEGSensorDataItem->setStreamingActive(true);
+                m_pRtEEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
+                m_pRtEEGSensorDataItem->setColortable("Jet");
+            }
 
+            for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
+                m_pRtEEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
+            }
+        }
+
+        //Add MEG data to interpolation
+        if(!m_pRtMEGSensorDataItem) {
+            m_pRtMEGSensorDataItem = m_pData3DModel->addSensorData("Sensors",
+                                                                "MEG Data",
+                                                                m_pRTMSA->getMultiSampleArray().first(),
+                                                                (*m_pBemSensor.data())[0],
+                                                                *m_pFiffInfo.data(),
+                                                                "MEG",
+                                                                0.05,
+                                                                "Cubic");
+
+            if(m_pRtMEGSensorDataItem) {
+                m_pRtMEGSensorDataItem->setLoopState(false);
+                m_pRtMEGSensorDataItem->setTimeInterval(17);
+                m_pRtMEGSensorDataItem->setNumberAverages(17);
+                m_pRtMEGSensorDataItem->setStreamingActive(true);
+                m_pRtMEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
+                m_pRtMEGSensorDataItem->setColortable("Jet");
+            }
+
+            for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
+                m_pRtMEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
+            }
+        }
+
+        for(MatrixXd data : m_pRTMSA->getMultiSampleArray()) {
+            if(m_pRtEEGSensorDataItem) {
+                m_pRtEEGSensorDataItem->addData(data);
+            }
+            if(m_pRtMEGSensorDataItem) {
+                m_pRtMEGSensorDataItem->addData(data);
+            }
+        }
     }
 }
 
