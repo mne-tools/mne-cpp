@@ -271,7 +271,8 @@ int main(int argc, char *argv[])
         pMegSensorTreeItem->setNumberAverages(1);
         pMegSensorTreeItem->setStreamingActive(false);
         pMegSensorTreeItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
-        pMegSensorTreeItem->setColortable("Hot Negative 2");
+        pMegSensorTreeItem->setColortable("Jet");
+        pMegSensorTreeItem->setCancelDistance(0.16);
 
     }
 
@@ -282,9 +283,10 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
-        pEegSensorTreeItem->setStreamingActive(false);
+        pEegSensorTreeItem->setStreamingActive(true);
         pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
-        pEegSensorTreeItem->setColortable("Hot Negative 2");
+        pEegSensorTreeItem->setColortable("Jet");
+        pEegSensorTreeItem->setCancelDistance(0.16);
 
     }
 
@@ -294,10 +296,10 @@ int main(int argc, char *argv[])
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingActive(false);
+            pRTDataItem->setStreamingActive(true);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
             pRTDataItem->setVisualizationType("Smoothing based");
-            pRTDataItem->setColortable("Hot");
+            pRTDataItem->setColortable("Jet");
         }
     }
 
