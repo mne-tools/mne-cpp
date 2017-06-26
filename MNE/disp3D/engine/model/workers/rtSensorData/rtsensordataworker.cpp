@@ -155,7 +155,7 @@ void RtSensorDataWorker::calculateSurfaceData()
 
     //filtering of bad channels out of the distance table
     GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
-                                    m_lInterpolationData.fiffEvoked,
+                                    m_lInterpolationData.fiffInfo,
                                     m_lInterpolationData.iSensorType);
 
     //create weight matrix
@@ -169,7 +169,7 @@ void RtSensorDataWorker::calculateSurfaceData()
 
 void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface,
                                               const QVector<Vector3f> &vecSensorPos,
-                                              const FIFFLIB::FiffEvoked &fiffEvoked,
+                                              const FIFFLIB::FiffInfo &fiffInfo,
                                               int iSensorType)
 {
     QMutexLocker locker(&m_qMutex);
@@ -182,7 +182,7 @@ void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface,
     //set members
     m_iNumSensors = vecSensorPos.size();
     m_lInterpolationData.bemSurface = bemSurface;
-    m_lInterpolationData.fiffEvoked = fiffEvoked;
+    m_lInterpolationData.fiffInfo = fiffInfo;
     m_lInterpolationData.iSensorType = iSensorType;
     
     //sensor projecting: One time operation because surface and sensors can not change 

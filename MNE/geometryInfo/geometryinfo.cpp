@@ -4,7 +4,7 @@
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2017
+* @date     May, 2017
 *
 * @section  LICENSE
 *
@@ -291,18 +291,18 @@ void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> pMatrix, std::string sFil
 }
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> pDistanceTable, const FIFFLIB::FiffEvoked& fiffEvoked, qint32 iSensorType){
+QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<MatrixXd> pDistanceTable, const FIFFLIB::FiffInfo& fiffInfo, qint32 iSensorType) {
     // use pointer to avoid copying of FiffChInfo objects
     QVector<qint32> vecBadColumns;
     QVector<const FiffChInfo*> vecSensors;
-    for(const FiffChInfo& s : fiffEvoked.info.chs){
+    for(const FiffChInfo& s : fiffInfo.chs){
         if(s.kind == iSensorType){
            vecSensors.push_back(&s);
         }
     }
 
     // inefficient: going through all bad sensors, i.e. also the ones which are of different type than the passed one
-    for(const QString& b : fiffEvoked.info.bads){
+    for(const QString& b : fiffInfo.bads){
         for(int col = 0; col < vecSensors.size(); ++col){
             if(vecSensors[col]->ch_name == b){
                 // found index of our bad channel, set whole column to infinity

@@ -4,7 +4,7 @@
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2017
+* @date     May, 2017
 *
 * @section  LICENSE
 *
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef INTERPOLATION_INTERPOLATION_H
-#define INTERPOLATION_INTERPOLATION_H
+#ifndef INTERPOLATION_H
+#define INTERPOLATION_H
 
 
 //*************************************************************************************************************
@@ -203,4 +203,4 @@ private:
 
 } // namespace INTERPOLATION
 
-#endif // INTERPOLATION_INTERPOLATION_H
+#endif // INTERPOLATION_H

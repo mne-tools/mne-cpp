@@ -114,9 +114,9 @@ struct InterpolationData {
     QSharedPointer<QVector<qint32>>         pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
 
     MNELIB::MNEBemSurface                   bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
-    FIFFLIB::FiffEvoked                     fiffEvoked;                       /**< Contains all information about th sensors. */
+    FIFFLIB::FiffInfo                       fiffInfo;                         /**< Contains all information about the sensors. */
     
-    double (*interpolationFunction) (double);                                /**< Function that computes interpolation coefficients using the distance values. */
+    double (*interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */
 };
 
 //=============================================================================================================
@@ -180,7 +180,7 @@ public:
      */
     void calculateSurfaceData(const MNELIB::MNEBemSurface &bemSurface,
                               const QVector<Vector3f> &vecSensorPos,
-                              const FIFFLIB::FiffEvoked &fiffEvoked,
+                              const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
    
     //=========================================================================================================

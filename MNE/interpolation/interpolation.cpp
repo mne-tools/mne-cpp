@@ -4,7 +4,7 @@
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2017
+* @date     May, 2017
 *
 * @section  LICENSE
 *
