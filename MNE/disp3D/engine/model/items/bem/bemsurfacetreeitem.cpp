@@ -123,4 +123,3 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface)
     data.setValue(tBemSurface.rr);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 }
-

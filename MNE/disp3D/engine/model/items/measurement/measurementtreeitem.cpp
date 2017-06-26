@@ -389,10 +389,20 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
 
 //*************************************************************************************************************
 
-void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const MatrixX3f& rightHemiColor)
+void MeasurementTreeItem::setSourceColors(const MatrixX3f& leftHemiColor, const MatrixX3f& rightHemiColor)
 {
     if(m_pMneEstimateTreeItem) {
         m_pMneEstimateTreeItem->setColorOrigin(leftHemiColor, rightHemiColor);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementTreeItem::setSensorColors(const MatrixX3f& sensorColor)
+{
+    if(m_pSensorDataTreeItem) {
+        m_pSensorDataTreeItem->setColorOrigin(sensorColor);
     }
 }
 

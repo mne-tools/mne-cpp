@@ -213,6 +213,15 @@ protected:
     QPointer<Qt3DRender::QMaterial>     m_pNormalMaterial;                  /**< The normal material. Ownership belongs to RenderableEntity. */
 
     QPointer<CustomMesh>                m_pCustomMesh;                      /**< The actual mesh information (vertices, normals, colors). */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the colors of the underlying surface changed.
+    *
+    * @param[in] surfaceColors        Color of the surface.
+    */
+    void colorOriginChanged(const MatrixX3f& surfaceColors);
 };
 
 } //NAMESPACE DISP3DLIB

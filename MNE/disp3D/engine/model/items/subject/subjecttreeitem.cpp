@@ -105,7 +105,7 @@ void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasure
             connect(pMeasurementItem, &MeasurementTreeItem::sourceColorChanged,
                 pMriItem, &MriTreeItem::setRtVertColor);
             connect(pMriItem, &MriTreeItem::colorOriginChanged,
-                pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
+                pMeasurementItem, &MeasurementTreeItem::setSourceColors);
         }
     }
 }
@@ -128,6 +128,8 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
                     if(pBemSurfItem->text() == "Head") {
                         connect(pMeasurementItem, &MeasurementTreeItem::sensorColorChanged,
                             pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
+                        connect(pBemSurfItem, &BemSurfaceTreeItem::colorOriginChanged,
+                            pMeasurementItem, &MeasurementTreeItem::setSensorColors);
                     }
                 }
             }
@@ -154,6 +156,8 @@ void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeas
                     if(pSensorSetSurfItem->text() == "Sensor Surface") {
                         connect(pMeasurementItem, &MeasurementTreeItem::sensorColorChanged,
                             pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
+                        connect(pSensorSetSurfItem, &SensorSurfaceTreeItem::colorOriginChanged,
+                            pMeasurementItem, &MeasurementTreeItem::setSensorColors);
                     }
                 }
             }
