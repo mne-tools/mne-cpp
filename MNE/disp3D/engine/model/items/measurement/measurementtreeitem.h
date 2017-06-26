@@ -232,11 +232,19 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever new colors for the activation data plotting are available.
+    * Call this function whenever new colors for the activation data plotting are available: source level.
     *
     * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
     */
-    void onVertColorChanged(const QVariant& vertColors);
+    void onSourceColorChanged(const QVariant& vertColors);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever new colors for the activation data plotting are available: sensor level.
+    *
+    * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
+    */
+    void onSensorColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
     QPointer<SensorDataTreeItem>                 m_pSensorDataTreeItem;         /**< The rt sensor data item of this item. */
@@ -246,12 +254,19 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
+    * emit this signal whenver the sensor level color changed.
     *
     * @param[in] vertColors        Real tiem colors for both hemispheres.
     */
-    void vertColorChanged(const QVariant& vertColors);
+    void sensorColorChanged(const QVariant& vertColors);
 
+    //=========================================================================================================
+    /**
+    * emit this signal whenver the source level color changed.
+    *
+    * @param[in] vertColors        Real tiem colors for both hemispheres.
+    */
+    void sourceColorChanged(const QVariant& vertColors);
 };
 
 } //NAMESPACE DISP3DLIB
