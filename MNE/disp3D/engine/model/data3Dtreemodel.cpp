@@ -492,7 +492,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                         const MNEBemSurface& tBemSurface,
                                         const FiffInfo& fiffInfo,
                                         const QString& sDataType,
-                                        const double dCancelDist,
+                                        const double& dCancelDist,
                                         const QString& sInterpolationFunction)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
@@ -516,12 +516,12 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                 }
             }
 
-            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction);
+            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, sDataType);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction);
+        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, sDataType);
 
         if(sDataType == "EEG") {
             pSubjectItem->connectMeasurementToBemHeadItems(pMeasurementItem);

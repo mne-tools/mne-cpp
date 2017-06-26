@@ -51,6 +51,10 @@
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
 #include "../sensordata/sensordatatreeitem.h"
+#include "../bem/bemtreeitem.h"
+#include "../bem/bemsurfacetreeitem.h"
+#include "../sensorspace/sensorsettreeitem.h"
+#include "../sensorspace/sensorsurfacetreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -256,8 +260,9 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                                                  const MNEBemSurface &bemSurface,
                                                  const FiffInfo &fiffInfo,
                                                  const QString &sSensorType,
-                                                 const double dCancelDist,
-                                                 const QString &sInterpolationFunction)
+                                                 const double& dCancelDist,
+                                                 const QString &sInterpolationFunction,
+                                                 const QString& sDataType)
 {
     if(!tSensorData.size() == 0) {
         if(m_pSensorDataTreeItem) {
@@ -274,12 +279,60 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                 list << new QStandardItem(m_pSensorDataTreeItem->toolTip());
                 this->appendRow(list);
 
-                MatrixX3f greyColor = MatrixX3f::Constant(bemSurface.rr.rows(), 3, 100.0f);
-                m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffInfo, sSensorType, dCancelDist, sInterpolationFunction);
+                //Find out current colors
+                MatrixX3f currentColors = MatrixX3f::Constant(bemSurface.rr.rows(), 3, 100.0f);
+                if(sDataType == "EEG") {
+                    if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
+                        QList<QStandardItem*> lBEMChildren = pParent->findChildren(Data3DTreeModelItemTypes::BemItem);
+                        BemTreeItem* pBemItem = Q_NULLPTR;
+
+                        //Find MRI data set and hemisphere from parent item
+                        //Option 1 - Choose first found MRI set
+                        if(!lBEMChildren.isEmpty()) {
+                            pBemItem = dynamic_cast<BemTreeItem*>(lBEMChildren.first());
+                        }
+
+                        if(pBemItem) {
+                            QList<QStandardItem*> itemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+
+                            for(int j = 0; j < itemList.size(); ++j) {
+                                if(BemSurfaceTreeItem* pBemHeadSurfaceTreeItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                                    if(pBemHeadSurfaceTreeItem->text() == "Head") {
+                                        currentColors = pBemHeadSurfaceTreeItem->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if(sDataType == "MEG") {
+                    if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
+                        QList<QStandardItem*> lSensorChildren = pParent->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
+                        SensorSetTreeItem* pSensorItem = Q_NULLPTR;
+
+                        //Find MRI data set and hemisphere from parent item
+                        //Option 1 - Choose first found MRI set
+                        if(!lSensorChildren.isEmpty()) {
+                            pSensorItem = dynamic_cast<SensorSetTreeItem*>(lSensorChildren.first());
+                        }
+
+                        if(pSensorItem) {
+                            QList<QStandardItem*> itemList = pSensorItem->findChildren(Data3DTreeModelItemTypes::SensorSurfaceItem);
+
+                            for(int j = 0; j < itemList.size(); ++j) {
+                                if(SensorSurfaceTreeItem* pSensorSurfaceTreeItem = dynamic_cast<SensorSurfaceTreeItem*>(itemList.at(j))) {
+                                    if(pSensorSurfaceTreeItem->text() == "Sensor Surface") {
+                                        currentColors = pSensorSurfaceTreeItem->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                m_pSensorDataTreeItem->init(currentColors, bemSurface, fiffInfo, sSensorType, dCancelDist, sInterpolationFunction);
 
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onSensorColorChanged);
-
 
                 m_pSensorDataTreeItem->addData(tSensorData);
             } else {

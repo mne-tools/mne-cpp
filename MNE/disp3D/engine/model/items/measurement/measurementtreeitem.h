@@ -170,6 +170,7 @@ public:
     * @param[in] sSensorType            Name of the sensor type EEG or MEG.
     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
     * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+    * @param[in] sDataType              The data type ("MEG" or "EEG").
     *
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
@@ -177,8 +178,9 @@ public:
                                 const MNELIB::MNEBemSurface &bemSurface,
                                 const FIFFLIB::FiffInfo &fiffInfo,
                                 const QString &sSensorType,
-                                const double dCancelDist,
-                                const QString &sInterpolationFunction);
+                                const double &dCancelDist,
+                                const QString &sInterpolationFunction,
+                                const QString &sDataType);
 
     //=========================================================================================================
     /**
