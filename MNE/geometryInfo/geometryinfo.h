@@ -4,7 +4,7 @@
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2017
+* @date     May, 2017
 *
 * @section  LICENSE
 *
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef GEOMETRYINFO_GEOMETRYINFO_H
-#define GEOMETRYINFO_GEOMETRYINFO_H
+#ifndef GEOMETRYINFO_H
+#define GEOMETRYINFO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -151,12 +151,12 @@ public:
     /**
      * @brief filterBadChannels     Filters bad channels from distance table
      * @param pDistanceTable        Result of SCDC
-     * @param fiffEvoked            Container for sensors
+     * @param fiffInfo              Container for sensors
      * @param iSensorType           Sensor type to be filtered out, use fiff constants
      *
      * @return Vector of bad channel indices
      */
-    static QVector<qint32> filterBadChannels(QSharedPointer<Eigen::MatrixXd> pDistanceTable, const FIFFLIB::FiffEvoked& fiffEvoked, qint32 iSensorType);
+    static QVector<qint32> filterBadChannels(QSharedPointer<Eigen::MatrixXd> pDistanceTable, const FIFFLIB::FiffInfo& fiffInfo, qint32 iSensorType);
 
 protected:
 
@@ -210,4 +210,4 @@ inline double GeometryInfo::squared(double dBase)
 
 } // namespace GEOMETRYINFO
 
-#endif // GEOMETRYINFO_GEOMETRYINFO_H
+#endif // GEOMETRYINFO_H

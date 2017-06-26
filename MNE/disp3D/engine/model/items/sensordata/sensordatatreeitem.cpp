@@ -203,7 +203,7 @@ void SensorDataTreeItem::initItem()
 
 void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
                               const MNEBemSurface& bemSurface,
-                              const FiffEvoked& fiffEvoked,
+                              const FiffInfo& fiffInfo,
                               const QString& sSensorType,
                               const double dCancelDist,
                               const QString& sInterpolationFunction)
@@ -232,7 +232,7 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
     QVector<Vector3f> vecSensorPos;
     m_iUsedSensors.clear();
     int iCounter = 0;
-    for( const FiffChInfo &info : fiffEvoked.info.chs) {
+    for( const FiffChInfo &info : fiffInfo.chs) {
         if(info.kind == sensorTypeFiffConstant) {
             vecSensorPos.push_back(info.chpos.r0);
 
@@ -247,7 +247,7 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
 
     m_pSensorRtDataWorker->calculateSurfaceData(bemSurface,
                                                 vecSensorPos,
-                                                fiffEvoked,
+                                                fiffInfo,
                                                 sensorTypeFiffConstant);
 
     m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
@@ -536,6 +536,9 @@ void SensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
     }
 }
 
+
+//*************************************************************************************************************
+
 void SensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
     if(dCancelDist.canConvert<double>()) {
@@ -545,6 +548,9 @@ void SensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
     }
 }
 
+
+//*************************************************************************************************************
+
 void SensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
     if(sInterpolationFunction.canConvert<QString>()) {
@@ -553,4 +559,3 @@ void SensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpo
         }
     }
 }
-

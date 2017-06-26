@@ -4,11 +4,11 @@
 * @author   Felix Griesau <felix.griesau@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     June, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Felix Griesau and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Felix Griesau and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -156,7 +156,7 @@ void TestGeometryInfo::testBadChannelFiltering() {
     // SCDC with cancel distance 0.03:
     QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface, mappedSubSet, 0.03);
     // filter for bad MEG channels:
-    QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked, FIFFV_MEG_CH);
+    QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
 
     for (qint32 col : erasedColums) {
         qint64 notInfCount = 0;
