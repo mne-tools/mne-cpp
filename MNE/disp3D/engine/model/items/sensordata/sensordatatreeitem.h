@@ -29,8 +29,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef DISP3DLIB_SENSORDATATREEITEM_H
-#define DISP3DLIB_SENSORDATATREEITEM_H
+#ifndef SENSORDATATREEITEM_H
+#define SENSORDATATREEITEM_H
 
 
 //*************************************************************************************************************
@@ -119,14 +119,14 @@ public:
      *
      * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on
      * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized
-     * @param[in] fiffEvoked                FiffEvoked that holds the sensors information
+     * @param[in] fiffInfo                  FiffInfo that holds the sensors information
      * @param[in] sSensorType               The sensor type that is later used for live interpolation
      * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
-     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values
+     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values
      */
     void init(const MatrixX3f& matSurfaceVertColor,
               const MNELIB::MNEBemSurface& bemSurface,
-              const FIFFLIB::FiffEvoked& fiffEvoked,
+              const FIFFLIB::FiffInfo &fiffInfo,
               const QString& sSensorType,
               const double dCancelDist,
               const QString &sInterpolationFunction);
@@ -328,4 +328,4 @@ inline bool SensorDataTreeItem::isDataInit() const
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_SENSORDATATREEITEM_H
+#endif // SENSORDATATREEITEM_H

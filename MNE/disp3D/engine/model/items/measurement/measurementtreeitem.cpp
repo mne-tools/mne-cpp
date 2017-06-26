@@ -254,8 +254,8 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
 SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                                                  const MNEBemSurface &bemSurface,
-                                                 const FiffEvoked &fiffEvoked,
-                                                 const QString sSensorType,
+                                                 const FiffInfo &fiffInfo,
+                                                 const QString &sSensorType,
                                                  const double dCancelDist,
                                                  const QString &sInterpolationFunction)
 {
@@ -275,7 +275,7 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                 this->appendRow(list);
 
                 MatrixX3f greyColor = MatrixX3f::Constant(bemSurface.rr.rows(), 3, 100.0f);
-                m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffEvoked, sSensorType, dCancelDist, sInterpolationFunction);
+                m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffInfo, sSensorType, dCancelDist, sInterpolationFunction);
 
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
                         this, &MeasurementTreeItem::onVertColorChanged);
