@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
-        pEegSensorTreeItem->setStreamingActive(true);
+        pEegSensorTreeItem->setStreamingActive(false);
         pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
         pEegSensorTreeItem->setColortable("Jet");
         pEegSensorTreeItem->setCancelDistance(0.16);

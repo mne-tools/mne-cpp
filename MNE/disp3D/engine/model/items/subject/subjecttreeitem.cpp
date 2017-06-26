@@ -142,7 +142,6 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
 
 void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem)
 {
-
     //Connect bem sensor surface item with the measurement tree items in case the real time color changes (i.e. rt source loc)
     QList<QStandardItem*> sensoSetItemList = this->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
     QList<QStandardItem*> sensorSurfacesItemList;

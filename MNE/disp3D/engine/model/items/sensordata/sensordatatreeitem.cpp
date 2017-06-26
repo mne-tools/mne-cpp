@@ -205,7 +205,7 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
                               const MNEBemSurface& bemSurface,
                               const FiffInfo& fiffInfo,
                               const QString& sSensorType,
-                              const double dCancelDist,
+                              const double& dCancelDist,
                               const QString& sInterpolationFunction)
 {
     this->setData(0, Data3DTreeModelItemRoles::RTData);
