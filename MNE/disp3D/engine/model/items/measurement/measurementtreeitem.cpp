@@ -175,7 +175,7 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                 this->appendRow(list);
 
                 connect(m_pMneEstimateTreeItem.data(), &MneEstimateTreeItem::sourceVertColorChanged,
-                        this, &MeasurementTreeItem::onVertColorChanged);
+                        this, &MeasurementTreeItem::onSourceColorChanged);
 
                 //Divide into left right hemi
                 if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
@@ -278,7 +278,7 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                 m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffInfo, sSensorType, dCancelDist, sInterpolationFunction);
 
                 connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
-                        this, &MeasurementTreeItem::onVertColorChanged);
+                        this, &MeasurementTreeItem::onSensorColorChanged);
 
 
                 m_pSensorDataTreeItem->addData(tSensorData);
@@ -399,8 +399,15 @@ void MeasurementTreeItem::setColorOrigin(const MatrixX3f& leftHemiColor, const M
 
 //*************************************************************************************************************
 
-void MeasurementTreeItem::onVertColorChanged(const QVariant &vertColors)
+void MeasurementTreeItem::onSourceColorChanged(const QVariant &vertColors)
 {
-    emit vertColorChanged(vertColors);
+    emit sourceColorChanged(vertColors);
 }
 
+
+//*************************************************************************************************************
+
+void MeasurementTreeItem::onSensorColorChanged(const QVariant &vertColors)
+{
+    emit sensorColorChanged(vertColors);
+}

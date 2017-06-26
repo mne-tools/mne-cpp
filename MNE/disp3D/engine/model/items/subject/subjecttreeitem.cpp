@@ -102,7 +102,7 @@ void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasure
 
     foreach(QStandardItem* item, mriItemList) {
         if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(item)) {
-            connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
+            connect(pMeasurementItem, &MeasurementTreeItem::sourceColorChanged,
                 pMriItem, &MriTreeItem::setRtVertColor);
             connect(pMriItem, &MriTreeItem::colorOriginChanged,
                 pMeasurementItem, &MeasurementTreeItem::setColorOrigin);
@@ -126,7 +126,7 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
             foreach(QStandardItem* itemBemSurf, bemSurfacesItemList) {
                 if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(itemBemSurf)) {
                     if(pBemSurfItem->text() == "Head") {
-                        connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
+                        connect(pMeasurementItem, &MeasurementTreeItem::sensorColorChanged,
                             pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
                     }
                 }
@@ -152,7 +152,7 @@ void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeas
             for(int k = 0; k < sensorSurfacesItemList.size(); ++k) {
                 if(SensorSurfaceTreeItem* pSensorSetSurfItem = dynamic_cast<SensorSurfaceTreeItem*>(sensorSurfacesItemList.at(i))) {
                     if(pSensorSetSurfItem->text() == "Sensor Surface") {
-                        connect(pMeasurementItem, &MeasurementTreeItem::vertColorChanged,
+                        connect(pMeasurementItem, &MeasurementTreeItem::sensorColorChanged,
                             pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
                     }
                 }
