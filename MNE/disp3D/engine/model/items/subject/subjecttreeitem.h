@@ -118,8 +118,9 @@ public:
     * Connects measurement items and their data (i.e. MNE source data) to already loaded sensor BEM data
     *
     * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    * @param[in] parent                 The parent of this item.
     */
-    void connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem);
+    void connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem, QStandardItem* parent);
 
 protected:
     //=========================================================================================================

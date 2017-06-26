@@ -510,8 +510,8 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
             if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() < 2) { // <2 because we can store MEG and EEG
                 if(sDataType == "EEG") {
                     pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-                } else if (sDataType == "MEG") {
-                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem);
+                } else if (sDataType == "MEG") {                    
+                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
                 }
             }
 
@@ -525,7 +525,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
         if(sDataType == "EEG") {
             pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
         } else if (sDataType == "MEG") {
-            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem);
+            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
         }
     }
 

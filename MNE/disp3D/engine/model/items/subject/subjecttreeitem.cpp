@@ -140,28 +140,28 @@ void SubjectTreeItem::connectEEGMeasurementToBemHeadItems(MeasurementTreeItem* p
 
 //*************************************************************************************************************
 
-void SubjectTreeItem::connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem)
+void SubjectTreeItem::connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem, QStandardItem* parent)
 {
     //Connect bem sensor surface item with the measurement tree items in case the real time color changes (i.e. rt source loc)
-    QStandardItem* parent = this->QStandardItem::parent();
+    if(parent) {
+        //Find sensor items which are stored as subejct items
+        for(int j = 0; j < parent->rowCount(); ++j) {
+            if(SubjectTreeItem* pSensorItem = dynamic_cast<SubjectTreeItem*>(parent->child(j))) {
+                QList<QStandardItem*> sensorSetItemList = pSensorItem->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
+                QList<QStandardItem*> sensorSurfacesItemList;
 
-    //Find sensor items which are stored as subejct items
-    for(int j = 0; j < parent->rowCount(); ++j) {
-        if(SubjectTreeItem* pSensorItem = dynamic_cast<SubjectTreeItem*>(parent->child(j))) {
-            QList<QStandardItem*> sensorSetItemList = pSensorItem->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
-            QList<QStandardItem*> sensorSurfacesItemList;
+                for(int i = 0; i < sensorSetItemList.size(); ++i) {
+                    if(SensorSetTreeItem* pSensorSetItem = dynamic_cast<SensorSetTreeItem*>(sensorSetItemList.at(i))) {
+                        sensorSurfacesItemList = pSensorSetItem->findChildren(Data3DTreeModelItemTypes::SensorSurfaceItem);
 
-            for(int i = 0; i < sensorSetItemList.size(); ++i) {
-                if(SensorSetTreeItem* pSensorSetItem = dynamic_cast<SensorSetTreeItem*>(sensorSetItemList.at(i))) {
-                    sensorSurfacesItemList = pSensorSetItem->findChildren(Data3DTreeModelItemTypes::SensorSurfaceItem);
-
-                    for(int k = 0; k < sensorSurfacesItemList.size(); ++k) {
-                        if(SensorSurfaceTreeItem* pSensorSetSurfItem = dynamic_cast<SensorSurfaceTreeItem*>(sensorSurfacesItemList.at(i))) {
-                            if(pSensorSetSurfItem->text() == "Sensor Surface") {
-                                connect(pMeasurementItem, &MeasurementTreeItem::sensorMEGColorChanged,
-                                    pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
-                                connect(pSensorSetSurfItem, &SensorSurfaceTreeItem::colorOriginChanged,
-                                    pMeasurementItem, &MeasurementTreeItem::setSensorMEGColors);
+                        for(int k = 0; k < sensorSurfacesItemList.size(); ++k) {
+                            if(SensorSurfaceTreeItem* pSensorSetSurfItem = dynamic_cast<SensorSurfaceTreeItem*>(sensorSurfacesItemList.at(k))) {
+                                if(pSensorSetSurfItem->text() == "Sensor Surface") {
+                                    connect(pMeasurementItem, &MeasurementTreeItem::sensorMEGColorChanged,
+                                            pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
+                                    connect(pSensorSetSurfItem, &SensorSurfaceTreeItem::colorOriginChanged,
+                                            pMeasurementItem, &MeasurementTreeItem::setSensorMEGColors);
+                                }
                             }
                         }
                     }
@@ -169,6 +169,4 @@ void SubjectTreeItem::connectMEGMeasurementToSensorItems(MeasurementTreeItem* pM
             }
         }
     }
-
-
 }
