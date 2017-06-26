@@ -94,6 +94,7 @@
 #include <QScrollBar>
 #include <QDebug>
 #include <QColor>
+#include <QToolBox>
 
 
 //*************************************************************************************************************
@@ -102,6 +103,17 @@
 //=============================================================================================================
 
 class QTime;
+
+namespace DISP3DLIB {
+    class SensorDataTreeItem;
+    class View3D;
+    class Control3DWidget;
+    class Data3DTreeModel;
+}
+
+namespace MNELIB {
+    class MNEBem;
+}
 
 namespace SCMEASLIB{class NewRealTimeMultiSampleArray;}
 
@@ -265,6 +277,12 @@ protected:
     */
     bool eventFilter(QObject *object, QEvent *event);
 
+    //=========================================================================================================
+    /**
+    * Shows the 3D control widget
+    */
+    void show3DControlWidget();
+
 signals:
     //=========================================================================================================
     /**
@@ -425,11 +443,19 @@ private:
     QDoubleSpinBox*                             m_pDoubleSpinBoxZoom;           /**< Adjust Zoom Factor */
     QSpinBox*                                   m_pSpinBoxTimeScale;            /**< Time scale spin box */
     QSpinBox*                                   m_pSpinBoxDSFactor;             /**< downsampling factor */
-    QTableView*                                 m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
+    QTableView*                                 m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt. */
+    QToolBox*                                   m_pToolBox;                     /**< The toolbox which holds the table view and real-time interpolation plot. */
+
+    QSharedPointer<DISP3DLIB::View3D>           m_p3DView;                      /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>  m_pControl3DView;               /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;                 /**< The Disp3D model. */
+    DISP3DLIB::SensorDataTreeItem*              m_pRtSensorDataItem;            /**< The Disp3D real time item for sensor data. */
+    QSharedPointer<MNELIB::MNEBem>              m_pBem;                         /**< The Disp3D Bem data. */
 
     QAction*                                    m_pActionSelectSensors;         /**< show roi select widget */
     QAction*                                    m_pActionHideBad;               /**< Hide bad channels. */
     QAction*                                    m_pActionQuickControl;          /**< Show quick control widget. */
+    QAction*                                    m_pAction3DControl;             /**< Show 3D View control widget */
  };
 
 } // NAMESPACE SCDISPLIB
