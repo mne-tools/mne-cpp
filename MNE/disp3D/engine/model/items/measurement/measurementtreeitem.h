@@ -221,7 +221,16 @@ public:
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void setColorOrigin(const MatrixX3f &leftHemiColor, const MatrixX3f &rightHemiColor);
+    void setSourceColors(const MatrixX3f &leftHemiColor, const MatrixX3f &rightHemiColor);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the origin of the surface vertex color (surface color) changed.
+    * The color generation then based on the current user chosen color origin.
+    *
+    * @param[in] sensorColor        Color of sensor surface.
+    */
+    void setSensorColors(const MatrixX3f& sensorColor);
 
 protected:
     //=========================================================================================================

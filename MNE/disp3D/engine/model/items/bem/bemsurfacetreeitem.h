@@ -134,6 +134,8 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
+
+    void onColorOriginChanged();
 };
 
 } //NAMESPACE DISP3DLIB
