@@ -264,8 +264,14 @@ int main(int argc, char *argv[])
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurement Data", evoked.data, t_sensorSurfaceVV[0],
-                                                                              evoked.info, "MEG", 0.05, "Cubic")) {
+    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+                                                                             evoked.comment,
+                                                                             evoked.data,
+                                                                             t_sensorSurfaceVV[0],
+                                                                             evoked.info,
+                                                                             "MEG",
+                                                                             0.05,
+                                                                             "Cubic")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
@@ -273,13 +279,17 @@ int main(int argc, char *argv[])
         pMegSensorTreeItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
         pMegSensorTreeItem->setColortable("Jet");
         pMegSensorTreeItem->setCancelDistance(0.16);
-
     }
 
     //add sensor item for EEG data
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment, evoked.data, t_Bem[0],
-                                                                             evoked.info, "EEG", 0.05, "Cubic")) {
+                                                                             evoked.comment,
+                                                                             evoked.data,
+                                                                             t_Bem[0],
+                                                                             evoked.info,
+                                                                             "EEG",
+                                                                             0.05,
+                                                                             "Cubic")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
@@ -287,7 +297,6 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
         pEegSensorTreeItem->setColortable("Jet");
         pEegSensorTreeItem->setCancelDistance(0.16);
-
     }
 
     if(bAddRtSourceLoc) {
@@ -296,7 +305,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingActive(true);
+            pRTDataItem->setStreamingActive(false);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
             pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColortable("Jet");

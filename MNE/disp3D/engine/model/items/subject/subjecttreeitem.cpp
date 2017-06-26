@@ -113,7 +113,7 @@ void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasure
 
 //*************************************************************************************************************
 
-void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem)
+void SubjectTreeItem::connectEEGMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem)
 {
     //Connect bem head item with the measurement tree items in case the real time color changes (i.e. rt source loc)
     QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
@@ -126,10 +126,10 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
             foreach(QStandardItem* itemBemSurf, bemSurfacesItemList) {
                 if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(itemBemSurf)) {
                     if(pBemSurfItem->text() == "Head") {
-                        connect(pMeasurementItem, &MeasurementTreeItem::sensorColorChanged,
+                        connect(pMeasurementItem, &MeasurementTreeItem::sensorEEGColorChanged,
                             pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
                         connect(pBemSurfItem, &BemSurfaceTreeItem::colorOriginChanged,
-                            pMeasurementItem, &MeasurementTreeItem::setSensorColors);
+                            pMeasurementItem, &MeasurementTreeItem::setSensorEEGColors);
                     }
                 }
             }
@@ -140,23 +140,23 @@ void SubjectTreeItem::connectMeasurementToBemHeadItems(MeasurementTreeItem* pMea
 
 //*************************************************************************************************************
 
-void SubjectTreeItem::connectMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem)
+void SubjectTreeItem::connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem)
 {
     //Connect bem sensor surface item with the measurement tree items in case the real time color changes (i.e. rt source loc)
-    QList<QStandardItem*> sensoSetItemList = this->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
+    QList<QStandardItem*> sensorSetItemList = this->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
     QList<QStandardItem*> sensorSurfacesItemList;
 
-    for(int i = 0; i < sensoSetItemList.size(); ++i) {
-        if(SensorSetTreeItem* pSensorSetItem = dynamic_cast<SensorSetTreeItem*>(sensoSetItemList.at(i))) {
+    for(int i = 0; i < sensorSetItemList.size(); ++i) {
+        if(SensorSetTreeItem* pSensorSetItem = dynamic_cast<SensorSetTreeItem*>(sensorSetItemList.at(i))) {
             sensorSurfacesItemList = pSensorSetItem->findChildren(Data3DTreeModelItemTypes::SensorSurfaceItem);
 
             for(int k = 0; k < sensorSurfacesItemList.size(); ++k) {
                 if(SensorSurfaceTreeItem* pSensorSetSurfItem = dynamic_cast<SensorSurfaceTreeItem*>(sensorSurfacesItemList.at(i))) {
                     if(pSensorSetSurfItem->text() == "Sensor Surface") {
-                        connect(pMeasurementItem, &MeasurementTreeItem::sensorColorChanged,
+                        connect(pMeasurementItem, &MeasurementTreeItem::sensorMEGColorChanged,
                             pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
                         connect(pSensorSetSurfItem, &SensorSurfaceTreeItem::colorOriginChanged,
-                            pMeasurementItem, &MeasurementTreeItem::setSensorColors);
+                            pMeasurementItem, &MeasurementTreeItem::setSensorMEGColors);
                     }
                 }
             }
