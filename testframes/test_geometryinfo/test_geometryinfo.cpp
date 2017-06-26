@@ -96,7 +96,7 @@ TestGeometryInfo::TestGeometryInfo() {
 //*************************************************************************************************************
 void TestGeometryInfo::initTestCase() {
     //acquire real surface data
-    QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     realSurface = t_sensorSurfaceVV[0];
 
