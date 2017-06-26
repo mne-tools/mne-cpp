@@ -286,7 +286,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
         //Add EEG data to interpolation
         if(!m_pRtEEGSensorDataItem) {
             m_pRtEEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
-                                                                "EEG Data",
+                                                                "Online Measurement",
                                                                 m_pRTMSA->getMultiSampleArray().first(),
                                                                 (*m_pBemHead.data())[0],
                                                                 *m_pFiffInfo.data(),
@@ -310,8 +310,8 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
         //Add MEG data to interpolation
         if(!m_pRtMEGSensorDataItem) {
-            m_pRtMEGSensorDataItem = m_pData3DModel->addSensorData("Sensors",
-                                                                "MEG Data",
+            m_pRtMEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
+                                                                "Online Measurement",
                                                                 m_pRTMSA->getMultiSampleArray().first(),
                                                                 (*m_pBemSensor.data())[0],
                                                                 *m_pFiffInfo.data(),
