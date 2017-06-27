@@ -333,7 +333,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
             }
         }
 
-        for(MatrixXd data : m_pRTMSA->getMultiSampleArray()) {
+        for(const MatrixXd &data : m_pRTMSA->getMultiSampleArray()) {
             if(m_pRtEEGSensorDataItem) {
                 m_pRtEEGSensorDataItem->addData(data);
             }
