@@ -99,7 +99,8 @@ namespace Data3DTreeModelItemTypes
                     SensorSetItem = QStandardItem::UserType + 15,
                     SensorSurfaceItem = QStandardItem::UserType + 16,
                     SensorPositionItem = QStandardItem::UserType + 17,
-                    AbstractMeshItem = QStandardItem::UserType + 18};
+                    AbstractMeshItem = QStandardItem::UserType + 18,
+                    SensorDataItem = QStandardItem::UserType + 19};
 }
 
 namespace MetaTreeItemTypes
@@ -131,7 +132,9 @@ namespace MetaTreeItemTypes
                     NumberDipoles = QStandardItem::UserType + 125,
                     MaterialType = QStandardItem::UserType + 126,
                     ShowNormals = QStandardItem::UserType + 127,
-                    Scale = QStandardItem::UserType + 128  };
+                    Scale = QStandardItem::UserType + 128,
+                    CancelDistance = QStandardItem::UserType + 129,
+                    InterpolationFunction = QStandardItem::UserType + 130};
 }
 
 // Model item roles
@@ -198,7 +201,9 @@ namespace MetaTreeItemRoles
                     SurfaceTessOuter = Qt::UserRole + 24,
                     SurfaceTriangleScale = Qt::UserRole + 25,
                     SurfaceMaterial = Qt::UserRole + 26,
-                    Scale = Qt::UserRole + 27};
+                    Scale = Qt::UserRole + 27,
+                    CancelDistance = Qt::UserRole + 28,
+                    InterpolationFunction = Qt::UserRole + 29};
 }
 
 } //NAMESPACE DISP3DLIB

@@ -82,9 +82,11 @@ namespace MNELIB {
     class MNESourceSpace;
     class MNEBem;
     class MNESourceEstimate;
+    class MNEBemSurface;
 }
 
 namespace FIFFLIB{
+    class FiffEvoked;
     class FiffDigPointSet;
 }
 
@@ -117,6 +119,7 @@ class SensorSetTreeItem;
 class DigitizerSetTreeItem;
 class SubjectTreeItem;
 class MeasurementTreeItem;
+class SensorDataTreeItem;
 
 
 //=============================================================================================================
@@ -306,6 +309,30 @@ public:
     DigitizerSetTreeItem* addDigitizerData(const QString& sSubject,
                                            const QString& sMeasurementSetName,
                                            const FIFFLIB::FiffDigPointSet &digitizer);
+
+    //=========================================================================================================
+    /**
+    * Adds live sensor data.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] matSensorData          The Sensor Data.
+    * @param[in] tBemSurface            The Bem Surface data.
+    * @param[in] fiffInfo             The FiffInfo that holds all information about the sensors.
+    * @param[in] sDataType              The data type ("MEG" or "EEG").
+    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
+    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+    *
+    * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    SensorDataTreeItem* addSensorData(const QString& sSubject,
+                                      const QString& sMeasurementSetName,
+                                      const Eigen::MatrixXd& matSensorData,
+                                      const MNELIB::MNEBemSurface& tBemSurface,
+                                      const FIFFLIB::FiffInfo &fiffInfo,
+                                      const QString &sDataType,
+                                      const double dCancelDist,
+                                      const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
