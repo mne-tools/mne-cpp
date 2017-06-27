@@ -2,7 +2,6 @@
 #
 # @file     testframes.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
@@ -45,6 +44,8 @@ SUBDIRS += \
     test_fiff_mne_types_io \
     test_forward_solution \
     test_fiff_cov \
+    test_geometryinfo \
+    test_interpolation \
     test_fiff_digitizer \
     test_mne_msh_display_surface_set
 

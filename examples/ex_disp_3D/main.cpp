@@ -43,6 +43,7 @@
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
@@ -55,6 +56,8 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
+#include <geometryInfo/geometryinfo.h>
+#include <interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,6 +79,8 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace GEOMETRYINFO;
+using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************
@@ -240,23 +245,54 @@ int main(int argc, char *argv[])
     //Create 3D data model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
+
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
+
 
     //Read and show BEM
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
+
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     p3DDataModel->addMegSensorInfo("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
 
+
+
     // Read & show digitizer points
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+
+
+    //add sensor item for MEG data
+    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0],
+                                                                              evoked.info, "MEG", 0.05, "Cubic")) {
+        pMegSensorTreeItem->setLoopState(true);
+        pMegSensorTreeItem->setTimeInterval(17);
+        pMegSensorTreeItem->setNumberAverages(1);
+        pMegSensorTreeItem->setStreamingActive(false);
+        pMegSensorTreeItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
+        pMegSensorTreeItem->setColortable("Hot Negative 2");
+
+    }
+
+    //add sensor item for EEG data
+    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+                                                                             evoked.comment, evoked.data, t_Bem[0],
+                                                                             evoked.info, "EEG", 0.05, "Cubic")) {
+        pEegSensorTreeItem->setLoopState(true);
+        pEegSensorTreeItem->setTimeInterval(17);
+        pEegSensorTreeItem->setNumberAverages(1);
+        pEegSensorTreeItem->setStreamingActive(false);
+        pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
+        pEegSensorTreeItem->setColortable("Hot Negative 2");
+
+    }
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values

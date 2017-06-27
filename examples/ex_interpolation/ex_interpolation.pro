@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_dipole_fit.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     ex_interpolation.pro
+# @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     November, 2016
+# @date     May, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Implements mne_dipole_fit application of MNE-C
+# @brief    Builds an example on how to use the new interpolation and geometryInfo libs
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,12 +39,12 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets 3dextras
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = mne_dipole_fit
+TARGET = ex_interpolation
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -59,12 +59,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}GeometryInfod \
             -lMNE$${MNE_LIB_VERSION}Interpolationd \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}DispChartsd \
-            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -74,23 +68,15 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}GeometryInfo \
             -lMNE$${MNE_LIB_VERSION}Interpolation \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}DispCharts \
-            -lMNE$${MNE_LIB_VERSION}Disp3D
+
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    main.cpp
+        main.cpp \
 
 HEADERS += \
 
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

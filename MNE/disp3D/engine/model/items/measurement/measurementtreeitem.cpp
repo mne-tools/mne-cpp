@@ -50,6 +50,7 @@
 #include "../digitizer/digitizertreeitem.h"
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
+#include "../sensordata/sensordatatreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -57,6 +58,7 @@
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_sourcespace.h>
+#include <mne/mne_bem_surface.h>
 
 #include <fiff/fiff_dig_point_set.h>
 
@@ -95,7 +97,7 @@ using namespace CONNECTIVITYLIB;
 //=============================================================================================================
 
 MeasurementTreeItem::MeasurementTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
+    : AbstractTreeItem(iType, text)
 {
     initItem();
 }
@@ -186,16 +188,16 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                         pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.first());
                     }
 
-//                    //Option 2 - Choose MRI set by its name
-//                    QString sMRISetName = "MRI";
+                    //                    //Option 2 - Choose MRI set by its name
+                    //                    QString sMRISetName = "MRI";
 
-//                    for(int i = 0; i < lMRIChildren.size(); ++i) {
-//                        if(lMRIChildren.at(i)->text() == sMRISetName) {
-//                            if(pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.at(i))) {
-//                                i = lMRIChildren.size();
-//                            }
-//                        }
-//                    }
+                    //                    for(int i = 0; i < lMRIChildren.size(); ++i) {
+                    //                        if(lMRIChildren.at(i)->text() == sMRISetName) {
+                    //                            if(pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.at(i))) {
+                    //                                i = lMRIChildren.size();
+                    //                            }
+                    //                        }
+                    //                    }
 
                     if(pMriItem) {
                         QList<QStandardItem*> itemList = pMriItem->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
@@ -219,12 +221,12 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 
                         if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && pAnnotTreeItemLeft && pAnnotTreeItemRight) {
                             m_pMneEstimateTreeItem->init(tForwardSolution,
-                                                        pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
-                                                        pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
-                                                        pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                        pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                        pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
-                                                        pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
+                                                         pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
+                                                         pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
+                                                         pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                         pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                         pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
+                                                         pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
                         }
                     }
                 }
@@ -245,6 +247,48 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
     }
 
     return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
+                                                 const MNEBemSurface &bemSurface,
+                                                 const FiffInfo &fiffInfo,
+                                                 const QString &sSensorType,
+                                                 const double dCancelDist,
+                                                 const QString &sInterpolationFunction)
+{
+    if(!tSensorData.size() == 0) {
+        if(m_pSensorDataTreeItem) {
+            m_pSensorDataTreeItem->addData(tSensorData);
+        }
+        else {
+            //Add sensor data as child
+            if(this->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() == 0) {
+                //If rt data item does not exists yet, create it here!
+                m_pSensorDataTreeItem = new SensorDataTreeItem();
+
+                QList<QStandardItem*> list;
+                list << m_pSensorDataTreeItem;
+                list << new QStandardItem(m_pSensorDataTreeItem->toolTip());
+                this->appendRow(list);
+
+                MatrixX3f greyColor = MatrixX3f::Constant(bemSurface.rr.rows(), 3, 100.0f);
+                m_pSensorDataTreeItem->init(greyColor, bemSurface, fiffInfo, sSensorType, dCancelDist, sInterpolationFunction);
+
+                connect(m_pSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
+                        this, &MeasurementTreeItem::onVertColorChanged);
+
+
+                m_pSensorDataTreeItem->addData(tSensorData);
+            } else {
+                qDebug() << "MeasurementTreeItem::addData - Cannot add sensor data since the SensorDataItem child already exist. Returning...";
+            }
+        }
+    }
+
+    return m_pSensorDataTreeItem;
 }
 
 

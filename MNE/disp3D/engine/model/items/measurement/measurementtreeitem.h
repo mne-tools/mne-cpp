@@ -77,6 +77,7 @@ namespace FSLIB {
 namespace MNELIB {
     class MNESourceSpace;
     class MNESourceEstimate;
+    class MNEBemSurface;
 }
 
 namespace FIFFLIB{
@@ -106,6 +107,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MneEstimateTreeItem;
+class SensorDataTreeItem;
 class NetworkTreeItem;
 class EcdDataTreeItem;
 class FsSurfaceTreeItem;
@@ -157,6 +159,26 @@ public:
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds interpolated activation data to this item.
+    *
+    * @param[in] tSensorData            The SensorData.
+    * @param[in] bemSurface             Holds all Bem data used in this item.
+    * @param[in] fiffInfo               Holds all information needed about the sensors.
+    * @param[in] sSensorType            Name of the sensor type EEG or MEG.
+    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
+    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+    *
+    * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+    */
+    SensorDataTreeItem* addData(const MatrixXd& tSensorData,
+                                const MNELIB::MNEBemSurface &bemSurface,
+                                const FIFFLIB::FiffInfo &fiffInfo,
+                                const QString &sSensorType,
+                                const double dCancelDist,
+                                const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -217,6 +239,7 @@ protected:
     void onVertColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
+    QPointer<SensorDataTreeItem>                 m_pSensorDataTreeItem;         /**< The rt sensor data item of this item. */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 

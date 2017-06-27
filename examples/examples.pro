@@ -52,7 +52,8 @@ SUBDIRS += \
     ex_read_evoked \
     ex_read_fwd \
     ex_read_raw \
-    ex_read_write_raw
+    ex_read_write_raw \
+    ex_interpolation
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
@@ -71,7 +72,8 @@ SUBDIRS += \
             ex_inverse_rap_music \
             ex_read_fwd_disp_3D \
             ex_roi_clustered_inverse_pwl_rap_music \
-            ex_st_clustered_inverse_pwl_rap_music
+            ex_st_clustered_inverse_pwl_rap_music \
+            ex_interpolation
 
         !isEmpty( CNTK_INCLUDE_DIR ) {
             SUBDIRS += \

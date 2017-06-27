@@ -159,6 +159,12 @@ void MetaTreeItem::initItem()
         case MetaTreeItemTypes::Scale:
             sToolTip = "The scaling value";
             break;
+        case MetaTreeItemTypes::CancelDistance:
+            sToolTip = "The cancel distance";
+            break;
+        case MetaTreeItemTypes::InterpolationFunction:
+            sToolTip = "The function used for interpolation";
+            break;
         default: // do nothing;
             break;
     }
