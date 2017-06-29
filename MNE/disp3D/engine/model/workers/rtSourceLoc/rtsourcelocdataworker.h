@@ -304,7 +304,9 @@ private:
     bool                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
     bool                    m_bAnnotationDataIsInit;            /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                    m_bIsOverflowing;                   /**< Flag specifying if the thread is too slow to stream the data. If so no further data is accepted in the addData function. */
 
+    int                     m_iDataSizeOld;                     /**< Old number of received data to be streamed. This is used to estimate whether the dat ais overflowing. */
     int                     m_iAverageSamples;                  /**< Number of average to compute. */
     int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */

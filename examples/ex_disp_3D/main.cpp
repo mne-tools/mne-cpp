@@ -270,10 +270,10 @@ int main(int argc, char *argv[])
                                                                              t_sensorSurfaceVV[0],
                                                                              evoked.info,
                                                                              "MEG",
-                                                                             0.05,
+                                                                             0.15,
                                                                              "Cubic")) {
         pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(17);
+        pMegSensorTreeItem->setTimeInterval(0);
         pMegSensorTreeItem->setNumberAverages(1);
         pMegSensorTreeItem->setStreamingActive(false);
         pMegSensorTreeItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
@@ -288,10 +288,10 @@ int main(int argc, char *argv[])
                                                                              t_Bem[0],
                                                                              evoked.info,
                                                                              "EEG",
-                                                                             0.05,
+                                                                             0.15,
                                                                              "Cubic")) {
         pEegSensorTreeItem->setLoopState(true);
-        pEegSensorTreeItem->setTimeInterval(17);
+        pEegSensorTreeItem->setTimeInterval(0);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
         pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
         //Add rt source loc data and init some visualization values
         if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
             pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(17);
+            pRTDataItem->setTimeInterval(0);
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(false);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));

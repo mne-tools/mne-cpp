@@ -291,13 +291,13 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                                                                 (*m_pBemHead.data())[0],
                                                                 *m_pFiffInfo.data(),
                                                                 "EEG",
-                                                                0.18,
+                                                                0.05,
                                                                 "Cubic");
 
             if(m_pRtEEGSensorDataItem) {
                 m_pRtEEGSensorDataItem->setLoopState(false);
-                m_pRtEEGSensorDataItem->setTimeInterval(17);
-                m_pRtEEGSensorDataItem->setNumberAverages(17);
+                m_pRtEEGSensorDataItem->setTimeInterval(0);
+                m_pRtEEGSensorDataItem->setNumberAverages(5);
                 m_pRtEEGSensorDataItem->setStreamingActive(true);
                 m_pRtEEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
                 m_pRtEEGSensorDataItem->setColortable("Jet");
@@ -321,8 +321,8 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
             if(m_pRtMEGSensorDataItem) {
                 m_pRtMEGSensorDataItem->setLoopState(false);
-                m_pRtMEGSensorDataItem->setTimeInterval(17);
-                m_pRtMEGSensorDataItem->setNumberAverages(17);
+                m_pRtMEGSensorDataItem->setTimeInterval(0);
+                m_pRtMEGSensorDataItem->setNumberAverages(5);
                 m_pRtMEGSensorDataItem->setStreamingActive(true);
                 m_pRtMEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
                 m_pRtMEGSensorDataItem->setColortable("Jet");
