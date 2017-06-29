@@ -261,11 +261,10 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                                                  const FiffInfo &fiffInfo,
                                                  const QString &sSensorType,
                                                  const double dCancelDist,
-                                                 const QString &sInterpolationFunction,
-                                                 const QString& sDataType)
+                                                 const QString &sInterpolationFunction)
 {
     if(!tSensorData.size() == 0) {
-        if(sDataType == "EEG") {
+        if(sSensorType == "EEG") {
             if(m_pEEGSensorDataTreeItem) {
                 m_pEEGSensorDataTreeItem->addData(tSensorData);
             } else {
@@ -315,7 +314,7 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
             return m_pEEGSensorDataTreeItem;
         }
 
-        if(sDataType == "MEG") {
+        if(sSensorType == "MEG") {
             if(m_pMEGSensorDataTreeItem) {
                 m_pMEGSensorDataTreeItem->addData(tSensorData);
             } else {
