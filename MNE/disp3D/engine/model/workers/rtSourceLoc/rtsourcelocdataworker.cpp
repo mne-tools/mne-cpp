@@ -390,6 +390,8 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_iMSecIntervall(50)
 , m_bSurfaceDataIsInit(false)
 , m_bAnnotationDataIsInit(false)
+, m_bIsOverflowing(false)
+, m_iDataSizeOld(0)
 {
     m_lVisualizationInfo << VisualizationInfo() << VisualizationInfo();
     m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
@@ -411,6 +413,10 @@ RtSourceLocDataWorker::~RtSourceLocDataWorker()
 
 void RtSourceLocDataWorker::addData(const MatrixXd& data)
 {
+    if(m_bIsOverflowing) {
+        return;
+    }
+
     QMutexLocker locker(&m_qMutex);
     if(data.rows() == 0)
         return;
@@ -667,13 +673,26 @@ void RtSourceLocDataWorker::run()
             m_qMutex.unlock();
         }
 
-        //Sleep specified amount of time - also take into account processing time from before
-        int iTimerElapsed = timer.elapsed();
-        //qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
-
-        if(m_iMSecIntervall-iTimerElapsed > 0) {
-            QThread::msleep(m_iMSecIntervall-iTimerElapsed);
+        //Check if more data is beeing sent than the thread can work off
+        if(m_iDataSizeOld > m_lData.size()) {
+            m_bIsOverflowing = true;
+        } else {
+            m_bIsOverflowing = false;
         }
+
+        m_iDataSizeOld = m_lData.size();
+
+        //Sleep specified amount of time - also take into account processing time from before
+        if(m_iMSecIntervall > 0) {
+            QThread::msleep(m_iMSecIntervall);
+        }
+
+//        int iTimerElapsed = timer.elapsed();
+//        //qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
+
+//        if(m_iMSecIntervall-iTimerElapsed > 0) {
+//            QThread::msleep(m_iMSecIntervall-iTimerElapsed);
+//        }
     }
 }
 

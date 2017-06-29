@@ -98,6 +98,8 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
 , m_iMSecIntervall(17)
 , m_bSurfaceDataIsInit(false)
 , m_iNumSensors(0)
+, m_bIsOverflowing(false)
+, m_iDataSizeOld(0)
 {
     m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
@@ -123,6 +125,10 @@ RtSensorDataWorker::~RtSensorDataWorker()
 
 void RtSensorDataWorker::addData(const MatrixXd& data)
 {
+    if(m_bIsOverflowing) {
+        return;
+    }
+
     QMutexLocker locker(&m_qMutex);
     if(data.rows() == 0) {
         return;
@@ -335,9 +341,9 @@ void RtSensorDataWorker::run()
     VectorXd t_vecAverage;
 
     m_bIsRunning = true;
+    QTime timer;
 
     while(true) {
-        QTime timer;
         timer.start();
 
         {
@@ -393,11 +399,20 @@ void RtSensorDataWorker::run()
             m_qMutex.unlock();
         }
 
-        //Sleep specified amount of time - also take into account processing time from before
-        const int iTimeLeft = m_iMSecIntervall - timer.elapsed();
+        //Check if more data is beeing sent than the thread can work off
+        if(m_iDataSizeOld > m_lData.size()) {
+            m_bIsOverflowing = true;
+        } else {
+            m_bIsOverflowing = false;
+        }
 
-        if(iTimeLeft > 0) {
-            QThread::msleep(iTimeLeft);
+        m_iDataSizeOld = m_lData.size();
+
+        //Sleep specified amount of time - also take into account processing time from before
+        //const int iTimeLeft = m_iMSecIntervall - timer.elapsed();
+
+        if(m_iMSecIntervall > 0) {
+            QThread::msleep(m_iMSecIntervall);
         }
     }
 }
