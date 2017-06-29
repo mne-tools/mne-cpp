@@ -260,7 +260,7 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                                                  const MNEBemSurface &bemSurface,
                                                  const FiffInfo &fiffInfo,
                                                  const QString &sSensorType,
-                                                 const double& dCancelDist,
+                                                 const double dCancelDist,
                                                  const QString &sInterpolationFunction,
                                                  const QString& sDataType)
 {

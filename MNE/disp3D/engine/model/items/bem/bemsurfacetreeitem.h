@@ -135,6 +135,11 @@ protected:
     */
     void initItem();
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever the color info changed. This needs to be done here since handling BEM color
+    * changes need to handled different to other AbstractMeshTreeItem objects.
+    */
     void onColorOriginChanged();
 };
 

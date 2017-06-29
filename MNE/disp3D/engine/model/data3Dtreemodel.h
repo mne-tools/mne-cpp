@@ -331,7 +331,7 @@ public:
                                       const MNELIB::MNEBemSurface& tBemSurface,
                                       const FIFFLIB::FiffInfo &fiffInfo,
                                       const QString &sDataType,
-                                      const double &dCancelDist,
+                                      const double dCancelDist,
                                       const QString &sInterpolationFunction);
 
     //=========================================================================================================

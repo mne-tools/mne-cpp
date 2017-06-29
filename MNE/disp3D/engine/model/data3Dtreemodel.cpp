@@ -491,7 +491,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                         const MNEBemSurface& tBemSurface,
                                         const FiffInfo& fiffInfo,
                                         const QString& sDataType,
-                                        const double& dCancelDist,
+                                        const double dCancelDist,
                                         const QString& sInterpolationFunction)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;

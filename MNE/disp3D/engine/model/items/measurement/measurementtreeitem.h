@@ -178,7 +178,7 @@ public:
                                 const MNELIB::MNEBemSurface &bemSurface,
                                 const FIFFLIB::FiffInfo &fiffInfo,
                                 const QString &sSensorType,
-                                const double &dCancelDist,
+                                const double dCancelDist,
                                 const QString &sInterpolationFunction,
                                 const QString &sDataType);
 
