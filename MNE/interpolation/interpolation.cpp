@@ -158,7 +158,7 @@ QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<S
     if(pInterpolationMatrix){
         QSharedPointer<VectorXf> pOutVec = QSharedPointer<VectorXf>::create();
         if (pInterpolationMatrix->cols() != vecMeasurementData.rows()) {
-            qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension missmatch. Return null pointer...";
+            qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
             return QSharedPointer<VectorXf>(nullptr);
         }
         (*pOutVec) = ((*pInterpolationMatrix) * vecMeasurementData).cast<float> ();

@@ -264,22 +264,16 @@ int main(int argc, char *argv[])
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     //Co-Register EEG points
-    QFile coordTransfile("D:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/all-trans.fif");
+    QFile coordTransfile("./MNE-sample-data/MEG/sample/all-trans.fif");
     FiffCoordTrans coordTransA(coordTransfile);
 
     for(int i = 0; i < evoked.info.chs.size(); ++i) {
         if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
-            Vector4f tempvec;
-            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
-            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
-            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
-            tempvec(3) = 1;
-            tempvec = coordTransA.invtrans * tempvec;
-            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
-            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
-            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+            evoked.info.chs[i].coil_trans = coordTransA.invtrans;
         }
     }
+
+    p3DDataModel->addEegSensorInfo("Sensors", "Tracked", evoked.info.chs);
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
