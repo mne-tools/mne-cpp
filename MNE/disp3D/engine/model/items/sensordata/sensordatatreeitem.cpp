@@ -464,6 +464,16 @@ void SensorDataTreeItem::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
+void SensorDataTreeItem::updateBadChannels(const FiffInfo& info)
+{
+    if(m_pSensorRtDataWorker) {
+        m_pSensorRtDataWorker->updateBadChannels(info);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void SensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(m_pSensorRtDataWorker) {
