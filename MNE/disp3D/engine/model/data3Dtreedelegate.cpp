@@ -133,11 +133,12 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
 
                 //Get data
                 MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+                matRTData = matRTData.cwiseAbs();
 
                 //Calcualte histogram
                 Eigen::VectorXd resultClassLimit;
                 Eigen::VectorXi resultFrequency;
-                MNEMath::histcounts(matRTData, true, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+                MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
 
                 //Create histogram plot
                 pSpline->setData(resultClassLimit, resultFrequency, 0);
@@ -402,11 +403,12 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
                     //Get data
                     MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+                    matRTData = matRTData.cwiseAbs();
 
                     //Calcualte histogram
                     Eigen::VectorXd resultClassLimit;
                     Eigen::VectorXi resultFrequency;
-                    MNEMath::histcounts(matRTData, true, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+                    MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
 
                     //Create histogram plot
                     pSpline->setData(resultClassLimit, resultFrequency, 0);

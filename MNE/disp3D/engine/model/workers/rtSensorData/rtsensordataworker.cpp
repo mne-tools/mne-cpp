@@ -458,12 +458,11 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
 
     //Generate color data for vertices
-    normalizeAndTransformToColor(
-                vecIntrpltdVals,
-                m_lVisualizationInfo.matFinalVertColor,
-                m_lVisualizationInfo.dThresholdX,
-                m_lVisualizationInfo.dThresholdZ,
-                m_lVisualizationInfo.functionHandlerColorMap);
+    normalizeAndTransformToColor(vecIntrpltdVals,
+                                    m_lVisualizationInfo.matFinalVertColor,
+                                    m_lVisualizationInfo.dThresholdX,
+                                    m_lVisualizationInfo.dThresholdZ,
+                                    m_lVisualizationInfo.functionHandlerColorMap);
 
     return m_lVisualizationInfo.matFinalVertColor;
 }
@@ -489,14 +488,14 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
     const double dTresholdDiff = dThreholdZ - dThresholdX;
 
     for(int r = 0; r < vecData.rows(); ++r) {
-        fSample = vecData(r);
+        //Take the absolute values because the histogram threshold is also calcualted using the absolute values
+        fSample = fabs(vecData(r));
 
         if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
             if(fSample >= dThreholdZ) {
                 fSample = 1.0f;
-            }
-            else {
+            } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
                     fSample = (fSample - dThresholdX) / (dTresholdDiff);
                 } else {
