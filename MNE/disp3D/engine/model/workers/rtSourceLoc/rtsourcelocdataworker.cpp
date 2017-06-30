@@ -183,7 +183,8 @@ void transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, do
     double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
 
     for(int r = 0; r < data.rows(); ++r) {
-        dSample = data(r);
+        //Take the absolute values because the histogram threshold is also calcualted using the absolute values
+        dSample = fabs(data(r));
 
         if(dSample >= dTrehsoldX) {
             //Check lower and upper thresholds and normalize to one
@@ -286,7 +287,7 @@ void generateColorsPerAnnotation(VisualizationInfo& input)
         //Transform label activations to rgb colors
         //Check if value is bigger than lower threshold. If not, don't plot activation
         if(vecLabelActivation[label.label_id] >= input.dThresholdX) {
-            transformDataToColor(vecLabelActivation[label.label_id], color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
+            transformDataToColor(fabs(vecLabelActivation[label.label_id]), color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
 
             for(int j = 0; j<label.vertices.rows(); j++) {
                 input.matFinalVertColor(label.vertices(j),0) = color.redF();

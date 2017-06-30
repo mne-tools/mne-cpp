@@ -172,6 +172,7 @@ public:
      * @return                              The function value of the gauss curve at d
      */
     static double gaussian(const double dIn);
+
     //=========================================================================================================
     /**
      * Calculates interpolation weights based on distance values
@@ -182,8 +183,8 @@ public:
      * @return                              The function value of the negative parabel at d
      */
     static double square(const double dIn);
-    //=========================================================================================================
 
+    //=========================================================================================================
     /**
      * Calculates interpolation weights based on distance values
      *
