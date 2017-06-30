@@ -130,6 +130,8 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
         return;
     }
 
+    qDebug() <<"RtSensorDataWorker::addData - m_lData.size()"<<m_lData.size();
+
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
         if(m_lData.size() < m_dSFreq) {
@@ -154,7 +156,6 @@ void RtSensorDataWorker::clear()
 
 void RtSensorDataWorker::calculateSurfaceData()
 {
-
     //SCDC with cancel distance 
     m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
                                                               m_lInterpolationData.pVecMappedSubset,
@@ -169,7 +170,9 @@ void RtSensorDataWorker::calculateSurfaceData()
     m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
                                                                                m_lInterpolationData.pDistanceMatrix,
                                                                                m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance);
+                                                                               m_lInterpolationData.dCancelDistance,
+                                                                               m_lInterpolationData.fiffInfo,
+                                                                               m_lInterpolationData.iSensorType);
 }
 
 //*************************************************************************************************************

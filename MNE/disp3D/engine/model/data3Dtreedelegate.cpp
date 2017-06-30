@@ -137,7 +137,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                 //Calcualte histogram
                 Eigen::VectorXd resultClassLimit;
                 Eigen::VectorXi resultFrequency;
-                MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+                MNEMath::histcounts(matRTData, true, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
 
                 //Create histogram plot
                 pSpline->setData(resultClassLimit, resultFrequency, 0);
@@ -406,7 +406,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
                     //Calcualte histogram
                     Eigen::VectorXd resultClassLimit;
                     Eigen::VectorXi resultFrequency;
-                    MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+                    MNEMath::histcounts(matRTData, true, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
 
                     //Create histogram plot
                     pSpline->setData(resultClassLimit, resultFrequency, 0);

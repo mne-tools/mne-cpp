@@ -45,6 +45,9 @@
 #include "interpolation_global.h"
 #include <limits>
 
+#include <fiff/fiff_info.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -52,6 +55,7 @@
 
 #include <QSharedPointer>
 #include <QVector>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -61,11 +65,11 @@
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 
 //*************************************************************************************************************
@@ -128,7 +132,9 @@ public:
     static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
                                                                                const QSharedPointer<Eigen::MatrixXd> pDistanceTable,
                                                                                double (*interpolationFunction) (double),
-                                                                               const double dCancelDist = DOUBLE_INFINITY);
+                                                                               const double dCancelDist = DOUBLE_INFINITY,
+                                                                               const FIFFLIB::FiffInfo &fiffInfo = FIFFLIB::FiffInfo(),
+                                                                               qint32 iSensorType = FIFFV_EEG_CH);
 
     //=========================================================================================================
     /**
