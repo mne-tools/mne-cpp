@@ -41,6 +41,7 @@
 
 #include "interpolation.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -81,7 +82,9 @@ using namespace Eigen;
 QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
                                                                             const QSharedPointer<MatrixXd> pDistanceTable,
                                                                             double (*interpolationFunction) (double),
-                                                                            const double dCancelDist)
+                                                                            const double dCancelDist,
+                                                                            const FIFFLIB::FiffInfo& fiffInfo,
+                                                                            qint32 iSensorType)
 {
     if (! pDistanceTable) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table. Returning null pointer...";
@@ -93,11 +96,20 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
     QVector<Eigen::Triplet<double> > vecNonZeroEntries;
     const qint32 iRows = pInterpolationMatrix->rows();
     const qint32 iCols = pInterpolationMatrix->cols();
-    // insert all sensor nodes into set for faster lookup during later computation
+
+    // insert all sensor nodes into set for faster lookup during later computation. Also consider bad channels here.
     QSet<qint32> sensorLookup;
-    for (qint32 i = 0; i < pProjectedSensors->size(); ++i){
-        sensorLookup.insert (pProjectedSensors->at(i));
+    int idx = 0;
+    for(const FIFFLIB::FiffChInfo& s : fiffInfo.chs){
+        if(s.kind == iSensorType){
+            if(!fiffInfo.bads.contains(s.ch_name)){
+                sensorLookup.insert (pProjectedSensors->at(idx));
+            }
+
+            idx++;
+        }
     }
+
     // main loop: go through all rows of distance table and calculate weights
     for (qint32 r = 0; r < iRows; ++r) {
         if (sensorLookup.contains(r) == false) {
@@ -134,7 +146,7 @@ QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<S
     if(pInterpolationMatrix){
         QSharedPointer<VectorXf> pOutVec = QSharedPointer<VectorXf>::create();
         if (pInterpolationMatrix->cols() != vecMeasurementData.rows()) {
-            qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
+            qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension missmatch. Return null pointer...";
             return QSharedPointer<VectorXf>(nullptr);
         }
         (*pOutVec) = ((*pInterpolationMatrix) * vecMeasurementData).cast<float> ();
