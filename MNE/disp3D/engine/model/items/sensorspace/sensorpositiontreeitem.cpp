@@ -63,6 +63,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -118,6 +120,8 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
 
         //Create plane mesh
         Renderable3DEntity* pSensorEntity = new Renderable3DEntity(this);
+        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
+        QMatrix4x4 m;
 
         if(sDataType == "MEG") {
             Qt3DExtras::QCuboidMesh* pSensorRect = new Qt3DExtras::QCuboidMesh();
@@ -126,31 +130,33 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
             pSensorRect->setZExtent(0.001f);
             pSensorEntity->addComponent(pSensorRect);
 
-            //Set plane position and orientation
-            Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-            QMatrix4x4 m;
+            m.translate(pos);
 
             for(int j = 0; j < 4; ++j) {
-                QVector4D row(lChInfo[i].coil_trans.row(j)(0),
-                          lChInfo[i].coil_trans.row(j)(1),
-                          lChInfo[i].coil_trans.row(j)(2),
-                          lChInfo[i].coil_trans.row(j)(3));
-
-                m.setRow(j, row);
+                m(j, 0) = lChInfo[i].coil_trans.row(j)(0);
+                m(j, 1) = lChInfo[i].coil_trans.row(j)(1);
+                m(j, 2) = lChInfo[i].coil_trans.row(j)(2);
             }
-
-            transform->setMatrix(m);
-            pSensorEntity->addComponent(transform);
         } else if (sDataType == "EEG") {
             Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
             sourceSphere->setRadius(0.001f);
-            Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-            QMatrix4x4 m;
-            m.translate(pos);
-            transform->setMatrix(m);
-            pSensorEntity->addComponent(transform);
             pSensorEntity->addComponent(sourceSphere);
+
+            Vector4f posTransRot;
+            posTransRot(0) = pos.x();
+            posTransRot(1) = pos.y();
+            posTransRot(2) = pos.z();
+            posTransRot(3) = 1;
+            posTransRot = lChInfo[i].coil_trans * posTransRot;
+            pos.setX(posTransRot(0));
+            pos.setY(posTransRot(1));
+            pos.setZ(posTransRot(2));
+
+            m.translate(pos);
         }
+
+        transform->setMatrix(m);
+        pSensorEntity->addComponent(transform);
 
         Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
         material->setAmbient(colDefault);
