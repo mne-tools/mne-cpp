@@ -172,9 +172,9 @@ void RealTimeSourceEstimateWidget::getData()
             m_pRtItem->setNormalization(QVector3D(0.0,5,10));
             m_pRtItem->setColortable("Hot");
             m_pRtItem->setVisualizationType("Annotation based");
-            //m_pRtItem->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
             m_pRtItem->setNumberAverages(1);
             m_pRtItem->setStreamingActive(true);
+            m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
         } else {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
 

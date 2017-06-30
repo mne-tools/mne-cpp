@@ -147,14 +147,14 @@ void SensorDataTreeItem::initItem()
     data.setValue(QVector3D(0.0,5.5,15));
     pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
 
-    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "0");
+    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "17");
     connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
             this, &SensorDataTreeItem::onTimeIntervalChanged);
     list.clear();
     list << pItemStreamingInterval;
     list << new QStandardItem(pItemStreamingInterval->toolTip());
     this->appendRow(list);
-    data.setValue(0);
+    data.setValue(17);
     pItemStreamingInterval->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
 
     MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
@@ -447,6 +447,16 @@ void SensorDataTreeItem::setColorOrigin(const MatrixX3f& matVertColor)
 {
     if(m_pSensorRtDataWorker){
         m_pSensorRtDataWorker->setSurfaceColor(matVertColor);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorDataTreeItem::setSFreq(const double dSFreq)
+{
+    if(m_pSensorRtDataWorker) {
+        m_pSensorRtDataWorker->setSFreq(dSFreq);
     }
 }
 

@@ -432,6 +432,7 @@ private:
     float                                       m_fSamplingRate;                /**< Sampling rate */
     qint32                                      m_iT;                           /**< Display window size in seconds */
 
+    QStringList                                 m_slAvailableModalities;        /**< List of available modalitites: EEG, MEG, etc. */
     QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
     QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda  */
     QList<qint32>                               m_qListBadChannels;             /**< Current list of bad channels  */

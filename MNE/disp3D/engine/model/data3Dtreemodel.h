@@ -44,6 +44,8 @@
 #include "../../disp3D_global.h"
 
 #include <mne/mne_forwardsolution.h>
+#include <mne/mne_bem.h>
+
 #include <connectivity/network/network.h>
 
 
@@ -282,7 +284,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds sensor data.
+    * Adds MEG sensor info.
     *
     * @param[in] sSubject           The name of the subject.
     * @param[in] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
@@ -293,8 +295,22 @@ public:
     */
     SensorSetTreeItem* addMegSensorInfo(const QString& sSubject,
                                         const QString& sSensorSetName,
-                                        const MNELIB::MNEBem& sensor,
-                                        const QList<FIFFLIB::FiffChInfo>& lChInfo = QList<FIFFLIB::FiffChInfo>());
+                                        const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                        const MNELIB::MNEBem& sensor = MNELIB::MNEBem());
+
+    //=========================================================================================================
+    /**
+    * Adds EEG sensor info.
+    *
+    * @param[in] sSubject           The name of the subject.
+    * @param[in] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] lChInfo            The channel information used to plot the EEG channels.
+    *
+    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    SensorSetTreeItem* addEegSensorInfo(const QString& sSubject,
+                                           const QString& sSensorSetName,
+                                           const QList<FIFFLIB::FiffChInfo>& lChInfo);
 
     //=========================================================================================================
     /**

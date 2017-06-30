@@ -84,6 +84,7 @@ using namespace UTILSLIB;
 using namespace GEOMETRYINFO;
 using namespace INTERPOLATION;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -98,8 +99,7 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
 , m_iMSecIntervall(17)
 , m_bSurfaceDataIsInit(false)
 , m_iNumSensors(0)
-, m_bIsOverflowing(false)
-, m_iDataSizeOld(0)
+, m_dSFreq(1000.0)
 {
     m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
@@ -125,10 +125,6 @@ RtSensorDataWorker::~RtSensorDataWorker()
 
 void RtSensorDataWorker::addData(const MatrixXd& data)
 {
-    if(m_bIsOverflowing) {
-        return;
-    }
-
     QMutexLocker locker(&m_qMutex);
     if(data.rows() == 0) {
         return;
@@ -136,7 +132,12 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
-        m_lData.append(data.col(i));
+        if(m_lData.size() < m_dSFreq) {
+            m_lData.append(data.col(i));
+        } else {
+            qDebug() <<"RtSensorDataWorker::addData - worker is full!";
+            break;
+        }
     }
 }
 
@@ -312,6 +313,16 @@ void RtSensorDataWorker::setLoop(bool bLooping)
 
 //*************************************************************************************************************
 
+void RtSensorDataWorker::setSFreq(const double dSFreq)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_dSFreq = dSFreq;
+}
+
+
+//*************************************************************************************************************
+
 void RtSensorDataWorker::start()
 {
     m_qMutex.lock();
@@ -391,29 +402,25 @@ void RtSensorDataWorker::run()
             m_iCurrentSample++;
 
             if((m_iCurrentSample/1) % m_iAverageSamples == 0) {
+                //Perform the actual interpolation and send signal
                 t_vecAverage /= (double)m_iAverageSamples;
                 emit newRtData(generateColorsFromSensorValues(t_vecAverage));
-                t_vecAverage.setZero(t_vecAverage.rows());
+                t_vecAverage.setZero(t_vecAverage.rows());                
+
+                //Sleep specified amount of time
+                const int timerelap = timer.elapsed();
+                const int iTimeLeft = m_iMSecIntervall - timerelap;
+
+                //qDebug()<<"elapsed"<<timerelap<<"diff"<<iTimeLeft;
+                if(iTimeLeft > 0) {
+                    QThread::msleep(iTimeLeft);
+                }
             }
 
             m_qMutex.unlock();
         }
 
-        //Check if more data is beeing sent than the thread can work off
-        if(m_iDataSizeOld > m_lData.size()) {
-            m_bIsOverflowing = true;
-        } else {
-            m_bIsOverflowing = false;
-        }
-
-        m_iDataSizeOld = m_lData.size();
-
-        //Sleep specified amount of time - also take into account processing time from before
-        //const int iTimeLeft = m_iMSecIntervall - timer.elapsed();
-
-        if(m_iMSecIntervall > 0) {
-            QThread::msleep(m_iMSecIntervall);
-        }
+        //qDebug()<<"m_lData.size()"<<m_lData.size();
     }
 }
 

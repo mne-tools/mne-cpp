@@ -96,7 +96,10 @@ void SensorSetTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent)
+void SensorSetTreeItem::addData(const MNEBem &tSensor,
+                                const QList<FiffChInfo>& lChInfo,
+                                const QString& sDataType,
+                                Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate sensor surfaces as childs
     for(int i = 0; i < tSensor.size(); ++i) {
@@ -112,19 +115,22 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
     //Sort MEG channel types
     QList<FiffChInfo> lChInfoGrad;
     QList<FiffChInfo> lChInfoMag;
+    QList<FiffChInfo> lChInfoEEG;
 
     for(int i = 0; i < lChInfo.size(); ++i) {
         if(lChInfo.at(i).unit == FIFF_UNIT_T_M) {
             lChInfoGrad << lChInfo.at(i);
         } else if(lChInfo.at(i).unit == FIFF_UNIT_T) {
             lChInfoMag << lChInfo.at(i);
+        } else if(lChInfo.at(i).kind == FIFFV_EEG_CH) {
+            lChInfoEEG << lChInfo.at(i);
         }
     }
 
     //Add sensor locations as child items
-    if(!lChInfoGrad.isEmpty()) {
+    if(!lChInfoGrad.isEmpty() && sDataType == "MEG") {
         SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
-        pSensorPosItem->addData(lChInfoGrad);
+        pSensorPosItem->addData(lChInfoGrad, "MEG");
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -132,9 +138,19 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor, const QList<FiffChInfo>& 
         this->appendRow(list);
     }
 
-    if(!lChInfoMag.isEmpty()) {
+    if(!lChInfoMag.isEmpty() && sDataType == "MEG") {
         SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
-        pSensorPosItem->addData(lChInfoMag);
+        pSensorPosItem->addData(lChInfoMag, "MEG");
+
+        QList<QStandardItem*> list;
+        list << pSensorPosItem;
+        list << new QStandardItem(pSensorPosItem->toolTip());
+        this->appendRow(list);
+    }
+
+    if(!lChInfoEEG.isEmpty() && sDataType == "EEG") {
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "EEG");
+        pSensorPosItem->addData(lChInfoEEG, "EEG");
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;

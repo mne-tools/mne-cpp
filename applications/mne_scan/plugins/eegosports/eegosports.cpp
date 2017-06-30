@@ -523,7 +523,7 @@ bool EEGoSports::start()
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_EEGoSports->data()->setMultiArraySize(10);
+    m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);
     m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer

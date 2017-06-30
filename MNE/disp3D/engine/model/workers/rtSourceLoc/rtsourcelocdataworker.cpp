@@ -390,8 +390,7 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_iMSecIntervall(50)
 , m_bSurfaceDataIsInit(false)
 , m_bAnnotationDataIsInit(false)
-, m_bIsOverflowing(false)
-, m_iDataSizeOld(0)
+, m_dSFreq(1000.0)
 {
     m_lVisualizationInfo << VisualizationInfo() << VisualizationInfo();
     m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
@@ -413,17 +412,18 @@ RtSourceLocDataWorker::~RtSourceLocDataWorker()
 
 void RtSourceLocDataWorker::addData(const MatrixXd& data)
 {
-    if(m_bIsOverflowing) {
-        return;
-    }
-
     QMutexLocker locker(&m_qMutex);
     if(data.rows() == 0)
         return;
 
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
-        m_lData.append(data.col(i));
+        if(m_lData.size() < m_dSFreq) {
+            m_lData.append(data.col(i));
+        } else {
+            qDebug() <<"RtSourceLocDataWorker::addData - worker is full!";
+            break;
+        }
     }
 }
 
@@ -576,6 +576,16 @@ void RtSourceLocDataWorker::setNormalization(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
+void RtSourceLocDataWorker::setSFreq(const double dSFreq)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_dSFreq = dSFreq;
+}
+
+
+//*************************************************************************************************************
+
 void RtSourceLocDataWorker::setLoop(bool looping)
 {
     QMutexLocker locker(&m_qMutex);
@@ -664,35 +674,24 @@ void RtSourceLocDataWorker::run()
             m_iCurrentSample++;
 
             if((m_iCurrentSample/1)%m_iAverageSamples == 0) {
+                //Perform the actual interpolation and send signal
                 t_vecAverage /= (double)m_iAverageSamples;
 
                 emit newRtData(performVisualizationTypeCalculation(t_vecAverage));
-                t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
+                t_vecAverage = VectorXd::Zero(t_vecAverage.rows());                
+
+                //Sleep specified amount of time
+                const int timerelap = timer.elapsed();
+                const int iTimeLeft = m_iMSecIntervall - timerelap;
+
+                //qDebug()<<"elapsed"<<timerelap<<"diff"<<iTimeLeft;
+                if(iTimeLeft > 0) {
+                    QThread::msleep(iTimeLeft);
+                }
             }
 
             m_qMutex.unlock();
         }
-
-        //Check if more data is beeing sent than the thread can work off
-        if(m_iDataSizeOld > m_lData.size()) {
-            m_bIsOverflowing = true;
-        } else {
-            m_bIsOverflowing = false;
-        }
-
-        m_iDataSizeOld = m_lData.size();
-
-        //Sleep specified amount of time - also take into account processing time from before
-        if(m_iMSecIntervall > 0) {
-            QThread::msleep(m_iMSecIntervall);
-        }
-
-//        int iTimerElapsed = timer.elapsed();
-//        //qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
-
-//        if(m_iMSecIntervall-iTimerElapsed > 0) {
-//            QThread::msleep(m_iMSecIntervall-iTimerElapsed);
-//        }
     }
 }
 
