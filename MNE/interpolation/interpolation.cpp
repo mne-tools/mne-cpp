@@ -101,7 +101,8 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
     QSet<qint32> sensorLookup;
     int idx = 0;
     for(const FIFFLIB::FiffChInfo& s : fiffInfo.chs){
-        if(s.kind == iSensorType){
+        //Only take EEG with V as unit or MEG magnetometers with T as unit
+        if(s.kind == iSensorType && (s.unit == FIFF_UNIT_T || s.unit == FIFF_UNIT_V)){
             if(!fiffInfo.bads.contains(s.ch_name)){
                 sensorLookup.insert (pProjectedSensors->at(idx));
             }

@@ -296,7 +296,8 @@ QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<MatrixXd> pDistan
     QVector<qint32> vecBadColumns;
     QVector<const FiffChInfo*> vecSensors;
     for(const FiffChInfo& s : fiffInfo.chs){
-        if(s.kind == iSensorType){
+        //Only take EEG with V as unit or MEG magnetometers with T as unit
+        if(s.kind == iSensorType && (s.unit == FIFF_UNIT_T || s.unit == FIFF_UNIT_V)){
            vecSensors.push_back(&s);
         }
     }

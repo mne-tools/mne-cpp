@@ -233,7 +233,8 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
     m_iUsedSensors.clear();
     int iCounter = 0;
     for( const FiffChInfo &info : fiffInfo.chs) {
-        if(info.kind == sensorTypeFiffConstant) {
+        //Only take EEG with V as unit or MEG magnetometers with T as unit
+        if(info.kind == sensorTypeFiffConstant && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
             vecSensorPos.push_back(info.chpos.r0);
 
             //save the number of the sensor
