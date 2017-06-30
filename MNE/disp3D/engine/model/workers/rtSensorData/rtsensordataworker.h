@@ -253,6 +253,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the sampling frequency.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void setSFreq(const double dSFreq);
+
+    //=========================================================================================================
+    /**
     * Sets the running flag to false and waits for the worker to stop.
     */
     void stop();
@@ -309,19 +317,18 @@ private:
     bool                                    m_bIsRunning;                       /**< Flag if this thread is running. */
     bool                                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
-    bool                                    m_bIsOverflowing;                   /**< Flag specifying if the thread is too slow to stream the data. If so no further data is accepted in the addData function. */
 
-    int                                     m_iDataSizeOld;                     /**< Old number of received data to be streamed. This is used to estimate whether the dat ais overflowing. */
     int                                     m_iNumSensors;                      /**< Number of sensors that this worker does expect when receiving rt data. */
     int                                     m_iAverageSamples;                  /**< Number of average to compute. */
     int                                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
     
+    double                                  m_dSFreq;                           /**< The current sampling frequency. */
+
     VisualizationInfo                       m_lVisualizationInfo;               /**< Container for the visualization info. */
 
     InterpolationData                       m_lInterpolationData;               /**< Container for the interpolation data. */
     
-
 signals:
     //=========================================================================================================
     /**

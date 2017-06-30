@@ -50,8 +50,6 @@
 #include "items/sensordata/sensordatatreeitem.h"
 #include "3dhelpers/renderable3Dentity.h"
 
-#include <mne/mne_bem.h>
-
 #include <inverse/dipoleFit/ecd_set.h>
 
 #include <fs/surfaceset.h>
@@ -361,8 +359,8 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString&
 
 SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
                                                        const QString& sSensorSetName,
-                                                       const MNELIB::MNEBem& sensor,
-                                                       const QList<FIFFLIB::FiffChInfo>& lChInfo)
+                                                        const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                                       const MNELIB::MNEBem& sensor)
 {
     SensorSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -374,11 +372,40 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::SensorSetItem)) {
         pReturnItem = dynamic_cast<SensorSetTreeItem*>(itemList.first());
-        pReturnItem->addData(sensor, lChInfo, m_pModelEntity);
+        pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
     } else {
         pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
         addItemWithDescription(pSubjectItem, pReturnItem);
-        pReturnItem->addData(sensor, lChInfo, m_pModelEntity);
+        pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
+    }
+
+    return pReturnItem;
+}
+
+
+//*************************************************************************************************************
+
+SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
+                                                       const QString& sSensorSetName,
+                                                       const QList<FIFFLIB::FiffChInfo>& lChInfo)
+{
+    SensorSetTreeItem* pReturnItem = Q_NULLPTR;
+
+    //Handle subject item
+    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
+
+    //Find already existing surface items and add the new data to the first search result
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sSensorSetName);
+
+    MNEBem tempBem = MNEBem();
+
+    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::SensorSetItem)) {
+        pReturnItem = dynamic_cast<SensorSetTreeItem*>(itemList.first());
+        pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
+    } else {
+        pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
+        addItemWithDescription(pSubjectItem, pReturnItem);
+        pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
     }
 
     return pReturnItem;

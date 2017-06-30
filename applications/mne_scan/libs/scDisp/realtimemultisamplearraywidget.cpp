@@ -151,17 +151,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
                                                                  QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
                                                                  Qt::Window));
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
-    //Add BEM head
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    m_pBemHead = MNEBem::SPtr(new MNEBem(t_fileBem));
-    m_pData3DModel->addBemData("Subject", "BEM", *m_pBemHead.data());
-
-    //Add MEG helmet
-    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-    m_pBemSensor = MNEBem::SPtr(new MNEBem(t_filesensorSurfaceVV));
-    m_pData3DModel->addMegSensorInfo("Sensors", "VectorView", *m_pBemSensor.data());
+    m_pControl3DView->init(m_pData3DModel, m_p3DView);    
 
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
 
@@ -277,6 +267,29 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
             m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().at(m_pRTMSA->getMultiSampleArray().size()-1).cols();
 
+            //Check what modalities are there
+            for(int i = 0; i < m_pFiffInfo->ch_names.size(); ++i) {
+                if(m_pFiffInfo->ch_names.at(i).contains("EEG") && !m_slAvailableModalities.contains("EEG")) {
+                    m_slAvailableModalities << "EEG";
+
+                    //Add BEM head
+                    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+                    m_pBemHead = MNEBem::SPtr(new MNEBem(t_fileBem));
+                    m_pData3DModel->addBemData("Subject", "BEM", *m_pBemHead.data());
+
+                    //Add EEG sensor info
+                    m_pData3DModel->addEegSensorInfo("Sensors", "Tracked", m_pFiffInfo->chs);
+
+                } else if (m_pFiffInfo->ch_names.at(i).contains("MEG") && !m_slAvailableModalities.contains("MEG")) {
+                    m_slAvailableModalities << "MEG";
+
+                    //Add MEG helmet
+                    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+                    m_pBemSensor = MNEBem::SPtr(new MNEBem(t_filesensorSurfaceVV));
+                    m_pData3DModel->addMegSensorInfo("Sensors", "MEG System", QList<FiffChInfo>(), *m_pBemSensor.data());
+                }
+            }
+
             init();
         }
     } else {
@@ -284,7 +297,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
         m_pRTMSAModel->addData(m_pRTMSA->getMultiSampleArray());
 
         //Add EEG data to interpolation
-        if(!m_pRtEEGSensorDataItem) {
+        if(!m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG")) {
             m_pRtEEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
                                                                 "Online Measurement",
                                                                 m_pRTMSA->getMultiSampleArray().first(),
@@ -296,11 +309,12 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
             if(m_pRtEEGSensorDataItem) {
                 m_pRtEEGSensorDataItem->setLoopState(false);
-                m_pRtEEGSensorDataItem->setTimeInterval(0);
-                m_pRtEEGSensorDataItem->setNumberAverages(5);
+                m_pRtEEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
+                m_pRtEEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/60+2); // Average sampels because we can not show more than 60Hz on a display -> add +2 to be safe
                 m_pRtEEGSensorDataItem->setStreamingActive(true);
                 m_pRtEEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
                 m_pRtEEGSensorDataItem->setColortable("Jet");
+                m_pRtEEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
             }
 
             for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
@@ -309,7 +323,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
         }
 
         //Add MEG data to interpolation
-        if(!m_pRtMEGSensorDataItem) {
+        if(!m_pRtMEGSensorDataItem && m_slAvailableModalities.contains("MEG")) {
             m_pRtMEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
                                                                 "Online Measurement",
                                                                 m_pRTMSA->getMultiSampleArray().first(),
@@ -321,11 +335,12 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
             if(m_pRtMEGSensorDataItem) {
                 m_pRtMEGSensorDataItem->setLoopState(false);
-                m_pRtMEGSensorDataItem->setTimeInterval(0);
-                m_pRtMEGSensorDataItem->setNumberAverages(5);
+                m_pRtMEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
+                m_pRtMEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/60+2); // Average sampels because we can not show more than 60Hz on a display -> add +2 to be safe
                 m_pRtMEGSensorDataItem->setStreamingActive(true);
                 m_pRtMEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
                 m_pRtMEGSensorDataItem->setColortable("Jet");
+                m_pRtMEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
             }
 
             for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {

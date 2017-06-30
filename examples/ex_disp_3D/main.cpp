@@ -256,12 +256,30 @@ int main(int argc, char *argv[])
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
+    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV);
 
     // Read & show digitizer points
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+
+    //Co-Register EEG points
+    QFile coordTransfile("D:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/all-trans.fif");
+    FiffCoordTrans coordTransA(coordTransfile);
+
+    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
+            Vector4f tempvec;
+            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+            tempvec(3) = 1;
+            tempvec = coordTransA.invtrans * tempvec;
+            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+        }
+    }
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
@@ -270,15 +288,15 @@ int main(int argc, char *argv[])
                                                                              t_sensorSurfaceVV[0],
                                                                              evoked.info,
                                                                              "MEG",
-                                                                             0.15,
+                                                                             0.05,
                                                                              "Cubic")) {
         pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(0);
+        pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
         pMegSensorTreeItem->setStreamingActive(false);
         pMegSensorTreeItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
         pMegSensorTreeItem->setColortable("Jet");
-        pMegSensorTreeItem->setCancelDistance(0.16);
+        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     //add sensor item for EEG data
@@ -288,15 +306,15 @@ int main(int argc, char *argv[])
                                                                              t_Bem[0],
                                                                              evoked.info,
                                                                              "EEG",
-                                                                             0.15,
+                                                                             0.05,
                                                                              "Cubic")) {
         pEegSensorTreeItem->setLoopState(true);
-        pEegSensorTreeItem->setTimeInterval(0);
+        pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
         pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
         pEegSensorTreeItem->setColortable("Jet");
-        pEegSensorTreeItem->setCancelDistance(0.16);
+        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     if(bAddRtSourceLoc) {
