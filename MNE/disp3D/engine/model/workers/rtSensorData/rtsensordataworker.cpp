@@ -153,6 +153,7 @@ void RtSensorDataWorker::clear()
     m_lData.clear();
 }
 
+
 //*************************************************************************************************************
 
 void RtSensorDataWorker::calculateSurfaceData()
@@ -322,6 +323,23 @@ void RtSensorDataWorker::setSFreq(const double dSFreq)
     QMutexLocker locker(&m_qMutex);
 
     m_dSFreq = dSFreq;
+}
+
+
+//*************************************************************************************************************
+
+void RtSensorDataWorker::updateBadChannels(const FiffInfo& info)
+{
+    qDebug()<<"RtSensorDataWorker::updateBadChannels";
+    QMutexLocker locker(&m_qMutex);
+
+    if(!m_bSurfaceDataIsInit) {
+        return;
+    }
+
+    m_lInterpolationData.fiffInfo = info;
+
+    calculateSurfaceData();
 }
 
 

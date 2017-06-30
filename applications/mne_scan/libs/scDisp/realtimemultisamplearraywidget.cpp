@@ -927,6 +927,9 @@ void RealTimeMultiSampleArrayWidget::markChBad()
     m_pRTMSAModel->updateProjection();
 
     m_pSelectionManagerWindow->updateBadChannels();
+
+    //Update 3D plot and interpolation
+    m_pRtEEGSensorDataItem->updateBadChannels(*m_pFiffInfo.data());
 }
 
 

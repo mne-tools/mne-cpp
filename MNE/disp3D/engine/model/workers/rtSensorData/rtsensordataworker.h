@@ -261,6 +261,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Update bad channels and recalculate interpolation matrix.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
+    void updateBadChannels(const FIFFLIB::FiffInfo& info);
+
+    //=========================================================================================================
+    /**
     * Sets the running flag to false and waits for the worker to stop.
     */
     void stop();

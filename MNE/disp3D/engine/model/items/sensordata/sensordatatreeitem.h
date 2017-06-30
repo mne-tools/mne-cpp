@@ -228,6 +228,14 @@ public:
     */
     void setSFreq(const double dSFreq);
 
+    //=========================================================================================================
+    /**
+    * Update bad channels and recalculate interpolation matrix.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
+    void updateBadChannels(const FIFFLIB::FiffInfo& info);
+
 protected:
     //=========================================================================================================
     /**
