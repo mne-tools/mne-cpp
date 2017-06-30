@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
         pMegSensorTreeItem->setStreamingActive(false);
-        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3.266454e-12/2, 3.266454e-12));
+        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
         pMegSensorTreeItem->setColortable("Jet");
         pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
-        pEegSensorTreeItem->setNormalization(QVector3D(0.0, 6.359454e-6/2, 6.359454e-6));
+        pEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
         pEegSensorTreeItem->setColortable("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }

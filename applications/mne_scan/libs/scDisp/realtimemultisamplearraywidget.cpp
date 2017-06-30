@@ -273,7 +273,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                     m_slAvailableModalities << "EEG";
 
                     //Add BEM head
-                    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+                    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
                     m_pBemHead = MNEBem::SPtr(new MNEBem(t_fileBem));
                     m_pData3DModel->addBemData("Subject", "BEM", *m_pBemHead.data());
 
@@ -312,7 +312,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                 m_pRtEEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
                 m_pRtEEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
                 m_pRtEEGSensorDataItem->setStreamingActive(true);
-                m_pRtEEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
+                m_pRtEEGSensorDataItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
                 m_pRtEEGSensorDataItem->setColortable("Jet");
                 m_pRtEEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
             }
@@ -338,7 +338,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                 m_pRtMEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
                 m_pRtMEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
                 m_pRtMEGSensorDataItem->setStreamingActive(true);
-                m_pRtMEGSensorDataItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
+                m_pRtMEGSensorDataItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
                 m_pRtMEGSensorDataItem->setColortable("Jet");
                 m_pRtMEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
             }
