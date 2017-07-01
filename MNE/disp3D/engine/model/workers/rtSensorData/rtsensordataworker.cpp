@@ -50,6 +50,7 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_types.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -84,6 +85,7 @@ using namespace UTILSLIB;
 using namespace GEOMETRYINFO;
 using namespace INTERPOLATION;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -98,6 +100,7 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
 , m_iMSecIntervall(17)
 , m_bSurfaceDataIsInit(false)
 , m_iNumSensors(0)
+, m_dSFreq(1000.0)
 {
     m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
@@ -128,9 +131,16 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
         return;
     }
 
+    qDebug() <<"RtSensorDataWorker::addData - m_lData.size()"<<m_lData.size();
+
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
-        m_lData.append(data.col(i));
+        if(m_lData.size() < m_dSFreq) {
+            m_lData.append(data.col(i));
+        } else {
+            qDebug() <<"RtSensorDataWorker::addData - worker is full!";
+            break;
+        }
     }
 }
 
@@ -143,11 +153,11 @@ void RtSensorDataWorker::clear()
     m_lData.clear();
 }
 
+
 //*************************************************************************************************************
 
 void RtSensorDataWorker::calculateSurfaceData()
 {
-
     //SCDC with cancel distance 
     m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
                                                               m_lInterpolationData.pVecMappedSubset,
@@ -162,7 +172,9 @@ void RtSensorDataWorker::calculateSurfaceData()
     m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
                                                                                m_lInterpolationData.pDistanceMatrix,
                                                                                m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance);
+                                                                               m_lInterpolationData.dCancelDistance,
+                                                                               m_lInterpolationData.fiffInfo,
+                                                                               m_lInterpolationData.iSensorType);
 }
 
 //*************************************************************************************************************
@@ -306,6 +318,33 @@ void RtSensorDataWorker::setLoop(bool bLooping)
 
 //*************************************************************************************************************
 
+void RtSensorDataWorker::setSFreq(const double dSFreq)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_dSFreq = dSFreq;
+}
+
+
+//*************************************************************************************************************
+
+void RtSensorDataWorker::updateBadChannels(const FiffInfo& info)
+{
+    qDebug()<<"RtSensorDataWorker::updateBadChannels";
+    QMutexLocker locker(&m_qMutex);
+
+    if(!m_bSurfaceDataIsInit) {
+        return;
+    }
+
+    m_lInterpolationData.fiffInfo = info;
+
+    calculateSurfaceData();
+}
+
+
+//*************************************************************************************************************
+
 void RtSensorDataWorker::start()
 {
     m_qMutex.lock();
@@ -335,9 +374,9 @@ void RtSensorDataWorker::run()
     VectorXd t_vecAverage;
 
     m_bIsRunning = true;
+    QTime timer;
 
     while(true) {
-        QTime timer;
         timer.start();
 
         {
@@ -385,20 +424,25 @@ void RtSensorDataWorker::run()
             m_iCurrentSample++;
 
             if((m_iCurrentSample/1) % m_iAverageSamples == 0) {
+                //Perform the actual interpolation and send signal
                 t_vecAverage /= (double)m_iAverageSamples;
                 emit newRtData(generateColorsFromSensorValues(t_vecAverage));
-                t_vecAverage.setZero(t_vecAverage.rows());
+                t_vecAverage.setZero(t_vecAverage.rows());                
+
+                //Sleep specified amount of time
+                const int timerelap = timer.elapsed();
+                const int iTimeLeft = m_iMSecIntervall - timerelap;
+
+                //qDebug()<<"elapsed"<<timerelap<<"diff"<<iTimeLeft;
+                if(iTimeLeft > 0) {
+                    QThread::msleep(iTimeLeft);
+                }
             }
 
             m_qMutex.unlock();
         }
 
-        //Sleep specified amount of time - also take into account processing time from before
-        const int iTimeLeft = m_iMSecIntervall - timer.elapsed();
-
-        if(iTimeLeft > 0) {
-            QThread::msleep(iTimeLeft);
-        }
+        //qDebug()<<"m_lData.size()"<<m_lData.size();
     }
 }
 
@@ -432,12 +476,11 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
 
     //Generate color data for vertices
-    normalizeAndTransformToColor(
-                vecIntrpltdVals,
-                m_lVisualizationInfo.matFinalVertColor,
-                m_lVisualizationInfo.dThresholdX,
-                m_lVisualizationInfo.dThresholdZ,
-                m_lVisualizationInfo.functionHandlerColorMap);
+    normalizeAndTransformToColor(vecIntrpltdVals,
+                                    m_lVisualizationInfo.matFinalVertColor,
+                                    m_lVisualizationInfo.dThresholdX,
+                                    m_lVisualizationInfo.dThresholdZ,
+                                    m_lVisualizationInfo.functionHandlerColorMap);
 
     return m_lVisualizationInfo.matFinalVertColor;
 }
@@ -463,14 +506,14 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
     const double dTresholdDiff = dThreholdZ - dThresholdX;
 
     for(int r = 0; r < vecData.rows(); ++r) {
-        fSample = vecData(r);
+        //Take the absolute values because the histogram threshold is also calcualted using the absolute values
+        fSample = fabs(vecData(r));
 
         if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
             if(fSample >= dThreholdZ) {
                 fSample = 1.0f;
-            }
-            else {
+            } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
                     fSample = (fSample - dThresholdX) / (dTresholdDiff);
                 } else {

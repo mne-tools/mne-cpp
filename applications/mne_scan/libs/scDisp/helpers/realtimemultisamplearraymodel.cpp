@@ -402,6 +402,18 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
 
 //*************************************************************************************************************
 
+MatrixXd RealTimeMultiSampleArrayModel::getLastBlock()
+{
+    if(m_filterData.isEmpty()) {
+        return m_matDataRaw.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataRaw.rows(), m_iCurrentBlockSize);
+    }
+
+    return m_matDataFiltered.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataFiltered.rows(), m_iCurrentBlockSize);
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 {
     //SSP

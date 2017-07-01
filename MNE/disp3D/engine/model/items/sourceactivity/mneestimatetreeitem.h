@@ -219,6 +219,14 @@ public:
     */
     void setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere);
 
+    //=========================================================================================================
+    /**
+    * Set the sampling frequency.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void setSFreq(const double dSFreq);
+
 protected:
     //=========================================================================================================
     /**

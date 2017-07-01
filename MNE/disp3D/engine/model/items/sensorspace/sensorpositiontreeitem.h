@@ -118,8 +118,9 @@ public:
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+    * @param[in] sDataType          The data type: EEG, MEG.
     */
-    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo);
+    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, const QString &sDataType);
 
 protected:
     //=========================================================================================================
@@ -127,8 +128,9 @@ protected:
     * Plots the sensors.
     *
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+    * @param[in] sDataType          The data type: EEG, MEG.
     */
-    void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo);
+    void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString &sDataType);
 
     //=========================================================================================================
     /**

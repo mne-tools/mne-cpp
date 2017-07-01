@@ -220,6 +220,22 @@ public:
     */
     void setColorOrigin(const MatrixX3f& matVertColor);
 
+    //=========================================================================================================
+    /**
+    * Set the sampling frequency.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void setSFreq(const double dSFreq);
+
+    //=========================================================================================================
+    /**
+    * Update bad channels and recalculate interpolation matrix.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
+    void updateBadChannels(const FIFFLIB::FiffInfo& info);
+
 protected:
     //=========================================================================================================
     /**
@@ -304,6 +320,7 @@ protected:
 
     QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
     QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
+    QVector<int>                     m_iSensorsBad;                     /**< Store bad channel indexes.*/
 
 signals:
     //=========================================================================================================
