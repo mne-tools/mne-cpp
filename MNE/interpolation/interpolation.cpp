@@ -50,6 +50,7 @@
 #include <QtDebug>
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -104,6 +105,7 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
 
     // insert all sensor nodes into set for faster lookup during later computation. Also consider bad channels here.
     QSet<qint32> sensorLookup;
+
     int idx = 0;
 
     for(const FIFFLIB::FiffChInfo& s : fiffInfo.chs){
@@ -124,8 +126,8 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
             QVector<QPair<qint32, double> > vecBelowThresh;
             vecBelowThresh.reserve(iCols);
-            double dWeightsSum = 0;
-            const RowVectorXd rowVec = pDistanceTable->row(r);
+            double dWeightsSum = 0.0;
+            const RowVectorXd& rowVec = pDistanceTable->row(r);
 
             for (qint32 c = 0; c < iCols; ++c) {
                 const double dDist = rowVec[c];
