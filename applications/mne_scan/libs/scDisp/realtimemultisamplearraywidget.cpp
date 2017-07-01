@@ -296,11 +296,14 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
         //Add data to table view
         m_pRTMSAModel->addData(m_pRTMSA->getMultiSampleArray());
 
+        //Get data from model since we also want to interpolate the processed data
+        MatrixXd data = m_pRTMSAModel->getLastBlock();
+
         //Add EEG data to interpolation
         if(!m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG")) {
             m_pRtEEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
                                                                 "Online Measurement",
-                                                                m_pRTMSA->getMultiSampleArray().first(),
+                                                                data,
                                                                 (*m_pBemHead.data())[0],
                                                                 *m_pFiffInfo.data(),
                                                                 "EEG",
@@ -320,13 +323,15 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
             for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
                 m_pRtEEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
             }
+        } else if (m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG"))  {
+            m_pRtEEGSensorDataItem->addData(data);
         }
 
         //Add MEG data to interpolation
         if(!m_pRtMEGSensorDataItem && m_slAvailableModalities.contains("MEG")) {
             m_pRtMEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
                                                                 "Online Measurement",
-                                                                m_pRTMSA->getMultiSampleArray().first(),
+                                                                data,
                                                                 (*m_pBemSensor.data())[0],
                                                                 *m_pFiffInfo.data(),
                                                                 "MEG",
@@ -346,15 +351,8 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
             for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
                 m_pRtMEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
             }
-        }
-
-        for(const MatrixXd &data : m_pRTMSA->getMultiSampleArray()) {
-            if(m_pRtEEGSensorDataItem) {
-                m_pRtEEGSensorDataItem->addData(data);
-            }
-            if(m_pRtMEGSensorDataItem) {
-                m_pRtMEGSensorDataItem->addData(data);
-            }
+        } else if (m_pRtMEGSensorDataItem && m_slAvailableModalities.contains("MEG")) {
+            m_pRtMEGSensorDataItem->addData(data);
         }
     }
 }

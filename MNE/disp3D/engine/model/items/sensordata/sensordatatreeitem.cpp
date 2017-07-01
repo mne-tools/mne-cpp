@@ -232,15 +232,20 @@ void SensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
     QVector<Vector3f> vecSensorPos;
     m_iUsedSensors.clear();
     int iCounter = 0;
-    for( const FiffChInfo &info : fiffInfo.chs) {
+    for(const FiffChInfo &info : fiffInfo.chs) {
         //Only take EEG with V as unit or MEG magnetometers with T as unit
         if(info.kind == sensorTypeFiffConstant && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
             vecSensorPos.push_back(info.chpos.r0);
 
             //save the number of the sensor
-            m_iUsedSensors.push_back(iCounter);
+            m_iUsedSensors.push_back(iCounter);            
         }
         iCounter++;
+    }
+
+    //Create bad channel idx list
+    for(const QString &bad : fiffInfo.bads) {
+        m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
     }
 
     setCancelDistance(dCancelDist);
@@ -273,7 +278,12 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
         MatrixXd dSmallSensorData(sensorSize, tSensorData.cols());
         for(int i = 0 ; i < sensorSize; ++i)
         {
-            dSmallSensorData.row(i)  = tSensorData.row(m_iUsedSensors[i]);
+            //Set bad channels to zero so they do not corrupt the histogram thresholding
+            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
+                dSmallSensorData.row(i).setZero();
+            } else {
+                dSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
+            }
         }
 
         //Set new data into item's data.
@@ -290,13 +300,22 @@ void SensorDataTreeItem::addData(const MatrixXd& tSensorData)
     }
     else
     {
+        //Set bad channels to zero so they do not corrupt the histogram thresholding
+        MatrixXd dSmallSensorData = tSensorData;
+        for(int i = 0 ; i < dSmallSensorData.rows(); ++i)
+        {
+            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
+                dSmallSensorData.row(i).setZero();
+            }
+        }
+
         //Set new data into item's data.
         QVariant data;
-        data.setValue(tSensorData);
+        data.setValue(dSmallSensorData);
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
         if(m_pSensorRtDataWorker) {
-             m_pSensorRtDataWorker->addData(tSensorData);
+             m_pSensorRtDataWorker->addData(dSmallSensorData);
         }
         else {
             qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
@@ -467,6 +486,14 @@ void SensorDataTreeItem::setSFreq(const double dSFreq)
 void SensorDataTreeItem::updateBadChannels(const FiffInfo& info)
 {
     if(m_pSensorRtDataWorker) {
+        //Create bad channel idx list
+        m_iSensorsBad.clear();
+        for(const QString &bad : info.bads) {
+            m_iSensorsBad.push_back(info.ch_names.indexOf(bad));
+        }
+
+        qDebug() << "m_iSensorsBad" << m_iSensorsBad;
+
         m_pSensorRtDataWorker->updateBadChannels(info);
     }
 }

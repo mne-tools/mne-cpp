@@ -320,6 +320,7 @@ protected:
 
     QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
     QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
+    QVector<int>                     m_iSensorsBad;                     /**< Store bad channel indexes.*/
 
 signals:
     //=========================================================================================================
