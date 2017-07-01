@@ -45,6 +45,7 @@
 #include <mne/mne_bem_surface.h>
 #include <string>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -86,6 +87,7 @@ private:
     // real data
     MNEBemSurface realSurface;
     QVector<Vector3f> megSensors;
+    FiffEvoked evoked;
     // random data (keep computation times short)
     MNEBemSurface smallSurface;
     QSharedPointer<QVector<qint32>> smallSubset;
@@ -105,12 +107,12 @@ void TestInterpolation::initTestCase() {
     QFile t_fileEvoked(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
     fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    evoked = FiffEvoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty()) {
         return;
     }
     for( const FiffChInfo &info : evoked.info.chs) {
-        if(info.kind == FIFFV_MEG_CH) {
+        if(info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) {
             megSensors.push_back(info.chpos.r0);
         }
     }
@@ -174,10 +176,14 @@ void TestInterpolation::testDimensionsForInterpolation() {
 void TestInterpolation::testSumOfRow() {
     // projecting with MEG:
     QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(realSurface, megSensors);
-    // SCDC with cancel distance 0.03:
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface, mappedSubSet, 0.03);
+    // SCDC with cancel distance 0.20 m:
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface, mappedSubSet, 0.20);
+
+    // filtering of bad channel
+    GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
+
     // weight matrix creation
-    QSharedPointer<SparseMatrix<double> > w = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, 0.03);
+    QSharedPointer<SparseMatrix<double> > w = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, 0.20, evoked.info, FIFFV_MEG_CH);
 
     qint32 n = w->rows();
     qint32 m = w->cols();
