@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_fileBem("D:/Git/mne-cpp-lorenze/bin/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
@@ -269,11 +269,17 @@ int main(int argc, char *argv[])
 
     for(int i = 0; i < evoked.info.chs.size(); ++i) {
         if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
-            evoked.info.chs[i].coil_trans = coordTransA.invtrans;
+            Vector4f tempvec;
+            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+            tempvec(3) = 1;
+            tempvec = coordTransA.invtrans * tempvec;
+            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
         }
     }
-
-    p3DDataModel->addEegSensorInfo("Sensors", "Tracked", evoked.info.chs);
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
@@ -300,7 +306,7 @@ int main(int argc, char *argv[])
                                                                              t_Bem[0],
                                                                              evoked.info,
                                                                              "EEG",
-                                                                             0.10,
+                                                                             0.2,
                                                                              "Cubic")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
