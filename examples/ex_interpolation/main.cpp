@@ -129,12 +129,12 @@ int main(int argc, char *argv[])
     for( const FiffChInfo &info : evoked.info.chs)
     {
         //EEG
-        if(info.kind == FIFFV_EEG_CH)
+        if(info.kind == FIFFV_EEG_CH && info.unit == FIFF_UNIT_V)
         {
             eegSensors.push_back(info.chpos.r0);
         }
         //MEG
-        if(info.kind == FIFFV_MEG_CH)
+        if(info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T)
         {
             megSensors.push_back(info.chpos.r0);
         }
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 
     //weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<SparseMatrix<double> > interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear);
+    QSharedPointer<SparseMatrix<double> > interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, DOUBLE_INFINITY, evoked.info, FIFFV_MEG_CH);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
     //realtime interpolation (1 iteration)

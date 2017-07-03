@@ -245,65 +245,88 @@ int main(int argc, char *argv[])
     //Create 3D data model
     Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
-
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_fileBem("D:/Git/mne-cpp-lorenze/bin/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
-
 
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", t_sensorSurfaceVV, evoked.info.chs);
-
-
+    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV);
 
     // Read & show digitizer points
     QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
     p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
+    //Co-Register EEG points
+    QFile coordTransfile("./MNE-sample-data/MEG/sample/all-trans.fif");
+    FiffCoordTrans coordTransA(coordTransfile);
+
+    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
+            Vector4f tempvec;
+            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+            tempvec(3) = 1;
+            tempvec = coordTransA.invtrans * tempvec;
+            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+        }
+    }
 
     //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData("Sensors", "Measurment Data", evoked.data, t_sensorSurfaceVV[0],
-                                                                              evoked.info, "MEG", 0.05, "Cubic")) {
+    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+                                                                             evoked.comment,
+                                                                             evoked.data,
+                                                                             t_sensorSurfaceVV[0],
+                                                                             evoked.info,
+                                                                             "MEG",
+                                                                             0.10,
+                                                                             "Cubic")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
         pMegSensorTreeItem->setStreamingActive(false);
-        pMegSensorTreeItem->setNormalization(QVector3D(-2.95239e-12, -.56059e-13, 3.266454e-12));
-        pMegSensorTreeItem->setColortable("Hot Negative 2");
-
+        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
+        pMegSensorTreeItem->setColortable("Jet");
+        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     //add sensor item for EEG data
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment, evoked.data, t_Bem[0],
-                                                                             evoked.info, "EEG", 0.05, "Cubic")) {
+                                                                             evoked.comment,
+                                                                             evoked.data,
+                                                                             t_Bem[0],
+                                                                             evoked.info,
+                                                                             "EEG",
+                                                                             0.2,
+                                                                             "Cubic")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingActive(false);
-        pEegSensorTreeItem->setNormalization(QVector3D(-6.786611e-6, 1.04059e-6, 6.359454e-6));
-        pEegSensorTreeItem->setColortable("Hot Negative 2");
-
+        pEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
+        pEegSensorTreeItem->setColortable("Jet");
+        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
         if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
             pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(17);
+            pRTDataItem->setTimeInterval(0);
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(false);
             pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
             pRTDataItem->setVisualizationType("Smoothing based");
-            pRTDataItem->setColortable("Hot");
+            pRTDataItem->setColortable("Jet");
         }
     }
 

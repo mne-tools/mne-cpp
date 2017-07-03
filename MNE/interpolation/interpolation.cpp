@@ -33,13 +33,13 @@
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "interpolation.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,6 +48,8 @@
 
 #include <QSet>
 #include <QtDebug>
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,15 +65,18 @@
 using namespace INTERPOLATION;
 using namespace Eigen;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INITIALIZE STATIC MEMBER
 //=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,23 +86,39 @@ using namespace Eigen;
 QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
                                                                             const QSharedPointer<MatrixXd> pDistanceTable,
                                                                             double (*interpolationFunction) (double),
-                                                                            const double dCancelDist)
+                                                                            const double dCancelDist,
+                                                                            const FIFFLIB::FiffInfo& fiffInfo,
+                                                                            qint32 iSensorType)
 {
     if (! pDistanceTable) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table. Returning null pointer...";
         return QSharedPointer<SparseMatrix<double> >(nullptr);
     }
+
     // initialization
     QSharedPointer<SparseMatrix<double> > pInterpolationMatrix = QSharedPointer<SparseMatrix<double> >::create(pDistanceTable->rows(), pProjectedSensors->size());
+
     // temporary helper structure for filling sparse matrix
     QVector<Eigen::Triplet<double> > vecNonZeroEntries;
     const qint32 iRows = pInterpolationMatrix->rows();
     const qint32 iCols = pInterpolationMatrix->cols();
-    // insert all sensor nodes into set for faster lookup during later computation
+
+    // insert all sensor nodes into set for faster lookup during later computation. Also consider bad channels here.
     QSet<qint32> sensorLookup;
-    for (qint32 i = 0; i < pProjectedSensors->size(); ++i){
-        sensorLookup.insert (pProjectedSensors->at(i));
+
+    int idx = 0;
+
+    for(const FIFFLIB::FiffChInfo& s : fiffInfo.chs){
+        //Only take EEG with V as unit or MEG magnetometers with T as unit
+        if(s.kind == iSensorType && (s.unit == FIFF_UNIT_T || s.unit == FIFF_UNIT_V)){
+            if(!fiffInfo.bads.contains(s.ch_name)){
+                sensorLookup.insert (pProjectedSensors->at(idx));
+            }
+
+            idx++;
+        }
     }
+
     // main loop: go through all rows of distance table and calculate weights
     for (qint32 r = 0; r < iRows; ++r) {
         if (sensorLookup.contains(r) == false) {
@@ -105,8 +126,9 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
             QVector<QPair<qint32, double> > vecBelowThresh;
             vecBelowThresh.reserve(iCols);
-            double dWeightsSum = 0;
-            const RowVectorXd rowVec = pDistanceTable->row(r);
+            double dWeightsSum = 0.0;
+            const RowVectorXd& rowVec = pDistanceTable->row(r);
+
             for (qint32 c = 0; c < iCols; ++c) {
                 const double dDist = rowVec[c];
                 if (dDist < dCancelDist) {
@@ -115,6 +137,7 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
                     vecBelowThresh.push_back(qMakePair<qint32, double> (c, dValueWeight));
                 }
             }
+
             for (const QPair<qint32, double> &qp : vecBelowThresh) {
                 vecNonZeroEntries.push_back(Eigen::Triplet<double> (r, qp.first, qp.second / dWeightsSum));
             }
@@ -124,9 +147,12 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             vecNonZeroEntries.push_back(Eigen::Triplet<double> (r, iIndexInSubset, 1));
         }
     }
+
     pInterpolationMatrix->setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
     return pInterpolationMatrix;
 }
+
+
 //*************************************************************************************************************
 
 QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<double> > pInterpolationMatrix, const VectorXd &vecMeasurementData)
@@ -139,30 +165,40 @@ QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<S
         }
         (*pOutVec) = ((*pInterpolationMatrix) * vecMeasurementData).cast<float> ();
         return pOutVec;
-    }
-    else{
+    } else {
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Null pointer for interpolationMatrix, weight matrix was not created. Return null pointer...";
         return QSharedPointer<VectorXf>(nullptr);
     }
 }
+
+
 //*************************************************************************************************************
 
-double Interpolation::linear(const double dIn) {
+double Interpolation::linear(const double dIn)
+{
     return dIn;
 }
+
+
 //*************************************************************************************************************
 
-double Interpolation::gaussian(const double dIn) {
+double Interpolation::gaussian(const double dIn)
+{
     return exp(-((dIn * dIn) / 2.0));
 }
+
+
 //*************************************************************************************************************
 
-double Interpolation::square(const double dIn) {
+double Interpolation::square(const double dIn)
+{
     return std::max((-(1.0f / 9.0f) * (dIn * dIn) + 1), 0.0);
 }
+
+
 //*************************************************************************************************************
 
-double Interpolation::cubic(const double dIn) {
+double Interpolation::cubic(const double dIn)
+{
     return dIn * dIn * dIn;
 }
-//*************************************************************************************************************

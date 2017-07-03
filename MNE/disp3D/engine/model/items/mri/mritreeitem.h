@@ -170,7 +170,7 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
+    * emit this signal whenver the color info of the underlying hemisphere surfaces changed.
     *
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
