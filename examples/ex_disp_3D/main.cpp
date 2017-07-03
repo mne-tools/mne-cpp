@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("D:/Git/mne-cpp-lorenze/bin/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
