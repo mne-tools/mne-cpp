@@ -253,6 +253,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the sampling frequency.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void setSFreq(const double dSFreq);
+
+    //=========================================================================================================
+    /**
+    * Update bad channels and recalculate interpolation matrix.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
+    void updateBadChannels(const FIFFLIB::FiffInfo& info);
+
+    //=========================================================================================================
+    /**
     * Sets the running flag to false and waits for the worker to stop.
     */
     void stop();
@@ -302,7 +318,6 @@ private:
     void calculateSurfaceData();
 
     //=========================================================================================================
-
     QMutex                                  m_qMutex;                           /**< The thread's mutex. */
 
     QList<Eigen::VectorXd>                  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
@@ -316,11 +331,12 @@ private:
     int                                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
     
+    double                                  m_dSFreq;                           /**< The current sampling frequency. */
+
     VisualizationInfo                       m_lVisualizationInfo;               /**< Container for the visualization info. */
 
     InterpolationData                       m_lInterpolationData;               /**< Container for the interpolation data. */
     
-
 signals:
     //=========================================================================================================
     /**

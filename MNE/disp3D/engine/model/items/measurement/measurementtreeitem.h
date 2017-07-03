@@ -221,7 +221,25 @@ public:
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void setColorOrigin(const MatrixX3f &leftHemiColor, const MatrixX3f &rightHemiColor);
+    void setSourceColors(const MatrixX3f &leftHemiColor, const MatrixX3f &rightHemiColor);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the origin of the surface vertex color (surface color) used for displaying MEG data changed.
+    * The color generation then based on the current user chosen color origin.
+    *
+    * @param[in] sensorColor        Color of sensor surface.
+    */
+    void setSensorMEGColors(const MatrixX3f& sensorColor);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the origin of the surface vertex color (surface color) used for displaying EEG data changed.
+    * The color generation then based on the current user chosen color origin.
+    *
+    * @param[in] sensorColor        Color of sensor surface.
+    */
+    void setSensorEEGColors(const MatrixX3f& sensorColor);
 
 protected:
     //=========================================================================================================
@@ -232,26 +250,58 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever new colors for the activation data plotting are available.
+    * Call this function whenever new colors for the activation data plotting are available: source level.
     *
     * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
     */
-    void onVertColorChanged(const QVariant& vertColors);
+    void onSourceColorChanged(const QVariant& vertColors);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever new colors for the activation data plotting are available: EEG sensor level.
+    *
+    * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
+    */
+    void onSensorEEGColorChanged(const QVariant& vertColors);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever new colors for the activation data plotting are available: MEG sensor level.
+    *
+    * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
+    */
+    void onSensorMEGColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
-    QPointer<SensorDataTreeItem>                 m_pSensorDataTreeItem;         /**< The rt sensor data item of this item. */
+    QPointer<SensorDataTreeItem>                 m_pEEGSensorDataTreeItem;       /**< The rt sensor EEG data item of this item. */
+    QPointer<SensorDataTreeItem>                 m_pMEGSensorDataTreeItem;       /**< The rt sensor MEG data item of this item. */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 
 signals:
     //=========================================================================================================
     /**
-    * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
+    * emit this signal whenver the EEG sensor level color changed.
+    *
+    * @param[in] vertColors        Real time colors for both hemispheres.
+    */
+    void sensorEEGColorChanged(const QVariant& vertColors);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenver the MEG sensor level color changed.
+    *
+    * @param[in] vertColors        Real time colors for both hemispheres.
+    */
+    void sensorMEGColorChanged(const QVariant& vertColors);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenver the source level color changed.
     *
     * @param[in] vertColors        Real tiem colors for both hemispheres.
     */
-    void vertColorChanged(const QVariant& vertColors);
-
+    void sourceColorChanged(const QVariant& vertColors);
 };
 
 } //NAMESPACE DISP3DLIB

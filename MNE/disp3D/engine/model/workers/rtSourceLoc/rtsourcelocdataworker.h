@@ -109,7 +109,7 @@ struct SmoothVertexInfo {
 
 //=========================================================================================================
 /**
-* The strucut specifing the smoothing visualization info.
+* The struct specifing the smoothing visualization info.
 */
 struct VisualizationInfo {
     VectorXd                    vSourceColorSamples;
@@ -256,6 +256,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the sampling frequency.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void setSFreq(const double dSFreq);
+
+    //=========================================================================================================
+    /**
     * Set the loop functionality on or off.
     *
     * @param[in] looping                The new looping state.
@@ -309,6 +317,8 @@ private:
     int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
     int                     m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
+
+    double                  m_dSFreq;                           /**< The current sampling frequency. */
 
     QList<VisualizationInfo>    m_lVisualizationInfo;           /**< The list holding all information needed to do the visualization for both hemispheres (0-left, 1-right). */
 

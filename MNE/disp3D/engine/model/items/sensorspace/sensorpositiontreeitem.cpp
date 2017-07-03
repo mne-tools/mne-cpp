@@ -55,12 +55,15 @@
 #include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DCore/QTransform>
 #include <Qt3DCore/QEntity>
+#include <Qt3DExtras/QSphereMesh>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -96,15 +99,15 @@ void SensorPositionTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo)
+void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
 {
-    plotSensors(lChInfo);
+    plotSensors(lChInfo, sDataType);
 }
 
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo)
+void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
 {
     //Create digitizers as small 3D spheres
     QVector3D pos;
@@ -116,33 +119,39 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         pos.setZ(lChInfo[i].chpos.r0(2));
 
         //Create plane mesh
-        Renderable3DEntity* pSensorRectEntity = new Renderable3DEntity(this);
-        Qt3DExtras::QCuboidMesh* pSensorRect = new Qt3DExtras::QCuboidMesh();
-        pSensorRect->setXExtent(0.01f);
-        pSensorRect->setYExtent(0.01f);
-        pSensorRect->setZExtent(0.001f);
-        pSensorRectEntity->addComponent(pSensorRect);
-
-        //Set plane position and orientation
+        Renderable3DEntity* pSensorEntity = new Renderable3DEntity(this);
         Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
         QMatrix4x4 m;
 
-        for(int j = 0; j < 4; ++j) {
-            QVector4D row(lChInfo[i].coil_trans.row(j)(0),
-                      lChInfo[i].coil_trans.row(j)(1),
-                      lChInfo[i].coil_trans.row(j)(2),
-                      lChInfo[i].coil_trans.row(j)(3));
+        if(sDataType == "MEG") {
+            Qt3DExtras::QCuboidMesh* pSensorRect = new Qt3DExtras::QCuboidMesh();
+            pSensorRect->setXExtent(0.01f);
+            pSensorRect->setYExtent(0.01f);
+            pSensorRect->setZExtent(0.001f);
+            pSensorEntity->addComponent(pSensorRect);
 
-            m.setRow(j, row);
+            m.translate(pos);
+
+            for(int j = 0; j < 4; ++j) {
+                m(j, 0) = lChInfo[i].coil_trans.row(j)(0);
+                m(j, 1) = lChInfo[i].coil_trans.row(j)(1);
+                m(j, 2) = lChInfo[i].coil_trans.row(j)(2);
+            }
+        } else if (sDataType == "EEG") {
+            Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
+            sourceSphere->setRadius(0.001f);
+            pSensorEntity->addComponent(sourceSphere);
+
+            m.translate(pos);
         }
 
         transform->setMatrix(m);
-        pSensorRectEntity->addComponent(transform);
+        pSensorEntity->addComponent(transform);
 
         Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
         material->setAmbient(colDefault);
         material->setAlpha(1.0);
-        pSensorRectEntity->addComponent(material);
+        pSensorEntity->addComponent(material);
     }
 
     //Update colors in color item

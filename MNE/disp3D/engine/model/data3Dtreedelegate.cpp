@@ -133,6 +133,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
 
                 //Get data
                 MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+                matRTData = matRTData.cwiseAbs();
 
                 //Calcualte histogram
                 Eigen::VectorXd resultClassLimit;
@@ -162,7 +163,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pSpinBox->setSuffix(" mSec");
             pSpinBox->setMinimum(17);
             pSpinBox->setMaximum(50000);
-            pSpinBox->setSingleStep(10);
+            pSpinBox->setSingleStep(1);
             pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::StreamingTimeInterval).toInt());
             return pSpinBox;
         }
@@ -402,6 +403,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
                     //Get data
                     MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+                    matRTData = matRTData.cwiseAbs();
 
                     //Calcualte histogram
                     Eigen::VectorXd resultClassLimit;

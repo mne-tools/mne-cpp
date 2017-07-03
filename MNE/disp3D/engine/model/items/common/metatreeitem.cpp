@@ -106,7 +106,7 @@ void MetaTreeItem::initItem()
             sToolTip = "The color map type";
             break;
         case MetaTreeItemTypes::StreamingTimeInterval:
-            sToolTip = "The m seconds waited in between each sample";
+            sToolTip = "The m seconds waited when displaying the data";
             break;
         case MetaTreeItemTypes::LoopedStreaming:
             sToolTip = "Turn looped streaming on/off";
