@@ -90,6 +90,8 @@ FsSurfaceTreeItem::FsSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iTy
 
 void FsSurfaceTreeItem::initItem()
 {
+    this->setToolTip("Brain hemisphere surface item");
+
     //Add surface meta information as item children
     QList<QStandardItem*> list;
     QVariant data;
