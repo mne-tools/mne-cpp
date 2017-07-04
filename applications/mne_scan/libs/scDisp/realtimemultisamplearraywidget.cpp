@@ -277,8 +277,8 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                     m_pBemHead = MNEBem::SPtr(new MNEBem(t_fileBem));
                     m_pData3DModel->addBemData("Subject", "BEM", *m_pBemHead.data());
 
-                    //Add EEG sensor info
-                    m_pData3DModel->addEegSensorInfo("Sensors", "Tracked", m_pFiffInfo->chs);
+//                    //Add EEG sensor info
+//                    m_pData3DModel->addEegSensorInfo("Sensors", "Tracked", m_pFiffInfo->chs);
 
                 } else if (m_pFiffInfo->ch_names.at(i).contains("MEG") && !m_slAvailableModalities.contains("MEG")) {
                     m_slAvailableModalities << "MEG";
@@ -298,6 +298,13 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
         //Get data from model since we also want to interpolate the processed data
         MatrixXd data = m_pRTMSAModel->getLastBlock();
+        double mean;
+
+        for(int i = 0; i < data.rows(); ++i) {
+            mean = data.row(i).mean();
+            data.row(i).normalize();
+            data.row(i).array() -= mean;
+        }
 
         //Add EEG data to interpolation
         if(!m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG")) {
