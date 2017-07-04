@@ -142,16 +142,6 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
             sourceSphere->setRadius(0.001f);
             pSensorEntity->addComponent(sourceSphere);
 
-            Vector4f posTransRot;
-            posTransRot(0) = pos.x();
-            posTransRot(1) = pos.y();
-            posTransRot(2) = pos.z();
-            posTransRot(3) = 1;
-            posTransRot = lChInfo[i].coil_trans * posTransRot;
-            pos.setX(posTransRot(0));
-            pos.setY(posTransRot(1));
-            pos.setZ(posTransRot(2));
-
             m.translate(pos);
         }
 
