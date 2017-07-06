@@ -120,9 +120,10 @@ public:
     *
     * @param[in] tSensor            The BEM data.
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+    * @param[in] sDataType          The data type: EEG, MEG.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEBem& tSensor, const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent = 0);
+    void addData(const MNELIB::MNEBem& tSensor, const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString &sDataType, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 protected:
     //=========================================================================================================

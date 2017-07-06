@@ -162,19 +162,20 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
 
 //*************************************************************************************************************
 
-void MriTreeItem::setRtVertColor(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
+void MriTreeItem::setRtVertColor(const QVariant& sourceColorSamples)
 {
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
     QVariant data;
+    QPair<MatrixX3f, MatrixX3f> colorsPerHemi = sourceColorSamples.value<QPair<MatrixX3f, MatrixX3f> >();
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     for(int j = 0; j < itemList.size(); ++j) {
         if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                data.setValue(sourceColorSamples.first);
-                pHemiItem->getSurfaceItem()->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+                data.setValue(colorsPerHemi.first);
+                pHemiItem->getSurfaceItem()->setVertColor(data);
             } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                data.setValue(sourceColorSamples.second);
-                pHemiItem->getSurfaceItem()->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+                data.setValue(colorsPerHemi.second);
+                pHemiItem->getSurfaceItem()->setVertColor(data);
             }
         }
     }

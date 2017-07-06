@@ -65,7 +65,7 @@ FiffChInfo::FiffChInfo()
 , unit_mul(0)
 , ch_name(QString(""))
 {
-
+    coil_trans.setIdentity();
 }
 
 

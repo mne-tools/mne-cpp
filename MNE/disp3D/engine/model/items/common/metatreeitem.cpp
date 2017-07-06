@@ -106,7 +106,7 @@ void MetaTreeItem::initItem()
             sToolTip = "The color map type";
             break;
         case MetaTreeItemTypes::StreamingTimeInterval:
-            sToolTip = "The m seconds waited in between each sample";
+            sToolTip = "The m seconds waited when displaying the data";
             break;
         case MetaTreeItemTypes::LoopedStreaming:
             sToolTip = "Turn looped streaming on/off";
@@ -158,6 +158,12 @@ void MetaTreeItem::initItem()
             break;
         case MetaTreeItemTypes::Scale:
             sToolTip = "The scaling value";
+            break;
+        case MetaTreeItemTypes::CancelDistance:
+            sToolTip = "The cancel distance";
+            break;
+        case MetaTreeItemTypes::InterpolationFunction:
+            sToolTip = "The function used for interpolation";
             break;
         default: // do nothing;
             break;

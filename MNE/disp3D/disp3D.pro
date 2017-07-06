@@ -54,6 +54,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}GeometryInfod \
+            -lMNE$${MNE_LIB_VERSION}Interpolationd \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
@@ -66,6 +68,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}GeometryInfo \
+            -lMNE$${MNE_LIB_VERSION}Interpolation \
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
@@ -121,6 +125,7 @@ SOURCES += \
     engine/model/items/common/metatreeitem.cpp \
     engine/model/items/common/abstractmeshtreeitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
+    engine/model/workers/rtSensorData/rtsensordataworker.cpp \
     engine/model/3dhelpers/renderable3Dentity.cpp \
     engine/model/3dhelpers/custommesh.cpp \
     engine/model/materials/pervertexphongalphamaterial.cpp \
@@ -132,6 +137,7 @@ SOURCES += \
     adapters/ecdview.cpp \
     adapters/abstractview.cpp \
     adapters/networkview.cpp \
+    engine/model/items/sensordata/sensordatatreeitem.cpp \
 
 HEADERS += \
     engine/view/view3D.h \
@@ -160,6 +166,7 @@ HEADERS += \
     engine/model/items/common/abstractmeshtreeitem.h \
     engine/model/items/common/types.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
+    engine/model/workers/rtSensorData/rtsensordataworker.h \
     engine/model/3dhelpers/renderable3Dentity.h \
     engine/model/3dhelpers/custommesh.h \
     engine/model/items/common/types.h \
@@ -173,6 +180,7 @@ HEADERS += \
     adapters/abstractview.h \
     adapters/networkview.h \
     disp3D_global.h \
+    engine/model/items/sensordata/sensordatatreeitem.h \
 
 FORMS += \
     engine/control/control3dwidget.ui \

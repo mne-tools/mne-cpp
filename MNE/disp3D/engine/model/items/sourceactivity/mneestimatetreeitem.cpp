@@ -147,14 +147,14 @@ void MneEstimateTreeItem::initItem()
     data.setValue(QVector3D(0.0,5.5,15));
     pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
 
-    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "50");
+    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "17");
     connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onTimeIntervalChanged);
     list.clear();
     list << pItemStreamingInterval;
     list << new QStandardItem(pItemStreamingInterval->toolTip());
     this->appendRow(list);
-    data.setValue(50);
+    data.setValue(17);
     pItemStreamingInterval->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
 
     MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
@@ -426,6 +426,16 @@ void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisp
 
 //*************************************************************************************************************
 
+void MneEstimateTreeItem::setSFreq(const double dSFreq)
+{
+    if(m_pSourceLocRtDataWorker) {
+        m_pSourceLocRtDataWorker->setSFreq(dSFreq);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(m_pSourceLocRtDataWorker) {
@@ -440,9 +450,12 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
-{
-    emit rtVertColorChanged(sourceColorSamples);
+void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColors)
+{    
+    QVariant data;
+    data.setValue(sourceColors);
+
+    emit sourceVertColorChanged(data);
 }
 
 
