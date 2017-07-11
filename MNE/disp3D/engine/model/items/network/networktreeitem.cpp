@@ -224,24 +224,33 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     //Generate connection indices for Qt3D buffer
     MatrixXi tMatLines;
     int count = 0;
+    int start, end;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         //Plot in edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
-            if(fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()) >= vecThreshold.x()) {
+            start = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
+            end = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
+
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()) >= vecThreshold.x() &&
+                    start != end) {
                 tMatLines.conservativeResize(count+1,2);
-                tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
-                tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
+                tMatLines(count,0) = start;
+                tMatLines(count,1) = end;
                 ++count;
             }
         }
 
         //Plot out edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
-            if(fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()) >= vecThreshold.x()) {
+            start = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
+            end = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
+
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()) >= vecThreshold.x() &&
+                    start != end) {
                 tMatLines.conservativeResize(count+1,2);
-                tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
-                tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
+                tMatLines(count,0) = start;
+                tMatLines(count,1) = end;
                 ++count;
             }
         }
