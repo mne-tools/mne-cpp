@@ -1,8 +1,7 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Lorenz Esch Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2016
