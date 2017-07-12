@@ -212,7 +212,7 @@ void DeepViewer::updateSceneItems()
     //
     for (int i = 0; i < m_pNetwork->edges().size(); ++i) {
         for (int j = 0; j < m_pNetwork->edges()[i].size(); ++j) {
-            if(fabs(m_pNetwork->edges()[i][j]->weight()) > m_pNetwork->weightThreshold()) {
+            if(std::fabs(m_pNetwork->edges()[i][j]->weight()) > m_pNetwork->weightThreshold()) {
                 if(!m_pNetwork->edges()[i][j]->scene()) {
                     m_pScene->addItem(m_pNetwork->edges()[i][j]);
                 }

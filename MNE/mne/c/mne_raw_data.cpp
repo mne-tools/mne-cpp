@@ -363,14 +363,14 @@ int mne_compare_filters(mneFilterDef f1,
       */
 {
     if (f1->filter_on != f2->filter_on ||
-            fabs(f1->lowpass-f2->lowpass) > 0.1 ||
-            fabs(f1->lowpass_width-f2->lowpass_width) > 0.1 ||
-            fabs(f1->highpass-f2->highpass) > 0.1 ||
-            fabs(f1->highpass_width-f2->highpass_width) > 0.1 ||
-            fabs(f1->eog_lowpass-f2->eog_lowpass) > 0.1 ||
-            fabs(f1->eog_lowpass_width-f2->eog_lowpass_width) > 0.1 ||
-            fabs(f1->eog_highpass-f2->eog_highpass) > 0.1 ||
-            fabs(f1->eog_highpass_width-f2->eog_highpass_width) > 0.1)
+            std::fabs(f1->lowpass - f2->lowpass) > 0.1 ||
+            std::fabs(f1->lowpass_width - f2->lowpass_width) > 0.1 ||
+            std::fabs(f1->highpass - f2->highpass) > 0.1 ||
+            std::fabs(f1->highpass_width - f2->highpass_width) > 0.1 ||
+            std::fabs(f1->eog_lowpass - f2->eog_lowpass) > 0.1 ||
+            std::fabs(f1->eog_lowpass_width - f2->eog_lowpass_width) > 0.1 ||
+            std::fabs(f1->eog_highpass - f2->eog_highpass) > 0.1 ||
+            std::fabs(f1->eog_highpass_width - f2->eog_highpass_width) > 0.1)
         return 1;
     else
         return 0;
@@ -1817,7 +1817,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
     for (k = 0; k < info->nchan; k++) {
         ch = info->chInfo+k;
         if (QString::compare(ch->ch_name,MNE_DEFAULT_TRIGGER_CH) == 0) {
-            if (fabs(1.0-ch->range) > 1e-5) {
+            if (std::fabs(1.0 - ch->range) > 1e-5) {
                 ch->range = 1.0;
                 fprintf(stderr,"%s range set to %f\n",MNE_DEFAULT_TRIGGER_CH,ch->range);
             }

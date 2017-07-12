@@ -202,7 +202,7 @@ int mne_decompose_eigen (double *mat,
 // idamax workaround begin
     maxi = 0;
     for(int i = 0; i < np; ++i)
-        if (fabs(mat[i]) > fabs(mat[maxi]))
+        if (std::fabs(mat[i]) > std::fabs(mat[maxi]))
             maxi = i;
 // idamax workaround end
 
@@ -607,9 +607,9 @@ int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float p_small, 
                 meglike = eeglike = 0.0;
                 for (p = 0; p < c->ncov; p++)  {
                     if (c->ch_class[p] == MNE_COV_CH_EEG)
-                        eeglike += fabs(c->eigen[k][p]);
+                        eeglike += std::fabs(c->eigen[k][p]);
                     else if (c->ch_class[p] == MNE_COV_CH_MEG_MAG || c->ch_class[p] == MNE_COV_CH_MEG_GRAD)
-                        meglike += fabs(c->eigen[k][p]);
+                        meglike += std::fabs(c->eigen[k][p]);
                 }
                 if (meglike > eeglike)
                     nmeg++;

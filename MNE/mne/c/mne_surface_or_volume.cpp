@@ -502,7 +502,7 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limi
                 * Check that the source is inside the inner skull surface
                 */
                 tot_angle = sum_solids(r1,surf)/(4*M_PI);
-                if (fabs(tot_angle-1.0) > 1e-5) {
+                if (std::fabs(tot_angle-1.0) > 1e-5) {
                     omit_outside++;
                     s->inuse[p1] = FALSE;
                     s->nuse--;
@@ -689,7 +689,7 @@ void *MneSurfaceOrVolume::filter_source_space(void *arg)
            * Check that the source is inside the inner skull surface
            */
             tot_angle = sum_solids(r1,a->surf)/(4*M_PI);
-            if (fabs(tot_angle-1.0) > 1e-5) {
+            if (std::fabs(tot_angle-1.0) > 1e-5) {
                 omit_outside++;
                 a->s->inuse[p1] = FALSE;
                 a->s->nuse--;
@@ -874,13 +874,13 @@ MneSourceSpaceOld* MneSurfaceOrVolume::make_volume_source_space(MneSurfaceOld* s
            1000*min[Z_17],1000*max[Z_17]);
     for (c = 0; c < 3; c++) {
         if (max[c] > 0)
-            maxn[c] = floor(fabs(max[c])/grid)+1;
+            maxn[c] = floor(std::fabs(max[c])/grid)+1;
         else
-            maxn[c] = -floor(fabs(max[c])/grid)-1;
+            maxn[c] = -floor(std::fabs(max[c])/grid)-1;
         if (min[c] > 0)
-            minn[c] = floor(fabs(min[c])/grid)+1;
+            minn[c] = floor(std::fabs(min[c])/grid)+1;
         else
-            minn[c] = -floor(fabs(min[c])/grid)-1;
+            minn[c] = -floor(std::fabs(min[c])/grid)-1;
     }
     printf("Grid extent:\n"
            "\tx = %6.1f ... %6.1f mm\n"
@@ -1522,7 +1522,7 @@ int MneSurfaceOrVolume::mne_project_to_surface(MneSurfaceOld* s, void *proj_data
     dist0 = 0.0;
     for (best = -1, k = 0; k < s->ntri; k++) {
         if (nearest_triangle_point(r,s,proj_data,k,&p,&q,&dist)) {
-            if (best < 0 || fabs(dist) < fabs(dist0)) {
+            if (best < 0 || std::fabs(dist) < std::fabs(dist0)) {
                 dist0 = dist;
                 best = k;
                 p0 = p;
@@ -3091,7 +3091,7 @@ int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerD
             /*
             * Discard unless cardinal landmark or HPI coil
             */
-            if (fabs(d->dist[k]) > maxdist &&
+            if (std::fabs(d->dist[k]) > maxdist &&
                     d->points[k].kind != FIFFV_POINT_CARDINAL &&
                     d->points[k].kind != FIFFV_POINT_HPI) {
                 discarded++;
@@ -3171,9 +3171,9 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
             */
             if (!do_approx && FALSE) {
                 if (sum_solids(rr[nactive],head->s)/(4*M_PI) > 0.9)
-                    dig->dist[k] = -fabs(dig->dist[k]);
+                    dig->dist[k] = - std::fabs(dig->dist[k]);
                 else
-                    dig->dist[k] = fabs(dig->dist[k]);
+                    dig->dist[k] = std::fabs(dig->dist[k]);
             }
             nactive++;
         }

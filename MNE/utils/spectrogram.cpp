@@ -102,7 +102,7 @@ MatrixXd Spectrogram::make_spectrogram(VectorXd signal, qint32 window_size = 0)
 
         for(qint32 i= 0; i<signal.rows()/2; i++)
         {
-            qreal value = pow(abs(fft_win_sig[i]), 2.0);
+            qreal value = pow(std::abs(fft_win_sig[i]), 2.0);
             real_coeffs[i] = value;
         }
 

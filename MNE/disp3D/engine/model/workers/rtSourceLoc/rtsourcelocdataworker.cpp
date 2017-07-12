@@ -105,7 +105,7 @@ void generateWeightsPerVertex(SmoothVertexInfo& input)
         }
 
         if(dist <= input.dThresholdDistance) {
-            valueWeight = fabs(1.0/pow(dist,input.iDistPow));
+            valueWeight = std::fabs(1.0/pow(dist,input.iDistPow));
 
             input.lTriplets.append(Eigen::Triplet<double>(input.iVertIdx, j, valueWeight));
             dWeightsSum += valueWeight;
@@ -184,7 +184,7 @@ void transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, do
 
     for(int r = 0; r < data.rows(); ++r) {
         //Take the absolute values because the histogram threshold is also calcualted using the absolute values
-        dSample = fabs(data(r));
+        dSample = std::fabs(data(r));
 
         if(dSample >= dTrehsoldX) {
             //Check lower and upper thresholds and normalize to one
@@ -274,7 +274,7 @@ void generateColorsPerAnnotation(VisualizationInfo& input)
         //Find out label for source
         qint32 labelIdx = input.mapLabelIdSources[input.vVertNo(i)];
 
-        if(fabs(input.vSourceColorSamples(i)) > fabs(vecLabelActivation[labelIdx]))
+        if(std::fabs(input.vSourceColorSamples(i)) > std::fabs(vecLabelActivation[labelIdx]))
             vecLabelActivation.insert(labelIdx, input.vSourceColorSamples(i));
     }
 
@@ -287,7 +287,7 @@ void generateColorsPerAnnotation(VisualizationInfo& input)
         //Transform label activations to rgb colors
         //Check if value is bigger than lower threshold. If not, don't plot activation
         if(vecLabelActivation[label.label_id] >= input.dThresholdX) {
-            transformDataToColor(fabs(vecLabelActivation[label.label_id]), color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
+            transformDataToColor(std::fabs(vecLabelActivation[label.label_id]), color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
 
             for(int j = 0; j<label.vertices.rows(); j++) {
                 input.matFinalVertColor(label.vertices(j),0) = color.redF();

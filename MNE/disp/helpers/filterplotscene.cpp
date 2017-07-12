@@ -207,18 +207,18 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
 
     float numberCoeff = coefficientsAFreq.cols();
-    float dsFactor = numberCoeff/2000;
+    float dsFactor = numberCoeff/2000.0f;
 
-    double max = 0;
+    double max = 0.0;
     for(int i = 0; i<coefficientsAFreq.cols(); i++)
-        if(abs(coefficientsAFreq(i)) > max)
-            max = abs(coefficientsAFreq(i));
+        if(std::abs(coefficientsAFreq(i)) > max)
+            max = std::abs(coefficientsAFreq(i));
 
     coefficientsAFreq = coefficientsAFreq / max;
 
     //Create painter path
     QPainterPath path;
-    double y = -20 * log10(abs(coefficientsAFreq(0))) * m_iScalingFactor; //-1 because we want to plot upwards
+    double y = -20 * log10(std::abs(coefficientsAFreq(0))) * m_iScalingFactor; //-1 because we want to plot upwards
     if(y > m_dMaxMagnitude)
         y = m_dMaxMagnitude;
     y -= m_iDiagramMarginsVert;
@@ -226,7 +226,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     path.moveTo(-m_iDiagramMarginsVert, y); //convert to db
 
     for(int i = 0; i<numberCoeff; i+=1+dsFactor) {
-        y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
+        y = -20 * log10(std::abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
         if(y > m_dMaxMagnitude)
             y = m_dMaxMagnitude;
 

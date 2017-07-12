@@ -266,7 +266,7 @@ VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, quint32 tr
 
     //normalization
     for(qint32 i = 0; i < sample_count; i++)
-        norm_atom += pow(abs(complex_atom[i]), 2.0);
+        norm_atom += pow(std::abs(complex_atom[i]), 2.0);
 
     norm_atom = sqrt(norm_atom);
 
