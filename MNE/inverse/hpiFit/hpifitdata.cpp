@@ -332,7 +332,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
     while ((func_evals < maxfun) && (itercount < maxiter)) {
 
         for (int i = 0;i < n;i++) {
-            tempX1(i) = abs(fv[0] - fv[i+1]);
+            tempX1(i) = std::fabs(fv[0] - fv[i+1]);
         }
 
         temp1 = tempX1.maxCoeff();

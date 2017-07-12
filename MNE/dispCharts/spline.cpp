@@ -410,11 +410,11 @@ QVector3D Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QStrin
     {
         if (m_vecResultExponentValues[0] < 0)
         {
-            exponent = abs(m_vecResultExponentValues[0]);
+            exponent = std::abs(m_vecResultExponentValues[0]);
         }
         else if (m_vecResultExponentValues[0] > 0)
         {
-            exponent = -(abs(m_vecResultExponentValues[0]));
+            exponent = -(std::abs(m_vecResultExponentValues[0]));
         }
         else
         {
@@ -425,11 +425,11 @@ QVector3D Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QStrin
     {
         if (m_vecResultExponentValues[0] < 0)
         {
-            exponent = -(abs(m_vecResultExponentValues[0]));
+            exponent = -(std::abs(m_vecResultExponentValues[0]));
         }
         else if (m_vecResultExponentValues[0] > 0)
         {
-            exponent = abs(m_vecResultExponentValues[0]);
+            exponent = std::abs(m_vecResultExponentValues[0]);
         }
         else
         {

@@ -170,7 +170,7 @@ bool SimplexAlgorithm::simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<
                 if (i !=  ihi)
                     inhi = i;
         }
-        rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
+        rtol = 2.0*std::fabs(y[ihi]-y[ilo])/(std::fabs(y[ihi])+std::fabs(y[ilo]));
         /*
         * Report that we are proceeding...
         */

@@ -205,14 +205,14 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 
     double max = 0;
     for(int i = 0; i<numberCoeff-dsFactor; i++)
-        if(abs(coefficientsAFreq(i)) > max)
-            max = abs(coefficientsAFreq(i));
+        if(std::abs(coefficientsAFreq(i)) > max)
+            max = std::abs(coefficientsAFreq(i));
 
     coefficientsAFreq = coefficientsAFreq / max;
 
     //Create painter path
     QPainterPath path;
-    double y = -20 * log10(abs(coefficientsAFreq(0))) * m_iScalingFactor; //-1 because we want to plot upwards
+    double y = -20 * log10(std::abs(coefficientsAFreq(0))) * m_iScalingFactor; //-1 because we want to plot upwards
     if(y > m_dMaxMagnitude)
         y = m_dMaxMagnitude;
     y -= m_iDiagramMarginsVert;
@@ -220,7 +220,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     path.moveTo(-m_iDiagramMarginsVert, y); //convert to db
 
     for(int i = 0; i<numberCoeff; i+=dsFactor) {
-        y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
+        y = -20 * log10(std::abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
         if(y > m_dMaxMagnitude)
             y = m_dMaxMagnitude;
 
