@@ -339,7 +339,18 @@ void RtSensorDataWorker::updateBadChannels(const FiffInfo& info)
 
     m_lInterpolationData.fiffInfo = info;
 
-    calculateSurfaceData();
+    //filtering of bad channels out of the distance table
+    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
+                                    m_lInterpolationData.fiffInfo,
+                                    m_lInterpolationData.iSensorType);
+
+    //create weight matrix
+    m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
+                                                                               m_lInterpolationData.pDistanceMatrix,
+                                                                               m_lInterpolationData.interpolationFunction,
+                                                                               m_lInterpolationData.dCancelDistance,
+                                                                               m_lInterpolationData.fiffInfo,
+                                                                               m_lInterpolationData.iSensorType);
 }
 
 
@@ -484,6 +495,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
 
     return m_lVisualizationInfo.matFinalVertColor;
 }
+
 
 //*************************************************************************************************************
 
