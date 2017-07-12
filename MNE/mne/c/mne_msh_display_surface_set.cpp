@@ -377,10 +377,10 @@ void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
 
     surf->fov = 0;
     for (c = 0; c < 3; c++) {
-        if (fabs(minv[c]) > surf->fov)
-            surf->fov = fabs(minv[c]);
-        if (fabs(maxv[c]) > surf->fov)
-            surf->fov = fabs(maxv[c]);
+        if (std::fabs(minv[c]) > surf->fov)
+            surf->fov = std::fabs(minv[c]);
+        if (std::fabs(maxv[c]) > surf->fov)
+            surf->fov = std::fabs(maxv[c]);
     }
     VEC_COPY_47(surf->minv,minv);
     VEC_COPY_47(surf->maxv,maxv);
@@ -438,7 +438,7 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
         double sum;
         MneSurfaceOld::mne_compute_surface_cm(surf);
         sum = MneSurfaceOld::sum_solids(surf->cm,surf)/(4*M_PI);
-        if (fabs(sum-1.0) > 1e-4) {
+        if (std::fabs(sum - 1.0) > 1e-4) {
             fprintf(stderr, "%s surface is not closed "
                                  "(sum of solid angles = %g * 4*PI).",name,sum);
             return FAIL;
@@ -537,7 +537,7 @@ void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
     curv_sum = 0.0;
     if (surf->curvature_color_mode == SHOW_CURVATURE_OVERLAY) {
         for (k = 0; k < s->np; k++) {
-            curv_sum += fabs(s->curv[k]);
+            curv_sum += std::fabs(s->curv[k]);
             for (c = 0; c < 3; c++)
                 col[c] = (s->curv[k] > 0) ? POS_CURV_COLOR : NEG_CURV_COLOR;
             if (ncolor == 4)
@@ -547,7 +547,7 @@ void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
     }
     else {
         for (k = 0; k < s->np; k++) {
-            curv_sum += fabs(s->curv[k]);
+            curv_sum += std::fabs(s->curv[k]);
             for (c = 0; c < 3; c++)
                 col[c] = EVEN_CURV_COLOR;
             if (ncolor == 4)

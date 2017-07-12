@@ -942,7 +942,7 @@ void FwdBemModel::lin_pot_coeff(float *from, MneTriangle* to, double omega[])	/*
     l3 = VEC_LEN_40(y3);
     ss = (l1*l2*l3+VEC_DOT_40(y1,y2)*l3+VEC_DOT_40(y1,y3)*l2+VEC_DOT_40(y2,y3)*l1);
     solid  = 2.0*atan2(triple,ss);
-    if (fabs(solid) < solid_eps) {
+    if (std::fabs(solid) < solid_eps) {
         for (k = 0; k < 3; k++)
             omega[k] = 0.0;
     }
@@ -1375,7 +1375,7 @@ int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, floa
         * to outer:     sum = 4*pi
         * to inner:     sum = 0*pi;
         */
-        if (fabs(sums[j]-desired) > 1e-4) {
+        if (std::fabs(sums[j]-desired) > 1e-4) {
             printf("solid angle matrix: rowsum[%d] = 2PI*%g",
                    j+1,sums[j]);
             res = -1;
@@ -3565,7 +3565,7 @@ int FwdBemModel::fwd_sphere_field(float *rd, float Q[], FwdCoilSet *coils, float
                         if (r > 0.0) {
                             rr0 = VEC_DOT_40(this_pos,rd);
                             ar = (r2-rr0);
-                            if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                            if (std::fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
                                                     * and the field point are on the same line */
                                 ar0  = ar/a;
 
@@ -3672,7 +3672,7 @@ int FwdBemModel::fwd_sphere_field_vec(float *rd, FwdCoilSet *coils, float **Bval
                         if (r > 0.0) {
                             rr0 = VEC_DOT_40(this_pos,rd);
                             ar = (r2-rr0);
-                            if (fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
+                            if (std::fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
                                                     * and the field point are on the same line */
 
                                 /* The main ingredients */

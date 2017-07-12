@@ -132,7 +132,7 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             for (qint32 c = 0; c < iCols; ++c) {
                 const double dDist = rowVec[c];
                 if (dDist < dCancelDist) {
-                    const double dValueWeight = fabs(1.0 / interpolationFunction(dDist));
+                    const double dValueWeight = std::fabs(1.0 / interpolationFunction(dDist));
                     dWeightsSum += dValueWeight;
                     vecBelowThresh.push_back(qMakePair<qint32, double> (c, dValueWeight));
                 }
