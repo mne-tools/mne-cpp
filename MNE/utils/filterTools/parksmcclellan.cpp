@@ -583,7 +583,7 @@ double ParksMcClellan::LeGrangeInterp2(int K, int N, int M) // D
   {
    if(j != K)Dee = 2.0 * Dee * (Q - CosOfGrid[j]);
   }
- if(fabs(Dee) < MIN_TEST_VAL )
+ if(std::fabs(Dee) < MIN_TEST_VAL )
   {
    if(Dee < 0.0)Dee = -MIN_TEST_VAL;
    else         Dee =  MIN_TEST_VAL;
@@ -605,7 +605,7 @@ double ParksMcClellan::GEE2(int K, int N)
  for(j=1; j<=N; j++)
   {
    C = XF - CosOfGrid[j];
-   if(fabs(C) < MIN_TEST_VAL )
+   if(std::fabs(C) < MIN_TEST_VAL )
     {
      if(C < 0.0)C = -MIN_TEST_VAL;
      else       C =  MIN_TEST_VAL;
@@ -614,7 +614,7 @@ double ParksMcClellan::GEE2(int K, int N)
    Dee = Dee + C;
    P = P + C*DesPlus[j];
   }
- if(fabs(Dee) < MIN_TEST_VAL )
+ if(std::fabs(Dee) < MIN_TEST_VAL )
   {
    if(Dee < 0.0)Dee = -MIN_TEST_VAL;
    else         Dee =  MIN_TEST_VAL;

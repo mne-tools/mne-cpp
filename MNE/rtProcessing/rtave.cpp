@@ -548,7 +548,7 @@ void checkChVariance(QPair<bool, RowVectorXd>& pairData)
 //    qDebug() << "RtAve::checkForArtifact - compare value " << abs(pairData.second.norm() / pairData.second.cols());
 
     //If variance is 3 times bigger than median -> reject
-    if(temp.norm() / temp.cols() > (m_dValueVariance * abs(dMedian))) {
+    if(temp.norm() / temp.cols() > (m_dValueVariance * std::fabs(dMedian))) {
         pairData.first = true;
     } else {
         pairData.first = false;
@@ -573,7 +573,7 @@ void checkChThreshold(QPair<bool, RowVectorXd>& pairData)
 //    qDebug() << "RtAve::checkForArtifact - m_dValueThreshold" << m_dValueThreshold;
 
     //If absolute vaue of min or max if bigger than threshold -> reject
-    if((abs(min) > m_dValueThreshold) || (abs(max) > m_dValueThreshold)) {
+    if((std::fabs(min) > m_dValueThreshold) || (std::fabs(max) > m_dValueThreshold)) {
         pairData.first = true;
     } else {
         pairData.first = false;

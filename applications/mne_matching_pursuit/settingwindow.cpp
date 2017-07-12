@@ -114,8 +114,8 @@ void settingwindow::on_btt_close_clicked()
 {
     QSettings settings;
     settings.setValue("channel_names", sel_signal_type_map);
-    settings.setValue("boost", abs(ui->sl_boost->value()));
-    settings.setValue("boost_fixDict", abs(ui->sl_boost_fixDict->value()));
+    settings.setValue("boost", std::abs(ui->sl_boost->value()));
+    settings.setValue("boost_fixDict", std::abs(ui->sl_boost_fixDict->value()));
     settings.setValue("fixPhase", ui->chb_fixphase->isChecked());
     settings.setValue("adaptive_iterations", ui->sb_adaptive_iteration->value());
     settings.setValue("adaptive_reflection", ui->dsb_adaptive_reflection->value());

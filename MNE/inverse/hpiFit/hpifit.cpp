@@ -275,8 +275,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         int chIdx = 0;
 
         for (int i = 0; i < amp.rows(); ++i) {
-            if(abs(amp(i,j)) > maxVal) {
-                maxVal = abs(amp(i,j));
+            if(std::fabs(amp(i,j)) > maxVal) {
+                maxVal = std::fabs(amp(i,j));
 
                 if(chIdx < innerind.size()) {
                     chIdx = innerind.at(i);

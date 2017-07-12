@@ -519,7 +519,7 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
 
     for(int r = 0; r < vecData.rows(); ++r) {
         //Take the absolute values because the histogram threshold is also calcualted using the absolute values
-        fSample = fabs(vecData(r));
+        fSample = std::fabs(vecData(r));
 
         if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one

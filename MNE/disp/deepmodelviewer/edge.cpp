@@ -213,7 +213,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 //    }
     path.cubicTo(c1, c2, m_destPoint);
     QColor lg = m_color;
-    float penWidth = fabs(m_weight*m_pNetwork->weightStrength());
+    float penWidth = std::fabs(m_weight*m_pNetwork->weightStrength());
     QPen pen(lg, penWidth, m_pNetwork->getPenStyle(), Qt::FlatCap);//(lg, m_penWidth, m_penStyle, m_capStyle, m_joinStyle);
     painter->strokePath(path, pen);
 
@@ -264,6 +264,6 @@ void Edge::updateColor()
     }
 
     m_color = QColor(DISPLIB::ColorMap::valueToRedBlue(weigt));
-    m_color.setAlpha(abs(weigt*255));
+    m_color.setAlpha(static_cast<int>(std::abs(weigt*255.0f)));
 }
 

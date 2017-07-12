@@ -280,7 +280,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
                 double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))/*-offset*/) * dScaleY;
 
                 //Cut plotting if three times bigger than m_iMaxHeigth
-                if(abs(val) > 6*m_iMaxHeigth) {
+                if(std::fabs(val) > 6*m_iMaxHeigth) {
                     qSamplePosition.setY(-(val/val) * m_iMaxHeigth); //(val/val) used to retrieve sign of val
                     qSamplePosition.setX(path.currentPosition().x()+1);
                 } else {
@@ -322,12 +322,12 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
     painter->setPen(pen);
 
     //Stim line
-    path.moveTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y());
-    path.lineTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y()+boundingRect.height());
+    path.moveTo(boundingRect.x() + std::abs(m_firstLastSample.first)/dsFactor, boundingRect.y());
+    path.lineTo(boundingRect.x() + std::abs(m_firstLastSample.first)/dsFactor, boundingRect.y() + boundingRect.height());
 
     //zero line
-    path.moveTo(boundingRect.x(),boundingRect.y()+boundingRect.height()/2);
-    path.lineTo(boundingRect.x()+m_lAverageData.first().second.second/dsFactor, boundingRect.y()+boundingRect.height()/2);
+    path.moveTo(boundingRect.x(), boundingRect.y() + boundingRect.height()/2);
+    path.lineTo(boundingRect.x() + m_lAverageData.first().second.second/dsFactor, boundingRect.y() + boundingRect.height()/2);
 
     painter->drawPath(path);
 }
