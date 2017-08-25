@@ -41,6 +41,7 @@
 
 #include <fwd/computeFwd/compute_fwd_settings.h>
 #include <fwd/computeFwd/compute_fwd.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -57,6 +58,7 @@
 //=============================================================================================================
 
 using namespace FWDLIB;
+using namespace MNELIB;
 
 
 //=============================================================================================================
@@ -106,9 +108,6 @@ void TestForwardSolution::initTestCase()
 
 void TestForwardSolution::computeForward()
 {
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/ref_dip_fit.dat");
-    QFile testFile;
-
     //*********************************************************************************************************
     // Forward Solution Settings
     //*********************************************************************************************************
@@ -176,6 +175,11 @@ void TestForwardSolution::compareForward()
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+    QString refFwdFileName(QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif");
+
+    //Load data
+    MNEForwardSolution t_Fwd(refFwdFileName);
 
 //    QVERIFY( m_refECDSet.size() == m_ECDSet.size() );
 
