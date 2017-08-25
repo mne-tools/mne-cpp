@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     testqstring.cpp
+* @file     test_codecov.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of codecov coverage analyser
+* @brief    Test for codecov coverage analyser
 *
 */
 

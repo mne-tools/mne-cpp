@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleFwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleCovFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");//3.0;//0.1;//3.0;
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");

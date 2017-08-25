@@ -191,6 +191,8 @@ public:
     */
     void setSamplingInfo(float sps, int T);
 
+    MatrixXd getLastBlock();
+
     //=========================================================================================================
     /**
     * Adds multiple time points (QVector) for a channel set (VectorXd)

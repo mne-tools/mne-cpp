@@ -183,7 +183,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
             if(i == mapped_best_matchings.constBegin())
                 global_best_matching = *i;
 
-            else if(abs(i->max_scalar_product) > abs(global_best_matching.max_scalar_product))
+            else if(std::fabs(i->max_scalar_product) > std::fabs(global_best_matching.max_scalar_product))
                 global_best_matching = *i;
         }
 
@@ -352,7 +352,7 @@ FixDictAtom FixDictMp::correlation(Dictionary current_pdict, MatrixXd current_re
                 best_matching.translation = p;
             }
 
-            else if(abs(max_scalar_product) > abs(best_matching.max_scalar_product))
+            else if(std::fabs(max_scalar_product) > std::fabs(best_matching.max_scalar_product))
             {
                 best_matching = current_pdict.atoms.at(i);
                 best_matching.max_scalar_product = max_scalar_product;

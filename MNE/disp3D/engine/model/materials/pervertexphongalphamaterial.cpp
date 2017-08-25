@@ -83,7 +83,7 @@ PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseAlpha, QNode *
 , m_pVertexEffect(new QEffect())
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
 , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 15.0f))
+, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
 , m_pAlphaParameter(new QParameter("alpha", 0.5f))
 , m_pVertexGL3Technique(new QTechnique())
 , m_pVertexGL3RenderPass(new QRenderPass())
@@ -141,7 +141,7 @@ void PerVertexPhongAlphaMaterial::init()
     m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
-    //If wanted setup transparency
+    //If wanted setup transparency - TODO: Fix transparency problem and remove this
     if(m_bUseAlpha) {
         m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
         m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);

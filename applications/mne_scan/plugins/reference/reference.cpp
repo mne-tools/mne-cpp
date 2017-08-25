@@ -61,10 +61,9 @@ using namespace IOBUFFER;
 
 Reference::Reference()
 : m_bIsRunning(false)
-, m_pRefInput(NULL)
-, m_pRefOutput(NULL)
-, m_pRefBuffer(CircularMatrixBuffer<double>::SPtr())
-, m_pRefToolbarWidget(QSharedPointer<ReferenceToolbarWidget>(new ReferenceToolbarWidget(this)))
+, m_pRefInput(Q_NULLPTR)
+, m_pRefOutput(Q_NULLPTR)
+, m_pRefBuffer(Q_NULLPTR)
 {
     //Add action which will be visible in the plugin's toolbar
     m_pActionRefToolbarWidget = new QAction(QIcon(":/icons/options.png"), tr("Reference Toolbar"),this);
@@ -110,7 +109,7 @@ void Reference::init()
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pRefBuffer.isNull())
-        m_pRefBuffer = CircularMatrixBuffer<double>::SPtr();
+        m_pRefBuffer.clear();
 }
 
 
@@ -188,7 +187,7 @@ void Reference::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
     if(pRTMSA) {
         //Check if buffer initialized
         if(!m_pRefBuffer) {
-            m_pRefBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+            m_pRefBuffer = CircularMatrixBuffer<double>::SPtr(new _double_CircularMatrixBuffer(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
         }
 
         //Fiff information
@@ -241,7 +240,7 @@ void Reference::run()
 
 void Reference::showRefToolbarWidget()
 {
-    if(m_pRefToolbarWidget == NULL){
+    if(!m_pRefToolbarWidget){
         m_pRefToolbarWidget = QSharedPointer<ReferenceToolbarWidget>( new ReferenceToolbarWidget(this));
     }
 

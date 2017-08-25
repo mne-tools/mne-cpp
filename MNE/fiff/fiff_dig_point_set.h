@@ -195,6 +195,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Pick the wanted types from this set and returns them
+    *
+    * @param[in] includeTypes    The include types (FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_ECG, FIFFV_POINT_EXTRA, FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA).
+    *
+    * @return FiffDigPointSet
+    */
+    FiffDigPointSet pickTypes(QList<int> includeTypes) const;
+
+    //=========================================================================================================
+    /**
     * Subscript operator << to add a new FiffDigPoint
     *
     * @param[in] dig    FiffDigPoint to be added

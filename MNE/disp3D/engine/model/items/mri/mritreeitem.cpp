@@ -82,35 +82,12 @@ MriTreeItem::MriTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-MriTreeItem::~MriTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void MriTreeItem::initItem()
 {
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("MRI item");
-}
-
-
-//*************************************************************************************************************
-
-QVariant MriTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  MriTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
 }
 
 
@@ -185,32 +162,21 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
 
 //*************************************************************************************************************
 
-void MriTreeItem::setRtVertColor(const QPair<MatrixX3f, MatrixX3f>& sourceColorSamples)
+void MriTreeItem::setRtVertColor(const QVariant& sourceColorSamples)
 {
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
     QVariant data;
+    QPair<MatrixX3f, MatrixX3f> colorsPerHemi = sourceColorSamples.value<QPair<MatrixX3f, MatrixX3f> >();
+    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
     for(int j = 0; j < itemList.size(); ++j) {
         if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
             if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                data.setValue(sourceColorSamples.first);
-                pHemiItem->getSurfaceItem()->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+                data.setValue(colorsPerHemi.first);
+                pHemiItem->getSurfaceItem()->setVertColor(data);
             } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                data.setValue(sourceColorSamples.second);
-                pHemiItem->getSurfaceItem()->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+                data.setValue(colorsPerHemi.second);
+                pHemiItem->getSurfaceItem()->setVertColor(data);
             }
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MriTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i < this->rowCount(); ++i) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
         }
     }
 }

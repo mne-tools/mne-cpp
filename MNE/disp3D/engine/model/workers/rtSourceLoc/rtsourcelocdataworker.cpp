@@ -105,7 +105,7 @@ void generateWeightsPerVertex(SmoothVertexInfo& input)
         }
 
         if(dist <= input.dThresholdDistance) {
-            valueWeight = fabs(1.0/pow(dist,input.iDistPow));
+            valueWeight = std::fabs(1.0/pow(dist,input.iDistPow));
 
             input.lTriplets.append(Eigen::Triplet<double>(input.iVertIdx, j, valueWeight));
             dWeightsSum += valueWeight;
@@ -180,10 +180,11 @@ void transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, do
 
     float dSample;
     QRgb qRgb;
-    double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
+    double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
 
     for(int r = 0; r < data.rows(); ++r) {
-        dSample = data(r);
+        //Take the absolute values because the histogram threshold is also calcualted using the absolute values
+        dSample = std::fabs(data(r));
 
         if(dSample >= dTrehsoldX) {
             //Check lower and upper thresholds and normalize to one
@@ -192,7 +193,12 @@ void transformDataToColor(const VectorXd& data, MatrixX3f& matFinalVertColor, do
             } else if(dSample < dTrehsoldX) {
                 dSample = 0.0;
             } else {
-                dSample = (dSample - dTrehsoldX) / (dTrehsoldDiff);
+                if(dTresholdDiff != 0.0) {
+                    dSample = (dSample - dTrehsoldX) / (dTresholdDiff);
+                } else {
+                    dSample = 0.0f;
+                }
+
             }
 
             qRgb = functionHandlerColorMap(dSample);
@@ -214,15 +220,19 @@ void transformDataToColor(float fSample, QColor& finalVertColor, double dTrehsol
 {
     //Note: This function needs to be implemented extremley efficient. That is why we have three if clauses.
     //      Otherwise we would have to check which color map to take for each vertex.
-    double dTrehsoldDiff = dTrehsoldZ - dTrehsoldX;
+    double dTresholdDiff = dTrehsoldZ - dTrehsoldX;
 
     //Check lower and upper thresholds and normalize to one
     if(fSample >= dTrehsoldZ) {
-        fSample = 1.0;
+        fSample = 1.0f;
     } else if(fSample < dTrehsoldX) {
-        fSample = 0.0;
+        fSample = 0.0f;
     } else {
-        fSample = (fSample - dTrehsoldX) / dTrehsoldDiff;
+        if(dTresholdDiff != 0.0) {
+            fSample = (fSample - dTrehsoldX) / dTresholdDiff;
+        } else {
+            fSample = 0.0f;
+        }
     }
 
     QRgb qRgb;
@@ -264,7 +274,7 @@ void generateColorsPerAnnotation(VisualizationInfo& input)
         //Find out label for source
         qint32 labelIdx = input.mapLabelIdSources[input.vVertNo(i)];
 
-        if(fabs(input.vSourceColorSamples(i)) > fabs(vecLabelActivation[labelIdx]))
+        if(std::fabs(input.vSourceColorSamples(i)) > std::fabs(vecLabelActivation[labelIdx]))
             vecLabelActivation.insert(labelIdx, input.vSourceColorSamples(i));
     }
 
@@ -277,7 +287,7 @@ void generateColorsPerAnnotation(VisualizationInfo& input)
         //Transform label activations to rgb colors
         //Check if value is bigger than lower threshold. If not, don't plot activation
         if(vecLabelActivation[label.label_id] >= input.dThresholdX) {
-            transformDataToColor(vecLabelActivation[label.label_id], color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
+            transformDataToColor(std::fabs(vecLabelActivation[label.label_id]), color, input.dThresholdX, input.dThresholdZ, input.functionHandlerColorMap);
 
             for(int j = 0; j<label.vertices.rows(); j++) {
                 input.matFinalVertColor(label.vertices(j),0) = color.redF();
@@ -381,9 +391,11 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_iMSecIntervall(50)
 , m_bSurfaceDataIsInit(false)
 , m_bAnnotationDataIsInit(false)
+, m_dSFreq(1000.0)
 {
     m_lVisualizationInfo << VisualizationInfo() << VisualizationInfo();
-    m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
+    m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
+    m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
 }
 
 
@@ -407,7 +419,12 @@ void RtSourceLocDataWorker::addData(const MatrixXd& data)
 
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
-        m_lData.append(data.col(i));
+        if(m_lData.size() < m_dSFreq) {
+            m_lData.append(data.col(i));
+        } else {
+            qDebug() <<"RtSourceLocDataWorker::addData - worker is full!";
+            break;
+        }
     }
 }
 
@@ -424,8 +441,8 @@ void RtSourceLocDataWorker::clear()
 
 void RtSourceLocDataWorker::setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
                                            const Eigen::VectorXi& vecVertNoRightHemi,
-                                           const QMap<int, QVector<int> > &mapVertexNeighborsLeftHemi,
-                                           const QMap<int, QVector<int> > &mapVertexNeighborsRightHemi,
+                                           const QVector<QVector<int> > &mapVertexNeighborsLeftHemi,
+                                           const QVector<QVector<int> > &mapVertexNeighborsRightHemi,
                                            const MatrixX3f &matVertPosLeftHemi,
                                            const MatrixX3f &matVertPosRightHemi)
 {
@@ -497,7 +514,7 @@ void RtSourceLocDataWorker::setAnnotationData(const Eigen::VectorXi& vecLabelIds
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setNumberAverages(const int &iNumAvr)
+void RtSourceLocDataWorker::setNumberAverages(int iNumAvr)
 {
     QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = iNumAvr;
@@ -506,7 +523,7 @@ void RtSourceLocDataWorker::setNumberAverages(const int &iNumAvr)
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setInterval(const int& iMSec)
+void RtSourceLocDataWorker::setInterval(int iMSec)
 {
     QMutexLocker locker(&m_qMutex);
     m_iMSecIntervall = iMSec;
@@ -515,7 +532,7 @@ void RtSourceLocDataWorker::setInterval(const int& iMSec)
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setVisualizationType(const int& iVisType)
+void RtSourceLocDataWorker::setVisualizationType(int iVisType)
 {
     QMutexLocker locker(&m_qMutex);
     m_iVisualizationType = iVisType;
@@ -532,12 +549,15 @@ void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
     if(sColormapType == "Hot Negative 1") {
         m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative1;
         m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative1;
+    } else if(sColormapType == "Hot") {
+        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
+        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
     } else if(sColormapType == "Hot Negative 2") {
         m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
         m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative2;
-    } else if(sColormapType == "Hot") {        
-        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
-        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
+    } else if(sColormapType == "Jet") {
+        m_lVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToJet;
+        m_lVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToJet;
     }
 }
 
@@ -552,6 +572,16 @@ void RtSourceLocDataWorker::setNormalization(const QVector3D& vecThresholds)
 
     m_lVisualizationInfo[0].dThresholdZ = vecThresholds.z();
     m_lVisualizationInfo[1].dThresholdZ = vecThresholds.z();
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setSFreq(const double dSFreq)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_dSFreq = dSFreq;
 }
 
 
@@ -592,7 +622,7 @@ void RtSourceLocDataWorker::stop()
 
 void RtSourceLocDataWorker::run()
 {
-    VectorXd t_vecAverage(0,0);
+    VectorXd t_vecAverage;
 
     m_bIsRunning = true;
 
@@ -645,21 +675,23 @@ void RtSourceLocDataWorker::run()
             m_iCurrentSample++;
 
             if((m_iCurrentSample/1)%m_iAverageSamples == 0) {
+                //Perform the actual interpolation and send signal
                 t_vecAverage /= (double)m_iAverageSamples;
 
                 emit newRtData(performVisualizationTypeCalculation(t_vecAverage));
-                t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
+                t_vecAverage = VectorXd::Zero(t_vecAverage.rows());                
+
+                //Sleep specified amount of time
+                const int timerelap = timer.elapsed();
+                const int iTimeLeft = m_iMSecIntervall - timerelap;
+
+                //qDebug()<<"elapsed"<<timerelap<<"diff"<<iTimeLeft;
+                if(iTimeLeft > 0) {
+                    QThread::msleep(iTimeLeft);
+                }
             }
 
             m_qMutex.unlock();
-        }
-
-        //Sleep specified amount of time - also take into account processing time from before
-        int iTimerElapsed = timer.elapsed();
-        //qDebug() << "RtSourceLocDataWorker::run()" << timer.elapsed() << "msecs";
-
-        if(m_iMSecIntervall-iTimerElapsed > 0) {
-            QThread::msleep(m_iMSecIntervall-iTimerElapsed);
         }
     }
 }
@@ -755,7 +787,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     leftHemi.vecVertNo = m_lVisualizationInfo[0].vVertNo;
     leftHemi.matVertPos = matVertPosLeftHemi;
     leftHemi.iDistPow = 3;
-    leftHemi.dThresholdDistance = 0.003;
+    leftHemi.dThresholdDistance = 0.032;
     inputData.append(leftHemi);
 
     SmoothOperatorInfo rightHemi;
@@ -764,7 +796,7 @@ void RtSourceLocDataWorker::createSmoothingOperator(const MatrixX3f& matVertPosL
     rightHemi.vecVertNo = m_lVisualizationInfo[1].vVertNo;
     rightHemi.matVertPos = matVertPosRightHemi;
     rightHemi.iDistPow = 3;
-    rightHemi.dThresholdDistance = 0.003;
+    rightHemi.dThresholdDistance = 0.032;
     inputData.append(rightHemi);
 
     QFuture<void> future = QtConcurrent::map(inputData, generateSmoothOperator);

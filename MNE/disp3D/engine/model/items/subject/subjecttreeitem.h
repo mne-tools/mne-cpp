@@ -43,6 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 #include "../common/abstracttreeitem.h"
+#include "../measurement/measurementtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -70,6 +71,8 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MeasurementTreeItem;
+
 
 //=============================================================================================================
 /**
@@ -96,16 +99,28 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
     */
-    ~SubjectTreeItem();
+    void connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem);
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded head BEM data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
     */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    void connectEEGMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem);
+
+    //=========================================================================================================
+    /**
+    * Connects measurement items and their data (i.e. MNE source data) to already loaded sensor BEM data
+    *
+    * @param[in] pMeasurementItem       The measurement item which is to be connected.
+    * @param[in] parent                 The parent of this item.
+    */
+    void connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem, QStandardItem* parent);
 
 protected:
     //=========================================================================================================
@@ -114,13 +129,6 @@ protected:
     */
     void initItem();
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 };
 
 } //NAMESPACE DISP3DLIB

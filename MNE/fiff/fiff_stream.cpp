@@ -51,9 +51,21 @@
 #include "fiff_ch_pos.h"
 #include "fiff_dig_point.h"
 #include "fiff_id.h"
+#include "c/fiff_digitizer_data.h"
+#include "fiff_dig_point.h"
 
 #include <utils/mnemath.h>
 #include <utils/ioutils.h>
+
+#define MALLOC_54(x,t) (t *)malloc((x)*sizeof(t))
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 
 //*************************************************************************************************************
@@ -824,6 +836,69 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
         printf("\tRead %d compensation matrices\n",compdata.size());
 
     return compdata;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigitizerData& p_digData)
+{
+    p_digData.coord_frame = FIFFV_COORD_UNKNOWN;
+    fiff_int_t kind = -1;
+    fiff_int_t pos = -1;
+    int npoint = 0;
+    FiffTag::SPtr t_pTag;
+
+    QList<FiffDirNode::SPtr> t_qListDigData = p_Node->dir_tree_find(FIFFB_ISOTRAK);
+
+    //Check if digitizer data is available
+    if(t_qListDigData.isEmpty()) {
+        t_qListDigData = p_Node->dir_tree_find(FIFFB_MRI_SET);
+
+        if(t_qListDigData.isEmpty()) {
+            fprintf(stderr, "No Isotrak data found in %s", this->streamName().toLatin1().data());
+            return false;
+        } else {
+            p_digData.coord_frame = FIFFV_COORD_MRI;
+        }
+    } else {
+        p_digData.coord_frame = FIFFV_COORD_HEAD;
+    }
+
+    // Read actual data and store it
+    for (int k = 0; k < t_qListDigData.first()->nent(); ++k) {
+        kind = t_qListDigData.first()->dir[k]->kind;
+        pos  = t_qListDigData.first()->dir[k]->pos;
+
+        switch(kind) {
+        case FIFF_DIG_POINT:
+            this->read_tag(t_pTag, pos);
+            p_digData.points.append(t_pTag->toDigPoint());
+            break;
+        case FIFF_MNE_COORD_FRAME:
+            this->read_tag(t_pTag, pos);
+            p_digData.coord_frame = *t_pTag->toInt();
+            break;
+        }
+    }
+
+    npoint = p_digData.points.size();
+
+    if (npoint == 0) {
+        fprintf(stderr, "No digitizer data in %s", this->streamName().toLatin1().data());
+        return false;
+    }
+
+    //Add other information as default
+    p_digData.filename    = this->streamName();
+    p_digData.npoint      = npoint;
+
+    for (int k = 0; k < p_digData.npoint; k++) {
+        p_digData.active.append(TRUE);
+        p_digData.discard.append(FALSE);
+    }
+
+    return true;
 }
 
 
@@ -1803,8 +1878,9 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
 
 QStringList FiffStream::split_name_list(QString p_sNameList)
 {
-    return p_sNameList.split(":");
+    return p_sNameList.replace(" ","").split(":");
 }
+
 
 //*************************************************************************************************************
 
@@ -1952,7 +2028,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     //    Blocks from the original
     //
     QList<fiff_int_t> blocks;
-    blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
+    blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_HPI_SUBSYSTEM << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY << FIFFB_DACQ_PARS << FIFFB_EVENTS;
     bool have_hpi_result = false;
     bool have_isotrak    = false;
     if (blocks.size() > 0 && !info.filename.isEmpty())
@@ -1973,6 +2049,33 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
                 have_isotrak = true;
         }
 
+        t_pStream2 = FiffStream::SPtr();
+    }
+    //
+    // Unused parameters from original file (could eventually put these in info struct)
+    //
+    QList<fiff_int_t> values;
+    values << FIFF_EXPERIMENTER << FIFF_DESCRIPTION << FIFF_PROJ_ID << FIFF_PROJ_NAME << FIFF_LINE_FREQ << FIFF_XPLOTTER_LAYOUT;
+    if (values.size() > 0 && !info.filename.isEmpty())
+    {
+        QFile t_qFile(info.filename);//ToDo this has to be adapted for TCPSocket
+        FiffStream::SPtr t_pStream2(new FiffStream(&t_qFile));
+        FiffTag::SPtr t_pTag;
+
+        t_pStream2->open();
+        QList<FiffDirNode::SPtr> nodes = t_pStream2->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+
+        for(qint32 k = 0; k < values.size(); ++k)
+        {
+            if(nodes.size() > 0 && nodes[0]->find_tag(t_pStream2, values[k], t_pTag)) {
+                if (values[k] == FIFF_EXPERIMENTER || values[k] == FIFF_DESCRIPTION || values[k] == FIFF_PROJ_NAME || values[k] == FIFF_XPLOTTER_LAYOUT)
+                    t_pStream->write_string(values[k], t_pTag->toString());
+                else if (values[k] == FIFF_PROJ_ID)
+                    t_pStream->write_int(values[k], t_pTag->toInt());
+                else if (values[k] == FIFF_LINE_FREQ)
+                    t_pStream->write_float(values[k], t_pTag->toFloat());
+            }
+        }
         t_pStream2 = FiffStream::SPtr();
     }
     //
@@ -2843,7 +2946,7 @@ fiff_long_t FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
         //    Scan numbers may have been messed up
         //
         chs[k].scanNo = k+1;//+1 because
-        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+//        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
         this->write_ch_info(chs[k]);
     }
 

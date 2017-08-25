@@ -42,6 +42,7 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_bem.h>
 
@@ -73,8 +74,8 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BemSurfaceTreeItem::BemSurfaceTreeItem(int iType, const QString& text)
-: AbstractSurfaceTreeItem(iType, text)
+BemSurfaceTreeItem::BemSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
 }
@@ -88,38 +89,30 @@ void BemSurfaceTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("BEM surface item");
+
+//    //Set shaders
+//    this->removeComponent(m_pMaterial);
+//    this->removeComponent(m_pTessMaterial);
+//    this->removeComponent(m_pNormalMaterial);
+
+//    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+//    this->addComponent(pBemMaterial);
 }
 
 
 //*************************************************************************************************************
 
-void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEntity* parent)
+void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface)
 {
-    //Set parents
-    m_pRenderable3DEntity->setParent(parent);
-    m_pRenderable3DEntityNormals->setParent(parent);
-
-    QPointer<Qt3DRender::QMaterial> pMaterial = new PerVertexPhongAlphaMaterial(true);
-    this->setMaterial(pMaterial);
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tBemSurface.rr,
-                                                        tBemSurface.nn,
-                                                        tBemSurface.tris,
-                                                        matVertColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
-
-    //Render normals
-    if(m_bRenderNormals) {
-        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tBemSurface.rr,
-                                                                      tBemSurface.nn,
-                                                                      tBemSurface.tris,
-                                                                      matVertColor,
-                                                                      Qt3DRender::QGeometryRenderer::Triangles);
-    }
+    m_pCustomMesh->setMeshData(tBemSurface.rr,
+                                tBemSurface.nn,
+                                tBemSurface.tris,
+                                matVertColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
 
     //Find out BEM layer type and change items name
     this->setText(MNEBemSurface::id_name(tBemSurface.id));
@@ -130,4 +123,3 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     data.setValue(tBemSurface.rr);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 }
-

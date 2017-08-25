@@ -46,11 +46,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // CNTK INCLUDES
 //=============================================================================================================
 
-#include <Eval.h>
-//#include <CNTKLibrary.h>
+#include <CNTKLibrary.h>
 
 
 //*************************************************************************************************************
@@ -59,6 +66,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -82,29 +90,24 @@ namespace DEEPLIB
 
 //=============================================================================================================
 /**
-* Deep cntk wrapper descritpion
+* Deep CNTK wrapper descritpion
 *
-* @brief Deep cntk wrapper to train and evaluate models
+* @brief Deep CNTK wrapper to train and evaluate models
 */
-class DEEPSHARED_EXPORT Deep
+class DEEPSHARED_EXPORT Deep : public QObject
 {
+    Q_OBJECT
 public:
     typedef QSharedPointer<Deep> SPtr;            /**< Shared pointer type for Deep. */
     typedef QSharedPointer<const Deep> ConstSPtr; /**< Const shared pointer type for Deep. */
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
-    Deep();
-
-    //=========================================================================================================
-    /**
-    * Constructor
+    * Constructs Deep which is a child of parent
     *
-    * @param [in] sModelFilename    The model filename to set
+    * @param [in] parent    The parent QObject
     */
-    Deep(const QString &sModelFilename);
+    Deep(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -112,58 +115,202 @@ public:
     */
     virtual ~Deep();
 
-    //=========================================================================================================
-    /**
-    * Returns the current set model file name
-    *
-    * @return the current model file name
-    */
-    const QString& getModelFilename() const;
+//    //=========================================================================================================
+//    /**
+//    * Evaluate the network in several runs
+//    *
+//    * @param [in] evalFunc      Function to evaluate
+//    * @param [in] device        Device to use
+//    */
+//    static void runEvaluationClassifier(CNTK::FunctionPtr evalFunc, const CNTK::DeviceDescriptor& device);
 
-    //=========================================================================================================
-    /**
-    * Set the model filename
-    *
-    * @param [in] sModelFilename    The model filename to set
-    */
-    void setModelFilename(const QString &sModelFilename);
+//    //=========================================================================================================
+//    /**
+//    * Shows how to use Clone() to share function parameters among multi evaluation threads.
+//    *
+//    * It first creates a new function with parameters, then spawns multi threads. Each thread uses Clone() to create a new
+//    * instance of function and then use this instance to do evaluation.
+//    * All cloned functions share the same parameters.
+//    *
+//    * @param [in] device
+//    * @param [in] threadCount   Numbers of threads to use
+//    */
+//    void multiThreadsEvaluationWithClone(const CNTK::DeviceDescriptor& device, const int threadCount);
 
-    //=========================================================================================================
-    /**
-    * Evaluate the MNE Deep Model set by the model file name
-    *
-    * @return true when MNE Deep model was sucessfully evaluated.
-    */
-    bool evalModel(std::vector<float>& inputs, std::vector<float>& outputs);
-
-    //=========================================================================================================
-    /**
-    * Loads the Deep Model set by the model file name
-    *
-    * @return true when MNE Deep model was sucessfully loaded.
-    */
-    bool loadModel();
+//    void testClone();
 
     //=========================================================================================================
     /**
     * Returns the Input Dimensions
     *
+    * @param [in] inputNodeName     input node name of which the dimension should be get from
+    *
     * @return the Input dimensions
     */
-    size_t inputDimensions();
+    size_t inputDimensions(const std::wstring inputNodeName = L"features");
 
     //=========================================================================================================
     /**
     * Returns the Output Dimensions
     *
+    * @param [in] outputNodeName    output node name of which the dimension should be get from
+    *
     * @return the Output dimensions
     */
-    size_t outputDimensions();
+    size_t outputDimensions(const std::wstring outputNodeName = L"labels");//out.z
+
+    //=========================================================================================================
+    /**
+    * Run the evaluation CNTK Model
+    *
+    * @param [in] model     Model to evaluate
+    * @param [in] input     The inputs (rows = samples, cols = feature inputs)
+    * @param [out] output   The ouptuts (rows = samples, cols = output results)
+    * @param [in] device    Device to use for evaluation
+    */
+    static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Returns the CNTK Model v2
+    *
+    * @return the CNTK Model
+    */
+    CNTK::FunctionPtr getModel();
+
+    //=========================================================================================================
+    /**
+    * Sets the CNTK Model v2
+    *
+    * @param [in] model     Model to set
+    */
+    void setModel(CNTK::FunctionPtr& model);
+
+    //=========================================================================================================
+    /**
+    * Loads CNTK Model v2
+    *
+    * @param [in] modelFileName     Model file name
+    * @param [in] device            Device to load the model to
+    *
+    * @return true when successfully loaded, false otherwise.
+    */
+    bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Save CNTK Model v2 function graph into a model file.
+    *
+    * @param [in] fileName     file name to save the model to
+    *
+    * @return true when successfully saved, false otherwise.
+    */
+    bool saveModel(const QString& fileName);
+
+    //=========================================================================================================
+    /**
+    * Evaluate the CNTK Model
+    *
+    * @param [in] input     The inputs (rows = samples, cols = feature inputs)
+    * @param [out] output   The ouptuts (rows = samples, cols = output results)
+    * @param [in] device    Device to use for evaluation
+    *
+    * @return true when successfully evaluated, false otherwise.
+    */
+    bool evalModel(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Train the CNTK Model with one Minibatch
+    *
+    * @param [in] input             The inputs (rows = samples (batchsize), cols = feature inputs)
+    * @param [in] targets           The targets (rows = samples (batchsize), cols = output results)
+    * @param [out] loss             The training loss
+    * @param [out] error            The training error
+    * @param [in] minibatch_size    The size of one minibatch (Default 25)
+    * @param [in] device            Device to use for evaluation
+    *
+    * @return true when successfully evaluated, false otherwise.
+    */
+    bool trainModel(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, QVector<double>& loss, QVector<double>& error, int minibatch_size = 25, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Train the CNTK Model with one Minibatch
+    *
+    * @param [in] input     The inputs (rows = samples (batchsize), cols = feature inputs)
+    * @param [in] targets   The targets (rows = samples (batchsize), cols = output results)
+    * @param [out] loss     The training loss
+    * @param [out] error    The training error
+    * @param [in] device    Device to use for training
+    *
+    * @return true when successfully evaluated, false otherwise.
+    */
+    bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
+
+    //=========================================================================================================
+    /**
+    * Cancel the current training session
+    */
+    void cancelTraining();
+
+    //=========================================================================================================
+    /**
+    * Print the model structure
+    */
+    void print();
+
+signals:
+
+
+protected:
+    //=========================================================================================================
+    /**
+    * Print the ouput function info to stderr stream
+    *
+    * @param [in] model     Function to evaluate
+    */
+    void outputFunctionInfo(CNTK::FunctionPtr model);
+
+    //=========================================================================================================
+    /**
+    * Searches for a varibale by name. Returns true when variable was found.
+    *
+    * @param [in] variableLists     List of variables to search for the variable by name
+    * @param [in] varName           Name of variable to find
+    * @param [out] var              The variable, if name was found
+    *
+    * @return true when variable was found, false otherwise.
+    */
+    static bool getVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var);
+
+    //=========================================================================================================
+    /**
+    * Searches for an input variable by name. Returns true when found.
+    *
+    * @param [in] evalFunc          Model to search for the respective input variable.
+    * @param [in] varName           Name of variable to find
+    * @param [out] var              The variable, if name was found
+    *
+    * @return true when variable was found, false otherwise.
+    */
+    inline static bool getInputVariableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
+
+    //=========================================================================================================
+    /**
+    * Searches for an output variable by name. Returns true when found.
+    *
+    * @param [in] evalFunc          Model to search for the respective input variable.
+    * @param [in] varName           Name of variable to find
+    * @param [out] var              The variable, if name was found
+    *
+    * @return true when variable was found, false otherwise.
+    */
+    inline static bool getOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
 
 private:
-    QString m_sModelFilename;                               /**< Model filename */
 
-    Microsoft::MSR::CNTK::IEvaluateModel<float>* m_model;   /**< The loaded model */
+    CNTK::FunctionPtr m_pModel;  /**< The CNTK model v2 */
 
 };
 

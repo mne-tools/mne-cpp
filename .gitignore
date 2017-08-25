@@ -78,6 +78,9 @@
 /bin/ex_st_clustered_inverse_pwl_rap_music
 /bin/ex_st_clustered_inverse_pwl_rap_musicd
 
+/bin/ex_interpolation
+/bin/test_fiff_cov
+
 # Binaries Tests
 /bin/test_codecov
 /bin/test_codecovd
@@ -186,6 +189,8 @@
 
 # Compiled Dynamic libraries
 *.so
+*.so.debug
+*.debug
 
 # Compiled Static libraries
 *.lai
@@ -222,3 +227,14 @@ Makefile
 .DS_Store
 
 lib
+/bin/printsupport
+/bin/mne_deep_models/examples/datasets/MNIST/*.txt
+/bin/mne_analyze_extensions/*.dll
+/bin/mne_analyze_extensions/*.exp
+/bin/mne_analyze_extensions/*.ilk
+/bin/mne_analyze_extensions/*.lib
+/bin/mne_analyze_extensions/*.pdb
+/bin/mne_analyze_extensions/deepcntknets/*.dll
+/bin/mne_analyze_extensions/deepcntknets/*.exp
+/bin/mne_analyze_extensions/deepcntknets/*.lib
+/applications/mne_analyze/extensions/deepcntknets/bio

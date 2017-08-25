@@ -112,7 +112,9 @@ SOURCES += \
     dipoleFit/guess_data.cpp \
     c/mne_inverse_operator.cpp \
     c/mne_meas_data.cpp \
-    c/mne_meas_data_set.cpp
+    c/mne_meas_data_set.cpp \
+    hpiFit/hpifit.cpp \
+    hpiFit/hpifitdata.cpp
 
 
 HEADERS +=\
@@ -132,7 +134,9 @@ HEADERS +=\
     dipoleFit/guess_data.h \
     c/mne_inverse_operator.h \
     c/mne_meas_data.h \
-    c/mne_meas_data_set.h
+    c/mne_meas_data_set.h \
+    hpiFit/hpifit.h \
+    hpiFit/hpifitdata.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

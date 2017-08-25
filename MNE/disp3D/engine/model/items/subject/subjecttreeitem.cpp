@@ -39,7 +39,12 @@
 //=============================================================================================================
 
 #include "subjecttreeitem.h"
-
+#include "../measurement/measurementtreeitem.h"
+#include "../mri/mritreeitem.h"
+#include "../bem/bemsurfacetreeitem.h"
+#include "../bem/bemtreeitem.h"
+#include "../sensorspace/sensorsettreeitem.h"
+#include "../sensorspace/sensorsurfacetreeitem.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,13 +83,6 @@ SubjectTreeItem::SubjectTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-SubjectTreeItem::~SubjectTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void SubjectTreeItem::initItem()
 {
     this->setEditable(false);
@@ -96,30 +94,79 @@ void SubjectTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant SubjectTreeItem::data(int role) const
+void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem)
 {
-    return AbstractTreeItem::data(role);
-}
+    //Connect mri item with the measurement tree items in case the real time color changes (i.e. rt source loc)
+    //or the user changes the color origin
+    QList<QStandardItem*> mriItemList = this->findChildren(Data3DTreeModelItemTypes::MriItem);
 
-
-//*************************************************************************************************************
-
-void SubjectTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void SubjectTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    for(int i = 0; i<this->rowCount(); i++) {
-        if(this->child(i)->isCheckable()) {
-            this->child(i)->setCheckState(checkState);
+    foreach(QStandardItem* item, mriItemList) {
+        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(item)) {
+            connect(pMeasurementItem, &MeasurementTreeItem::sourceColorChanged,
+                pMriItem, &MriTreeItem::setRtVertColor);
+            connect(pMriItem, &MriTreeItem::colorOriginChanged,
+                pMeasurementItem, &MeasurementTreeItem::setSourceColors);
         }
     }
 }
 
 
+//*************************************************************************************************************
 
+void SubjectTreeItem::connectEEGMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem)
+{
+    //Connect bem head item with the measurement tree items in case the real time color changes (i.e. rt source loc)
+    QList<QStandardItem*> bemItemList = this->findChildren(Data3DTreeModelItemTypes::BemItem);
+    QList<QStandardItem*> bemSurfacesItemList;
+
+    foreach(QStandardItem* item, bemItemList) {
+        if(BemTreeItem* pBemItem = dynamic_cast<BemTreeItem*>(item)) {
+            bemSurfacesItemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+
+            foreach(QStandardItem* itemBemSurf, bemSurfacesItemList) {
+                if(BemSurfaceTreeItem* pBemSurfItem = dynamic_cast<BemSurfaceTreeItem*>(itemBemSurf)) {
+                    if(pBemSurfItem->text() == "Head") {
+                        connect(pMeasurementItem, &MeasurementTreeItem::sensorEEGColorChanged,
+                            pBemSurfItem, &BemSurfaceTreeItem::setVertColor);
+                        connect(pBemSurfItem, &BemSurfaceTreeItem::colorOriginChanged,
+                            pMeasurementItem, &MeasurementTreeItem::setSensorEEGColors);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SubjectTreeItem::connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem, QStandardItem* parent)
+{
+    //Connect bem sensor surface item with the measurement tree items in case the real time color changes (i.e. rt source loc)
+    if(parent) {
+        //Find sensor items which are stored as subejct items
+        for(int j = 0; j < parent->rowCount(); ++j) {
+            if(SubjectTreeItem* pSensorItem = dynamic_cast<SubjectTreeItem*>(parent->child(j))) {
+                QList<QStandardItem*> sensorSetItemList = pSensorItem->findChildren(Data3DTreeModelItemTypes::SensorSetItem);
+                QList<QStandardItem*> sensorSurfacesItemList;
+
+                for(int i = 0; i < sensorSetItemList.size(); ++i) {
+                    if(SensorSetTreeItem* pSensorSetItem = dynamic_cast<SensorSetTreeItem*>(sensorSetItemList.at(i))) {
+                        sensorSurfacesItemList = pSensorSetItem->findChildren(Data3DTreeModelItemTypes::SensorSurfaceItem);
+
+                        for(int k = 0; k < sensorSurfacesItemList.size(); ++k) {
+                            if(SensorSurfaceTreeItem* pSensorSetSurfItem = dynamic_cast<SensorSurfaceTreeItem*>(sensorSurfacesItemList.at(k))) {
+                                if(pSensorSetSurfItem->text() == "Sensor Surface") {
+                                    connect(pMeasurementItem, &MeasurementTreeItem::sensorMEGColorChanged,
+                                            pSensorSetSurfItem, &SensorSurfaceTreeItem::setVertColor);
+                                    connect(pSensorSetSurfItem, &SensorSurfaceTreeItem::colorOriginChanged,
+                                            pMeasurementItem, &MeasurementTreeItem::setSensorMEGColors);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -42,6 +42,7 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_bem.h>
 
@@ -73,8 +74,8 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorSurfaceTreeItem::SensorSurfaceTreeItem(int iType, const QString& text)
-: AbstractSurfaceTreeItem(iType, text)
+SensorSurfaceTreeItem::SensorSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
 }
@@ -88,38 +89,30 @@ void SensorSurfaceTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("Sensor surface item");
+
+    //Set shaders
+    this->removeComponent(m_pMaterial);
+    this->removeComponent(m_pTessMaterial);
+    this->removeComponent(m_pNormalMaterial);
+
+    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+    this->addComponent(pBemMaterial);
 }
 
 
 //*************************************************************************************************************
 
-void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface, Qt3DCore::QEntity* parent)
+void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface)
 {
-    //Set parents
-    m_pRenderable3DEntity->setParent(parent);
-    m_pRenderable3DEntityNormals->setParent(parent);
-
-    QPointer<Qt3DRender::QMaterial> pMaterial = new PerVertexPhongAlphaMaterial(true);
-    this->setMaterial(pMaterial);
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tSensorSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSensorSurface.rr,
-                                                        tSensorSurface.nn,
-                                                        tSensorSurface.tris,
-                                                        matVertColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
-
-    //Render normals
-    if(m_bRenderNormals) {
-        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSensorSurface.rr,
-                                                                      tSensorSurface.nn,
-                                                                      tSensorSurface.tris,
-                                                                      matVertColor,
-                                                                      Qt3DRender::QGeometryRenderer::Triangles);
-    }
+    m_pCustomMesh->setMeshData(tSensorSurface.rr,
+                                tSensorSurface.nn,
+                                tSensorSurface.tris,
+                                matVertColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
 
     //Add data which is held by this SensorSurfaceTreeItem
     QVariant data;

@@ -79,13 +79,6 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-MetaTreeItem::~MetaTreeItem()
-{
-}
-
-
-//*************************************************************************************************************
-
 void MetaTreeItem::initItem()
 {
     QString sToolTip;
@@ -96,9 +89,6 @@ void MetaTreeItem::initItem()
             break;
         case MetaTreeItemTypes::FilePath:
             sToolTip = "File path";
-            break;
-        case MetaTreeItemTypes::SurfaceType:
-            sToolTip = "Surface type";
             break;
         case MetaTreeItemTypes::SurfaceColorGyri:
             sToolTip = "Color Gyri";
@@ -116,7 +106,7 @@ void MetaTreeItem::initItem()
             sToolTip = "The color map type";
             break;
         case MetaTreeItemTypes::StreamingTimeInterval:
-            sToolTip = "The m seconds waited in between each sample";
+            sToolTip = "The m seconds waited when displaying the data";
             break;
         case MetaTreeItemTypes::LoopedStreaming:
             sToolTip = "Turn looped streaming on/off";
@@ -145,14 +135,14 @@ void MetaTreeItem::initItem()
         case MetaTreeItemTypes::SurfaceTriangleScale:
             sToolTip = "Surface triangle scale value";
             break;
-        case MetaTreeItemTypes::SurfaceTranslateX:
-            sToolTip = "Surface x translation value";
+        case MetaTreeItemTypes::TranslateX:
+            sToolTip = "x translation value";
             break;
-        case MetaTreeItemTypes::SurfaceTranslateY:
-            sToolTip = "Surface y translation value";
+        case MetaTreeItemTypes::TranslateY:
+            sToolTip = "y translation value";
             break;
-        case MetaTreeItemTypes::SurfaceTranslateZ:
-            sToolTip = "Surface z translation value";
+        case MetaTreeItemTypes::TranslateZ:
+            sToolTip = "z translation value";
             break;
         case MetaTreeItemTypes::NetworkThreshold:
             sToolTip = "The threshold used to scale the network";
@@ -162,6 +152,18 @@ void MetaTreeItem::initItem()
             break;
         case MetaTreeItemTypes::NumberDipoles:
             sToolTip = "The number of dipoles";
+            break;
+        case MetaTreeItemTypes::MaterialType:
+            sToolTip = "The surface material";
+            break;
+        case MetaTreeItemTypes::Scale:
+            sToolTip = "The scaling value";
+            break;
+        case MetaTreeItemTypes::CancelDistance:
+            sToolTip = "The cancel distance";
+            break;
+        case MetaTreeItemTypes::InterpolationFunction:
+            sToolTip = "The function used for interpolation";
             break;
         default: // do nothing;
             break;
@@ -173,103 +175,10 @@ void MetaTreeItem::initItem()
 
 //*************************************************************************************************************
 
-QVariant MetaTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  MetaTreeItem::setData(const QVariant& value, int role)
+void MetaTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
-    switch(role) {
-        case MetaTreeItemRoles::SurfaceColorSulci: {
-            emit curvColorsChanged();
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceColorGyri: {
-            emit curvColorsChanged();
-            break;
-        }
-
-        case MetaTreeItemRoles::StreamingTimeInterval: {
-            emit rtDataTimeIntervalChanged(value.toInt());
-            break;
-        }
-
-        case MetaTreeItemRoles::DistributedSourceLocThreshold: {
-            QVector3D vecTemp = value.value<QVector3D>();
-            emit rtDataNormalizationValueChanged(vecTemp);
-            break;
-        }
-
-        case MetaTreeItemRoles::ColormapType: {
-            emit rtDataColormapTypeChanged(value.toString());
-            break;
-        }
-
-        case MetaTreeItemRoles::VisualizationType: {
-            emit rtDataVisualizationTypeChanged(value.toString());
-            break;
-        }
-
-        case MetaTreeItemRoles::Color: {
-            emit colorChanged(value.value<QColor>());
-            break;
-        }
-
-        case MetaTreeItemRoles::NumberAverages: {
-            emit rtDataNumberAveragesChanged(value.toInt());
-            break;
-        }
-
-        case MetaTreeItemRoles::AlphaValue: {
-            emit alphaChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTessInner: {
-            emit surfaceTessInnerChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTessOuter: {
-            emit surfaceTessOuterChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTriangleScale: {
-            emit surfaceTriangleScaleChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTranslateX: {
-            emit surfaceTranslationXChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTranslateY: {
-            emit surfaceTranslationYChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::SurfaceTranslateZ: {
-            emit surfaceTranslationZChanged(value.toFloat());
-            break;
-        }
-
-        case MetaTreeItemRoles::NetworkThreshold: {
-            QVector3D vecTemp = value.value<QVector3D>();
-            emit networkThresholdChanged(vecTemp);
-            break;
-        }
-
-        default: // do nothing;
-            break;
-    }
+    emit dataChanged(value);
 }
 

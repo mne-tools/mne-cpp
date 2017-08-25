@@ -95,7 +95,7 @@ void TFplot::calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qr
     //normalisation of the tf-matrix
     qreal norm1 = tf_matrix.maxCoeff();
     qreal mnorm = tf_matrix.minCoeff();
-    if(abs(mnorm) > norm1) norm1 = mnorm;
+    if(std::fabs(mnorm) > norm1) norm1 = mnorm;
     tf_matrix /= norm1;
 
     //setup image
@@ -109,22 +109,22 @@ void TFplot::calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qr
             switch  (cmap)
             {
                 case Jet:
-                    color.setRgb(ColorMap::valueToJet(abs(tf_matrix(y, x))));
+                    color.setRgb(ColorMap::valueToJet(std::fabs(tf_matrix(y, x))));
                     break;
                 case Hot:
-                    color.setRgb(ColorMap::valueToHot(abs(tf_matrix(y, x))));
+                    color.setRgb(ColorMap::valueToHot(std::fabs(tf_matrix(y, x))));
                     break;
                 case HotNeg1:
-                    color.setRgb(ColorMap::valueToHotNegative1(abs(tf_matrix(y, x))));
+                    color.setRgb(ColorMap::valueToHotNegative1(std::fabs(tf_matrix(y, x))));
                     break;
                 case HotNeg2:
-                    color.setRgb(ColorMap::valueToHotNegative2(abs(tf_matrix(y, x))));
+                    color.setRgb(ColorMap::valueToHotNegative2(std::fabs(tf_matrix(y, x))));
                     break;
                 case Bone:
-                    color.setRgb(ColorMap::valueToBone(abs(tf_matrix(y, x))));
+                    color.setRgb(ColorMap::valueToBone(std::fabs(tf_matrix(y, x))));
                     break;
                 case RedBlue:
-                    color.setRgb(ColorMap::valueToRedBlue(abs(tf_matrix(y, x))));
+                    color.setRgb(ColorMap::valueToRedBlue(std::fabs(tf_matrix(y, x))));
                     break;
             }
             image_to_tf_plot->setPixel(x, tf_matrix.rows() - 1 -  y,  color.rgb());

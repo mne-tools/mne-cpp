@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstractsurfacetreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 #include "../common/types.h"
 
 
@@ -85,7 +85,6 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MetaTreeItem;
-class Renderable3DEntity;
 
 
 //=============================================================================================================
@@ -94,7 +93,7 @@ class Renderable3DEntity;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractSurfaceTreeItem
+class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
@@ -106,19 +105,21 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit FsSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceItem, const QString& text = "Surface");
+    explicit FsSurfaceTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
+                               int iType = Data3DTreeModelItemTypes::SurfaceItem,
+                               const QString& text = "Surface");
 
     //=========================================================================================================
     /**
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] parent             The Qt3D entity parent of the new item.
     */
-    void addData(const FSLIB::Surface& tSurface, Qt3DCore::QEntity* parent);
+    void addData(const FSLIB::Surface& tSurface);
 
     //=========================================================================================================
     /**
@@ -151,13 +152,14 @@ protected:
     *
     * @return The final colors per vertex (RGB).
     */
-    MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
+    MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
+                                       const QColor& colSulci = QColor(50,50,50),
+                                       const QColor& colGyri = QColor(125,125,125)) const;
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
 
-    //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
-    MetaTreeItem*                   m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
-    MetaTreeItem*                   m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
+    QPointer<MetaTreeItem>          m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
+    QPointer<MetaTreeItem>          m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
 
 signals:
     //=========================================================================================================

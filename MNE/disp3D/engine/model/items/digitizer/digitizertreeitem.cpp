@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "digitizertreeitem.h"
-#include "../../3dhelpers/renderable3Dentity.h"
 #include "../common/metatreeitem.h"
 
 #include <fiff/fiff_constants.h>
@@ -52,13 +51,13 @@
 //=============================================================================================================
 
 #include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
-//=============================================================================================================
+//============================================================================= ================================
 
 
 //*************************************************************************************************************
@@ -74,21 +73,10 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DigitizerTreeItem::DigitizerTreeItem(int iType, const QString& text)
-: AbstractTreeItem(iType, text)
-, m_pRenderable3DEntity(new Renderable3DEntity())
+DigitizerTreeItem::DigitizerTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-DigitizerTreeItem::~DigitizerTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-    }
 }
 
 
@@ -100,56 +88,38 @@ void DigitizerTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip(this->text());
-
-    //Add color picker item as meta information item
-    QVariant data;
-    QList<QStandardItem*> list;
-
-    MetaTreeItem* pItemColor = new MetaTreeItem(MetaTreeItemTypes::Color, "Point color");
-    connect(pItemColor, &MetaTreeItem::colorChanged,
-            this, &DigitizerTreeItem::onSurfaceColorChanged);
-    list.clear();
-    list << pItemColor;
-    list << new QStandardItem(pItemColor->toolTip());
-    this->appendRow(list);
-    data.setValue(QColor(100,100,100));
-    pItemColor->setData(data, MetaTreeItemRoles::PointColor);
-    pItemColor->setData(data, Qt::DecorationRole);
 }
 
 
 //*************************************************************************************************************
 
-QVariant DigitizerTreeItem::data(int role) const
+void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
 {
-    return AbstractTreeItem::data(role);
-}
+    QVector3D pos;
 
+    if(!list.isEmpty() && list.size() == tDigitizer.size()) {
+        for(int i = 0; i < list.size(); ++i) {
+            pos.setX(tDigitizer[i].r[0]);
+            pos.setY(tDigitizer[i].r[1]);
+            pos.setZ(tDigitizer[i].r[2]);
 
-//*************************************************************************************************************
+            list[i]->setPosition(pos);
+        }
+        return;
+    }
 
-void  DigitizerTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, Qt3DCore::QEntity* parent)
-{
-    //Clear all data
-    m_lSpheres.clear();
-
-    m_pRenderable3DEntity->setParent(parent);
+//    for(int i = 0; i < list.size(); ++i) {
+//        list[i]->deleteLater();
+//    }
+//    list.clear();
 
     //Create digitizers as small 3D spheres
-    QVector3D pos;
     QColor colDefault(100,100,100);
 
     for(int i = 0; i < tDigitizer.size(); ++i) {
-        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
+        list.append(pSourceSphereEntity);
         pos.setX(tDigitizer[i].r[0]);
         pos.setY(tDigitizer[i].r[1]);
         pos.setZ(tDigitizer[i].r[2]);
@@ -164,21 +134,21 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         pSourceSphereEntity->addComponent(sourceSphere);
         pSourceSphereEntity->setPosition(pos);
 
-        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+        Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
 
         switch (tDigitizer[i].kind) {
             case FIFFV_POINT_CARDINAL:
                 switch (tDigitizer[i].ident) {
-                    case 1:
+                    case FIFFV_POINT_LPA:
                     colDefault = Qt::green;
                     material->setAmbient(colDefault);
                     break;
-                    case 2:
+                    case FIFFV_POINT_NASION:
                     colDefault = Qt::yellow;
                     material->setAmbient(colDefault);
                     break;
-                    case 3:
-                    colDefault = Qt::darkGreen;
+                    case FIFFV_POINT_RPA:
+                    colDefault = Qt::magenta;
                     material->setAmbient(colDefault);
                     break;
                     default:
@@ -206,57 +176,32 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         }
 
         pSourceSphereEntity->addComponent(material);
+    }
 
-        m_lSpheres.append(pSourceSphereEntity);
+    //Update alpha
+    float alpha = 1.0;
+    this->setMaterialParameter(QVariant(alpha), "alpha");
+
+    QList<QStandardItem*> items = m_pItemAppearanceOptions->findChildren(MetaTreeItemTypes::AlphaValue);
+
+    for(int i = 0; i < items.size(); ++i) {
+        if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
+            QVariant data;
+            data.setValue(alpha);
+            item->setData(data, MetaTreeItemRoles::AlphaValue);
+            item->setData(data, Qt::DecorationRole);
+        }
     }
 
     //Update colors in color item
-    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
+    items = m_pItemAppearanceOptions->findChildren(MetaTreeItemTypes::Color);
 
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
             data.setValue(colDefault);
-            item->setData(data, MetaTreeItemRoles::PointColor);            
+            item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerTreeItem::setVisible(bool state)
-{
-    if(m_pRenderable3DEntity) {
-        for(int i = 0; i < m_lSpheres.size(); ++i) {
-            m_lSpheres.at(i)->setEnabled(state);
-        }
-
-        m_pRenderable3DEntity->setEnabled(state);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
-void DigitizerTreeItem::onSurfaceColorChanged(const QColor& color)
-{
-    for(int i = 0; i < m_lSpheres.size(); ++i) {
-        for(int j = 0; j < m_lSpheres.at(i)->components().size(); ++j) {
-            Qt3DCore::QComponent* pComponent = m_lSpheres.at(i)->components().at(j);
-
-            if(Qt3DExtras::QPhongMaterial* pMaterial = dynamic_cast<Qt3DExtras::QPhongMaterial*>(pComponent)) {
-                pMaterial->setAmbient(color);
-            }
         }
     }
 }

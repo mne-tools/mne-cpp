@@ -328,7 +328,7 @@ protected:
 
     int m_iMaxNumThreads;   /**< Number of available CPU threads. */
 
-    bool m_bIsInit; /**< Wether the algorithm is initialized. */
+    bool m_bIsInit; /**< Whether the algorithm is initialized. */
 
     //Stc stuff
     int m_iSamplesStcWindow;    /**< Number of samples per localization window */

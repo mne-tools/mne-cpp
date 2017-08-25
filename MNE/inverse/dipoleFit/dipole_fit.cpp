@@ -371,7 +371,7 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
         /*
      * Find out the correct samples
      */
-        if (fabs(sfreq*integ) < EPS_VALUES) { /* This is the single-sample case */
+        if (std::fabs(sfreq*integ) < EPS_VALUES) { /* This is the single-sample case */
             s1 = sfreq*(time - tmin);
             n1 = floor(s1);
             f1 = 1.0 + n1 - s1;
@@ -383,7 +383,7 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
        * Avoid rounding error
        */
             if (n1 == nsamp-1) {
-                if (fabs(f1-1.0) < 1e-3)
+                if (std::fabs(f1-1.0) < 1e-3)
                     f1 = 1.0;
             }
             if (f1 < 1.0 && n1 > nsamp-2) {
@@ -392,13 +392,13 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
             }
             if (f1 < 1.0) {
                 if (use_abs)
-                    sum = f1*fabs(data[n1][ch]) + (1.0-f1)*fabs(data[n1+1][ch]);
+                    sum = f1*std::fabs(data[n1][ch]) + (1.0-f1)*std::fabs(data[n1+1][ch]);
                 else
                     sum = f1*data[n1][ch] + (1.0-f1)*data[n1+1][ch];
             }
             else {
                 if (use_abs)
-                    sum = fabs(data[n1][ch]);
+                    sum = std::fabs(data[n1][ch]);
                 else
                     sum = data[n1][ch];
             }
@@ -414,7 +414,7 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
                 f1 = s1 - n1;
                 f2 = s2 - n1;
                 if (use_abs)
-                    sum = 0.5*((f1+f2)*fabs(data[n1+1][ch]) + (2.0-f1-f2)*fabs(data[n1][ch]));
+                    sum = 0.5*((f1+f2)*std::fabs(data[n1+1][ch]) + (2.0-f1-f2)*std::fabs(data[n1][ch]));
                 else
                     sum = 0.5*((f1+f2)*data[n1+1][ch] + (2.0-f1-f2)*data[n1][ch]);
             }
@@ -437,10 +437,10 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
                 width = 0.0;
                 if (n2 > n1) {		/* Do the whole intervals */
                     if (use_abs) {
-                        sum = 0.5*fabs(data[n1][ch]);
+                        sum = 0.5 * std::fabs(data[n1][ch]);
                         for (k = n1+1; k < n2; k++)
-                            sum = sum + fabs(data[k][ch]);
-                        sum = sum + 0.5*fabs(data[n2][ch]);
+                            sum = sum + std::fabs(data[k][ch]);
+                        sum = sum + 0.5 * std::fabs(data[n2][ch]);
                     }
                     else {
                         sum = 0.5*data[n1][ch];
@@ -455,9 +455,9 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
          */
                 if (use_abs) {
                     if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*fabs(data[n1-1][ch]) + (2.0-f1)*fabs(data[n1][ch]));
+                        sum = sum + 0.5 * f1 * (f1 * std::fabs(data[n1-1][ch]) + (2.0 - f1) * std::fabs(data[n1][ch]));
                     if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*fabs(data[n2+1][ch]) + (2.0-f2)*fabs(data[n2][ch]));
+                        sum = sum + 0.5 * f2 * (f2 * std::fabs(data[n2+1][ch]) + (2.0 - f2) * std::fabs(data[n2][ch]));
                 }
                 else {
                     if (f1 != 0.0)
@@ -500,7 +500,7 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
         /*
      * Find out the correct samples
      */
-        if (fabs(sfreq*integ) < EPS_VALUES) { /* This is the single-sample case */
+        if (std::fabs(sfreq * integ) < EPS_VALUES) { /* This is the single-sample case */
             s1 = sfreq*(time - tmin);
             n1 = floor(s1);
             f1 = 1.0 + n1 - s1;
@@ -510,13 +510,13 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
                 return(-1);
             if (f1 < 1.0) {
                 if (use_abs)
-                    sum = f1*fabs(data[ch][n1]) + (1.0-f1)*fabs(data[ch][n1+1]);
+                    sum = f1 * std::fabs(data[ch][n1]) + (1.0 - f1) * std::fabs(data[ch][n1+1]);
                 else
                     sum = f1*data[ch][n1] + (1.0-f1)*data[ch][n1+1];
             }
             else {
                 if (use_abs)
-                    sum = fabs(data[ch][n1]);
+                    sum = std::fabs(data[ch][n1]);
                 else
                     sum = data[ch][n1];
             }
@@ -532,7 +532,7 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
                 f1 = s1 - n1;
                 f2 = s2 - n1;
                 if (use_abs)
-                    sum = 0.5*((f1+f2)*fabs(data[ch][n1+1]) + (2.0-f1-f2)*fabs(data[ch][n1]));
+                    sum = 0.5*((f1+f2)*std::fabs(data[ch][n1+1]) + (2.0-f1-f2)*std::fabs(data[ch][n1]));
                 else
                     sum = 0.5*((f1+f2)*data[ch][n1+1] + (2.0-f1-f2)*data[ch][n1]);
             }
@@ -549,10 +549,10 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
                 width = 0.0;
                 if (n2 > n1) {		/* Do the whole intervals */
                     if (use_abs) {
-                        sum = 0.5*fabs(data[ch][n1]);
+                        sum = 0.5 * std::fabs(data[ch][n1]);
                         for (k = n1+1; k < n2; k++)
-                            sum = sum + fabs(data[ch][k]);
-                        sum = sum + 0.5*fabs(data[ch][n2]);
+                            sum = sum + std::fabs(data[ch][k]);
+                        sum = sum + 0.5 * std::fabs(data[ch][n2]);
                     }
                     else {
                         sum = 0.5*data[ch][n1];
@@ -567,9 +567,9 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
          */
                 if (use_abs) {
                     if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*fabs(data[ch][n1-1]) + (2.0-f1)*fabs(data[ch][n1]));
+                        sum = sum + 0.5 * f1 * (f1 * std::fabs(data[ch][n1-1]) + (2.0 - f1) * std::fabs(data[ch][n1]));
                     if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*fabs(data[ch][n2+1]) + (2.0-f2)*fabs(data[ch][n2]));
+                        sum = sum + 0.5 * f2 * (f2 * std::fabs(data[ch][n2+1]) + (2.0 - f2) * std::fabs(data[ch][n2]));
                 }
                 else {
                     if (f1 != 0.0)

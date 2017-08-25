@@ -460,18 +460,18 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
 
         for (j = 0; j < nrow; j++)
             for (k = 0; k < ncol; k++) {
-                val = fabs(dense[j][k]);
+                val = std::fabs(dense[j][k]);
                 if (val > maxval)
                     maxval = val;
             }
         if (maxval > 0)
-            small = maxval*fabs(small);
+            small = maxval * std::fabs(small);
         else
-            small = fabs(small);
+            small = std::fabs(small);
     }
     for (j = 0, nz = 0; j < nrow; j++)
         for (k = 0; k < ncol; k++) {
-            if (fabs(dense[j][k]) > small)
+            if (std::fabs(dense[j][k]) > small)
                 nz++;
         }
 
@@ -504,7 +504,7 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
         for (j = 0, nz = 0; j < nrow; j++) {
             ptr = -1;
             for (k = 0; k < ncol; k++)
-                if (fabs(dense[j][k]) > small) {
+                if (std::fabs(dense[j][k]) > small) {
                     sparse->data[nz] = dense[j][k];
                     if (ptr < 0)
                         ptr = nz;
@@ -521,7 +521,7 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
         for (k = 0, nz = 0; k < ncol; k++) {
             ptr = -1;
             for (j = 0; j < nrow; j++)
-                if (fabs(dense[j][k]) > small) {
+                if (std::fabs(dense[j][k]) > small) {
                     sparse->data[nz] = dense[j][k];
                     if (ptr < 0)
                         ptr = nz;
@@ -791,7 +791,7 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
         /*
      * Find out the correct samples
      */
-        if (fabs(sfreq*integ) < EPS_3) { /* This is the single-sample case */
+        if (std::fabs(sfreq*integ) < EPS_3) { /* This is the single-sample case */
             s1 = sfreq*(time - tmin);
             n1 = floor(s1);
             f1 = 1.0 + n1 - s1;
@@ -803,7 +803,7 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
        * Avoid rounding error
        */
             if (n1 == nsamp-1) {
-                if (fabs(f1-1.0) < 1e-3)
+                if (std::fabs(f1 - 1.0) < 1e-3)
                     f1 = 1.0;
             }
             if (f1 < 1.0 && n1 > nsamp-2) {
@@ -812,13 +812,13 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
             }
             if (f1 < 1.0) {
                 if (use_abs)
-                    sum = f1*fabs(data[n1][ch]) + (1.0-f1)*fabs(data[n1+1][ch]);
+                    sum = f1*std::fabs(data[n1][ch]) + (1.0-f1)*std::fabs(data[n1+1][ch]);
                 else
                     sum = f1*data[n1][ch] + (1.0-f1)*data[n1+1][ch];
             }
             else {
                 if (use_abs)
-                    sum = fabs(data[n1][ch]);
+                    sum = std::fabs(data[n1][ch]);
                 else
                     sum = data[n1][ch];
             }
@@ -834,7 +834,7 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
                 f1 = s1 - n1;
                 f2 = s2 - n1;
                 if (use_abs)
-                    sum = 0.5*((f1+f2)*fabs(data[n1+1][ch]) + (2.0-f1-f2)*fabs(data[n1][ch]));
+                    sum = 0.5*((f1+f2)*std::fabs(data[n1+1][ch]) + (2.0-f1-f2)*std::fabs(data[n1][ch]));
                 else
                     sum = 0.5*((f1+f2)*data[n1+1][ch] + (2.0-f1-f2)*data[n1][ch]);
             }
@@ -857,10 +857,10 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
                 width = 0.0;
                 if (n2 > n1) {		/* Do the whole intervals */
                     if (use_abs) {
-                        sum = 0.5*fabs(data[n1][ch]);
+                        sum = 0.5 * std::fabs(data[n1][ch]);
                         for (k = n1+1; k < n2; k++)
-                            sum = sum + fabs(data[k][ch]);
-                        sum = sum + 0.5*fabs(data[n2][ch]);
+                            sum = sum + std::fabs(data[k][ch]);
+                        sum = sum + 0.5 * std::fabs(data[n2][ch]);
                     }
                     else {
                         sum = 0.5*data[n1][ch];
@@ -875,9 +875,9 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
          */
                 if (use_abs) {
                     if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*fabs(data[n1-1][ch]) + (2.0-f1)*fabs(data[n1][ch]));
+                        sum = sum + 0.5*f1*(f1*std::fabs(data[n1-1][ch]) + (2.0-f1)*std::fabs(data[n1][ch]));
                     if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*fabs(data[n2+1][ch]) + (2.0-f2)*fabs(data[n2][ch]));
+                        sum = sum + 0.5*f2*(f2*std::fabs(data[n2+1][ch]) + (2.0-f2)*std::fabs(data[n2][ch]));
                 }
                 else {
                     if (f1 != 0.0)
@@ -938,7 +938,7 @@ int mne_decompose_eigen_3(double *mat,
 // idamax workaround begin
     maxi = 0;
     for(int i = 0; i < np; ++i)
-        if (fabs(mat[i]) > fabs(mat[maxi]))
+        if (std::fabs(mat[i]) > std::fabs(mat[maxi]))
             maxi = i;
 // idamax workaround end
 
@@ -1348,9 +1348,9 @@ static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_
                 meglike = eeglike = 0.0;
                 for (p = 0; p < c->ncov; p++)  {
                     if (c->ch_class[p] == MNE_COV_CH_EEG)
-                        eeglike += fabs(c->eigen[k][p]);
+                        eeglike += std::fabs(c->eigen[k][p]);
                     else if (c->ch_class[p] == MNE_COV_CH_MEG_MAG || c->ch_class[p] == MNE_COV_CH_MEG_GRAD)
-                        meglike += fabs(c->eigen[k][p]);
+                        meglike += std::fabs(c->eigen[k][p]);
                 }
                 if (meglike > eeglike)
                     nmeg++;
@@ -1697,7 +1697,7 @@ int mne_simplex_minimize(float **p,		                              /* The initia
             } else if (y[i] > y[inhi])
                 if (i !=  ihi) inhi = i;
         }
-        rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
+        rtol = 2.0*std::fabs(y[ihi]-y[ilo])/(std::fabs(y[ihi])+std::fabs(y[ilo]));
         /*
      * Report that we are proceeding...
      */
@@ -2463,7 +2463,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
             /*
             * Avoid crosstalk between MEG/EEG
             */
-            if (fabs(vv_meg[p][k]) < SMALL_VALUE)
+            if (std::fabs(vv_meg[p][k]) < SMALL_VALUE)
                 op->proj_data[op->nvec][k] = 0.0;
             else
                 op->proj_data[op->nvec][k] = vv_meg[p][k];
@@ -2485,7 +2485,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
             /*
             * Avoid crosstalk between MEG/EEG
             */
-            if (fabs(vv_eeg[p][k]) < SMALL_VALUE)
+            if (std::fabs(vv_eeg[p][k]) < SMALL_VALUE)
                 op->proj_data[op->nvec][k] = 0.0;
             else
                 op->proj_data[op->nvec][k] = vv_eeg[p][k];
@@ -5054,7 +5054,7 @@ int simplex_minimize(float **p,		                              /* The initial si
             } else if (y[i] > y[inhi])
                 if (i !=  ihi) inhi = i;
         }
-        rtol = 2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
+        rtol = 2.0*std::fabs(y[ihi]-y[ilo])/(std::fabs(y[ihi])+std::fabs(y[ilo]));
         /*
      * Report that we are proceeding...
      */

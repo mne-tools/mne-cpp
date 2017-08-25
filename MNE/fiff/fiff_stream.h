@@ -99,6 +99,7 @@ class FiffDigPoint;
 class FiffChInfo;
 class FiffChPos;
 class FiffCoordTrans;
+class FiffDigitizerData;
 
 static FiffId defaultFiffId;
 
@@ -324,6 +325,21 @@ public:
 
     //=========================================================================================================
     /**
+    * Reimplemntation of load_digitizer_data (digitizer.c)
+    *
+    * ### MNE-C root function ###
+    *
+    * Read the digitizer data from the given node.
+    *
+    * @param[in] p_Node     The node of interest
+    * @param[out] p_digData  The read digitizer data
+    *
+    * @return rue if succeeded, false otherwise
+    */
+    bool read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigitizerData& p_digData);
+
+    //=========================================================================================================
+    /**
     * fiff_read_meas_info
     *
     * ### MNE toolbox root function ###
@@ -508,7 +524,7 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel = defaultMatrixXi, bool resetRange = true);
+    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel = defaultMatrixXi, bool resetRange = false);
 
     //=========================================================================================================
     /**
