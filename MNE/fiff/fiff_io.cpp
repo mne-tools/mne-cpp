@@ -133,7 +133,7 @@ bool FiffIO::read(QIODevice& p_IODevice)
         //append to corresponding member qlist
         m_qlistRaw.append(p_fiffRawData);
 
-        printf("Finished reading raw data!");
+        fprintf(stderr, "Finished reading raw data!\n");
     }
 
     //evoked data + projections
@@ -225,7 +225,7 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const {
     RowVectorXi sel;
 
 //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toUtf8() << std::endl;
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
 
     //Setup reading parameters
     fiff_int_t from = m_qlistRaw[idx]->first_samp;

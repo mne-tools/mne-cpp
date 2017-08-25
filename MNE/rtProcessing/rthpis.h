@@ -47,6 +47,9 @@
 #include "rtprocessing_global.h"
 
 #include <generics/circularmatrixbuffer.h>
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_coord_trans.h>
 
 
 //*************************************************************************************************************
@@ -65,6 +68,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QSharedPointer>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -74,8 +78,6 @@
 
 namespace FIFFLIB{
     class FiffInfo;
-    class FiffCoordTrans;
-    class FiffDigPointSet;
 }
 
 
@@ -94,51 +96,50 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 //=========================================================================================================
 /**
-* The strucut specifing the coil parameters.
+* The struct specifing all data needed to perform coil-wise fitting.
 */
-struct coilParam {
-    Eigen::MatrixXd pos;
-    Eigen::MatrixXd mom;
-    Eigen::VectorXd dpfiterror;
-    Eigen::VectorXd dpfitnumitr;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the dipole error.
-*/
-struct dipError {
-    double error;
-    Eigen::MatrixXd moment;
-    int numIterations;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the sensor parameters.
-*/
-struct sens {
-    Eigen::MatrixXd coilpos;
-    Eigen::MatrixXd coilori;
-    Eigen::MatrixXd tra;
-};
-
-//=========================================================================================================
-/**
-* The strucut specifing the sorting parameters.
-*/
-struct sortStruct {
-    double base_arr;
-    int idx;
+struct FittingResult {
+    FIFFLIB::FiffDigPointSet fittedCoils;
+    FIFFLIB::FiffCoordTrans devHeadTrans;
+    QVector<double> errorDistances;
 };
 
 //=============================================================================================================
 /**
-* Real-time Head Coil Positions estimation
+* Real-time HPI worker.
 *
-* @brief Real-time HPI estimation
+* @brief Real-time HPI worker.
 */
-class RTPROCESSINGSHARED_EXPORT RtHPIS : public QThread
+class RtHPISWorker : public QObject
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+    * Perform one single HPI fit.
+    *
+    * @param[in] t_mat           Data to estimate the HPI positions from
+    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
+    * @param[in] vFreqs          The frequencies for each coil.
+    * @param[in] p_pFiffInfo     Associated Fiff Information.
+    */
+    void doWork(const Eigen::MatrixXd& matData,
+                const Eigen::MatrixXd& m_matProjectors,
+                const QVector<int>& vFreqs,
+                QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+signals:
+    void resultReady(const RTPROCESSINGLIB::FittingResult &fitResult);
+};
+
+//=============================================================================================================
+/**
+* Real-time Head Coil Positions estimation.
+*
+* @brief Real-time Head Coil Positions estimation.
+*/
+class RTPROCESSINGSHARED_EXPORT RtHPIS : public QObject
 {
     Q_OBJECT
 
@@ -150,7 +151,6 @@ public:
     /**
     * Creates the real-time HPIS estimation object.
     *
-    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
@@ -160,97 +160,51 @@ public:
     /**
     * Destroys the Real-time HPI estimation object.
     */
-    ~RtHPIS();
-
-    //=========================================================================================================
-    /**
-    * Inits the rt HPI processing and performs one single fit.
-    *
-    * @param[in] t_mat           Data to estimate the HPI positions from
-    * @param[out] transDevHead   The final dev head transformation matrix
-    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
-    * @param[in] vFreqs          The frequencies for each coil.
-    * @param[in] fittedPointSet  The final fitted positions in form of a digitizer set.
-    */
-    void singleHPIFit(const Eigen::MatrixXd& t_mat,
-                      FIFFLIB::FiffCoordTrans &transDevHead,
-                      const QVector<int>& vFreqs,
-                      QVector<double> &vGof,
-                      FIFFLIB::FiffDigPointSet& fittedPointSet);
+    ~RtHPIS();    
 
     //=========================================================================================================
     /**
     * Slot to receive incoming data.
     *
-    * @param[in] p_DataSegment  Data to estimate the HPI positions from
+    * @param[in] data  Data to estimate the HPI positions from
     */
-    void append(const Eigen::MatrixXd &p_DataSegment);
+    void append(const Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
-    * Returns true if is running, otherwise false.
+    * Set the coil frequencies.
     *
-    * @return true if is running, false otherwise
+    * @param[in] vCoilFreqs  The coil frequencies.
     */
-    inline bool isRunning();
+    void setCoilFrequencies(const QVector<int>& vCoilFreqs);
 
     //=========================================================================================================
     /**
-    * Starts the RtHPIS by starting the producer's thread.
+    * Set the new projection matrix.
     *
-    * @return true if succeeded, false otherwise
+    * @param[in] matProjectors  The new projection matrix.
     */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the RtHPIS by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
+    void setProjectionMatrix(const Eigen::MatrixXd& matProjectors);
 
 protected:
     //=========================================================================================================
     /**
-    * Fits dipoles for the given coils and a given data set.
-    *
-    * @param[in] coilParam      The coil parameters.
-    * @param[in] sensors        The sensor information.
-    * @param[in] data           The data which used to fit the coils.
-    * @param[in] numCoils       The number of coils.
-    *
-    * @return Returns the coil parameters.
+    * Handles the result
     */
-    coilParam dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils);
+    void handleResults(const FittingResult &fitResult);
 
-    //=========================================================================================================
-    /**
-    * Computes the transformation matrix between two sets of 3D points.
-    *
-    * @param[in] NH     The first set of input 3D points (row-wise order).
-    * @param[in] BT     The second set of input 3D points (row-wise order).
-    *
-    * @return Returns the transformation matrix.
-    */
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
-
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
 
-    QMutex              m_mutex;                /**< The global mutex to provide thread safety.*/
+    QThread             m_workerThread;         /**< The worker thread. */
+    QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+    Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
-    bool                m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
-
-    QString             m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
+signals:
+    void newFittingResultAvailable(const RTPROCESSINGLIB::FittingResult &fitResult);
+    void operate(const Eigen::MatrixXd& matData,
+                 const Eigen::MatrixXd& matProjectors,
+                 const QVector<int>& vFreqs,
+                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 };
 
 //*************************************************************************************************************
@@ -258,11 +212,11 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtHPIS::isRunning()
-{
-    return m_bIsRunning;
-}
-
 } // NAMESPACE
+
+#ifndef metatype_rthpisfittingresult
+#define metatype_rthpisfittingresult
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FittingResult)
+#endif
 
 #endif // RTHPIS_H

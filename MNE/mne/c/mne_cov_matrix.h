@@ -198,7 +198,7 @@ public:
 
 
 
-    static int mne_decompose_eigen_cov_small(MneCovMatrix* c,float small, int use_rank);
+    static int mne_decompose_eigen_cov_small(MneCovMatrix* c,float p_small, int use_rank);
 
 
     static int mne_decompose_eigen_cov(MneCovMatrix* c);

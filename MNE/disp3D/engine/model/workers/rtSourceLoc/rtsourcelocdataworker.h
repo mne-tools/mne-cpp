@@ -109,14 +109,14 @@ struct SmoothVertexInfo {
 
 //=========================================================================================================
 /**
-* The strucut specifing the smoothing visualization info.
+* The struct specifing the smoothing visualization info.
 */
 struct VisualizationInfo {
     VectorXd                    vSourceColorSamples;
     VectorXi                    vVertNo;
     QList<FSLIB::Label>         lLabels;
     QMap<qint32, qint32>        mapLabelIdSources;
-    QMap<int, QVector<int> >    mapVertexNeighbors;
+    QVector<QVector<int> >      mapVertexNeighbors;
     SparseMatrix<double>        matWDistSmooth;
     double                      dThresholdX;
     double                      dThresholdZ;
@@ -178,15 +178,15 @@ public:
     *
     * @param[in] vecVertNoLeftHemi                  The vertex indexes for the left hemipshere.
     * @param[in] vecVertNoRightHemi                 The vertex indexes for the right hemipshere.
-    * @param[in] mapVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
-    * @param[in] mapVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
+    * @param[in] vecVertexNeighborsLeftHemi         The neighbor vertices for the left hemisphere.
+    * @param[in] vecVertexNeighborsRightHemi        The neighbor vertices for the right hemisphere.
     * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
     * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
     */
     void setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
                         const Eigen::VectorXi& vecVertNoRightHemi,
-                        const QMap<int, QVector<int> >& mapVertexNeighborsLeftHemi,
-                        const QMap<int, QVector<int> >& mapVertexNeighborsRightHemi,
+                        const QVector<QVector<int> >& vecVertexNeighborsLeftHemi,
+                        const QVector<QVector<int> >& vecVertexNeighborsRightHemi,
                         const MatrixX3f& matVertPosLeftHemi,
                         const MatrixX3f& matVertPosRightHemi);
 
@@ -220,7 +220,7 @@ public:
     *
     * @param[in] samples                The new number of averages.
     */
-    void setNumberAverages(const int& iNumAvr);
+    void setNumberAverages(int iNumAvr);
 
     //=========================================================================================================
     /**
@@ -228,7 +228,7 @@ public:
     *
     * @param[in] iMSec                  The new length in milli Seconds to wait inbetween data samples.
     */
-    void setInterval(const int& iMSec);
+    void setInterval(int iMSec);
 
     //=========================================================================================================
     /**
@@ -236,7 +236,7 @@ public:
     *
     * @param[in] iVisType               The new visualization type.
     */
-    void setVisualizationType(const int& iVisType);
+    void setVisualizationType(int iVisType);
 
     //=========================================================================================================
     /**
@@ -253,6 +253,14 @@ public:
     * @param[in] dValue                 The new threshold values used for normalizing the data.
     */
     void setNormalization(const QVector3D &vecThresholds);
+
+    //=========================================================================================================
+    /**
+    * Set the sampling frequency.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void setSFreq(const double dSFreq);
 
     //=========================================================================================================
     /**
@@ -309,6 +317,8 @@ private:
     int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
     int                     m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
+
+    double                  m_dSFreq;                           /**< The current sampling frequency. */
 
     QList<VisualizationInfo>    m_lVisualizationInfo;           /**< The list holding all information needed to do the visualization for both hemispheres (0-left, 1-right). */
 

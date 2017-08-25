@@ -43,6 +43,7 @@
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/pervertexphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>
@@ -77,11 +78,9 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
-: AbstractSurfaceTreeItem(iType, text)
+FsSurfaceTreeItem::FsSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString& text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 , m_sColorInfoOrigin("Color from curvature")
-, m_pItemSurfColGyri(new MetaTreeItem())
-, m_pItemSurfColSulci(new MetaTreeItem())
 {
     initItem();
 }
@@ -91,27 +90,33 @@ FsSurfaceTreeItem::FsSurfaceTreeItem(int iType, const QString& text)
 
 void FsSurfaceTreeItem::initItem()
 {
+    this->setToolTip("Brain hemisphere surface item");
+
     //Add surface meta information as item children
     QList<QStandardItem*> list;
     QVariant data;
 
-    m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
-    connect(m_pItemSurfColSulci, &MetaTreeItem::curvColorsChanged,
+    if(!m_pItemSurfColSulci) {
+        m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
+    }
+    connect(m_pItemSurfColSulci.data(), &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list << m_pItemSurfColSulci;
     list << new QStandardItem(m_pItemSurfColSulci->toolTip());
-    this->appendRow(list);
+    m_pItemAppearanceOptions->appendRow(list);
     data.setValue(QColor(50,50,50));
     m_pItemSurfColSulci->setData(data, MetaTreeItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
 
-    m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
-    connect(m_pItemSurfColGyri, &MetaTreeItem::curvColorsChanged,
+    if(!m_pItemSurfColGyri) {
+        m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
+    }
+    connect(m_pItemSurfColGyri.data(), &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list.clear();
     list << m_pItemSurfColGyri;
     list << new QStandardItem(m_pItemSurfColGyri->toolTip());
-    this->appendRow(list);
+    m_pItemAppearanceOptions->appendRow(list);
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
@@ -120,33 +125,19 @@ void FsSurfaceTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
+void FsSurfaceTreeItem::addData(const Surface& tSurface)
 {
-    //Set parents
-    m_pRenderable3DEntity->setParent(parent);
-    m_pRenderable3DEntityNormals->setParent(parent);
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tSurface.rr(),
-                                                        tSurface.nn(),
-                                                        tSurface.tris(),
-                                                        matCurvatureColor,
-                                                        Qt3DRender::QGeometryRenderer::Triangles);
-    m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-
-    //Render normals
-    if(m_bRenderNormals) {
-        m_pRenderable3DEntityNormals->getCustomMesh()->setMeshData(tSurface.rr(),
-                                                      tSurface.nn(),
-                                                      tSurface.tris(),
-                                                      matCurvatureColor,
-                                                      Qt3DRender::QGeometryRenderer::Triangles);
-        m_pRenderable3DEntityNormals->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
-    }
+    m_pCustomMesh->setMeshData(tSurface.rr(),
+                                tSurface.nn(),
+                                tSurface.tris(),
+                                matCurvatureColor,
+                                Qt3DRender::QGeometryRenderer::Triangles);
+    this->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     //Add data which is held by this FsSurfaceTreeItem
     QVariant data;
@@ -173,23 +164,14 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* pare
     data.setValue(tSurface.fileName());
     itemSurfFileName->setData(data, MetaTreeItemRoles::SurfaceFileName);
 
-    MetaTreeItem *itemSurfType = new MetaTreeItem(MetaTreeItemTypes::SurfaceType, tSurface.surf());
-    itemSurfType->setEditable(false);
-    list.clear();
-    list << itemSurfType;
-    list << new QStandardItem(itemSurfType->toolTip());
-    this->appendRow(list);
-    data.setValue(tSurface.surf());
-    itemSurfType->setData(data, MetaTreeItemRoles::SurfaceType);
-
-    MetaTreeItem *itemSurfPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tSurface.filePath());
-    itemSurfPath->setEditable(false);
-    list.clear();
-    list << itemSurfPath;
-    list << new QStandardItem(itemSurfPath->toolTip());
-    this->appendRow(list);
-    data.setValue(tSurface.filePath());
-    itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
+//    MetaTreeItem *itemSurfPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tSurface.filePath());
+//    itemSurfPath->setEditable(false);
+//    list.clear();
+//    list << itemSurfPath;
+//    list << new QStandardItem(itemSurfPath->toolTip());
+//    this->appendRow(list);
+//    data.setValue(tSurface.filePath());
+//    itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
 }
 
 
@@ -211,7 +193,7 @@ void FsSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
 void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 {
-    if(this->hasChildren()) {
+    if(m_pItemSurfColSulci && m_pItemSurfColGyri) {
         QVariant data;
         MatrixX3f matNewVertColor;
 
@@ -258,7 +240,7 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 
 //*************************************************************************************************************
 
-MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
+MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri) const
 {
     MatrixX3f colors(curvature.rows(), 3);
 

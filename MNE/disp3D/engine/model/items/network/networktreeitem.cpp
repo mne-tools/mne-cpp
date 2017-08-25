@@ -43,6 +43,7 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/networkmaterial.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
@@ -59,7 +60,7 @@
 //=============================================================================================================
 
 #include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QPhongAlphaMaterial>
 #include <Qt3DCore/QTransform>
 
 
@@ -87,24 +88,11 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkTreeItem::NetworkTreeItem(int iType, const QString &text)
-: AbstractTreeItem(iType, text)
-, m_bDataIsInit(false)
+NetworkTreeItem::NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
 , m_bNodesPlotted(false)
-, m_pItemNetworkThreshold(new MetaTreeItem())
-, m_pRenderable3DEntity(new Renderable3DEntity())
 {
     initItem();
-}
-
-
-//*************************************************************************************************************
-
-NetworkTreeItem::~NetworkTreeItem()
-{
-    if(m_pRenderable3DEntity) {
-        m_pRenderable3DEntity->deleteLater();
-    }
 }
 
 
@@ -122,13 +110,17 @@ void NetworkTreeItem::initItem()
     QVariant data;
 
     QVector3D vecEdgeTrehshold(0,5,10);
-    m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold, QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
+    if(!m_pItemNetworkThreshold) {
+        m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold,
+                                                    QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
+    }
+
     list << m_pItemNetworkThreshold;
     list << new QStandardItem(m_pItemNetworkThreshold->toolTip());
     this->appendRow(list);
     data.setValue(vecEdgeTrehshold);
     m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
-    connect(m_pItemNetworkThreshold, &MetaTreeItem::networkThresholdChanged,
+    connect(m_pItemNetworkThreshold.data(), &MetaTreeItem::dataChanged,
             this, &NetworkTreeItem::onNetworkThresholdChanged);
 
     list.clear();
@@ -136,37 +128,14 @@ void NetworkTreeItem::initItem()
     list << pItemNetworkMatrix;
     list << new QStandardItem(pItemNetworkMatrix->toolTip());
     this->appendRow(list);
-}
-
-
-//*************************************************************************************************************
-
-QVariant NetworkTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  NetworkTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-void NetworkTreeItem::initData(Qt3DCore::QEntity* parent)
-{
-    //Create renderable 3D entity
-    m_pRenderable3DEntity->setParent(parent);
 
     //Set shaders
-    NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
-    m_pRenderable3DEntity->addComponent(pNetworkMaterial);
+    this->removeComponent(m_pMaterial);
+    this->removeComponent(m_pTessMaterial);
+    this->removeComponent(m_pNormalMaterial);
 
-    m_bDataIsInit = true;
+    NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
+    this->addComponent(pNetworkMaterial);
 }
 
 
@@ -174,11 +143,6 @@ void NetworkTreeItem::initData(Qt3DCore::QEntity* parent)
 
 void NetworkTreeItem::addData(const Network& tNetworkData)
 {
-    if(!m_bDataIsInit) {
-        qDebug() << "NetworkTreeItem::addData - NetworkTreeItem data has not been initialized yet!";
-        return;
-    }
-
     //Add data which is held by this NetworkTreeItem
     QVariant data;
 
@@ -190,38 +154,22 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
     //Plot network
-    plotNetwork(tNetworkData,
-                m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
-}
-
-
-//*************************************************************************************************************
-
-void NetworkTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
-{
-    this->setVisible(checkState == Qt::Unchecked ? false : true);
-}
-
-
-//*************************************************************************************************************
-
-void NetworkTreeItem::setVisible(bool state)
-{
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        m_lNodes.at(i)->setEnabled(state);
+    if(m_pItemNetworkThreshold) {
+        plotNetwork(tNetworkData,
+                    m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
     }
-
-    m_pRenderable3DEntity->setEnabled(state);
 }
 
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
+void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 {
-    Network tNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network>();
+    if(vecThresholds.canConvert<QVector3D>()) {
+        Network tNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network>();
 
-    plotNetwork(tNetwork, vecThresholds);
+        plotNetwork(tNetwork, vecThresholds.value<QVector3D>());
+    }
 }
 
 
@@ -229,35 +177,6 @@ void NetworkTreeItem::onNetworkThresholdChanged(const QVector3D& vecThresholds)
 
 void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& vecThreshold)
 {
-//    // Delete all old renderable children
-//    Renderable3DEntity* pParentTemp = new Renderable3DEntity();
-//    QList<QObject*> list = m_pRenderable3DEntity->children();
-//    QMutableListIterator<QObject*> i(list);
-//    int counter = 0;
-
-//    while (i.hasNext()) {
-//        if(Renderable3DEntity* entity = dynamic_cast<Renderable3DEntity*>(i.next())) {
-//            entity->setParent(pParentTemp);
-//            delete entity;
-//            i.remove();
-//            counter++;
-//        }
-//    }
-
-//    delete pParentTemp;
-
-//    qDebug() << "Deleted children from qt3d entity:" << counter;
-
-//    //Delete all nodes
-//    QMutableListIterator<QPointer<Renderable3DEntity> > i(m_lNodes);
-
-//    while(i.hasNext()) {
-//        delete i.next();
-//        i.remove();
-//    }
-
-//    m_lNodes.clear();
-
     //Create network vertices and normals
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
@@ -282,7 +201,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
             pos.setY(lNetworkNodes.at(i)->getVert()(1));
             pos.setZ(lNetworkNodes.at(i)->getVert()(2));
 
-            Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(m_pRenderable3DEntity);
+            Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(this);
 
             Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
             sourceSphere->setRadius(0.001f);
@@ -294,11 +213,9 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
             transform->setMatrix(m);
             sourceSphereEntity->addComponent(transform);
 
-            Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial();
+            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
             material->setAmbient(Qt::blue);
             sourceSphereEntity->addComponent(material);
-
-            m_lNodes.append(sourceSphereEntity);
         }
 
         m_bNodesPlotted = true;
@@ -307,24 +224,33 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     //Generate connection indices for Qt3D buffer
     MatrixXi tMatLines;
     int count = 0;
+    int start, end;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         //Plot in edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
-            if(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight() >= vecThreshold.x()) {
+            start = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
+            end = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
+
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()) >= vecThreshold.x() &&
+                    start != end) {
                 tMatLines.conservativeResize(count+1,2);
-                tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
-                tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
+                tMatLines(count,0) = start;
+                tMatLines(count,1) = end;
                 ++count;
             }
         }
 
         //Plot out edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
-            if(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight() >= vecThreshold.x()) {
+            start = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
+            end = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
+
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()) >= vecThreshold.x() &&
+                    start != end) {
                 tMatLines.conservativeResize(count+1,2);
-                tMatLines(count,0) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
-                tMatLines(count,1) = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
+                tMatLines(count,0) = start;
+                tMatLines(count,1) = end;
                 ++count;
             }
         }
@@ -339,11 +265,11 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         matLineColor(i,2) = 1.0f;
     }
 
-    m_pRenderable3DEntity->getCustomMesh()->setMeshData(tMatVert,
-                                                        tMatNorm,
-                                                        tMatLines,
-                                                        matLineColor,
-                                                        Qt3DRender::QGeometryRenderer::Lines);
+    m_pCustomMesh->setMeshData(tMatVert,
+                                tMatNorm,
+                                tMatLines,
+                                matLineColor,
+                                Qt3DRender::QGeometryRenderer::Lines);
 }
 
 

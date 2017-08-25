@@ -44,6 +44,8 @@ SUBDIRS += \
     fs \
     fiff \
     mne \
+    geometryInfo \
+    interpolation \
     fwd \
     inverse \
     connectivity \
@@ -53,18 +55,19 @@ SUBDIRS += \
 
 
 !contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-        disp \
 
     !isEmpty( CNTK_INCLUDE_DIR ) {
         SUBDIRS += \
-            deep \
+            deep
     }
+
+    SUBDIRS += \
+        disp
 
     qtHaveModule(charts) {
         SUBDIRS += \
             dispCharts \
-            disp3D \
+            disp3D
     } else {
         message("MNE.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }

@@ -1,0 +1,198 @@
+//=============================================================================================================
+/**
+* @file     lineplot.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     January, 2017
+*
+* @section  LICENSE
+*
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    LinePlot class declaration.
+*
+*/
+
+#ifndef LINEPLOT_H
+#define LINEPLOT_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "dispcharts_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QChart>
+#include <QChartView>
+#include <QLineSeries>
+#include <QSharedPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPCHARTSLIB
+//=============================================================================================================
+
+namespace DISPCHARTSLIB
+{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+* Line Plot based on QtCharts
+*
+* @brief Line Plot
+*/
+class DISPCHARTSSHARED_EXPORT LinePlot : public QtCharts::QChartView
+{
+    Q_OBJECT
+public:
+    typedef QSharedPointer<LinePlot> SPtr;            /**< Shared pointer type for DeepViewer. */
+    typedef QSharedPointer<const LinePlot> ConstSPtr; /**< Const shared pointer type for DeepViewer. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a line series plot
+    *
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+    */
+    LinePlot(QWidget *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Constructs a line series plot
+    *
+    * @param [in] y         The double data vector
+    * @param [in] title     Plot title
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+    */
+    LinePlot(const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Constructs a line series plot
+    *
+    * @param [in] x         X-Axis data to plot
+    * @param [in] y         Y-Axis data to plot
+    * @param [in] title     Plot title
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+    */
+    LinePlot(const QVector<double>& x, const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    /**
+    * Destructs the line series plot
+    */
+    virtual ~LinePlot();
+
+    //=========================================================================================================
+    /**
+    * Sets the scaled image view title.
+    *
+    * @param[in] p_sTitle   The title
+    */
+    void setTitle(const QString &p_sTitle);
+
+    //=========================================================================================================
+    /**
+    * Sets the label of the y axes
+    *
+    * @param [in] p_sXLabel   The x axes label
+    */
+    void setXLabel(const QString &p_sXLabel);
+
+    //=========================================================================================================
+    /**
+    * Sets the label of the y axes
+    *
+    * @param [in] p_sXLabel   The y axes label
+    */
+    void setYLabel(const QString &p_sYLabel);
+
+    //=========================================================================================================
+    /**
+    * Updates the plot using a given double vector without given X data.
+    *
+    * @param [in] y          The double data vector
+    */
+    void updateData(const QVector<double>& y);
+
+    //=========================================================================================================
+    /**
+    * Updates the plot using the given vectors.
+    *
+    * @param [in] x         X-Axis data to plot
+    * @param [in] y         Y-Axis data to plot
+    */
+    void updateData(const QVector<double>& x, const QVector<double>& y);
+
+private:
+    //=========================================================================================================
+    /**
+    * Updates the plot.
+    */
+    void update();
+
+private:
+    QString m_sTitle;                       /**< Title */
+    QString m_sXLabel;                      /**< X axes label */
+    QString m_sYLabel;                      /**< Y axes label */
+
+    QtCharts::QLineSeries*  m_pLineSeries;  /**< Line series */
+    QtCharts::QChart*       m_pChart;       /**< The chart */
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // NAMESPACE
+
+#endif // LINEPLOT_H

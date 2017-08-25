@@ -1809,9 +1809,9 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
     ui->lb_signal_energy_text->setText("absolute signal energy:");
     ui->lb_signal_energy->setText(QString::number(signal_energy, 'g', 2));
     ui->lb_approx_energy_text->setText("approximation energy:");
-    ui->lb_approx_energy->setText(QString::number(abs(composed_energy), 'f', 2) + "%");
+    ui->lb_approx_energy->setText(QString::number(std::fabs(composed_energy), 'f', 2) + "%");
     ui->lb_residual_energy_text->setText("remaining residual energy:");
-    ui->lb_residual_energy->setText(QString::number(abs(100 - composed_energy), 'f', 2) + "%");
+    ui->lb_residual_energy->setText(QString::number(std::fabs(100.0 - composed_energy), 'f', 2) + "%");
 
     callAtomSumWindow->update();
     callResidumWindow->update();
@@ -1886,9 +1886,9 @@ void MainWindow::calc_thread_finished()
     ui->lb_signal_energy_text->setText("absolute signal energy:");
     ui->lb_signal_energy->setText(QString::number(signal_energy, 'g', 2));
     ui->lb_approx_energy_text->setText("approximation energy:");
-    ui->lb_approx_energy->setText(QString::number(abs(composed_energy), 'f', 2) + "%");
+    ui->lb_approx_energy->setText(QString::number(std::fabs(composed_energy), 'f', 2) + "%");
     ui->lb_residual_energy_text->setText("remaining residual energy:");
-    ui->lb_residual_energy->setText(QString::number(abs(100 - composed_energy), 'f', 2) + "%");
+    ui->lb_residual_energy->setText(QString::number(std::fabs(100.0 - composed_energy), 'f', 2) + "%");
     //show energy infos
     ui->lb_signal_energy->setHidden(false);
     ui->lb_signal_energy_text->setHidden(false);
@@ -2591,7 +2591,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
             FiffRawData raw(t_fileIn);
 
             RowVectorXd cals;
-            FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
+            FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, raw.info, cals, picks);
 
             //   Set up the reading parameters
             fiff_int_t from = raw.first_samp;
@@ -3183,7 +3183,7 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
         setCursor(Qt::CrossCursor);
 
         // +/- 5 pixel dont read new if clicked by mistake
-        if(abs(_press_pos - release_pos) < 5 || old_from == _from || old_to == _to)
+        if(std::abs(_press_pos - release_pos) < 5 || old_from == _from || old_to == _to)
             return;
 
         emit read_new();

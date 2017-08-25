@@ -120,19 +120,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~MriTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
     * @param[in] tSurfaceSet        FreeSurfer surface set.
@@ -143,7 +130,9 @@ public:
     *                               of the list hereby corresponds to the ordering of the input surface set.
     *                               The list is empty if no item was added.
     */
-    QList<FsSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    QList<FsSurfaceTreeItem*> addData(const FSLIB::SurfaceSet& tSurfaceSet,
+                                      const FSLIB::AnnotationSet& tAnnotationSet,
+                                      Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -163,7 +152,7 @@ public:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
     */
-    void setRtVertColor(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
+    void setRtVertColor(const QVariant& sourceColorSamples);
 
 protected:
     //=========================================================================================================
@@ -174,14 +163,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
     * This function gets called whenever the origin of the vertex color changed to curvature or annotation mode.
     */
     void onColorOriginChanged();
@@ -189,7 +170,7 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * emit this signal whenver the color info of the underlying hemisphere surfaes changed.
+    * emit this signal whenver the color info of the underlying hemisphere surfaces changed.
     *
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.

@@ -56,11 +56,13 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScreenKeyboard::ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointer<SsvepBciSetupStimulusWidget> pSsvepBciSetupStimulusWidget, QSharedPointer<SsvepBciScreen> pSsvepBciScreen)
+ScreenKeyboard::ScreenKeyboard(SsvepBci* pSsvepBci,
+                               SsvepBciSetupStimulusWidget* pSsvepBciSetupStimulusWidget,
+                               SsvepBciScreen* pSsvepBciScreen)
 : m_pSsvepBci(pSsvepBci)
 , m_pSsvepBciSetupStimulusWidget(pSsvepBciSetupStimulusWidget)
 , m_pSsvepBciScreen(pSsvepBciScreen)
-, m_qPainter(m_pSsvepBciScreen.data())
+, m_qPainter(m_pSsvepBciScreen)
 , m_qCurCursorCoord(QPair<int, int> (0,0))
 , m_qOldCursorCoord(QPair<int, int> (1,0))
 , m_bDisplaySpeller(false)
@@ -108,11 +110,11 @@ ScreenKeyboard::ScreenKeyboard(QSharedPointer<SsvepBci> pSsvepBci, QSharedPointe
     m_pSsvepBciScreen->update();
 
     // connect ssvepBCI signals to the screen keyboard
-    connect(m_pSsvepBci.data(), &SsvepBci::getFrequencyLabels, this, &ScreenKeyboard::updateClassList);
-    connect(m_pSsvepBci.data(), &SsvepBci::classificationResult, this, &ScreenKeyboard::updateCommand);
+    connect(m_pSsvepBci, &SsvepBci::getFrequencyLabels, this, &ScreenKeyboard::updateClassList);
+    connect(m_pSsvepBci, &SsvepBci::classificationResult, this, &ScreenKeyboard::updateCommand);
 
     // connect SSVEPBCI speller
-    connect(m_pSsvepBciSetupStimulusWidget.data(), &SsvepBciSetupStimulusWidget::settledPhrase, this, &ScreenKeyboard::setPhrase);
+    connect(m_pSsvepBciSetupStimulusWidget, &SsvepBciSetupStimulusWidget::settledPhrase, this, &ScreenKeyboard::setPhrase);
 }
 
 
@@ -130,9 +132,9 @@ void ScreenKeyboard::paint(QPaintDevice *device)
     QPainter painter(device);
 
     // declare center of screen and width of letter boxes
-    int width = int(0.08*m_pSsvepBciScreen.data()->height());
-    int x = int(0.5*m_pSsvepBciScreen.data()->width() - 0.5*width);
-    int y = int(0.5*m_pSsvepBciScreen.data()->height() - 0.5*width);
+    int width = int(0.08*m_pSsvepBciScreen->height());
+    int x = int(0.5*m_pSsvepBciScreen->width() - 0.5*width);
+    int y = int(0.5*m_pSsvepBciScreen->height() - 0.5*width);
 
     // draw screen keyboard
     if(m_bInitializeKeyboard){
@@ -215,9 +217,9 @@ void ScreenKeyboard::paint(QPaintDevice *device)
         }
 
         // setting speller box parameter
-        int heightSpBox = 0.1* m_pSsvepBciScreen.data()->height() ;
-        int widthSpBox = 0.3* m_pSsvepBciScreen.data()->width() ;
-        QRect rectSpBox = QRect(0,m_pSsvepBciScreen.data()->height() - heightSpBox, widthSpBox, heightSpBox);
+        int heightSpBox = 0.1* m_pSsvepBciScreen->height() ;
+        int widthSpBox = 0.3* m_pSsvepBciScreen->width() ;
+        QRect rectSpBox = QRect(0,m_pSsvepBciScreen->height() - heightSpBox, widthSpBox, heightSpBox);
 
         // drawing speller box
         painter.setBrush(Qt::white);

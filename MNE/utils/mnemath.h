@@ -54,6 +54,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <Eigen/SVD>
 
 
 //*************************************************************************************************************
@@ -71,6 +72,7 @@
 
 namespace UTILSLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -353,7 +355,6 @@ public:
     template<typename T>
     static inline double log2( const T d);
 
-
     //=========================================================================================================
     /**
     * creates a class and frequency distribution from data matrix
@@ -372,6 +373,15 @@ public:
     static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
     static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+
+    //=========================================================================================================
+    /**
+    * Creates the pseudo inverse of a matrix.
+    *
+    * @param[in]  a        raw data matrix that needs to be analyzed.
+    */
+    template<typename T>
+    static Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> pinv(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a);
 };
 
 //*************************************************************************************************************
@@ -544,12 +554,12 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
 
     if (bMakeSymmetrical == true)          //in case the user wants the histogram to have symmetrical class ranges
     {
-        if (fabs(rawMin) > rawMax)          //in case the negative side is larger than the positive side
+        if (std::fabs(rawMin) > rawMax)          //in case the negative side is larger than the positive side
         {
-            localMax = fabs(rawMin);        //positive side is "stretched" to the exact length as negative side
+            localMax = std::fabs(rawMin);        //positive side is "stretched" to the exact length as negative side
             localMin = rawMin;
         }
-        else if (rawMax > fabs(rawMin))     //in case the positive side is larger than the negative side
+        else if (rawMax > std::fabs(rawMin))     //in case the positive side is larger than the negative side
         {
             localMin = -(rawMax);          //negative side is "stretched" to the exact length as positive side
             localMax = rawMax;
@@ -615,6 +625,17 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
      }
 }
 
+
+//*************************************************************************************************************
+
+template<typename T>
+Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> MNEMath::pinv(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a)
+{
+    double epsilon = std::numeric_limits<double>::epsilon();
+    Eigen::JacobiSVD< Eigen::MatrixXd > svd(a ,Eigen::ComputeThinU | Eigen::ComputeThinV);
+    double tolerance = epsilon * std::max(a.cols(), a.rows()) * svd.singularValues().array().abs()(0);
+    return svd.matrixV() * (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(),0).matrix().asDiagonal() * svd.matrixU().adjoint();
+}
 
 //*************************************************************************************************************
 

@@ -475,10 +475,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
         printf("\tSSP projectors applied to the evoked data\n");
     }
 
-    // Run baseline correction
-    all_data = MNEMath::rescale(all_data, times, t_baseline, QString("mean"));
-    printf("Applying baseline correction ... (mode: mean)\n");
-
     // Put it all together
     p_FiffEvoked.info = info;
     p_FiffEvoked.nave = nave;
@@ -488,6 +484,9 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     p_FiffEvoked.comment = comment;
     p_FiffEvoked.times = times;
     p_FiffEvoked.data = all_data;
+
+    // Run baseline correction
+    p_FiffEvoked.applyBaselineCorrection(t_baseline);
 
     return true;
 }
@@ -553,4 +552,15 @@ FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
     }
 
     return *this;
+}
+
+
+//*************************************************************************************************************
+
+void FiffEvoked::applyBaselineCorrection(QPair<QVariant, QVariant>& p_baseline)
+{
+    // Run baseline correction
+    printf("Applying baseline correction ... (mode: mean)\n");
+    this->data = MNEMath::rescale(this->data, this->times, p_baseline, QString("mean"));
+    this->baseline = p_baseline;
 }

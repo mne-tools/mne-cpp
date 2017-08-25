@@ -474,7 +474,7 @@ QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const 
             features << data.squaredNorm(); // Compute variance
             break;
         case 1:
-            features << abs(log10(data.squaredNorm())); // Compute log of variance
+            features << std::abs(log10(data.squaredNorm())); // Compute log of variance
             break;
         default:
             features << data.squaredNorm(); // Compute variance

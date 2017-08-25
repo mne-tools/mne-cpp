@@ -45,6 +45,9 @@
 
 #include <disp/imagesc.h>
 
+#include <utils/mnemath.h>
+#include <dispCharts/spline.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -118,6 +121,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pComboBox->addItem("Hot Negative 1");
             pComboBox->addItem("Hot Negative 2");
             pComboBox->addItem("Hot");
+            pComboBox->addItem("Jet");
             return pComboBox;
         }
 
@@ -132,6 +136,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
 
                 //Get data
                 MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+                matRTData = matRTData.cwiseAbs();
 
                 //Calcualte histogram
                 Eigen::VectorXd resultClassLimit;
@@ -161,7 +166,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pSpinBox->setSuffix(" mSec");
             pSpinBox->setMinimum(17);
             pSpinBox->setMaximum(50000);
-            pSpinBox->setSingleStep(10);
+            pSpinBox->setSingleStep(1);
             pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::StreamingTimeInterval).toInt());
             return pSpinBox;
         }
@@ -239,7 +244,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pDoubleSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateX: {
+        case MetaTreeItemTypes::TranslateX: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -247,11 +252,11 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.001);
             pDoubleSpinBox->setDecimals(5);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateX).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::TranslateX).toDouble());
             return pDoubleSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateY: {
+        case MetaTreeItemTypes::TranslateY: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -259,11 +264,11 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.001);
             pDoubleSpinBox->setDecimals(5);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateY).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::TranslateY).toDouble());
             return pDoubleSpinBox;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateZ: {
+        case MetaTreeItemTypes::TranslateZ: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
@@ -271,7 +276,19 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.001);
             pDoubleSpinBox->setDecimals(5);
-            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateZ).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::TranslateZ).toDouble());
+            return pDoubleSpinBox;
+        }
+
+        case MetaTreeItemTypes::Scale: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(-10000.0);
+            pDoubleSpinBox->setMaximum(10000.0);
+            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setDecimals(3);
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::Scale).toDouble());
             return pDoubleSpinBox;
         }
 
@@ -285,7 +302,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
                 QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
 
                 //Get data
-                MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+                MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>().array().abs();
 
                 //Calcualte histogram
                 Eigen::VectorXd resultClassLimit;
@@ -309,6 +326,38 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             ImageSc* pPlotLA = new ImageSc(matRTData);
             pPlotLA->show();
             //return pPlotLA;
+        }
+
+        case MetaTreeItemTypes::MaterialType: {
+            QComboBox* pComboBox = new QComboBox(parent);
+
+            pComboBox->setCurrentText(index.model()->data(index, MetaTreeItemRoles::SurfaceMaterial).toString());
+            pComboBox->addItem("Phong Alpha Tesselation");
+            pComboBox->addItem("Phong Alpha");
+            return pComboBox;
+        }
+        
+        case MetaTreeItemTypes::CancelDistance: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(0.001);
+            pDoubleSpinBox->setMaximum(1.0);
+            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setSuffix("m");
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::CancelDistance).toDouble());
+            return pDoubleSpinBox;
+        }
+
+        case MetaTreeItemTypes::InterpolationFunction: {
+            QComboBox* pComboBox = new QComboBox(parent);
+            connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
+            pComboBox->addItem("Linear");
+            pComboBox->addItem("Square");
+            pComboBox->addItem("Cubic");
+            pComboBox->addItem("Gaussian");
+            return pComboBox;
         }
 
         default: // do nothing;
@@ -357,6 +406,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
                     //Get data
                     MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::RTData).value<MatrixXd>();
+                    matRTData = matRTData.cwiseAbs();
 
                     //Calcualte histogram
                     Eigen::VectorXd resultClassLimit;
@@ -446,26 +496,33 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateX: {
-            double value = index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateX).toDouble();
+        case MetaTreeItemTypes::TranslateX: {
+            double value = index.model()->data(index, MetaTreeItemRoles::TranslateX).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateY: {
-            double value = index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateY).toDouble();
+        case MetaTreeItemTypes::TranslateY: {
+            double value = index.model()->data(index, MetaTreeItemRoles::TranslateY).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateZ: {
-            double value = index.model()->data(index, MetaTreeItemRoles::SurfaceTranslateZ).toDouble();
+        case MetaTreeItemTypes::TranslateZ: {
+            double value = index.model()->data(index, MetaTreeItemRoles::TranslateZ).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
-        }        
+        }
+
+        case MetaTreeItemTypes::Scale: {
+            double value = index.model()->data(index, MetaTreeItemRoles::Scale).toDouble();
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            pDoubleSpinBox->setValue(value);
+            break;
+        }
 
         case MetaTreeItemTypes::NetworkThreshold: {
             if(Spline* pSpline = static_cast<Spline*>(editor)) {
@@ -474,7 +531,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
                     QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
 
                     //Get data
-                    MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+                    MatrixXd matNetworkData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>().array().abs();
 
                     //Calcualte histogram
                     Eigen::VectorXd resultClassLimit;
@@ -500,6 +557,19 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             }
 
             return;
+        }
+
+        case MetaTreeItemTypes::MaterialType: {
+            QString materialType = index.model()->data(index, MetaTreeItemRoles::SurfaceMaterial).toString();
+            QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+            pComboBox->setCurrentText(materialType);
+            return;
+        }
+        case MetaTreeItemTypes::CancelDistance: {
+            int value = index.model()->data(index, MetaTreeItemRoles::CancelDistance).toDouble();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
+            break;
         }
 
         default: // do nothing;
@@ -557,11 +627,11 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 
                 QString displayThreshold;
                 displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
-                QVariant dataDisplay;
-                dataDisplay.setValue(displayThreshold);
-
-                model->setData(index, dataDisplay, Qt::DisplayRole);
-                model->setData(index, returnVector, MetaTreeItemRoles::DistributedSourceLocThreshold);
+                QVariant data;
+                data.setValue(displayThreshold);
+                model->setData(index, data, Qt::DisplayRole);
+                data.setValue(returnVector);
+                model->setData(index, data, MetaTreeItemRoles::DistributedSourceLocThreshold);
             }
             return;
         }
@@ -649,32 +719,42 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateX: {
+        case MetaTreeItemTypes::TranslateX: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateX);
+            model->setData(index, data, MetaTreeItemRoles::TranslateX);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateY: {
+        case MetaTreeItemTypes::TranslateY: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateY);
+            model->setData(index, data, MetaTreeItemRoles::TranslateY);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case MetaTreeItemTypes::SurfaceTranslateZ: {
+        case MetaTreeItemTypes::TranslateZ: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, MetaTreeItemRoles::SurfaceTranslateZ);
+            model->setData(index, data, MetaTreeItemRoles::TranslateZ);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case MetaTreeItemTypes::Scale: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+
+            model->setData(index, data, MetaTreeItemRoles::Scale);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
@@ -686,15 +766,47 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 
                 QString displayThreshold;
                 displayThreshold = QString("%1,%2,%3").arg(returnVector.x()).arg(returnVector.y()).arg(returnVector.z());
-                QVariant dataDisplay;
-                dataDisplay.setValue(displayThreshold);
-                model->setData(index, dataDisplay, Qt::DisplayRole);
 
-                model->setData(index, returnVector, MetaTreeItemRoles::NetworkThreshold);
+                QVariant data;
+                data.setValue(displayThreshold);
+                model->setData(index, data, Qt::DisplayRole);
+                data.setValue(returnVector);
+                model->setData(index, data, MetaTreeItemRoles::NetworkThreshold);
             }
 
             return;
         }
+
+        case MetaTreeItemTypes::MaterialType: {
+            QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+            QVariant data;
+            data.setValue(pComboBox->currentText());
+
+            model->setData(index, data, MetaTreeItemRoles::SurfaceMaterial);
+            model->setData(index, data, Qt::DisplayRole);
+            return;
+        }
+        
+        case MetaTreeItemTypes::CancelDistance: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+    
+            model->setData(index, data, MetaTreeItemRoles::CancelDistance);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case MetaTreeItemTypes::InterpolationFunction: {
+            QComboBox* pColorMapType = static_cast<QComboBox*>(editor);
+            QVariant data;
+            data.setValue(pColorMapType->currentText());
+
+            model->setData(index, data, MetaTreeItemRoles::InterpolationFunction);
+            model->setData(index, data, Qt::DisplayRole);
+            return;
+        }
+        
 
         default: // do nothing;
             break;

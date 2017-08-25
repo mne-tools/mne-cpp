@@ -65,7 +65,7 @@
 //=============================================================================================================
 
 namespace Ui {
-class SsvepBciSetupStimulusWidget;
+    class SsvepBciSetupStimulusWidget;
 }
 
 
@@ -256,7 +256,7 @@ private:
     void changeComboBox();
 
     Ui::SsvepBciSetupStimulusWidget*        ui;                     /**< Pointer to the graphical user interface. */
-    QSharedPointer<SsvepBci>                m_pSsvepBci;            /**< a pointer to corresponding EEGoSports */
+    SsvepBci*                               m_pSsvepBci;            /**< a pointer to corresponding EEGoSports */
     QSharedPointer<SsvepBciScreen>          m_pSsvepBciScreen;      /**< pointer to the SsvepBciscreen class of the subject (friend class) */
     QSharedPointer<ScreenKeyboard>          m_pScreenKeyboard;      /**< pointer to the Screenkeyboard class */
     QSharedPointer<QScreen>                 m_pScreen;              /**< pointer to the QScreen class; */

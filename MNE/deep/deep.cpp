@@ -40,15 +40,15 @@
 
 #include "deep.h"
 
+#include "deepmodelcreator.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // SYSTEM INCLUDES
 //=============================================================================================================
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 #include <QFile>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -65,16 +66,8 @@
 //=============================================================================================================
 
 using namespace DEEPLIB;
-using namespace Microsoft::MSR::CNTK;
-
-
-// Used for retrieving the model appropriate for the element type (float / double)
-template<typename ElemType>
-using GetEvalProc = void(*)(IEvaluateModel<ElemType>**);
-
-
-typedef std::pair<std::wstring, std::vector<float>*> MapEntry;
-typedef std::map<std::wstring, std::vector<float>*> Layer;
+using namespace CNTK;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -82,19 +75,9 @@ typedef std::map<std::wstring, std::vector<float>*> Layer;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Deep::Deep()
-: m_model(NULL)
+Deep::Deep(QObject *parent)
+: QObject(parent)
 {
-}
-
-
-//*************************************************************************************************************
-
-Deep::Deep(const QString &sModelFilename)
-: m_sModelFilename(sModelFilename)
-, m_model(NULL)
-{
-    loadModel();
 }
 
 
@@ -108,81 +91,204 @@ Deep::~Deep()
 
 //*************************************************************************************************************
 
-const QString& Deep::getModelFilename() const
-{
-    return m_sModelFilename;
-}
+//void Deep::runEvaluationClassifier(FunctionPtr evalFunc, const DeviceDescriptor &device)
+//{
+//    const std::wstring inputNodeName = L"features";
+
+//    Variable inputVar;
+//    if (!getInputVariableByName(evalFunc, inputNodeName, inputVar))
+//    {
+//        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+//        throw("Input variable not found error.");
+//    }
+
+//    // Evaluate the network in several runs
+//    size_t iterationCount = 4;
+//    unsigned int randSeed = 2;
+//    srand(randSeed);
+//    size_t numSamples = 3;
+//    std::vector<float> inputData(inputVar.Shape().TotalSize() * numSamples);
+//    for (size_t t = 0; t < iterationCount; ++t) {
+//        for (size_t i = 0; i < inputData.size(); ++i) {
+//            inputData[i] = ((float)rand()) / RAND_MAX;
+//        }
+
+//        // Create input data shape. Adding sequence length and numSamples as axes.
+//        // Todo: remove sequence length when only numSamples is supported.
+//        // Todo: add convenience APIs to simplify data preparation here.
+////        NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
+////        ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+//        ValuePtr inputValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
+
+
+//        // Define output.
+//        ValuePtr outputValue;
+//        auto outputVar = evalFunc->Output();
+//        std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
+
+//        // Evaluate the model
+//        evalFunc->Forward({{inputVar, inputValue}}, outputs, device);
+
+//        // Get output value
+//        outputValue = outputs[outputVar];
+
+//        // Todo: remove sequence length when only numSamples is supported.
+//        // Todo: add convenience APIs to simplify retrieval of output results.
+//        NDShape outputShape = outputVar.Shape().AppendShape({1, numSamples});
+//        std::vector<float> outputData(outputShape.TotalSize());
+//        NDArrayViewPtr cpuArrayOutput = MakeSharedObject<NDArrayView>(outputShape, outputData, false);
+//        cpuArrayOutput->CopyFrom(*outputValue->Data());
+
+//        assert(outputData.size() == outputVar.Shape()[0] * numSamples);
+//        fprintf(stderr, "Evaluation result:\n");
+//        size_t dataIndex = 0;
+//        auto outputDim = outputVar.Shape()[0];
+//        for (size_t i = 0; i < numSamples; i++)
+//        {
+//            fprintf(stderr, "Iteration:%lu, Sample %lu:\n", (unsigned long)t, (unsigned long)i);
+//            fprintf(stderr, "    ");
+//            dataIndex = i * outputDim;
+//            for (size_t j = 0; j < std::min((size_t)10, outputDim); j++)
+//            {
+//                fprintf(stderr, "%f ", outputData[dataIndex++]);
+//            }
+//            if (outputDim > 10)
+//            {
+//                fprintf(stderr, "...");
+//            }
+//            fprintf(stderr, "\n");
+//        }
+//    }
+//}
 
 
 //*************************************************************************************************************
 
-void Deep::setModelFilename(const QString &sModelFilename)
-{
-    m_sModelFilename = sModelFilename;
-}
+//void Deep::multiThreadsEvaluationWithClone(const DeviceDescriptor &device, const int threadCount)
+//{
+//    using namespace std::placeholders;
+
+//    const size_t inputDim = 937;
+//    const size_t numOutputClasses = 9304;
+//    const size_t numHiddenLayers = 6;
+//    const size_t hiddenLayersDim = 2048;
+
+//    auto inputVar = InputVariable({inputDim}, DataType::Float, L"features");
+
+//    assert(numHiddenLayers >= 1);
+//    auto classifierRoot = DeepModelCreator::setupFullyConnectedDNNLayer(inputVar, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
+//    for (size_t i = 1; i < numHiddenLayers; ++i)
+//    {
+//        classifierRoot = DeepModelCreator::setupFullyConnectedDNNLayer(classifierRoot, hiddenLayersDim, device, std::bind(Sigmoid, _1, L""));
+//    }
+
+//    auto outputTimesParam = Parameter(NDArrayView::RandomUniform<float>({numOutputClasses, hiddenLayersDim}, -0.5, 0.5, 1, device));
+//    auto classifierFunc = Times(outputTimesParam, classifierRoot, L"classifierOutput");
+
+//    // Now test the structure
+//    if (classifierFunc->Parameters().size() != ((numHiddenLayers * 2) + 1))
+//    {
+//        throw std::runtime_error("multiThreadsEvaluationWithClone: Function does not have expected Parameter count");
+//    }
+
+//    outputFunctionInfo(classifierFunc);
+//    fprintf(stderr, "multiThreadsEvaluationWithClone on device=%d\n", device.Id());
+
+//    // Run evaluation in parallel
+//    std::vector<std::thread> threadList(threadCount);
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th] = std::thread(runEvaluationClassifier, classifierFunc->Clone(), device);
+//    }
+
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th].join();
+//        fprintf(stderr, "thread %d joined.\n", th);
+//        fflush(stderr);
+//    }
+//}
 
 
 //*************************************************************************************************************
 
-bool Deep::evalModel(std::vector<float>& inputs, std::vector<float>& outputs)
+//void Deep::testClone()
+//{
+//    int numOfThreads = 2;
+
+//    // Test multi-threads evaluation using clone.
+//    fprintf(stderr, "\n##### Run evaluation using clone function on CPU. #####\n");
+//    multiThreadsEvaluationWithClone(DeviceDescriptor::CPUDevice(), numOfThreads);
+//}
+
+
+//*************************************************************************************************************
+
+size_t Deep::inputDimensions(const std::wstring inputNodeName)
 {
-    if( !m_model )
-        return false;
-
-    // get the model's layers dimensions
-    std::map<std::wstring, size_t> inDims;
-    std::map<std::wstring, size_t> outDims;
-    m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-    m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
-
-    std::wstring inputLayerName = inDims.begin()->first;
-    std::wstring outputLayerName = outDims.begin()->first;
-
-    if(inDims[inputLayerName] != inputs.size()) {
-        fprintf(stderr, "Input dimension does not fit %zu != %llu.\n", inputs.size(), inDims[inputLayerName]);
-        return false;
+    Variable inputVar;
+    if (!getInputVariableByName(m_pModel, inputNodeName, inputVar)) {
+        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+        throw("Input variable not found error.");
     }
 
-    // Setup the maps for inputs and output
-    Layer inputLayer;
-    inputLayer.insert(MapEntry(inputLayerName, &inputs));
-    Layer outputLayer;
-    outputLayer.insert(MapEntry(outputLayerName, &outputs));
-
-    // We can call the evaluate method and get back the results (single layer)...
-    m_model->Evaluate(inputLayer, outputLayer);
-
-    // This pattern is used by End2EndTests to check whether the program runs to complete.
-    fprintf(stderr, "Evaluation complete.\n");
-
-    return true;
+    return inputVar.Shape().TotalSize();
 }
 
 
 //*************************************************************************************************************
 
-bool Deep::loadModel()
+size_t Deep::outputDimensions(const std::wstring outputNodeName)
 {
-    QFile file(m_sModelFilename);
+    Variable outputVar;
+    if (!getOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
+        fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
+        throw("Output variable not found error.");
+    }
+
+    return outputVar.Shape().TotalSize();
+}
+
+
+//*************************************************************************************************************
+
+void Deep::runEvaluation(FunctionPtr model, const CNTK::Variable& inputVar, const ValuePtr& inputValue, const CNTK::Variable& outputVar, ValuePtr& outputValue, const DeviceDescriptor &device)
+{
+    std::unordered_map<Variable, ValuePtr> outputs = {{outputVar, outputValue}};
+    model->Forward({{inputVar, inputValue}}, outputs, device);
+    outputValue = outputs[outputVar];
+}
+
+
+//*************************************************************************************************************
+
+FunctionPtr Deep::getModel()
+{
+    return m_pModel;
+}
+
+
+//*************************************************************************************************************
+
+void Deep::setModel(FunctionPtr &model)
+{
+    m_pModel = model;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::loadModel(const QString& modelFileName, const DeviceDescriptor &device)
+{
+    QFile file(modelFileName);
     if(!file.exists()) {
-        qCritical("Model filename (%s) does not exist.\n", m_sModelFilename.toUtf8().constData());
+        qCritical("Model filename (%s) does not exist.\n", modelFileName.toUtf8().constData());
         return false;
     }
 
-    fprintf(stderr, "Evaluating Model %s\n", m_sModelFilename.toUtf8().constData());
+    fprintf(stderr, "Loading model %s.\n",modelFileName.toUtf8().constData());
 
-    const std::string modelFile = m_sModelFilename.toUtf8().constData();
-
-    GetEvalF(&m_model);
-
-    // Load model with desired outputs
-    std::string networkConfiguration;
-    // Uncomment the following line to re-define the outputs (include h1.z AND the output ol.z)
-    // When specifying outputNodeNames in the configuration, it will REPLACE the list of output nodes
-    // with the ones specified.
-    //networkConfiguration += "outputNodeNames=\"h1.z:ol.z\"\n";
-    networkConfiguration += "modelPath=\"" + modelFile + "\"";
-    m_model->CreateNetwork(networkConfiguration);
+    m_pModel = Function::Load(modelFileName.toStdWString(), device);
 
     return true;
 }
@@ -190,27 +296,329 @@ bool Deep::loadModel()
 
 //*************************************************************************************************************
 
-size_t Deep::inputDimensions()
+bool Deep::saveModel(const QString &fileName)
 {
-    if(m_model) {
-        std::map<std::wstring, size_t> inDims;
-        m_model->GetNodeDimensions(inDims, NodeGroup::nodeInput);
-        std::wstring inputLayerName = inDims.begin()->first;
-        return inDims[inputLayerName];
-    }
-    return 0;
+    if(!m_pModel)
+        return false;
+
+    m_pModel->Save(fileName.toStdWString());
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-size_t Deep::outputDimensions()
+bool Deep::evalModel(const MatrixXf& input, MatrixXf& output, const DeviceDescriptor &device)
 {
-    if(m_model) {
-        std::map<std::wstring, size_t> outDims;
-        m_model->GetNodeDimensions(outDims, NodeGroup::nodeOutput);
-        std::wstring outputLayerName = outDims.begin()->first;
-        return outDims[outputLayerName];
+    outputFunctionInfo(m_pModel);
+
+    fprintf(stderr, "Evaluate model on device=%d\n", device.Id());
+
+    // Run evaluation in parallel.
+//    std::vector<std::thread> threadList(threadCount);
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th] = std::thread(runEvaluation, m_pModelFunction_v2->Clone(), device,inputVar,inputValue,outputVar,outputValue);
+//    }
+
+//    for (int th = 0; th < threadCount; ++th)
+//    {
+//        threadList[th].join();
+//        fprintf(stderr, "thread %d joined.\n", th);
+//        fflush(stderr);
+//    }
+
+    //
+    // Input
+    //
+    const std::wstring inputNodeName = L"features";
+
+    Variable inputVar;
+    if (!getInputVariableByName(m_pModel, inputNodeName, inputVar)) {
+        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+        throw("Input variable not found error.");
     }
-    return 0;
+
+    //Check if input data size matches the number of features
+    if (inputVar.Shape().TotalSize() != static_cast<size_t>(input.cols())) {
+            fprintf(stderr, "Input data size: %d, do not match feature size: %d.\n", static_cast<int>(input.rows()), static_cast<int>(inputVar.Shape().TotalSize()));
+            throw("Input data size do not match input feature size.");
+    }
+
+    // Evaluate the network in several runs
+    size_t numSamples = static_cast<size_t>(input.rows());
+    size_t numFeatures = static_cast<size_t>(input.cols());
+
+    std::vector<float> inputData(numFeatures * numSamples);
+    size_t dataIndex = 0;
+    for (int m = 0; m < numSamples; ++m) {
+        for (int n = 0; n < numFeatures; ++n) {
+//            printf("%d: %f =? %f\n",dataIndex,input(m,n),static_cast<float>(dataIndex % 255));
+            inputData[dataIndex++] = input(m,n);
+        }
+    }
+
+//    NDShape inputShape = inputVar.Shape().AppendShape({1, numSamples});
+//    ValuePtr inputValue = MakeSharedObject<Value>(MakeSharedObject<NDArrayView>(inputShape, inputData, true));
+    ValuePtr inputValue = Value::CreateBatch(inputVar.Shape(), inputData, device);
+
+
+
+    //
+    // Output
+    //
+    const std::wstring outputNodeName = L"labels";//L"out.z";
+
+    Variable outputVar;
+    if (!getOutputVaraiableByName(m_pModel, outputNodeName, outputVar)) {
+        fprintf(stderr, "Output variable %S is not available.\n", outputNodeName.c_str());
+        throw("Output variable not found error.");
+    }
+
+    ValuePtr outputValue;
+
+    //
+    // Evaluate
+    //
+    runEvaluation(m_pModel,inputVar,inputValue,outputVar,outputValue,device);
+
+    //
+    // Put the output together
+    //
+    NDShape outputShape = outputVar.Shape().AppendShape({1, numSamples});
+    std::vector<float> outputData(outputShape.TotalSize());
+    NDArrayViewPtr cpuArrayOutput = MakeSharedObject<NDArrayView>(outputShape, outputData, false);
+    cpuArrayOutput->CopyFrom(*outputValue->Data());
+
+    // consistency check
+    assert(outputData.size() == outputVar.Shape()[0] * numSamples);
+
+    dataIndex = 0;
+    size_t outputDim = outputVar.Shape()[0];
+    output.resize(numSamples, outputDim);
+    for (size_t i = 0; i < numSamples; i++)
+    {
+        for (size_t j = 0; j < outputDim; j++)
+        {
+//            fprintf(stderr, "%f ", output(i,j));
+            output(i,j) = outputData[dataIndex++];
+        }
+    }
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::trainModel(const MatrixXf &input, const MatrixXf &targets, QVector<double> &loss, QVector<double> &error, int minibatch_size, const DeviceDescriptor &device)
+{
+    int num_samples = input.rows();
+    int num_minibatches_to_train = floor(num_samples / minibatch_size);
+
+    double loss_val, error_val;
+
+    for(int i = 0; i < num_minibatches_to_train; ++i) {
+
+        trainMinibatch(input.block(i * minibatch_size, 0, minibatch_size, input.cols()),
+                       targets.block(i * minibatch_size, 0, minibatch_size, targets.cols()),
+                       loss_val, error_val,device);
+
+        if(i % 9 == 0)
+            qDebug() << "Iteration:" << i+1 << "; loss" << loss_val << "; error" << error_val;
+
+        loss.append(loss_val);
+        error.append(error_val);
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device)
+{
+
+    if(!m_pModel) {
+        return false;
+    }
+
+    FunctionPtr z = m_pModel;
+
+    //
+    // Input
+    //
+    const std::wstring inputNodeName = L"features";
+    Variable inputFeatures;
+    if (!getInputVariableByName(z, inputNodeName, inputFeatures)) {
+        fprintf(stderr, "Input variable %S is not available.\n", inputNodeName.c_str());
+        throw("Input variable not found error.");
+    }
+
+    //
+    // Output
+    //
+    Variable outputLabels = InputVariable({z->Output().Shape().TotalSize()}, DataType::Float, L"labels"); //z->Output();
+
+    FunctionPtr fctLoss = CrossEntropyWithSoftmax(z,outputLabels);
+    FunctionPtr fctEvalError = ClassificationError(z, outputLabels);
+
+    double learning_rate = 0.5;
+    LearningRateSchedule lr_schedule = LearningRateSchedule(learning_rate, LearningRateSchedule::UnitType::Minibatch);
+    std::vector<LearnerPtr> learner; learner.push_back(SGDLearner(z->Parameters(),lr_schedule));
+
+    TrainerPtr trainer = CreateTrainer(z,fctLoss,fctEvalError,learner);
+
+    //
+    // Consistency Checks
+    //
+    size_t batchSize = 0;
+
+    if(input.rows() == targets.rows() && input.rows() > 0) {
+        batchSize = input.rows();
+    }
+    else {
+        fprintf(stderr, "Sample size of features (%d) and targets (%d) do not match or are 0.\n", static_cast<int>(input.rows()), static_cast<int>(input.rows()));
+        throw("Sample size do not match.");
+    }
+
+    if(input.cols() != inputFeatures.Shape().TotalSize()) {
+        fprintf(stderr, "Input feature size (%d) do not match model feature size (%d).\n", static_cast<int>(input.cols()), static_cast<int>(inputFeatures.Shape().TotalSize()));
+        throw("Sample size do not match.");
+    }
+
+    if(targets.cols() != outputLabels.Shape().TotalSize()) {
+        fprintf(stderr, "Target size (%d) do not match model label size (%d).\n", static_cast<int>(targets.cols()), static_cast<int>(outputLabels.Shape().TotalSize()));
+        throw("Target size do not match.");
+    }
+
+    //
+    // Prepare data
+    //
+//    qDebug() << "inputFeatures.IsInput()" << inputFeatures.IsInput() << "inputFeatures.Shape().TotalSize()" << inputFeatures.Shape().TotalSize();
+//    qDebug() << "outputLabels.IsOutput()" << outputLabels.IsOutput() << "outputLabels.Shape().TotalSize()" << outputLabels.Shape().TotalSize();
+
+    size_t inputDim = inputFeatures.Shape().TotalSize();
+    size_t numOutputClasses = outputLabels.Shape().TotalSize();
+
+    std::vector<float> inputData(inputDim * batchSize);
+    //    for (size_t i = 0; i < inputData.size(); ++i)
+    //        inputData[i] = (float)rand() / RAND_MAX;
+    size_t dataIndex = 0;
+    for (int m = 0; m < batchSize; ++m) {
+        for (int n = 0; n < inputDim; ++n) {
+            inputData[dataIndex++] = input(m,n);
+        }
+    }
+    ValuePtr inputDataValue = Value::CreateBatch(inputFeatures.Shape(), inputData, device);
+    //    std::unordered_map<Variable, ValuePtr> inputValues = { { inputVar, inputDataValue } };
+
+    std::vector<float> outputData(numOutputClasses * batchSize);
+    //    for (size_t i = 0; i < outputData.size(); ++i)
+    //        outputData[i] = (float)rand() / RAND_MAX;
+    dataIndex = 0;
+    for (int m = 0; m < batchSize; ++m) {
+        for (int n = 0; n < numOutputClasses; ++n) {
+            outputData[dataIndex++] = targets(m,n);
+        }
+    }
+    ValuePtr outputDataValue = Value::CreateBatch(outputLabels.Shape(), outputData, device);//    z->Output().Shape()
+    //    std::unordered_map<Variable, ValuePtr> outputValues = { { outputLabels, outputDataValue } };
+
+    std::unordered_map<Variable, ValuePtr> inOutValues = { { inputFeatures, inputDataValue }, { outputLabels, outputDataValue } };
+
+    //
+    // Train the minibatch
+    //
+    trainer->TrainMinibatch(inOutValues,device);
+
+    loss = trainer->PreviousMinibatchLossAverage();
+    error = trainer->PreviousMinibatchEvaluationAverage();
+//    size_t minibatch_samples = trainer->PreviousMinibatchSampleCount();
+//    qDebug() << "Finished minibatch training: loss" << loss << "; error" << error << "; samples" << minibatch_samples;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+void Deep::cancelTraining()
+{
+    qDebug() << "cancelTraining()";
+}
+
+
+//*************************************************************************************************************
+
+void Deep::print()
+{
+    if(!m_pModel) {
+        fprintf(stderr, "No model defined.\n");
+        return;
+    }
+
+
+    fprintf(stderr,"Model structure\n\n");
+
+    for (int i = static_cast<int>(m_pModel->Parameters().size()) - 1; i >= 0 ; --i) {
+        fprintf(stderr,"\n >> Level = %ju <<\n",m_pModel->Parameters().size() - i);
+
+        fprintf(stderr,"Dim: %ls\n",m_pModel->Parameters()[i].Shape().AsString().c_str());
+    }
+
+    fprintf(stderr,"\nArguments %ls\n", m_pModel->Arguments()[0].AsString().c_str());
+    fprintf(stderr,"Kind %ls, Is Input:",VariableKindName(m_pModel->Arguments()[0].Kind()));
+    fprintf(stderr,m_pModel->Arguments()[0].IsInput() ? "true\n" : "false\n");
+}
+
+
+//*************************************************************************************************************
+
+void Deep::outputFunctionInfo(FunctionPtr model)
+{
+    auto inputVariables = model->Arguments();
+    fprintf(stderr, "Function '%S': Input Variables (count=%lu)\n", model->Name().c_str(), (unsigned long)inputVariables.size());
+    for_each(inputVariables.begin(), inputVariables.end(), [](const Variable v) {
+        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
+    });
+
+    auto outputVariables = model->Outputs();
+    fprintf(stderr, "Function '%S': Output Variables (count=%lu)\n", model->Name().c_str(), (unsigned long)outputVariables.size());
+    for_each(outputVariables.begin(), outputVariables.end(), [](const Variable v) {
+        fprintf(stderr, "    name=%S, kind=%d\n", v.Name().c_str(), static_cast<int>(v.Kind()));
+    });
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::getVariableByName(std::vector<Variable> variableLists, std::wstring varName, Variable &var)
+{
+    for (std::vector<Variable>::iterator it = variableLists.begin(); it != variableLists.end(); ++it)
+    {
+        if (it->Name().compare(varName) == 0)
+        {
+            var = *it;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::getInputVariableByName(FunctionPtr model, std::wstring varName, Variable &var)
+{
+    return getVariableByName(model->Arguments(), varName, var);
+}
+
+
+//*************************************************************************************************************
+
+bool Deep::getOutputVaraiableByName(FunctionPtr model, std::wstring varName, Variable &var)
+{
+    return getVariableByName(model->Outputs(), varName, var);
 }

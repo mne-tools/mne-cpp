@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../../../disp3D_global.h"
-#include "custommesh.h"
 
 
 //*************************************************************************************************************
@@ -73,10 +72,6 @@ namespace Qt3DCore {
     class QTransform;
 }
 
-namespace Qt3DRender{
-    class QMaterial;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,8 +87,6 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ShaderMaterial;
-
 
 //=============================================================================================================
 /**
@@ -104,6 +97,7 @@ class ShaderMaterial;
 class DISP3DNEWSHARED_EXPORT Renderable3DEntity : public Qt3DCore::QEntity
 {
     Q_OBJECT
+    Q_PROPERTY(float scale READ scaleValue WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(float rotX READ rotX WRITE setRotX NOTIFY rotXChanged)
     Q_PROPERTY(float rotY READ rotY WRITE setRotY NOTIFY rotYChanged)
     Q_PROPERTY(float rotZ READ rotZ WRITE setRotZ NOTIFY rotZChanged)
@@ -115,7 +109,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor for freesurfer mesh.#
+    * Default constructor.
     *
     * @param[in] parent         The parent of this entity.
     */
@@ -123,41 +117,48 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor for freesurfer mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The color info of all the vertices.
-    * @param[in] parent         The parent of this class.
-    */
-    Renderable3DEntity(const Eigen::MatrixX3f& tMatVert,
-                       const Eigen::MatrixX3f& tMatNorm,
-                       const Eigen::MatrixX3i& tMatTris,
-                       const Eigen::MatrixX3f& tMatColors,
-                       Qt3DCore::QEntity* parent = 0);
-
-    //=========================================================================================================
-    /**
     * Default destructor.
     */
-    ~Renderable3DEntity();
+    virtual ~Renderable3DEntity();
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation.
-    *
-    * @param[in] pTransform     The new entity's transform.
+    * Manual garbage collection, since Qt3D is still a bit buggy when it come to memory handling.
     */
-    void setTransform(QPointer<Qt3DCore::QTransform> pTransform);
+    //void releaseNode(Qt3DCore::QNode *node);
 
     //=========================================================================================================
     /**
-    * Returns the custom mesh.
+    * Sets the entity's transformation. This will clear the old transformation.
     *
-    * @return The costum mesh.
+    * @param[in] transform     The new entity's transform.
     */
-    QPointer<CustomMesh> getCustomMesh();
+    virtual void setTransform(const Qt3DCore::QTransform &transform);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    virtual void applyTransform(const Qt3DCore::QTransform& transform);
+
+    //=========================================================================================================
+    /**
+    * Sets the value of a specific paramater of the materials for this entity.
+    *
+    * @param[in] data             The value to be set.
+    * @param[in] sParameterName   The name of the parameter to be set.
+    */
+    virtual void setMaterialParameter(QVariant data, QString sParameterName);
+
+    //=========================================================================================================
+    /**
+    * Returns the current scaling value.
+    *
+    * @return The scaling value.
+    */
+    virtual float scaleValue() const;
 
     //=========================================================================================================
     /**
@@ -165,7 +166,7 @@ public:
     *
     * @return The x-axis rotation value.
     */
-    float rotX() const;
+    virtual float rotX() const;
 
     //=========================================================================================================
     /**
@@ -173,7 +174,7 @@ public:
     *
     * @return The y-axis rotation value.
     */
-    float rotY() const;
+    virtual float rotY() const;
 
     //=========================================================================================================
     /**
@@ -181,7 +182,7 @@ public:
     *
     * @return The z-axis rotation value.
     */
-    float rotZ() const;
+    virtual float rotZ() const;
 
     //=========================================================================================================
     /**
@@ -189,7 +190,7 @@ public:
     *
     * @return The position/translation value.
     */
-    QVector3D position() const;
+    virtual QVector3D position() const;
 
     //=========================================================================================================
     /**
@@ -197,7 +198,7 @@ public:
     *
     * @param[in] rotX     The x-axis rotation value.
     */
-    void setRotX(float rotX);
+    virtual void setRotX(float rotX);
 
     //=========================================================================================================
     /**
@@ -205,7 +206,7 @@ public:
     *
     * @param[in] rotY     The y-axis rotation value.
     */
-    void setRotY(float rotY);
+    virtual void setRotY(float rotY);
 
     //=========================================================================================================
     /**
@@ -213,7 +214,7 @@ public:
     *
     * @param[in] rotZ     The z-axis rotation value.
     */
-    void setRotZ(float rotZ);
+    virtual void setRotZ(float rotZ);
 
     //=========================================================================================================
     /**
@@ -221,21 +222,28 @@ public:
     *
     * @param[in] position     The position/translation value.
     */
-    void setPosition(QVector3D position);
+    virtual void setPosition(QVector3D position);
 
     //=========================================================================================================
     /**
-    * Sets the value of a specific paramater of the materials for this entity.
+    * Call this function whenever you want to change the visibilty of the 3D rendered content.
     *
-    * @param[in] fValue             The value to be set.
-    * @param[in] sParameterName     The name of the parameter to be set.
+    * @param[in] state     The visiblity flag.
     */
-    void setMaterialParameter(float fValue, QString sParameterName);
+    virtual void setVisible(bool state);
+
+    //=========================================================================================================
+    /**
+    * Sets the current scale.
+    *
+    * @param[in] scale     The new scaling value.
+    */
+    virtual void setScale(float scale);
 
 protected: 
-    QPointer<CustomMesh>                        m_pCustomMesh;           /**< The actual mesh information (vertices, normals, colors). */
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
 
+    float                                       m_fScale;                /**< The scaling value. */
     float                                       m_fRotX;                 /**< The x axis rotation value. */
     float                                       m_fRotY;                 /**< The y axis rotation value. */
     float                                       m_fRotZ;                 /**< The z axis rotation value. */
@@ -245,9 +253,17 @@ protected:
     /**
     * Update the set transformation with the currently set translation and rotation values.
     */
-    void updateTransform();
+    virtual void updateTransform();
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the scaling changed.
+    *
+    * @param[in] scale     The scaling value.
+    */
+    void scaleChanged(float scale);
+
     //=========================================================================================================
     /**
     * Emit this signal whenever the x-axis rotation changed.
@@ -283,10 +299,5 @@ signals:
 };
 
 } // NAMESPACE
-
-#ifndef metatype_renderable3Dentity
-#define metatype_renderable3Dentity
-Q_DECLARE_METATYPE(DISP3DLIB::Renderable3DEntity*)
-#endif
 
 #endif // RENDERABLE3DENTITY_H

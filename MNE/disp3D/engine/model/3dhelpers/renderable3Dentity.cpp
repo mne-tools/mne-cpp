@@ -88,29 +88,11 @@ using namespace Qt3DRender;
 
 Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
-, m_pCustomMesh(new CustomMesh())
-, m_pTransform(new Qt3DCore::QTransform())
+, m_fScale(1.0f)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
 {
-    this->addComponent(m_pCustomMesh);
-    this->addComponent(m_pTransform);
-}
-
-
-//*************************************************************************************************************
-
-Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const MatrixX3f& tMatColors, Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tMatColors))
-, m_pTransform(new Qt3DCore::QTransform())
-, m_fRotX(0.0f)
-, m_fRotY(0.0f)
-, m_fRotZ(0.0f)
-{
-    this->addComponent(m_pCustomMesh);
-    this->addComponent(m_pTransform);
 }
 
 
@@ -118,26 +100,104 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
+    //releaseNode(this);
+}
+
+
+////*************************************************************************************************************
+
+//void Renderable3DEntity::releaseNode(Qt3DCore::QNode* node)
+//{
+//    if (QEntity* entity = dynamic_cast<QEntity*>(node)) {
+//        QComponentVector components = entity->components();
+
+//        foreach (QComponent* component, components) {
+//            entity->removeComponent(component);
+//            delete component;
+//        }
+//    }
+
+//    QNodeVector nodes = node->childNodes();
+
+//    foreach (QNode* nodeIt, nodes) {
+//        releaseNode(nodeIt);
+//        delete nodeIt;
+//    }
+//}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
+{
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
+    }
+
+    m_pTransform->setMatrix(transform.matrix());
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setTransform(QPointer<Qt3DCore::QTransform> pTransform)
+void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
 {
-    if(m_pTransform) {
-        this->removeComponent(m_pTransform);
-        m_pTransform = pTransform;
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
         this->addComponent(m_pTransform);
+    }
+
+    m_pTransform->setMatrix(m_pTransform->matrix() * transform.matrix());
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterName)
+{
+    //Look for all materials and set the corresponding parameters
+    QComponentVector vComponents;
+
+    //Search in this item's components
+    if(QEntity* pEntity = dynamic_cast<QEntity*>(this)) {
+        vComponents = pEntity->components();
+
+        for(int j = 0; j < vComponents.size(); ++j) {
+            if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
+                for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
+                    if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
+                        pMaterial->effect()->parameters().at(i)->setValue(data);
+                    }
+                }
+            }
+        }
+    }
+
+    //Search in all child item components
+    for(int k = 0; k < this->childNodes().size(); ++k) {
+        if(QEntity* pEntity = dynamic_cast<QEntity*>(this->childNodes().at(k))) {
+            vComponents = pEntity->components();
+
+            for(int j = 0; j < vComponents.size(); ++j) {
+                if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
+                    for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
+                        if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
+                            pMaterial->effect()->parameters().at(i)->setValue(data);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 
 //*************************************************************************************************************
 
-QPointer<CustomMesh> Renderable3DEntity::getCustomMesh()
+float Renderable3DEntity::scaleValue() const
 {
-    return m_pCustomMesh;
+    return m_fScale;
 }
 
 
@@ -217,25 +277,6 @@ void Renderable3DEntity::setRotZ(float rotZ)
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setMaterialParameter(float fValue, QString sParameterName)
-{
-    //Look for all materials and set the corresponding parameters
-    QComponentVector vComponents = this->components();
-
-    for(int j = 0; j < vComponents.size(); ++j) {
-        if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
-            for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
-                if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
-                    pMaterial->effect()->parameters().at(i)->setValue(fValue);
-                }
-            }
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
 void Renderable3DEntity::setPosition(QVector3D position)
 {
     if(m_position == position) {
@@ -250,18 +291,46 @@ void Renderable3DEntity::setPosition(QVector3D position)
 
 //*************************************************************************************************************
 
+void Renderable3DEntity::setVisible(bool state)
+{
+    for(int i = 0; i < this->childNodes().size(); ++i) {
+        this->childNodes()[i]->setEnabled(state);
+    }
+    this->setEnabled(state);
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setScale(float scale)
+{
+    if(m_fScale == scale) {
+        return;
+    }
+
+    m_fScale = scale;
+    emit scaleChanged(scale);
+    updateTransform();
+}
+
+
+//*************************************************************************************************************
+
 void Renderable3DEntity::updateTransform()
 {
     QMatrix4x4 m;
 
     //Do the translation after rotating, otherwise rotation around the x,y,z axis would be screwed up
-    m.translate(m_position);
+    m.scale(m_fScale);
     m.rotate(m_fRotX, QVector3D(1.0f, 0.0f, 0.0f));
     m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
     m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
+    m.translate(m_position);
+
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
+    }
 
     m_pTransform->setMatrix(m);
 }
-
-
-

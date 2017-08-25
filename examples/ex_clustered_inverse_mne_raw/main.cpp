@@ -124,9 +124,9 @@ int main(int argc, char *argv[])
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0f;//0.1f;//3.0f;
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0;//0.1;//3.0;
     QCommandLineOption invFileOutOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
-    QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");    
+    QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
     QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
     QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
@@ -463,6 +463,9 @@ int main(int argc, char *argv[])
     //########################################################################################
     // Source Estimate
 
+    //
+    // Settings
+    //
     double snr = parser.value(snrOption).toDouble();
     QString method(parser.value(methodOption));
 
@@ -472,20 +475,18 @@ int main(int argc, char *argv[])
     double lambda2 = 1.0 / pow(snr, 2);
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
-//    // Load data
-//    fiff_int_t setno = 1;
-//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-//    FiffEvoked evoked(t_fileEvoked, setno, baseline);
-//    if(evoked.isEmpty())
-//        return 1;
-
+    //
+    // Load data
+    //
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
 
     FiffCov noise_cov(t_fileCov);
 
+    //
     // regularize noise covariance
+    //
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
     //

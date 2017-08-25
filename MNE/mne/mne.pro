@@ -119,7 +119,19 @@ SOURCES += \
     c/mne_source_space_old.cpp \
     c/mne_surface_old.cpp \
     c/mne_surface_or_volume.cpp \
-    c/filter_thread_arg.cpp
+    c/filter_thread_arg.cpp \
+    c/mne_msh_display_surface.cpp \
+    c/mne_msh_display_surface_set.cpp \
+    c/mne_msh_picked.cpp \
+    c/mne_morph_map.cpp \
+    c/mne_msh_color_scale_def.cpp \
+    c/mne_proj_data.cpp \
+    c/mne_msh_light.cpp\
+    c/mne_msh_light_set.cpp \
+    c/mne_surface_patch.cpp \
+    c/mne_msh_eyes.cpp \
+    c/mne_mgh_tag.cpp \
+    c/mne_mgh_tag_group.cpp
 
 HEADERS += \
     mne.h \
@@ -159,7 +171,19 @@ HEADERS += \
     c/mne_source_space_old.h \
     c/mne_surface_old.h \
     c/mne_surface_or_volume.h \
-    c/filter_thread_arg.h
+    c/filter_thread_arg.h \
+    c/mne_msh_display_surface.h \
+    c/mne_msh_display_surface_set.h \
+    c/mne_msh_picked.h \
+    c/mne_morph_map.h \
+    c/mne_msh_color_scale_def.h \
+    c/mne_proj_data.h\
+    c/mne_msh_light.h\
+    c/mne_msh_light_set.h \
+    c/mne_surface_patch.h \
+    c/mne_msh_eyes.h \
+    c/mne_mgh_tag.h \
+    c/mne_mgh_tag_group.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

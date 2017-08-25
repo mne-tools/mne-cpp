@@ -116,26 +116,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~SensorSetTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
     * @param[in] tSensor            The BEM data.
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+    * @param[in] sDataType          The data type: EEG, MEG.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     */
-    void addData(const MNELIB::MNEBem& tSensor, const QList<FIFFLIB::FiffChInfo>& lChInfo, Qt3DCore::QEntity* p3DEntityParent = 0);
+    void addData(const MNELIB::MNEBem& tSensor, const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString &sDataType, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 protected:
     //=========================================================================================================
@@ -143,14 +131,6 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 };
 
 } //NAMESPACE DISP3DLIB
