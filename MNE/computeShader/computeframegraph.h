@@ -4,11 +4,11 @@
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     August, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Lars Debor and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "computeShader_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,6 +50,8 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QPointer>
+#include <Qt3DRender/QViewport>
 
 
 //*************************************************************************************************************
@@ -61,7 +64,18 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
+namespace Qt3DRender {
+        class QRenderSurfaceSelector;
+        class QClearBuffers;
+        class QNoDraw;
+        class QDispatchCompute;
+        class QTechniqueFilter;
+        class QCameraSelector;
+        class QCamera;
+        class QFilterKey;
+        class QMemoryBarrier;
+        class QCamera;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,7 +98,7 @@ namespace CSH {
 * @brief Brief description of this class.
 */
 
-class ComputeFramegraph
+class COMPUTE_SHADERSHARED_EXPORT ComputeFramegraph : public Qt3DRender::QViewport
 {
 
 public:
@@ -95,11 +109,42 @@ public:
     /**
     * Constructs a ComputeFramegraph object.
     */
-    ComputeFramegraph();
+    explicit ComputeFramegraph(Qt3DCore::QNode *parent = 0);
+
+    //void setWorkGroups(const int x, const int y, const int z);
+
+    void setCamera(Qt3DRender::QCamera *pCamera);
+
+    void setWorkGroupSize(const unsigned int x, const unsigned int y , const unsigned int z);
+
+    //Qt3DRender::QCamera *getCamera();
 
 protected:
 
 private:
+    void init();
+
+//    QPointer<Qt3DRender::QCamera> m_pCamera;
+
+    QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;
+
+    QPointer<Qt3DRender::QClearBuffers> m_pClearBuffers;
+
+    QPointer<Qt3DRender::QNoDraw> m_pNoDraw;
+
+    QPointer<Qt3DRender::QDispatchCompute> m_pDispatchCompute;
+
+    QPointer<Qt3DRender::QFilterKey> m_pComputeKey;
+    QPointer<Qt3DRender::QFilterKey> m_pDrawKey;
+
+    QPointer<Qt3DRender::QCameraSelector> m_pCameraSelector;
+
+    QPointer<Qt3DRender::QTechniqueFilter> m_pComputeFilter;
+    QPointer<Qt3DRender::QTechniqueFilter> m_pDrawFilter;
+
+
+
+    QPointer<Qt3DRender::QMemoryBarrier> m_pMemoryBarrier;
 
 
 };
