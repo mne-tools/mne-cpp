@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include"computeShader_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,6 +50,8 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QPointer>
+#include <Qt3DRender/QMaterial>
 
 
 //*************************************************************************************************************
@@ -62,6 +65,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace Qt3DCore {
+        class QNode;
+}
+
+namespace Qt3DRender {
+        class QEffect;
+        class QParameter;
+        class QShaderProgram;
+        class QRenderPass;
+        class QFilterKey;
+        class QTechnique;
+        class QBuffer;
+
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,12 +96,12 @@ namespace CSH {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class stores the Material used for compute shader usage.
 *
-* @brief Brief description of this class.
+* @brief Compute material storage.
 */
 
-class ComputeMaterial
+class COMPUTE_SHADERSHARED_EXPORT ComputeMaterial : public Qt3DRender::QMaterial
 {
 
 public:
@@ -95,11 +112,44 @@ public:
     /**
     * Constructs a ComputeMaterial object.
     */
-    ComputeMaterial();
+    explicit ComputeMaterial(Qt3DCore::QNode *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Default destructor.
+    */
+    ~ComputeMaterial() = default;
+
+    void setColorBuffer(Qt3DRender::QBuffer *colorbuffer);
 
 protected:
 
 private:
+    void init();
+
+    QPointer<Qt3DRender::QEffect> m_pEffect;
+
+    //Compute Part
+    QPointer<Qt3DRender::QShaderProgram> m_pComputeShader;
+    QPointer<Qt3DRender::QRenderPass> m_pComputeRenderPass;
+    QPointer<Qt3DRender::QFilterKey> m_pComputeFilterKey;
+    QPointer<Qt3DRender::QTechnique> m_pComputeTechnique;
+
+    //test
+//    QPointer<Qt3DRender::QBuffer> m_pShaderStorage;
+//    QPointer<Qt3DRender::QParameter> m_pStorageParameter;
+//    QPointer<Qt3DRender::QParameter> m_pSinParameter;
+//    QPointer<QTimer> m_pTimer;
+    //
+
+    //Draw Part
+    QPointer<Qt3DRender::QShaderProgram> m_pDrawShader;
+    QPointer<Qt3DRender::QRenderPass> m_pDrawRenderPass;
+    QPointer<Qt3DRender::QFilterKey> m_pDrawFilterKey;
+    QPointer<Qt3DRender::QTechnique> m_pDrawTechnique;
+
+    QPointer<Qt3DRender::QParameter> m_pColorParameter;
+
 
 
 };
