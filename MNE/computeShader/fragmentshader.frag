@@ -1,7 +1,13 @@
 #version 430 core
 
+//in vec4 vPosition;
+in vec3 vColor;
+in vec3 vNormal;
+
+out vec4 color;
 
 void main(void)
 {
-    color = vec4(1.0, 0.0, 0.0, 1.0);
+    //TODO add phong alpha
+    color = vec4(vColor.xyz, 1.0);
 }
