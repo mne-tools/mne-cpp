@@ -176,6 +176,14 @@ public:
                      const Eigen::MatrixX3f& tMatColors,
                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
+    //=========================================================================================================
+    /**
+    * Add new Attribute to the geometry.
+    *
+    * @param[in] tAttribute       new QAttribute.
+    */
+    void addAttrib(Qt3DRender::QAttribute *tAttribute);
+
 protected:
     //=========================================================================================================
     /**
