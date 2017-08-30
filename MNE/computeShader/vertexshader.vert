@@ -4,7 +4,7 @@
 in vec3 vertexPosition;
 in vec3 vertexColor;
 in vec3 vertexNormal;
-in vec4 colorArray;
+in float YOutVec;
 
 //out vec4 vPosition;
 out vec3 vColor;
@@ -16,6 +16,6 @@ void main()
 
         vNormal = normalize( vertexNormal );
 
-        //TODO change this to colorArray
-        vColor = colorArray.xyz;
+        //TODO use some kind of colormap
+        vColor = vec3(YOutVec, 0.0, 0.0);
 }
