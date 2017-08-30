@@ -47,6 +47,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+#include <cmath>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,6 +65,7 @@
 #include <Qt3DRender/QShaderProgram>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <QUrl>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,6 +95,7 @@ using namespace Qt3DRender;
 
 ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     : QMaterial(parent)
+    , m_iSignalCtr(0)
     , m_pEffect(new QEffect)
     , m_pComputeShader(new QShaderProgram)
     , m_pComputeRenderPass(new QRenderPass)
@@ -102,27 +106,87 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     , m_pDrawFilterKey(new QFilterKey)
     , m_pDrawTechnique(new QTechnique)
     , m_pColorParameter(new QParameter)
+    , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+    , m_pSignalDataParameter(new QParameter)
+    , m_pTimer(new QTimer(this))
 {
     this->init();
 }
 
-void ComputeMaterial::setColorBuffer(QBuffer *colorbuffer)
+void ComputeMaterial::setYOutBuffer(QBuffer *yOutBuffer)
 {
 
-    m_pColorParameter->setName(QStringLiteral("colorArray"));
+    m_pColorParameter->setName(QStringLiteral("YOutVec"));
 
     //Set the buffer as parameter data
-    QVariant tempVariant;
-    tempVariant.setValue(colorbuffer);
-    m_pColorParameter->setValue(tempVariant);
+    m_pColorParameter->setValue(QVariant::fromValue(yOutBuffer));
     m_pComputeRenderPass->addParameter(m_pColorParameter);
+}
+
+void ComputeMaterial::addComputePassParameter(QPointer<QParameter> tParameter)
+{
+    if(tParameter.isNull())
+    {
+        std::cerr << "setComputePassParameter: QParameter = nullptr. Returning!" << std::endl;
+        return;
+    }
+
+    if(m_CustomParameters.contains(tParameter->name()))
+    {
+        std::cerr << "setComputePassParameter: A Parameter with this Name: " << tParameter->name().toStdString()
+                  << " already exists. Returning!" << std::endl;
+        return;
+    }
+
+    m_pComputeRenderPass->addParameter(tParameter);
+    //add the parameter to the hash table for later usage.
+    m_CustomParameters.insert(tParameter->name(), tParameter);
+}
+
+void ComputeMaterial::createSignalMatrix(uint tRows, uint tCols)
+{
+    m_signalMatrix = Eigen::MatrixXf::Zero(tRows, tCols);
+    //Generate random entries
+    for(uint i = 0; i < tRows; ++i)
+    {
+        for(uint j = 0; j < tCols; ++j)
+        {
+            m_signalMatrix(i, j) = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+        }
+    }
+    updateSignalBuffer();
+}
+
+void ComputeMaterial::updateSignalBuffer()
+{
+    const uint iBufferSize = m_signalMatrix.rows();
+    QByteArray bufferData;
+    bufferData.resize(iBufferSize * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    for(uint i = 0; i < iBufferSize; ++i)
+    {
+        rawVertexArray[i] = m_signalMatrix(i, m_iSignalCtr);
+    }
+
+    m_iSignalCtr++;
+
+    if(m_iSignalCtr >= m_signalMatrix.cols())
+    {
+        m_iSignalCtr = 0;
+    }
+
+    //Set buffer and parameter
+    m_pSignalDataBuffer->setData(bufferData);
+    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
+
 }
 
 void ComputeMaterial::init()
 {
     //Compute part
     //Set shader
-    m_pComputeShader->setComputeShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/computeshader.csh"))));
+    m_pComputeShader->setComputeShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/interpolation.csh"))));
 
     m_pComputeRenderPass->setShaderProgram(m_pComputeShader);
 
@@ -161,6 +225,10 @@ void ComputeMaterial::init()
     m_pDrawTechnique->addFilterKey(m_pDrawFilterKey);
     m_pDrawTechnique->addRenderPass(m_pDrawRenderPass);
 
+    //init signal processing
+    m_pSignalDataParameter->setName(QStringLiteral("MeasurementVec"));
+    m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
+
     //Effect
     //Link shader and uniforms
     m_pEffect->addTechnique(m_pComputeTechnique);
@@ -168,6 +236,10 @@ void ComputeMaterial::init()
 
     //Add to material
     this->setEffect(m_pEffect);
+
+    //init timer and connect with updateSignalBuffer
+    connect(m_pTimer, &QTimer::timeout,this, &ComputeMaterial::updateSignalBuffer);
+    m_pTimer->start(100);
 }
 
 
