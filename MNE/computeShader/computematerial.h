@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include"computeShader_global.h"
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,6 +52,8 @@
 
 #include <QSharedPointer>
 #include <QPointer>
+#include <QHash>
+#include <QTimer>
 #include <Qt3DRender/QMaterial>
 
 
@@ -79,6 +82,7 @@ namespace Qt3DRender {
         class QBuffer;
 
 }
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -120,9 +124,35 @@ public:
     */
     ~ComputeMaterial() = default;
 
-    void setColorBuffer(Qt3DRender::QBuffer *colorbuffer);
+    //=========================================================================================================
+    /**
+     * Set a Colorbuffer for testing.
+     * @param colorbuffer
+     */
+    void setYOutBuffer(Qt3DRender::QBuffer *yOutBuffer);
+
+    //=========================================================================================================
+    /**
+     * @brief setComputePassParameter
+     * @param tParameter
+     */
+    void addComputePassParameter(QPointer<Qt3DRender::QParameter> tParameter);
+
+    //=========================================================================================================
+    /**
+     * generate a random signal matrix for testing.
+     */
+    void createSignalMatrix(uint tRows, uint tCols);
+
+
 
 protected:
+
+    //=========================================================================================================
+    /**
+     * update the signal buffer with new measurement data.
+     */
+    void updateSignalBuffer();
 
 private:
     void init();
@@ -150,6 +180,14 @@ private:
 
     QPointer<Qt3DRender::QParameter> m_pColorParameter;
 
+    QHash<QString, QPointer<Qt3DRender::QParameter>> m_CustomParameters;
+
+    //Measurement signal
+    QPointer<Qt3DRender::QBuffer> m_pSignalDataBuffer;
+    QPointer<Qt3DRender::QParameter> m_pSignalDataParameter;
+    Eigen::MatrixXf m_signalMatrix;
+    uint m_iSignalCtr;
+    QPointer<QTimer> m_pTimer;
 
 
 };

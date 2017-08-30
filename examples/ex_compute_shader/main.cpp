@@ -101,6 +101,7 @@ using namespace Qt3DRender;
 QByteArray createVertexBufferFromBemSurface(const MNEBemSurface &tBemSurface);
 QByteArray createColorBuffer(const int iVertNum);
 MatrixX3f createVertColor(const MatrixXf& vertices, const QColor& color);
+QByteArray createWeightMatBuffer(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix);
 
 
 //*************************************************************************************************************
@@ -178,9 +179,9 @@ int main(int argc, char *argv[])
     QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 
-    //projecting with MEG
+    //projecting with EEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0], megSensors);
+    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0], eegSensors);
     std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
 
     //SCDC with cancel distance 0.03
@@ -188,16 +189,16 @@ int main(int argc, char *argv[])
     QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0], mappedSubSet, 0.03);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
-    //filter out bad MEG channels
-    GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
+    //filter out bad EEG channels
+    GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_EEG_CH);
 
     //weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<SparseMatrix<double> > interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, DOUBLE_INFINITY, evoked.info, FIFFV_MEG_CH);
+    QSharedPointer<SparseMatrix<double> > interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, DOUBLE_INFINITY, evoked.info, FIFFV_EEG_CH);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
     //realtime interpolation (1 iteration)
-    VectorXd signal = VectorXd::Random(megSensors.size());
+    VectorXd signal = VectorXd::Random(eegSensors.size());
     qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
     Interpolation::interpolateSignal(interpolationMatrix, signal);
     std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
@@ -213,36 +214,64 @@ int main(int argc, char *argv[])
 
     Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
 
-    Qt3DRender::QBuffer *pColorBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
-    pColorBuffer->setData(createColorBuffer(t_sensorSurfaceVV[0].rr.rows()));
+    //TODO change colorbuffer to yOut
+    Qt3DRender::QBuffer *pYOutBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
+    pYOutBuffer->setData(createColorBuffer(t_sensorSurfaceVV[0].rr.rows()));
 
     //Color buffer size 2562
     std::cout << "Color buffer size: " << t_sensorSurfaceVV[0].rr.rows() << std::endl;
+    std::cout << "EEG senors size: " << eegSensors.size() << std::endl;
 
     ComputeMaterial *pComputeMaterial = new ComputeMaterial();
-    pComputeMaterial->setColorBuffer(pColorBuffer);
+    pComputeMaterial->setYOutBuffer(pYOutBuffer);
+    //add custom parameters to computeMaterial
+    //@TODO change this values to the correct one
+    const unsigned int iWeightMatRows = t_sensorSurfaceVV[0].rr.rows();
+    const unsigned int iWeightMatCols = eegSensors.size();
+    QParameter *pRowUniform = new QParameter(QStringLiteral("rows"), iWeightMatRows);
+    pComputeMaterial->addComputePassParameter(pRowUniform);
+    QParameter *pColsUniform = new QParameter(QStringLiteral("cols"), iWeightMatCols);
+    pComputeMaterial->addComputePassParameter(pColsUniform);
+
+    //Create Weight matrix buffer and Parameter
+    Qt3DRender::QBuffer *pWeightMatBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
+    pWeightMatBuffer->setData(createWeightMatBuffer(interpolationMatrix));
+
+    QParameter *pWeightMatParameter = new QParameter(QStringLiteral("WeightMat"),
+                                                     QVariant::fromValue(pWeightMatBuffer));
+    pComputeMaterial->addComputePassParameter(pWeightMatParameter);
+
+    //create random EEG signal for testing
+    pComputeMaterial->createSignalMatrix(eegSensors.size(), 300);
+
+
+
+
+
 
     ComputeFramegraph *pFramegraph = new ComputeFramegraph();
     //@TODO wie workgroup size bestimmen besser Aufteilung finden es gibt 2562 vertecies
-    pFramegraph->setWorkGroupSize(2562, 0 ,0 );
+    pFramegraph->setWorkGroupSize(iWeightMatRows, 0 ,0 );
 
     //Compute entity
     Qt3DCore::QEntity *pComputeEntity = new Qt3DCore::QEntity(rootEntity);
     QComputeCommand *pComputeCommand = new QComputeCommand();
+    //pComputeCommand->setWorkGroupX(iWeightMatRows);
+
     pComputeEntity->addComponent(pComputeCommand);
     pComputeEntity->addComponent(pComputeMaterial);
 
 
     //Color attribute
-    QAttribute *pColorAttribute = new QAttribute();
-    pColorAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    pColorAttribute->setDataType(Qt3DRender::QAttribute::Float);
-    pColorAttribute->setVertexSize(4);
-    pColorAttribute->setByteOffset(0);
-    pColorAttribute->setByteStride(4 * sizeof(float));
+    QAttribute *pYOutAttribute = new QAttribute();
+    pYOutAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
+    pYOutAttribute->setDataType(Qt3DRender::QAttribute::Float);
+    pYOutAttribute->setVertexSize(1);
+    pYOutAttribute->setByteOffset(0);
+    pYOutAttribute->setByteStride(1 * sizeof(float));
     //@TODO change the name of "colorArray" to a better one
-    pColorAttribute->setName(QStringLiteral("colorArray"));
-    pColorAttribute->setBuffer(pColorBuffer);
+    pYOutAttribute->setName(QStringLiteral("YOutVec"));
+    pYOutAttribute->setBuffer(pYOutBuffer);
 
     //custom mesh
     DISP3DLIB::CustomMesh *pCustomMesh = new DISP3DLIB::CustomMesh();
@@ -255,7 +284,7 @@ int main(int argc, char *argv[])
                                 matVertColor,
                                 Qt3DRender::QGeometryRenderer::Triangles);
     //add Custom Attribute
-    pCustomMesh->addAttrib(pColorAttribute);
+    pCustomMesh->addAttrib(pYOutAttribute);
 
     //mesh render entity
     Qt3DCore::QEntity *pMeshRenderEntity = new Qt3DCore::QEntity(rootEntity);
@@ -316,23 +345,17 @@ QByteArray createVertexBufferFromBemSurface(const MNEBemSurface &tBemSurface)
         rawVertexArray[idxVert++] = (tBemSurface.rr(i,2));
     }
 
-//    for(int i = 0; i < iVertNum; ++i)
-//    {
-//        for(int j = 0; j < iVertSize; ++j)
-//        {
-//            rawVertexArray[i + j] = tBemSurface.rr(i, j);
-//        }
-//    }
     return bufferData;
 }
 
 QByteArray createColorBuffer(const int iVertNum)
 {
-    const int iBufferSize = iVertNum * 4;
+    const int iBufferSize = iVertNum;
     QByteArray bufferData;
     bufferData.resize(iBufferSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
+    //Set default values
     for(int i = 0; i < iBufferSize; ++i)
     {
         rawVertexArray[i] = 1.0f;
@@ -353,3 +376,26 @@ MatrixX3f createVertColor(const MatrixXf& vertices, const QColor& color)
     return matColor;
 }
 
+QByteArray createWeightMatBuffer(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
+{
+    QByteArray bufferData;
+
+    const uint iRows = tInterpolationMatrix->rows();
+    const uint iCols = tInterpolationMatrix->cols();
+
+    bufferData.resize(iRows * iCols * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    unsigned int iCtr = 0;
+    for(uint i = 0; i < iRows; ++i)
+    {
+        for(uint j = 0; j < iCols; ++j)
+        {
+            //@TODO this is probably not the best way to extract the weight matrix components
+            rawVertexArray[iCtr] = tInterpolationMatrix->coeff(i, j);
+            iCtr++;
+        }
+    }
+
+    return bufferData;
+}
