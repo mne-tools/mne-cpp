@@ -344,7 +344,7 @@ void Epidetect::run()
         VectorXd newP2PVal = calculator.getP2P();
         VectorXd newKurtosisVal = calculator.getKurtosis();
 
-        if (counter = m_iFuzzyEnStep*m_iListLength-1)
+        if (counter == m_iFuzzyEnStep*m_iListLength-1)
         {
             FuzzyEnHistoryValues.col(0) = fuzzyEnHistory.rowwise().minCoeff();
             FuzzyEnHistoryValues.col(1) = fuzzyEnHistory.rowwise().mean();
