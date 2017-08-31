@@ -71,6 +71,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
+            -lMNE$${MNE_LIB_VERSION}GeometryInfod \
+            -lMNE$${MNE_LIB_VERSION}Interpolationd \
             -lanSharedd
 }
 else {
@@ -85,6 +87,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lMNE$${MNE_LIB_VERSION}Disp3D \
+            -lMNE$${MNE_LIB_VERSION}GeometryInfo \
+            -lMNE$${MNE_LIB_VERSION}Interpolation \
             -lanShared
 }
 
