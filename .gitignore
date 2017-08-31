@@ -92,6 +92,10 @@
 /bin/test_fiff_rwrd
 /bin/test_forward_solution
 /bin/test_forward_solutiond
+/bin/test_fiff_digitizer
+/bin/test_geometryinfo
+/bin/test_interpolation
+/bin/test_mne_msh_display_surface_set
 
 # Other files
 /bin/MNE-sample-data/MEG
