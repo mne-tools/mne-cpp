@@ -124,7 +124,7 @@ protected:
 private:
     void init();
 
-//    QPointer<Qt3DRender::QCamera> m_pCamera;
+    //QPointer<Qt3DRender::QCamera> m_pCamera;
 
     QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;
 
