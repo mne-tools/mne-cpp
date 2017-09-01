@@ -103,13 +103,14 @@ ComputeFramegraph::ComputeFramegraph(Qt3DCore::QNode *parent)
     , m_pMemoryBarrier(new QMemoryBarrier(m_pDrawFilter))
     , m_pDrawKey(new QFilterKey)
     , m_pComputeKey(new QFilterKey)
-    //, m_pCamera(new QCamera)
+   // , m_pCamera(new QCamera)
 {
     init();
 }
 
 void ComputeFramegraph::setCamera(QCamera *pCamera)
 {
+
     m_pCameraSelector->setCamera(pCamera);
 }
 
@@ -159,12 +160,15 @@ void ComputeFramegraph::init()
     //Set camera
 //    m_pCamera->setProjectionType(QCameraLens::PerspectiveProjection);
 //    m_pCamera->setViewCenter(QVector3D(0, 0, 0));
-//    m_pCamera->setPosition(QVector3D(0, 0, -800.0));
+//    m_pCamera->setPosition(QVector3D(0, 0, -40.0f));
 //    m_pCamera->setNearPlane(0.1f);
 //    m_pCamera->setFarPlane(1000.0f);
 //    m_pCamera->setFieldOfView(25.0f);
 //    m_pCamera->setAspectRatio(1.33f);
 //    m_pCameraSelector->setCamera(m_pCamera);
+    //camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
+
+
 }
 
 

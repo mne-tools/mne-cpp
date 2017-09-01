@@ -106,7 +106,7 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     , m_pDrawFilterKey(new QFilterKey)
     , m_pDrawTechnique(new QTechnique)
     , m_pColorParameter(new QParameter)
-    , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+    , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pSignalDataParameter(new QParameter)
     , m_pTimer(new QTimer(this))
 {
