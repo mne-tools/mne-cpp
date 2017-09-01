@@ -7,7 +7,7 @@ uniform uint rows;
 uniform uint cols;
 
 //TODO x workgroup is size of 1 row
-layout (local_size_x = 60) in;
+layout (local_size_x = 1) in;
 
 
 //output buffer colortable needs to be applied on this array
@@ -40,7 +40,15 @@ void main(void)
     // only for 1 dimension weight matrix
     uint globalId = gl_GlobalInvocationID.x;
 
-    yOut[uint(mod(globalId, cols))] += weights[globalId] * mData[uint(mod(globalId, rows))];
+    float sum = 0.0;
+    for(uint i = 0; i < cols; i++)
+    {
+        sum += weights[globalId * cols + i] * mData[i];
+    }
+
+    yOut[globalId] = sum;
+
+    //yOut[uint(mod(globalId, cols))] += weights[globalId] * mData[uint(mod(globalId, rows))];
 
     //TODO forward to other shaders and apply color table
 }
