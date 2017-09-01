@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
     pComputeMaterial->addComputePassParameter(pColsUniform);
 
     //Create Weight matrix buffer and Parameter
-    Qt3DRender::QBuffer *pWeightMatBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
+    Qt3DRender::QBuffer *pWeightMatBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer);
     pWeightMatBuffer->setData(createWeightMatBuffer(interpolationMatrix));
 
     QParameter *pWeightMatParameter = new QParameter(QStringLiteral("WeightMat"),
@@ -305,24 +305,39 @@ int main(int argc, char *argv[])
     pMeshRenderEntity->addComponent(pTransform);
 
 
-    Qt3DRender::QCamera *camera = new QCamera();
-    camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-    camera->setPosition(QVector3D(0, 0, 40.0f));
-    camera->setViewCenter(QVector3D(0, 0, 0));
+
+    Qt3DRender::QCamera *pCamera = new QCamera;
+    pCamera->setProjectionType(QCameraLens::PerspectiveProjection);
+    pCamera->setViewCenter(QVector3D(0, 0, 0));
+    pCamera->setPosition(QVector3D(0, 0, 40.0));
+    pCamera->setNearPlane(0.1f);
+    pCamera->setFarPlane(1000.0f);
+    pCamera->setFieldOfView(25.0f);
+    pCamera->setAspectRatio(1.33f);
+
+
+    pFramegraph->setCamera(pCamera);
+//    camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
+//    camera->setPosition(QVector3D(0, 0, 40.0f));
+//    camera->setViewCenter(QVector3D(0, 0, 0));
     //forwardRenderer->setCamera(camera);
-    pFramegraph->setCamera(camera);
+//    pFramegraph->setCamera(camera);
+
     //Camera controller
     Qt3DExtras::QFirstPersonCameraController *pCamController = new Qt3DExtras::QFirstPersonCameraController(rootEntity);
-    //pCamController->setCamera(pFramegraph->getCamera());
-    pCamController->setCamera(camera);
+    pCamController->setCamera(pCamera);
 
 
 
     //Configure view settings
     view.setRootEntity(rootEntity);
+
     view.setActiveFrameGraph(pFramegraph);
     //view.setActiveFrameGraph(forwardRenderer);
     view.renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::Always);
+
+    //pCamController->setCamera(view.camera());
+
     view.show();
 
 
