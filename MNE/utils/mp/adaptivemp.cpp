@@ -200,7 +200,7 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
                     if(trial_separation) temp_scalar_product = max_scalar_product[chn];
                     else temp_scalar_product = max_scalar_product[0];
 
-                    if(abs(atom_parameters[4]) >= abs(temp_scalar_product))
+                    if(std::fabs(atom_parameters[4]) >= std::fabs(temp_scalar_product))
                     {
                         //set highest scalarproduct, in comparison to best matching atom
                         gabor_Atom->scale              = atom_parameters[0];
@@ -254,7 +254,7 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
                 qreal temp_scalar_product = 0;
                 if(trial_separation) temp_scalar_product = max_scalar_product[chn];
                 else temp_scalar_product = max_scalar_product[0];
-                if(abs(parameters_no_envelope[4]) > abs(temp_scalar_product))
+                if(std::fabs(parameters_no_envelope[4]) > std::fabs(temp_scalar_product))
                 {
                     //set highest scalarproduct, in comparison to best matching atom
 
@@ -565,7 +565,7 @@ void AdaptiveMp::simplex_maximisation(qint32 simplex_it, qreal simplex_reflectio
         double diff=0;          //calculate the difference of the simplex centers
 
         //see if the difference is less than the termination criteria
-        for(qint32 i=0; i<N; ++i) diff += fabs(xcentroid_old[i]-xcentroid_new[i]);
+        for(qint32 i=0; i<N; ++i) diff += std::fabs(xcentroid_old[i]-xcentroid_new[i]);
 
         if (diff/N < tol) break;              //terminate the optimizer
         else xcentroid_old.swap(xcentroid_new); //update simplex center
@@ -667,7 +667,7 @@ void AdaptiveMp::simplex_maximisation(qint32 simplex_it, qreal simplex_reflectio
         if(trial_separation) temp_scalar_product = max_scalar_product[chn];
         else temp_scalar_product = max_scalar_product[0];
 
-        if(abs(atom_fxc_params[4]) > abs(temp_scalar_product) && atom_fxc_params[1] < sample_count && atom_fxc_params[1] > 0)//ToDo: find a way to make the simplex not running out of bounds
+        if(std::fabs(atom_fxc_params[4]) > std::fabs(temp_scalar_product) && atom_fxc_params[1] < sample_count && atom_fxc_params[1] > 0)//ToDo: find a way to make the simplex not running out of bounds
         {
             //set highest scalarproduct, in comparison to best matching atom
 

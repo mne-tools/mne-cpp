@@ -137,7 +137,7 @@ void TestFiffCov::compareData()
 //    qDebug()<<"abs(data_diff.sum()) "<<abs(data_diff.sum());
 //    qDebug()<<"epsilon "<<epsilon;
 
-    QVERIFY( abs(data_diff.sum()) < epsilon );
+    QVERIFY( std::abs(data_diff.sum()) < epsilon );
 }
 
 
