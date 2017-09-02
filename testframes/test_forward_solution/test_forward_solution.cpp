@@ -179,7 +179,8 @@ void TestForwardSolution::compareForward()
     QString refFwdFileName(QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif");
 
     //Load data
-    MNEForwardSolution t_Fwd(refFwdFileName);
+    QFile t_fileForwardSolution(refFwdFileName);
+    MNEForwardSolution t_Fwd(t_fileForwardSolution);
 
 //    QVERIFY( m_refECDSet.size() == m_ECDSet.size() );
 
