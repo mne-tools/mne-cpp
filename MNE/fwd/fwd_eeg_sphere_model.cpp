@@ -1376,7 +1376,7 @@ double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
     fitUser u = (fitUser)user_data;
 
     for (k = 0; k < u->nfit; k++) {
-        if (fabs(mu[k]) > 1.0)
+        if (std::fabs(mu[k]) > 1.0)
             return 1.0;
     }
     /*

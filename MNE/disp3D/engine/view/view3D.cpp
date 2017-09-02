@@ -40,6 +40,7 @@
 
 #include "view3D.h"
 #include "../model/3dhelpers/renderable3Dentity.h"
+#include "../model/items/common/abstract3Dtreeitem.h"
 #include "../model/items/common/types.h"
 #include "../model/data3Dtreemodel.h"
 
@@ -226,7 +227,7 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 void View3D::startModelRotationRecursive(QObject* pObject)
 {
     //TODO this won't work with QEntities
-    if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
+    if(Abstract3DTreeItem* pItem = dynamic_cast<Abstract3DTreeItem*>(pObject)) {
         QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
         anim->setDuration(30000);
         anim->setStartValue(QVariant::fromValue(pItem->rotZ()));

@@ -108,9 +108,11 @@ Network ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, 
     }
 
     //Create edges
+    double pearsonsCoeff;
+
     for(int i = 0; i < matData.rows(); ++i) {
         for(int j = i; j < matData.rows(); ++j) {
-            double pearsonsCoeff = calcPearsonsCorrelationCoeff(matData.row(i), matData.row(j));
+            pearsonsCoeff = calcPearsonsCorrelationCoeff(matData.row(i), matData.row(j));
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], pearsonsCoeff));
 
@@ -143,9 +145,11 @@ Network ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const Ma
     }
 
     //Create edges
+    QPair<int,double> crossCorrPair;
+
     for(int i = 0; i < matData.rows(); ++i) {
         for(int j = i; j < matData.rows(); ++j) {
-            QPair<int,double> crossCorrPair = calcCrossCorrelation(matData.row(i), matData.row(j));
+            crossCorrPair = calcCrossCorrelation(matData.row(i), matData.row(j));
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], crossCorrPair.second));
 

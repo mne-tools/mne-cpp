@@ -339,7 +339,18 @@ void RtSensorDataWorker::updateBadChannels(const FiffInfo& info)
 
     m_lInterpolationData.fiffInfo = info;
 
-    calculateSurfaceData();
+    //filtering of bad channels out of the distance table
+    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
+                                    m_lInterpolationData.fiffInfo,
+                                    m_lInterpolationData.iSensorType);
+
+    //create weight matrix
+    m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
+                                                                               m_lInterpolationData.pDistanceMatrix,
+                                                                               m_lInterpolationData.interpolationFunction,
+                                                                               m_lInterpolationData.dCancelDistance,
+                                                                               m_lInterpolationData.fiffInfo,
+                                                                               m_lInterpolationData.iSensorType);
 }
 
 
@@ -485,6 +496,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
     return m_lVisualizationInfo.matFinalVertColor;
 }
 
+
 //*************************************************************************************************************
 
 void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
@@ -507,7 +519,7 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
 
     for(int r = 0; r < vecData.rows(); ++r) {
         //Take the absolute values because the histogram threshold is also calcualted using the absolute values
-        fSample = fabs(vecData(r));
+        fSample = std::fabs(vecData(r));
 
         if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one

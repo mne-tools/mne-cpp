@@ -416,18 +416,18 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
 
         for (j = 0; j < nrow; j++)
             for (k = 0; k < ncol; k++) {
-                val = fabs(dense[j][k]);
+                val = std::fabs(dense[j][k]);
                 if (val > maxval)
                     maxval = val;
             }
         if (maxval > 0)
-            small = maxval*fabs(small);
+            small = maxval*std::fabs(small);
         else
-            small = fabs(small);
+            small = std::fabs(small);
     }
     for (j = 0, nz = 0; j < nrow; j++)
         for (k = 0; k < ncol; k++) {
-            if (fabs(dense[j][k]) > small)
+            if (std::fabs(dense[j][k]) > small)
                 nz++;
         }
 
@@ -460,7 +460,7 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
         for (j = 0, nz = 0; j < nrow; j++) {
             ptr = -1;
             for (k = 0; k < ncol; k++)
-                if (fabs(dense[j][k]) > small) {
+                if (std::fabs(dense[j][k]) > small) {
                     sparse->data[nz] = dense[j][k];
                     if (ptr < 0)
                         ptr = nz;
@@ -477,7 +477,7 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
         for (k = 0, nz = 0; k < ncol; k++) {
             ptr = -1;
             for (j = 0; j < nrow; j++)
-                if (fabs(dense[j][k]) > small) {
+                if (std::fabs(dense[j][k]) > small) {
                     sparse->data[nz] = dense[j][k];
                     if (ptr < 0)
                         ptr = nz;

@@ -528,7 +528,7 @@ void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, qint32 LIn, qint
 //  % check input parameters
 //  % -- R ~= 0 & THETA ~= 0
     for(int i=0; i<X.rows(); i++)
-        if ( (abs(X(i)) < 1e-30) && (abs(Y(i)) < 1e-30) )
+        if ( (std::fabs(X(i)) < 1e-30) && (std::fabs(Y(i)) < 1e-30) )
         {
 //            std::cout << "Zero THETA detected!****  ";
             //std::cout << "X, Y: " << X(i) << ",  " << Y(i) << endl;
@@ -1100,7 +1100,7 @@ float plgndr(int l, int m, float x)
     float fact,pll,pmm,pmmp1,somx2;
     int i,ll;
 
-    if (m < 0 || m > l || fabs(x) > 1.0)
+    if (m < 0 || m > l || std::fabs(x) > 1.0)
         std::cout << "Bad arguments in routine plgndr";
 //        nrerror("Bad arguments in routine plgndr");
     pmm=1.0;

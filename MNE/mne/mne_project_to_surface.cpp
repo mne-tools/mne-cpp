@@ -202,7 +202,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const i
 bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int &bestTri, float &bestDist)
 {
     float p = 0, q = 0, p0 = 0, q0 = 0, dist0 = 0;
-    bestDist = 0;
+    bestDist = 0.0f;
     bestTri = -1;
     for (int tri = 0; tri < a .size(); ++tri)
     {
@@ -212,7 +212,7 @@ bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rT
             return false;
         }
 
-        if ((bestTri < 0) || (fabs(dist0) < fabs(bestDist)))
+        if ((bestTri < 0) || (std::fabs(dist0) < std::fabs(bestDist)))
         {
             bestDist = dist0;
             p = p0;

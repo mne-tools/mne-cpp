@@ -371,7 +371,7 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
         int iStartY = m_qPointMouseStartPosition.y();
 
         // Compute pixel difference
-        int iPixelDifferenceY = abs(iStartY - iEndY);
+        int iPixelDifferenceY = std::abs(iStartY - iEndY);
 
         double scale = (m_dMaxValue_init-m_dMinValue_init)/usHeight;
 
@@ -458,8 +458,8 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
 
         // Compute pixel difference
-        double iPixelDifferenceX = abs(iStartX - iEndX);
-        double iPixelDifferenceY = abs(iStartY - iEndY);
+        double iPixelDifferenceX = static_cast<double>(std::abs(iStartX - iEndX));
+        double iPixelDifferenceY = static_cast<double>(std::abs(iStartY - iEndY));
 
         if(iPixelDifferenceX < 5 && iPixelDifferenceY < 5)
             return;

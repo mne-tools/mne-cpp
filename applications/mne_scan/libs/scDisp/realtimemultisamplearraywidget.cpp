@@ -159,6 +159,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pToolBox->insertItem(0, pWidgetContainer, QIcon(), "3D Topoplot");
     m_pToolBox->insertItem(0, m_pTableView, QIcon(), "Signal time plot");
 
+    m_pToolBox->setCurrentIndex(0);
+
     //set layout
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
     rtmsaLayout->addWidget(m_pToolBox);
