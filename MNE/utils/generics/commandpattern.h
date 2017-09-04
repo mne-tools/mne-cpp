@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     generics_global.h
+* @file     commandpattern.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,12 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     generics library export/import macros.
+* @brief    Contains declarations of the command design pattern: ICommand interface.
 *
 */
 
-#ifndef GENERICS_GLOBAL_H
-#define GENERICS_GLOBAL_H
+#ifndef COMMANDPATTERN_H
+#define COMMANDPATTERN_H
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../utils_global.h"
 
 
 //*************************************************************************************************************
@@ -42,26 +50,41 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QSharedPointer>
+#include <QString>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
-//=============================================================================================================
+/**
+* Declare interface command
+*
+* @brief The ICommand interface provides the base class of every command of the command design pattern.
+*/
+class ICommand
+{
+public:
+    typedef QSharedPointer<ICommand> SPtr;             /**< Shared pointer type for ICommand. */
+    typedef QSharedPointer<const ICommand> ConstSPtr;  /**< Const shared pointer type for ICommand. */
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define GENERICSSHARED_EXPORT
-#elif defined(GENERICS_LIBRARY)
-#  define GENERICSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define GENERICSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+    //=========================================================================================================
+    /**
+    * Destroys the ICommand.
+    */
+    virtual ~ICommand() {};
 
-//#if defined(GENERICS_LIBRARY)
-//#  define GENERICSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define GENERICSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
+    //=========================================================================================================
+    /**
+    * Executes the ICommand.
+    */
+    virtual void execute() = 0;
 
-#endif // GENERICS_GLOBAL_H
+};
+
+//Invoker
+//--> Use signal/slot
+
+//Receiver
+//--> Use signal/slot
+
+
+#endif // COMMANDPATTERN_H

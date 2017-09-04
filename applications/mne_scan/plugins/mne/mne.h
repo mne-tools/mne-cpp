@@ -45,7 +45,7 @@
 #include "mne_global.h"
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>

@@ -10,7 +10,7 @@
 #include "command.h"
 #include "commandparser.h"
 
-#include <generics/observerpattern.h>
+#include <utils/generics/observerpattern.h>
 
 
 //*************************************************************************************************************

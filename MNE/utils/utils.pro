@@ -91,7 +91,11 @@ SOURCES += \
     warp.cpp \
     filterTools/sphara.cpp \
     sphere.cpp \
-    eegref.cpp
+    eegref.cpp \
+    generics/buffer.cpp \
+    generics/circularbuffer.cpp \
+    generics/circularmatrixbuffer.cpp \
+    generics/observerpattern.cpp
 
 HEADERS += \
     kmeans.h\
@@ -115,7 +119,15 @@ HEADERS += \
     filterTools/sphara.h \
     sphere.h \
     simplex_algorithm.h \
-    eegref.h
+    eegref.h \
+    generics/buffer.h \
+    generics/circularbuffer.h \
+    generics/circularbuffer_old.h \
+    generics/circularmatrixbuffer.h \
+    generics/circularmultichannelbuffer_old.h \
+    generics/commandpattern.h \
+    generics/observerpattern.h \
+    generics/typename_old.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -39,7 +39,6 @@ TEMPLATE = subdirs
 
 # TBD change the dependency order - forward before inverse
 SUBDIRS += \
-    generics \
     utils \
     fs \
     fiff \
