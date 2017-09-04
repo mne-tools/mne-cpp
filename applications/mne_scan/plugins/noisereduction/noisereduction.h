@@ -53,7 +53,7 @@
 
 #include <realtime/rtProcessing/rtfilter.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 #include <scMeas/newrealtimemultisamplearray.h>
 

@@ -46,7 +46,7 @@
 #include "rawcommand.h"
 #include "command.h"
 
-#include <generics/observerpattern.h>
+#include <utils/generics/observerpattern.h>
 
 
 //*************************************************************************************************************

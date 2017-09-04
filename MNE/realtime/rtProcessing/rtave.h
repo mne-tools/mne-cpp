@@ -47,7 +47,7 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_info.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
