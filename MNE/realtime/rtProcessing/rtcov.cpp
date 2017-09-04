@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTPROCESSINGLIB;
+using namespace REALTIMELIB;
 using namespace FIFFLIB;
 
 

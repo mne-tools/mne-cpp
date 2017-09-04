@@ -59,8 +59,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}RtCommandd \
-            -lMNE$${MNE_LIB_VERSION}RtClientd \
+            -lMNE$${MNE_LIB_VERSION}Realtimed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
@@ -77,8 +76,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}RtCommand \
-            -lMNE$${MNE_LIB_VERSION}RtClient \
+            -lMNE$${MNE_LIB_VERSION}Realtime \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
             -lMNE$${MNE_LIB_VERSION}Disp3D \

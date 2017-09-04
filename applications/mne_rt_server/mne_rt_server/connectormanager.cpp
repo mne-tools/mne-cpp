@@ -45,7 +45,7 @@
 
 #include "IConnector.h"
 
-#include <rtCommand/commandmanager.h>
+#include <realtime/rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************

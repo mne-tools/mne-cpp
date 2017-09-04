@@ -110,7 +110,7 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
 {
-    qRegisterMetaType<REALTIMELIB::FittingResult>("RTPROCESSINGLIB::FittingResult");
+    qRegisterMetaType<REALTIMELIB::FittingResult>("REALTIMELIB::FittingResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
 

@@ -58,13 +58,13 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}RtCommandd
+            -lMNE$${MNE_LIB_VERSION}Realtimed
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}RtCommand
+            -lMNE$${MNE_LIB_VERSION}Realtime
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins

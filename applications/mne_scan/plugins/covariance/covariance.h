@@ -48,7 +48,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
-#include <rtProcessing/rtcov.h>
+#include <realtime/rtProcessing/rtcov.h>
 
 
 //*************************************************************************************************************
@@ -86,7 +86,7 @@ namespace CovariancePlugin
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
-using namespace RTPROCESSINGLIB;
+using namespace REALTIMELIB;
 using namespace FIFFLIB;
 
 
