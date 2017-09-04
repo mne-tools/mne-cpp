@@ -49,10 +49,7 @@ SUBDIRS += \
     fwd \
     inverse \
     connectivity \
-    rtCommand \
-    rtClient \
-    rtProcessing \
-
+    realtime \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
 
