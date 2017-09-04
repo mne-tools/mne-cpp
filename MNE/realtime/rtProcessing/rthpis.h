@@ -44,7 +44,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtime_global.h"
+#include "../realtime_global.h"
 
 #include <generics/circularmatrixbuffer.h>
 #include <fiff/fiff_dig_point_set.h>

@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtime_global.h"
+#include "../realtime_global.h"
 
 #include <generics/commandpattern.h>
 

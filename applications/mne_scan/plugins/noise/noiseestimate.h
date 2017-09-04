@@ -49,7 +49,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/frequencyspectrum.h>
-#include <rtProcessing/rtnoise.h>
+#include <realtime/rtProcessing/rtnoise.h>
 
 
 //*************************************************************************************************************
@@ -95,7 +95,7 @@ namespace NoiseEstimatePlugin
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
-using namespace RTPROCESSINGLIB;
+using namespace REALTIMELIB;
 
 //*************************************************************************************************************
 //=============================================================================================================

@@ -46,7 +46,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
-#include <rtProcessing/rtave.h>
+#include <realtime/rtProcessing/rtave.h>
 
 
 //*************************************************************************************************************
@@ -75,7 +75,7 @@ namespace SCMEASLIB{
     class RealTimeEvokedSet;
 }
 
-namespace RTPROCESSINGLIB{
+namespace REALTIMELIB{
     class RtAve;
 }
 
@@ -287,7 +287,7 @@ private:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
     QList<qint32>                                   m_qListStimChs;                     /**< Stimulus channels.*/
 
-    RTPROCESSINGLIB::RtAve::SPtr                    m_pRtAve;                           /**< Real-time average. */
+    REALTIMELIB::RtAve::SPtr                    m_pRtAve;                           /**< Real-time average. */
 
     bool                                            m_bIsRunning;                       /**< If this thread is running. */
     bool                                            m_bProcessData;                     /**< If data should be received for processing. */

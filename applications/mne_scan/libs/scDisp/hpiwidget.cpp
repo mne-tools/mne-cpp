@@ -90,7 +90,7 @@ using namespace SCDISPLIB;
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
-using namespace RTPROCESSINGLIB;
+using namespace REALTIMELIB;
 using namespace INVERSELIB;
 
 
@@ -431,7 +431,7 @@ void HPIWidget::alignFiducials(const QString& fileNameDigData)
 
 //*************************************************************************************************************
 
-void HPIWidget::onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult)
+void HPIWidget::onNewFittingResultAvailable(REALTIMELIB::FittingResult fitResult)
 {
     m_vGof = fitResult.errorDistances;
 
