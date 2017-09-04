@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "generics_global.h"
+#include "../utils_global.h"
 
 
 //*************************************************************************************************************
@@ -96,7 +96,7 @@ public:
 *
 * @brief The Subject class provides the base class of every subject of the observer design pattern.
 */
-class GENERICSSHARED_EXPORT Subject
+class UTILSSHARED_EXPORT Subject
 {
 public:
     typedef QSharedPointer<Subject> SPtr;               /**< Shared pointer type for Subject. */

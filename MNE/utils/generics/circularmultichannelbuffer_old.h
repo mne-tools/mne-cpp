@@ -292,13 +292,13 @@ void CircularMultiChannelBuffer_old<_Tp>::clear()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<int>                      _int_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of integer type.*/
-typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<short>                    _short_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of short type.*/
-typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<short*>                    _pShort_CircularMultiChannelBuffer_old;			/**< Defines CircularBuffer of short* type.*/
-typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<char>                     _char_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of char type.*/
-typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old<double>                   _double_CircularMultiChannelBuffer_old;			/**< Defines CircularBuffer of double type.*/
-typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<int, int> >        _int_int_pair_CircularMultiChannelBuffer_old;		/**< Defines CircularBuffer of integer Pair type.*/
-typedef GENERICSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<double, double> >  _double_double_pair_CircularMultiChannelBuffer_old;	/**< Defines CircularBuffer of double Pair type.*/
+typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old<int>                      _int_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of integer type.*/
+typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old<short>                    _short_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of short type.*/
+typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old<short*>                    _pShort_CircularMultiChannelBuffer_old;			/**< Defines CircularBuffer of short* type.*/
+typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old<char>                     _char_CircularMultiChannelBuffer_old;				/**< Defines CircularBuffer of char type.*/
+typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old<double>                   _double_CircularMultiChannelBuffer_old;			/**< Defines CircularBuffer of double type.*/
+typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<int, int> >        _int_int_pair_CircularMultiChannelBuffer_old;		/**< Defines CircularBuffer of integer Pair type.*/
+typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<double, double> >  _double_double_pair_CircularMultiChannelBuffer_old;	/**< Defines CircularBuffer of double Pair type.*/
 
 } // NAMESPACE
 

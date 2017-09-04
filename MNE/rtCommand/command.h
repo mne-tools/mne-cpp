@@ -43,7 +43,7 @@
 
 #include "rtcommand_global.h"
 
-#include <generics/commandpattern.h>
+#include <utils/generics/commandpattern.h>
 
 
 //*************************************************************************************************************

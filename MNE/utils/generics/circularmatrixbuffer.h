@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "generics_global.h"
+#include "../utils_global.h"
 #include "buffer.h"
 
 
@@ -394,12 +394,12 @@ inline bool CircularMatrixBuffer<_Tp>::releaseFromPush()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<int>                      _int_CircularMatrixBuffer;                 /**< Defines CircularMatrixBuffer of integer type.*/
-typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<float>                    _float_CircularMatrixBuffer;               /**< Defines CircularMatrixBuffer of float type.*/
-typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<char>                     _char_CircularMatrixBuffer;                /**< Defines CircularMatrixBuffer of char type.*/
-typedef GENERICSSHARED_EXPORT CircularMatrixBuffer<double>                   _double_CircularMatrixBuffer;              /**< Defines CircularMatrixBuffer of double type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<int>                      _int_CircularMatrixBuffer;                 /**< Defines CircularMatrixBuffer of integer type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<float>                    _float_CircularMatrixBuffer;               /**< Defines CircularMatrixBuffer of float type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<char>                     _char_CircularMatrixBuffer;                /**< Defines CircularMatrixBuffer of char type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<double>                   _double_CircularMatrixBuffer;              /**< Defines CircularMatrixBuffer of double type.*/
 
-typedef GENERICSSHARED_EXPORT _float_CircularMatrixBuffer                   RawMatrixBuffer;                           /**< Defines RawMatrixBuffer of type _float_CircularMatrixBuffer.*/
+typedef UTILSSHARED_EXPORT _float_CircularMatrixBuffer                   RawMatrixBuffer;                           /**< Defines RawMatrixBuffer of type _float_CircularMatrixBuffer.*/
 
 } // NAMESPACE
 

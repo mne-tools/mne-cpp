@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "generics_global.h"
+#include "../utils_global.h"
 
 
 //*************************************************************************************************************
@@ -66,7 +66,7 @@ namespace IOBUFFER
 *
 * @brief The Buffer class provides a base class for buffers.
 */
-class GENERICSSHARED_EXPORT Buffer
+class UTILSSHARED_EXPORT Buffer
 {
 public:
     typedef QSharedPointer<Buffer> SPtr;              /**< Shared pointer type for Buffer. */

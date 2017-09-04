@@ -46,7 +46,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 #include "FormFiles/neuronalconnectivityyourwidget.h"
 
