@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer_old.h>
+#include <utils/generics/circularbuffer_old.h>
 
 #include <rtClient/rtdataclient.h>
 

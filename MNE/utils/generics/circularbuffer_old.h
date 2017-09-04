@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "generics_global.h"
+#include "../utils_global.h"
 #include "buffer.h"
 
 
@@ -250,25 +250,25 @@ void CircularBuffer_old<_Tp>::clear()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<int>                      _int_CircularBuffer_old;             /**< Defines CircularBuffer of integer type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<short>                    _short_CircularBuffer_old;           /**< Defines CircularBuffer of short type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<short*>                    _pShort_CircularBuffer_old;         /**< Defines CircularBuffer of short* type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<char>                     _char_CircularBuffer_old;            /**< Defines CircularBuffer of char type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old<double>                   _double_CircularBuffer_old;          /**< Defines CircularBuffer of double type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<int, int> >        _int_int_pair_CircularBuffer_old;        /**< Defines CircularBuffer of integer Pair type.*/
-typedef GENERICSSHARED_EXPORT CircularBuffer_old< QPair<double, double> >  _double_double_pair_CircularBuffer_old;  /**< Defines CircularBuffer of double Pair type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer_old<int>                      _int_CircularBuffer_old;             /**< Defines CircularBuffer of integer type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer_old<short>                    _short_CircularBuffer_old;           /**< Defines CircularBuffer of short type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer_old<short*>                    _pShort_CircularBuffer_old;         /**< Defines CircularBuffer of short* type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer_old<char>                     _char_CircularBuffer_old;            /**< Defines CircularBuffer of char type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer_old<double>                   _double_CircularBuffer_old;          /**< Defines CircularBuffer of double type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer_old< QPair<int, int> >        _int_int_pair_CircularBuffer_old;        /**< Defines CircularBuffer of integer Pair type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer_old< QPair<double, double> >  _double_double_pair_CircularBuffer_old;  /**< Defines CircularBuffer of double Pair type.*/
 
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   dBuffer_old;             /**< Short for _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _int_CircularBuffer_old                      iBuffer_old;             /**< Short for _int_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _char_CircularBuffer_old                     cBuffer_old;             /**< Short for _char_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _pShort_CircularBuffer_old                   pShortBuffer_old;        /**< Short for _pShort_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   MEGBuffer_old;           /**< Defines MEGBuffer of type _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   ECGBuffer_old;           /**< Defines ECGBuffer of type _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   RTServerBuffer_old;      /**< Defines ECGBuffer of type _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   DummyBuffer_old;         /**< Defines DummyBuffer of type _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   WaveletBuffer_old;       /**< Defines WaveletBuffer of type _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   FilterBuffer_old;        /**< Defines FilterBuffer of type _double_CircularBuffer.*/
-typedef GENERICSSHARED_EXPORT _double_CircularBuffer_old                   GaborParticleBuffer_old; /**< Defines GaborParticleBuffer of type _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   dBuffer_old;             /**< Short for _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _int_CircularBuffer_old                      iBuffer_old;             /**< Short for _int_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _char_CircularBuffer_old                     cBuffer_old;             /**< Short for _char_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _pShort_CircularBuffer_old                   pShortBuffer_old;        /**< Short for _pShort_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   MEGBuffer_old;           /**< Defines MEGBuffer of type _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   ECGBuffer_old;           /**< Defines ECGBuffer of type _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   RTServerBuffer_old;      /**< Defines ECGBuffer of type _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   DummyBuffer_old;         /**< Defines DummyBuffer of type _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   WaveletBuffer_old;       /**< Defines WaveletBuffer of type _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   FilterBuffer_old;        /**< Defines FilterBuffer of type _double_CircularBuffer.*/
+typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   GaborParticleBuffer_old; /**< Defines GaborParticleBuffer of type _double_CircularBuffer.*/
 
 } // NAMESPACE
 

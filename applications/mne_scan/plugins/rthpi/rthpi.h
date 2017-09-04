@@ -46,7 +46,7 @@
 #include "rthpi_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <rtProcessing/rthpis.h>
 

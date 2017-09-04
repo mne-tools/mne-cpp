@@ -49,7 +49,7 @@
 #include <fiff/fiff_stream.h>
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
