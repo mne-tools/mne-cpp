@@ -339,7 +339,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
     //Add all digitizer but additional points to the 3D view
     FiffDigPointSet t_digSetWithoutAdditional = t_digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
     m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
-    m_pData3DModel->addDigitizerData("Head", "Tracked_No_Trans", t_digSetWithoutAdditional);
+    //m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
 
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
@@ -366,7 +366,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
         m_vCoilFreqs << 155 << 165 << 190 << 220;
     }
 
-    alignFiducials(fileName);
+    //alignFiducials(fileName);
 
     return lDigPoints;
 }
