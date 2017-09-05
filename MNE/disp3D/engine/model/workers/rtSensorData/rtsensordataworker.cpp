@@ -44,7 +44,7 @@
 #include <disp/helpers/colormap.h>
 #include <utils/ioutils.h>
 #include "../../../../helpers/interpolation/interpolation.h"
-#include "../../../../helpers/geometryInfo/geometryinfo.h"
+#include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_constants.h>
