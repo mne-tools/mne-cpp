@@ -44,8 +44,8 @@
 
 #include <iostream>
 
-#include <geometryInfo/geometryinfo.h>
-#include <interpolation/interpolation.h>
+#include <disp3D/helpers/geometryInfo/geometryinfo.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 #include <fiff/fiff_constants.h>
 
 //*************************************************************************************************************
