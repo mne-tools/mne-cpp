@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
 
     parser.addOption(surfOption);
     parser.addOption(annotOption);
@@ -141,16 +142,17 @@ int main(int argc, char *argv[])
     parser.addOption(subjectOption);
     parser.addOption(subjectPathOption);
     parser.addOption(sampleEvokedFileOption);
+    parser.addOption(evokedIndexOption);
 
     parser.process(a);
 
     //acquire sensor positions
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
 
+
     // Load data
-    fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
     if(evoked.isEmpty())
     {
         return 1;
