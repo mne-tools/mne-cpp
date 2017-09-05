@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dispcharts_global.h"
+#include "disp_global.h"
 
 
 //*************************************************************************************************************
@@ -78,10 +78,10 @@ namespace QtCharts
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISPCHARTSLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace DISPCHARTSLIB
+namespace DISPLIB
 {
 
 
@@ -95,7 +95,7 @@ namespace DISPCHARTSLIB
 * @brief Spline class for histogram display using Qtcharts/QSpline
 */
 
-class DISPCHARTSSHARED_EXPORT Spline: public QWidget
+class DISPSHARED_EXPORT Spline: public QWidget
 {
     Q_OBJECT
 

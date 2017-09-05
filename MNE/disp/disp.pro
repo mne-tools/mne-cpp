@@ -42,6 +42,7 @@ QT  += core widgets svg
 # Deep Model Viewer
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(opengl): QT += opengl
+qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
@@ -125,7 +126,7 @@ SOURCES += \
     selectionmanagerwindow.cpp \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
-    helpers/roundededgeswidget.cpp
+    helpers/roundededgeswidget.cpp \
 
 HEADERS += \
     disp_global.h \
@@ -147,7 +148,19 @@ HEADERS += \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
-    helpers/roundededgeswidget.h
+    helpers/roundededgeswidget.h \
+
+qtHaveModule(charts) {
+    SOURCES += \
+        bar.cpp \
+        spline.cpp \
+        lineplot.cpp \
+
+    HEADERS += \
+        bar.h \
+        spline.h \
+        lineplot.h \
+}
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {

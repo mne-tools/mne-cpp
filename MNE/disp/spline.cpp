@@ -68,7 +68,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
-using namespace DISPCHARTSLIB;
+using namespace DISPLIB;
 using namespace QtCharts;
 
 

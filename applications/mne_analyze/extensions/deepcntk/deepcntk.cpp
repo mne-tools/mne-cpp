@@ -45,7 +45,7 @@
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <dispCharts/lineplot.h>
+#include <disp/lineplot.h>
 #include <disp/deepmodelviewer/deepviewer.h>
 #include <disp/deepmodelviewer/controls.h>
 
@@ -82,7 +82,7 @@ using namespace ANSHAREDLIB;
 using namespace Eigen;
 using namespace DEEPLIB;
 using namespace DISPLIB;
-using namespace DISPCHARTSLIB;
+using namespace DISPLIB;
 //using namespace QtCharts;
 using namespace CNTK;
 
