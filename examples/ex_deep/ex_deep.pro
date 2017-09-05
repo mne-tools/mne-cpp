@@ -59,7 +59,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Deepd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}DispChartsd \
+             \
             -lCntk.Eval-2.0 \
             -lCntk.Core-2.0
 }
@@ -71,7 +71,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Deep \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}DispCharts \
+             \
             -lCntk.Eval-2.0 \
             -lCntk.Core-2.0
 }

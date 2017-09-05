@@ -49,8 +49,8 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/mnemath.h>
-#include <dispCharts/bar.h>
-#include <dispCharts/spline.h>
+#include <disp/bar.h>
+#include <disp/spline.h>
 
 //includes for source localization data
 #include <fs/label.h>
@@ -88,7 +88,7 @@
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace std;
-using namespace DISPCHARTSLIB;
+using namespace DISPLIB;
 using namespace FSLIB;
 using namespace INVERSELIB;
 using namespace DISP3DLIB;

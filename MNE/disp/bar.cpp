@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     lineplot.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     bar.cpp
+* @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     January, 2017
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Ricky Tjen and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LinePlot class implementation.
+* @brief    Bar class definition
 *
 */
 
@@ -38,23 +38,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "lineplot.h"
+#include "bar.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// SYSTEM INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-
+#include <QGridLayout>
+#include <QSharedPointer>
+#include <QtCharts/QChartView>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
-
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -62,8 +61,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPCHARTSLIB;
-using namespace Eigen;
+using namespace DISPLIB;
 using namespace QtCharts;
 
 
@@ -72,128 +70,22 @@ using namespace QtCharts;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LinePlot::LinePlot(QWidget *parent)
-: QChartView(parent)
-, m_pLineSeries(Q_NULLPTR)
-, m_pChart(Q_NULLPTR)
+Bar::Bar(const QString& title, QWidget* parent)
+: QWidget(parent)
 {
-    update();
-}
+    m_pChart = new QChart();
+    m_pChart->setTitle(title);
+    m_pChart->setAnimationOptions(QChart::SeriesAnimations);
 
+    m_pAxis= new QBarCategoryAxis();
+    m_pChart->legend()->setVisible(true);
+    m_pChart->legend()->setAlignment(Qt::AlignBottom);
 
-//*************************************************************************************************************
+    QChartView *chartView = new QChartView(m_pChart);
+    chartView->setRenderHint(QPainter::Antialiasing);
 
-LinePlot::LinePlot(const QVector<double> &y, const QString& title, QWidget *parent)
-: QChartView(parent)
-, m_sTitle(title)
-, m_pLineSeries(Q_NULLPTR)
-, m_pChart(Q_NULLPTR)
-{
-    updateData(y);
-}
+    QGridLayout* layout = new QGridLayout();
 
-
-//*************************************************************************************************************
-
-LinePlot::LinePlot(const QVector<double> &x, const QVector<double> &y, const QString& title, QWidget *parent)
-: QChartView(parent)
-, m_sTitle(title)
-, m_pLineSeries(Q_NULLPTR)
-, m_pChart(Q_NULLPTR)
-{
-    updateData(x, y);
-}
-
-
-//*************************************************************************************************************
-
-LinePlot::~LinePlot()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void LinePlot::setTitle(const QString &p_sTitle)
-{
-    m_sTitle = p_sTitle;
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void LinePlot::setXLabel(const QString &p_sXLabel)
-{
-    m_sXLabel = p_sXLabel;
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void LinePlot::setYLabel(const QString &p_sYLabel)
-{
-    m_sYLabel = p_sYLabel;
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void LinePlot::updateData(const QVector<double> &y)
-{
-    QVector<double> x(y.size());
-
-    for(int i = 0; i < x.size(); ++i) {
-        x[i] = i;
-    }
-
-    return updateData(x, y);
-}
-
-
-//*************************************************************************************************************
-
-void LinePlot::updateData(const QVector<double> &x, const QVector<double> &y)
-{
-    if(!m_pLineSeries) {
-        m_pLineSeries = new QLineSeries;
-    }
-    else {
-        m_pLineSeries->clear();
-    }
-
-    for(int i = 0; i < x.size(); ++i) {
-        m_pLineSeries->append(x[i], y[i]);
-    }
-
-    if(!m_pChart) {
-        m_pChart = new QChart;
-    }
-    else {
-        m_pChart->removeAllSeries();
-    }
-
-    m_pChart->legend()->hide();
-    m_pChart->addSeries(m_pLineSeries);
-    m_pChart->createDefaultAxes();
-
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void LinePlot::update()
-{
-    if(!m_pChart)
-        return;
-
-    m_pChart->setTitle(m_sTitle);
-
-    this->setChart(m_pChart);
-    this->setRenderHint(QPainter::Antialiasing);
-    this->setWindowTitle(m_sTitle);
+    layout->addWidget(chartView,0,0);
+    this->setLayout(layout);
 }
