@@ -133,7 +133,7 @@ struct InterpolationData {
 *
 * @brief Data scheduler
 */
-class DISP3DNEWSHARED_EXPORT RtSensorDataWorker : public QThread
+class DISP3DSHARED_EXPORT RtSensorDataWorker : public QThread
 {
     Q_OBJECT
 public:

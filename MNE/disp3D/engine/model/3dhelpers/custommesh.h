@@ -92,7 +92,7 @@ namespace DISP3DLIB
 *
 * @brief Custom mesh functionality.
 */
-class DISP3DNEWSHARED_EXPORT CustomMesh : public Qt3DRender::QGeometryRenderer
+class DISP3DSHARED_EXPORT CustomMesh : public Qt3DRender::QGeometryRenderer
 {
     Q_OBJECT
 

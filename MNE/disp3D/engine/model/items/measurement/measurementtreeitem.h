@@ -121,7 +121,7 @@ class DigitizerSetTreeItem;
 *
 * @brief Provides a generic MeasurementTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT MeasurementTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT MeasurementTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

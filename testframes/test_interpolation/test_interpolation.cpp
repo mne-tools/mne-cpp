@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <geometryInfo/geometryinfo.h>
-#include <interpolation/interpolation.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <string>
@@ -58,9 +58,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INTERPOLATION;
-using namespace GEOMETRYINFO;
+using namespace DISP3DLIB;
 using namespace MNELIB;
+
 
 //=============================================================================================================
 /**

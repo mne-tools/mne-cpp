@@ -92,7 +92,7 @@ namespace DISP3DLIB
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT EcdDataTreeItem : public Abstract3DTreeItem
+class DISP3DSHARED_EXPORT EcdDataTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 

@@ -39,6 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
+QT += 3dextras
 QT -= gui
 
 CONFIG   += console
@@ -58,6 +59,11 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}GeometryInfod \
             -lMNE$${MNE_LIB_VERSION}Interpolationd \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
@@ -66,7 +72,11 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}GeometryInfo \
             -lMNE$${MNE_LIB_VERSION}Interpolation \
-
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}

@@ -64,7 +64,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Realtimed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-             \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd \
             -lscDispd \
@@ -82,7 +81,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Realtime \
             -lMNE$${MNE_LIB_VERSION}Disp \
-             \
             -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas \
             -lscDisp \

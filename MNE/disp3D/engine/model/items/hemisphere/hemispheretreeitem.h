@@ -105,7 +105,7 @@ class SourceSpaceTreeItem;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT HemisphereTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT HemisphereTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

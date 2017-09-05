@@ -97,7 +97,7 @@ class Renderable3DEntity;
 *
 * @brief DigitizerSetTreeItem provides a tree item to hold the set of digitizer data.
 */
-class DISP3DNEWSHARED_EXPORT DigitizerSetTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT DigitizerSetTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

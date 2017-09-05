@@ -80,7 +80,7 @@ class MeasurementTreeItem;
 *
 * @brief Provides a generic SubjectTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT SubjectTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT SubjectTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

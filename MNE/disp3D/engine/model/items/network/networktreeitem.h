@@ -105,7 +105,7 @@ class MetaTreeItem;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT NetworkTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT NetworkTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 

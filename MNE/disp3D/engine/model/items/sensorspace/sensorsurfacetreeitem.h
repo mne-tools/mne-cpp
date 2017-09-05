@@ -100,7 +100,7 @@ class Renderable3DEntity;
 *
 * @brief SensorSurfaceTreeItem provides a generic brain tree item to hold sensor surfaces.
 */
-class DISP3DNEWSHARED_EXPORT SensorSurfaceTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT SensorSurfaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
