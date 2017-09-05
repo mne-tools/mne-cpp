@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "geometryinfo_global.h"
+#include "../../disp3D_global.h"
 #include <fiff/fiff_evoked.h>
 
 //*************************************************************************************************************
@@ -80,10 +80,10 @@ namespace MNELIB {
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SWP
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace GEOMETRYINFO {
+namespace DISP3DLIB {
 
 #define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
 
@@ -104,7 +104,7 @@ namespace GEOMETRYINFO {
 *
 */
 
-class GEOMETRYINFOSHARED_EXPORT GeometryInfo
+class DISP3DSHARED_EXPORT GeometryInfo
 {
 
 public:

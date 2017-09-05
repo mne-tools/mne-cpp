@@ -91,7 +91,7 @@ namespace DISP3DLIB
 *
 * @brief DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
 */
-class DISP3DNEWSHARED_EXPORT DigitizerTreeItem : public Abstract3DTreeItem
+class DISP3DSHARED_EXPORT DigitizerTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 

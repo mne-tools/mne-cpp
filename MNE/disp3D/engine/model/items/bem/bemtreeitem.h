@@ -93,7 +93,7 @@ namespace DISP3DLIB
 *
 * @brief BemTreeItem provides a tree item to hold BEM models.
 */
-class DISP3DNEWSHARED_EXPORT BemTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT BemTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

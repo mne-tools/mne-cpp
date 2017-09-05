@@ -136,6 +136,8 @@ SOURCES += \
     adapters/abstractview.cpp \
     adapters/networkview.cpp \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
+    helpers/interpolation/interpolation.cpp \
+    helpers/geometryinfo/geometryinfo.cpp \
 
 HEADERS += \
     engine/view/view3D.h \
@@ -179,6 +181,8 @@ HEADERS += \
     adapters/networkview.h \
     disp3D_global.h \
     engine/model/items/sensordata/sensordatatreeitem.h \
+    helpers/interpolation/interpolation.h \
+    helpers/geometryinfo/geometryinfo.h \
 
 FORMS += \
     engine/control/control3dwidget.ui \

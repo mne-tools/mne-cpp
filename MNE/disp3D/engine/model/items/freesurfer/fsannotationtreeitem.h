@@ -93,7 +93,7 @@ namespace DISP3DLIB
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT FsAnnotationTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT FsAnnotationTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

@@ -80,7 +80,7 @@ namespace DISP3DLIB
 *
 * @brief Provides the basic tree item.
 */
-class DISP3DNEWSHARED_EXPORT AbstractTreeItem : public QObject, public QStandardItem
+class DISP3DSHARED_EXPORT AbstractTreeItem : public QObject, public QStandardItem
 {
     Q_OBJECT
 

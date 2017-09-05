@@ -66,8 +66,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
-using namespace GEOMETRYINFO;
-using namespace INTERPOLATION;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************

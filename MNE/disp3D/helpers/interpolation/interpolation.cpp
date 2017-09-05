@@ -62,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INTERPOLATION;
+using namespace DISP3DLIB;
 using namespace Eigen;
 
 

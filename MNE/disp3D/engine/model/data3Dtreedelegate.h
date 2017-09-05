@@ -89,7 +89,7 @@ namespace DISP3DLIB
 *
 * @brief Provides a delegate to render user specific input methods in the tree model.
 */
-class DISP3DNEWSHARED_EXPORT Data3DTreeDelegate : public QItemDelegate
+class DISP3DSHARED_EXPORT Data3DTreeDelegate : public QItemDelegate
 {
     Q_OBJECT
 

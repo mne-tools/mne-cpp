@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef INTERPOLATION_H
-#define INTERPOLATION_H
+#ifndef DISP3D_H
+#define DISP3D_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "interpolation_global.h"
+#include "../../disp3D_global.h"
 #include <limits>
 
 #include <fiff/fiff_info.h>
@@ -74,10 +74,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SWP
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace INTERPOLATION {
+namespace DISP3DLIB {
 
 #define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
 
@@ -99,7 +99,7 @@ namespace INTERPOLATION {
 * @brief This class holds methods for creating distance-based weight matrices and for interpolating signals
 */
 
-class INTERPOLATIONSHARED_EXPORT Interpolation
+class DISP3DSHARED_EXPORT Interpolation
 {
 
 public:
@@ -208,6 +208,6 @@ private:
 //=============================================================================================================
 
 
-} // namespace INTERPOLATION
+} // namespace DISP3DLIB
 
-#endif // INTERPOLATION_H
+#endif // DISP3D_H

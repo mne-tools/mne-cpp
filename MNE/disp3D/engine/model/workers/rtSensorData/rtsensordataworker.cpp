@@ -43,8 +43,8 @@
 
 #include <disp/helpers/colormap.h>
 #include <utils/ioutils.h>
-#include <interpolation/interpolation.h>
-#include <geometryInfo/geometryinfo.h>
+#include "../../../../helpers/interpolation/interpolation.h"
+#include "../../../../helpers/geometryInfo/geometryinfo.h"
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_constants.h>
@@ -82,8 +82,6 @@ using namespace DISPLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
-using namespace GEOMETRYINFO;
-using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************
@@ -108,7 +106,7 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
     m_lInterpolationData = InterpolationData();
     //5cm cancel distance
     m_lInterpolationData.dCancelDistance = 0.05;
-    m_lInterpolationData.interpolationFunction = Interpolation::cubic;
+    m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
 }
 
 

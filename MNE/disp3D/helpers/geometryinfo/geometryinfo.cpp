@@ -69,7 +69,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace GEOMETRYINFO;
+using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace MNELIB;
 

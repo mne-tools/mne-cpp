@@ -96,7 +96,7 @@ class Renderable3DEntity;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT SourceSpaceTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT SourceSpaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
