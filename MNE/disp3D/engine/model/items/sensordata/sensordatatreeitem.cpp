@@ -46,7 +46,7 @@
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_evoked.h>
 #include "../../../../helpers/interpolation/interpolation.h"
-#include "../../../../helpers/geometryInfo/geometryinfo.h"
+#include "../../../../helpers/geometryinfo/geometryinfo.h"
 
 
 //*************************************************************************************************************

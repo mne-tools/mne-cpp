@@ -55,7 +55,7 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/helpers/geometryInfo/geometryinfo.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
 #include <disp3D/helpers/interpolation/interpolation.h>
 
 //*************************************************************************************************************
