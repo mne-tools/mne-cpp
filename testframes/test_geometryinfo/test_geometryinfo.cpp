@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <geometryInfo/geometryinfo.h>
+#include <disp3D/helpers/geometryInfo/geometryinfo.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 

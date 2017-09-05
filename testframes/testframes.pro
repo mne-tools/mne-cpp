@@ -47,7 +47,13 @@ SUBDIRS += \
     test_geometryinfo \
     test_interpolation \
     test_fiff_digitizer \
-    test_mne_msh_display_surface_set
+    test_mne_msh_display_surface_set \
+
+    qtHaveModule(charts) {
+        SUBDIRS += \
+            test_interpolation \
+            test_fiff_digitizer \
+    }
 
 !contains(MNECPP_CONFIG, minimalVersion) {
 #    SUBDIRS += \
