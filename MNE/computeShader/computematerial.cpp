@@ -159,57 +159,57 @@ void ComputeMaterial::createSignalMatrix(uint tRows, uint tCols)
 
 void ComputeMaterial::addSignalData(const Eigen::MatrixXf &tSignalMat, const uint tSensorSize)
 {
-    //if more data then needed is provided
-    if(tSignalMat.rows() > tSensorSize)
-    {
-        Eigen::MatrixXf fSmallSensorData(tSensorSize, tSignalMat.cols());
-        for(uint i = 0 ; i < tSensorSize; ++i)
-        {
-            //@TODO Set bad channels to zero so they do not corrupt the histogram thresholding
+//    //if more data then needed is provided
+//    if(tSignalMat.rows() > tSensorSize)
+//    {
+//        Eigen::MatrixXf fSmallSensorData(tSensorSize, tSignalMat.cols());
+//        for(uint i = 0 ; i < tSensorSize; ++i)
+//        {
+//            //@TODO Set bad channels to zero so they do not corrupt the histogram thresholding
+////            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
+////                dSmallSensorData.row(i).setZero();
+////            } else {
+////                dSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
+////            }
+//            dSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
+//        }
+
+//        //Set new data into item's data.
+//        QVariant data;
+//        data.setValue(dSmallSensorData);
+//        this->setData(data, Data3DTreeModelItemRoles::RTData);
+
+//        if(m_pSensorRtDataWorker) {
+//             m_pSensorRtDataWorker->addData(dSmallSensorData);
+//        }
+//        else {
+//            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
+//        }
+//    }
+//    else
+//    {
+//        //Set bad channels to zero so they do not corrupt the histogram thresholding
+//        MatrixXd dSmallSensorData = tSensorData;
+//        for(int i = 0 ; i < dSmallSensorData.rows(); ++i)
+//        {
 //            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
 //                dSmallSensorData.row(i).setZero();
-//            } else {
-//                dSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
 //            }
-            dSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
-        }
+//        }
 
-        //Set new data into item's data.
-        QVariant data;
-        data.setValue(dSmallSensorData);
-        this->setData(data, Data3DTreeModelItemRoles::RTData);
+//        //Set new data into item's data.
+//        QVariant data;
+//        data.setValue(dSmallSensorData);
+//        this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-        if(m_pSensorRtDataWorker) {
-             m_pSensorRtDataWorker->addData(dSmallSensorData);
-        }
-        else {
-            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
-        }
-    }
-    else
-    {
-        //Set bad channels to zero so they do not corrupt the histogram thresholding
-        MatrixXd dSmallSensorData = tSensorData;
-        for(int i = 0 ; i < dSmallSensorData.rows(); ++i)
-        {
-            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
-                dSmallSensorData.row(i).setZero();
-            }
-        }
-
-        //Set new data into item's data.
-        QVariant data;
-        data.setValue(dSmallSensorData);
-        this->setData(data, Data3DTreeModelItemRoles::RTData);
-
-        if(m_pSensorRtDataWorker) {
-             m_pSensorRtDataWorker->addData(dSmallSensorData);
-        }
-        else {
-            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
-        }
-    }
-}
+//        if(m_pSensorRtDataWorker) {
+//             m_pSensorRtDataWorker->addData(dSmallSensorData);
+//        }
+//        else {
+//            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
+//        }
+//    }
+//}
 }
 
 void ComputeMaterial::updateSignalBuffer()

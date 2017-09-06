@@ -38,8 +38,7 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 # TBD change the dependency order - forward before inverse
-SUBDIRS += \
-    computeShader \
+SUBDIRS += \  
     generics \
     utils \
     fs \
@@ -53,6 +52,7 @@ SUBDIRS += \
     rtCommand \
     rtClient \
     rtProcessing \
+    computeShader \
 
 
 !contains(MNECPP_CONFIG, minimalVersion) {

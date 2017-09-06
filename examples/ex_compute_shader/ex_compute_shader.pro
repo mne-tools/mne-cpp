@@ -52,8 +52,7 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}ComputeShaderd \
-            -lMNE$${MNE_LIB_VERSION}Genericsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
@@ -65,11 +64,11 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}DispChartsd \
-            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
+            -lMNE$${MNE_LIB_VERSION}ComputeShaderd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}ComputeShader \
-            -lMNE$${MNE_LIB_VERSION}Generics \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
@@ -81,7 +80,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}DispCharts \
-            -lMNE$${MNE_LIB_VERSION}Disp3D
+            -lMNE$${MNE_LIB_VERSION}Disp3D  \
+            -lMNE$${MNE_LIB_VERSION}ComputeShader
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
