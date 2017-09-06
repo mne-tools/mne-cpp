@@ -216,7 +216,6 @@ int main(int argc, char *argv[])
 
     Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
 
-    //TODO change colorbuffer to yOut
     Qt3DRender::QBuffer *pYOutBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
     pYOutBuffer->setData(createColorBuffer(t_sensorSurfaceVV[0].rr.rows()));
 
@@ -271,7 +270,6 @@ int main(int argc, char *argv[])
     pYOutAttribute->setVertexSize(1);
     pYOutAttribute->setByteOffset(0);
     pYOutAttribute->setByteStride(1 * sizeof(float));
-    //@TODO change the name of "colorArray" to a better one
     pYOutAttribute->setName(QStringLiteral("YOutVec"));
     pYOutAttribute->setBuffer(pYOutBuffer);
 

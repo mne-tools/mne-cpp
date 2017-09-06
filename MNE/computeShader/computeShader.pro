@@ -87,14 +87,16 @@ else {
 
 SOURCES += \
     computematerial.cpp \
-    computeframegraph.cpp
+    computeframegraph.cpp \
+    computeinterpolationcontroller.cpp
 
 
 
 HEADERS += \
     computeShader_global.h \
     computematerial.h \
-    computeframegraph.h
+    computeframegraph.h \
+    computeinterpolationcontroller.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

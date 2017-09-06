@@ -1,6 +1,6 @@
 #version 430 core
 
-uniform mat4 mvp;
+uniform mat4 mvp; //need for the QCamera and camera controller to work
 
 in vec3 vertexPosition;
 in vec3 vertexColor;
