@@ -74,7 +74,6 @@
 using namespace UTILSLIB;
 using namespace DISP3DLIB;
 using namespace DISPLIB;
-using namespace DISPLIB;
 
 
 //*************************************************************************************************************

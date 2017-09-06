@@ -82,7 +82,6 @@ using namespace ANSHAREDLIB;
 using namespace Eigen;
 using namespace DEEPLIB;
 using namespace DISPLIB;
-using namespace DISPLIB;
 //using namespace QtCharts;
 using namespace CNTK;
 
