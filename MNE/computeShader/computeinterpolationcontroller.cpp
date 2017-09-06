@@ -119,7 +119,7 @@ QPointer<ComputeFramegraph> ComputeInterpolationController::getComputeFramegraph
 
 void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                                           const FIFFLIB::FiffEvoked &tEvoked,
-                                                          double (*interpolationFunction)(double),
+                                                          double (*tInterpolationFunction)(double),
                                                           const qint32 tSensorType,
                                                           const double tCancelDist
                                                           )
@@ -156,7 +156,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     //create weight matrix
     QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = Interpolation::createInterpolationMat(pMappedSubSet,
                                                                                pDistanceMatrix,
-                                                                               interpolationFunction,
+                                                                               tInterpolationFunction,
                                                                                tCancelDist,
                                                                                tEvoked.info,
                                                                                tSensorType);
@@ -222,10 +222,40 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
 }
 
-void ComputeInterpolationController::addSignalData(Eigen::MatrixXf tSignalMat)
+void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSignalMat)
 {
     //@TODO implemet the same as in sensordataitem
     m_pMaterial->createSignalMatrix(m_iUsedSensors.size(), 300);
+
+    ///////////////////////////////////
+    //if more data then needed is provided
+    const int iSensorSize = m_iUsedSensors.size();
+    if(tSensorData.rows() > iSensorSize)
+    {
+        MatrixXf fSmallSensorData(iSensorSize, tSensorData.cols());
+        for(uint i = 0 ; i < iSensorSize; ++i)
+        {
+            //Set bad channels to zero
+            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
+                fSmallSensorData.row(i).setZero();
+            } else {
+                fSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
+            }
+        }
+        m_pMaterial->addSignalData(fSmallSensorData);
+    }
+    else
+    {
+        //Set bad channels to zero
+        MatrixXf fSmallSensorData = tSensorData;
+        for(uint i = 0 ; i < fSmallSensorData.rows(); ++i)
+        {
+            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
+                fSmallSensorData.row(i).setZero();
+            }
+        }
+        m_pMaterial->addSignalData(fSmallSensorData);
+    }
 }
 
 void ComputeInterpolationController::init()
