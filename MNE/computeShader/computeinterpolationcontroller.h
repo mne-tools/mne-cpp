@@ -44,7 +44,7 @@
 
 #include "computeShader_global.h"
 #include <fiff/fiff_types.h>
-#include <Eigen/Core>
+#include <interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,6 +52,8 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QPointer>
+#include <QHash>
 
 
 //*************************************************************************************************************
@@ -60,6 +62,7 @@
 //=============================================================================================================
 
 #include <Eigen/Sparse>
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,7 +89,7 @@ namespace Qt3DRender {
     class QAttribute;
 }
 
-namespace Qt3DExtra {
+namespace Qt3DExtras {
     class QFirstPersonCameraController;
 }
 
@@ -148,9 +151,10 @@ public:
 
     void setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                               const FIFFLIB::FiffEvoked &tEvoked,
+                              double (*interpolationFunction) (double),
                               const qint32 tSensorType = FIFFV_EEG_CH,
-                              const double tCancelDist = DOUBLE_INFINITY,
-                              double (*interpolationFunction) (double));
+                              const double tCancelDist = DOUBLE_INFINITY);
+
 
     void addSignalData(Eigen::MatrixXf tSignalMat);
 
@@ -170,6 +174,8 @@ private:
      */
     QByteArray createZeroBuffer(const uint tBufferSize);
 
+    Eigen::MatrixX3f createColorMat(const Eigen::MatrixXf& tVertices, const QColor& tColor);
+
     QPointer<Qt3DCore::QEntity> m_pRootEntity;
     QPointer<CSH::ComputeFramegraph> m_pFramegraph;
     QPointer<CSH::ComputeMaterial> m_pMaterial;
@@ -181,7 +187,7 @@ private:
     QPointer<Qt3DCore::QEntity> m_pMeshRenderEntity;
 
     QPointer<Qt3DRender::QCamera> m_pCamera;
-    QPointer<Qt3DExtra::QFirstPersonCameraController> m_pCamController;
+    QPointer<Qt3DExtras::QFirstPersonCameraController> m_pCamController;
     QPointer<Qt3DCore::QTransform> m_pTransform;
 
     QPointer<Qt3DRender::QAttribute> m_pInterpolatedSignalAttrib;
@@ -190,8 +196,8 @@ private:
     QVector<uint> m_iSensorsBad;    /**< Store bad channel indexes.*/
     QVector<uint> m_iUsedSensors;   /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
 
-    QHash<QString, QPointer<Qt3DRender::QParameter> m_pParameters;  /**< Stores all Parameters with their name.*/
-    QHash<QString, QPointer<Qt3DRender::QBuffer> m_pBuffers;        /**< Stores all Buffers with their name.*/
+    QHash<QString, QPointer<Qt3DRender::QParameter>> m_pParameters;  /**< Stores all Parameters with their name.*/
+    QHash<QString, QPointer<Qt3DRender::QBuffer>> m_pBuffers;        /**< Stores all Buffers with their name.*/
 };
 
 

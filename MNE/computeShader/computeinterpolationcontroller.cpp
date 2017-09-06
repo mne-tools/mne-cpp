@@ -44,9 +44,9 @@
 #include "computematerial.h"
 #include <disp3D/engine/model/3dhelpers/custommesh.h>
 #include <geometryInfo/geometryinfo.h>
-#include <interpolation/interpolation.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_types.h>
+#include <mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,6 +59,8 @@
 #include <Qt3DRender/QComputeCommand>
 #include <Qt3DRender/QCamera>
 #include <Qt3DRender/QBuffer>
+#include <Qt3DRender/QAttribute>
+#include <Qt3DRender/QParameter>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,9 +98,9 @@ ComputeInterpolationController::ComputeInterpolationController()
     , m_pRootEntity(new Qt3DCore::QEntity)
     , m_pComputeEntity(new Qt3DCore::QEntity(m_pRootEntity))
     , m_pMeshRenderEntity(new Qt3DCore::QEntity(m_pRootEntity))
-    , m_pCamController(new Qt3DExtra::QFirstPersonCameraController(m_pRootEntity))
+    , m_pCamController(new Qt3DExtras::QFirstPersonCameraController(m_pRootEntity))
     , m_pComputeCommand(new QComputeCommand)
-    , m_pTransform(new QTransform)
+    , m_pTransform(new Qt3DCore::QTransform)
     , m_pMaterial(new ComputeMaterial)
     , m_pFramegraph(new ComputeFramegraph)
 {
@@ -117,9 +119,10 @@ QPointer<ComputeFramegraph> ComputeInterpolationController::getComputeFramegraph
 
 void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                                           const FIFFLIB::FiffEvoked &tEvoked,
+                                                          double (*interpolationFunction)(double),
                                                           const qint32 tSensorType,
-                                                          const double tCancelDist,
-                                                          double (*interpolationFunction)(double))
+                                                          const double tCancelDist
+                                                          )
 {
     //fill QVector with the right sensor positions
     QVector<Eigen::Vector3f> vecSensorPos;
@@ -181,7 +184,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
 
     //Set work group size
-    pFramegraph->setWorkGroupSize(iWeightMatRows, 0 ,0 );
+    m_pFramegraph->setWorkGroupSize(iWeightMatRows, 0 ,0 );
 
     //Init interpolated signal buffer
     QString sInterpolatedSignalName = QStringLiteral("InterpolatedSignal");
@@ -204,7 +207,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
     //Set custom mesh data
     //generate base color
-    MatrixX3f matVertColor = createVertColor(t_sensorSurfaceVV[0].rr, QColor(0,0,255,255));
+    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, QColor(0,0,255,255));
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
@@ -222,7 +225,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 void ComputeInterpolationController::addSignalData(Eigen::MatrixXf tSignalMat)
 {
     //@TODO implemet the same as in sensordataitem
-    pComputeMaterial->createSignalMatrix(eegSensors.size(), 300);
+    m_pMaterial->createSignalMatrix(m_iUsedSensors.size(), 300);
 }
 
 void ComputeInterpolationController::init()
@@ -292,6 +295,19 @@ QByteArray ComputeInterpolationController::createZeroBuffer(const uint tBufferSi
     return bufferData;
 }
 
+MatrixX3f ComputeInterpolationController::createColorMat(const MatrixXf &tVertices, const QColor &tColor)
+{
+    MatrixX3f matColor(tVertices.rows(),3);
+
+    for(int i = 0; i < matColor.rows(); ++i) {
+        matColor(i,0) = tColor.redF();
+        matColor(i,1) = tColor.greenF();
+        matColor(i,2) = tColor.blueF();
+    }
+
+    return matColor;
+}
+
 /* YOut buffer hängt ab vom Surface
  *
  * Uniform rows  und cols hängt ab von weight matrix #
@@ -306,5 +322,5 @@ QByteArray ComputeInterpolationController::createZeroBuffer(const uint tBufferSi
  *
  *
  *
-
+*/
 //*************************************************************************************************************
