@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     computematerial.h
+* @file     computeinterpolationcontroller.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     August, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Lars Debor and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ComputeMaterial class declaration.
+* @brief     ComputeInterpolationController class declaration.
 *
 */
 
-#ifndef CSH_COMPUTEMATERIAL_H
-#define CSH_COMPUTEMATERIAL_H
+#ifndef CSH_COMPUTEINTERPOLATIONCONTROLLER_H
+#define CSH_COMPUTEINTERPOLATIONCONTROLLER_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include"computeShader_global.h"
+#include "computeShader_global.h"
+#include <fiff/fiff_types.h>
 #include <Eigen/Core>
 
 //*************************************************************************************************************
@@ -51,10 +52,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QPointer>
-#include <QHash>
-#include <QTimer>
-#include <Qt3DRender/QMaterial>
 
 
 //*************************************************************************************************************
@@ -62,27 +59,41 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Sparse>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Qt3DCore {
-        class QNode;
+namespace FIFFLIB{
+    class FiffEvoked;
+}
+
+namespace MNELIB {
+    class MNEBemSurface;
+}
+
+namespace DISP3DLIB {
+    class CustomMesh;
 }
 
 namespace Qt3DRender {
-        class QEffect;
-        class QParameter;
-        class QShaderProgram;
-        class QRenderPass;
-        class QFilterKey;
-        class QTechnique;
-        class QBuffer;
-
+    class QComputeCommand;
+    class QCamera;
+    class QParameter;
+    class QBuffer;
+    class QAttribute;
 }
 
+namespace Qt3DExtra {
+    class QFirstPersonCameraController;
+}
+
+namespace Qt3DCore {
+    class QEntity;
+    class QTransform;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -97,107 +108,90 @@ namespace CSH {
 // CSH FORWARD DECLARATIONS
 //=============================================================================================================
 
+class ComputeMaterial;
+class ComputeFramegraph;
 
 //=============================================================================================================
 /**
-* This class stores the Material used for compute shader usage.
+* Description of what this class is intended to do (in detail).
 *
-* @brief Compute material storage.
+* @brief Brief description of this class.
 */
 
-class COMPUTE_SHADERSHARED_EXPORT ComputeMaterial : public Qt3DRender::QMaterial
+class COMPUTE_SHADERSHARED_EXPORT ComputeInterpolationController
 {
 
 public:
-    typedef QSharedPointer<ComputeMaterial> SPtr;            /**< Shared pointer type for ComputeMaterial. */
-    typedef QSharedPointer<const ComputeMaterial> ConstSPtr; /**< Const shared pointer type for ComputeMaterial. */
+    typedef QSharedPointer<ComputeInterpolationController> SPtr;            /**< Shared pointer type for ComputeInterpolationController. */
+    typedef QSharedPointer<const ComputeInterpolationController> ConstSPtr; /**< Const shared pointer type for ComputeInterpolationController. */
 
     //=========================================================================================================
     /**
-    * Constructs a ComputeMaterial object.
+    * Constructs a ComputeInterpolationController object.
     */
-    explicit ComputeMaterial(Qt3DCore::QNode *parent = 0);
+    //const MNELIB::MNEBemSurface &tMneBemSurface, const FIFFLIB::FiffEvoked &tEvoked,
+    explicit ComputeInterpolationController( );
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
-    ~ComputeMaterial() = default;
-
-    //=========================================================================================================
-    /**
-     * Set a Colorbuffer for testing.
-     * @param colorbuffer
+     * @brief getRootEntity
+     * @return
      */
-    void setYOutBuffer(Qt3DRender::QBuffer *yOutBuffer);
+    QPointer<Qt3DCore::QEntity> getRootEntity() const;
 
     //=========================================================================================================
     /**
-     * @brief setComputePassParameter
-     * @param tParameter
+     * @brief getComputeFramegraph
+     * @return
      */
-    void addComputePassParameter(QPointer<Qt3DRender::QParameter> tParameter);
+    QPointer<CSH::ComputeFramegraph> getComputeFramegraph() const;
 
-    //=========================================================================================================
-    /**
-     * generate a random signal matrix for testing.
-     */
-    void createSignalMatrix(uint tRows, uint tCols);
+    void setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
+                              const FIFFLIB::FiffEvoked &tEvoked,
+                              const qint32 tSensorType = FIFFV_EEG_CH,
+                              const double tCancelDist = DOUBLE_INFINITY,
+                              double (*interpolationFunction) (double));
 
-    //=========================================================================================================
-    /**
-     * Add a new matrix with signal data form the sensors and filter out unwanted channels
-     * @param tSignalMat
-     * @param tSensorSize Number of EEG or MEG Sensors
-     */
-    void addSignalData(const Eigen::MatrixXf &tSignalMat, const uint tSensorSize);
-
-
+    void addSignalData(Eigen::MatrixXf tSignalMat);
 
 protected:
 
-    //=========================================================================================================
-    /**
-     * update the signal buffer with new measurement data.
-     */
-    void updateSignalBuffer();
-
 private:
+
     void init();
 
-    QPointer<Qt3DRender::QEffect> m_pEffect;
+    QByteArray createWeightMatBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix);
 
-    //Compute Part
-    QPointer<Qt3DRender::QShaderProgram> m_pComputeShader;
-    QPointer<Qt3DRender::QRenderPass> m_pComputeRenderPass;
-    QPointer<Qt3DRender::QFilterKey> m_pComputeFilterKey;
-    QPointer<Qt3DRender::QTechnique> m_pComputeTechnique;
+    //=========================================================================================================
+    /**
+     * Create a buffer with tBufferSize floats with the value 0.0f
+     * @param tBufferSize
+     * @return
+     */
+    QByteArray createZeroBuffer(const uint tBufferSize);
 
-    //test
-//    QPointer<Qt3DRender::QBuffer> m_pShaderStorage;
-//    QPointer<Qt3DRender::QParameter> m_pStorageParameter;
-//    QPointer<Qt3DRender::QParameter> m_pSinParameter;
-//    QPointer<QTimer> m_pTimer;
-    //
+    QPointer<Qt3DCore::QEntity> m_pRootEntity;
+    QPointer<CSH::ComputeFramegraph> m_pFramegraph;
+    QPointer<CSH::ComputeMaterial> m_pMaterial;
+    QPointer<DISP3DLIB::CustomMesh> m_pCustomMesh;
 
-    //Draw Part
-    QPointer<Qt3DRender::QShaderProgram> m_pDrawShader;
-    QPointer<Qt3DRender::QRenderPass> m_pDrawRenderPass;
-    QPointer<Qt3DRender::QFilterKey> m_pDrawFilterKey;
-    QPointer<Qt3DRender::QTechnique> m_pDrawTechnique;
+    QPointer<Qt3DCore::QEntity> m_pComputeEntity;
+    QPointer<Qt3DRender::QComputeCommand> m_pComputeCommand;
 
-    QPointer<Qt3DRender::QParameter> m_pColorParameter;
+    QPointer<Qt3DCore::QEntity> m_pMeshRenderEntity;
 
-    QHash<QString, QPointer<Qt3DRender::QParameter>> m_CustomParameters;
+    QPointer<Qt3DRender::QCamera> m_pCamera;
+    QPointer<Qt3DExtra::QFirstPersonCameraController> m_pCamController;
+    QPointer<Qt3DCore::QTransform> m_pTransform;
 
-    //Measurement signal
-    QPointer<Qt3DRender::QBuffer> m_pSignalDataBuffer;
-    QPointer<Qt3DRender::QParameter> m_pSignalDataParameter;
-    Eigen::MatrixXf m_signalMatrix;
-    uint m_iSignalCtr;
-    QPointer<QTimer> m_pTimer;
+    QPointer<Qt3DRender::QAttribute> m_pInterpolatedSignalAttrib;
 
 
+    QVector<uint> m_iSensorsBad;    /**< Store bad channel indexes.*/
+    QVector<uint> m_iUsedSensors;   /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
+
+    QHash<QString, QPointer<Qt3DRender::QParameter> m_pParameters;  /**< Stores all Parameters with their name.*/
+    QHash<QString, QPointer<Qt3DRender::QBuffer> m_pBuffers;        /**< Stores all Buffers with their name.*/
 };
 
 
@@ -209,4 +203,4 @@ private:
 
 } // namespace CSH
 
-#endif // CSH_COMPUTEMATERIAL_H
+#endif // CSH_COMPUTEINTERPOLATIONCONTROLLER_H
