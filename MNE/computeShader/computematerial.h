@@ -144,13 +144,14 @@ public:
      */
     void createSignalMatrix(uint tRows, uint tCols);
 
+
     //=========================================================================================================
     /**
-     * Add a new matrix with signal data form the sensors and filter out unwanted channels
+     * Add a new matrix with signal data form the sensors
      * @param tSignalMat
      * @param tSensorSize Number of EEG or MEG Sensors
      */
-    void addSignalData(const Eigen::MatrixXf &tSignalMat, const uint tSensorSize);
+    void addSignalData(const Eigen::MatrixXf &tSignalMat);
 
 
 

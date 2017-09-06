@@ -151,12 +151,12 @@ public:
 
     void setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                               const FIFFLIB::FiffEvoked &tEvoked,
-                              double (*interpolationFunction) (double),
+                              double (*tInterpolationFunction) (double),
                               const qint32 tSensorType = FIFFV_EEG_CH,
                               const double tCancelDist = DOUBLE_INFINITY);
 
 
-    void addSignalData(Eigen::MatrixXf tSignalMat);
+    void addSignalData(const Eigen::MatrixXf &tSignalMat);
 
 protected:
 
@@ -174,6 +174,13 @@ private:
      */
     QByteArray createZeroBuffer(const uint tBufferSize);
 
+    //=========================================================================================================
+    /**
+     * Create a Matrix with rgb values for each vertex
+     * @param tVertices
+     * @param tColor
+     * @return
+     */
     Eigen::MatrixX3f createColorMat(const Eigen::MatrixXf& tVertices, const QColor& tColor);
 
     QPointer<Qt3DCore::QEntity> m_pRootEntity;
