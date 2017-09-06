@@ -11,3 +11,4 @@ void main(void)
     //TODO add phong alpha
     color = vec4(vColor.xyz, 1.0);
 }
+
