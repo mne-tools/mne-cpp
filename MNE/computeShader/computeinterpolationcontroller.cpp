@@ -103,18 +103,19 @@ ComputeInterpolationController::ComputeInterpolationController()
     , m_pTransform(new Qt3DCore::QTransform)
     , m_pMaterial(new ComputeMaterial)
     , m_pFramegraph(new ComputeFramegraph)
+    , m_pInterpolatedSignalAttrib(new QAttribute)
 {
     init();
 }
 
-QPointer<Qt3DCore::QEntity> ComputeInterpolationController::getRootEntity() const
+Qt3DCore::QEntity *ComputeInterpolationController::getRootEntity() const
 {
-    return m_pRootEntity;
+    return m_pRootEntity.data();
 }
 
-QPointer<ComputeFramegraph> ComputeInterpolationController::getComputeFramegraph() const
+ComputeFramegraph  *ComputeInterpolationController::getComputeFramegraph() const
 {
-    return m_pFramegraph;
+    return m_pFramegraph.data();
 }
 
 void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
@@ -165,9 +166,10 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     //create weight matrix Uniforms
     const uint iWeightMatRows = tMneBemSurface.rr.rows();
     const uint iWeightMatCols = m_iUsedSensors.size();
-    QParameter *pRowUniform = new QParameter(QStringLiteral("rows"), iWeightMatRows);
-    m_pMaterial->addComputePassParameter(pRowUniform);
-    m_pParameters.insert(pRowUniform->name(), pRowUniform);
+
+//    QParameter *pRowUniform = new QParameter(QStringLiteral("rows"), iWeightMatRows);
+//    m_pMaterial->addComputePassParameter(pRowUniform);
+//    m_pParameters.insert(pRowUniform->name(), pRowUniform);
 
     QParameter *pColsUniform = new QParameter(QStringLiteral("cols"), iWeightMatCols);
     m_pMaterial->addComputePassParameter(pColsUniform);
@@ -184,25 +186,24 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
 
     //Set work group size
-    m_pFramegraph->setWorkGroupSize(iWeightMatRows, 0 ,0 );
+    m_pFramegraph->setWorkGroupSize(iWeightMatCols, 1 ,1 );
 
     //Init interpolated signal buffer
     QString sInterpolatedSignalName = QStringLiteral("InterpolatedSignal");
     Qt3DRender::QBuffer *pInterpolatedSignalBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
-    pInterpolatedSignalBuffer->setData(createZeroBuffer( 3 * iWeightMatRows));
+    pInterpolatedSignalBuffer->setData(createZeroBuffer(  iWeightMatRows));
     m_pBuffers.insert(sInterpolatedSignalName, pInterpolatedSignalBuffer);
 
     //@TODO setYoutBuffer umschreiben
     m_pMaterial->setYOutBuffer(pInterpolatedSignalBuffer);
 
     //Interpolated signal attribute
-    QAttribute *m_pInterpolatedSignalAttrib = new QAttribute();
     m_pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     m_pInterpolatedSignalAttrib->setDataType(Qt3DRender::QAttribute::Float);
     m_pInterpolatedSignalAttrib->setVertexSize(1);
     m_pInterpolatedSignalAttrib->setByteOffset(0);
     m_pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
-    m_pInterpolatedSignalAttrib->setName(sInterpolatedSignalName);
+    m_pInterpolatedSignalAttrib->setName(QStringLiteral("YOutVec"));
     m_pInterpolatedSignalAttrib->setBuffer(pInterpolatedSignalBuffer);
 
     //Set custom mesh data
@@ -278,6 +279,9 @@ void ComputeInterpolationController::init()
     m_pCamera->setFieldOfView(25.0f);
     m_pCamera->setAspectRatio(1.33f);
 
+    //Set camera in framegraph
+    m_pFramegraph->setCamera(m_pCamera);
+
     //Set cam controller
     m_pCamController->setCamera(m_pCamera);
 
@@ -300,7 +304,7 @@ QByteArray ComputeInterpolationController::createWeightMatBuffer(QSharedPointer<
         for(uint j = 0; j < iCols; ++j)
         {
             //@TODO this is probably not the best way to extract the weight matrix components
-            rawVertexArray[iCtr] = tInterpolationMatrix->coeff(i, j);
+            rawVertexArray[iCtr] = static_cast<float>(tInterpolationMatrix->coeff(i, j));
             iCtr++;
         }
     }
@@ -315,7 +319,7 @@ QByteArray ComputeInterpolationController::createZeroBuffer(const uint tBufferSi
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
     //Set default values
-    for(int i = 0; i < tBufferSize; ++i)
+    for(uint i = 0; i < tBufferSize; ++i)
     {
         rawVertexArray[i] = 0.0f;
     }
