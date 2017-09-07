@@ -61,9 +61,11 @@ SUBDIRS += \
     qtHaveModule(charts) {
         SUBDIRS += \
             disp3D
+            computeShader
     } else {
         message("libraries.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
 }
+
 
 CONFIG += ordered
