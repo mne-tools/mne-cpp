@@ -45,6 +45,7 @@
 #include <disp3D/engine/model/3dhelpers/custommesh.h>
 #include <computeShader/computematerial.h>
 #include <computeShader/computeframegraph.h>
+#include <computeShader/computeinterpolationcontroller.h>
 
 #include <iostream>
 
@@ -158,53 +159,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // positions of EEG and MEG sensors
-    QVector<Vector3f> eegSensors;
-    QVector<Vector3f> megSensors;
-    //fill both QVectors with the right sensor positions
-    for( const FiffChInfo &info : evoked.info.chs)
-    {
-        //EEG
-        if(info.kind == FIFFV_EEG_CH && info.unit == FIFF_UNIT_V)
-        {
-            eegSensors.push_back(info.chpos.r0);
-        }
-        //MEG
-        if(info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T)
-        {
-            megSensors.push_back(info.chpos.r0);
-        }
-    }
 
     //acquire surface data
     //QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-
-    //projecting with EEG
-    qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0], eegSensors);
-    std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
-
-    //SCDC with cancel distance 0.03
-    qint64 startTimeScdc = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0], mappedSubSet, 0.03);
-    std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
-
-    //filter out bad EEG channels
-    GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_EEG_CH);
-
-    //weight matrix
-    qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<SparseMatrix<double> > interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, DOUBLE_INFINITY, evoked.info, FIFFV_EEG_CH);
-    std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
-
-    //realtime interpolation (1 iteration)
-    VectorXd signal = VectorXd::Random(eegSensors.size());
-    qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
-    Interpolation::interpolateSignal(interpolationMatrix, signal);
-    std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
-
 
     //########################################################################################
     //
@@ -214,129 +173,27 @@ int main(int argc, char *argv[])
 
     Qt3DExtras::Qt3DWindow view;
 
-    Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
+    ComputeInterpolationController *CompController = new ComputeInterpolationController;
 
-    Qt3DRender::QBuffer *pYOutBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
-    pYOutBuffer->setData(createColorBuffer(t_sensorSurfaceVV[0].rr.rows()));
+    CompController->setInterpolationData(t_sensorSurfaceVV[0],evoked, Interpolation::linear, FIFFV_EEG_CH, 0.03 );
+    Eigen::MatrixXf tempMat = evoked.data.cast<float>();
+    std::cout << tempMat.rows() << " " << tempMat.cols() <<std::endl;
+    CompController->addSignalData(tempMat);
 
-    //Color buffer size 2562
-    std::cout << "Color buffer size: " << t_sensorSurfaceVV[0].rr.rows() << std::endl;
-    std::cout << "EEG senors size: " << eegSensors.size() << std::endl;
+    Qt3DCore::QEntity *rootEntiy = CompController->getRootEntity();
+    ComputeFramegraph *pFramegragh = CompController->getComputeFramegraph();
 
-    ComputeMaterial *pComputeMaterial = new ComputeMaterial();
-    pComputeMaterial->setYOutBuffer(pYOutBuffer);
-    //add custom parameters to computeMaterial
-    //@TODO change this values to the correct one
-    const unsigned int iWeightMatRows = t_sensorSurfaceVV[0].rr.rows();
-    const unsigned int iWeightMatCols = eegSensors.size();
-    QParameter *pRowUniform = new QParameter(QStringLiteral("rows"), iWeightMatRows);
-    pComputeMaterial->addComputePassParameter(pRowUniform);
-    QParameter *pColsUniform = new QParameter(QStringLiteral("cols"), iWeightMatCols);
-    pComputeMaterial->addComputePassParameter(pColsUniform);
-
-    //Create Weight matrix buffer and Parameter
-    Qt3DRender::QBuffer *pWeightMatBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer);
-    pWeightMatBuffer->setData(createWeightMatBuffer(interpolationMatrix));
-
-    QParameter *pWeightMatParameter = new QParameter(QStringLiteral("WeightMat"),
-                                                     QVariant::fromValue(pWeightMatBuffer));
-    pComputeMaterial->addComputePassParameter(pWeightMatParameter);
-
-    //create random EEG signal for testing
-    pComputeMaterial->createSignalMatrix(eegSensors.size(), 300);
-
-
-
-
-
-
-    ComputeFramegraph *pFramegraph = new ComputeFramegraph();
-    //@TODO wie workgroup size bestimmen besser Aufteilung finden es gibt 2562 vertecies
-    pFramegraph->setWorkGroupSize(iWeightMatRows, 0 ,0 );
-
-    //Compute entity
-    Qt3DCore::QEntity *pComputeEntity = new Qt3DCore::QEntity(rootEntity);
-    QComputeCommand *pComputeCommand = new QComputeCommand();
-    //pComputeCommand->setWorkGroupX(iWeightMatRows);
-
-    pComputeEntity->addComponent(pComputeCommand);
-    pComputeEntity->addComponent(pComputeMaterial);
-
-
-    //Color attribute
-    QAttribute *pYOutAttribute = new QAttribute();
-    pYOutAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    pYOutAttribute->setDataType(Qt3DRender::QAttribute::Float);
-    pYOutAttribute->setVertexSize(1);
-    pYOutAttribute->setByteOffset(0);
-    pYOutAttribute->setByteStride(1 * sizeof(float));
-    pYOutAttribute->setName(QStringLiteral("YOutVec"));
-    pYOutAttribute->setBuffer(pYOutBuffer);
-
-    //custom mesh
-    DISP3DLIB::CustomMesh *pCustomMesh = new DISP3DLIB::CustomMesh();
-    MatrixX3f matVertColor = createVertColor(t_sensorSurfaceVV[0].rr, QColor(255,0,0,255));
-
-    //Set renderable 3D entity mesh and color data
-    pCustomMesh->setMeshData(t_sensorSurfaceVV[0].rr,
-                                t_sensorSurfaceVV[0].nn,
-                                t_sensorSurfaceVV[0].tris,
-                                matVertColor,
-                                Qt3DRender::QGeometryRenderer::Triangles);
-    //add Custom Attribute
-    pCustomMesh->addAttrib(pYOutAttribute);
-
-    //mesh render entity
-    Qt3DCore::QEntity *pMeshRenderEntity = new Qt3DCore::QEntity(rootEntity);
-
-
-    //@TODO delete material and forward renderer
-//    Qt3DRender::QMaterial *material = new Qt3DExtras::QPhongMaterial(rootEntity);
-//    Qt3DExtras::QForwardRenderer *forwardRenderer = new Qt3DExtras::QForwardRenderer();
-
-
-    Qt3DCore::QTransform *pTransform = new Qt3DCore::QTransform;
-    pTransform->setScale3D(QVector3D(50.0, 50.0, 50.0));
-
-
-    pMeshRenderEntity->addComponent(pCustomMesh);
-    //pMeshRenderEntity->addComponent(material);
-    pMeshRenderEntity->addComponent(pComputeMaterial);
-    pMeshRenderEntity->addComponent(pTransform);
-
-
-
-    Qt3DRender::QCamera *pCamera = new QCamera;
-    pCamera->setProjectionType(QCameraLens::PerspectiveProjection);
-    pCamera->setViewCenter(QVector3D(0, 0, 0));
-    pCamera->setPosition(QVector3D(0, 0, 40.0));
-    pCamera->setNearPlane(0.1f);
-    pCamera->setFarPlane(1000.0f);
-    pCamera->setFieldOfView(25.0f);
-    pCamera->setAspectRatio(1.33f);
-
-
-    pFramegraph->setCamera(pCamera);
-//    camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-//    camera->setPosition(QVector3D(0, 0, 40.0f));
-//    camera->setViewCenter(QVector3D(0, 0, 0));
-    //forwardRenderer->setCamera(camera);
-//    pFramegraph->setCamera(camera);
-
-    //Camera controller
-    Qt3DExtras::QFirstPersonCameraController *pCamController = new Qt3DExtras::QFirstPersonCameraController(rootEntity);
-    pCamController->setCamera(pCamera);
 
 
 
     //Configure view settings
-    view.setRootEntity(rootEntity);
+    view.setRootEntity(rootEntiy);
 
-    view.setActiveFrameGraph(pFramegraph);
-    //view.setActiveFrameGraph(forwardRenderer);
+    view.setActiveFrameGraph(pFramegragh);
+
     view.renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::Always);
 
-    //pCamController->setCamera(view.camera());
+
 
     view.show();
 

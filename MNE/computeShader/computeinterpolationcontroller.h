@@ -140,14 +140,14 @@ public:
      * @brief getRootEntity
      * @return
      */
-    QPointer<Qt3DCore::QEntity> getRootEntity() const;
+    Qt3DCore::QEntity * getRootEntity() const;
 
     //=========================================================================================================
     /**
      * @brief getComputeFramegraph
      * @return
      */
-    QPointer<CSH::ComputeFramegraph> getComputeFramegraph() const;
+    ComputeFramegraph *getComputeFramegraph() const;
 
     void setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                               const FIFFLIB::FiffEvoked &tEvoked,
