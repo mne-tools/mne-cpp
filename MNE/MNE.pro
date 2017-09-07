@@ -52,7 +52,7 @@ SUBDIRS += \
     rtCommand \
     rtClient \
     rtProcessing \
-    computeShader \
+
 
 
 !contains(MNECPP_CONFIG, minimalVersion) {
@@ -68,10 +68,12 @@ SUBDIRS += \
     qtHaveModule(charts) {
         SUBDIRS += \
             dispCharts \
-            disp3D
+            disp3D \
+            computeShader
     } else {
         message("MNE.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
 }
+
 
 CONFIG += ordered
