@@ -41,7 +41,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <rtCommand/commandmanager.h>
+#include <realtime/rtCommand/commandmanager.h>
 #include "connectormanager.h"
 #include "commandserver.h"
 #include "fiffstreamserver.h"
@@ -76,7 +76,7 @@ namespace RTSERVER
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTCOMMANDLIB;
+using namespace REALTIMELIB;
 
 //*************************************************************************************************************
 //=============================================================================================================

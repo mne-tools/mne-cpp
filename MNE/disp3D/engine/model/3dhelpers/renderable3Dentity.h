@@ -94,7 +94,7 @@ namespace DISP3DLIB
 *
 * @brief Base class for renederable 3D QEntities.
 */
-class DISP3DNEWSHARED_EXPORT Renderable3DEntity : public Qt3DCore::QEntity
+class DISP3DSHARED_EXPORT Renderable3DEntity : public Qt3DCore::QEntity
 {
     Q_OBJECT
     Q_PROPERTY(float scale READ scaleValue WRITE setScale NOTIFY scaleChanged)

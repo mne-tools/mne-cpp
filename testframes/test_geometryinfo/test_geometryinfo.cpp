@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <geometryInfo/geometryinfo.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 
@@ -54,7 +54,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace GEOMETRYINFO;
+using namespace DISP3DLIB;
 using namespace MNELIB;
 
 //=============================================================================================================

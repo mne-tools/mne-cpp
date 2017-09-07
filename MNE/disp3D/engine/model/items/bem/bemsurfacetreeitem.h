@@ -100,7 +100,7 @@ class Renderable3DEntity;
 *
 * @brief BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
 */
-class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT BemSurfaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 

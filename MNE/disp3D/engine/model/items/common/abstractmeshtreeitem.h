@@ -98,7 +98,7 @@ class CustomMesh;
 *
 * @brief Provides a generic mesh tree item.
 */
-class DISP3DNEWSHARED_EXPORT AbstractMeshTreeItem : public Abstract3DTreeItem
+class DISP3DSHARED_EXPORT AbstractMeshTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 

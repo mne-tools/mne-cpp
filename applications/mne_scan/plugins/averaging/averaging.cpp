@@ -80,7 +80,7 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace FIFFLIB;
-using namespace RTPROCESSINGLIB;
+using namespace REALTIMELIB;
 
 
 //*************************************************************************************************************

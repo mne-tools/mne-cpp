@@ -46,7 +46,7 @@
 #include <disp/imagesc.h>
 
 #include <utils/mnemath.h>
-#include <dispCharts/spline.h>
+#include <disp/spline.h>
 
 
 //*************************************************************************************************************
@@ -73,7 +73,6 @@
 
 using namespace UTILSLIB;
 using namespace DISP3DLIB;
-using namespace DISPCHARTSLIB;
 using namespace DISPLIB;
 
 

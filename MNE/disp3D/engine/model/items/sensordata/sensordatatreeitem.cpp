@@ -45,8 +45,8 @@
 
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_evoked.h>
-#include <geometryInfo/geometryinfo.h>
-#include <interpolation/interpolation.h>
+#include "../../../../helpers/interpolation/interpolation.h"
+#include "../../../../helpers/geometryinfo/geometryinfo.h"
 
 
 //*************************************************************************************************************
@@ -71,8 +71,6 @@ using namespace Eigen;
 using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
-using namespace GEOMETRYINFO;
-using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************

@@ -55,8 +55,8 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <geometryInfo/geometryinfo.h>
-#include <interpolation/interpolation.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,8 +78,6 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace GEOMETRYINFO;
-using namespace INTERPOLATION;
 
 
 //*************************************************************************************************************

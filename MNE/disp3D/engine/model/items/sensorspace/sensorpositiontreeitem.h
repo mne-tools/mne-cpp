@@ -93,7 +93,7 @@ namespace DISP3DLIB
 *
 * @brief SensorPositionTreeItem provides a tree item to visualize sensor position data.
 */
-class DISP3DNEWSHARED_EXPORT SensorPositionTreeItem : public Abstract3DTreeItem
+class DISP3DSHARED_EXPORT SensorPositionTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 

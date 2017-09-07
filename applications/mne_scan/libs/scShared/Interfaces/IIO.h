@@ -44,7 +44,7 @@
 
 #include "IPlugin.h"
 
-#include <generics/circularbuffer_old.h>
+#include <utils/generics/circularbuffer_old.h>
 
 
 //*************************************************************************************************************

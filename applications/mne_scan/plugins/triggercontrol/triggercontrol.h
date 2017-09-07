@@ -46,8 +46,8 @@
 #include "triggercontrol_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularbuffer.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimesamplearray.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 

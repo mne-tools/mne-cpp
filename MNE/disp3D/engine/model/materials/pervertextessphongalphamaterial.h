@@ -101,7 +101,7 @@ namespace DISP3DLIB
 *
 * @brief PerVertexTessPhongAlphaMaterial is provides a Qt3D material with own shader support.
 */
-class DISP3DNEWSHARED_EXPORT PerVertexTessPhongAlphaMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT PerVertexTessPhongAlphaMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 

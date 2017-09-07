@@ -73,7 +73,7 @@ using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
-using namespace RTCLIENTLIB;
+using namespace REALTIMELIB;
 using namespace SCDISPLIB;
 
 

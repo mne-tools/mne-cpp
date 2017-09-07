@@ -101,7 +101,7 @@ class FsSurfaceTreeItem;
 *
 * @brief Provides a generic MriTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT MriTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT MriTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

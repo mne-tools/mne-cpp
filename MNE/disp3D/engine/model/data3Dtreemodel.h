@@ -130,7 +130,7 @@ class SensorDataTreeItem;
 *
 * @brief Data3DTreeModel provides a tree based data model to hold all information about data which was added to the View 3D.
 */
-class DISP3DNEWSHARED_EXPORT Data3DTreeModel : public QStandardItemModel
+class DISP3DSHARED_EXPORT Data3DTreeModel : public QStandardItemModel
 {
     Q_OBJECT
 

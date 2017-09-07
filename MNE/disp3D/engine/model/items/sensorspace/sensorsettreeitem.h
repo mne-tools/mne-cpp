@@ -97,7 +97,7 @@ namespace DISP3DLIB
 *
 * @brief Provides a generic SensorSetTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT SensorSetTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT SensorSetTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

@@ -46,9 +46,9 @@
 #include "rthpi_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
-#include <rtProcessing/rthpis.h>
+#include <realtime/rtProcessing/rthpis.h>
 
 
 //*************************************************************************************************************
@@ -84,7 +84,7 @@ namespace RtHpiPlugin
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
-using namespace RTPROCESSINGLIB;
+using namespace REALTIMELIB;
 
 
 //=============================================================================================================

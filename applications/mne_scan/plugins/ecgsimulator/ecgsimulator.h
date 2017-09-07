@@ -47,7 +47,7 @@
 #include "ecgsimchannel.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularbuffer.h>
+#include <utils/generics/circularbuffer.h>
 #include <scMeas/newrealtimesamplearray.h>
 
 

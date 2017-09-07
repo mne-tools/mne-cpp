@@ -45,7 +45,7 @@
 #include "mne_global.h"
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>
@@ -54,7 +54,7 @@
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <rtProcessing/rtinvop.h>
+#include <realtime/rtProcessing/rtinvop.h>
 
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/newrealtimemultisamplearray.h>
@@ -89,7 +89,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
-using namespace RTPROCESSINGLIB;
+using namespace REALTIMELIB;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;

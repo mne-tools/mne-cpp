@@ -137,7 +137,7 @@ struct VisualizationInfo {
 *
 * @brief Data scheduler
 */
-class DISP3DNEWSHARED_EXPORT RtSourceLocDataWorker : public QThread
+class DISP3DSHARED_EXPORT RtSourceLocDataWorker : public QThread
 {
     Q_OBJECT
 public:

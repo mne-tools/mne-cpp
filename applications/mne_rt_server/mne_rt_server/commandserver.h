@@ -41,8 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <rtCommand/commandparser.h>
-#include <rtCommand/commandmanager.h>
+#include <realtime/rtCommand/commandparser.h>
+#include <realtime/rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -67,7 +67,7 @@ namespace RTSERVER
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTCOMMANDLIB;
+using namespace REALTIMELIB;
 
 
 //*************************************************************************************************************

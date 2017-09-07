@@ -83,7 +83,7 @@ class MetaTreeItem;
 *
 * @brief Provides the basic tree item.
 */
-class DISP3DNEWSHARED_EXPORT Abstract3DTreeItem : public Renderable3DEntity, public QStandardItem
+class DISP3DSHARED_EXPORT Abstract3DTreeItem : public Renderable3DEntity, public QStandardItem
 {
     Q_OBJECT
 
