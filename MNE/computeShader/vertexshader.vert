@@ -3,7 +3,7 @@
 uniform mat4 mvp; //need for the QCamera and camera controller to work
 
 in vec3 vertexPosition;
-in vec3 vertexColor;
+//in vec3 vertexColor;
 in vec3 vertexNormal;
 in float YOutVec;
 
