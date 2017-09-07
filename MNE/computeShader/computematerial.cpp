@@ -113,7 +113,7 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     this->init();
 }
 
-void ComputeMaterial::setYOutBuffer(QBuffer *yOutBuffer)
+void ComputeMaterial::setYOutBuffer(Qt3DRender::QBuffer *yOutBuffer)
 {
 
     m_pColorParameter->setName(QStringLiteral("YOutVec"));
@@ -233,6 +233,7 @@ void ComputeMaterial::init()
 
     //init signal processing
     m_pSignalDataParameter->setName(QStringLiteral("MeasurementVec"));
+    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
     m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
 
     //Effect
