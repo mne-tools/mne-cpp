@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNE.pro
+# @file     libraries.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -62,7 +62,7 @@ SUBDIRS += \
         SUBDIRS += \
             disp3D
     } else {
-        message("MNE.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
+        message("libraries.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
 }
 

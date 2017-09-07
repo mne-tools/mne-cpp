@@ -44,7 +44,7 @@ TEMPLATE = subdirs
 }
 
 SUBDIRS += \
-    MNE \
+    libraries \
     applications
 
 !contains(MNECPP_CONFIG, noExamples) {
