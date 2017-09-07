@@ -1,7 +1,7 @@
 #version 430 core
 
 //numer of rows in the weight matrix (n)
-uniform uint rows;
+//uniform uint rows;
 
 //number of colums in the weight matrix(m)
 uniform uint cols;
@@ -50,5 +50,5 @@ void main(void)
 
     //yOut[uint(mod(globalId, cols))] += weights[globalId] * mData[uint(mod(globalId, rows))];
 
-    //TODO forward to other shaders and apply color table
+
 }
