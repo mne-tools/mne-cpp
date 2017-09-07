@@ -95,7 +95,7 @@ class RtSourceLocDataWorker;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT MneEstimateTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT MneEstimateTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

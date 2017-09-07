@@ -92,7 +92,7 @@ class Data3DTreeModel;
 *
 * @brief User GUI control for the View3D.
 */
-class DISP3DNEWSHARED_EXPORT Control3DWidget : public QWidget/*, public DISPLIB::RoundedEdgesWidget*/
+class DISP3DSHARED_EXPORT Control3DWidget : public QWidget/*, public DISPLIB::RoundedEdgesWidget*/
 {
     Q_OBJECT
 

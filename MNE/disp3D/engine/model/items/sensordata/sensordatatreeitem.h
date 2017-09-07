@@ -92,7 +92,7 @@ class RtSensorDataWorker;
 * @brief This item integrates GeometryInfo and Interpolation into Disp3D structure
 */
 
-class DISP3DNEWSHARED_EXPORT SensorDataTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT SensorDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 

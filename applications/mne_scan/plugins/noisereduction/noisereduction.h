@@ -51,9 +51,9 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <rtProcessing/rtfilter.h>
+#include <realtime/rtProcessing/rtfilter.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 #include <scMeas/newrealtimemultisamplearray.h>
 
@@ -303,7 +303,7 @@ private:
     QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
 
     DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
-    RTPROCESSINGLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
+    REALTIMELIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
 
     SCMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
 

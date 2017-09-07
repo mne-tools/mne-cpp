@@ -44,8 +44,8 @@
 
 #include <iostream>
 
-#include <geometryInfo/geometryinfo.h>
-#include <interpolation/interpolation.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 #include <fiff/fiff_constants.h>
 
 //*************************************************************************************************************
@@ -66,8 +66,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
-using namespace GEOMETRYINFO;
-using namespace INTERPOLATION;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************

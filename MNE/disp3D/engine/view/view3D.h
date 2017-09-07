@@ -103,7 +103,7 @@ class Data3DTreeModel;
 *
 * @brief Visualizes 3D data
 */
-class DISP3DNEWSHARED_EXPORT View3D : public Qt3DExtras::Qt3DWindow
+class DISP3DSHARED_EXPORT View3D : public Qt3DExtras::Qt3DWindow
 {
     Q_OBJECT
 

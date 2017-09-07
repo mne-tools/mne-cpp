@@ -160,7 +160,7 @@ signals:
 
 private:
     PluginList m_pluginList;    /**< List of plugins associated with this set. */
-    PluginConnectorConnectionList m_conConList; /**< List of connector connections. */
+//    PluginConnectorConnectionList m_conConList; /**< List of connector connections. */
 
 //    QSharedPointer<PluginSet> m_pPluginSet;     /**< The Plugin set of the stage -> ToDo: check, if more than one set on the stage is usefull. */
 };

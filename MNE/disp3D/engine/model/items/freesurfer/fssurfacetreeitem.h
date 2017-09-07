@@ -93,7 +93,7 @@ class MetaTreeItem;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT FsSurfaceTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT FsSurfaceTreeItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 

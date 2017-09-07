@@ -42,6 +42,7 @@ QT  += core widgets svg
 # Deep Model Viewer
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(opengl): QT += opengl
+qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
@@ -53,8 +54,7 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
@@ -62,8 +62,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inversed
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
@@ -127,7 +126,7 @@ SOURCES += \
     selectionmanagerwindow.cpp \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
-    helpers/roundededgeswidget.cpp
+    helpers/roundededgeswidget.cpp \
 
 HEADERS += \
     disp_global.h \
@@ -149,7 +148,19 @@ HEADERS += \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
-    helpers/roundededgeswidget.h
+    helpers/roundededgeswidget.h \
+
+qtHaveModule(charts) {
+    SOURCES += \
+        bar.cpp \
+        spline.cpp \
+        lineplot.cpp \
+
+    HEADERS += \
+        bar.h \
+        spline.h \
+        lineplot.h \
+}
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {

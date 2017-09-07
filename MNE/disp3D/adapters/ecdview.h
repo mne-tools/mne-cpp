@@ -85,7 +85,7 @@ namespace DISP3DLIB
 *
 * @brief Visualizes ECD data.
 */
-class DISP3DNEWSHARED_EXPORT ECDView : public AbstractView
+class DISP3DSHARED_EXPORT ECDView : public AbstractView
 {
     Q_OBJECT
 

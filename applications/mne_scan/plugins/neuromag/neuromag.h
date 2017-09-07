@@ -45,8 +45,8 @@
 #include "neuromag_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularbuffer_old.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer_old.h>
+#include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 
 
@@ -63,7 +63,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <rtClient/rtcmdclient.h>
+#include <realtime/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -92,7 +92,7 @@ namespace MneRtClientPlugin
 
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
-using namespace RTCLIENTLIB;
+using namespace REALTIMELIB;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 

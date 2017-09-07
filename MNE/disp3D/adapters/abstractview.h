@@ -84,7 +84,7 @@ class Data3DTreeModel;
 *
 * @brief Adapter which provides the abstract class for all adapter views.
 */
-class DISP3DNEWSHARED_EXPORT AbstractView : public QWidget
+class DISP3DSHARED_EXPORT AbstractView : public QWidget
 {
     Q_OBJECT
 
