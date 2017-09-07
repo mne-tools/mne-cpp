@@ -48,7 +48,7 @@
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
-#include <utils/eegref.h>
+#include <eegref.h>
 
 #include "FormFiles/referencesetupwidget.h"
 #include "FormFiles/referencetoolbarwidget.h"

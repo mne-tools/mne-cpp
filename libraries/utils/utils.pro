@@ -91,7 +91,6 @@ SOURCES += \
     warp.cpp \
     filterTools/sphara.cpp \
     sphere.cpp \
-    eegref.cpp \
     generics/buffer.cpp \
     generics/circularbuffer.cpp \
     generics/circularmatrixbuffer.cpp \
@@ -119,7 +118,6 @@ HEADERS += \
     filterTools/sphara.h \
     sphere.h \
     simplex_algorithm.h \
-    eegref.h \
     generics/buffer.h \
     generics/circularbuffer.h \
     generics/circularbuffer_old.h \
