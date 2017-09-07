@@ -222,11 +222,8 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
 }
 
-void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSignalMat)
+void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSensorData)
 {
-    //@TODO implemet the same as in sensordataitem
-    m_pMaterial->createSignalMatrix(m_iUsedSensors.size(), 300);
-
     ///////////////////////////////////
     //if more data then needed is provided
     const int iSensorSize = m_iUsedSensors.size();
