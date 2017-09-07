@@ -156,7 +156,7 @@ public:
                               const double tCancelDist = DOUBLE_INFINITY);
 
 
-    void addSignalData(const Eigen::MatrixXf &tSignalMat);
+    void addSignalData(const Eigen::MatrixXf &tSensorData);
 
 protected:
 
