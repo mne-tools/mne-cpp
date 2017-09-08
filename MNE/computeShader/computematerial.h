@@ -4,11 +4,11 @@
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     August, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Lars Debor and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include"computeShader_global.h"
-#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,6 +61,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,7 +80,6 @@ namespace Qt3DRender {
         class QFilterKey;
         class QTechnique;
         class QBuffer;
-
 }
 
 
@@ -147,13 +146,6 @@ public:
 
     //=========================================================================================================
     /**
-     * generate a random signal matrix for testing.
-     */
-    void createSignalMatrix(uint tRows, uint tCols);
-
-
-    //=========================================================================================================
-    /**
      * Add a new matrix with signal data form the sensors
      * @param tSignalMat
      * @param tSensorSize Number of EEG or MEG Sensors
@@ -171,7 +163,12 @@ protected:
     void updateSignalBuffer();
 
 private:
+    //=========================================================================================================
+    /**
+     * @brief init
+     */
     void init();
+
 
     QPointer<Qt3DRender::QEffect> m_pEffect;
 
@@ -180,13 +177,6 @@ private:
     QPointer<Qt3DRender::QRenderPass> m_pComputeRenderPass;
     QPointer<Qt3DRender::QFilterKey> m_pComputeFilterKey;
     QPointer<Qt3DRender::QTechnique> m_pComputeTechnique;
-
-    //test
-//    QPointer<Qt3DRender::QBuffer> m_pShaderStorage;
-//    QPointer<Qt3DRender::QParameter> m_pStorageParameter;
-//    QPointer<Qt3DRender::QParameter> m_pSinParameter;
-//    QPointer<QTimer> m_pTimer;
-    //
 
     //Draw Part
     QPointer<Qt3DRender::QShaderProgram> m_pDrawShader;
@@ -204,8 +194,6 @@ private:
     Eigen::MatrixXf m_signalMatrix;
     uint m_iSignalCtr;
     QPointer<QTimer> m_pTimer;
-
-
 };
 
 
