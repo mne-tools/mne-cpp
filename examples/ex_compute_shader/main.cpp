@@ -49,12 +49,9 @@
 
 #include <iostream>
 
-#include <geometryInfo/geometryinfo.h>
 #include <interpolation/interpolation.h>
 #include <fiff/fiff_constants.h>
 
-#include <cmath>
-#include <cstdlib>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -65,20 +62,10 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
-#include <QDateTime>
 #include <QFile>
-
-#include <QByteArray>
-#include <QRectF>
-#include <Qt3DCore>
-#include <Qt3DRender>
+#include <Qt3DCore/QEntity>
 #include <Qt3DExtras/Qt3DWindow>
-#include <Qt3DExtras/QCylinderMesh>
-#include <Qt3DExtras/QSphereGeometry>
-#include <Qt3DExtras/QFirstPersonCameraController>
-#include <Qt3DExtras/QTorusMesh>
-#include <Qt3DExtras>
-
+#include <Qt3DRender/QRenderSettings>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,22 +75,8 @@
 using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace GEOMETRYINFO;
 using namespace INTERPOLATION;
 using namespace CSH;
-using namespace Qt3DRender;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DECLARED FUNCTIONS
-//=============================================================================================================
-
-QByteArray createVertexBufferFromBemSurface(const MNEBemSurface &tBemSurface);
-QByteArray createColorBuffer(const int iVertNum);
-MatrixX3f createVertColor(const MatrixXf& vertices, const QColor& color);
-QByteArray createWeightMatBuffer(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix);
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -175,99 +148,22 @@ int main(int argc, char *argv[])
 
     ComputeInterpolationController *CompController = new ComputeInterpolationController;
 
-    CompController->setInterpolationData(t_sensorSurfaceVV[0],evoked, Interpolation::linear, FIFFV_EEG_CH, 0.03 );
+    CompController->setInterpolationData(t_sensorSurfaceVV[0],evoked, Interpolation::cubic, FIFFV_EEG_CH, 0.1 );
     Eigen::MatrixXf tempMat = evoked.data.cast<float>();
     std::cout << tempMat.rows() << " " << tempMat.cols() <<std::endl;
     CompController->addSignalData(tempMat);
 
-    Qt3DCore::QEntity *rootEntiy = CompController->getRootEntity();
+    Qt3DCore::QEntity *rootEntity = CompController->getRootEntity();
     ComputeFramegraph *pFramegragh = CompController->getComputeFramegraph();
 
-
-
-
     //Configure view settings
-    view.setRootEntity(rootEntiy);
-
+    view.setRootEntity(rootEntity);
     view.setActiveFrameGraph(pFramegragh);
 
+    //Render always is important for compute shaders
     view.renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::Always);
-
-
 
     view.show();
 
-
     return a.exec();
-}
-
-QByteArray createVertexBufferFromBemSurface(const MNEBemSurface &tBemSurface)
-{
-    const int iVertNum = tBemSurface.rr.rows();
-    const int iVertSize = tBemSurface.rr.cols();
-
-    QByteArray bufferData;
-    bufferData.resize(iVertNum * iVertSize * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    int idxVert = 0;
-    for(int i = 0; i < tBemSurface.rr.rows(); ++i) {
-        rawVertexArray[idxVert++] = (tBemSurface.rr(i,0));
-        rawVertexArray[idxVert++] = (tBemSurface.rr(i,1));
-        rawVertexArray[idxVert++] = (tBemSurface.rr(i,2));
-    }
-
-    return bufferData;
-}
-
-QByteArray createColorBuffer(const int iVertNum)
-{
-    const int iBufferSize = iVertNum;
-    QByteArray bufferData;
-    bufferData.resize(iBufferSize * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    //Set default values
-    for(int i = 0; i < iBufferSize; ++i)
-    {
-        rawVertexArray[i] = 1.0f;
-    }
-    return bufferData;
-}
-
-MatrixX3f createVertColor(const MatrixXf& vertices, const QColor& color)
-{
-    MatrixX3f matColor(vertices.rows(),3);
-
-    for(int i = 0; i < matColor.rows(); ++i) {
-        matColor(i,0) = color.redF();
-        matColor(i,1) = color.greenF();
-        matColor(i,2) = color.blueF();
-    }
-
-    return matColor;
-}
-
-QByteArray createWeightMatBuffer(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
-{
-    QByteArray bufferData;
-
-    const uint iRows = tInterpolationMatrix->rows();
-    const uint iCols = tInterpolationMatrix->cols();
-
-    bufferData.resize(iRows * iCols * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    unsigned int iCtr = 0;
-    for(uint i = 0; i < iRows; ++i)
-    {
-        for(uint j = 0; j < iCols; ++j)
-        {
-            //@TODO this is probably not the best way to extract the weight matrix components
-            rawVertexArray[iCtr] = tInterpolationMatrix->coeff(i, j);
-            iCtr++;
-        }
-    }
-
-    return bufferData;
 }

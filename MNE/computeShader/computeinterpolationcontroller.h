@@ -132,8 +132,7 @@ public:
     /**
     * Constructs a ComputeInterpolationController object.
     */
-    //const MNELIB::MNEBemSurface &tMneBemSurface, const FIFFLIB::FiffEvoked &tEvoked,
-    explicit ComputeInterpolationController( );
+    explicit ComputeInterpolationController();
 
     //=========================================================================================================
     /**
@@ -149,21 +148,43 @@ public:
      */
     ComputeFramegraph *getComputeFramegraph() const;
 
+    //=========================================================================================================
+    /**
+     * @brief setInterpolationData
+     * @param tMneBemSurface
+     * @param tEvoked
+     * @param tSensorType
+     * @param tCancelDist
+     */
     void setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                               const FIFFLIB::FiffEvoked &tEvoked,
                               double (*tInterpolationFunction) (double),
                               const qint32 tSensorType = FIFFV_EEG_CH,
                               const double tCancelDist = DOUBLE_INFINITY);
 
-
+    //=========================================================================================================
+    /**
+     * @brief addSignalData
+     * @param tSensorData
+     */
     void addSignalData(const Eigen::MatrixXf &tSensorData);
 
 protected:
 
 private:
 
+    //=========================================================================================================
+    /**
+     * @brief init
+     */
     void init();
 
+    //=========================================================================================================
+    /**
+     * @brief createWeightMatBuffer
+     * @param tInterpolationMatrix
+     * @return
+     */
     QByteArray createWeightMatBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix);
 
     //=========================================================================================================
@@ -182,6 +203,7 @@ private:
      * @return
      */
     Eigen::MatrixX3f createColorMat(const Eigen::MatrixXf& tVertices, const QColor& tColor);
+
 
     QPointer<Qt3DCore::QEntity> m_pRootEntity;
     QPointer<CSH::ComputeFramegraph> m_pFramegraph;

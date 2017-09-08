@@ -8,7 +8,7 @@ out vec4 color;
 
 void main(void)
 {
-    //TODO add phong alpha
+    //TODO add phong lightning
     color = vec4(vColor.xyz, 1.0);
 }
 
