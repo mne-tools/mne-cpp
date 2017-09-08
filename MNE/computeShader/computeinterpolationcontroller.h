@@ -205,6 +205,14 @@ private:
 
     QHash<QString, QPointer<Qt3DRender::QParameter>> m_pParameters;  /**< Stores all Parameters with their name.*/
     QHash<QString, QPointer<Qt3DRender::QBuffer>> m_pBuffers;        /**< Stores all Buffers with their name.*/
+
+    //The threshold values used for normalizing the data
+    float m_fThresholdX;     /**< Lower threshold.*/
+    float m_fThresholdZ;     /**< Upper threshold.*/
+
+    QPointer<Qt3DRender::QParameter> m_pThresholdXUniform;
+    QPointer<Qt3DRender::QParameter> m_pThresholdZUniform;
+
 };
 
 
