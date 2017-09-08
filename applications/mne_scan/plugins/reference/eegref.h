@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
+#include "reference_global.h"
 #include <fiff/fiff_info.h>
 #include <utils/ioutils.h>
 
@@ -66,10 +66,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
+// DEFINE NAMESPACE REFERENCEPLUGIN
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace REFERENCEPLUGIN {
 
 
 //=============================================================================================================
@@ -79,7 +79,7 @@ namespace UTILSLIB {
 * @brief This class provides transformations for EEG reference operations.
 */
 
-class UTILSSHARED_EXPORT EEGRef
+class REFERENCESHARED_EXPORT EEGRef
 {
 
 public:
@@ -102,7 +102,6 @@ public:
     * @return EEG data matrix with common average reference
     */
     static Eigen::MatrixXd applyCAR(Eigen::MatrixXd& matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo);
-
 
 };
 

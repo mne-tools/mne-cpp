@@ -52,12 +52,14 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -67,6 +69,7 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         reference.cpp \
+        eegref.cpp \
         FormFiles/referencesetupwidget.cpp \
         FormFiles/referenceaboutwidget.cpp \
         FormFiles/referencetoolbarwidget.cpp
@@ -74,6 +77,7 @@ SOURCES += \
 HEADERS += \
         reference.h\
         reference_global.h \
+        eegref.h \
         FormFiles/referencesetupwidget.h \
         FormFiles/referenceaboutwidget.h \
         FormFiles/referencetoolbarwidget.h
