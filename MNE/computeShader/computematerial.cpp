@@ -4,11 +4,11 @@
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     August, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, Lars Debor and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -110,18 +110,23 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     , m_pSignalDataParameter(new QParameter)
     , m_pTimer(new QTimer(this))
 {
-    this->init();
+    init();
 }
+
+
+//*************************************************************************************************************
 
 void ComputeMaterial::setYOutBuffer(Qt3DRender::QBuffer *yOutBuffer)
 {
-
     m_pColorParameter->setName(QStringLiteral("YOutVec"));
 
     //Set the buffer as parameter data
     m_pColorParameter->setValue(QVariant::fromValue(yOutBuffer));
     m_pComputeRenderPass->addParameter(m_pColorParameter);
 }
+
+
+//*************************************************************************************************************
 
 void ComputeMaterial::addComputePassParameter(QPointer<QParameter> tParameter)
 {
@@ -143,6 +148,9 @@ void ComputeMaterial::addComputePassParameter(QPointer<QParameter> tParameter)
     m_CustomParameters.insert(tParameter->name(), tParameter);
 }
 
+
+//*************************************************************************************************************
+
 void ComputeMaterial::addDrawPassParameter(QPointer<QParameter> tParameter)
 {
     if(tParameter.isNull())
@@ -163,25 +171,17 @@ void ComputeMaterial::addDrawPassParameter(QPointer<QParameter> tParameter)
     m_CustomParameters.insert(tParameter->name(), tParameter);
 }
 
-void ComputeMaterial::createSignalMatrix(uint tRows, uint tCols)
-{
-    m_signalMatrix = Eigen::MatrixXf::Zero(tRows, tCols);
-    //Generate random entries
-    for(uint i = 0; i < tRows; ++i)
-    {
-        for(uint j = 0; j < tCols; ++j)
-        {
-            m_signalMatrix(i, j) = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-        }
-    }
-    updateSignalBuffer();
-}
+
+//*************************************************************************************************************
 
 void ComputeMaterial::addSignalData(const Eigen::MatrixXf &tSignalMat)
 {
     m_signalMatrix = tSignalMat;
     updateSignalBuffer();
 }
+
+
+//*************************************************************************************************************
 
 void ComputeMaterial::updateSignalBuffer()
 {
@@ -205,8 +205,10 @@ void ComputeMaterial::updateSignalBuffer()
     //Set buffer and parameter
     m_pSignalDataBuffer->setData(bufferData);
     m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
-
 }
+
+
+//*************************************************************************************************************
 
 void ComputeMaterial::init()
 {

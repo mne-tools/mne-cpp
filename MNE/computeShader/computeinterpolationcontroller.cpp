@@ -112,22 +112,30 @@ ComputeInterpolationController::ComputeInterpolationController()
     init();
 }
 
+
+//*************************************************************************************************************
+
 Qt3DCore::QEntity *ComputeInterpolationController::getRootEntity() const
 {
     return m_pRootEntity.data();
 }
+
+
+//*************************************************************************************************************
 
 ComputeFramegraph  *ComputeInterpolationController::getComputeFramegraph() const
 {
     return m_pFramegraph.data();
 }
 
+
+//*************************************************************************************************************
+
 void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                                           const FIFFLIB::FiffEvoked &tEvoked,
                                                           double (*tInterpolationFunction)(double),
                                                           const qint32 tSensorType,
-                                                          const double tCancelDist
-                                                          )
+                                                          const double tCancelDist)
 {
     //fill QVector with the right sensor positions
     QVector<Eigen::Vector3f> vecSensorPos;
@@ -167,14 +175,10 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
                                                                                tSensorType);
 
 
-    //create weight matrix Uniforms
     const uint iWeightMatRows = tMneBemSurface.rr.rows();
     const uint iWeightMatCols = m_iUsedSensors.size();
 
-//    QParameter *pRowUniform = new QParameter(QStringLiteral("rows"), iWeightMatRows);
-//    m_pMaterial->addComputePassParameter(pRowUniform);
-//    m_pParameters.insert(pRowUniform->name(), pRowUniform);
-
+    //Create uniform for the number of columns
     QParameter *pColsUniform = new QParameter(QStringLiteral("cols"), iWeightMatCols);
     m_pMaterial->addComputePassParameter(pColsUniform);
     m_pParameters.insert(pColsUniform->name(), pColsUniform);
@@ -198,7 +202,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     pInterpolatedSignalBuffer->setData(createZeroBuffer(  iWeightMatRows));
     m_pBuffers.insert(sInterpolatedSignalName, pInterpolatedSignalBuffer);
 
-    //@TODO setYoutBuffer umschreiben
+    //@TODO rewrite setYoutBuffer with custom name input
     m_pMaterial->setYOutBuffer(pInterpolatedSignalBuffer);
 
     //Interpolated signal attribute
@@ -207,12 +211,13 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     m_pInterpolatedSignalAttrib->setVertexSize(1);
     m_pInterpolatedSignalAttrib->setByteOffset(0);
     m_pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
+    //@TODO change this to sInterpolatedSignalName
     m_pInterpolatedSignalAttrib->setName(QStringLiteral("YOutVec"));
     m_pInterpolatedSignalAttrib->setBuffer(pInterpolatedSignalBuffer);
 
     //Set custom mesh data
     //generate base color
-    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, QColor(160,160,160,255));
+    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, Qt::gray);
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
@@ -222,14 +227,13 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
                                 Qt3DRender::QGeometryRenderer::Triangles);
     //add interpolated signal Attribute
     m_pCustomMesh->addAttrib(m_pInterpolatedSignalAttrib);
-
-
-
 }
+
+
+//*************************************************************************************************************
 
 void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSensorData)
 {
-    ///////////////////////////////////
     //if more data then needed is provided
     const int iSensorSize = m_iUsedSensors.size();
     if(tSensorData.rows() > iSensorSize)
@@ -259,6 +263,9 @@ void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSenso
         m_pMaterial->addSignalData(fSmallSensorData);
     }
 }
+
+
+//*************************************************************************************************************
 
 void ComputeInterpolationController::init()
 {  
@@ -292,9 +299,10 @@ void ComputeInterpolationController::init()
     //Set thresholdX parameter
     m_pMaterial->addDrawPassParameter(m_pThresholdXUniform);
     m_pMaterial->addDrawPassParameter(m_pThresholdZUniform);
-
-    
 }
+
+
+//*************************************************************************************************************
 
 QByteArray ComputeInterpolationController::createWeightMatBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
 {
@@ -320,6 +328,9 @@ QByteArray ComputeInterpolationController::createWeightMatBuffer(QSharedPointer<
     return bufferData;
 }
 
+
+//*************************************************************************************************************
+
 QByteArray ComputeInterpolationController::createZeroBuffer(const uint tBufferSize)
 {
     QByteArray bufferData;
@@ -334,6 +345,9 @@ QByteArray ComputeInterpolationController::createZeroBuffer(const uint tBufferSi
     return bufferData;
 }
 
+
+//*************************************************************************************************************
+
 MatrixX3f ComputeInterpolationController::createColorMat(const MatrixXf &tVertices, const QColor &tColor)
 {
     MatrixX3f matColor(tVertices.rows(),3);
@@ -347,19 +361,5 @@ MatrixX3f ComputeInterpolationController::createColorMat(const MatrixXf &tVertic
     return matColor;
 }
 
-/* YOut buffer hängt ab vom Surface
- *
- * Uniform rows  und cols hängt ab von weight matrix #
- *
- * weight matrix buffer hängt ab von interpolation matrix #
- *
- * addSignal größe auf eeg bzw. meg anpassen
- *
- * sensoren speichern #
- *
- * workgroupsize setzen abhängig von weight matrix
- *
- *
- *
-*/
+
 //*************************************************************************************************************

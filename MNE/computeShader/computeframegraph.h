@@ -111,20 +111,32 @@ public:
     */
     explicit ComputeFramegraph(Qt3DCore::QNode *parent = 0);
 
-    //void setWorkGroups(const int x, const int y, const int z);
-
+    //=========================================================================================================
+    /**
+     * @brief setCamera
+     * @param pCamera
+     */
     void setCamera(Qt3DRender::QCamera *pCamera);
 
-    void setWorkGroupSize(const unsigned int x, const unsigned int y , const unsigned int z);
-
-    //Qt3DRender::QCamera *getCamera();
+    //=========================================================================================================
+    /**
+     * @brief setWorkGroupSize
+     * @param x
+     * @param y
+     * @param z
+     */
+    void setWorkGroupSize(const uint x, const uint y , const uint z);
 
 protected:
 
 private:
+
+    //=========================================================================================================
+    /**
+     * @brief init
+     */
     void init();
 
-    //QPointer<Qt3DRender::QCamera> m_pCamera;
 
     QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;
 
@@ -142,10 +154,7 @@ private:
     QPointer<Qt3DRender::QTechniqueFilter> m_pComputeFilter;
     QPointer<Qt3DRender::QTechniqueFilter> m_pDrawFilter;
 
-
-
     QPointer<Qt3DRender::QMemoryBarrier> m_pMemoryBarrier;
-
 
 };
 
