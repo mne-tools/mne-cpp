@@ -104,6 +104,10 @@ ComputeInterpolationController::ComputeInterpolationController()
     , m_pMaterial(new ComputeMaterial)
     , m_pFramegraph(new ComputeFramegraph)
     , m_pInterpolatedSignalAttrib(new QAttribute)
+    , m_fThresholdX(0.0f)
+    , m_fThresholdZ(6e-6f)
+    , m_pThresholdXUniform(new QParameter(QStringLiteral("fThresholdX"), m_fThresholdX))
+    , m_pThresholdZUniform(new QParameter(QStringLiteral("fThresholdZ"), m_fThresholdZ))
 {
     init();
 }
@@ -186,7 +190,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
 
     //Set work group size
-    m_pFramegraph->setWorkGroupSize(iWeightMatCols, 1 ,1 );
+    m_pFramegraph->setWorkGroupSize(iWeightMatRows, 1 ,1 );
 
     //Init interpolated signal buffer
     QString sInterpolatedSignalName = QStringLiteral("InterpolatedSignal");
@@ -208,7 +212,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
     //Set custom mesh data
     //generate base color
-    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, QColor(0,0,255,255));
+    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, QColor(160,160,160,255));
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
@@ -284,6 +288,10 @@ void ComputeInterpolationController::init()
 
     //Set cam controller
     m_pCamController->setCamera(m_pCamera);
+
+    //Set thresholdX parameter
+    m_pMaterial->addDrawPassParameter(m_pThresholdXUniform);
+    m_pMaterial->addDrawPassParameter(m_pThresholdZUniform);
 
     
 }

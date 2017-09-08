@@ -1,9 +1,7 @@
 #version 430 core
 
-uniform mat4 mvp; //need for the QCamera and camera controller to work
-
 in vec3 vertexPosition;
-//in vec3 vertexColor;
+in vec3 vertexColor;
 in vec3 vertexNormal;
 in float YOutVec;
 
@@ -11,14 +9,17 @@ in float YOutVec;
 out vec3 vColor;
 out vec3 vNormal;
 
+uniform mat4 mvp; //need for the QCamera and camera controller to work
+uniform float fThresholdX;
+uniform float fThresholdZ;
 
 
-//color maps
 float linearSlope(float x, float m, float n)
 {
     return m*x + n;
 }
 
+//color maps
 vec3 colorMapJet(float x)
 {
     vec3 outColor;
@@ -114,6 +115,31 @@ void main()
 
         vNormal = normalize( vertexNormal );
 
+        /////////////////////////TEST//////////////
+
+                float fSample = abs(YOutVec);
+                float fTresholdDiff = fThresholdZ - fThresholdX;
+
+                vec3 tempColor = vertexColor;
+
+                if(fSample >= fThresholdX) {
+                    //Check lower and upper thresholds and normalize to one
+                    if(fSample >= fThresholdZ) {
+                        fSample = 1.0;
+                    } else {
+                        if(fSample != 0.0 && fTresholdDiff != 0.0 ) {
+                            fSample = (fSample - fThresholdX) / (fTresholdDiff);
+                        } else {
+                            fSample = 0.0;
+                        }
+                    }
+                    tempColor = colorMapJet(fSample);
+                }
+
+                vColor = tempColor;
+
+        //////////////////TEST///////////////////////
+
         //TODO use some kind of colormap
-        vColor = colorMapJet(YOutVec);
+        //vColor = colorMapJet(YOutVec);
 }

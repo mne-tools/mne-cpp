@@ -140,6 +140,13 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief addRenderPassParameter
+     * @param tParameter
+     */
+    void addDrawPassParameter(QPointer<Qt3DRender::QParameter> tParameter);
+
+    //=========================================================================================================
+    /**
      * generate a random signal matrix for testing.
      */
     void createSignalMatrix(uint tRows, uint tCols);

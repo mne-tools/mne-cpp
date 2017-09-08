@@ -143,6 +143,26 @@ void ComputeMaterial::addComputePassParameter(QPointer<QParameter> tParameter)
     m_CustomParameters.insert(tParameter->name(), tParameter);
 }
 
+void ComputeMaterial::addDrawPassParameter(QPointer<QParameter> tParameter)
+{
+    if(tParameter.isNull())
+    {
+        std::cerr << "setRenderPassParameter: QParameter = nullptr. Returning!" << std::endl;
+        return;
+    }
+
+    if(m_CustomParameters.contains(tParameter->name()))
+    {
+        std::cerr << "setRenderPassParameter: A Parameter with this Name: " << tParameter->name().toStdString()
+                  << " already exists. Returning!" << std::endl;
+        return;
+    }
+
+    m_pDrawRenderPass->addParameter(tParameter);
+    //add the parameter to the hash table for later usage.
+    m_CustomParameters.insert(tParameter->name(), tParameter);
+}
+
 void ComputeMaterial::createSignalMatrix(uint tRows, uint tCols)
 {
     m_signalMatrix = Eigen::MatrixXf::Zero(tRows, tCols);
@@ -233,7 +253,6 @@ void ComputeMaterial::init()
 
     //init signal processing
     m_pSignalDataParameter->setName(QStringLiteral("MeasurementVec"));
-    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
     m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
 
     //Effect
@@ -246,7 +265,7 @@ void ComputeMaterial::init()
 
     //init timer and connect with updateSignalBuffer
     connect(m_pTimer, &QTimer::timeout,this, &ComputeMaterial::updateSignalBuffer);
-    m_pTimer->start(100);
+    m_pTimer->start(16); //60Hz
 }
 
 
