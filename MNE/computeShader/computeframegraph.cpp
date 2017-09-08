@@ -103,29 +103,30 @@ ComputeFramegraph::ComputeFramegraph(Qt3DCore::QNode *parent)
     , m_pMemoryBarrier(new QMemoryBarrier(m_pDrawFilter))
     , m_pDrawKey(new QFilterKey)
     , m_pComputeKey(new QFilterKey)
-   // , m_pCamera(new QCamera)
 {
     init();
 }
 
+
+//*************************************************************************************************************
+
 void ComputeFramegraph::setCamera(QCamera *pCamera)
 {
-
     m_pCameraSelector->setCamera(pCamera);
 }
 
-void ComputeFramegraph::setWorkGroupSize(const unsigned int x, const unsigned int y, const unsigned int z)
+
+//*************************************************************************************************************
+
+void ComputeFramegraph::setWorkGroupSize(const uint x, const uint y, const uint z)
 {
     m_pDispatchCompute->setWorkGroupX(x);
     m_pDispatchCompute->setWorkGroupY(y);
     m_pDispatchCompute->setWorkGroupZ(z);
-
 }
 
-//QCamera *ComputeFramegraph::getCamera()
-//{
-//    return m_pCamera.data();
-//}
+
+//*************************************************************************************************************
 
 void ComputeFramegraph::init()
 {
@@ -134,12 +135,6 @@ void ComputeFramegraph::init()
     //Set ClearBuffers
     m_pClearBuffers->setBuffers(QClearBuffers::ColorDepthBuffer);
     m_pClearBuffers->setClearColor(Qt::black);
-
-    //Set Workgroup size
-    //@TO-DO set correct workgroup size
-    m_pDispatchCompute->setWorkGroupX(50);
-    m_pDispatchCompute->setWorkGroupY(1);
-    m_pDispatchCompute->setWorkGroupZ(1);
 
     //Set FilterKeys
     m_pComputeKey->setName(QStringLiteral("type"));
@@ -152,23 +147,9 @@ void ComputeFramegraph::init()
     m_pComputeFilter->addMatch(m_pComputeKey);
     m_pDrawFilter->addMatch(m_pDrawKey);
 
-
     //Set Memory Barrier
     //@TO-DO change this if needed
     m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
-
-    //Set camera
-//    m_pCamera->setProjectionType(QCameraLens::PerspectiveProjection);
-//    m_pCamera->setViewCenter(QVector3D(0, 0, 0));
-//    m_pCamera->setPosition(QVector3D(0, 0, -40.0f));
-//    m_pCamera->setNearPlane(0.1f);
-//    m_pCamera->setFarPlane(1000.0f);
-//    m_pCamera->setFieldOfView(25.0f);
-//    m_pCamera->setAspectRatio(1.33f);
-//    m_pCameraSelector->setCamera(m_pCamera);
-    //camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-
-
 }
 
 

@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>computeshader.csh</file>
         <file>fragmentshader.frag</file>
         <file>vertexshader.vert</file>
         <file>interpolation.csh</file>
