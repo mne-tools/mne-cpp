@@ -42,6 +42,7 @@
 #include "computeinterpolationcontroller.h"
 #include "computeframegraph.h"
 #include "computematerial.h"
+#include "cshdataworker.h"
 #include <disp3D/engine/model/3dhelpers/custommesh.h>
 #include <geometryInfo/geometryinfo.h>
 #include <fiff/fiff_evoked.h>
@@ -108,8 +109,18 @@ ComputeInterpolationController::ComputeInterpolationController()
     , m_fThresholdZ(6e-6f)
     , m_pThresholdXUniform(new QParameter(QStringLiteral("fThresholdX"), m_fThresholdX))
     , m_pThresholdZUniform(new QParameter(QStringLiteral("fThresholdZ"), m_fThresholdZ))
+    , m_pRtDataWorker(new CshDataWorker)
 {
+    qRegisterMetaType<Eigen::VectorXf>();
     init();
+}
+
+ComputeInterpolationController::~ComputeInterpolationController()
+{
+    if(m_pRtDataWorker->isRunning()) {
+        m_pRtDataWorker->stop();
+        delete m_pRtDataWorker;
+    }
 }
 
 
@@ -234,8 +245,9 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
 void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSensorData)
 {
+
     //if more data then needed is provided
-    const int iSensorSize = m_iUsedSensors.size();
+    const uint iSensorSize = m_iUsedSensors.size();
     if(tSensorData.rows() > iSensorSize)
     {
         MatrixXf fSmallSensorData(iSensorSize, tSensorData.cols());
@@ -248,7 +260,7 @@ void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSenso
                 fSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
             }
         }
-        m_pMaterial->addSignalData(fSmallSensorData);
+        m_pRtDataWorker->addData(fSmallSensorData);
     }
     else
     {
@@ -260,8 +272,33 @@ void ComputeInterpolationController::addSignalData(const Eigen::MatrixXf &tSenso
                 fSmallSensorData.row(i).setZero();
             }
         }
-        m_pMaterial->addSignalData(fSmallSensorData);
+        m_pRtDataWorker->addData(fSmallSensorData);
     }
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::setNormalization(const QVector3D &tVecThresholds)
+{
+    m_fThresholdX = tVecThresholds.x();
+    m_fThresholdZ = tVecThresholds.z();
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::startWorker()
+{
+    m_pRtDataWorker->start();
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::onNewRtData(const VectorXf &tSensorData)
+{
+    m_pMaterial->addSignalData(tSensorData);
 }
 
 
@@ -299,6 +336,9 @@ void ComputeInterpolationController::init()
     //Set thresholdX parameter
     m_pMaterial->addDrawPassParameter(m_pThresholdXUniform);
     m_pMaterial->addDrawPassParameter(m_pThresholdZUniform);
+
+    connect(m_pRtDataWorker, &CshDataWorker::newRtData,
+            this, &ComputeInterpolationController::onNewRtData);
 }
 
 
