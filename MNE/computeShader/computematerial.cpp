@@ -95,7 +95,6 @@ using namespace Qt3DRender;
 
 ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     : QMaterial(parent)
-    , m_iSignalCtr(0)
     , m_pEffect(new QEffect)
     , m_pComputeShader(new QShaderProgram)
     , m_pComputeRenderPass(new QRenderPass)
@@ -108,7 +107,6 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     , m_pColorParameter(new QParameter)
     , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pSignalDataParameter(new QParameter)
-    , m_pTimer(new QTimer(this))
 {
     init();
 }
@@ -174,32 +172,16 @@ void ComputeMaterial::addDrawPassParameter(QPointer<QParameter> tParameter)
 
 //*************************************************************************************************************
 
-void ComputeMaterial::addSignalData(const Eigen::MatrixXf &tSignalMat)
+void ComputeMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
 {
-    m_signalMatrix = tSignalMat;
-    updateSignalBuffer();
-}
-
-
-//*************************************************************************************************************
-
-void ComputeMaterial::updateSignalBuffer()
-{
-    const uint iBufferSize = m_signalMatrix.rows();
+    const uint iBufferSize = tSignalVec.rows();
     QByteArray bufferData;
     bufferData.resize(iBufferSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
     for(uint i = 0; i < iBufferSize; ++i)
     {
-        rawVertexArray[i] = m_signalMatrix(i, m_iSignalCtr);
-    }
-
-    m_iSignalCtr++;
-
-    if(m_iSignalCtr >= m_signalMatrix.cols())
-    {
-        m_iSignalCtr = 0;
+        rawVertexArray[i] = tSignalVec(i);
     }
 
     //Set buffer and parameter
@@ -264,10 +246,6 @@ void ComputeMaterial::init()
 
     //Add to material
     this->setEffect(m_pEffect);
-
-    //init timer and connect with updateSignalBuffer
-    connect(m_pTimer, &QTimer::timeout,this, &ComputeMaterial::updateSignalBuffer);
-    m_pTimer->start(16); //60Hz
 }
 
 

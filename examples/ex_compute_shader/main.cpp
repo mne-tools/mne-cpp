@@ -149,12 +149,13 @@ int main(int argc, char *argv[])
     ComputeInterpolationController *CompController = new ComputeInterpolationController;
 
     CompController->setInterpolationData(t_sensorSurfaceVV[0],evoked, Interpolation::cubic, FIFFV_EEG_CH, 0.1 );
-    Eigen::MatrixXf tempMat = evoked.data.cast<float>();
-    std::cout << tempMat.rows() << " " << tempMat.cols() <<std::endl;
-    CompController->addSignalData(tempMat);
+
+    CompController->addSignalData(evoked.data.cast<float>());
 
     Qt3DCore::QEntity *rootEntity = CompController->getRootEntity();
     ComputeFramegraph *pFramegragh = CompController->getComputeFramegraph();
+
+    CompController->startWorker();
 
     //Configure view settings
     view.setRootEntity(rootEntity);
