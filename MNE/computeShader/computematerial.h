@@ -52,7 +52,6 @@
 #include <QSharedPointer>
 #include <QPointer>
 #include <QHash>
-#include <QTimer>
 #include <Qt3DRender/QMaterial>
 
 
@@ -106,7 +105,7 @@ namespace CSH {
 
 class COMPUTE_SHADERSHARED_EXPORT ComputeMaterial : public Qt3DRender::QMaterial
 {
-
+    Q_OBJECT
 public:
     typedef QSharedPointer<ComputeMaterial> SPtr;            /**< Shared pointer type for ComputeMaterial. */
     typedef QSharedPointer<const ComputeMaterial> ConstSPtr; /**< Const shared pointer type for ComputeMaterial. */
@@ -146,21 +145,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Add a new matrix with signal data form the sensors
-     * @param tSignalMat
-     * @param tSensorSize Number of EEG or MEG Sensors
+     * Add a new vector with signal data form the sensors add add them to the m_pSignalDataBuffer.
+     * @param tSignalVec
      */
-    void addSignalData(const Eigen::MatrixXf &tSignalMat);
-
-
+    void addSignalData(const Eigen::VectorXf &tSignalVec);
 
 protected:
 
-    //=========================================================================================================
-    /**
-     * update the signal buffer with new measurement data.
-     */
-    void updateSignalBuffer();
+
 
 private:
     //=========================================================================================================
@@ -169,7 +161,7 @@ private:
      */
     void init();
 
-
+    //=========================================================================================================
     QPointer<Qt3DRender::QEffect> m_pEffect;
 
     //Compute Part
@@ -191,9 +183,7 @@ private:
     //Measurement signal
     QPointer<Qt3DRender::QBuffer> m_pSignalDataBuffer;
     QPointer<Qt3DRender::QParameter> m_pSignalDataParameter;
-    Eigen::MatrixXf m_signalMatrix;
-    uint m_iSignalCtr;
-    QPointer<QTimer> m_pTimer;
+
 };
 
 
