@@ -100,7 +100,7 @@ namespace CSH {
 
 class COMPUTE_SHADERSHARED_EXPORT ComputeFramegraph : public Qt3DRender::QViewport
 {
-
+    Q_OBJECT
 public:
     typedef QSharedPointer<ComputeFramegraph> SPtr;            /**< Shared pointer type for ComputeFramegraph. */
     typedef QSharedPointer<const ComputeFramegraph> ConstSPtr; /**< Const shared pointer type for ComputeFramegraph. */

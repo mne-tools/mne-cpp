@@ -37,6 +37,7 @@
 #define CSH_COMPUTEINTERPOLATIONCONTROLLER_H
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -54,6 +55,7 @@
 #include <QSharedPointer>
 #include <QPointer>
 #include <QHash>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -105,6 +107,10 @@ namespace Qt3DCore {
 
 namespace CSH {
 
+#ifndef metatype_vectorxd
+#define metatype_vectorxd
+Q_DECLARE_METATYPE(Eigen::VectorXf);
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -113,6 +119,7 @@ namespace CSH {
 
 class ComputeMaterial;
 class ComputeFramegraph;
+class CshDataWorker;
 
 //=============================================================================================================
 /**
@@ -121,9 +128,9 @@ class ComputeFramegraph;
 * @brief Brief description of this class.
 */
 
-class COMPUTE_SHADERSHARED_EXPORT ComputeInterpolationController
+class COMPUTE_SHADERSHARED_EXPORT ComputeInterpolationController : public QObject
 {
-
+    Q_OBJECT
 public:
     typedef QSharedPointer<ComputeInterpolationController> SPtr;            /**< Shared pointer type for ComputeInterpolationController. */
     typedef QSharedPointer<const ComputeInterpolationController> ConstSPtr; /**< Const shared pointer type for ComputeInterpolationController. */
@@ -133,6 +140,13 @@ public:
     * Constructs a ComputeInterpolationController object.
     */
     explicit ComputeInterpolationController();
+
+
+    //=========================================================================================================
+    /**
+    * Destructor, stops and deletes rtdata worker
+    */
+    ~ComputeInterpolationController();
 
     //=========================================================================================================
     /**
@@ -169,7 +183,29 @@ public:
      */
     void addSignalData(const Eigen::MatrixXf &tSensorData);
 
+    //=========================================================================================================
+    /**
+    * Set the normalization value.
+    *
+    * @param[in] tVecThresholds          The new threshold values used for normalizing the data.
+    */
+    void setNormalization(const QVector3D &tVecThresholds);
+
+    //=========================================================================================================
+    /**
+     * @brief startWorker
+     */
+    void startWorker();
+
 protected:
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever this item receives new signalvalues for each sensor.
+    *
+    * @param[in] tSensorData         The signal values for each sensor.
+    */
+    void onNewRtData(const Eigen::VectorXf &tSensorData);
 
 private:
 
@@ -230,10 +266,12 @@ private:
 
     //The threshold values used for normalizing the data
     float m_fThresholdX;     /**< Lower threshold.*/
-    float m_fThresholdZ;     /**< Upper threshold.*/
+    float m_fThresholdZ;     /**< Upper threshold.*/   
 
     QPointer<Qt3DRender::QParameter> m_pThresholdXUniform;
     QPointer<Qt3DRender::QParameter> m_pThresholdZUniform;
+
+    QPointer<CshDataWorker>     m_pRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
 
 };
 
