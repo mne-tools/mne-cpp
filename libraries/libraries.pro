@@ -48,6 +48,7 @@ SUBDIRS += \
     connectivity \
     realtime \
 
+
 !contains(MNECPP_CONFIG, minimalVersion) {
 
     !isEmpty( CNTK_INCLUDE_DIR ) {
