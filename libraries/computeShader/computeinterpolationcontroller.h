@@ -45,7 +45,7 @@
 
 #include "computeShader_global.h"
 #include <fiff/fiff_types.h>
-#include <interpolation/interpolation.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================

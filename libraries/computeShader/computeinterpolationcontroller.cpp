@@ -44,7 +44,7 @@
 #include "computematerial.h"
 #include "cshdataworker.h"
 #include <disp3D/engine/model/3dhelpers/custommesh.h>
-#include <geometryInfo/geometryinfo.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_types.h>
 #include <mne/mne_bem_surface.h>
@@ -77,8 +77,6 @@
 using namespace CSH;
 using namespace Qt3DRender;
 using namespace DISP3DLIB;
-using namespace INTERPOLATION;
-using namespace GEOMETRYINFO;
 using namespace Eigen;
 
 

@@ -46,10 +46,9 @@
 #include <computeShader/computematerial.h>
 #include <computeShader/computeframegraph.h>
 #include <computeShader/computeinterpolationcontroller.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 
 #include <iostream>
-
-#include <interpolation/interpolation.h>
 #include <fiff/fiff_constants.h>
 
 
@@ -75,7 +74,7 @@
 using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INTERPOLATION;
+using namespace DISP3DLIB;
 using namespace CSH;
 
 //*************************************************************************************************************
