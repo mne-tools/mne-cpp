@@ -181,7 +181,7 @@ void ComputeMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
 
     for(uint i = 0; i < iBufferSize; ++i)
     {
-        rawVertexArray[i] = tSignalVec(i);
+        rawVertexArray[i] = tSignalVec[i];
     }
 
     //Set buffer and parameter
@@ -237,7 +237,9 @@ void ComputeMaterial::init()
 
     //init signal processing
     m_pSignalDataParameter->setName(QStringLiteral("MeasurementVec"));
+    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
     m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
+
 
     //Effect
     //Link shader and uniforms
