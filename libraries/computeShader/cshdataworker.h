@@ -212,4 +212,9 @@ signals:
 
 } // namespace CSH
 
+#ifndef metatype_vectorxd
+#define metatype_vectorxd
+Q_DECLARE_METATYPE(Eigen::VectorXf);
+#endif
+
 #endif // CSH_CSHDATAWORKER_H

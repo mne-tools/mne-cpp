@@ -107,10 +107,6 @@ namespace Qt3DCore {
 
 namespace CSH {
 
-#ifndef metatype_vectorxd
-#define metatype_vectorxd
-Q_DECLARE_METATYPE(Eigen::VectorXf);
-#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -283,5 +279,10 @@ private:
 
 
 } // namespace CSH
+
+#ifndef metatype_vectorxd
+#define metatype_vectorxd
+Q_DECLARE_METATYPE(Eigen::VectorXf);
+#endif
 
 #endif // CSH_COMPUTEINTERPOLATIONCONTROLLER_H

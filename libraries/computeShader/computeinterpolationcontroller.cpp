@@ -109,7 +109,7 @@ ComputeInterpolationController::ComputeInterpolationController()
     , m_pThresholdZUniform(new QParameter(QStringLiteral("fThresholdZ"), m_fThresholdZ))
     , m_pRtDataWorker(new CshDataWorker)
 {
-    qRegisterMetaType<Eigen::VectorXf>();
+    qRegisterMetaType<Eigen::VectorXf>("Eigen::VectorXf");
     init();
 }
 
@@ -294,7 +294,7 @@ void ComputeInterpolationController::startWorker()
 
 //*************************************************************************************************************
 
-void ComputeInterpolationController::onNewRtData(const VectorXf &tSensorData)
+void ComputeInterpolationController::onNewRtData(const Eigen::VectorXf &tSensorData)
 {
     m_pMaterial->addSignalData(tSensorData);
 }
