@@ -104,7 +104,7 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     , m_pDrawRenderPass(new QRenderPass)
     , m_pDrawFilterKey(new QFilterKey)
     , m_pDrawTechnique(new QTechnique)
-    , m_pColorParameter(new QParameter)
+    , m_pInterpolatedSignalParameter(new QParameter)
     , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pSignalDataParameter(new QParameter)
 {
@@ -114,13 +114,13 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
 
 //*************************************************************************************************************
 
-void ComputeMaterial::setYOutBuffer(Qt3DRender::QBuffer *yOutBuffer)
+void ComputeMaterial::setInterpolatedSignalBuffer(Qt3DRender::QBuffer *tBuffer, const QString &tBufferName)
 {
-    m_pColorParameter->setName(QStringLiteral("YOutVec"));
+    m_pInterpolatedSignalParameter->setName(tBufferName);
 
     //Set the buffer as parameter data
-    m_pColorParameter->setValue(QVariant::fromValue(yOutBuffer));
-    m_pComputeRenderPass->addParameter(m_pColorParameter);
+    m_pInterpolatedSignalParameter->setValue(QVariant::fromValue(tBuffer));
+    m_pComputeRenderPass->addParameter(m_pInterpolatedSignalParameter);
 }
 
 

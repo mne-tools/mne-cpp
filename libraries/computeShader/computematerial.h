@@ -124,10 +124,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Set a Colorbuffer for testing.
-     * @param colorbuffer
+     * @brief setInterpolatedSignalBuffer
+     * @param tBuffer
+     * @param tBufferName
      */
-    void setYOutBuffer(Qt3DRender::QBuffer *yOutBuffer);
+    void setInterpolatedSignalBuffer(Qt3DRender::QBuffer *tBuffer, const QString &tBufferName);
 
     //=========================================================================================================
     /**
@@ -176,7 +177,7 @@ private:
     QPointer<Qt3DRender::QFilterKey> m_pDrawFilterKey;
     QPointer<Qt3DRender::QTechnique> m_pDrawTechnique;
 
-    QPointer<Qt3DRender::QParameter> m_pColorParameter;
+    QPointer<Qt3DRender::QParameter> m_pInterpolatedSignalParameter;
 
     QHash<QString, QPointer<Qt3DRender::QParameter>> m_CustomParameters;
 

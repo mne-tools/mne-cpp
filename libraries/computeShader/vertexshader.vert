@@ -3,7 +3,7 @@
 in vec3 vertexPosition;
 in vec3 vertexColor;
 in vec3 vertexNormal;
-in float YOutVec;
+in float InterpolatedSignal;
 
 //out vec4 vPosition;
 out vec3 vColor;
@@ -117,7 +117,7 @@ void main()
 
         /////////////////////////TEST//////////////
 
-                float fSample = abs(YOutVec);
+                float fSample = abs(InterpolatedSignal);
                 float fTresholdDiff = fThresholdZ - fThresholdX;
 
                 vec3 tempColor = vertexColor;
