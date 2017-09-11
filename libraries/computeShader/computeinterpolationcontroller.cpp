@@ -212,7 +212,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     m_pBuffers.insert(sInterpolatedSignalName, pInterpolatedSignalBuffer);
 
     //@TODO rewrite setYoutBuffer with custom name input
-    m_pMaterial->setYOutBuffer(pInterpolatedSignalBuffer);
+    m_pMaterial->setInterpolatedSignalBuffer(pInterpolatedSignalBuffer, sInterpolatedSignalName);
 
     //Interpolated signal attribute
     m_pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
@@ -221,7 +221,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     m_pInterpolatedSignalAttrib->setByteOffset(0);
     m_pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
     //@TODO change this to sInterpolatedSignalName
-    m_pInterpolatedSignalAttrib->setName(QStringLiteral("YOutVec"));
+    m_pInterpolatedSignalAttrib->setName(sInterpolatedSignalName);
     m_pInterpolatedSignalAttrib->setBuffer(pInterpolatedSignalBuffer);
 
     //Set custom mesh data

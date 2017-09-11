@@ -11,9 +11,9 @@ layout (local_size_x = 1) in;
 
 
 //output buffer colortable needs to be applied on this array
-layout (std430, binding = 0) buffer YOutVec
+layout (std430, binding = 0) buffer InterpolatedSignal
 {
-    float yOut[];
+    float interpolatedSignal[];
 };
 
 //Weight matrix buffer
@@ -28,12 +28,6 @@ layout (std430, binding = 2) buffer MeasurementVec
     float mData[];
 };
 
-/*
-uint modulo(uint x, uint y)
-{
-    return x - y * floor( x / y);
-}
-*/
 
 void main(void)
 {
@@ -46,7 +40,7 @@ void main(void)
         sum += weights[globalId * cols + i] * mData[i];
     }
 
-    yOut[globalId] = sum;
+    interpolatedSignal[globalId] = sum;
 
     //yOut[uint(mod(globalId, cols))] += weights[globalId] * mData[uint(mod(globalId, rows))];
 
