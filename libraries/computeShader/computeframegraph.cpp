@@ -110,19 +110,19 @@ ComputeFramegraph::ComputeFramegraph(Qt3DCore::QNode *parent)
 
 //*************************************************************************************************************
 
-void ComputeFramegraph::setCamera(QCamera *pCamera)
+void ComputeFramegraph::setCamera(QCamera *tCamera)
 {
-    m_pCameraSelector->setCamera(pCamera);
+    m_pCameraSelector->setCamera(tCamera);
 }
 
 
 //*************************************************************************************************************
 
-void ComputeFramegraph::setWorkGroupSize(const uint x, const uint y, const uint z)
+void ComputeFramegraph::setWorkGroupSize(const uint tX, const uint tY, const uint tZ)
 {
-    m_pDispatchCompute->setWorkGroupX(x);
-    m_pDispatchCompute->setWorkGroupY(y);
-    m_pDispatchCompute->setWorkGroupZ(z);
+    m_pDispatchCompute->setWorkGroupX(tX);
+    m_pDispatchCompute->setWorkGroupY(tY);
+    m_pDispatchCompute->setWorkGroupZ(tZ);
 }
 
 

@@ -93,9 +93,9 @@ namespace CSH {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class holds the framegraph that is used for computation in OpenGL compute shadern.
 *
-* @brief Brief description of this class.
+* @brief Compute framegaph class.
 */
 
 class COMPUTE_SHADERSHARED_EXPORT ComputeFramegraph : public Qt3DRender::QViewport
@@ -113,19 +113,21 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setCamera
-     * @param pCamera
+     * Sets active camera for use in the framegraphs camera selector.
+     *
+     * @param tCamera               Pointer to QCamera object.
      */
-    void setCamera(Qt3DRender::QCamera *pCamera);
+    void setCamera(Qt3DRender::QCamera *tCamera);
 
     //=========================================================================================================
     /**
-     * @brief setWorkGroupSize
-     * @param x
-     * @param y
-     * @param z
+     * Sets the work group size for the computation in each dim.
+     *
+     * @param tX                     Size of X work group.
+     * @param tY                     Size of Y work group.
+     * @param tZ                     Size of Z work group.
      */
-    void setWorkGroupSize(const uint x, const uint y , const uint z);
+    void setWorkGroupSize(const uint tX, const uint tY , const uint tZ);
 
 protected:
 
@@ -133,11 +135,11 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief init
+     * Init the  ComputeFramegraph class.
      */
     void init();
 
-
+    //=========================================================================================================
     QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;
 
     QPointer<Qt3DRender::QClearBuffers> m_pClearBuffers;
