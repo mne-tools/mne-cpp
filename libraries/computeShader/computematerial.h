@@ -124,30 +124,31 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setInterpolatedSignalBuffer
-     * @param tBuffer
-     * @param tBufferName
+     * Set buffer to save the result of the interpolation.
+     * @param tBuffer                   Pointer to the buffer.
+     * @param tBufferName               Name of the buffer. The name is used in compute shader code.
      */
     void setInterpolatedSignalBuffer(Qt3DRender::QBuffer *tBuffer, const QString &tBufferName);
 
     //=========================================================================================================
     /**
-     * @brief setComputePassParameter
-     * @param tParameter
+     * Add one parameter to compute-renderpass and save the pointer to it.
+     * @param tParameter                New QParameter from outside the class.
      */
     void addComputePassParameter(QPointer<Qt3DRender::QParameter> tParameter);
 
     //=========================================================================================================
     /**
-     * @brief addRenderPassParameter
-     * @param tParameter
+     * Add one parameter to draw-renderpass and save the pointer to it.
+     * @param tParameter                New QParameter from outside the class.
      */
     void addDrawPassParameter(QPointer<Qt3DRender::QParameter> tParameter);
 
     //=========================================================================================================
     /**
-     * Add a new vector with signal data form the sensors add add them to the m_pSignalDataBuffer.
-     * @param tSignalVec
+     * Add a new vector with signal data form the sensors and push them into the m_pSignalDataBuffer.
+     *
+     * @param tSignalVec                Vector with one float value for each sensor.
      */
     void addSignalData(const Eigen::VectorXf &tSignalVec);
 
@@ -158,7 +159,7 @@ protected:
 private:
     //=========================================================================================================
     /**
-     * @brief init
+     * Init ComputeMaterial class.
      */
     void init();
 
@@ -177,13 +178,15 @@ private:
     QPointer<Qt3DRender::QFilterKey> m_pDrawFilterKey;
     QPointer<Qt3DRender::QTechnique> m_pDrawTechnique;
 
-    QPointer<Qt3DRender::QParameter> m_pInterpolatedSignalParameter;
-
+    //Storage for custom parameters
     QHash<QString, QPointer<Qt3DRender::QParameter>> m_CustomParameters;
 
     //Measurement signal
     QPointer<Qt3DRender::QBuffer> m_pSignalDataBuffer;
     QPointer<Qt3DRender::QParameter> m_pSignalDataParameter;
+
+    //Output parameter
+    QPointer<Qt3DRender::QParameter> m_pInterpolatedSignalParameter;
 
 };
 
