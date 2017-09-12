@@ -103,11 +103,13 @@ ComputeInterpolationController::ComputeInterpolationController()
     , m_pMaterial(new ComputeMaterial)
     , m_pFramegraph(new ComputeFramegraph)
     , m_pInterpolatedSignalAttrib(new QAttribute)
-    , m_fThresholdX(0.0f)
+    , m_fThresholdX(1e-10f)
     , m_fThresholdZ(6e-6f)
     , m_pThresholdXUniform(new QParameter(QStringLiteral("fThresholdX"), m_fThresholdX))
     , m_pThresholdZUniform(new QParameter(QStringLiteral("fThresholdZ"), m_fThresholdZ))
     , m_pRtDataWorker(new CshDataWorker)
+    , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
+    , m_pInterpolatedSignalBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
 {
     qRegisterMetaType<Eigen::VectorXf>("Eigen::VectorXf");
     init();
@@ -188,32 +190,24 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     const uint iWeightMatCols = m_iUsedSensors.size();
 
     //Create uniform for the number of columns
-    QParameter *pColsUniform = new QParameter(QStringLiteral("cols"), iWeightMatCols);
-    m_pMaterial->addComputePassParameter(pColsUniform);
-    m_pParameters.insert(pColsUniform->name(), pColsUniform);
+    m_pColsUniform = new QParameter(QStringLiteral("cols"), iWeightMatCols);
+    m_pMaterial->addComputePassParameter(m_pColsUniform);
 
     //Create Weight matrix buffer and Parameter
-    Qt3DRender::QBuffer *pWeightMatBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer);
-    pWeightMatBuffer->setData(createWeightMatBuffer(pInterpolationMatrix));
-    QParameter *pWeightMatParameter = new QParameter(QStringLiteral("WeightMat"),
-                                                     QVariant::fromValue(pWeightMatBuffer));
-    m_pMaterial->addComputePassParameter(pWeightMatParameter);
-    m_pBuffers.insert(pWeightMatParameter->name(), pWeightMatBuffer);
-    m_pParameters.insert(pWeightMatParameter->name(), pWeightMatParameter);
-
+    m_pWeightMatBuffer->setData(createWeightMatBuffer(pInterpolationMatrix));
+    m_pWeightMatParameter = new QParameter(QStringLiteral("WeightMat"),
+                                                     QVariant::fromValue(m_pWeightMatBuffer.data()));
+    m_pMaterial->addComputePassParameter(m_pWeightMatParameter);
 
     //Set work group size
-    uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iWeightMatRows)));
+    const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iWeightMatRows)));
     m_pFramegraph->setWorkGroupSize(iWorkGroupsSize, iWorkGroupsSize ,1 );
 
     //Init interpolated signal buffer
     QString sInterpolatedSignalName = QStringLiteral("InterpolatedSignal");
-    Qt3DRender::QBuffer *pInterpolatedSignalBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
-    pInterpolatedSignalBuffer->setData(createZeroBuffer(  iWeightMatRows));
-    m_pBuffers.insert(sInterpolatedSignalName, pInterpolatedSignalBuffer);
+    m_pInterpolatedSignalBuffer->setData(createZeroBuffer(iWeightMatRows));
 
-    //@TODO rewrite setYoutBuffer with custom name input
-    m_pMaterial->setInterpolatedSignalBuffer(pInterpolatedSignalBuffer, sInterpolatedSignalName);
+    m_pMaterial->setInterpolatedSignalBuffer(m_pInterpolatedSignalBuffer.data(), sInterpolatedSignalName);
 
     //Interpolated signal attribute
     m_pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
@@ -221,13 +215,12 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     m_pInterpolatedSignalAttrib->setVertexSize(1);
     m_pInterpolatedSignalAttrib->setByteOffset(0);
     m_pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
-    //@TODO change this to sInterpolatedSignalName
     m_pInterpolatedSignalAttrib->setName(sInterpolatedSignalName);
-    m_pInterpolatedSignalAttrib->setBuffer(pInterpolatedSignalBuffer);
+    m_pInterpolatedSignalAttrib->setBuffer(m_pInterpolatedSignalBuffer);
 
     //Set custom mesh data
-    //generate base color
-    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, Qt::gray);
+    //generate mesh base color
+    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, QColor(80, 80, 80, 255));
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
