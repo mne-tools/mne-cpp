@@ -54,7 +54,6 @@
 
 #include <QSharedPointer>
 #include <QPointer>
-#include <QHash>
 #include <QTimer>
 
 
@@ -253,12 +252,16 @@ private:
 
     QPointer<Qt3DRender::QAttribute> m_pInterpolatedSignalAttrib;
 
+    QPointer<Qt3DRender::QBuffer> m_pWeightMatBuffer;
+    QPointer<Qt3DRender::QParameter> m_pWeightMatParameter;
+
+    QPointer<Qt3DRender::QBuffer> m_pInterpolatedSignalBuffer;
+
+    QPointer<Qt3DRender::QParameter> m_pColsUniform;
+
 
     QVector<uint> m_iSensorsBad;    /**< Store bad channel indexes.*/
     QVector<uint> m_iUsedSensors;   /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
-
-    QHash<QString, QPointer<Qt3DRender::QParameter>> m_pParameters;  /**< Stores all Parameters with their name.*/
-    QHash<QString, QPointer<Qt3DRender::QBuffer>> m_pBuffers;        /**< Stores all Buffers with their name.*/
 
     //The threshold values used for normalizing the data
     float m_fThresholdX;     /**< Lower threshold.*/
