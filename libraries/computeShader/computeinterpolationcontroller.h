@@ -118,9 +118,9 @@ class CshDataWorker;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class controlls all aspects that are needed for interpolation using compute shaders.
 *
-* @brief Brief description of this class.
+* @brief Interpoltion controller.
 */
 
 class COMPUTE_SHADERSHARED_EXPORT ComputeInterpolationController : public QObject
@@ -136,6 +136,21 @@ public:
     */
     explicit ComputeInterpolationController();
 
+    //=========================================================================================================
+    /**
+     * Constructs a ComputeInterpolationController object and initialize it with interpolation data.
+     *
+     * @param tMneBemSurface        The Surface wich is used for interpolation.
+     * @param tEvoked               Contains information about all sensors.
+     * @param tSensorType           The type of sensor that is used for the interpolation.
+     * @param tCancelDist           Distances higher than this are ignored in the calculation.
+     */
+    ComputeInterpolationController(const MNELIB::MNEBemSurface &tMneBemSurface,
+                                   const FIFFLIB::FiffEvoked &tEvoked,
+                                   double (*tInterpolationFunction) (double),
+                                   const qint32 tSensorType = FIFFV_EEG_CH,
+                                   const double tCancelDist = DOUBLE_INFINITY);
+
 
     //=========================================================================================================
     /**
@@ -145,25 +160,28 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief getRootEntity
-     * @return
+     * Returns a pointer to the root entity of the QEntity tree used for computing and rendering.
+     *
+     * @return          Pointer to root entity.
      */
     Qt3DCore::QEntity * getRootEntity() const;
 
     //=========================================================================================================
     /**
-     * @brief getComputeFramegraph
-     * @return
+     * Returns a pointer to the framegraph used for computing and rendering.
+     *
+     * @return          Pointer to framegraph.
      */
     ComputeFramegraph *getComputeFramegraph() const;
 
     //=========================================================================================================
     /**
-     * @brief setInterpolationData
-     * @param tMneBemSurface
-     * @param tEvoked
-     * @param tSensorType
-     * @param tCancelDist
+     * Initialize the object with all data needed for interpolation.
+     *
+     * @param tMneBemSurface        The Surface wich is used for interpolation.
+     * @param tEvoked               Contains information about all sensors.
+     * @param tSensorType           The type of sensor that is used for the interpolation.
+     * @param tCancelDist           Distances higher than this are ignored in the calculation.
      */
     void setInterpolationData(const MNELIB::MNEBemSurface &tMneBemSurface,
                               const FIFFLIB::FiffEvoked &tEvoked,
@@ -173,8 +191,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief addSignalData
-     * @param tSensorData
+     * Adds new real time data from the sensors.
+     *
+     * @param tSensorData           Sensor values n channels x m points in time.
      */
     void addSignalData(const Eigen::MatrixXf &tSensorData);
 
@@ -188,15 +207,54 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief startWorker
+     * Starts the worker thread.
      */
     void startWorker();
+
+    //=========================================================================================================
+    /**
+    * Sets the running flag to false and waits for the worker to stop.
+    */
+    void stopWorker();
+
+    //=========================================================================================================
+    /**
+    * Set the number of average to take after emitting the data to the listening threads.
+    *
+    * @param[in] tNumAvr                The new number of averages.
+    */
+    void setNumberAverages(const uint tNumAvr);
+
+    //=========================================================================================================
+    /**
+    * Set the length in milli Seconds to wait inbetween data samples.
+    *
+    * @param[in] tMSec                  The new length in milli Seconds to wait inbetween data samples.
+    */
+    void setInterval(const uint tMSec);
+
+    //=========================================================================================================
+    /**
+    * Set the loop functionality on or off.
+    *
+    * @param[in] tLooping                The new looping state.
+    */
+    void setLoop(const bool tLooping);
+
+    //=========================================================================================================
+    /**
+    * Set the sampling frequency.
+    *
+    * @param[in] tSFreq                 The new sampling frequency.
+    */
+    void setSFreq(const double tSFreq);
+
 
 protected:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever this item receives new signalvalues for each sensor.
+    * This function gets called whenever this item receives new signal values for each sensor.
     *
     * @param[in] tSensorData         The signal values for each sensor.
     */
@@ -206,35 +264,41 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief init
+     * Init ComputeInterpolationController object.
      */
     void init();
 
     //=========================================================================================================
     /**
-     * @brief createWeightMatBuffer
-     * @param tInterpolationMatrix
-     * @return
+     * Creates data for the weight matrix buffer out of a interpolation matrix.
+     *
+     * @param tInterpolationMatrix      Weight matrix with n rows, where n is the number of vertices of the mesh
+     *                                  and m columns, where m is the number of sensors.
+     * @return                          Weight matrix in form of a QByteArray.
      */
     QByteArray createWeightMatBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix);
 
     //=========================================================================================================
     /**
-     * Create a buffer with tBufferSize floats with the value 0.0f
-     * @param tBufferSize
-     * @return
+     * Create a buffer with the value 0.0f for all entries.
+     *
+     * @param tBufferSize               Number of floats in the buffer.
+     * @return                          Buffer data.
      */
     QByteArray createZeroBuffer(const uint tBufferSize);
 
     //=========================================================================================================
     /**
-     * Create a Matrix with rgb values for each vertex
-     * @param tVertices
-     * @param tColor
+     * Create a Matrix with RGB values for each vertex.
+     *
+     * @param tVertices                 Number of vertices.
+     * @param tColor                    Color for the vertices.
      * @return
      */
     Eigen::MatrixX3f createColorMat(const Eigen::MatrixXf& tVertices, const QColor& tColor);
 
+    //=========================================================================================================
+    bool m_bIsInit;
 
     QPointer<Qt3DCore::QEntity> m_pRootEntity;
     QPointer<CSH::ComputeFramegraph> m_pFramegraph;

@@ -92,7 +92,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 ComputeInterpolationController::ComputeInterpolationController()
-    : m_pCamera(new QCamera)
+    : m_bIsInit(false)
+    , m_pCamera(new QCamera)
     , m_pCustomMesh(new CustomMesh)
     , m_pRootEntity(new Qt3DCore::QEntity)
     , m_pComputeEntity(new Qt3DCore::QEntity(m_pRootEntity))
@@ -113,6 +114,17 @@ ComputeInterpolationController::ComputeInterpolationController()
 {
     qRegisterMetaType<Eigen::VectorXf>("Eigen::VectorXf");
     init();
+}
+
+ComputeInterpolationController::ComputeInterpolationController(const MNELIB::MNEBemSurface &tMneBemSurface,
+                                                               const FIFFLIB::FiffEvoked &tEvoked,
+                                                               double (*tInterpolationFunction)(double),
+                                                               const qint32 tSensorType,
+                                                               const double tCancelDist)
+    : ComputeInterpolationController()
+{
+    setInterpolationData(tMneBemSurface, tEvoked, tInterpolationFunction, tSensorType, tCancelDist);
+    m_bIsInit = true;
 }
 
 ComputeInterpolationController::~ComputeInterpolationController()
@@ -148,6 +160,12 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
                                                           const qint32 tSensorType,
                                                           const double tCancelDist)
 {
+    if(m_bIsInit)
+    {
+        //@TOdO error msg
+        //qDebug << "ComputeInterpolationController::setInterpolationData: interpolation data already initialized.";
+        return;
+    }
     //fill QVector with the right sensor positions
     QVector<Eigen::Vector3f> vecSensorPos;
     m_iUsedSensors.clear();
@@ -283,6 +301,46 @@ void ComputeInterpolationController::setNormalization(const QVector3D &tVecThres
 void ComputeInterpolationController::startWorker()
 {
     m_pRtDataWorker->start();
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::stopWorker()
+{
+    m_pRtDataWorker->stop();
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::setNumberAverages(const uint tNumAvr)
+{
+    m_pRtDataWorker->setNumberAverages(tNumAvr);
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::setInterval(const uint tMSec)
+{
+    m_pRtDataWorker->setInterval(tMSec);
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::setLoop(const bool tLooping)
+{
+    m_pRtDataWorker->setLoop(tLooping);
+}
+
+
+//*************************************************************************************************************
+
+void ComputeInterpolationController::setSFreq(const double tSFreq)
+{
+    m_pRtDataWorker->setSFreq(tSFreq);
 }
 
 
