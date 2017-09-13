@@ -45,6 +45,7 @@
 
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
+#include <scMeas/newrealtimemultisamplearray.h>
 
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
@@ -68,7 +69,7 @@ using namespace CONNECTIVITYLIB;
 
 NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
-, m_iDownSample(4)
+, m_iDownSample(1)
 , m_pRTSEInput(Q_NULLPTR)
 , m_pRTCEOutput(Q_NULLPTR)
 , m_pNeuronalConnectivityBuffer(CircularMatrixBuffer<double>::SPtr())
@@ -110,6 +111,10 @@ void NeuronalConnectivity::init()
     m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "NeuronalConnectivityInSource", "NeuronalConnectivity source input data");
     connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &NeuronalConnectivity::updateSource, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSEInput);
+
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "NeuronalConnectivityInSensor", "NeuronalConnectivity sensor input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &NeuronalConnectivity::updateRTMSA, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
@@ -243,6 +248,80 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasure
 
         MatrixXd t_mat = pRTSE->getValue()->data;
         m_pNeuronalConnectivityBuffer->push(&t_mat);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+
+    if(pRTMSA) {
+        //Fiff information
+        if(!m_pFiffInfo) {
+            m_pFiffInfo = pRTMSA->info();
+
+            //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
+
+            //Prepare network creation
+            //Generate node vertices
+            bool bPick = false;
+            qint32 unit;
+            int counter = 0;
+            QString sChType = "mag";
+
+            for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+                unit = m_pFiffInfo->chs.at(i).unit;
+
+                if(unit == FIFF_UNIT_T_M &&
+                    sChType == "grad") {
+                    bPick = true;
+                } else if(unit == FIFF_UNIT_T &&
+                            sChType == "mag") {
+                    bPick = true;
+                } else if (unit == FIFF_UNIT_V &&
+                            sChType == "eeg") {
+                    bPick = true;
+                }
+
+                if(bPick) {
+                    //Get the positions
+                    m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
+                    m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
+                    m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
+                    m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
+
+                    m_chIdx << i;
+                    counter++;
+                }
+
+                bPick = false;
+            }
+
+            //Check if buffer initialized
+            if(!m_pNeuronalConnectivityBuffer) {
+                m_pNeuronalConnectivityBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, counter, pRTMSA->getMultiSampleArray()[0].cols()));
+            }
+
+        }
+
+        MatrixXd t_mat;
+        MatrixXd data;
+        for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
+        {
+            t_mat = pRTMSA->getMultiSampleArray()[i];
+            data.resize(m_chIdx.size(), t_mat.cols());
+
+            for(qint32 j = 0; j < m_chIdx.size(); ++j)
+            {
+                data.row(j) = t_mat.row(m_chIdx.at(j));
+            }
+
+            m_pNeuronalConnectivityBuffer->push(&data);
+        }
     }
 }
 
