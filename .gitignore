@@ -80,6 +80,7 @@
 
 /bin/ex_interpolation
 /bin/test_fiff_cov
+/bin/ex_compute_shader
 
 # Binaries Tests
 /bin/test_codecov
