@@ -164,9 +164,12 @@ int main(int argc, char *argv[])
 
     Qt3DExtras::Qt3DWindow view;
 
-    ComputeInterpolationController *CompController = new ComputeInterpolationController;
+    //ComputeInterpolationController *CompController = new ComputeInterpolationController;
 
-    CompController->setInterpolationData(t_sensorSurfaceVV[0],evoked, Interpolation::cubic, FIFFV_EEG_CH, 0.1 );
+    ComputeInterpolationController *CompController = new ComputeInterpolationController(t_sensorSurfaceVV[0],evoked,
+            Interpolation::cubic, FIFFV_EEG_CH, 0.1 );
+
+    //CompController->setInterpolationData(t_sensorSurfaceVV[0],evoked, Interpolation::cubic, FIFFV_EEG_CH, 0.1 );
 
     CompController->addSignalData(evoked.data.cast<float>());
 
