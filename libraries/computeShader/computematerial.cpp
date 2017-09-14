@@ -65,6 +65,7 @@
 #include <Qt3DRender/QShaderProgram>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <QUrl>
+#include <QColor>
 
 
 //*************************************************************************************************************
@@ -96,6 +97,10 @@ using namespace Qt3DRender;
 ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     : QMaterial(parent)
     , m_pEffect(new QEffect)
+    , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
+    , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
+    , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
+    , m_pAlphaParameter(new QParameter(QStringLiteral("alpha"), 0.5f))
     , m_pComputeShader(new QShaderProgram)
     , m_pComputeRenderPass(new QRenderPass)
     , m_pComputeFilterKey(new QFilterKey)
@@ -220,6 +225,12 @@ void ComputeMaterial::init()
     m_pDrawShader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/fragmentshader.frag"))));
 
     m_pDrawRenderPass->setShaderProgram(m_pDrawShader);
+
+    //Add Phongalpha parameter
+    m_pDrawRenderPass->addParameter(m_pDiffuseParameter);
+    m_pDrawRenderPass->addParameter(m_pSpecularParameter);
+    m_pDrawRenderPass->addParameter(m_pShininessParameter);
+    m_pDrawRenderPass->addParameter(m_pAlphaParameter);
 
     //Set OpenGL version
     m_pDrawTechnique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);

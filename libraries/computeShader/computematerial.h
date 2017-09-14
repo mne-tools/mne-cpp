@@ -178,6 +178,12 @@ private:
     QPointer<Qt3DRender::QFilterKey> m_pDrawFilterKey;
     QPointer<Qt3DRender::QTechnique> m_pDrawTechnique;
 
+    //Phongalpha parameter
+    QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;
+    QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;
+    QPointer<Qt3DRender::QParameter>        m_pShininessParameter;
+    QPointer<Qt3DRender::QParameter>        m_pAlphaParameter;
+
     //Storage for custom parameters
     QHash<QString, QPointer<Qt3DRender::QParameter>> m_CustomParameters;
 

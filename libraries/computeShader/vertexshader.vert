@@ -6,10 +6,16 @@ in vec3 vertexNormal;
 in float InterpolatedSignal;
 
 //out vec4 vPosition;
-out vec3 vColor;
-out vec3 vNormal;
+//out vec3 vColor;
+//out vec3 vNormal;
+out vec3 worldPosition;
+out vec3 worldNormal;
+out vec3 color;
 
+uniform mat4 modelMatrix;
+uniform mat3 modelNormalMatrix;
 uniform mat4 mvp; //need for the QCamera and camera controller to work
+
 uniform float fThresholdX;
 uniform float fThresholdZ;
 
@@ -113,7 +119,8 @@ void main()
 {
     gl_Position = mvp * vec4(vertexPosition, 1.0);
 
-        vNormal = normalize( vertexNormal );
+    worldNormal = normalize( modelNormalMatrix * vertexNormal );
+    worldPosition = vec3( modelMatrix * vec4( vertexPosition, 1.0 ) );
 
         /////////////////////////TEST//////////////
 
@@ -136,7 +143,7 @@ void main()
                     tempColor = colorMapJet(fSample);
                 }
 
-                vColor = tempColor;
+                color = tempColor;
 
         //////////////////TEST///////////////////////
 
