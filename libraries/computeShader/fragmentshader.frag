@@ -1,14 +1,25 @@
 #version 430 core
 
-//in vec4 vPosition;
-in vec3 vColor;
-in vec3 vNormal;
+#pragma include light.inc.frag
 
-out vec4 color;
+// TODO: Replace with a struct
+uniform vec3 kd;            // Diffuse reflectivity
+uniform vec3 ks;            // Specular reflectivity
+uniform float shininess;    // Specular shininess factor
+uniform float alpha;
+
+uniform vec3 eyePosition;
+
+in vec3 worldPosition;
+in vec3 worldNormal;
+in vec3 color;
+
+out vec4 fragColor;
 
 void main(void)
 {
-    //TODO add phong lightning
-    color = vec4(vColor.xyz, 1.0);
+    vec3 diffuseColor, specularColor;
+    adsModel(worldPosition, worldNormal, eyePosition, shininess, diffuseColor, specularColor);
+    fragColor = vec4( color + kd * diffuseColor + ks * specularColor, alpha );
 }
 
