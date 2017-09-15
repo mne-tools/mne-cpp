@@ -211,6 +211,10 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     m_pColsUniform = new QParameter(QStringLiteral("cols"), iWeightMatCols);
     m_pMaterial->addComputePassParameter(m_pColsUniform);
 
+    //Create uniform for the number of rows
+    m_pRowsUniform = new QParameter(QStringLiteral("rows"), iWeightMatRows);
+    m_pMaterial->addComputePassParameter(m_pRowsUniform);
+
     //Create Weight matrix buffer and Parameter
     m_pWeightMatBuffer->setData(createWeightMatBuffer(pInterpolationMatrix));
     m_pWeightMatParameter = new QParameter(QStringLiteral("WeightMat"),

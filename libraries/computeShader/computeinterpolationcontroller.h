@@ -322,7 +322,7 @@ private:
     QPointer<Qt3DRender::QBuffer> m_pInterpolatedSignalBuffer;
 
     QPointer<Qt3DRender::QParameter> m_pColsUniform;
-
+    QPointer<Qt3DRender::QParameter> m_pRowsUniform;
 
     QVector<uint> m_iSensorsBad;    /**< Store bad channel indexes.*/
     QVector<uint> m_iUsedSensors;   /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
