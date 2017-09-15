@@ -1,7 +1,7 @@
 #version 430 core
 
 //numer of rows in the weight matrix (n)
-//uniform uint rows;
+uniform uint rows;
 
 //number of colums in the weight matrix(m)
 uniform uint cols;
@@ -31,19 +31,20 @@ layout (std430, binding = 2) buffer MeasurementVec
 
 void main(void)
 {
-    // only for 1 dimension weight matrix
     //uint globalId = gl_GlobalInvocationID.x;
     uint globalId = gl_GlobalInvocationID.x + gl_NumWorkGroups.y * gl_GlobalInvocationID.y;
 
-    float sum = 0.0;
-    for(uint i = 0; i < cols; i++)
+    //prevent out of bound errors
+    if(globalId < rows)
     {
-        sum += weights[globalId * cols + i] * mData[i];
+        float sum = 0.0;
+        for(uint i = 0; i < cols; i++)
+        {
+            sum += weights[globalId * cols + i] * mData[i];
+        }
+
+        interpolatedSignal[globalId] = sum;
+
+        //yOut[uint(mod(globalId, cols))] += weights[globalId] * mData[uint(mod(globalId, rows))];
     }
-
-    interpolatedSignal[globalId] = sum;
-
-    //yOut[uint(mod(globalId, cols))] += weights[globalId] * mData[uint(mod(globalId, rows))];
-
-
 }
