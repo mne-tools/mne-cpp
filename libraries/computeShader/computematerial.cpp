@@ -247,6 +247,7 @@ void ComputeMaterial::init()
     m_pDrawTechnique->addRenderPass(m_pDrawRenderPass);
 
     //init signal processing
+    m_pSignalDataBuffer->setData(buildZeroBuffer(60));
     m_pSignalDataParameter->setName(QStringLiteral("MeasurementVec"));
     m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
     m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
@@ -259,6 +260,23 @@ void ComputeMaterial::init()
 
     //Add to material
     this->setEffect(m_pEffect);
+}
+
+
+//*************************************************************************************************************
+
+QByteArray ComputeMaterial::buildZeroBuffer(const uint tSize)
+{
+    QByteArray bufferData;
+    bufferData.resize(tSize * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    //Set default values
+    for(uint i = 0; i < tSize; ++i)
+    {
+        rawVertexArray[i] = 0.0f;
+    }
+    return bufferData;
 }
 
 

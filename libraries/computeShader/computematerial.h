@@ -164,6 +164,14 @@ private:
     void init();
 
     //=========================================================================================================
+    /**
+     * This function is temporary used to init m_pSignalDataBuffer
+     * @param tSize
+     * @return
+     */
+    QByteArray buildZeroBuffer(const uint tSize);
+
+    //=========================================================================================================
     QPointer<Qt3DRender::QEffect> m_pEffect;
 
     //Compute Part

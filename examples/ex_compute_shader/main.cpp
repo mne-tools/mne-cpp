@@ -182,8 +182,7 @@ int main(int argc, char *argv[])
     view.setRootEntity(rootEntity);
     view.setActiveFrameGraph(pFramegragh);
 
-    //Render always is important for compute shaders
-    view.renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::Always);
+    view.renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
 
     view.show();
 
