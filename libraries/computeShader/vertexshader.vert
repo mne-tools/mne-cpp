@@ -5,9 +5,6 @@ in vec3 vertexColor;
 in vec3 vertexNormal;
 in float InterpolatedSignal;
 
-//out vec4 vPosition;
-//out vec3 vColor;
-//out vec3 vNormal;
 out vec3 worldPosition;
 out vec3 worldNormal;
 out vec3 color;
@@ -19,11 +16,51 @@ uniform mat4 mvp; //need for the QCamera and camera controller to work
 uniform float fThresholdX;
 uniform float fThresholdZ;
 
+//FORWARD DECLARATIONS
+float linearSlope(float x, float m, float n);
+vec3 colorMapHot(float x);
+vec3 colorMapJet(float x);
+
+void main()
+{
+    gl_Position = mvp * vec4(vertexPosition, 1.0);
+
+    worldNormal = normalize( modelNormalMatrix * vertexNormal );
+    worldPosition = vec3( modelMatrix * vec4( vertexPosition, 1.0 ) );
+
+    //calc thresholds
+    float fSample = abs(InterpolatedSignal);
+    float fTresholdDiff = fThresholdZ - fThresholdX;
+
+    vec3 tempColor = vertexColor;
+
+    if(fSample >= fThresholdX) {
+        //Check lower and upper thresholds and normalize to one
+        if(fSample >= fThresholdZ) {
+            fSample = 1.0;
+        } else {
+            if(fSample != 0.0 && fTresholdDiff != 0.0 ) {
+                fSample = (fSample - fThresholdX) / (fTresholdDiff);
+            } else {
+                fSample = 0.0;
+            }
+        }
+        tempColor = colorMapJet(fSample);
+    }
+
+    color = tempColor;
+}
+
+
+//*************************************************************************
 
 float linearSlope(float x, float m, float n)
 {
-    return m*x + n;
+    return m * x + n;
 }
+
+
+//*************************************************************************
 
 //color maps
 vec3 colorMapJet(float x)
@@ -79,6 +116,9 @@ vec3 colorMapJet(float x)
     return outColor;
 }
 
+
+//*************************************************************************
+
 vec3 colorMapHot(float x)
 {
     vec3 outColor;
@@ -115,38 +155,3 @@ vec3 colorMapHot(float x)
 
 
 //*************************************************************************
-void main()
-{
-    gl_Position = mvp * vec4(vertexPosition, 1.0);
-
-    worldNormal = normalize( modelNormalMatrix * vertexNormal );
-    worldPosition = vec3( modelMatrix * vec4( vertexPosition, 1.0 ) );
-
-        /////////////////////////TEST//////////////
-
-                float fSample = abs(InterpolatedSignal);
-                float fTresholdDiff = fThresholdZ - fThresholdX;
-
-                vec3 tempColor = vertexColor;
-
-                if(fSample >= fThresholdX) {
-                    //Check lower and upper thresholds and normalize to one
-                    if(fSample >= fThresholdZ) {
-                        fSample = 1.0;
-                    } else {
-                        if(fSample != 0.0 && fTresholdDiff != 0.0 ) {
-                            fSample = (fSample - fThresholdX) / (fTresholdDiff);
-                        } else {
-                            fSample = 0.0;
-                        }
-                    }
-                    tempColor = colorMapJet(fSample);
-                }
-
-                color = tempColor;
-
-        //////////////////TEST///////////////////////
-
-        //TODO use some kind of colormap
-        //vColor = colorMapJet(YOutVec);
-}
