@@ -247,6 +247,8 @@ void ComputeMaterial::init()
     m_pDrawTechnique->addRenderPass(m_pDrawRenderPass);
 
     //init signal processing
+    m_pSignalDataBuffer->setAccessType(Qt3DRender::QBuffer::ReadWrite);
+    m_pSignalDataBuffer->setUsage(Qt3DRender::QBuffer::StreamDraw);
     m_pSignalDataBuffer->setData(buildZeroBuffer(60));
     m_pSignalDataParameter->setName(QStringLiteral("MeasurementVec"));
     m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
