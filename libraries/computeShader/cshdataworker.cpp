@@ -186,7 +186,7 @@ void CshDataWorker::stop()
 void CshDataWorker::start()
 {
     m_qMutex.lock();
-    m_itCurrentSample = m_lData.begin();
+    m_itCurrentSample = m_lData.cbegin();
     m_qMutex.unlock();
     QThread::start();
 }
@@ -253,11 +253,11 @@ void CshDataWorker::run()
             m_qMutex.lock();
 
             iAverageCtr++;
-
             m_itCurrentSample++;
-            if(m_itCurrentSample == m_lData.end())
+
+            if(m_itCurrentSample == m_lData.cend())
             {
-                m_itCurrentSample = m_lData.begin();
+                m_itCurrentSample = m_lData.cbegin();
             }
 
             if(iAverageCtr % m_iAverageSamples == 0) {
