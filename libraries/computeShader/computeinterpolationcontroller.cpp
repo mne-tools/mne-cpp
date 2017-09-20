@@ -216,6 +216,8 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
     m_pMaterial->addComputePassParameter(m_pRowsUniform);
 
     //Create Weight matrix buffer and Parameter
+    m_pWeightMatBuffer->setAccessType(Qt3DRender::QBuffer::Write);
+    m_pWeightMatBuffer->setUsage(Qt3DRender::QBuffer::StaticDraw);
     m_pWeightMatBuffer->setData(createWeightMatBuffer(pInterpolationMatrix));
     m_pWeightMatParameter = new QParameter(QStringLiteral("WeightMat"),
                                                      QVariant::fromValue(m_pWeightMatBuffer.data()));
@@ -227,6 +229,8 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
     //Init interpolated signal buffer
     QString sInterpolatedSignalName = QStringLiteral("InterpolatedSignal");
+    m_pInterpolatedSignalBuffer->setAccessType(Qt3DRender::QBuffer::ReadWrite);
+    m_pInterpolatedSignalBuffer->setUsage(Qt3DRender::QBuffer::StreamCopy);
     m_pInterpolatedSignalBuffer->setData(createZeroBuffer(iWeightMatRows));
 
     m_pMaterial->setInterpolatedSignalBuffer(m_pInterpolatedSignalBuffer.data(), sInterpolatedSignalName);
