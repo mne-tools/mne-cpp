@@ -98,19 +98,48 @@ public:
     */
     DynamicCircularBuffer();
 
-    DynamicCircularBuffer(const uint size);
+    DynamicCircularBuffer(const uint tSize);
 
+    //@TODO other ctors
+
+
+    //=========================================================================================================
+    /**
+     * Destructor of DynamicCircularBuffer.
+     */
     ~DynamicCircularBuffer();
 
+    //=========================================================================================================
+    /**
+     * Returns reference to the first element in the buffer. front of a empty buffer is undefined.
+     */
     inline T& front();
 
-    inline void push_back(const T &newObject);
+    //=========================================================================================================
+    /**
+     * Adds new object to the end of the buffer.
+     * @param tNewObject        Input object.
+     */
+    inline void push_back(const T &tNewObject);
 
+    //=========================================================================================================
+    /**
+     * Pops the first object in the buffer.
+     */
     inline void pop_front();
 
-    inline void reserve(const uint size);
+    //=========================================================================================================
+    /**
+     * Reserves memory for the buffer.
+     * @param tSize             Size of the memory to reserve.
+     */
+    inline void reserve(const uint tSize);
 
-    inline void isEmpty();
+    //=========================================================================================================
+    /**
+     *  Returns true if the buffer is empty.
+     */
+    inline bool isEmpty();
 
     //=========================================================================================================
     /**
@@ -123,11 +152,18 @@ protected:
 
 private:
 
-    uint            m_iBufferSize;
-    uint            m_iObjectNum;
-    T*              m_pBuffer;              /**< Holds the circular buffer.*/
-    int             m_iCurrentReadIndex;    /**< Holds the current read index.*/
-    int             m_iCurrentWriteIndex;   /**< Holds the current write index.*/
+    //=========================================================================================================
+    /**
+     * Maps tIndex to the correct correct index in the buffer. m_iHead = 0.
+     * @param tIndex        Input index.
+     */
+    inline uint mapIndex(const uint tIndex);
+
+    uint                m_iBufferSize;          /**< Holds the size of the buffer array.*/
+    uint                m_iObjectNum;           /**< Holds the  current number of objects.*/
+    T*                  m_pBuffer;              /**< Holds the circular buffer.*/
+    uint                m_iHead;                /**< Holds the current read index.*/
+    uint                m_iTail;                /**< Holds the current write index.*/
 
 };
 
@@ -142,14 +178,14 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer()
     : m_iBufferSize(10)
     , m_iObjectNum(0)
     , m_pBuffer(new T[m_iBufferSize])
-    , m_iCurrentReadIndex(0)
-    , m_iCurrentWriteIndex(0)
+    , m_iHead(0)
+    , m_iTail(0)
 {
 
 }
 
 template<typename T>
-DynamicCircularBuffer<T>::DynamicCircularBuffer(const uint size)
+DynamicCircularBuffer<T>::DynamicCircularBuffer(const uint tSize)
 {
 
 }
@@ -163,39 +199,91 @@ DynamicCircularBuffer<T>::~DynamicCircularBuffer()
 template<typename T>
 inline T& DynamicCircularBuffer<T>::front()
 {
-
+    return m_pBuffer[m_iHead];
 }
 
 template<typename T>
-inline void DynamicCircularBuffer<T>::push_back(const T &newObject)
+inline void DynamicCircularBuffer<T>::push_back(const T &tNewObject)
 {
+    m_pBuffer[m_iTail] = tNewObject;
+    m_iTail++;
+    m_iObjectNum++;
 
+    //Set tail to the front of the buffer if needed
+    if(m_iTail == m_iBufferSize)
+    {
+        m_iTail = 0;
+    }
+
+    if(m_iTail == m_iHead)
+    {
+        reserve(2 * m_iBufferSize);
+    }
 }
 
 template<typename T>
 inline void DynamicCircularBuffer<T>::pop_front()
 {
+    m_iHead++;
+    m_iObjectNum--;
 
+    if(m_iHead == m_iBufferSize)
+    {
+        m_iHead = 0;
+    }
 }
 
 template<typename T>
-inline void DynamicCircularBuffer<T>::reserve(const uint size)
+inline void DynamicCircularBuffer<T>::reserve(const uint tSize)
 {
+    if(tSize <= m_iBufferSize)
+    {
+        return;
+    }
+    //allocate new storage
+    T *pTemp = new T[tSize];
+    for(uint i = 0; i < m_iObjectNum; ++i)
+    {
+        pTemp[i] = m_pBuffer[mapIndex(i)];
+    }
 
+    m_iHead = 0;
+    if(m_iObjectNum == 0)
+    {
+        m_iTail = 0;
+    }
+    else
+    {
+        m_iTail = m_iObjectNum - 1;
+    }
+
+    delete[] m_pBuffer;
+    m_pBuffer = pTemp;
 }
 
 template<typename T>
-inline void DynamicCircularBuffer<T>::isEmpty()
+inline bool DynamicCircularBuffer<T>::isEmpty()
 {
-
+    return m_iHead == m_iTail;
 }
 
 template<typename T>
 inline void DynamicCircularBuffer<T>::clear()
 {
-
+    //reset
+    delete[] m_pBuffer;
+    m_iTail = 0;
+    m_iHead = 0;
+    m_iObjectNum = 0;
+    m_iBufferSize = 10;
+    m_pBuffer = new T[m_iBufferSize];
 }
 
+template<typename T>
+inline uint DynamicCircularBuffer<T>::mapIndex(const uint tIndex)
+{
+    return (m_iHead + tIndex) % m_iBufferSize;
+}
 
 } // namespace IOBUFFER
 
