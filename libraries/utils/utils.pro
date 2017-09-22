@@ -96,6 +96,7 @@ SOURCES += \
     generics/circularmatrixbuffer.cpp \
     generics/observerpattern.cpp
 
+
 HEADERS += \
     kmeans.h\
     utils_global.h \
@@ -125,7 +126,8 @@ HEADERS += \
     generics/circularmultichannelbuffer_old.h \
     generics/commandpattern.h \
     generics/observerpattern.h \
-    generics/typename_old.h
+    generics/typename_old.h \
+    generics/dynamiccircularbuffer.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
