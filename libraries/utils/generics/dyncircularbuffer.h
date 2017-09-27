@@ -85,55 +85,55 @@ namespace IOBUFFER {
 * @brief Dynamic circular queue/buffer.
 */
 template<typename T>
-class DynamicCircularBuffer
+class DynCircularBuffer
 {
 
 public:
-    typedef QSharedPointer<DynamicCircularBuffer> SPtr;            /**< Shared pointer type for DynamicCircularBuffer. */
-    typedef QSharedPointer<const DynamicCircularBuffer> ConstSPtr; /**< Const shared pointer type for DynamicCircularBuffer. */
+    typedef QSharedPointer<DynCircularBuffer> SPtr;            /**< Shared pointer type for DynamicCircularBuffer. */
+    typedef QSharedPointer<const DynCircularBuffer> ConstSPtr; /**< Const shared pointer type for DynamicCircularBuffer. */
 
     //=========================================================================================================
     /**
     * Constructs a DynamicCircularBuffer object.
     */
-    DynamicCircularBuffer();
+    DynCircularBuffer();
 
     //=========================================================================================================
     /**
      * Constructs a DynamicCircularBuffer object.
      * @param tSize         Reserved space in the buffer.
      */
-    DynamicCircularBuffer(const uint tSize);
+    DynCircularBuffer(const uint tSize);
 
     //=========================================================================================================
     /**
     * Copy constructs a DynamicCircularBuffer object.
     */
-    DynamicCircularBuffer(const DynamicCircularBuffer& other);
+    DynCircularBuffer(const DynCircularBuffer& other);
 
     //=========================================================================================================
     /**
     * Copy operator.
     */
-    inline DynamicCircularBuffer<T>& operator =(const DynamicCircularBuffer<T>& other);
+    inline DynCircularBuffer<T>& operator =(const DynCircularBuffer<T>& other);
 
     //=========================================================================================================
     /**
     * Move constructs a DynamicCircularBuffer object.
     */
-    DynamicCircularBuffer(DynamicCircularBuffer&& other);
+    DynCircularBuffer(DynCircularBuffer&& other);
 
     //=========================================================================================================
     /**
     * Move operator.
     */
-    inline DynamicCircularBuffer<T>& operator =(DynamicCircularBuffer<T>&& other);
+    inline DynCircularBuffer<T>& operator =(DynCircularBuffer<T>&& other);
 
     //=========================================================================================================
     /**
      * Destructor of DynamicCircularBuffer.
      */
-    ~DynamicCircularBuffer();
+    ~DynCircularBuffer();
 
     //=========================================================================================================
     /**
@@ -230,7 +230,7 @@ private:
 //=============================================================================================================
 
 template<typename T>
-DynamicCircularBuffer<T>::DynamicCircularBuffer()
+DynCircularBuffer<T>::DynCircularBuffer()
     : m_iBufferSize(10)
     , m_iObjectNum(0)
     , m_pBuffer(new T[m_iBufferSize])
@@ -244,7 +244,7 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer()
 //*************************************************************************************************************
 
 template<typename T>
-DynamicCircularBuffer<T>::DynamicCircularBuffer(const uint tSize)
+DynCircularBuffer<T>::DynCircularBuffer(const uint tSize)
     : m_iBufferSize(tSize)
     , m_iObjectNum(0)
     , m_pBuffer(new T[m_iBufferSize])
@@ -258,7 +258,7 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer(const uint tSize)
 //*************************************************************************************************************
 
 template<typename T>
-DynamicCircularBuffer<T>::DynamicCircularBuffer(const DynamicCircularBuffer& other)
+DynCircularBuffer<T>::DynCircularBuffer(const DynCircularBuffer& other)
     : m_iBufferSize(other.m_iBufferSize)
     , m_iObjectNum(other.m_iObjectNum)
     , m_pBuffer(new T[other.m_iBufferSize])
@@ -276,7 +276,7 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer(const DynamicCircularBuffer& oth
 //*************************************************************************************************************
 
 template<typename T>
-inline DynamicCircularBuffer<T>& DynamicCircularBuffer<T>::operator =(const DynamicCircularBuffer<T>& other)
+inline DynCircularBuffer<T>& DynCircularBuffer<T>::operator =(const DynCircularBuffer<T>& other)
 {
     if(this != other)
     {
@@ -301,7 +301,7 @@ inline DynamicCircularBuffer<T>& DynamicCircularBuffer<T>::operator =(const Dyna
 //*************************************************************************************************************
 
 template<typename T>
-DynamicCircularBuffer<T>::DynamicCircularBuffer(DynamicCircularBuffer&& other)
+DynCircularBuffer<T>::DynCircularBuffer(DynCircularBuffer&& other)
     : m_iBufferSize(other.m_iBufferSize)
     , m_iObjectNum(other.m_iObjectNum)
     , m_iHead(other.m_iHead)
@@ -322,7 +322,7 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer(DynamicCircularBuffer&& other)
 //*************************************************************************************************************
 
 template<typename T>
-inline DynamicCircularBuffer<T>& DynamicCircularBuffer<T>::operator =(DynamicCircularBuffer<T>&& other)
+inline DynCircularBuffer<T>& DynCircularBuffer<T>::operator =(DynCircularBuffer<T>&& other)
 {
     if(this != &other)
     {
@@ -350,7 +350,7 @@ inline DynamicCircularBuffer<T>& DynamicCircularBuffer<T>::operator =(DynamicCir
 //*************************************************************************************************************
 
 template<typename T>
-DynamicCircularBuffer<T>::~DynamicCircularBuffer()
+DynCircularBuffer<T>::~DynCircularBuffer()
 {
     delete[] m_pBuffer;
 }
@@ -359,7 +359,7 @@ DynamicCircularBuffer<T>::~DynamicCircularBuffer()
 //*************************************************************************************************************
 
 template<typename T>
-inline T& DynamicCircularBuffer<T>::front()
+inline T& DynCircularBuffer<T>::front()
 {
     return m_pBuffer[m_iHead];
 }
@@ -368,7 +368,7 @@ inline T& DynamicCircularBuffer<T>::front()
 //*************************************************************************************************************
 
 template<typename T>
-inline T DynamicCircularBuffer<T>::front() const
+inline T DynCircularBuffer<T>::front() const
 {
     return m_pBuffer[m_iHead];
 }
@@ -376,7 +376,7 @@ inline T DynamicCircularBuffer<T>::front() const
 //*************************************************************************************************************
 
 template<typename T>
-T& DynamicCircularBuffer<T>::operator [](uint idx)
+T& DynCircularBuffer<T>::operator [](uint idx)
 {
     return m_pBuffer[mapIndex(idx)];
 }
@@ -385,7 +385,7 @@ T& DynamicCircularBuffer<T>::operator [](uint idx)
 //*************************************************************************************************************
 
 template<typename T>
-T DynamicCircularBuffer<T>::operator [](uint idx) const
+T DynCircularBuffer<T>::operator [](uint idx) const
 {
     return m_pBuffer[mapIndex(idx)];
 }
@@ -394,7 +394,7 @@ T DynamicCircularBuffer<T>::operator [](uint idx) const
 //*************************************************************************************************************
 
 template<typename T>
-inline void DynamicCircularBuffer<T>::push_back(const T &tNewObject)
+inline void DynCircularBuffer<T>::push_back(const T &tNewObject)
 {
     m_pBuffer[m_iTail] = tNewObject;
     m_iTail++;
@@ -416,7 +416,7 @@ inline void DynamicCircularBuffer<T>::push_back(const T &tNewObject)
 //*************************************************************************************************************
 
 template<typename T>
-inline void DynamicCircularBuffer<T>::pop_front()
+inline void DynCircularBuffer<T>::pop_front()
 {
     m_iHead++;
     m_iObjectNum--;
@@ -431,7 +431,7 @@ inline void DynamicCircularBuffer<T>::pop_front()
 //*************************************************************************************************************
 
 template<typename T>
-inline void DynamicCircularBuffer<T>::reserve(const uint tSize)
+inline void DynCircularBuffer<T>::reserve(const uint tSize)
 {
     if(tSize <= m_iBufferSize)
     {
@@ -466,7 +466,7 @@ inline void DynamicCircularBuffer<T>::reserve(const uint tSize)
 //*************************************************************************************************************
 
 template<typename T>
-inline bool DynamicCircularBuffer<T>::isEmpty() const
+inline bool DynCircularBuffer<T>::isEmpty() const
 {
     return m_iHead == m_iTail;
 }
@@ -475,7 +475,7 @@ inline bool DynamicCircularBuffer<T>::isEmpty() const
 //*************************************************************************************************************
 
 template<typename T>
-inline void DynamicCircularBuffer<T>::clear()
+inline void DynCircularBuffer<T>::clear()
 {
     //reset
     delete[] m_pBuffer;
@@ -490,7 +490,7 @@ inline void DynamicCircularBuffer<T>::clear()
 //*************************************************************************************************************
 
 template<typename T>
-inline uint DynamicCircularBuffer<T>::size() const
+inline uint DynCircularBuffer<T>::size() const
 {
     return m_iObjectNum;
 }
@@ -499,7 +499,7 @@ inline uint DynamicCircularBuffer<T>::size() const
 //*************************************************************************************************************
 
 template<typename T>
-inline uint DynamicCircularBuffer<T>::capacity() const
+inline uint DynCircularBuffer<T>::capacity() const
 {
     return m_iBufferSize;
 }
@@ -508,7 +508,7 @@ inline uint DynamicCircularBuffer<T>::capacity() const
 //*************************************************************************************************************
 
 template<typename T>
-inline uint DynamicCircularBuffer<T>::mapIndex(const uint tIndex)
+inline uint DynCircularBuffer<T>::mapIndex(const uint tIndex)
 {
     return (m_iHead + tIndex) % m_iBufferSize;
 }
