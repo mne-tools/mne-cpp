@@ -115,7 +115,7 @@ public:
     /**
     * Copy operator.
     */
-    DynamicCircularBuffer& operator =(const DynamicCircularBuffer& other);
+    inline DynamicCircularBuffer<T>& operator =(const DynamicCircularBuffer<T>& other);
 
     //=========================================================================================================
     /**
@@ -127,7 +127,7 @@ public:
     /**
     * Move operator.
     */
-    DynamicCircularBuffer& operator =(const DynamicCircularBuffer&& other);
+    inline DynamicCircularBuffer<T>& operator =(DynamicCircularBuffer<T>&& other);
 
     //=========================================================================================================
     /**
@@ -214,6 +214,7 @@ private:
      */
     inline uint mapIndex(const uint tIndex);
 
+
     uint                m_iBufferSize;          /**< Holds the size of the buffer array.*/
     uint                m_iObjectNum;           /**< Holds the  current number of objects.*/
     T*                  m_pBuffer;              /**< Holds the circular buffer.*/
@@ -275,7 +276,7 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer(const DynamicCircularBuffer& oth
 //*************************************************************************************************************
 
 template<typename T>
-DynamicCircularBuffer& DynamicCircularBuffer<T>::operator =(const DynamicCircularBuffer &other)
+inline DynamicCircularBuffer<T>& DynamicCircularBuffer<T>::operator =(const DynamicCircularBuffer<T>& other)
 {
     if(this != other)
     {
@@ -321,7 +322,7 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer(DynamicCircularBuffer&& other)
 //*************************************************************************************************************
 
 template<typename T>
-DynamicCircularBuffer& DynamicCircularBuffer<T>::operator =(const DynamicCircularBuffer&& other)
+inline DynamicCircularBuffer<T>& DynamicCircularBuffer<T>::operator =(DynamicCircularBuffer<T>&& other)
 {
     if(this != &other)
     {
