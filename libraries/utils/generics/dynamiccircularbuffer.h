@@ -80,12 +80,12 @@ namespace IOBUFFER {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class is a implementation of a queue based on a array with dynamic size.
 *
-* @brief Brief description of this class.
+* @brief Dynamic circular queue/buffer.
 */
 template<typename T>
-class UTILSSHARED_EXPORT DynamicCircularBuffer
+class DynamicCircularBuffer
 {
 
 public:
@@ -98,10 +98,36 @@ public:
     */
     DynamicCircularBuffer();
 
+    //=========================================================================================================
+    /**
+     * Constructs a DynamicCircularBuffer object.
+     * @param tSize         Reserved space in the buffer.
+     */
     DynamicCircularBuffer(const uint tSize);
 
-    //@TODO other ctors
+    //=========================================================================================================
+    /**
+    * Copy constructs a DynamicCircularBuffer object.
+    */
+    DynamicCircularBuffer(const DynamicCircularBuffer& other);
 
+    //=========================================================================================================
+    /**
+    * Copy operator.
+    */
+    DynamicCircularBuffer& operator =(const DynamicCircularBuffer& other);
+
+    //=========================================================================================================
+    /**
+    * Move constructs a DynamicCircularBuffer object.
+    */
+    DynamicCircularBuffer(DynamicCircularBuffer&& other);
+
+    //=========================================================================================================
+    /**
+    * Move operator.
+    */
+    DynamicCircularBuffer& operator =(const DynamicCircularBuffer&& other);
 
     //=========================================================================================================
     /**
@@ -114,6 +140,24 @@ public:
      * Returns reference to the first element in the buffer. front of a empty buffer is undefined.
      */
     inline T& front();
+
+    //=========================================================================================================
+    /**
+     * Returns copy of the first element in the buffer. front of a empty buffer is undefined.
+     */
+    inline T front() const;
+
+    //=========================================================================================================
+    /**
+     * Overloaded [] operator for iterating over the buffer.
+     */
+    T& operator [](uint idx);
+
+    //=========================================================================================================
+    /**
+     * Overloaded const [] operator for iterating over the buffer.
+     */
+    T operator [](uint idx) const;
 
     //=========================================================================================================
     /**
@@ -139,7 +183,7 @@ public:
     /**
      *  Returns true if the buffer is empty.
      */
-    inline bool isEmpty();
+    inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
@@ -147,6 +191,17 @@ public:
     */
     inline void clear();
 
+    //=========================================================================================================
+    /**
+     * Returns the current number of objects in the buffer.
+     */
+    inline uint size() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the current capacity of the buffer.
+     */
+    inline uint capacity() const;
 
 protected:
 
@@ -184,11 +239,114 @@ DynamicCircularBuffer<T>::DynamicCircularBuffer()
 
 }
 
+
+//*************************************************************************************************************
+
 template<typename T>
 DynamicCircularBuffer<T>::DynamicCircularBuffer(const uint tSize)
+    : m_iBufferSize(tSize)
+    , m_iObjectNum(0)
+    , m_pBuffer(new T[m_iBufferSize])
+    , m_iHead(0)
+    , m_iTail(0)
 {
 
 }
+
+
+//*************************************************************************************************************
+
+template<typename T>
+DynamicCircularBuffer<T>::DynamicCircularBuffer(const DynamicCircularBuffer& other)
+    : m_iBufferSize(other.m_iBufferSize)
+    , m_iObjectNum(other.m_iObjectNum)
+    , m_pBuffer(new T[other.m_iBufferSize])
+    , m_iHead(other.m_iHead)
+    , m_iTail(other.m_iTail)
+{
+    //copy array
+    for(uint i = 0; i < m_iBufferSize; i++)
+    {
+        m_pBuffer[i] = other.m_pBuffer[i];
+    }
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+DynamicCircularBuffer& DynamicCircularBuffer<T>::operator =(const DynamicCircularBuffer &other)
+{
+    if(this != other)
+    {
+        //copy variables
+        m_iBufferSize = other.m_iBufferSize;
+        m_iObjectNum = other.m_iObjectNum;
+        m_iHead = other.m_iHead;
+        m_iTail = other.m_iTail;
+
+        //copy array
+        delete[] m_pBuffer;
+        m_pBuffer = new T[m_iBufferSize];
+        for(uint i = 0; i < m_iBufferSize; i++)
+        {
+            m_pBuffer[i] = other.m_pBuffer[i];
+        }
+    }
+    return *this;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+DynamicCircularBuffer<T>::DynamicCircularBuffer(DynamicCircularBuffer&& other)
+    : m_iBufferSize(other.m_iBufferSize)
+    , m_iObjectNum(other.m_iObjectNum)
+    , m_iHead(other.m_iHead)
+    , m_iTail(other.m_iTail)
+{
+    //take other's ressources
+    m_pBuffer = other.m_pBuffer;
+
+    //reset other
+    other.m_iBufferSize = 0;
+    other.m_iObjectNum = 0;
+    other.m_iHead = 0;
+    other.m_iTail = 0;
+    other. m_pBuffer = nullptr;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+DynamicCircularBuffer& DynamicCircularBuffer<T>::operator =(const DynamicCircularBuffer&& other)
+{
+    if(this != &other)
+    {
+        //copy variables
+        m_iBufferSize = other.m_iBufferSize;
+        m_iObjectNum = other.m_iObjectNum;
+        m_iHead = other.m_iHead;
+        m_iTail = other.m_iTail;
+
+        //take others resources
+        delete[] m_pBuffer;
+        m_pBuffer = other.m_pBuffer;
+
+        //reset other
+        other.m_pBuffer = nullptr;
+        other.m_iBufferSize = 0;
+        other.m_iObjectNum = 0;
+        other.m_iHead = 0;
+        other.m_iTail = 0;
+    }
+    return *this;
+}
+
+
+//*************************************************************************************************************
 
 template<typename T>
 DynamicCircularBuffer<T>::~DynamicCircularBuffer()
@@ -196,11 +354,43 @@ DynamicCircularBuffer<T>::~DynamicCircularBuffer()
     delete[] m_pBuffer;
 }
 
+
+//*************************************************************************************************************
+
 template<typename T>
 inline T& DynamicCircularBuffer<T>::front()
 {
     return m_pBuffer[m_iHead];
 }
+
+
+//*************************************************************************************************************
+
+template<typename T>
+inline T DynamicCircularBuffer<T>::front() const
+{
+    return m_pBuffer[m_iHead];
+}
+
+//*************************************************************************************************************
+
+template<typename T>
+T& DynamicCircularBuffer<T>::operator [](uint idx)
+{
+    return m_pBuffer[mapIndex(idx)];
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+T DynamicCircularBuffer<T>::operator [](uint idx) const
+{
+    return m_pBuffer[mapIndex(idx)];
+}
+
+
+//*************************************************************************************************************
 
 template<typename T>
 inline void DynamicCircularBuffer<T>::push_back(const T &tNewObject)
@@ -221,6 +411,9 @@ inline void DynamicCircularBuffer<T>::push_back(const T &tNewObject)
     }
 }
 
+
+//*************************************************************************************************************
+
 template<typename T>
 inline void DynamicCircularBuffer<T>::pop_front()
 {
@@ -233,6 +426,9 @@ inline void DynamicCircularBuffer<T>::pop_front()
     }
 }
 
+
+//*************************************************************************************************************
+
 template<typename T>
 inline void DynamicCircularBuffer<T>::reserve(const uint tSize)
 {
@@ -240,8 +436,10 @@ inline void DynamicCircularBuffer<T>::reserve(const uint tSize)
     {
         return;
     }
+
     //allocate new storage
     T *pTemp = new T[tSize];
+
     for(uint i = 0; i < m_iObjectNum; ++i)
     {
         pTemp[i] = m_pBuffer[mapIndex(i)];
@@ -254,18 +452,26 @@ inline void DynamicCircularBuffer<T>::reserve(const uint tSize)
     }
     else
     {
-        m_iTail = m_iObjectNum - 1;
+        m_iTail = m_iObjectNum;
     }
 
     delete[] m_pBuffer;
     m_pBuffer = pTemp;
+    //update buffer size
+    m_iBufferSize = tSize;
 }
 
+
+//*************************************************************************************************************
+
 template<typename T>
-inline bool DynamicCircularBuffer<T>::isEmpty()
+inline bool DynamicCircularBuffer<T>::isEmpty() const
 {
     return m_iHead == m_iTail;
 }
+
+
+//*************************************************************************************************************
 
 template<typename T>
 inline void DynamicCircularBuffer<T>::clear()
@@ -279,11 +485,35 @@ inline void DynamicCircularBuffer<T>::clear()
     m_pBuffer = new T[m_iBufferSize];
 }
 
+
+//*************************************************************************************************************
+
+template<typename T>
+inline uint DynamicCircularBuffer<T>::size() const
+{
+    return m_iObjectNum;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+inline uint DynamicCircularBuffer<T>::capacity() const
+{
+    return m_iBufferSize;
+}
+
+
+//*************************************************************************************************************
+
 template<typename T>
 inline uint DynamicCircularBuffer<T>::mapIndex(const uint tIndex)
 {
     return (m_iHead + tIndex) % m_iBufferSize;
 }
+
+
+//*************************************************************************************************************
 
 } // namespace IOBUFFER
 
