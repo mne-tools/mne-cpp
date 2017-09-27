@@ -43,6 +43,7 @@
 
 #include "../../../../disp3D_global.h"
 #include "../../items/common/types.h"
+#include <utils/generics/dyncircularbuffer.h>
 
 
 //*************************************************************************************************************
@@ -304,23 +305,23 @@ private:
     */
     void createSmoothingOperator(const MatrixX3f& matVertPosLeftHemi, const MatrixX3f& matVertPosRightHemi);
 
-    QMutex                  m_qMutex;                           /**< The thread's mutex. */
+    QMutex                                          m_qMutex;                           /**< The thread's mutex. */
 
-    QList<Eigen::VectorXd>  m_lData;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    IOBUFFER::DynCircularBuffer<Eigen::VectorXd>    m_dataQ;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
-    bool                    m_bIsRunning;                       /**< Flag if this thread is running. */
-    bool                    m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
-    bool                    m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
-    bool                    m_bAnnotationDataIsInit;            /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                                            m_bIsRunning;                       /**< Flag if this thread is running. */
+    bool                                            m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
+    bool                                            m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                                            m_bAnnotationDataIsInit;            /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    int                     m_iAverageSamples;                  /**< Number of average to compute. */
-    int                     m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
-    int                     m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
-    int                     m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
+    int                                             m_iAverageSamples;                  /**< Number of average to compute. */
+    uint                                            m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
+    int                                             m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
+    int                                             m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
 
-    double                  m_dSFreq;                           /**< The current sampling frequency. */
+    double                                          m_dSFreq;                           /**< The current sampling frequency. */
 
-    QList<VisualizationInfo>    m_lVisualizationInfo;           /**< The list holding all information needed to do the visualization for both hemispheres (0-left, 1-right). */
+    QList<VisualizationInfo>                        m_lVisualizationInfo;               /**< The list holding all information needed to do the visualization for both hemispheres (0-left, 1-right). */
 
 signals:
     //=========================================================================================================

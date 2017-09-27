@@ -129,12 +129,12 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
         return;
     }
 
-    qDebug() <<"RtSensorDataWorker::addData - m_lData.size()"<<m_lData.size();
+    qDebug() <<"RtSensorDataWorker::addData - m_lData.size()"<<m_dataQ.size();
 
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
-        if(m_lData.size() < m_dSFreq) {
-            m_lData.append(data.col(i));
+        if(m_dataQ.size() < m_dSFreq) {
+            m_dataQ.push_back(data.col(i));
         } else {
             qDebug() <<"RtSensorDataWorker::addData - worker is full!";
             break;
@@ -148,7 +148,7 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 void RtSensorDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
-    m_lData.clear();
+    m_dataQ.clear();
 }
 
 
@@ -398,7 +398,7 @@ void RtSensorDataWorker::run()
 
         {
             QMutexLocker locker(&m_qMutex);
-            if(!m_lData.isEmpty() && m_lData.size() > 0)
+            if(m_dataQ.size() > 0)
                 doProcessing = true;
         }
 
@@ -407,10 +407,10 @@ void RtSensorDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in loop mode
-                if(t_vecAverage.rows() != m_lData[0].rows()) {
-                    t_vecAverage = m_lData[m_iCurrentSample%m_lData.size()];
+                if(t_vecAverage.rows() != m_dataQ.front().rows()) {
+                    t_vecAverage = m_dataQ[m_iCurrentSample % m_dataQ.size()];
                 } else {
-                    t_vecAverage += m_lData[m_iCurrentSample%m_lData.size()];
+                    t_vecAverage += m_dataQ[m_iCurrentSample % m_dataQ.size()];
                 }
 
                 m_qMutex.unlock();
@@ -418,13 +418,13 @@ void RtSensorDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_lData[0].rows()) {
-                    t_vecAverage = m_lData.front();
+                if(t_vecAverage.rows() != m_dataQ.front().rows()) {
+                    t_vecAverage = m_dataQ.front();
                 } else {
-                    t_vecAverage += m_lData.front();
+                    t_vecAverage += m_dataQ.front();
                 }
 
-                m_lData.pop_front();
+                m_dataQ.pop_front();
 
                 m_qMutex.unlock();
             }
@@ -432,7 +432,7 @@ void RtSensorDataWorker::run()
             m_qMutex.lock();
             m_iCurrentSample++;
 
-            if((m_iCurrentSample/1) % m_iAverageSamples == 0) {
+            if(m_iCurrentSample % m_iAverageSamples == 0) {
                 //Perform the actual interpolation and send signal
                 t_vecAverage /= (double)m_iAverageSamples;
                 emit newRtData(generateColorsFromSensorValues(t_vecAverage));
