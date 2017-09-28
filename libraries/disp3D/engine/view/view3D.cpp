@@ -141,7 +141,8 @@ void View3D::init()
     toggleCoordAxis(false);
 
     //Only render new frames when needed
-    this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
+    //@TODO uncomment this when Qt5.9 is supported!
+    //this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
 }
 
 
