@@ -91,6 +91,7 @@ SensorDataTreeItem::SensorDataTreeItem(int iType, const QString &text)
     initItem();
 }
 
+
 //*************************************************************************************************************
 
 SensorDataTreeItem::~SensorDataTreeItem()
@@ -107,7 +108,7 @@ SensorDataTreeItem::~SensorDataTreeItem()
 void SensorDataTreeItem::initItem()
 {
     this->setEditable(false);
-    this->setToolTip("MNE SensorData item");
+    this->setToolTip("SensorData item");
 
     //Add items
     QList<QStandardItem*> list;
