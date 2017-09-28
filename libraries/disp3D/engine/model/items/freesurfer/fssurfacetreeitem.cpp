@@ -99,6 +99,7 @@ void FsSurfaceTreeItem::initItem()
     if(!m_pItemSurfColSulci) {
         m_pItemSurfColSulci = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorSulci, "Sulci color");
     }
+
     connect(m_pItemSurfColSulci.data(), &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list << m_pItemSurfColSulci;
@@ -111,6 +112,7 @@ void FsSurfaceTreeItem::initItem()
     if(!m_pItemSurfColGyri) {
         m_pItemSurfColGyri = new MetaTreeItem(MetaTreeItemTypes::SurfaceColorGyri, "Gyri color");
     }
+
     connect(m_pItemSurfColGyri.data(), &MetaTreeItem::dataChanged,
             this, &FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list.clear();
@@ -120,6 +122,12 @@ void FsSurfaceTreeItem::initItem()
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
+
+    //Set shaders
+    this->removeComponent(m_pMaterial);
+
+    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(false);
+    this->addComponent(pBemMaterial);
 }
 
 
