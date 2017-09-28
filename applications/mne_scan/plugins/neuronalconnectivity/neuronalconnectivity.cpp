@@ -308,11 +308,10 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurem
 
         }
 
-        MatrixXd t_mat;
         MatrixXd data;
         for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
         {
-            t_mat = pRTMSA->getMultiSampleArray()[i];
+            const MatrixXd& t_mat = pRTMSA->getMultiSampleArray()[i];
             data.resize(m_chIdx.size(), t_mat.cols());
 
             for(qint32 j = 0; j < m_chIdx.size(); ++j)
