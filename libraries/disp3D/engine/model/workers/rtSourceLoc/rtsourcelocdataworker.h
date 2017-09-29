@@ -43,7 +43,6 @@
 
 #include "../../../../disp3D_global.h"
 #include "../../items/common/types.h"
-#include <utils/generics/dyncircularbuffer.h>
 
 
 //*************************************************************************************************************
@@ -54,6 +53,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QVector3D>
+#include <QLinkedList>
 
 
 //*************************************************************************************************************
@@ -307,7 +307,8 @@ private:
 
     QMutex                                          m_qMutex;                           /**< The thread's mutex. */
 
-    IOBUFFER::DynCircularBuffer<Eigen::VectorXd>    m_dataQ;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QLinkedList<Eigen::VectorXd>                    m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QLinkedList<Eigen::VectorXd>::const_iterator    m_itCurrentSample;                  /**< Iterator to current sample which is/was streamed. */
 
     bool                                            m_bIsRunning;                       /**< Flag if this thread is running. */
     bool                                            m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
@@ -315,7 +316,6 @@ private:
     bool                                            m_bAnnotationDataIsInit;            /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
     int                                             m_iAverageSamples;                  /**< Number of average to compute. */
-    uint                                            m_iCurrentSample;                   /**< Number of the current sample which is/was streamed. */
     int                                             m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
     int                                             m_iVisualizationType;               /**< The visualization type (single vertex, smoothing, annotation based). */
 

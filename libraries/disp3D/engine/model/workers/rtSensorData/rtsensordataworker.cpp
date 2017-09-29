@@ -57,7 +57,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QList>
 #include <QTime>
 #include <QDebug>
 #include <QtConcurrent>
@@ -94,7 +93,6 @@ RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
-, m_iCurrentSample(0)
 , m_iMSecIntervall(17)
 , m_bSurfaceDataIsInit(false)
 , m_iNumSensors(0)
@@ -129,12 +127,12 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
         return;
     }
 
-    qDebug() <<"RtSensorDataWorker::addData - m_lData.size()"<<m_dataQ.size();
+    qDebug() <<"RtSensorDataWorker::addData - m_lData.size()"<<m_lDataQ.size();
 
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
-        if(m_dataQ.size() < m_dSFreq) {
-            m_dataQ.push_back(data.col(i));
+        if(m_lDataQ.size() < m_dSFreq) {
+            m_lDataQ.push_back(data.col(i));
         } else {
             qDebug() <<"RtSensorDataWorker::addData - worker is full!";
             break;
@@ -148,7 +146,7 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 void RtSensorDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
-    m_dataQ.clear();
+    m_lDataQ.clear();
 }
 
 
@@ -357,7 +355,7 @@ void RtSensorDataWorker::updateBadChannels(const FiffInfo& info)
 void RtSensorDataWorker::start()
 {
     m_qMutex.lock();
-    m_iCurrentSample = 0;
+    m_itCurrentSample = m_lDataQ.cbegin();
     m_qMutex.unlock();
 
     QThread::start();
@@ -382,6 +380,7 @@ void RtSensorDataWorker::run()
 {
     VectorXd t_vecAverage;
 
+    uint iSampleCtr = 0;
     m_bIsRunning = true;
     QTime timer;
 
@@ -398,7 +397,7 @@ void RtSensorDataWorker::run()
 
         {
             QMutexLocker locker(&m_qMutex);
-            if(m_dataQ.size() > 0)
+            if(m_lDataQ.size() > 0)
                 doProcessing = true;
         }
 
@@ -407,10 +406,10 @@ void RtSensorDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in loop mode
-                if(t_vecAverage.rows() != m_dataQ.front().rows()) {
-                    t_vecAverage = m_dataQ[m_iCurrentSample % m_dataQ.size()];
+                if(t_vecAverage.rows() != m_lDataQ.front().rows()) {
+                    t_vecAverage = *m_itCurrentSample;
                 } else {
-                    t_vecAverage += m_dataQ[m_iCurrentSample % m_dataQ.size()];
+                    t_vecAverage += *m_itCurrentSample;
                 }
 
                 m_qMutex.unlock();
@@ -418,21 +417,29 @@ void RtSensorDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_dataQ.front().rows()) {
-                    t_vecAverage = m_dataQ.front();
+                if(t_vecAverage.rows() != m_lDataQ.front().rows()) {
+                    t_vecAverage = m_lDataQ.front();
                 } else {
-                    t_vecAverage += m_dataQ.front();
+                    t_vecAverage += m_lDataQ.front();
                 }
 
-                m_dataQ.pop_front();
+                m_lDataQ.pop_front();
 
                 m_qMutex.unlock();
             }
 
             m_qMutex.lock();
-            m_iCurrentSample++;
 
-            if(m_iCurrentSample % m_iAverageSamples == 0) {
+            m_itCurrentSample++;
+            iSampleCtr++;
+
+            //Set iterator back to the front if needed
+            if(m_itCurrentSample == m_lDataQ.cend())
+            {
+                m_itCurrentSample = m_lDataQ.cbegin();
+            }
+
+            if(iSampleCtr % m_iAverageSamples == 0) {
                 //Perform the actual interpolation and send signal
                 t_vecAverage /= (double)m_iAverageSamples;
                 emit newRtData(generateColorsFromSensorValues(t_vecAverage));
@@ -441,6 +448,9 @@ void RtSensorDataWorker::run()
                 //Sleep specified amount of time
                 const int timerelap = timer.elapsed();
                 const int iTimeLeft = m_iMSecIntervall - timerelap;
+
+                //reset sample counter
+                iSampleCtr = 0;
 
                 //qDebug()<<"elapsed"<<timerelap<<"diff"<<iTimeLeft;
                 if(iTimeLeft > 0) {
