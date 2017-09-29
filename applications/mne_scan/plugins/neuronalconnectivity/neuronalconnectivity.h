@@ -80,6 +80,7 @@ namespace FIFFLIB {
 
 namespace SCMEASLIB {
     class RealTimeSourceEstimate;
+    class NewRealTimeMultiSampleArray;
     class RealTimeConnectivityEstimate;
 }
 
@@ -146,6 +147,14 @@ public:
     */
     void updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    //=========================================================================================================
+    /**
+    * Updates the real time multi sample array data
+    *
+    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    */
+    void updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+
 protected:
     //=========================================================================================================
     /**
@@ -166,11 +175,15 @@ private:
     QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
+
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
     Eigen::MatrixX3f        m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
     Eigen::MatrixX3f        m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
     Eigen::MatrixX3f        m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+
+    QVector<int>            m_chIdx;                    /**< The channel indeces to pick from the incoming data.*/
 
 signals:
     //=========================================================================================================

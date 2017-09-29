@@ -77,8 +77,8 @@ MNE::MNE()
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iNumAverages(1)
-, m_iDownSample(6)
-, m_sAvrType("4")
+, m_iDownSample(2)
+, m_sAvrType("1")
 {
 
 }
@@ -112,7 +112,7 @@ void MNE::init()
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.orig", m_sSurfaceDir+"/rh.orig"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -335,7 +335,7 @@ IPlugin::PluginType MNE::getType() const
 
 QString MNE::getName() const
 {
-    return "MNE";
+    return "RTC-MNE";
 }
 
 
@@ -432,6 +432,7 @@ void MNE::updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
             FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                qDebug()<<""<<m_sAvrType;
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     qDebug()<<"MNE::updateRTE - avrage found type - " << m_sAvrType;
                     m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
