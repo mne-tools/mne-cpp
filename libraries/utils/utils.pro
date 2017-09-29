@@ -126,8 +126,7 @@ HEADERS += \
     generics/circularmultichannelbuffer_old.h \
     generics/commandpattern.h \
     generics/observerpattern.h \
-    generics/typename_old.h \
-    generics/dyncircularbuffer.h
+    generics/typename_old.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
