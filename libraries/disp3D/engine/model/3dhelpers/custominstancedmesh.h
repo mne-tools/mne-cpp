@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <disp3D_global.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,6 +50,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QPointer>
 #include <Qt3DRender/QGeometryRenderer>
 
 
@@ -57,6 +59,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -65,6 +68,7 @@
 namespace Qt3DRender {
         class QGeometry;
         class QBuffer;
+        class QAttribute;
 }
 
 namespace Qt3DCore {
@@ -93,8 +97,9 @@ namespace DISP3DLIB {
 * @brief Instaced based renderer.
 */
 
-class CustomInstancedMesh : public Qt3DRender::QGeometryRenderer
+class DISP3DSHARED_EXPORT CustomInstancedMesh : public Qt3DRender::QGeometryRenderer
 {
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<CustomInstancedMesh> SPtr;            /**< Shared pointer type for CustomInstancedMesh. */
@@ -104,20 +109,27 @@ public:
     /**
     * Constructs a CustomInstancedMesh object.
     */
-    CustomInstancedMesh(const Qt3DRender::QGeometry& tGeometry, Qt3DCore::QNode *tParent = nullptr);
+    explicit CustomInstancedMesh::CustomInstancedMesh(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+                                                      Qt3DCore::QNode *tParent = nullptr);
 
+    ~CustomInstancedMesh();
 
+    void setPositions(const Eigen::MatrixX3f& tVertPositions);
 
 protected:
 
-    QPointer<Qt3DRender::QGeometry>                 m_pGeometry;
-
-    QPointer<Qt3DRender::QBuffer>                   m_pPositonBuffer;
-
-
 private:
 
+    void init();
 
+    QByteArray buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions);
+
+
+    QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
+
+    QPointer<Qt3DRender::QBuffer>                   m_pPositionBuffer;
+
+    QPointer<Qt3DRender::QAttribute>                m_pPositionAttribute;
 
 };
 
