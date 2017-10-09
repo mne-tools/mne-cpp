@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "custominstancedmesh.h"
+#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,6 +90,8 @@ CustomInstancedMesh::CustomInstancedMesh(QSharedPointer<Qt3DRender::QGeometry> t
 }
 
 
+//*************************************************************************************************************
+
 CustomInstancedMesh::~CustomInstancedMesh()
 {
     m_pGeometry->deleteLater();
@@ -96,9 +99,12 @@ CustomInstancedMesh::~CustomInstancedMesh()
     m_pPositionAttribute->deleteLater();
 }
 
+
+//*************************************************************************************************************
+
 void CustomInstancedMesh::setPositions(const Eigen::MatrixX3f &tVertPositions)
 {
-    if(tVertPositions.cols() == 0)
+    if(tVertPositions.rows() == 0)
     {
         qDebug ("ERROR!: CustomInstancedMesh::setPositions: Matrix is empty!");
         return;
@@ -109,9 +115,11 @@ void CustomInstancedMesh::setPositions(const Eigen::MatrixX3f &tVertPositions)
     m_pPositionAttribute->setBuffer(m_pPositionBuffer);
 
     //set number of instances to draw
-    this->setInstanceCount(tVertPositions.cols());
+    this->setInstanceCount(tVertPositions.rows());
 }
 
+
+//*************************************************************************************************************
 
 void CustomInstancedMesh::init()
 {
@@ -125,7 +133,7 @@ void CustomInstancedMesh::init()
     m_pPositionAttribute->setByteStride(3 * (int)sizeof(float));
 
     //Set default position
-    Eigen::MatrixX3f tempPos = Eigen::MatrixX3f::Zero (1, 3);
+    Eigen::MatrixX3f tempPos = Eigen::MatrixX3f::Zero(1, 3);
     setPositions(tempPos);
 
     //Add Attibute to Geometry
@@ -139,22 +147,25 @@ void CustomInstancedMesh::init()
 
 }
 
+
+//*************************************************************************************************************
+
 QByteArray CustomInstancedMesh::buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions)
 {
-    const uint iBufferSize = tVertPositions.cols();
-    const uint iVertSize = tVertPositions.rows();
+    const uint iVertNum = tVertPositions.rows();
+    const uint iVertSize = tVertPositions.cols();
 
     //create byre array
     QByteArray bufferData;
-    bufferData.resize(iBufferSize* iVertSize * (int)sizeof(float));
+    bufferData.resize(iVertNum* iVertSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
     //copy positions into buffer
-    for(uint i = 0 ; i < iBufferSize; i++)
+    for(uint i = 0 ; i < iVertNum; i++)
     {
-        for(int j = 0; j < iVertSize; j++)
+        for(uint j = 0; j < iVertSize; j++)
         {
-            rawVertexArray[i + j] = tVertPositions(i, j);
+            rawVertexArray[3 * i + j] = tVertPositions(i, j);
         }
     }
 
