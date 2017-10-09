@@ -109,19 +109,52 @@ public:
     /**
     * Constructs a CustomInstancedMesh object.
     */
-    explicit CustomInstancedMesh::CustomInstancedMesh(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+    explicit CustomInstancedMesh(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
                                                       Qt3DCore::QNode *tParent = nullptr);
 
+    //=========================================================================================================
+    /**
+    * Copy Constructor disabled
+    */
+    CustomInstancedMesh(const CustomInstancedMesh& other) = delete;
+
+    //=========================================================================================================
+    /**
+    * Copy operator disabled
+    */
+    CustomInstancedMesh& operator =(const CustomInstancedMesh& other) = delete;
+
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
     ~CustomInstancedMesh();
 
+    //=========================================================================================================
+    /**
+     * Sets the positions for each instance of the mesh.
+     *
+     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
+     */
     void setPositions(const Eigen::MatrixX3f& tVertPositions);
 
 protected:
 
 private:
 
+    //=========================================================================================================
+    /**
+     * Initialize CustomInstancedMesh object.
+     */
     void init();
 
+    //=========================================================================================================
+    /**
+     * Builds the position buffer content.
+     *
+     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
+     * @return                          buffer content.
+     */
     QByteArray buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions);
 
 
