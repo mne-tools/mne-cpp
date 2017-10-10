@@ -134,8 +134,8 @@ SOURCES += \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
     helpers/interpolation/interpolation.cpp \
     helpers/geometryinfo/geometryinfo.cpp \
-    engine/model/3dhelpers/custominstancedmesh.cpp \
-    engine/model/materials/instancedpervertexphongalphamaterial.cpp
+    engine/model/materials/instancedpositionrendermaterial.cpp \
+    engine/model/3dhelpers/custominstancedrenderer.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -181,8 +181,8 @@ HEADERS += \
     engine/model/items/sensordata/sensordatatreeitem.h \
     helpers/interpolation/interpolation.h \
     helpers/geometryinfo/geometryinfo.h \
-    engine/model/3dhelpers/custominstancedmesh.h \
-    engine/model/materials/instancedpervertexphongalphamaterial.h
+    engine/model/materials/instancedpositionrendermaterial.h \
+    engine/model/3dhelpers/custominstancedrenderer.h
 
 FORMS += \
     engine/control/control3dwidget.ui \
