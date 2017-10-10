@@ -20,5 +20,9 @@
         <file>engine/model/materials/shaders/gl4/pervertextessphongalpha.vert</file>
         <file>engine/model/materials/shaders/gl4/pervertextessphongalpha_pn_triangles.tes</file>
         <file>engine/model/materials/shaders/gl4/pervertextessphongalpha_simple.tes</file>
+        <file>engine/model/materials/shaders/es2/instancedposition.frag</file>
+        <file>engine/model/materials/shaders/es2/instancedposition.vert</file>
+        <file>engine/model/materials/shaders/gl3/instancedposition.frag</file>
+        <file>engine/model/materials/shaders/gl3/instancedposition.vert</file>
     </qresource>
 </RCC>
