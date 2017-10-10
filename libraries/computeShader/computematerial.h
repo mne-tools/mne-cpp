@@ -79,6 +79,7 @@ namespace Qt3DRender {
         class QFilterKey;
         class QTechnique;
         class QBuffer;
+        class QCullFace;
 }
 
 
@@ -201,6 +202,8 @@ private:
 
     //Output parameter
     QPointer<Qt3DRender::QParameter> m_pInterpolatedSignalParameter;
+
+    QPointer<Qt3DRender::QCullFace> m_pCullFace;
 
 };
 

@@ -64,6 +64,7 @@
 #include <Qt3DRender/QBuffer>
 #include <Qt3DRender/QShaderProgram>
 #include <Qt3DRender/QGraphicsApiFilter>
+#include <Qt3DRender/QCullFace>
 #include <QUrl>
 #include <QColor>
 
@@ -112,6 +113,7 @@ ComputeMaterial::ComputeMaterial(Qt3DCore::QNode *parent)
     , m_pInterpolatedSignalParameter(new QParameter)
     , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pSignalDataParameter(new QParameter)
+    , m_pCullFace(new QCullFace)
 {
     init();
 }
@@ -231,6 +233,10 @@ void ComputeMaterial::init()
     m_pDrawRenderPass->addParameter(m_pSpecularParameter);
     m_pDrawRenderPass->addParameter(m_pShininessParameter);
     m_pDrawRenderPass->addParameter(m_pAlphaParameter);
+
+    //Add Face Culling
+    m_pCullFace->setMode(QCullFace::Back);
+    m_pDrawRenderPass->addRenderState(m_pCullFace);
 
     //Set OpenGL version
     m_pDrawTechnique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
