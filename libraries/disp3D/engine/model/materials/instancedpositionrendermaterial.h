@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
-* @file     custominstancedmesh.h
-* @author   Lars Debor <lars.debor@gmx.de>;
+* @file     instancedpostionrendermaterial.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     October, 2017
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CustomInstancedMesh class declaration.
+* @brief     InstancedPositionRenderMaterial class declaration.
 *
 */
 
-#ifndef DISP3DLIB_CUSTOMINSTANCEDMESH_H
-#define DISP3DLIB_CUSTOMINSTANCEDMESH_H
+#ifndef DISP3DLIB_INSTANCEDPOSITIONRENDERMATERIAL_H
+#define DISP3DLIB_INSTANCEDPOSITIONRENDERMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -42,16 +42,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D_global.h>
+
+#include "../../../disp3D_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QPointer>
-#include <Qt3DRender/QGeometryRenderer>
+#include <Qt3DRender/QMaterial>
 
 
 //*************************************************************************************************************
@@ -59,20 +59,26 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
 namespace Qt3DRender {
-        class QGeometry;
-        class QBuffer;
-        class QAttribute;
+    class QEffect;
+    class QParameter;
+    class QShaderProgram;
+    class QFilterKey;
+    class QTechnique;
+    class QRenderPass;
+    class QNoDepthMask;
+    class QBlendEquationArguments;
+    class QBlendEquation;
 }
 
-namespace Qt3DCore {
-        class QNode;
+namespace Qtcore {
+    class QColor;
 }
 
 //*************************************************************************************************************
@@ -91,78 +97,102 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* This classes uses instanced rendering to draw the same Gemometry multiple at multiple positions.
-* For example it can be used with QSphereGeometry
+* Description of what this class is intended to do (in detail).
 *
-* @brief Instaced based renderer.
+* @brief Brief description of this class.
 */
 
-class DISP3DSHARED_EXPORT CustomInstancedMesh : public Qt3DRender::QGeometryRenderer
+class DISP3DSHARED_EXPORT InstancedPositionRenderMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CustomInstancedMesh> SPtr;            /**< Shared pointer type for CustomInstancedMesh. */
-    typedef QSharedPointer<const CustomInstancedMesh> ConstSPtr; /**< Const shared pointer type for CustomInstancedMesh. */
 
     //=========================================================================================================
     /**
-    * Constructs a CustomInstancedMesh object.
+    * Default constructor.
+    *
+    * @param[in] bUseAlpha      Whether to use alpha/transparency.
+    * @param[in] parent         The parent of this class.
     */
-    explicit CustomInstancedMesh(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
-                                                      Qt3DCore::QNode *tParent = nullptr);
+    explicit InstancedPositionRenderMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+
 
     //=========================================================================================================
     /**
-    * Copy Constructor disabled
+    * Copy constructor disabled.
     */
-    CustomInstancedMesh(const CustomInstancedMesh& other) = delete;
+    InstancedPositionRenderMaterial(const InstancedPositionRenderMaterial &other) = delete;
 
     //=========================================================================================================
     /**
-    * Copy operator disabled
+    * Copy operator disabled.
     */
-    CustomInstancedMesh& operator =(const CustomInstancedMesh& other) = delete;
+    InstancedPositionRenderMaterial& operator =(const InstancedPositionRenderMaterial &other) = delete;
 
     //=========================================================================================================
     /**
-    * Destructor
+    * default destructor.
     */
-    ~CustomInstancedMesh();
+    ~InstancedPositionRenderMaterial();
 
     //=========================================================================================================
     /**
-     * Sets the positions for each instance of the mesh.
-     *
-     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
+     * Sets ambient Color for the mesh.
+     * @param tColor            New color.
      */
-    void setPositions(const Eigen::MatrixX3f& tVertPositions);
+    void setAmbient(const QColor &tColor);
 
-protected:
+    //=========================================================================================================
+    /**
+    * Get the current alpha value.
+    *
+    * @return The current alpha value.
+    */
+    float alpha();
+
+    //=========================================================================================================
+    /**
+    * Set the current alpha value.
+    *
+    * @param[in] alpha  The new alpha value.
+    */
+    void setAlpha(float alpha);
 
 private:
 
     //=========================================================================================================
     /**
-     * Initialize CustomInstancedMesh object.
-     */
+    * Init the InstancedPositionRenderMaterial class.
+    */
     void init();
 
-    //=========================================================================================================
-    /**
-     * Builds the position buffer content.
-     *
-     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
-     * @return                          buffer content.
-     */
-    QByteArray buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions);
+    QPointer<Qt3DRender::QEffect>           m_pVertexEffect;
 
+    QPointer<Qt3DRender::QParameter>        m_pAmbientColor;
 
-    QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
+    QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;
+    QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;
+    QPointer<Qt3DRender::QParameter>        m_pShininessParameter;
+    QPointer<Qt3DRender::QParameter>        m_pAlphaParameter;
+    QPointer<Qt3DRender::QFilterKey>        m_pFilterKey;
 
-    QPointer<Qt3DRender::QBuffer>                   m_pPositionBuffer;
+    QPointer<Qt3DRender::QTechnique>        m_pVertexGL3Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;
 
-    QPointer<Qt3DRender::QAttribute>                m_pPositionAttribute;
+    QPointer<Qt3DRender::QTechnique>        m_pVertexGL2Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL2RenderPass;
+
+    QPointer<Qt3DRender::QTechnique>        m_pVertexES2Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexES2RenderPass;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;
+
+    QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
+    QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
+    QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;
+
+    bool        m_bUseAlpha;
 
 };
 
@@ -175,4 +205,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_CUSTOMINSTANCEDMESH_H
+#endif // DISP3DLIB_INSTANCEDPOSITIONRENDERMATERIAL_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     custominstancedmesh.cpp
+* @file     custominstancedrenderer.h
 * @author   Lars Debor <lars.debor@gmx.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CustomInstancedMesh class definition.
+* @brief     CustomInstancedRenderer class declaration.
 *
 */
+
+#ifndef DISP3DLIB_CUSTOMINSTANCEDRENDERER_H
+#define DISP3DLIB_CUSTOMINSTANCEDRENDERER_H
 
 
 //*************************************************************************************************************
@@ -39,138 +42,137 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "custominstancedmesh.h"
-#include <iostream>
+#include <disp3D_global.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/QGeometry>
-#include <Qt3DRender/QBuffer>
-#include <Qt3DRender/QAttribute>
+#include <QSharedPointer>
+#include <QPointer>
+#include <Qt3DRender/QGeometryRenderer>
 
-#include <Qt3DCore/QNode>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace DISP3DLIB;
-using namespace Qt3DRender;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-CustomInstancedMesh::CustomInstancedMesh(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
-                                         Qt3DCore::QNode *tParent)
-    : QGeometryRenderer(tParent)
-    , m_pGeometry(tGeometry)
-    , m_pPositionBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-    , m_pPositionAttribute(new QAttribute())
-{
-    init();
+namespace Qt3DRender {
+        class QGeometry;
+        class QBuffer;
+        class QAttribute;
 }
 
-
-//*************************************************************************************************************
-
-CustomInstancedMesh::~CustomInstancedMesh()
-{
-    m_pGeometry->deleteLater();
-    m_pPositionBuffer->deleteLater();
-    m_pPositionAttribute->deleteLater();
+namespace Qt3DCore {
+        class QNode;
 }
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
+
+namespace DISP3DLIB {
+
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DISP3DLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
-void CustomInstancedMesh::setPositions(const Eigen::MatrixX3f &tVertPositions)
+
+//=============================================================================================================
+/**
+* This classes uses instanced rendering to draw the same Gemometry multiple at multiple positions.
+* For example it can be used with QSphereGeometry
+*
+* @brief Instaced based renderer.
+*/
+
+class DISP3DSHARED_EXPORT CustomInstancedRenderer : public Qt3DRender::QGeometryRenderer
 {
-    if(tVertPositions.rows() == 0)
-    {
-        qDebug ("ERROR!: CustomInstancedMesh::setPositions: Matrix is empty!");
-        return;
-    }
+    Q_OBJECT
 
-    //init buffer
-    m_pPositionBuffer->setData(buildPositionBuffer(tVertPositions));
-    m_pPositionAttribute->setBuffer(m_pPositionBuffer);
+public:
+    typedef QSharedPointer<CustomInstancedRenderer> SPtr;            /**< Shared pointer type for CustomInstancedMesh. */
+    typedef QSharedPointer<const CustomInstancedRenderer> ConstSPtr; /**< Const shared pointer type for CustomInstancedMesh. */
 
-    //set number of instances to draw
-    this->setInstanceCount(tVertPositions.rows());
-}
+    //=========================================================================================================
+    /**
+    * Constructs a CustomInstancedRenderer object.
+    */
+    explicit CustomInstancedRenderer(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+                                                      Qt3DCore::QNode *tParent = nullptr);
+
+    //=========================================================================================================
+    /**
+    * Copy Constructor disabled
+    */
+    CustomInstancedRenderer(const CustomInstancedRenderer& other) = delete;
+
+    //=========================================================================================================
+    /**
+    * Copy operator disabled
+    */
+    CustomInstancedRenderer& operator =(const CustomInstancedRenderer& other) = delete;
+
+    //=========================================================================================================
+    /**
+    * Destructor
+    */
+    ~CustomInstancedRenderer();
+
+    //=========================================================================================================
+    /**
+     * Sets the positions for each instance of the mesh.
+     *
+     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
+     */
+    void setPositions(const Eigen::MatrixX3f& tVertPositions);
+
+protected:
+
+private:
+
+    //=========================================================================================================
+    /**
+     * Initialize CustomInstancedRenderer object.
+     */
+    void init();
+
+    //=========================================================================================================
+    /**
+     * Builds the position buffer content.
+     *
+     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
+     * @return                          buffer content.
+     */
+    QByteArray buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions);
+
+
+    QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
+
+    QPointer<Qt3DRender::QBuffer>                   m_pPositionBuffer;
+
+    QPointer<Qt3DRender::QAttribute>                m_pPositionAttribute;
+
+};
 
 
 //*************************************************************************************************************
-
-void CustomInstancedMesh::init()
-{
-    //Set Attribute parameters
-    m_pPositionAttribute->setName(QStringLiteral("geometryPosition"));
-    m_pPositionAttribute->setAttributeType(QAttribute::VertexAttribute);
-    m_pPositionAttribute->setVertexBaseType(QAttribute::Float);
-    m_pPositionAttribute->setVertexSize(3);
-    m_pPositionAttribute->setDivisor(1);
-    m_pPositionAttribute->setByteOffset(0);
-    m_pPositionAttribute->setByteStride(3 * (int)sizeof(float));
-
-    //Set default position
-    Eigen::MatrixX3f tempPos = Eigen::MatrixX3f::Zero(1, 3);
-    setPositions(tempPos);
-
-    //Add Attibute to Geometry
-    m_pGeometry->addAttribute(m_pPositionAttribute);
-
-    //configure geometry renderer
-    this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
-    this->setIndexOffset(0);
-    this->setFirstInstance(0);
-    this->setGeometry(m_pGeometry.data());
-
-}
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
 
-//*************************************************************************************************************
+} // namespace DISP3DLIB
 
-QByteArray CustomInstancedMesh::buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions)
-{
-    const uint iVertNum = tVertPositions.rows();
-    const uint iVertSize = tVertPositions.cols();
-
-    //create byre array
-    QByteArray bufferData;
-    bufferData.resize(iVertNum* iVertSize * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    //copy positions into buffer
-    for(uint i = 0 ; i < iVertNum; i++)
-    {
-        for(uint j = 0; j < iVertSize; j++)
-        {
-            rawVertexArray[3 * i + j] = tVertPositions(i, j);
-        }
-    }
-
-    return bufferData;
-}
-
-
-//*************************************************************************************************************
+#endif // DISP3DLIB_CUSTOMINSTANCEDRENDERER_H
