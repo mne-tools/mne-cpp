@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     custominstancedrenderer.h
+* @file     geometrymultiplier.h
 * @author   Lars Debor <lars.debor@gmx.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CustomInstancedRenderer class declaration.
+* @brief     GeometryMultiplier class declaration.
 *
 */
 
@@ -65,6 +65,7 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
 namespace Qt3DRender {
         class QGeometry;
         class QBuffer;
@@ -73,6 +74,10 @@ namespace Qt3DRender {
 
 namespace Qt3DCore {
         class QNode;
+}
+
+namespace QtCore {
+        class QVector3D;
 }
 
 //*************************************************************************************************************
@@ -97,46 +102,54 @@ namespace DISP3DLIB {
 * @brief Instaced based renderer.
 */
 
-class DISP3DSHARED_EXPORT CustomInstancedRenderer : public Qt3DRender::QGeometryRenderer
+class DISP3DSHARED_EXPORT GeometryMultiplier : public Qt3DRender::QGeometryRenderer
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CustomInstancedRenderer> SPtr;            /**< Shared pointer type for CustomInstancedMesh. */
-    typedef QSharedPointer<const CustomInstancedRenderer> ConstSPtr; /**< Const shared pointer type for CustomInstancedMesh. */
+    typedef QSharedPointer<GeometryMultiplier> SPtr;            /**< Shared pointer type for CustomInstancedMesh. */
+    typedef QSharedPointer<const GeometryMultiplier> ConstSPtr; /**< Const shared pointer type for CustomInstancedMesh. */
 
     //=========================================================================================================
     /**
-    * Constructs a CustomInstancedRenderer object.
+    * Constructs a GeometryMultiplier object.
     */
-    explicit CustomInstancedRenderer(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+    explicit GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
                                                       Qt3DCore::QNode *tParent = nullptr);
 
     //=========================================================================================================
     /**
     * Copy Constructor disabled
     */
-    CustomInstancedRenderer(const CustomInstancedRenderer& other) = delete;
+    GeometryMultiplier(const GeometryMultiplier& other) = delete;
 
     //=========================================================================================================
     /**
     * Copy operator disabled
     */
-    CustomInstancedRenderer& operator =(const CustomInstancedRenderer& other) = delete;
+    GeometryMultiplier& operator =(const GeometryMultiplier& other) = delete;
 
     //=========================================================================================================
     /**
     * Destructor
     */
-    ~CustomInstancedRenderer();
+    ~GeometryMultiplier();
 
     //=========================================================================================================
     /**
-     * Sets the positions for each instance of the mesh.
+     * Sets the positions for each instance of the geometry.
      *
      * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
      */
     void setPositions(const Eigen::MatrixX3f& tVertPositions);
+
+    //=========================================================================================================
+    /**
+     * Overloaded functions to set the positions for each instance of the geometry.
+     *
+     * @param tVertPositions            Array of row vectors with x, y and z coordinates for each instance.
+     */
+    void setPositions(const QVector<QVector3D> &tVertPositions);
 
 protected:
 
@@ -144,7 +157,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Initialize CustomInstancedRenderer object.
+     * Initialize GeometryMultiplier object.
      */
     void init();
 
