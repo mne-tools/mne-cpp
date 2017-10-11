@@ -135,7 +135,7 @@ SOURCES += \
     helpers/interpolation/interpolation.cpp \
     helpers/geometryinfo/geometryinfo.cpp \
     engine/model/materials/instancedpositionrendermaterial.cpp \
-    engine/model/3dhelpers/custominstancedrenderer.cpp
+    engine/model/3dhelpers/geometrymultiplier.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -182,7 +182,7 @@ HEADERS += \
     helpers/interpolation/interpolation.h \
     helpers/geometryinfo/geometryinfo.h \
     engine/model/materials/instancedpositionrendermaterial.h \
-    engine/model/3dhelpers/custominstancedrenderer.h
+    engine/model/3dhelpers/geometrymultiplier.h
 
 FORMS += \
     engine/control/control3dwidget.ui \

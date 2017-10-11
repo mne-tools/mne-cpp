@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     custominstancedrenderer.cpp
+* @file     geometrymultiplier.cpp
 * @author   Lars Debor <lars.debor@gmx.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CustomInstancedRenderer class definition.
+* @brief    GeometryMultiplier class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "custominstancedrenderer.h"
+#include "geometrymultiplier.h"
 #include <iostream>
 
 //*************************************************************************************************************
@@ -79,7 +79,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomInstancedRenderer::CustomInstancedRenderer(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
                                          Qt3DCore::QNode *tParent)
     : QGeometryRenderer(tParent)
     , m_pGeometry(tGeometry)
@@ -92,7 +92,7 @@ CustomInstancedRenderer::CustomInstancedRenderer(QSharedPointer<Qt3DRender::QGeo
 
 //*************************************************************************************************************
 
-CustomInstancedRenderer::~CustomInstancedRenderer()
+GeometryMultiplier::~GeometryMultiplier()
 {
     m_pGeometry->deleteLater();
     m_pPositionBuffer->deleteLater();
@@ -102,7 +102,7 @@ CustomInstancedRenderer::~CustomInstancedRenderer()
 
 //*************************************************************************************************************
 
-void CustomInstancedRenderer::setPositions(const Eigen::MatrixX3f &tVertPositions)
+void GeometryMultiplier::setPositions(const Eigen::MatrixX3f &tVertPositions)
 {
     if(tVertPositions.rows() == 0)
     {
@@ -118,10 +118,24 @@ void CustomInstancedRenderer::setPositions(const Eigen::MatrixX3f &tVertPosition
     this->setInstanceCount(tVertPositions.rows());
 }
 
+void GeometryMultiplier::setPositions(const QVector<QVector3D> &tVertPositions)
+{
+    //create matrix
+    Eigen::MatrixX3f tempMat(tVertPositions.size(), 3);
+    for(uint i = 0; i < tVertPositions.size(); i++)
+    {
+        tempMat(i, 0) = tVertPositions[i].x();  //x
+        tempMat(i, 1) = tVertPositions[i].y();  //y
+        tempMat(i, 2) = tVertPositions[i].z();  //z
+    }
+
+    setPositions(tempMat);
+}
+
 
 //*************************************************************************************************************
 
-void CustomInstancedRenderer::init()
+void GeometryMultiplier::init()
 {
     //Set Attribute parameters
     m_pPositionAttribute->setName(QStringLiteral("geometryPosition"));
@@ -150,7 +164,7 @@ void CustomInstancedRenderer::init()
 
 //*************************************************************************************************************
 
-QByteArray CustomInstancedRenderer::buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions)
+QByteArray GeometryMultiplier::buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions)
 {
     const uint iVertNum = tVertPositions.rows();
     const uint iVertSize = tVertPositions.cols();
