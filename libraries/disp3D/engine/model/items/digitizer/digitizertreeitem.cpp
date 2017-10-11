@@ -41,7 +41,7 @@
 #include "digitizertreeitem.h"
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/geometrymultiplier.h"
-#include "../../materials/instancedpositionrendermaterial.h"
+#include "../../materials/geometrymultipliermaterial.h"
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
@@ -110,7 +110,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         pSourceSphereEntity->addComponent(m_pSphereMesh);
 
         //Add material
-        InstancedPositionRenderMaterial* pMaterial = new InstancedPositionRenderMaterial(true);
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
         pMaterial->setAmbient(tSphereColor);
         pSourceSphereEntity->addComponent(pMaterial);
     }
