@@ -84,6 +84,7 @@ namespace DISP3DLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+    class GeometryMultiplier;
 
 //=============================================================================================================
 /**
@@ -116,8 +117,12 @@ public:
     * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] tDigitizer         The digitizer data.
+    * @param[in] tSphereRadius      The radius of the visualized digitizer sphere.
+    * @param[in] tSphereColor       The color of the visualized digitizer.
     */
-    void addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer);
+    void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer,
+                                    const float tSphereRadius,
+                                    const QColor &tSphereColor);
 
 protected:
     //=========================================================================================================
@@ -126,7 +131,7 @@ protected:
     */
     void initItem();
 
-    QList<Renderable3DEntity*> list;
+    QPointer<GeometryMultiplier>    m_pSphereMesh;
 };
 
 } //NAMESPACE DISP3DLIB

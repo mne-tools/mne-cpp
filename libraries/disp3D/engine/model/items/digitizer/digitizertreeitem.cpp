@@ -40,6 +40,8 @@
 
 #include "digitizertreeitem.h"
 #include "../common/metatreeitem.h"
+#include "../../3dhelpers/geometrymultiplier.h"
+#include "../../materials/instancedpositionrendermaterial.h"
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
@@ -50,8 +52,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongAlphaMaterial>
+#include <Qt3DExtras/QSphereGeometry>
 
 
 //*************************************************************************************************************
@@ -93,89 +94,45 @@ void DigitizerTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
+void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, const float tSphereRadius, const QColor &tSphereColor)
 {
-    QVector3D pos;
-
-    if(!list.isEmpty() && list.size() == tDigitizer.size()) {
-        for(int i = 0; i < list.size(); ++i) {
-            pos.setX(tDigitizer[i].r[0]);
-            pos.setY(tDigitizer[i].r[1]);
-            pos.setZ(tDigitizer[i].r[2]);
-
-            list[i]->setPosition(pos);
-        }
-        return;
-    }
-
-//    for(int i = 0; i < list.size(); ++i) {
-//        list[i]->deleteLater();
-//    }
-//    list.clear();
-
-    //Create digitizers as small 3D spheres
-    QColor colDefault(100,100,100);
-
-    for(int i = 0; i < tDigitizer.size(); ++i) {
+    //create instanced renderer if there is none
+    if(!m_pSphereMesh && !tDigitizer.isEmpty())
+    {
         Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
-        list.append(pSourceSphereEntity);
-        pos.setX(tDigitizer[i].r[0]);
-        pos.setY(tDigitizer[i].r[1]);
-        pos.setZ(tDigitizer[i].r[2]);
+        QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+        pSourceSphereGeometry->setRadius(tSphereRadius);
 
-        Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
+        m_pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
 
-        if (tDigitizer[i].kind == FIFFV_POINT_CARDINAL) {
-            sourceSphere->setRadius(0.002f);
-        } else {
-            sourceSphere->setRadius(0.001f);
-        }
-        pSourceSphereEntity->addComponent(sourceSphere);
-        pSourceSphereEntity->setPosition(pos);
+        //Set sphere positions
+        pSourceSphereEntity->addComponent(m_pSphereMesh);
 
-        Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
+        //Add material
+        InstancedPositionRenderMaterial* pMaterial = new InstancedPositionRenderMaterial(true);
+        pMaterial->setAmbient(tSphereColor);
+        pSourceSphereEntity->addComponent(pMaterial);
+    }
 
-        switch (tDigitizer[i].kind) {
-            case FIFFV_POINT_CARDINAL:
-                switch (tDigitizer[i].ident) {
-                    case FIFFV_POINT_LPA:
-                    colDefault = Qt::green;
-                    material->setAmbient(colDefault);
-                    break;
-                    case FIFFV_POINT_NASION:
-                    colDefault = Qt::yellow;
-                    material->setAmbient(colDefault);
-                    break;
-                    case FIFFV_POINT_RPA:
-                    colDefault = Qt::magenta;
-                    material->setAmbient(colDefault);
-                    break;
-                    default:
-                    colDefault = Qt::white;
-                    material->setAmbient(colDefault);
-                    break;
-                }
-                break;
-            case FIFFV_POINT_HPI:
-                colDefault = Qt::red;
-                material->setAmbient(colDefault);
-                break;
-            case FIFFV_POINT_EEG:
-                colDefault = Qt::cyan;
-                material->setAmbient(colDefault);
-                break;
-            case FIFFV_POINT_EXTRA:
-                colDefault = Qt::magenta;
-                material->setAmbient(colDefault);
-                break;
-            default:
-                colDefault = Qt::white;
-                material->setAmbient(colDefault);
-                break;
+    //Set positions
+    if(!tDigitizer.isEmpty())
+    {
+        QVector<QVector3D> vPostitions;
+        vPostitions.resize(tDigitizer.size());
+
+        QVector3D tempPos;
+
+        for(int i = 0; i < tDigitizer.size(); ++i) {
+            tempPos.setX(tDigitizer[i].r[0]);
+            tempPos.setY(tDigitizer[i].r[1]);
+            tempPos.setZ(tDigitizer[i].r[2]);
+
+            vPostitions.push_back(tempPos);
         }
 
-        pSourceSphereEntity->addComponent(material);
+        //Set sphere positions
+        m_pSphereMesh->setPositions(vPostitions);
     }
 
     //Update alpha
@@ -199,7 +156,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer)
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
-            data.setValue(colDefault);
+            data.setValue(tSphereColor);
             item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
         }
