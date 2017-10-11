@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     instancedpostionrendermaterial.cpp
+* @file     geometrymultipliermaterial.cpp
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    InstancedPositionRenderMaterial class definition.
+* @brief    GeometryMultiplierMaterial class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "instancedpositionrendermaterial.h"
+#include "geometrymultipliermaterial.h"
 
 
 //*************************************************************************************************************
@@ -88,7 +88,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InstancedPositionRenderMaterial::InstancedPositionRenderMaterial(bool bUseAlpha, Qt3DCore::QNode *parent)
+GeometryMultiplierMaterial::GeometryMultiplierMaterial(bool bUseAlpha, Qt3DCore::QNode *parent)
     : QMaterial(parent)
     , m_pVertexEffect(new QEffect())
     , m_pAmbientColor(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.2f, 0.2f, 0.2f, 1.0f)))
@@ -116,7 +116,7 @@ InstancedPositionRenderMaterial::InstancedPositionRenderMaterial(bool bUseAlpha,
 
 //*************************************************************************************************************
 
-InstancedPositionRenderMaterial::~InstancedPositionRenderMaterial()
+GeometryMultiplierMaterial::~GeometryMultiplierMaterial()
 {
 
 }
@@ -124,7 +124,7 @@ InstancedPositionRenderMaterial::~InstancedPositionRenderMaterial()
 
 //*************************************************************************************************************
 
-void InstancedPositionRenderMaterial::setAmbient(const QColor &tColor)
+void GeometryMultiplierMaterial::setAmbient(const QColor &tColor)
 {
     m_pAmbientColor->setValue(tColor);
 }
@@ -132,7 +132,7 @@ void InstancedPositionRenderMaterial::setAmbient(const QColor &tColor)
 
 //*************************************************************************************************************
 
-float InstancedPositionRenderMaterial::alpha()
+float GeometryMultiplierMaterial::alpha()
 {
     return m_pAlphaParameter->value().toFloat();
 }
@@ -140,7 +140,7 @@ float InstancedPositionRenderMaterial::alpha()
 
 //*************************************************************************************************************
 
-void InstancedPositionRenderMaterial::setAlpha(float alpha)
+void GeometryMultiplierMaterial::setAlpha(float alpha)
 {
     m_pAlphaParameter->setValue(alpha);
 }
@@ -148,7 +148,7 @@ void InstancedPositionRenderMaterial::setAlpha(float alpha)
 
 //*************************************************************************************************************
 
-void InstancedPositionRenderMaterial::init()
+void GeometryMultiplierMaterial::init()
 {
     //Set shader
     m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl3/instancedposition.vert"))));

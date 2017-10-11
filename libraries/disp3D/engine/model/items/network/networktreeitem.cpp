@@ -45,7 +45,7 @@
 #include "../../materials/networkmaterial.h"
 #include "../../3dhelpers/custommesh.h"
 #include "../../3dhelpers/geometrymultiplier.h"
-#include "../../materials/instancedpositionrendermaterial.h"
+#include "../../materials/geometrymultipliermaterial.h"
 
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
@@ -207,7 +207,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         sourceSphereEntity->addComponent(pSphereMesh);
 
         //Add material
-        InstancedPositionRenderMaterial* material = new InstancedPositionRenderMaterial(true);
+        GeometryMultiplierMaterial* material = new GeometryMultiplierMaterial(true);
         material->setAmbient(Qt::blue);
         sourceSphereEntity->addComponent(material);
 

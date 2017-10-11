@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     instancedpostionrendermaterial.h
+* @file     geometrymultipliermaterial.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     InstancedPositionRenderMaterial class declaration.
+* @brief     GeometryMultiplierMaterial class declaration.
 *
 */
 
-#ifndef DISP3DLIB_INSTANCEDPOSITIONRENDERMATERIAL_H
-#define DISP3DLIB_INSTANCEDPOSITIONRENDERMATERIAL_H
+#ifndef DISP3DLIB_GEOMETRYMULTIPLIERMATERIAL_H
+#define DISP3DLIB_GEOMETRYMULTIPLIERMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -97,12 +97,12 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* Custom phong alpha material for instanced rendering.
 *
-* @brief Brief description of this class.
+* @brief Custom phong alpha material for instanced rendering.
 */
 
-class DISP3DSHARED_EXPORT InstancedPositionRenderMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT GeometryMultiplierMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 
@@ -115,26 +115,26 @@ public:
     * @param[in] bUseAlpha      Whether to use alpha/transparency.
     * @param[in] parent         The parent of this class.
     */
-    explicit InstancedPositionRenderMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+    explicit GeometryMultiplierMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
 
 
     //=========================================================================================================
     /**
     * Copy constructor disabled.
     */
-    InstancedPositionRenderMaterial(const InstancedPositionRenderMaterial &other) = delete;
+    GeometryMultiplierMaterial(const GeometryMultiplierMaterial &other) = delete;
 
     //=========================================================================================================
     /**
     * Copy operator disabled.
     */
-    InstancedPositionRenderMaterial& operator =(const InstancedPositionRenderMaterial &other) = delete;
+    GeometryMultiplierMaterial& operator =(const GeometryMultiplierMaterial &other) = delete;
 
     //=========================================================================================================
     /**
     * default destructor.
     */
-    ~InstancedPositionRenderMaterial();
+    ~GeometryMultiplierMaterial();
 
     //=========================================================================================================
     /**
@@ -163,7 +163,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Init the InstancedPositionRenderMaterial class.
+    * Init the GeometryMultiplierMaterial class.
     */
     void init();
 
@@ -205,4 +205,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_INSTANCEDPOSITIONRENDERMATERIAL_H
+#endif // DISP3DLIB_GEOMETRYMULTIPLIERMATERIAL_H
