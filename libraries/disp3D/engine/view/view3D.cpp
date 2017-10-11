@@ -68,6 +68,7 @@
 #include <Qt3DExtras/QCylinderMesh>
 #include <Qt3DExtras/QForwardRenderer>
 #include <Qt3DExtras/QSphereMesh>
+#include <Qt3DRender/QRenderSettings>
 
 
 //*************************************************************************************************************
@@ -138,6 +139,9 @@ void View3D::init()
     //Create coordinate system and hide as default
     createCoordSystem(m_p3DObjectsEntity);
     toggleCoordAxis(false);
+
+    //Only render new frames when needed
+    this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
 }
 
 
