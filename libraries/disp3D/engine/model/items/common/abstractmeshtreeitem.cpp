@@ -167,15 +167,6 @@ void AbstractMeshTreeItem::initItem()
     data.setValue(fTriangleScale);
     itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 
-    MetaTreeItem* pItemShowNormals = new MetaTreeItem(MetaTreeItemTypes::ShowNormals, "Show normals");
-    connect(pItemShowNormals, &MetaTreeItem::checkStateChanged,
-            this, &AbstractMeshTreeItem::onSurfaceNormalsChanged);
-    pItemShowNormals->setCheckable(true);
-    list.clear();
-    list << pItemShowNormals;
-    list << new QStandardItem("Show the normals");
-    pItemMaterialOptions->appendRow(list);
-
     //Init materials
     this->addComponent(m_pMaterial);
 
@@ -248,6 +239,7 @@ void AbstractMeshTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
 {
     this->removeComponent(m_pTessMaterial);
     this->removeComponent(m_pMaterial);
+    this->removeComponent(m_pNormalMaterial);
 
     if(sMaterial.toString() == "Phong Alpha") {
         this->addComponent(m_pMaterial);
@@ -259,15 +251,12 @@ void AbstractMeshTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
         if(m_pCustomMesh) {
             m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Patches);
         }
+    } else if(sMaterial.toString() == "Show normals") {
+        this->addComponent(m_pNormalMaterial);
+        if(m_pCustomMesh) {
+            m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
+        }
     }
-}
-
-
-//*************************************************************************************************************
-
-void AbstractMeshTreeItem::onSurfaceNormalsChanged(const Qt::CheckState& checkState)
-{
-    m_pNormalMaterial->setEnabled(checkState == Qt::Unchecked ? false : true);
 }
 
 

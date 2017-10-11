@@ -333,6 +333,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pComboBox->setCurrentText(index.model()->data(index, MetaTreeItemRoles::SurfaceMaterial).toString());
             pComboBox->addItem("Phong Alpha Tesselation");
             pComboBox->addItem("Phong Alpha");
+            pComboBox->addItem("Show normals");
             return pComboBox;
         }
         

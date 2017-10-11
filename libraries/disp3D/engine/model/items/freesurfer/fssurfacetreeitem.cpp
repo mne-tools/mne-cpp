@@ -122,12 +122,6 @@ void FsSurfaceTreeItem::initItem()
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
-
-    //Set shaders
-    this->removeComponent(m_pMaterial);
-
-    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(false);
-    this->addComponent(pBemMaterial);
 }
 
 
