@@ -120,6 +120,9 @@ void GeometryMultiplier::setPositions(const Eigen::MatrixX3f &tVertPositions)
     this->setInstanceCount(tVertPositions.rows());
 }
 
+
+//*************************************************************************************************************#
+
 void GeometryMultiplier::setPositions(const QVector<QVector3D> &tVertPositions)
 {
     //create matrix

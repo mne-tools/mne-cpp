@@ -119,7 +119,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     if(!tDigitizer.isEmpty())
     {
         QVector<QVector3D> vPostitions;
-        vPostitions.resize(tDigitizer.size());
+        vPostitions.reserve(tDigitizer.size());
 
         QVector3D tempPos;
 
