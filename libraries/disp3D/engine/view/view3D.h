@@ -210,6 +210,14 @@ protected:
     */
     void createCoordSystem(Qt3DCore::QEntity *parent);
 
+    //=========================================================================================================
+    /**
+    * Sets the rotation for all 3D models being children.
+    *
+    * @param[in] obj         The parent of the children to be rotated.
+    */
+    void setRotationRecursive(QObject* obj);
+
     QPointer<Qt3DCore::QEntity>         m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
@@ -231,6 +239,8 @@ protected:
     QVector3D                           m_vecViewTransOld;            /**< The camera old translation vector. */
     QVector3D                           m_vecViewRotation;            /**< The camera rotation vector. */
     QVector3D                           m_vecViewRotationOld;         /**< The camera old rotation vector. */
+    QVector3D                           m_vecModelRotation;           /**< The model rotation vector. */
+    QVector3D                           m_vecModelRotationOld;        /**< The model old rotation vector. */
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;        /**< The animations for each 3D object. */
     QList<QPair<QPointer<Qt3DRender::QPointLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */
