@@ -92,9 +92,9 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCameraEntity(this->camera())
-, m_bCameraRotationMode(false)
+, m_bCameraRotationMode(true)
 , m_bCameraTransMode(false)
-, m_bModelRotationMode(false)
+, m_bModelRotationMode(true)
 , m_vecViewTrans(QVector3D(0.0f,-0.025f,-0.25f))
 , m_vecViewTransOld(QVector3D(0.0,0.0,-0.5))
 , m_vecViewRotation(QVector3D(-90.0,130.0,0.0))
@@ -312,18 +312,18 @@ void View3D::keyPressEvent(QKeyEvent* e)
     switch ( e->key() )
     {
         case Qt::Key_Space:
-            m_bModelRotationMode = true;
+            m_bModelRotationMode = !m_bModelRotationMode;
             break;
 
         case Qt::Key_Left:
                 m_vecViewRotation.setY(-0.75 + m_vecViewRotationOld.y());
 
-                //Rotate all surface objects
+                //Rotate all entities
                 if(!m_bModelRotationMode) {
                     //Rotate camera
                     m_pCameraTransform->setRotationY(m_vecViewRotation.y());
                 } else {
-                    //Rotate all surface objects
+                    //Rotate all objects
                     for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
                         if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_p3DObjectsEntity->children().at(i))) {
                             pItem->setRotY(m_vecViewRotation.y());
@@ -395,10 +395,6 @@ void View3D::keyReleaseEvent(QKeyEvent* e)
 {
     switch ( e->key() )
     {
-        case Qt::Key_Space:
-            m_bModelRotationMode = false;
-            break;
-
         case Qt::Key_Left:
             m_vecViewRotationOld = m_vecViewRotation;
             break;
@@ -448,10 +444,11 @@ void View3D::mousePressEvent(QMouseEvent* e)
 
 void View3D::wheelEvent(QWheelEvent* e)
 {
-    if(e->angleDelta().y() > 0)
+    if(e->angleDelta().y() > 0) {
         m_vecViewTrans.setZ(m_vecViewTrans.z() + 0.005f);
-    else
+    } else {
         m_vecViewTrans.setZ(m_vecViewTrans.z() - 0.005f);
+    }
 
     // Transform
     m_pCameraTransform->setTranslation(m_vecViewTrans);
@@ -468,8 +465,24 @@ void View3D::mouseReleaseEvent(QMouseEvent* e)
     m_bCameraTransMode = false;
     m_vecViewTransOld = m_vecViewTrans;
     m_vecViewRotationOld = m_vecViewRotation;
+    m_vecModelRotationOld = m_vecModelRotation;
 
     Qt3DWindow::mouseReleaseEvent(e);
+}
+
+
+//*************************************************************************************************************
+
+void View3D::setRotationRecursive(QObject* obj)
+{
+    for(int i = 0; i < obj->children().size(); ++i) {
+        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(obj->children().at(i))) {
+            pItem->setRotZ(m_vecModelRotation.y());
+            pItem->setRotX(m_vecModelRotation.x());
+        }
+
+        setRotationRecursive(obj->children().at(i));
+    }
 }
 
 
@@ -478,22 +491,20 @@ void View3D::mouseReleaseEvent(QMouseEvent* e)
 void View3D::mouseMoveEvent(QMouseEvent* e)
 {
     if(m_bCameraRotationMode) {
-        m_vecViewRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecViewRotationOld.x());
-        m_vecViewRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecViewRotationOld.y());
-
-        //Rotate all surface objects
+        //Rotate
         if(!m_bModelRotationMode) {
             //Rotate camera
+            m_vecViewRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecViewRotationOld.x());
+            m_vecViewRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecViewRotationOld.y());
+
             m_pCameraTransform->setRotationX(m_vecViewRotation.x());
             m_pCameraTransform->setRotationY(m_vecViewRotation.y());
         } else {
-            //Rotate all surface objects
-            for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-                if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_p3DObjectsEntity->children().at(i))) {
-                    pItem->setRotZ(m_vecViewRotation.y());
-                    pItem->setRotX(m_vecViewRotation.x());
-                }
-            }
+            //Rotate objects
+            m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
+            m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
+
+            setRotationRecursive(m_p3DObjectsEntity);
         }
     }
 
