@@ -93,7 +93,7 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCameraEntity(this->camera())
-, m_bCameraRotationMode(true)
+, m_bRotationMode(false)
 , m_bCameraTransMode(false)
 , m_bModelRotationMode(true)
 , m_vecViewTrans(QVector3D(0.0f,-0.025f,-0.25f))
@@ -166,27 +166,27 @@ void View3D::initLight()
     //Create all the lights - make it shine
     for(int i = 0; i < lLightPositions.size(); ++i) {
         //Light source
-        Qt3DCore::QEntity* enitityLight = new Qt3DCore::QEntity(m_pLightEntity);
+        Qt3DCore::QEntity* entityLight = new Qt3DCore::QEntity(m_pLightEntity);
         Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
         QMatrix4x4 m;
         m.translate(lLightPositions.at(i));
         transform->setMatrix(m);
 
-        enitityLight->addComponent(transform);
+        entityLight->addComponent(transform);
 
-        Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight(enitityLight);
+        Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight(entityLight);
         light1->setColor(lLightColor.at(i));
         //light1->setWorldDirection(lLightDirections.at(i));
         light1->setIntensity(lLightIntensities.at(i));
-        enitityLight->addComponent(light1);
+        entityLight->addComponent(light1);
 
-//        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(enitityLight);
+//        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(entityLight);
 //        lightSphere->setRadius(0.1f);
 //        enitityLight->addComponent(lightSphere);
 
-        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(enitityLight);
+        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(entityLight);
         material->setAmbient(lLightColor.at(i));
-        enitityLight->addComponent(material);
+        entityLight->addComponent(material);
 
         QPair<Qt3DRender::QPointLight*, Qt3DExtras::QPhongMaterial*> pair;
         pair.first = light1;
@@ -432,7 +432,7 @@ void View3D::mousePressEvent(QMouseEvent* e)
             //TODO: SelectionMode
             break;
         case Qt::MidButton:
-            m_bCameraRotationMode = true;
+            m_bRotationMode = true;
             break;
         case Qt::RightButton:
             m_bCameraTransMode = true;
@@ -465,7 +465,7 @@ void View3D::wheelEvent(QWheelEvent* e)
 
 void View3D::mouseReleaseEvent(QMouseEvent* e)
 {
-    m_bCameraRotationMode = false;
+    m_bRotationMode = false;
     m_bCameraTransMode = false;
     m_vecViewTransOld = m_vecViewTrans;
     m_vecViewRotationOld = m_vecViewRotation;
@@ -494,7 +494,7 @@ void View3D::setRotationRecursive(QObject* obj)
 
 void View3D::mouseMoveEvent(QMouseEvent* e)
 {
-    if(m_bCameraRotationMode) {
+    if(m_bRotationMode) {
         //Rotate
         if(!m_bModelRotationMode) {
             //Rotate camera

@@ -230,8 +230,8 @@ protected:
     QPointer<Qt3DCore::QTransform>      m_pCameraTransform;             /**< The main camera transform. */
 
     bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
-    bool                                m_bCameraRotationMode;          /**< Flag for activating/deactivating the rotation camera mode. */
-    bool                                m_bModelRotationMode;           /**< Flag for activating/deactivating the rotation model mode. */
+    bool                                m_bRotationMode;                /**< Flag for activating/deactivating the rotation mode. */
+    bool                                m_bModelRotationMode;           /**< Flag for activating/deactivating the rotation model mode (camera is default). */
 
     QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
 
