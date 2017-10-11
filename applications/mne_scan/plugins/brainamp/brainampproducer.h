@@ -45,7 +45,7 @@
 
 #include "brainamp_global.h"
 
-#include <generics/circularbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 
 //*************************************************************************************************************

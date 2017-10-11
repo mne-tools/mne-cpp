@@ -238,11 +238,8 @@ void BrainAMP::setUpFiffInfo()
             //Set channel type
             fChInfo.kind = FIFFV_EEG_CH;
 
-            //Set coil type
-            fChInfo.coil_type = FIFFV_COIL_EEG;
-
             //Set logno
-            fChInfo.logno = i;
+            fChInfo.logNo = i;
 
             //Set coord frame
             fChInfo.coord_frame = FIFFV_COORD_HEAD;
@@ -262,21 +259,21 @@ void BrainAMP::setUpFiffInfo()
             fChInfo.eeg_loc(2,1) = 0;
 
             //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
-            fChInfo.loc(0,0) = 0;
-            fChInfo.loc(1,0) = 0;
-            fChInfo.loc(2,0) = 0;
+            fChInfo.chpos.r0(0) = 0;
+            fChInfo.chpos.r0(1) = 0;
+            fChInfo.chpos.r0(2) = 0;
 
-            fChInfo.loc(3,0) = 0;
-            fChInfo.loc(4,0) = 0;
-            fChInfo.loc(5,0) = 0;
+            fChInfo.chpos.ex(0) = 1;
+            fChInfo.chpos.ex(1) = 0;
+            fChInfo.chpos.ex(2) = 0;
 
-            fChInfo.loc(6,0) = 0;
-            fChInfo.loc(7,0) = 1;
-            fChInfo.loc(8,0) = 0;
+            fChInfo.chpos.ey(0) = 0;
+            fChInfo.chpos.ey(1) = 1;
+            fChInfo.chpos.ey(2) = 0;
 
-            fChInfo.loc(9,0) = 0;
-            fChInfo.loc(10,0) = 0;
-            fChInfo.loc(11,0) = 1;
+            fChInfo.chpos.ez(0) = 0;
+            fChInfo.chpos.ez(1) = 0;
+            fChInfo.chpos.ez(2) = 1;
         }
 
         //Digital input channel
