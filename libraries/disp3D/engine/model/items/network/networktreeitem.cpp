@@ -44,6 +44,8 @@
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/networkmaterial.h"
 #include "../../3dhelpers/custommesh.h"
+#include "../../3dhelpers/geometrymultiplier.h"
+#include "../../materials/instancedpositionrendermaterial.h"
 
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
@@ -59,8 +61,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongAlphaMaterial>
+#include <Qt3DExtras/QSphereGeometry>
 #include <Qt3DCore/QTransform>
 
 
@@ -194,29 +195,21 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     //Draw network nodes
     //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
     if(!m_bNodesPlotted) {
-        QVector3D pos;
 
-        for(int i = 0; i < lNetworkNodes.size(); ++i) {
-            pos.setX(lNetworkNodes.at(i)->getVert()(0));
-            pos.setY(lNetworkNodes.at(i)->getVert()(1));
-            pos.setZ(lNetworkNodes.at(i)->getVert()(2));
+        Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(this);
+        //create geometry
+        QSharedPointer<Qt3DExtras::QSphereGeometry> sourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+        sourceSphereGeometry->setRadius(0.001f);
+        //create instanced renderer
+        GeometryMultiplier *pSphereMesh = new GeometryMultiplier(sourceSphereGeometry);
+        //Set sphere positions
+        pSphereMesh->setPositions(tMatVert);
+        sourceSphereEntity->addComponent(pSphereMesh);
 
-            Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(this);
-
-            Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.001f);
-            sourceSphereEntity->addComponent(sourceSphere);
-
-            Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-            QMatrix4x4 m;
-            m.translate(pos);
-            transform->setMatrix(m);
-            sourceSphereEntity->addComponent(transform);
-
-            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
-            material->setAmbient(Qt::blue);
-            sourceSphereEntity->addComponent(material);
-        }
+        //Add material
+        InstancedPositionRenderMaterial* material = new InstancedPositionRenderMaterial(true);
+        material->setAmbient(Qt::blue);
+        sourceSphereEntity->addComponent(material);
 
         m_bNodesPlotted = true;
     }
