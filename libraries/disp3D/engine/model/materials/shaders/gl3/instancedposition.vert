@@ -3,21 +3,21 @@
 in vec3 vertexPosition;
 in vec3 vertexNormal;
 
-in vec3 geometryPosition; //from InstancedCustomMesh
+in mat4 instanceModelMatrix; //from GeometryMultiplier
 
 out vec3 worldPosition;
 out vec3 worldNormal;
 
-uniform mat4 modelMatrix;
 uniform mat3 modelNormalMatrix;
-uniform mat4 mvp;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
 
 void main()
 {
-    vec4 pos = vec4(vertexPosition.xyz, 1.0) + vec4(geometryPosition, 0.0);
+    vec4 pos = vec4(vertexPosition.xyz, 1.0);
 
     worldNormal = normalize( modelNormalMatrix * vertexNormal );
-    worldPosition = vec3( modelMatrix * pos);
+    worldPosition = vec3( instanceModelMatrix * pos);
 
-    gl_Position = mvp * pos;
+    gl_Position = projectionMatrix * viewMatrix * instanceModelMatrix * pos;
 }

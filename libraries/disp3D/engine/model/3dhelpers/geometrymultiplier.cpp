@@ -54,6 +54,7 @@
 #include <Qt3DCore/QNode>
 
 #include <QVector3D>
+#include <QMatrix4x4>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,7 +87,9 @@ GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGe
     : QGeometryRenderer(tParent)
     , m_pGeometry(tGeometry)
     , m_pPositionBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+    , m_pTransformBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pPositionAttribute(new QAttribute())
+    , m_pTransformAttribute(new QAttribute())
 {
     init();
 }
@@ -98,7 +101,9 @@ GeometryMultiplier::~GeometryMultiplier()
 {
     m_pGeometry->deleteLater();
     m_pPositionBuffer->deleteLater();
+    m_pTransformBuffer->deleteLater();
     m_pPositionAttribute->deleteLater();
+    m_pTransformAttribute->deleteLater();
 }
 
 
@@ -108,7 +113,7 @@ void GeometryMultiplier::setPositions(const Eigen::MatrixX3f &tVertPositions)
 {
     if(tVertPositions.rows() == 0)
     {
-        qDebug ("ERROR!: CustomInstancedMesh::setPositions: Matrix is empty!");
+        qDebug ("ERROR!: GeometryMultiplier::setPositions: Matrix is empty!");
         return;
     }
 
@@ -127,7 +132,7 @@ void GeometryMultiplier::setPositions(const QVector<QVector3D> &tVertPositions)
 {
     //create matrix
     Eigen::MatrixX3f tempMat(tVertPositions.size(), 3);
-    for(uint i = 0; i < tVertPositions.size(); i++)
+    for(int i = 0; i < tVertPositions.size(); i++)
     {
         tempMat(i, 0) = tVertPositions[i].x();  //x
         tempMat(i, 1) = tVertPositions[i].y();  //y
@@ -137,12 +142,26 @@ void GeometryMultiplier::setPositions(const QVector<QVector3D> &tVertPositions)
     setPositions(tempMat);
 }
 
+void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansform)
+{
+    if(tInstanceTansform.isEmpty())
+    {
+        qDebug ("ERROR!: GeometryMultiplier::setTransforms: QVector is empty!");
+        return;
+    }
+
+    m_pTransformBuffer->setData(buildTransformBuffer(tInstanceTansform));
+    m_pTransformAttribute->setBuffer(m_pTransformBuffer);
+
+    this->setInstanceCount(tInstanceTansform.size());
+}
+
 
 //*************************************************************************************************************
 
 void GeometryMultiplier::init()
 {
-    //Set Attribute parameters
+    //Set position attribute parameters
     m_pPositionAttribute->setName(QStringLiteral("geometryPosition"));
     m_pPositionAttribute->setAttributeType(QAttribute::VertexAttribute);
     m_pPositionAttribute->setVertexBaseType(QAttribute::Float);
@@ -151,18 +170,34 @@ void GeometryMultiplier::init()
     m_pPositionAttribute->setByteOffset(0);
     m_pPositionAttribute->setByteStride(3 * (int)sizeof(float));
 
+    //Set transform attribute parameter
+    m_pTransformAttribute->setName(QStringLiteral("instanceModelMatrix"));
+    m_pTransformAttribute->setAttributeType(QAttribute::VertexAttribute);
+    m_pTransformAttribute->setVertexBaseType(QAttribute::Float);
+    m_pTransformAttribute->setVertexSize(16);
+    m_pTransformAttribute->setDivisor(1);
+    m_pTransformAttribute->setByteOffset(0);
+    m_pTransformAttribute->setByteStride(16 * (int)sizeof(float));
+
     //Set default position
     Eigen::MatrixX3f tempPos = Eigen::MatrixX3f::Zero(1, 3);
     setPositions(tempPos);
 
+    //set default transforms
+    QVector<QMatrix4x4> tempTrans;
+    tempTrans.push_back(QMatrix4x4());
+    setTransforms(tempTrans);
+
     //Add Attibute to Geometry
     m_pGeometry->addAttribute(m_pPositionAttribute);
+    m_pGeometry->addAttribute(m_pTransformAttribute);
 
     //configure geometry renderer
     this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
     this->setIndexOffset(0);
     this->setFirstInstance(0);
     this->setGeometry(m_pGeometry.data());
+
 
 }
 
@@ -185,6 +220,36 @@ QByteArray GeometryMultiplier::buildPositionBuffer(const Eigen::MatrixX3f& tVert
         for(uint j = 0; j < iVertSize; j++)
         {
             rawVertexArray[3 * i + j] = tVertPositions(i, j);
+        }
+    }
+
+    return bufferData;
+}
+
+
+//*************************************************************************************************************
+
+QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform)
+{
+    const uint iVertNum = tInstanceTransform.size();
+    const uint iMatrixDim = 4;
+
+    //create byre array
+    QByteArray bufferData;
+    bufferData.resize(iVertNum* iMatrixDim * iMatrixDim * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    //copy transforms into buffer
+    for(uint i = 0 ; i < iVertNum; i++)
+    {
+        //for each row
+        for(uint col = 0; col < iMatrixDim; col++)
+        {
+            for(uint row = 0; row < iMatrixDim; row++)
+            {
+                rawVertexArray[iMatrixDim * iMatrixDim * i + iMatrixDim * col + row] = tInstanceTransform.at(i)(row, col);
+            }
+
         }
     }
 
