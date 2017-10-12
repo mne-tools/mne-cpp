@@ -196,20 +196,39 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
     if(!m_bNodesPlotted) {
 
-        Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(this);
+        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
         //create geometry
-        QSharedPointer<Qt3DExtras::QSphereGeometry> sourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
-        sourceSphereGeometry->setRadius(0.001f);
+        QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+        pSourceSphereGeometry->setRadius(0.001f);
         //create instanced renderer
-        GeometryMultiplier *pSphereMesh = new GeometryMultiplier(sourceSphereGeometry);
-        //Set sphere positions
-        pSphereMesh->setPositions(tMatVert);
-        sourceSphereEntity->addComponent(pSphereMesh);
+        GeometryMultiplier *pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
+
+        //Create transform matrix for each sphere instance
+        QVector<QMatrix4x4> vTransforms;
+        vTransforms.reserve(tMatVert.rows());
+        QVector3D tempPos;
+
+        for(int i = 0; i < tMatVert.rows(); ++i) {
+            QMatrix4x4 tempTransform;
+
+            tempPos.setX(tMatVert(i, 0));
+            tempPos.setY(tMatVert(i, 1));
+            tempPos.setZ(tMatVert(i, 2));
+            //Set position
+            tempTransform.translate(tempPos);
+            vTransforms.push_back(tempTransform);
+        }
+
+        //Set instance Transform
+        pSphereMesh->setTransforms(vTransforms);
+
+        pSourceSphereEntity->addComponent(pSphereMesh);
 
         //Add material
-        GeometryMultiplierMaterial* material = new GeometryMultiplierMaterial(true);
-        material->setAmbient(Qt::blue);
-        sourceSphereEntity->addComponent(material);
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+        pMaterial->setAmbient(Qt::blue);
+        pMaterial->setAlpha(1.0f);
+        pSourceSphereEntity->addComponent(pMaterial);
 
         m_bNodesPlotted = true;
     }
