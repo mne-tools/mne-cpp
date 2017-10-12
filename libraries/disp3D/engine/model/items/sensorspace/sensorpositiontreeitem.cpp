@@ -40,6 +40,8 @@
 
 #include "sensorpositiontreeitem.h"
 #include "../common/metatreeitem.h"
+#include "../../3dhelpers/geometrymultiplier.h"
+#include "../../materials/geometrymultipliermaterial.h"
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_ch_info.h>
@@ -51,11 +53,9 @@
 //=============================================================================================================
 
 #include <QMatrix4x4>
-#include <Qt3DExtras/QCuboidMesh>
-#include <Qt3DExtras/QPhongAlphaMaterial>
-#include <Qt3DCore/QTransform>
+#include <Qt3DExtras/QCuboidGeometry>
 #include <Qt3DCore/QEntity>
-#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DExtras/QSphereGeometry>
 
 
 //*************************************************************************************************************
@@ -109,50 +109,85 @@ void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
 
 void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
 {
-    //Create digitizers as small 3D spheres
-    QVector3D pos;
-    QColor colDefault(100,100,100);
+    //Create digitizers
+    Renderable3DEntity* pSensorEntity = new Renderable3DEntity(this);
 
-    for(int i = 0; i < lChInfo.size(); ++i) {
-        pos.setX(lChInfo[i].chpos.r0(0));
-        pos.setY(lChInfo[i].chpos.r0(1));
-        pos.setZ(lChInfo[i].chpos.r0(2));
+    GeometryMultiplier *pMesh;
 
-        //Create plane mesh
-        Renderable3DEntity* pSensorEntity = new Renderable3DEntity(this);
-        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-        QMatrix4x4 m;
+    if(sDataType == "MEG")
+    {
+        QSharedPointer<Qt3DExtras::QCuboidGeometry> pSensorRect = QSharedPointer<Qt3DExtras::QCuboidGeometry>::create();
+        pSensorRect->setXExtent(0.01f);
+        pSensorRect->setYExtent(0.01f);
+        pSensorRect->setZExtent(0.001f);
 
-        if(sDataType == "MEG") {
-            Qt3DExtras::QCuboidMesh* pSensorRect = new Qt3DExtras::QCuboidMesh();
-            pSensorRect->setXExtent(0.01f);
-            pSensorRect->setYExtent(0.01f);
-            pSensorRect->setZExtent(0.001f);
-            pSensorEntity->addComponent(pSensorRect);
+        pMesh = new GeometryMultiplier(pSensorRect);
 
-            m.translate(pos);
+        //Create transform matrix for each cuboid instance
+        QVector<QMatrix4x4> vTransforms;
+        vTransforms.reserve(lChInfo.size());
+        QVector3D tempPos;
 
+        for(int i = 0; i < lChInfo.size(); ++i) {
+            QMatrix4x4 tempTransform;
+
+            tempPos.setX(lChInfo[i].chpos.r0(0));
+            tempPos.setY(lChInfo[i].chpos.r0(1));
+            tempPos.setZ(lChInfo[i].chpos.r0(2));
+            //Set position
+            tempTransform.translate(tempPos);
+
+            //Set orientation
             for(int j = 0; j < 4; ++j) {
-                m(j, 0) = lChInfo[i].coil_trans.row(j)(0);
-                m(j, 1) = lChInfo[i].coil_trans.row(j)(1);
-                m(j, 2) = lChInfo[i].coil_trans.row(j)(2);
+                tempTransform(j, 0) = lChInfo[i].coil_trans.row(j)(0);
+                tempTransform(j, 1) = lChInfo[i].coil_trans.row(j)(1);
+                tempTransform(j, 2) = lChInfo[i].coil_trans.row(j)(2);
             }
-        } else if (sDataType == "EEG") {
-            Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.001f);
-            pSensorEntity->addComponent(sourceSphere);
 
-            m.translate(pos);
+            vTransforms.push_back(tempTransform);
         }
 
-        transform->setMatrix(m);
-        pSensorEntity->addComponent(transform);
-
-        Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
-        material->setAmbient(colDefault);
-        material->setAlpha(1.0);
-        pSensorEntity->addComponent(material);
+        //Set instance Transform
+        pMesh->setTransforms(vTransforms);
     }
+    else if (sDataType == "EEG")
+    {
+        QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphere = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+        pSourceSphere->setRadius(0.001f);
+
+        pMesh = new GeometryMultiplier(pSourceSphere);
+
+        //Create transform matrix for each cuboid instance
+        QVector<QMatrix4x4> vTransforms;
+        vTransforms.reserve(lChInfo.size());
+        QVector3D tempPos;
+
+        for(int i = 0; i < lChInfo.size(); ++i) {
+            QMatrix4x4 tempTransform;
+
+            tempPos.setX(lChInfo[i].chpos.r0(0));
+            tempPos.setY(lChInfo[i].chpos.r0(1));
+            tempPos.setZ(lChInfo[i].chpos.r0(2));
+            //Set position
+            tempTransform.translate(tempPos);
+
+            vTransforms.push_back(tempTransform);
+        }
+
+        //Set instance Transform
+        pMesh->setTransforms(vTransforms);
+    }
+
+    pSensorEntity->addComponent(pMesh);
+
+    //Add material
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+
+    QColor colDefault(100,100,100);
+    pMaterial->setAmbient(colDefault);
+    pMaterial->setAlpha(1.0f);
+    pSensorEntity->addComponent(pMaterial);
+
 
     //Update colors in color item
     QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
