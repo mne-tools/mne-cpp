@@ -78,6 +78,7 @@ namespace Qt3DCore {
 
 namespace QtCore {
         class QVector3D;
+        class QMatrix4x4;
 }
 
 //*************************************************************************************************************
@@ -151,6 +152,8 @@ public:
      */
     void setPositions(const QVector<QVector3D> &tVertPositions);
 
+    void setTransforms(const QVector<QMatrix4x4> &tInstanceTansform);
+
 protected:
 
 private:
@@ -170,12 +173,18 @@ private:
      */
     QByteArray buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions);
 
+    QByteArray buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform);
+
 
     QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
 
     QPointer<Qt3DRender::QBuffer>                   m_pPositionBuffer;
 
+    QPointer<Qt3DRender::QBuffer>                   m_pTransformBuffer;
+
     QPointer<Qt3DRender::QAttribute>                m_pPositionAttribute;
+
+    QPointer<Qt3DRender::QAttribute>                m_pTransformAttribute;
 
 };
 
