@@ -120,7 +120,7 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
     m_pTransformBuffer->setData(buildTransformBuffer(tInstanceTansform));
     m_pTransformAttribute->setBuffer(m_pTransformBuffer);
 
-    this->setInstanceCount(tInstanceTansform.size());
+    updateInstanceCount(tInstanceTansform.size());
 }
 
 
@@ -137,7 +137,7 @@ void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
     m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
     m_pColorAttribute->setBuffer(m_pColorBuffer);
 
-    this->setInstanceCount(tInstanceColors.size());
+    updateInstanceCount(tInstanceColors.size());
 }
 
 
@@ -234,6 +234,20 @@ QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstance
     }
 
     return bufferData;
+}
+
+
+//*************************************************************************************************************
+
+void GeometryMultiplier::updateInstanceCount(const uint tCount)
+{
+    //warining
+    if(this->instanceCount() > 1 && tCount != this->instanceCount())
+    {
+        qDebug ("WARNING!: GeometryMultiplier::InstanceCount mismatch");
+    }
+
+    this->setInstanceCount(tCount);
 }
 
 
