@@ -9,15 +9,15 @@ out vec3 worldPosition;
 out vec3 worldNormal;
 
 uniform mat3 modelNormalMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
+uniform mat4 modelMatrix;
+uniform mat4 mvp;
 
 void main()
 {
     vec4 pos = vec4(vertexPosition.xyz, 1.0);
 
     worldNormal = normalize( modelNormalMatrix * vertexNormal );
-    worldPosition = vec3( instanceModelMatrix * pos);
+    worldPosition = vec3( modelMatrix * instanceModelMatrix * pos);
 
-    gl_Position = projectionMatrix * viewMatrix * instanceModelMatrix * pos;
+    gl_Position = mvp * instanceModelMatrix * pos;
 }
