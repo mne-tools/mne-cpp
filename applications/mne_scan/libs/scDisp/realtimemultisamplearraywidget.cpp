@@ -96,6 +96,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_pFilterWindow(Q_NULLPTR)
 , m_pRtEEGSensorDataItem(Q_NULLPTR)
 , m_pRtMEGSensorDataItem(Q_NULLPTR)
+, m_bVisualize3DSensorData(false)
 {
     Q_UNUSED(pTime)
 
@@ -135,28 +136,32 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pTableView->setMouseTracking(true);
 
     //Sensor interpolation view
-    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
-    m_pAction3DControl->setShortcut(tr("F9"));
-    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
-    connect(m_pAction3DControl, &QAction::triggered,
-            this, &RealTimeMultiSampleArrayWidget::show3DControlWidget);
-    addDisplayAction(m_pAction3DControl);
-    m_pAction3DControl->setVisible(true);
+    if(m_bVisualize3DSensorData) {
+        m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
+        m_pAction3DControl->setShortcut(tr("F9"));
+        m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
+        connect(m_pAction3DControl, &QAction::triggered,
+                this, &RealTimeMultiSampleArrayWidget::show3DControlWidget);
+        addDisplayAction(m_pAction3DControl);
+        m_pAction3DControl->setVisible(true);
 
-    m_p3DView = View3D::SPtr(new View3D());
-    m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+        m_p3DView = View3D::SPtr(new View3D());
+        m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-    m_p3DView->setModel(m_pData3DModel);
+        m_p3DView->setModel(m_pData3DModel);
 
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
-                                                                 QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
-                                                                 Qt::Window));
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);    
+        m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
+                                                                     QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
+                                                                     Qt::Window));
+        m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+        QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+
+        //Add views to toolbox
+        m_pToolBox->insertItem(0, pWidgetContainer, QIcon(), "3D Topoplot");
+    }
 
     //Add views to toolbox
-    m_pToolBox->insertItem(0, pWidgetContainer, QIcon(), "3D Topoplot");
     m_pToolBox->insertItem(0, m_pTableView, QIcon(), "Signal time plot");
 
     m_pToolBox->setCurrentIndex(0);
@@ -269,26 +274,28 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
             m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().at(m_pRTMSA->getMultiSampleArray().size()-1).cols();
 
-            //Check what modalities are there
-            for(int i = 0; i < m_pFiffInfo->ch_names.size(); ++i) {
-                if(m_pFiffInfo->ch_names.at(i).contains("EEG") && !m_slAvailableModalities.contains("EEG")) {
-                    m_slAvailableModalities << "EEG";
+            //Check what modalities are there for 3D sensor interpolation
+            if(m_bVisualize3DSensorData) {
+                for(int i = 0; i < m_pFiffInfo->ch_names.size(); ++i) {
+                    if(m_pFiffInfo->ch_names.at(i).contains("EEG") && !m_slAvailableModalities.contains("EEG")) {
+                        m_slAvailableModalities << "EEG";
 
-                    //Add BEM head
-                    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-                    m_pBemHead = MNEBem::SPtr(new MNEBem(t_fileBem));
-                    m_pData3DModel->addBemData("Subject", "BEM", *m_pBemHead.data());
+                        //Add BEM head
+                        QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+                        m_pBemHead = MNEBem::SPtr(new MNEBem(t_fileBem));
+                        m_pData3DModel->addBemData("Subject", "BEM", *m_pBemHead.data());
 
-//                    //Add EEG sensor info
-//                    m_pData3DModel->addEegSensorInfo("Sensors", "Tracked", m_pFiffInfo->chs);
+    //                    //Add EEG sensor info
+    //                    m_pData3DModel->addEegSensorInfo("Sensors", "Tracked", m_pFiffInfo->chs);
 
-                } else if (m_pFiffInfo->ch_names.at(i).contains("MEG") && !m_slAvailableModalities.contains("MEG")) {
-                    m_slAvailableModalities << "MEG";
+                    } else if (m_pFiffInfo->ch_names.at(i).contains("MEG") && !m_slAvailableModalities.contains("MEG")) {
+                        m_slAvailableModalities << "MEG";
 
-                    //Add MEG helmet
-                    QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
-                    m_pBemSensor = MNEBem::SPtr(new MNEBem(t_filesensorSurfaceVV));
-                    m_pData3DModel->addMegSensorInfo("Sensors", "MEG System", QList<FiffChInfo>(), *m_pBemSensor.data());
+                        //Add MEG helmet
+                        QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+                        m_pBemSensor = MNEBem::SPtr(new MNEBem(t_filesensorSurfaceVV));
+                        m_pData3DModel->addMegSensorInfo("Sensors", "MEG System", QList<FiffChInfo>(), *m_pBemSensor.data());
+                    }
                 }
             }
 
@@ -298,70 +305,73 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
         //Add data to table view
         m_pRTMSAModel->addData(m_pRTMSA->getMultiSampleArray());
 
-        //Get data from model since we also want to interpolate the processed data
-        MatrixXd data = m_pRTMSAModel->getLastBlock();
-        double mean;
+        //Add data to 3D interpolation
+        if(m_bVisualize3DSensorData) {
+            //Get data from model since we also want to interpolate the processed data
+            MatrixXd data = m_pRTMSAModel->getLastBlock();
+            double mean;
 
-        for(int i = 0; i < data.rows(); ++i) {
-            mean = data.row(i).mean();
-            data.row(i).normalize();
-            data.row(i).array() -= mean;
-        }
-
-        //Add EEG data to interpolation
-        if(!m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG")) {
-            m_pRtEEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
-                                                                "Online Measurement",
-                                                                data,
-                                                                (*m_pBemHead.data())[0],
-                                                                *m_pFiffInfo.data(),
-                                                                "EEG",
-                                                                0.05,
-                                                                "Cubic");
-
-            if(m_pRtEEGSensorDataItem) {
-                m_pRtEEGSensorDataItem->setLoopState(false);
-                m_pRtEEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
-                m_pRtEEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
-                m_pRtEEGSensorDataItem->setStreamingActive(true);
-                m_pRtEEGSensorDataItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
-                m_pRtEEGSensorDataItem->setColortable("Jet");
-                m_pRtEEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
+            for(int i = 0; i < data.rows(); ++i) {
+                mean = data.row(i).mean();
+                data.row(i).normalize();
+                data.row(i).array() -= mean;
             }
 
-            for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
-                m_pRtEEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
-            }
-        } else if (m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG"))  {
-            m_pRtEEGSensorDataItem->addData(data);
-        }
+            //Add EEG data to interpolation
+            if(!m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG")) {
+                m_pRtEEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
+                                                                    "Online Measurement",
+                                                                    data,
+                                                                    (*m_pBemHead.data())[0],
+                                                                    *m_pFiffInfo.data(),
+                                                                    "EEG",
+                                                                    0.05,
+                                                                    "Cubic");
 
-        //Add MEG data to interpolation
-        if(!m_pRtMEGSensorDataItem && m_slAvailableModalities.contains("MEG")) {
-            m_pRtMEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
-                                                                "Online Measurement",
-                                                                data,
-                                                                (*m_pBemSensor.data())[0],
-                                                                *m_pFiffInfo.data(),
-                                                                "MEG",
-                                                                0.05,
-                                                                "Cubic");
+                if(m_pRtEEGSensorDataItem) {
+                    m_pRtEEGSensorDataItem->setLoopState(false);
+                    m_pRtEEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
+                    m_pRtEEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
+                    m_pRtEEGSensorDataItem->setStreamingActive(true);
+                    m_pRtEEGSensorDataItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
+                    m_pRtEEGSensorDataItem->setColortable("Jet");
+                    m_pRtEEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
+                }
 
-            if(m_pRtMEGSensorDataItem) {
-                m_pRtMEGSensorDataItem->setLoopState(false);
-                m_pRtMEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
-                m_pRtMEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
-                m_pRtMEGSensorDataItem->setStreamingActive(true);
-                m_pRtMEGSensorDataItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
-                m_pRtMEGSensorDataItem->setColortable("Jet");
-                m_pRtMEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
+                for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
+                    m_pRtEEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
+                }
+            } else if (m_pRtEEGSensorDataItem && m_slAvailableModalities.contains("EEG"))  {
+                m_pRtEEGSensorDataItem->addData(data);
             }
 
-            for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
-                m_pRtMEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
+            //Add MEG data to interpolation
+            if(!m_pRtMEGSensorDataItem && m_slAvailableModalities.contains("MEG")) {
+                m_pRtMEGSensorDataItem = m_pData3DModel->addSensorData("Subject",
+                                                                    "Online Measurement",
+                                                                    data,
+                                                                    (*m_pBemSensor.data())[0],
+                                                                    *m_pFiffInfo.data(),
+                                                                    "MEG",
+                                                                    0.05,
+                                                                    "Cubic");
+
+                if(m_pRtMEGSensorDataItem) {
+                    m_pRtMEGSensorDataItem->setLoopState(false);
+                    m_pRtMEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
+                    m_pRtMEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
+                    m_pRtMEGSensorDataItem->setStreamingActive(true);
+                    m_pRtMEGSensorDataItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
+                    m_pRtMEGSensorDataItem->setColortable("Jet");
+                    m_pRtMEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
+                }
+
+                for(int i = 1; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
+                    m_pRtMEGSensorDataItem->addData(m_pRTMSA->getMultiSampleArray().at(i));
+                }
+            } else if (m_pRtMEGSensorDataItem && m_slAvailableModalities.contains("MEG")) {
+                m_pRtMEGSensorDataItem->addData(data);
             }
-        } else if (m_pRtMEGSensorDataItem && m_slAvailableModalities.contains("MEG")) {
-            m_pRtMEGSensorDataItem->addData(data);
         }
     }
 }
@@ -781,11 +791,13 @@ bool RealTimeMultiSampleArrayWidget::eventFilter(QObject *object, QEvent *event)
 
 void RealTimeMultiSampleArrayWidget::show3DControlWidget()
 {
-    if(m_pControl3DView->isActiveWindow()) {
-        m_pControl3DView->hide();
-    } else {
-        m_pControl3DView->activateWindow();
-        m_pControl3DView->show();
+    if(m_bVisualize3DSensorData) {
+        if(m_pControl3DView->isActiveWindow()) {
+            m_pControl3DView->hide();
+        } else {
+            m_pControl3DView->activateWindow();
+            m_pControl3DView->show();
+        }
     }
 }
 
@@ -936,7 +948,9 @@ void RealTimeMultiSampleArrayWidget::markChBad()
     m_pSelectionManagerWindow->updateBadChannels();
 
     //Update 3D plot and interpolation
-    m_pRtEEGSensorDataItem->updateBadChannels(*m_pFiffInfo.data());
+    if(m_bVisualize3DSensorData) {
+        m_pRtEEGSensorDataItem->updateBadChannels(*m_pFiffInfo.data());
+    }
 }
 
 
