@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "geometrymultiplier.h"
-#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,6 +54,7 @@
 
 #include <QVector3D>
 #include <QMatrix4x4>
+#include <QColor>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,10 +86,10 @@ GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGe
                                          Qt3DCore::QNode *tParent)
     : QGeometryRenderer(tParent)
     , m_pGeometry(tGeometry)
-    , m_pPositionBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pTransformBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-    , m_pPositionAttribute(new QAttribute())
+    , m_pColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pTransformAttribute(new QAttribute())
+    , m_pColorAttribute(new QAttribute())
 {
     init();
 }
@@ -100,47 +100,14 @@ GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGe
 GeometryMultiplier::~GeometryMultiplier()
 {
     m_pGeometry->deleteLater();
-    m_pPositionBuffer->deleteLater();
     m_pTransformBuffer->deleteLater();
-    m_pPositionAttribute->deleteLater();
+    m_pColorBuffer->deleteLater();
     m_pTransformAttribute->deleteLater();
-}
-
-
-//*************************************************************************************************************
-
-void GeometryMultiplier::setPositions(const Eigen::MatrixX3f &tVertPositions)
-{
-    if(tVertPositions.rows() == 0)
-    {
-        qDebug ("ERROR!: GeometryMultiplier::setPositions: Matrix is empty!");
-        return;
-    }
-
-    //init buffer
-    m_pPositionBuffer->setData(buildPositionBuffer(tVertPositions));
-    m_pPositionAttribute->setBuffer(m_pPositionBuffer);
-
-    //set number of instances to draw
-    this->setInstanceCount(tVertPositions.rows());
+    m_pColorAttribute->deleteLater();
 }
 
 
 //*************************************************************************************************************#
-
-void GeometryMultiplier::setPositions(const QVector<QVector3D> &tVertPositions)
-{
-    //create matrix
-    Eigen::MatrixX3f tempMat(tVertPositions.size(), 3);
-    for(int i = 0; i < tVertPositions.size(); i++)
-    {
-        tempMat(i, 0) = tVertPositions[i].x();  //x
-        tempMat(i, 1) = tVertPositions[i].y();  //y
-        tempMat(i, 2) = tVertPositions[i].z();  //z
-    }
-
-    setPositions(tempMat);
-}
 
 void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansform)
 {
@@ -157,19 +124,27 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
 }
 
 
+//*************************************************************************************************************#
+
+void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
+{
+    if(tInstanceColors.isEmpty())
+    {
+        qDebug ("ERROR!: GeometryMultiplier::setColors: QVector is empty!");
+        return;
+    }
+
+    m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
+    m_pColorAttribute->setBuffer(m_pColorBuffer);
+
+    this->setInstanceCount(tInstanceColors.size());
+}
+
+
 //*************************************************************************************************************
 
 void GeometryMultiplier::init()
 {
-    //Set position attribute parameters
-    m_pPositionAttribute->setName(QStringLiteral("geometryPosition"));
-    m_pPositionAttribute->setAttributeType(QAttribute::VertexAttribute);
-    m_pPositionAttribute->setVertexBaseType(QAttribute::Float);
-    m_pPositionAttribute->setVertexSize(3);
-    m_pPositionAttribute->setDivisor(1);
-    m_pPositionAttribute->setByteOffset(0);
-    m_pPositionAttribute->setByteStride(3 * (int)sizeof(float));
-
     //Set transform attribute parameter
     m_pTransformAttribute->setName(QStringLiteral("instanceModelMatrix"));
     m_pTransformAttribute->setAttributeType(QAttribute::VertexAttribute);
@@ -179,9 +154,19 @@ void GeometryMultiplier::init()
     m_pTransformAttribute->setByteOffset(0);
     m_pTransformAttribute->setByteStride(16 * (int)sizeof(float));
 
-    //Set default position
-    Eigen::MatrixX3f tempPos = Eigen::MatrixX3f::Zero(1, 3);
-    setPositions(tempPos);
+    //Set color attribute parameters
+    m_pColorAttribute->setName(QStringLiteral("instanceColor"));
+    m_pColorAttribute->setAttributeType(QAttribute::VertexAttribute);
+    m_pColorAttribute->setVertexBaseType(QAttribute::Float);
+    m_pColorAttribute->setVertexSize(3);
+    m_pColorAttribute->setDivisor(1);
+    m_pColorAttribute->setByteOffset(0);
+    m_pColorAttribute->setByteStride(3 * (int)sizeof(float));
+
+    //Set default instance color
+    QVector<QColor> tempColors;
+    tempColors.push_back(QColor(0,0,0));
+    setColors(tempColors);
 
     //set default transforms
     QVector<QMatrix4x4> tempTrans;
@@ -189,41 +174,14 @@ void GeometryMultiplier::init()
     setTransforms(tempTrans);
 
     //Add Attibute to Geometry
-    m_pGeometry->addAttribute(m_pPositionAttribute);
     m_pGeometry->addAttribute(m_pTransformAttribute);
+    m_pGeometry->addAttribute(m_pColorAttribute);
 
     //configure geometry renderer
     this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
     this->setIndexOffset(0);
     this->setFirstInstance(0);
     this->setGeometry(m_pGeometry.data());
-
-
-}
-
-
-//*************************************************************************************************************
-
-QByteArray GeometryMultiplier::buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions)
-{
-    const uint iVertNum = tVertPositions.rows();
-    const uint iVertSize = tVertPositions.cols();
-
-    //create byre array
-    QByteArray bufferData;
-    bufferData.resize(iVertNum* iVertSize * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    //copy positions into buffer
-    for(uint i = 0 ; i < iVertNum; i++)
-    {
-        for(uint j = 0; j < iVertSize; j++)
-        {
-            rawVertexArray[3 * i + j] = tVertPositions(i, j);
-        }
-    }
-
-    return bufferData;
 }
 
 
@@ -251,6 +209,28 @@ QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &t
             }
 
         }
+    }
+
+    return bufferData;
+}
+
+
+//*************************************************************************************************************
+
+QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstanceColor)
+{
+    const uint iVertSize = 3;
+    //create byre array
+    QByteArray bufferData;
+    bufferData.resize(tInstanceColor.size() * iVertSize * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    //copy colors into buffer
+    for(uint i = 0; i < tInstanceColor.size(); i++)
+    {
+        rawVertexArray[iVertSize * i] = tInstanceColor[i].redF();
+        rawVertexArray[iVertSize * i + 1] = tInstanceColor[i].greenF();
+        rawVertexArray[iVertSize * i + 2] = tInstanceColor[i].blueF();
     }
 
     return bufferData;

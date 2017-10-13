@@ -54,6 +54,7 @@
 
 #include <Qt3DExtras/QSphereGeometry>
 #include <QMatrix4x4>
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -110,34 +111,15 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         //Set sphere positions
         pSourceSphereEntity->addComponent(m_pSphereMesh);
 
+        //add transform
+        Qt3DCore::QTransform *pTransform = new Qt3DCore::QTransform;
+        pSourceSphereEntity->addComponent(pTransform);
+
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
         pMaterial->setAmbient(tSphereColor);
         pSourceSphereEntity->addComponent(pMaterial);
     }
-
-    /*
-    //Set positions
-    if(!tDigitizer.isEmpty())
-    {
-        QVector<QVector3D> vPostitions;
-        vPostitions.reserve(tDigitizer.size());
-
-        QVector3D tempPos;
-
-        for(int i = 0; i < tDigitizer.size(); ++i) {
-            tempPos.setX(tDigitizer[i].r[0]);
-            tempPos.setY(tDigitizer[i].r[1]);
-            tempPos.setZ(tDigitizer[i].r[2]);
-
-            vPostitions.push_back(tempPos);
-        }
-
-        //Set sphere positions
-        m_pSphereMesh->setPositions(vPostitions);
-    }
-    */
-
 
     //Set transforms
     if(!tDigitizer.isEmpty())

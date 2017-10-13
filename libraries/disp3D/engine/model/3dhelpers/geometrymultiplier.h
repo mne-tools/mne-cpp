@@ -59,7 +59,6 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -138,21 +137,20 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the positions for each instance of the geometry.
+     * Sets the transformation matrix for each instance of the geometry.
+     * It can be used to translate, scale and rotate each instance individually.
      *
-     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
+     * @param tInstanceTansform         Transformation matrix.
      */
-    void setPositions(const Eigen::MatrixX3f& tVertPositions);
+    void setTransforms(const QVector<QMatrix4x4> &tInstanceTansform);
 
     //=========================================================================================================
     /**
-     * Overloaded functions to set the positions for each instance of the geometry.
+     * Sets the color for each instance of the geometry.
      *
-     * @param tVertPositions            Array of row vectors with x, y and z coordinates for each instance.
+     * @param tInstanceColors           Color of the geometry;
      */
-    void setPositions(const QVector<QVector3D> &tVertPositions);
-
-    void setTransforms(const QVector<QMatrix4x4> &tInstanceTansform);
+    void setColors(const QVector<QColor> &tInstanceColors);
 
 protected:
 
@@ -166,25 +164,32 @@ private:
 
     //=========================================================================================================
     /**
-     * Builds the position buffer content.
+     * Builds the transform matrix buffer content.
      *
-     * @param tVertPositions            Matrix with x, y and z coordinates for each instance.
+     * @param tInstanceTransform        Transformation matrix for each instance.
      * @return                          buffer content.
      */
-    QByteArray buildPositionBuffer(const Eigen::MatrixX3f& tVertPositions);
-
     QByteArray buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform);
+
+    //=========================================================================================================
+    /**
+     * Builds color buffer content.
+     *
+     * @param tInstanceColor            Color for each instance.
+     * @return                          buffer content.
+     */
+    QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
 
 
     QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
 
-    QPointer<Qt3DRender::QBuffer>                   m_pPositionBuffer;
-
     QPointer<Qt3DRender::QBuffer>                   m_pTransformBuffer;
 
-    QPointer<Qt3DRender::QAttribute>                m_pPositionAttribute;
+    QPointer<Qt3DRender::QBuffer>                   m_pColorBuffer;
 
     QPointer<Qt3DRender::QAttribute>                m_pTransformAttribute;
+
+    QPointer<Qt3DRender::QAttribute>                m_pColorAttribute;
 
 };
 
