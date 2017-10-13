@@ -180,6 +180,13 @@ private:
      */
     QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
 
+    //=========================================================================================================
+    /**
+     * Updates the instance count and warns about instance count mismatch.
+     * @param tCount                    The new count.
+     */
+    void updateInstanceCount(const uint tCount);
+
 
     QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
 
