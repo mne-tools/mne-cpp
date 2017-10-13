@@ -120,7 +120,7 @@ public:
     * @param[in] tSphereRadius      The radius of the visualized digitizer sphere.
     * @param[in] tSphereColor       The color of the visualized digitizer.
     */
-    void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer,
+    void addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer,
                                     const float tSphereRadius,
                                     const QColor &tSphereColor);
 
