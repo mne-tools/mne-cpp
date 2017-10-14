@@ -116,6 +116,9 @@ ComputeInterpolationController::ComputeInterpolationController()
     init();
 }
 
+
+//*************************************************************************************************************
+
 ComputeInterpolationController::ComputeInterpolationController(const MNELIB::MNEBemSurface &tMneBemSurface,
                                                                const FIFFLIB::FiffEvoked &tEvoked,
                                                                double (*tInterpolationFunction)(double),
@@ -126,6 +129,9 @@ ComputeInterpolationController::ComputeInterpolationController(const MNELIB::MNE
     setInterpolationData(tMneBemSurface, tEvoked, tInterpolationFunction, tSensorType, tCancelDist);
     m_bIsInit = true;
 }
+
+
+//*************************************************************************************************************
 
 ComputeInterpolationController::~ComputeInterpolationController()
 {
@@ -162,8 +168,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 {
     if(m_bIsInit)
     {
-        //@TOdO error msg
-        //qDebug << "ComputeInterpolationController::setInterpolationData: interpolation data already initialized.";
+        qDebug("ComputeInterpolationController::setInterpolationData: interpolation data already initialized.");
         return;
     }
     //fill QVector with the right sensor positions
