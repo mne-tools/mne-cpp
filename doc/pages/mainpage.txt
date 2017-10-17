@@ -64,5 +64,5 @@
  *
  * \section authors_sec Authors
  *
- * For more information please feel free to take a look at our <a href="https://www.mne-cpp.org/index.php/partners/">partners</a> and <a href="https://www.mne-cpp.org/index.php/team/">code contributors</a> pages.
+ * An overview of the authors can be found <a href="https://www.mne-cpp.org/index.php/team/"><b>here</b></a>.
  */
