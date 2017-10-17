@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     geometrymultiplier.cpp
-* @author   Lars Debor <lars.debor@gmx.de>;
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     October, 2017
@@ -152,7 +152,6 @@ void GeometryMultiplier::init()
     m_pTransformAttribute->setVertexSize(16);
     m_pTransformAttribute->setDivisor(1);
     m_pTransformAttribute->setByteOffset(0);
-    m_pTransformAttribute->setByteStride(16 * (int)sizeof(float));
 
     //Set color attribute parameters
     m_pColorAttribute->setName(QStringLiteral("instanceColor"));
@@ -161,11 +160,10 @@ void GeometryMultiplier::init()
     m_pColorAttribute->setVertexSize(3);
     m_pColorAttribute->setDivisor(1);
     m_pColorAttribute->setByteOffset(0);
-    m_pColorAttribute->setByteStride(3 * (int)sizeof(float));
 
     //Set default instance color
     QVector<QColor> tempColors;
-    tempColors.push_back(QColor(0,0,0));
+    tempColors.push_back(QColor(0, 0, 0));
     setColors(tempColors);
 
     //set default transforms
@@ -191,23 +189,19 @@ QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &t
 {
     const uint iVertNum = tInstanceTransform.size();
     const uint iMatrixDim = 4;
-
+    const uint iMatrixSize = iMatrixDim * iMatrixDim;
     //create byre array
     QByteArray bufferData;
-    bufferData.resize(iVertNum* iMatrixDim * iMatrixDim * (int)sizeof(float));
+    bufferData.resize(iVertNum * iMatrixSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
     //copy transforms into buffer
     for(uint i = 0 ; i < iVertNum; i++)
     {
-        //for each row
-        for(uint col = 0; col < iMatrixDim; col++)
+        const float *rawMatrix = tInstanceTransform.at(i).data();
+        for(uint idx = 0; idx < iMatrixSize; idx++)
         {
-            for(uint row = 0; row < iMatrixDim; row++)
-            {
-                rawVertexArray[iMatrixDim * iMatrixDim * i + iMatrixDim * col + row] = tInstanceTransform.at(i)(row, col);
-            }
-
+            rawVertexArray[iMatrixSize * i + idx] = rawMatrix[idx];
         }
     }
 
@@ -241,7 +235,7 @@ QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstance
 
 void GeometryMultiplier::updateInstanceCount(const uint tCount)
 {
-    //warining
+    //warning
     if(this->instanceCount() > 1 && tCount != this->instanceCount())
     {
         qDebug ("WARNING!: GeometryMultiplier::InstanceCount mismatch");

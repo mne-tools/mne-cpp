@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     geometrymultiplier.h
-* @author   Lars Debor <lars.debor@gmx.de>;
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     October, 2017
