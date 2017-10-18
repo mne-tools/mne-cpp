@@ -190,7 +190,7 @@ QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &t
     const uint iVertNum = tInstanceTransform.size();
     const uint iMatrixDim = 4;
     const uint iMatrixSize = iMatrixDim * iMatrixDim;
-    //create byre array
+    //create byte array
     QByteArray bufferData;
     bufferData.resize(iVertNum * iMatrixSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
@@ -214,7 +214,7 @@ QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &t
 QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstanceColor)
 {
     const uint iVertSize = 3;
-    //create byre array
+    //create byte array
     QByteArray bufferData;
     bufferData.resize(tInstanceColor.size() * iVertSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
