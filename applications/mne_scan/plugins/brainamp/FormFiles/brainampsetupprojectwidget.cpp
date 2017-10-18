@@ -235,8 +235,8 @@ void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 
 void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
-    QList<QVector<double> > elcLocation3D;
-    QList<QVector<double> > elcLocation2D;
+    QList<QVector<float> > elcLocation3D;
+    QList<QVector<float> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 

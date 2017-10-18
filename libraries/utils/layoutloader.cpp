@@ -73,7 +73,11 @@ LayoutLoader::LayoutLoader()
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readAsaElcFile(const QString& path, QStringList &channelNames, QList<QVector<float> > &location3D, QList<QVector<float> > &location2D, QString &unit)
+bool LayoutLoader::readAsaElcFile(const QString& path,
+                                  QStringList &channelNames,
+                                  QList<QVector<float> > &location3D,
+                                  QList<QVector<float> > &location2D,
+                                  QString &unit)
 {
     //Open .elc file
     if(!path.contains(".elc"))

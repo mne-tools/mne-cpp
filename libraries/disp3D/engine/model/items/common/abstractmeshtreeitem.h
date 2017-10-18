@@ -191,14 +191,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Call this function whenever surface normal visisbility state changed.
-    *
-    * @param[in] checkState        The current check state of teh corresponding item.
-    */
-    virtual void onSurfaceNormalsChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
     * Creates a QByteArray of colors for given color for the input vertices.
     *
     * @param[in] vertices       The vertices information.
