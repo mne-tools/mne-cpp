@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef DISP3DLIB_CUSTOMINSTANCEDRENDERER_H
-#define DISP3DLIB_CUSTOMINSTANCEDRENDERER_H
+#ifndef DISP3DLIB_GEOMETRYMULTIPLIER_H
+#define DISP3DLIB_GEOMETRYMULTIPLIER_H
 
 
 //*************************************************************************************************************
@@ -107,8 +107,8 @@ class DISP3DSHARED_EXPORT GeometryMultiplier : public Qt3DRender::QGeometryRende
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<GeometryMultiplier> SPtr;            /**< Shared pointer type for CustomInstancedMesh. */
-    typedef QSharedPointer<const GeometryMultiplier> ConstSPtr; /**< Const shared pointer type for CustomInstancedMesh. */
+    typedef QSharedPointer<GeometryMultiplier> SPtr;            /**< Shared pointer type for GeometryMultiplier. */
+    typedef QSharedPointer<const GeometryMultiplier> ConstSPtr; /**< Const shared pointer type for GeometryMultiplier. */
 
     //=========================================================================================================
     /**
@@ -209,4 +209,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_CUSTOMINSTANCEDRENDERER_H
+#endif // DISP3DLIB_GEOMETRYMULTIPLIER_H
