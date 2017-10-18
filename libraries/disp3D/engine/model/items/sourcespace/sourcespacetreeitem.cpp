@@ -42,6 +42,8 @@
 #include "../common/metatreeitem.h"
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../3dhelpers/custommesh.h"
+#include "../../3dhelpers/geometrymultiplier.h"
+#include "../../materials/geometrymultipliermaterial.h"
 
 #include <mne/mne_hemisphere.h>
 
@@ -51,9 +53,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongAlphaMaterial>
-#include <Qt3DCore/QTransform>
+#include <Qt3DExtras/QSphereGeometry>
+#include <QMatrix4x4>
 
 
 //*************************************************************************************************************
@@ -125,48 +126,63 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
 
 void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 {
-    //Create sources as small 3D spheres
-    RowVector3f sourcePos;
-    QVector3D pos;
-    QColor defaultColor(255,0,0);
+    Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
 
-    if(tHemisphere.isClustered()) {
-        for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++) {
-            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
+    //create geometry
+    QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+    pSourceSphereGeometry->setRadius(0.001f);
+    //create instanced renderer
+    GeometryMultiplier *pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
 
-            sourcePos = tHemisphere.rr.row(tHemisphere.cluster_info.centroidVertno.at(i));
-            pos.setX(sourcePos(0));
-            pos.setY(sourcePos(1));
-            pos.setZ(sourcePos(2));
+    //Create transform matrix for each sphere instance
+    QVector<QMatrix4x4> vTransforms;
+    QVector3D tempPos;
 
-            Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.001f);
-            pSourceSphereEntity->addComponent(sourceSphere);
+    if(tHemisphere.isClustered())
+    {
+        vTransforms.reserve(tHemisphere.cluster_info.centroidVertno.size());
 
-            pSourceSphereEntity->setPosition(pos);
+        for(int i = 0; i < tHemisphere.cluster_info.centroidVertno.size(); i++)
+        {
+            QMatrix4x4 tempTransform;
+            const RowVector3f& sourcePos = tHemisphere.rr.row(tHemisphere.cluster_info.centroidVertno.at(i));
 
-            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
-            material->setAmbient(defaultColor);
-            pSourceSphereEntity->addComponent(material);
-        }
-    } else {
-        for(int i = 0; i < tHemisphere.vertno.rows(); i++) {
-            Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
+            tempPos.setX(sourcePos(0));
+            tempPos.setY(sourcePos(1));
+            tempPos.setZ(sourcePos(2));
 
-            sourcePos = tHemisphere.rr.row(tHemisphere.vertno(i));
-            pos.setX(sourcePos(0));
-            pos.setY(sourcePos(1));
-            pos.setZ(sourcePos(2));
-
-            Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.001f);
-            pSourceSphereEntity->addComponent(sourceSphere);
-
-            pSourceSphereEntity->setPosition(pos);
-
-            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
-            material->setAmbient(defaultColor);
-            pSourceSphereEntity->addComponent(material);
+            //Set position
+            tempTransform.translate(tempPos);
+            vTransforms.push_back(tempTransform);
         }
     }
+    else
+    {
+        vTransforms.reserve(tHemisphere.vertno.rows());
+
+        for(int i = 0; i < tHemisphere.vertno.rows(); i++)
+        {
+            QMatrix4x4 tempTransform;
+            const RowVector3f& sourcePos = tHemisphere.rr.row(tHemisphere.vertno(i));
+
+            tempPos.setX(sourcePos(0));
+            tempPos.setY(sourcePos(1));
+            tempPos.setZ(sourcePos(2));
+
+            //Set position
+            tempTransform.translate(tempPos);
+            vTransforms.push_back(tempTransform);
+        }
+    }
+    //Set instance Transform
+    pSphereMesh->setTransforms(vTransforms);
+
+    pSourceSphereEntity->addComponent(pSphereMesh);
+
+    //Add material
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+    QColor defaultColor(255,0,0);
+    pMaterial->setAmbient(defaultColor);
+
+    pSourceSphereEntity->addComponent(pMaterial);
 }
