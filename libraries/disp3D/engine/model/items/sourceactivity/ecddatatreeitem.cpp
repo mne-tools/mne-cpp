@@ -42,6 +42,8 @@
 #include "../common/metatreeitem.h"
 
 #include <inverse/dipoleFit/ecd_set.h>
+#include "../../3dhelpers/geometrymultiplier.h"
+#include "../../materials/geometrymultipliermaterial.h"
 
 
 //*************************************************************************************************************
@@ -57,11 +59,9 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <Qt3DRender/qshaderprogram.h>
-#include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongAlphaMaterial>
-#include <Qt3DCore/QTransform>
 #include <QQuaternion>
-#include <Qt3DExtras/QConeMesh>
+#include <Qt3DExtras/QConeGeometry>
+#include <QMatrix4x4>
 
 
 //*************************************************************************************************************
@@ -134,11 +134,26 @@ void EcdDataTreeItem::addData(const ECDSet& pECDSet)
 void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
 {
     //Plot dipoles
+
+    Renderable3DEntity* dipoleEntity = new Renderable3DEntity(this);
+
+    //create geometry
+    QSharedPointer<Qt3DExtras::QConeGeometry> pDipolGeometry = QSharedPointer<Qt3DExtras::QConeGeometry>::create();
+    pDipolGeometry->setBottomRadius(0.001f);
+    pDipolGeometry->setLength(0.003f);
+    //create instanced renderer
+    GeometryMultiplier *pDipolMesh = new GeometryMultiplier(pDipolGeometry);
+
     QVector3D pos, to, from;
 
     //The Qt3D default cone orientation and the top of the cone lies in line with the positive y-axis.
     from = QVector3D(0.0, 1.0, 0.0);
     double norm;
+
+    QVector<QColor> vColors;
+    vColors.reserve(tECDSet.size());
+    QVector<QMatrix4x4> vTransforms;
+    vTransforms.reserve(tECDSet.size());
 
     for(int i = 0; i < tECDSet.size(); ++i) {
         pos.setX(tECDSet[i].rd(0));
@@ -156,33 +171,27 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
 
         QQuaternion final = QQuaternion::rotationTo(from, to);
 
-        Renderable3DEntity* dipoleEntity = new Renderable3DEntity(this);
-
-        Qt3DExtras::QConeMesh* dipoleCone = new Qt3DExtras::QConeMesh();
-        dipoleCone->setBottomRadius(0.001f);
-
-//        //Calculate cone length based on norm 0.1mm -> 1nAm
-//        double cm = 0.001;
-//        double scale = (pow(10,-9))/(cm*0.01);
-//        dipoleCone->setLength(norm/scale);
-////        qDebug()<<"setLength"<<norm/scale;
-
-        dipoleCone->setLength(0.003f);
-
-        dipoleEntity->addComponent(dipoleCone);
-
         //Set dipole position and orientation
-        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
         QMatrix4x4 m;
         m.translate(pos);
         m.rotate(final);
-        transform->setMatrix(m);
-        dipoleEntity->addComponent(transform);
+        vTransforms.push_back(m);
 
-        Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
-        material->setAmbient(QColor(rand()%255, rand()%255, rand()%255));
-        dipoleEntity->addComponent(material);
+        //add random color;
+        vColors.push_back(QColor(rand()%255, rand()%255, rand()%255));
     }
+    //Set instance Transform
+    pDipolMesh->setTransforms(vTransforms);
+    //Set instance colors
+    pDipolMesh->setColors(vColors);
+
+    dipoleEntity->addComponent(pDipolMesh);
+
+    //Add material
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+    pMaterial->setAmbient(QColor(0,0,0));
+    pMaterial->setAlpha(1.0f);
+    dipoleEntity->addComponent(pMaterial);
 }
 
 

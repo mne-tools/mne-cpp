@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     digitizertreeitem.h
-* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+* @file     geometrymultipliermaterial.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     October, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Jana Kiesel and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,26 +29,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     DigitizerTreeItem class declaration.
+* @brief     GeometryMultiplierMaterial class declaration.
 *
 */
 
-#ifndef DIGITIZERTREEITEM_H
-#define DIGITIZERTREEITEM_H
+#ifndef DISP3DLIB_GEOMETRYMULTIPLIERMATERIAL_H
+#define DISP3DLIB_GEOMETRYMULTIPLIERMATERIAL_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../../disp3D_global.h"
-#include "../common/abstract3Dtreeitem.h"
 
+#include "../../../disp3D_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
+
+#include <QPointer>
+#include <Qt3DRender/QMaterial>
 
 
 //*************************************************************************************************************
@@ -62,78 +65,144 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffDigPoint;
+namespace Qt3DRender {
+    class QEffect;
+    class QParameter;
+    class QShaderProgram;
+    class QFilterKey;
+    class QTechnique;
+    class QRenderPass;
+    class QNoDepthMask;
+    class QBlendEquationArguments;
+    class QBlendEquation;
 }
 
-namespace Qt3DCore {
-    class QEntity;
+namespace Qtcore {
+    class QColor;
 }
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
+namespace DISP3DLIB {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-    class GeometryMultiplier;
 
 //=============================================================================================================
 /**
-* DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
+* Custom phong alpha material for instanced rendering.
 *
-* @brief DigitizerTreeItem provides a generic tree item to hold and visualize digitizer data.
+* @brief Custom phong alpha material for instanced rendering.
 */
-class DISP3DSHARED_EXPORT DigitizerTreeItem : public Abstract3DTreeItem
+
+class DISP3DSHARED_EXPORT GeometryMultiplierMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DigitizerTreeItem> SPtr;             /**< Shared pointer type for DigitizerTreeItem class. */
-    typedef QSharedPointer<const DigitizerTreeItem> ConstSPtr;  /**< Const shared pointer type for DigitizerTreeItem class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] bUseAlpha      Whether to use alpha/transparency.
+    * @param[in] parent         The parent of this class.
     */
-    explicit DigitizerTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
-                               int iType = Data3DTreeModelItemTypes::DigitizerItem,
-                               const QString& text = "Digitizer");
+    explicit GeometryMultiplierMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
+    * Copy constructor disabled.
+    */
+    GeometryMultiplierMaterial(const GeometryMultiplierMaterial &other) = delete;
+
+    //=========================================================================================================
+    /**
+    * Copy operator disabled.
+    */
+    GeometryMultiplierMaterial& operator =(const GeometryMultiplierMaterial &other) = delete;
+
+    //=========================================================================================================
+    /**
+    * default destructor.
+    */
+    ~GeometryMultiplierMaterial();
+
+    //=========================================================================================================
+    /**
+     * Sets ambient Color for the mesh.
+     * @param tColor            New color.
+     */
+    void setAmbient(const QColor &tColor);
+
+    //=========================================================================================================
+    /**
+    * Get the current alpha value.
     *
-    * @param[in] tDigitizer         The digitizer data.
-    * @param[in] tSphereRadius      The radius of the visualized digitizer sphere.
-    * @param[in] tSphereColor       The color of the visualized digitizer.
+    * @return The current alpha value.
     */
-    void addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer,
-                                    const float tSphereRadius,
-                                    const QColor &tSphereColor);
+    float alpha();
 
-protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
+    * Set the current alpha value.
+    *
+    * @param[in] alpha  The new alpha value.
     */
-    void initItem();
+    void setAlpha(float alpha);
 
-    QPointer<GeometryMultiplier>    m_pSphereMesh;
+private:
+
+    //=========================================================================================================
+    /**
+    * Init the GeometryMultiplierMaterial class.
+    */
+    void init();
+
+    QPointer<Qt3DRender::QEffect>           m_pVertexEffect;
+
+    QPointer<Qt3DRender::QParameter>        m_pAmbientColor;
+
+    QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;
+    QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;
+    QPointer<Qt3DRender::QParameter>        m_pShininessParameter;
+    QPointer<Qt3DRender::QParameter>        m_pAlphaParameter;
+    QPointer<Qt3DRender::QFilterKey>        m_pFilterKey;
+
+    QPointer<Qt3DRender::QTechnique>        m_pVertexGL3Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;
+
+    QPointer<Qt3DRender::QTechnique>        m_pVertexGL2Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL2RenderPass;
+
+    QPointer<Qt3DRender::QTechnique>        m_pVertexES2Technique;
+    QPointer<Qt3DRender::QRenderPass>       m_pVertexES2RenderPass;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;
+
+    QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
+    QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
+    QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;
+
+    bool        m_bUseAlpha;
+
 };
 
-} //NAMESPACE DISP3DLIB
 
-#endif // DIGITIZERTREEITEM_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace DISP3DLIB
+
+#endif // DISP3DLIB_GEOMETRYMULTIPLIERMATERIAL_H
