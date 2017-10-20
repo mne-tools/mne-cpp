@@ -77,15 +77,17 @@
 /bin/ex_roi_clustered_inverse_pwl_rap_musicd
 /bin/ex_st_clustered_inverse_pwl_rap_music
 /bin/ex_st_clustered_inverse_pwl_rap_musicd
-
 /bin/ex_interpolation
-/bin/test_fiff_cov
+/bin/ex_interpolationd
+
 
 # Binaries Tests
 /bin/test_codecov
 /bin/test_codecovd
 /bin/test_dipole_fit
 /bin/test_dipole_fitd
+/bin/test_fiff_cov
+/bin/test_fiff_covd
 /bin/test_fiff_mne_types_io
 /bin/test_fiff_mne_types_iod
 /bin/test_fiff_rwr
@@ -93,11 +95,16 @@
 /bin/test_forward_solution
 /bin/test_forward_solutiond
 /bin/test_fiff_digitizer
+/bin/test_fiff_digitizerd
 /bin/test_geometryinfo
+/bin/test_geometryinfod
 /bin/test_interpolation
+/bin/test_interpolationd
 /bin/test_mne_msh_display_surface_set
+/bin/test_mne_msh_display_surface_setd
 
 # Other files
+/bin/Screenshots
 /bin/MNE-sample-data/MEG
 /bin/MNE-sample-data/subjects
 /bin/MNE-sample-data/._.DS_Store
