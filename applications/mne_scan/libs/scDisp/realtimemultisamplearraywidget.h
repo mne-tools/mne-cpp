@@ -426,6 +426,7 @@ private:
 
     bool                                        m_bInitialized;                 /**< Is Initialized */
     bool                                        m_bHideBadChannels;             /**< hide bad channels flag. */
+    bool                                        m_bVisualize3DSensorData;       /**< Whether to visualize sensor data in 3D using Disp3D. */
     qint32                                      m_iMaxFilterTapSize;            /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
     float                                       m_fDefaultSectionSize;          /**< Default row height */
     float                                       m_fZoomFactor;                  /**< Zoom factor */

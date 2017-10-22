@@ -67,9 +67,10 @@ using namespace SSVEPBCIPLUGIN;
 SsvepBciScreen::SsvepBciScreen(SsvepBci* pSsvepBci,
                                SsvepBciSetupStimulusWidget* pSsvepBciSetupStimulusWidget,
                                QOpenGLWidget *parent)
-: m_pSsvepBci(pSsvepBci)
+: QOpenGLWidget(parent)
+, m_pSsvepBci(pSsvepBci)
 , m_pSsvepBciSetupStimulusWidget(pSsvepBciSetupStimulusWidget)
-, m_pScreenKeyboard(Q_NULLPTR)
+, m_pScreenKeyboard(new ScreenKeyboard(m_pSsvepBci, m_pSsvepBciSetupStimulusWidget, this))
 , m_dXPosCross(0.5)
 , m_dYPosCross(0.5)
 , m_dStep(0.01)
@@ -79,7 +80,6 @@ SsvepBciScreen::SsvepBciScreen(SsvepBci* pSsvepBci,
 , m_bClearScreen(true)
 {
     Q_UNUSED(parent);
-
 
     // register Meta Type
     qRegisterMetaType<MyQList>("MyQList");

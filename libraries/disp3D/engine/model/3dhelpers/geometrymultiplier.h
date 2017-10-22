@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     AbstractMeshTreeItem.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     geometrymultiplier.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     October, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,29 +29,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     AbstractMeshTreeItem class declaration.
+* @brief     GeometryMultiplier class declaration.
 *
 */
 
-#ifndef ABSTRACTMESHTREEITEM_H
-#define ABSTRACTMESHTREEITEM_H
+#ifndef DISP3DLIB_GEOMETRYMULTIPLIER_H
+#define DISP3DLIB_GEOMETRYMULTIPLIER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../../disp3D_global.h"
-#include "../common/abstract3Dtreeitem.h"
-#include "../common/types.h"
-
+#include <disp3D_global.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QPointer>
+#include <Qt3DRender/QGeometryRenderer>
 
 
 //*************************************************************************************************************
@@ -65,157 +65,148 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Qt3DCore {
-    class QEntity;
-}
-
 namespace Qt3DRender {
-    class QMaterial;
+        class QGeometry;
+        class QBuffer;
+        class QAttribute;
 }
 
+namespace Qt3DCore {
+        class QNode;
+}
+
+namespace QtCore {
+        class QVector3D;
+        class QMatrix4x4;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
+namespace DISP3DLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class MetaTreeItem;
-class CustomMesh;
 
 
 //=============================================================================================================
 /**
-* AbstractMeshTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* This classes uses instanced rendering to draw the same Gemometry multiple at multiple positions.
+* For example it can be used with QSphereGeometry
 *
-* @brief Provides a generic mesh tree item.
+* @brief Instaced based renderer.
 */
-class DISP3DSHARED_EXPORT AbstractMeshTreeItem : public Abstract3DTreeItem
+
+class DISP3DSHARED_EXPORT GeometryMultiplier : public Qt3DRender::QGeometryRenderer
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AbstractMeshTreeItem> SPtr;             /**< Shared pointer type for AbstractMeshTreeItem class. */
-    typedef QSharedPointer<const AbstractMeshTreeItem> ConstSPtr;  /**< Const shared pointer type for AbstractMeshTreeItem class. */
+    typedef QSharedPointer<GeometryMultiplier> SPtr;            /**< Shared pointer type for GeometryMultiplier. */
+    typedef QSharedPointer<const GeometryMultiplier> ConstSPtr; /**< Const shared pointer type for GeometryMultiplier. */
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+    * Constructs a GeometryMultiplier object.
     */
-    explicit AbstractMeshTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
-                                  int iType = Data3DTreeModelItemTypes::AbstractMeshItem,
-                                  const QString& text = "Abstract Mesh");
+    explicit GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+                                                      Qt3DCore::QNode *tParent = nullptr);
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
+    * Copy Constructor disabled
     */
-    virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    GeometryMultiplier(const GeometryMultiplier& other) = delete;
 
     //=========================================================================================================
     /**
-    * Returns the custom mesh.
-    *
-    * @return The costum mesh.
+    * Copy operator disabled
     */
-    virtual QPointer<CustomMesh> getCustomMesh();
+    GeometryMultiplier& operator =(const GeometryMultiplier& other) = delete;
 
     //=========================================================================================================
     /**
-    * Set new vertices colors to the mesh.
-    *
-    * @param[in] vertColor New color matrix MatrixX3f in form of a QVariant.
-    *
-    * @return The costum mesh.
+    * Destructor
     */
-    virtual void setVertColor(const QVariant &vertColor);
+    ~GeometryMultiplier();
+
+    //=========================================================================================================
+    /**
+     * Sets the transformation matrix for each instance of the geometry.
+     * It can be used to translate, scale and rotate each instance individually.
+     *
+     * @param tInstanceTansform         Transformation matrix.
+     */
+    void setTransforms(const QVector<QMatrix4x4> &tInstanceTansform);
+
+    //=========================================================================================================
+    /**
+     * Sets the color for each instance of the geometry.
+     *
+     * @param tInstanceColors           Color of the geometry;
+     */
+    void setColors(const QVector<QColor> &tInstanceColors);
 
 protected:
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    virtual void initItem();
+
+private:
 
     //=========================================================================================================
     /**
-    * Call this function whenever the inner tesselation value changed.
-    *
-    * @param[in] fTessInner     The new inner tesselation value.
-    */
-    virtual void onSurfaceTessInnerChanged(const QVariant& fTessInner);
+     * Initialize GeometryMultiplier object.
+     */
+    void init();
 
     //=========================================================================================================
     /**
-    * Call this function whenever the outer tesselation value changed.
-    *
-    * @param[in] fTessOuter     The new outer tesselation value.
-    */
-    virtual void onSurfaceTessOuterChanged(const QVariant& fTessOuter);
+     * Builds the transform matrix buffer content.
+     *
+     * @param tInstanceTransform        Transformation matrix for each instance.
+     * @return                          buffer content.
+     */
+    QByteArray buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the triangle scale value changed.
-    *
-    * @param[in] fTriangleScale     The triangle scale value.
-    */
-    virtual void onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale);
+     * Builds color buffer content.
+     *
+     * @param tInstanceColor            Color for each instance.
+     * @return                          buffer content.
+     */
+    QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
-    virtual void onColorChanged(const QVariant& color);
+     * Updates the instance count and warns about instance count mismatch.
+     * @param tCount                    The new count.
+     */
+    void updateInstanceCount(const uint tCount);
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever the surface material was changed.
-    *
-    * @param[in] material        The new surface material.
-    */
-    virtual void onSurfaceMaterialChanged(const QVariant& sMaterial);
 
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given color for the input vertices.
-    *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
-    *
-    * @return The colors per vertex
-    */
-    virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
+    QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
 
-    QPointer<Qt3DRender::QMaterial>     m_pMaterial;                        /**< The material. Ownership belongs to RenderableEntity. */
-    QPointer<Qt3DRender::QMaterial>     m_pTessMaterial;                    /**< The tesselation material. Ownership belongs to RenderableEntity. */
-    QPointer<Qt3DRender::QMaterial>     m_pNormalMaterial;                  /**< The normal material. Ownership belongs to RenderableEntity. */
+    QPointer<Qt3DRender::QBuffer>                   m_pTransformBuffer;
 
-    QPointer<CustomMesh>                m_pCustomMesh;                      /**< The actual mesh information (vertices, normals, colors). */
+    QPointer<Qt3DRender::QBuffer>                   m_pColorBuffer;
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the colors of the underlying surface changed.
-    *
-    * @param[in] surfaceColors        Color of the surface.
-    */
-    void colorOriginChanged(const MatrixX3f& surfaceColors);
+    QPointer<Qt3DRender::QAttribute>                m_pTransformAttribute;
+
+    QPointer<Qt3DRender::QAttribute>                m_pColorAttribute;
+
 };
 
-} //NAMESPACE DISP3DLIB
 
-#endif // ABSTRACTMESHTREEITEM_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace DISP3DLIB
+
+#endif // DISP3DLIB_GEOMETRYMULTIPLIER_H

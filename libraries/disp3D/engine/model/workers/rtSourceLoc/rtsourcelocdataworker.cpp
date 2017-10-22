@@ -386,7 +386,6 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
-, m_iCurrentSample(0)
 , m_iVisualizationType(Data3DTreeModelItemRoles::VertexBased)
 , m_iMSecIntervall(50)
 , m_bSurfaceDataIsInit(false)
@@ -419,8 +418,8 @@ void RtSourceLocDataWorker::addData(const MatrixXd& data)
 
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
-        if(m_lData.size() < m_dSFreq) {
-            m_lData.append(data.col(i));
+        if(m_lDataQ.size() < m_dSFreq) {
+            m_lDataQ.push_back(data.col(i));
         } else {
             qDebug() <<"RtSourceLocDataWorker::addData - worker is full!";
             break;
@@ -599,7 +598,7 @@ void RtSourceLocDataWorker::setLoop(bool looping)
 void RtSourceLocDataWorker::start()
 {
     m_qMutex.lock();
-    m_iCurrentSample = 0;
+    m_itCurrentSample = m_lDataQ.cbegin();
     m_qMutex.unlock();
 
     QThread::start();
@@ -624,6 +623,7 @@ void RtSourceLocDataWorker::run()
 {
     VectorXd t_vecAverage;
 
+    uint iSampleCtr = 0;
     m_bIsRunning = true;
 
     while(true) {
@@ -640,7 +640,7 @@ void RtSourceLocDataWorker::run()
 
         {
             QMutexLocker locker(&m_qMutex);
-            if(!m_lData.isEmpty() && m_lData.size() > 0)
+            if(m_lDataQ.size() > 0)
                 doProcessing = true;
         }
 
@@ -649,10 +649,10 @@ void RtSourceLocDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in loop mode
-                if(t_vecAverage.rows() != m_lData[0].rows()) {
-                    t_vecAverage = m_lData[m_iCurrentSample%m_lData.size()];
+                if(t_vecAverage.rows() != m_lDataQ.front().rows()) {
+                    t_vecAverage = *m_itCurrentSample;
                 } else {
-                    t_vecAverage += m_lData[m_iCurrentSample%m_lData.size()];
+                    t_vecAverage += *m_itCurrentSample;
                 }
 
                 m_qMutex.unlock();
@@ -660,21 +660,29 @@ void RtSourceLocDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_lData[0].rows()) {
-                    t_vecAverage = m_lData.front();
+                if(t_vecAverage.rows() != m_lDataQ.front().rows()) {
+                    t_vecAverage = m_lDataQ.front();
                 } else {
-                    t_vecAverage += m_lData.front();
+                    t_vecAverage += m_lDataQ.front();
                 }
 
-                m_lData.pop_front();
+                m_lDataQ.pop_front();
 
                 m_qMutex.unlock();
             }
 
             m_qMutex.lock();
-            m_iCurrentSample++;
 
-            if((m_iCurrentSample/1)%m_iAverageSamples == 0) {
+            m_itCurrentSample++;
+            iSampleCtr++;
+
+            //Set iterator back to the front if needed
+            if(m_itCurrentSample == m_lDataQ.cend())
+            {
+                m_itCurrentSample = m_lDataQ.cbegin();
+            }
+
+            if(iSampleCtr % m_iAverageSamples == 0) {
                 //Perform the actual interpolation and send signal
                 t_vecAverage /= (double)m_iAverageSamples;
 
@@ -684,6 +692,9 @@ void RtSourceLocDataWorker::run()
                 //Sleep specified amount of time
                 const int timerelap = timer.elapsed();
                 const int iTimeLeft = m_iMSecIntervall - timerelap;
+
+                //reset sample counter
+                iSampleCtr = 0;
 
                 //qDebug()<<"elapsed"<<timerelap<<"diff"<<iTimeLeft;
                 if(iTimeLeft > 0) {
