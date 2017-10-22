@@ -44,6 +44,8 @@
 #include "../../3dhelpers/renderable3Dentity.h"
 #include "../../materials/networkmaterial.h"
 #include "../../3dhelpers/custommesh.h"
+#include "../../3dhelpers/geometrymultiplier.h"
+#include "../../materials/geometrymultipliermaterial.h"
 
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
@@ -59,8 +61,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <Qt3DExtras/QSphereMesh>
-#include <Qt3DExtras/QPhongAlphaMaterial>
+#include <Qt3DExtras/QSphereGeometry>
 #include <Qt3DCore/QTransform>
 
 
@@ -194,29 +195,40 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     //Draw network nodes
     //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
     if(!m_bNodesPlotted) {
-        QVector3D pos;
 
-        for(int i = 0; i < lNetworkNodes.size(); ++i) {
-            pos.setX(lNetworkNodes.at(i)->getVert()(0));
-            pos.setY(lNetworkNodes.at(i)->getVert()(1));
-            pos.setZ(lNetworkNodes.at(i)->getVert()(2));
+        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
+        //create geometry
+        QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+        pSourceSphereGeometry->setRadius(0.001f);
+        //create instanced renderer
+        GeometryMultiplier *pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
 
-            Renderable3DEntity* sourceSphereEntity = new Renderable3DEntity(this);
+        //Create transform matrix for each sphere instance
+        QVector<QMatrix4x4> vTransforms;
+        vTransforms.reserve(tMatVert.rows());
+        QVector3D tempPos;
 
-            Qt3DExtras::QSphereMesh* sourceSphere = new Qt3DExtras::QSphereMesh();
-            sourceSphere->setRadius(0.001f);
-            sourceSphereEntity->addComponent(sourceSphere);
+        for(int i = 0; i < tMatVert.rows(); ++i) {
+            QMatrix4x4 tempTransform;
 
-            Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-            QMatrix4x4 m;
-            m.translate(pos);
-            transform->setMatrix(m);
-            sourceSphereEntity->addComponent(transform);
-
-            Qt3DExtras::QPhongAlphaMaterial* material = new Qt3DExtras::QPhongAlphaMaterial();
-            material->setAmbient(Qt::blue);
-            sourceSphereEntity->addComponent(material);
+            tempPos.setX(tMatVert(i, 0));
+            tempPos.setY(tMatVert(i, 1));
+            tempPos.setZ(tMatVert(i, 2));
+            //Set position
+            tempTransform.translate(tempPos);
+            vTransforms.push_back(tempTransform);
         }
+
+        //Set instance Transform
+        pSphereMesh->setTransforms(vTransforms);
+
+        pSourceSphereEntity->addComponent(pSphereMesh);
+
+        //Add material
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+        pMaterial->setAmbient(Qt::blue);
+        pMaterial->setAlpha(1.0f);
+        pSourceSphereEntity->addComponent(pMaterial);
 
         m_bNodesPlotted = true;
     }

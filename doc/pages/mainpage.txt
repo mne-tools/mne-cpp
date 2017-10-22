@@ -18,11 +18,11 @@
  *
  * \section dependencies_sec Dependencies
  *
- * <a href="http://download.qt.io/official_releases/qt/"><b>>= Qt 5.7.1</b></a>
- * 
- * 
+ * <a href="http://download.qt.io/official_releases/qt/"><b>>= Qt 5.9.1</b></a>
+ *
+ *
  * \section contact_sec Contact
- * 
+ *
  * A list of contact persons can be found <a href="http://www.mne-cpp.org/index.php/contact/"><b>here</b></a>.
  *
  * Mailing List: <a href="http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis"><b>http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis</b></a>
@@ -64,27 +64,5 @@
  *
  * \section authors_sec Authors
  *
- * \li Christoph Dinh chdinh@nmr.mgh.harvard.edu 2010
- * \li Matti Hamalainen msh@nmr.mgh.harvard.edu 2010
- * \li Martin Luessi mluessi@nmr.mgh.harvard.edu 2012
- * \li Christof Pieloth pieloth@labp.htwk-leipzig.de 2012
- * \li Limin Sun liminsun@nmr.mgh.harvard.edu 2013
- * \li Daniel Strohmeier daniel.strohmeier@tu-ilmenau.de 2013
- * \li Lorenz Esch lorenz.esch@tu-ilmenau.de 2013
- * \li Florian Schlembach florian.schlembach@tu-ilmenau.de 2013
- * \li Tim Kunze tim.kunze@tu-ilmenau.de 2014
- * \li Luise Lang luise.lang@tu-ilmenau.de 2014
- * \li Felix Arndt felix.arndt@tu-ilmenau.de 2014
- * \li Daniel Knobl daniel.knobl@tu-ilmenau.de 2014
- * \li Martin Henfling martin.henfling@tu-ilmenau.de 2014
- * \li Seok Lew slew@nmr.mgh.harvard.edu 2014
- * \li Chiran Doshi chiran.doshi@childrens.harvard.edu 2014
- * \li Franco-Joel Polo franco-joel.polo@tu-ilmenau.de 2014
- * \li Carsten Boensel carsten.boensel@tu-ilmenau.de 2015
- * \li Jana Kiesel jana.kiesel@tu-ilmenau.de 2015
- * \li Martin Henfling martin.henfling@tu-ilmenau.de 2015
- * \li Daniel Knobl daniel.knobl@tu-ilmenau.de 2015
- * \li Viktor Klüber viktor.klueber@tu-ilmenau.de 2015 
- * \li Ricky Tjen Ricky270@student.sgu.ac.id 2016 
+ * An overview of the authors can be found <a href="https://www.mne-cpp.org/index.php/team/"><b>here</b></a>.
  */
-

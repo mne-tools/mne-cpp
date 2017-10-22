@@ -96,6 +96,7 @@ SOURCES += \
     generics/circularmatrixbuffer.cpp \
     generics/observerpattern.cpp
 
+
 HEADERS += \
     kmeans.h\
     utils_global.h \
