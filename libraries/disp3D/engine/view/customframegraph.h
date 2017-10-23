@@ -53,7 +53,6 @@
 #include <QPointer>
 #include <Qt3DRender/QViewport>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -93,9 +92,9 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* This class holds the framegraph that is used for computation in OpenGL compute shadern.
+* This class holds a custom framegraph that can be used for computations with OpenGL compute shadern.
 *
-* @brief Compute framegaph class.
+* @brief Custom framegaph class.
 */
 
 class DISP3DSHARED_EXPORT CustomFrameGraph : public Qt3DRender::QViewport
@@ -110,6 +109,24 @@ public:
     * Constructs a CustomFrameGraph object.
     */
     explicit CustomFrameGraph(Qt3DCore::QNode *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Copy constructor disabled.
+    */
+    CustomFrameGraph(const CustomFrameGraph &other) = delete;
+
+    //=========================================================================================================
+    /**
+    * Copy operator disabled.
+    */
+    CustomFrameGraph& operator =(const CustomFrameGraph &other) = delete;
+
+    //=========================================================================================================
+    /**
+    * Destructor.
+    */
+    ~CustomFrameGraph();
 
     //=========================================================================================================
     /**

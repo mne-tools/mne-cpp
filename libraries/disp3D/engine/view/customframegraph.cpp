@@ -102,6 +102,23 @@ CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
 
 //*************************************************************************************************************
 
+CustomFrameGraph::~CustomFrameGraph()
+{
+    m_pSurfaceSelector->deleteLater();
+    m_pClearBuffers->deleteLater();
+    m_pNoDraw->deleteLater();
+    m_pDispatchCompute->deleteLater();
+    m_pComputeFilter->deleteLater();
+    m_pCameraSelector->deleteLater();
+    m_pForwardFilter->deleteLater();
+    m_pMemoryBarrier->deleteLater();
+    m_pForwardKey->deleteLater();
+    m_pComputeKey->deleteLater();
+}
+
+
+//*************************************************************************************************************
+
 void CustomFrameGraph::setCamera(QCamera *tCamera)
 {
     m_pCameraSelector->setCamera(tCamera);
@@ -132,7 +149,7 @@ void CustomFrameGraph::init()
 {
     this->setNormalizedRect(QRectF(0.0f, 0.0f, 1.0f, 1.0f));
 
-    //Set ClearBuffers
+    //Set ClearBuffer
     m_pClearBuffers->setBuffers(QClearBuffers::ColorDepthBuffer);
     m_pClearBuffers->setClearColor(Qt::black);
 
