@@ -95,6 +95,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class Data3DTreeModel;
+class CustomFrameGraph;
 
 
 //=============================================================================================================
@@ -222,6 +223,7 @@ protected:
     QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
     QPointer<Qt3DRender::QCamera>       m_pCameraEntity;                /**< The camera entity. */
+    QPointer<CustomFrameGraph>          m_pFrameGraph;                   /**< The frameGraph entity. */
 
     QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
     QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */

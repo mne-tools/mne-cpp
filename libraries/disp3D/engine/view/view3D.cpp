@@ -43,6 +43,7 @@
 #include "../model/items/common/abstract3Dtreeitem.h"
 #include "../model/items/common/types.h"
 #include "../model/data3Dtreemodel.h"
+#include "customframegraph.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -66,7 +67,6 @@
 #include <Qt3DRender/QPointLight>
 #include <Qt3DRender/QPointLight>
 #include <Qt3DExtras/QCylinderMesh>
-#include <Qt3DExtras/QForwardRenderer>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
 
@@ -93,6 +93,7 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCameraEntity(this->camera())
+, m_pFrameGraph(new CustomFrameGraph)
 , m_bRotationMode(false)
 , m_bCameraTransMode(false)
 , m_bModelRotationMode(true)
@@ -128,7 +129,10 @@ void View3D::init()
     Qt3DExtras::QFirstPersonCameraController *camController = new Qt3DExtras::QFirstPersonCameraController(m_pRootEntity);
     camController->setCamera(m_pCameraEntity);
 
-    this->defaultFrameGraph()->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
+    //FrameGraph
+    m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
+    m_pFrameGraph->setCamera(m_pCameraEntity);
+    this->setActiveFrameGraph(m_pFrameGraph);
 
     //Init the transforms
     initTransformations();
@@ -222,7 +226,7 @@ void View3D::setModel(Data3DTreeModel::SPtr pModel)
 
 void View3D::setSceneColor(const QColor& colSceneColor)
 {
-    this->defaultFrameGraph()->setClearColor(colSceneColor);
+    m_pFrameGraph->setClearColor(colSceneColor);
 }
 
 
