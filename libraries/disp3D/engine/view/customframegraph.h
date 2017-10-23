@@ -131,8 +131,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setClearColor
-     * @param tColor
+     * Sets the clear color of the framegraph.
+     *
+     * @param tColor        New clear color.
      */
     void setClearColor(const QColor &tColor);
 
@@ -146,7 +147,7 @@ private:
      */
     void init();
 
-    //=========================================================================================================
+
     QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;
 
     QPointer<Qt3DRender::QClearBuffers> m_pClearBuffers;

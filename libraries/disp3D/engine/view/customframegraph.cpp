@@ -120,6 +120,14 @@ void CustomFrameGraph::setWorkGroupSize(const uint tX, const uint tY, const uint
 
 //*************************************************************************************************************
 
+void CustomFrameGraph::setClearColor(const QColor &tColor)
+{
+    m_pClearBuffers->setClearColor(tColor);
+}
+
+
+//*************************************************************************************************************
+
 void CustomFrameGraph::init()
 {
     this->setNormalizedRect(QRectF(0.0f, 0.0f, 1.0f, 1.0f));
