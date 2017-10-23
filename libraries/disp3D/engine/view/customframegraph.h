@@ -156,16 +156,17 @@ private:
 
     QPointer<Qt3DRender::QDispatchCompute> m_pDispatchCompute;
 
-    QPointer<Qt3DRender::QFilterKey> m_pComputeKey;
-    QPointer<Qt3DRender::QFilterKey> m_pDrawKey;
+    QPointer<Qt3DRender::QTechniqueFilter> m_pComputeFilter;
 
     QPointer<Qt3DRender::QCameraSelector> m_pCameraSelector;
 
-    QPointer<Qt3DRender::QTechniqueFilter> m_pComputeFilter;
-    QPointer<Qt3DRender::QTechniqueFilter> m_pDrawFilter;
+    QPointer<Qt3DRender::QTechniqueFilter> m_pForwardFilter;
 
     QPointer<Qt3DRender::QMemoryBarrier> m_pMemoryBarrier;
 
+    QPointer<Qt3DRender::QFilterKey> m_pForwardKey;
+
+    QPointer<Qt3DRender::QFilterKey> m_pComputeKey;
 };
 
 

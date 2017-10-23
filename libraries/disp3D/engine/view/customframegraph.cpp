@@ -91,9 +91,9 @@ CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
     , m_pDispatchCompute(new QDispatchCompute(m_pSurfaceSelector))
     , m_pComputeFilter(new QTechniqueFilter(m_pDispatchCompute))
     , m_pCameraSelector(new QCameraSelector(m_pSurfaceSelector))
-    , m_pDrawFilter(new QTechniqueFilter(m_pCameraSelector))
-    , m_pMemoryBarrier(new QMemoryBarrier(m_pDrawFilter))
-    , m_pDrawKey(new QFilterKey)
+    , m_pForwardFilter(new QTechniqueFilter(m_pCameraSelector))
+    , m_pMemoryBarrier(new QMemoryBarrier(m_pForwardFilter))
+    , m_pForwardKey(new QFilterKey)
     , m_pComputeKey(new QFilterKey)
 {
     init();
@@ -137,15 +137,15 @@ void CustomFrameGraph::init()
     m_pClearBuffers->setClearColor(Qt::black);
 
     //Set FilterKeys
-    m_pComputeKey->setName(QStringLiteral("type"));
+    m_pComputeKey->setName(QStringLiteral("renderingStyle"));
     m_pComputeKey->setValue(QStringLiteral("compute"));
 
-    m_pDrawKey->setName(QStringLiteral("type"));
-    m_pDrawKey->setValue(QStringLiteral("draw"));
+    m_pForwardKey->setName(QStringLiteral("renderingStyle"));
+    m_pForwardKey->setValue(QStringLiteral("forward"));
 
     //Add Matches
     m_pComputeFilter->addMatch(m_pComputeKey);
-    m_pDrawFilter->addMatch(m_pDrawKey);
+    m_pForwardFilter->addMatch(m_pForwardKey);
 
     //Set Memory Barrier
     m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
