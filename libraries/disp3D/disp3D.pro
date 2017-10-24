@@ -136,7 +136,8 @@ SOURCES += \
     helpers/geometryinfo/geometryinfo.cpp \
     engine/model/3dhelpers/geometrymultiplier.cpp \
     engine/model/materials/geometrymultipliermaterial.cpp \
-    engine/view/customframegraph.cpp
+    engine/view/customframegraph.cpp \
+    engine/model/materials/cshinterpolationmaterial.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -184,7 +185,8 @@ HEADERS += \
     helpers/geometryinfo/geometryinfo.h \
     engine/model/3dhelpers/geometrymultiplier.h \
     engine/model/materials/geometrymultipliermaterial.h \
-    engine/view/customframegraph.h
+    engine/view/customframegraph.h \
+    engine/model/materials/cshinterpolationmaterial.h
 
 FORMS += \
     engine/control/control3dwidget.ui \
