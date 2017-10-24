@@ -138,11 +138,100 @@ void CshInterpolationMaterial::setAlpha(float alpha)
     m_pAlphaParameter->setValue(alpha);
 }
 
+
 //*************************************************************************************************************
 
 void CshInterpolationMaterial::init()
 {
+    //Compute part
+    //Set shader
+    m_pComputeShader->setComputeShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.csh"))));
 
+    m_pComputeRenderPass->setShaderProgram(m_pComputeShader);
+
+    //Set OpenGL version
+    m_pComputeTechnique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
+    m_pComputeTechnique->graphicsApiFilter()->setMajorVersion(4);
+    m_pComputeTechnique->graphicsApiFilter()->setMinorVersion(3);
+    m_pComputeTechnique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
+
+    //Set filter Keys
+    m_pComputeFilterKey->setName(QStringLiteral("renderingStyle"));
+    m_pComputeFilterKey->setValue(QStringLiteral("compute"));
+
+    //Add to technique
+    m_pComputeTechnique->addFilterKey(m_pComputeFilterKey);
+    m_pComputeTechnique->addRenderPass(m_pComputeRenderPass);
+
+    //Draw part
+    //Set shader
+    m_pDrawShader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.vert"))));
+    m_pDrawShader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.frag"))));
+
+    m_pDrawRenderPass->setShaderProgram(m_pDrawShader);
+
+    //Add Phongalpha parameter
+    m_pDrawRenderPass->addParameter(m_pDiffuseParameter);
+    m_pDrawRenderPass->addParameter(m_pSpecularParameter);
+    m_pDrawRenderPass->addParameter(m_pShininessParameter);
+    m_pDrawRenderPass->addParameter(m_pAlphaParameter);
+
+    if(m_bUseAlpha)
+    {
+        //@TODO like phongalpha
+    }
+
+    //Add Face Culling
+    m_pCullFace->setMode(QCullFace::Back);
+    m_pDrawRenderPass->addRenderState(m_pCullFace);
+
+    //Set OpenGL version
+    m_pDrawTechnique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
+    m_pDrawTechnique->graphicsApiFilter()->setMajorVersion(4);
+    m_pDrawTechnique->graphicsApiFilter()->setMinorVersion(3);
+    m_pDrawTechnique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
+
+    //Set filter Keys
+    m_pDrawFilterKey->setName(QStringLiteral("renderingStyle"));
+    m_pDrawFilterKey->setValue(QStringLiteral("forward"));
+
+    //Add to technique
+    m_pDrawTechnique->addFilterKey(m_pDrawFilterKey);
+    m_pDrawTechnique->addRenderPass(m_pDrawRenderPass);
+
+    //init signal processing
+    m_pSignalDataBuffer->setAccessType(Qt3DRender::QBuffer::ReadWrite);
+    m_pSignalDataBuffer->setUsage(Qt3DRender::QBuffer::StreamDraw);
+    m_pSignalDataBuffer->setData(buildZeroBuffer(60));
+    m_pSignalDataParameter->setName(QStringLiteral("InputVec"));
+    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
+    m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
+
+
+    //Effect
+    //Link shader and uniforms
+    m_pEffect->addTechnique(m_pComputeTechnique);
+    m_pEffect->addTechnique(m_pDrawTechnique);
+
+    //Add to material
+    this->setEffect(m_pEffect);
+}
+
+
+//*************************************************************************************************************
+
+QByteArray CshInterpolationMaterial::buildZeroBuffer(const uint tSize)
+{
+    QByteArray bufferData;
+    bufferData.resize(tSize * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    //Set default values
+    for(uint i = 0; i < tSize; ++i)
+    {
+        rawVertexArray[i] = 0.0f;
+    }
+    return bufferData;
 }
 
 
