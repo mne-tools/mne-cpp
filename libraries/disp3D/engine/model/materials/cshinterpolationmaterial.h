@@ -171,6 +171,15 @@ private:
      */
     void init();
 
+    //=========================================================================================================
+    /**
+     * Build buffer of 0.0f .
+     *
+     * @param tSize         Number of zeros.
+     * @return              Buffer content.
+     */
+    QByteArray buildZeroBuffer(const uint tSize);
+
     bool                                    m_bUseAlpha;
 
     QPointer<Qt3DRender::QEffect>           m_pEffect;

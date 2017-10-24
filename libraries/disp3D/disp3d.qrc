@@ -24,5 +24,8 @@
         <file>engine/model/materials/shaders/es2/instancedposition.vert</file>
         <file>engine/model/materials/shaders/gl3/instancedposition.frag</file>
         <file>engine/model/materials/shaders/gl3/instancedposition.vert</file>
+        <file>engine/model/materials/shaders/compute/interpolation.csh</file>
+        <file>engine/model/materials/shaders/compute/interpolation.frag</file>
+        <file>engine/model/materials/shaders/compute/interpolation.vert</file>
     </qresource>
 </RCC>
