@@ -103,6 +103,10 @@ CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
     , m_pDrawTechnique(new QTechnique)
     , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pSignalDataParameter(new QParameter)
+    , m_pColsParameter(new QParameter)
+    , m_pRowsParameter(new QParameter)
+    , m_pWeightMatParameter(new QParameter)
+    , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pInterpolatedSignalParameter(new QParameter)
     , m_pCullFace(new QCullFace)
 {
@@ -117,9 +121,33 @@ CshInterpolationMaterial::~CshInterpolationMaterial()
 
 }
 
+void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
+{
+    //Set Rows and Cols
+    m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
+    m_pRowsParameter->setValue(static_cast<uint>(tInterpolationMatrix->rows()));
+
+    //Set buffer
+    m_pWeightMatBuffer->setData(buildWeightMatrixBuffer(tInterpolationMatrix));
+
+    //@TODO addParameter needed?
+}
+
 void CshInterpolationMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
 {
+    const uint iBufferSize = tSignalVec.rows();
+    QByteArray bufferData;
+    bufferData.resize(iBufferSize * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
+    for(uint i = 0; i < iBufferSize; ++i)
+    {
+        rawVertexArray[i] = tSignalVec[i];
+    }
+
+    //Set buffer and parameter
+    m_pSignalDataBuffer->setData(bufferData);
+    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
 }
 
 
@@ -162,6 +190,20 @@ void CshInterpolationMaterial::init()
     //Add to technique
     m_pComputeTechnique->addFilterKey(m_pComputeFilterKey);
     m_pComputeTechnique->addRenderPass(m_pComputeRenderPass);
+
+    //Set default weight matrix parameters
+    m_pColsParameter->setName(QStringLiteral("cols"));
+    m_pColsParameter->setValue(1);
+    m_pRowsParameter->setName(QStringLiteral("rows"));
+    m_pRowsParameter->setValue(1);
+
+    m_pWeightMatBuffer->setData(buildZeroBuffer(1));
+    m_pWeightMatParameter->setName(QStringLiteral("WeightMat"));
+    m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
+
+    m_pComputeRenderPass->addParameter(m_pColsParameter);
+    m_pComputeRenderPass->addParameter(m_pRowsParameter);
+    m_pComputeRenderPass->addParameter(m_pWeightMatParameter);
 
     //Draw part
     //Set shader
@@ -215,6 +257,33 @@ void CshInterpolationMaterial::init()
 
     //Add to material
     this->setEffect(m_pEffect);
+}
+
+
+//*************************************************************************************************************
+
+QByteArray CshInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
+{
+    QByteArray bufferData;
+
+    const uint iRows = tInterpolationMatrix->rows();
+    const uint iCols = tInterpolationMatrix->cols();
+
+    bufferData.resize(iRows * iCols * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    unsigned int iCtr = 0;
+    for(uint i = 0; i < iRows; ++i)
+    {
+        for(uint j = 0; j < iCols; ++j)
+        {
+            //@TODO this is probably not the best way to extract the weight matrix components
+            rawVertexArray[iCtr] = static_cast<float>(tInterpolationMatrix->coeff(i, j));
+            iCtr++;
+        }
+    }
+
+    return bufferData;
 }
 
 
