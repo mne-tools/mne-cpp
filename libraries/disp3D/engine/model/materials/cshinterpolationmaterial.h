@@ -60,6 +60,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -140,6 +141,13 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief setWeightMatrix
+     * @param pInterpolationMatrix
+     */
+    void setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
+
+    //=========================================================================================================
+    /**
     * Add a new vector with signal data form the sensors and push them into m_pSignalDataBuffer.
     *
     * @param tSignalVec                Vector with one float value for each sensor.
@@ -170,6 +178,13 @@ private:
      * Init CshInterpolationMaterial class.
      */
     void init();
+
+    /**
+     * @brief buildWeightMatrixBuffer
+     * @param tInterpolationMatrix
+     * @return
+     */
+    QByteArray buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -205,6 +220,12 @@ private:
     //Measurement signal
     QPointer<Qt3DRender::QBuffer>           m_pSignalDataBuffer;
     QPointer<Qt3DRender::QParameter>        m_pSignalDataParameter;
+
+    //Weight matrix parameter
+    QPointer<Qt3DRender::QParameter>        m_pColsParameter;
+    QPointer<Qt3DRender::QParameter>        m_pRowsParameter;
+    QPointer<Qt3DRender::QParameter>        m_pWeightMatParameter;
+    QPointer<Qt3DRender::QBuffer>           m_pWeightMatBuffer;
 
     //Output parameter
     QPointer<Qt3DRender::QParameter>        m_pInterpolatedSignalParameter;
