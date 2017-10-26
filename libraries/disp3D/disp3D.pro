@@ -138,6 +138,7 @@ SOURCES += \
     engine/model/materials/geometrymultipliermaterial.cpp \
     engine/view/customframegraph.cpp \
     engine/model/materials/cshinterpolationmaterial.cpp \
+    engine/model/items/sensordata/cshsensordatatreeitem.cpp \
     engine/model/workers/rtSensorData/rtcshsensordataworker.cpp
 
 HEADERS += \
@@ -188,6 +189,7 @@ HEADERS += \
     engine/model/materials/geometrymultipliermaterial.h \
     engine/view/customframegraph.h \
     engine/model/materials/cshinterpolationmaterial.h \
+    engine/model/items/sensordata/cshsensordatatreeitem.h \
     engine/model/workers/rtSensorData/rtcshsensordataworker.h
 
 FORMS += \
