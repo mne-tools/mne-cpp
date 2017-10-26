@@ -245,7 +245,7 @@ protected:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the check/actiation state of the rt data worker changed.
+    * This function gets called whenever the check/activation state of the rt data worker changed.
     *
     * @param[in] checkState                 The check state of the worker.
     */
@@ -285,7 +285,7 @@ protected:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the check/actiation state of the looped streaming state changed.
+    * This function gets called whenever the check/activation state of the looped streaming state changed.
     *
     * @param[in] checkState                 The check state of the looped streaming state.
     */
