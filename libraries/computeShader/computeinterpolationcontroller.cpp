@@ -230,7 +230,11 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
 
     //Set work group size
     const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iWeightMatRows)));
-    m_pFramegraph->setWorkGroupSize(iWorkGroupsSize, iWorkGroupsSize ,1 );
+//    m_pFramegraph->setWorkGroupSize(iWorkGroupsSize, iWorkGroupsSize ,1 );
+
+    m_pComputeCommand->setWorkGroupX(iWorkGroupsSize);
+    m_pComputeCommand->setWorkGroupY(iWorkGroupsSize);
+    m_pComputeCommand->setWorkGroupZ(1);
 
     //Init interpolated signal buffer
     QString sInterpolatedSignalName = QStringLiteral("InterpolatedSignal");
