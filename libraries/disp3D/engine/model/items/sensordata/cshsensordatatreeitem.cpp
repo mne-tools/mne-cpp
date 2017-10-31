@@ -41,6 +41,8 @@
 
 #include "cshsensordatatreeitem.h"
 #include "../common/metatreeitem.h"
+#include "../../../../helpers/geometryinfo/geometryinfo.h"
+#include "../../../../helpers/interpolation/interpolation.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,6 +72,24 @@ using namespace MNELIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
+typedef double (*dFuncPtr)(double);
+
+dFuncPtr transformInterpolationFromStrToFunc(const QString &tFunctionName)
+{
+    if(tFunctionName == "Linear") {
+        return Interpolation::linear;
+    }
+    else if(tFunctionName == "Square") {
+        return Interpolation::square;
+    }
+    else if(tFunctionName == "Cubic") {
+        return Interpolation::cubic;
+    }
+    else if(tFunctionName == "Gaussian") {
+        return Interpolation::gaussian;
+    }
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,10 +118,87 @@ CshSensorDataTreeItem::~CshSensorDataTreeItem()
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::init(const MatrixX3f &matSurfaceVertColor, const MNEBemSurface &bemSurface, const FiffInfo &fiffInfo, const QString &sSensorType, const double dCancelDist, const QString &sInterpolationFunction)
+void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
+                                 const FiffInfo &tFiffInfo,
+                                 const QString &tSensorType,
+                                 const double tCancelDist,
+                                 const QString &tInterpolationFunction)
 {
     //@TODO implement this
 
+    //@TODO check this
+    this->setData(0, Data3DTreeModelItemRoles::RTData);
+
+    if(!m_pSensorRtDataWorker) {
+        m_pSensorRtDataWorker = new RtCshSensorDataWorker();
+    }
+
+    connect(m_pSensorRtDataWorker.data(), &RtCshSensorDataWorker::newRtData,
+            this, &CshSensorDataTreeItem::onNewRtData);
+
+    // map passed sensor type string to fiff constant
+    fiff_int_t sensorTypeFiffConstant;
+    if (tSensorType.toStdString() == std::string("MEG")) {
+        sensorTypeFiffConstant = FIFFV_MEG_CH;
+    } else if (tSensorType.toStdString() == std::string("EEG")) {
+        sensorTypeFiffConstant = FIFFV_EEG_CH;
+    } else {
+        qDebug() << "SensorDataTreeItem::init - unknown sensor type. Returning ...";
+        return;
+    }
+
+    //fill QVector with the right sensor positions
+    QVector<Vector3f> vecSensorPos;
+    m_iUsedSensors.clear();
+    int iCounter = 0;
+    for(const FiffChInfo &info : tFiffInfo.chs) {
+        //Only take EEG with V as unit or MEG magnetometers with T as unit
+        if(info.kind == sensorTypeFiffConstant && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
+            vecSensorPos.push_back(info.chpos.r0);
+
+            //save the number of the sensor
+            m_iUsedSensors.push_back(iCounter);
+        }
+        iCounter++;
+    }
+
+    //Create bad channel idx list
+    for(const QString &bad : tFiffInfo.bads) {
+        m_iSensorsBad.push_back(tFiffInfo.ch_names.indexOf(bad));
+    }
+
+    //Set cancle distance
+    setCancelDistance(tCancelDist);
+    //Set interpolation function
+    setInterpolationFunction(tInterpolationFunction);
+
+    //sensor projecting
+    QSharedPointer<QVector<qint32>> pMappedSubSet = GeometryInfo::projectSensors(tBemSurface, vecSensorPos);
+
+    //SCDC with cancel distance
+    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(tBemSurface, pMappedSubSet, tCancelDist);
+
+    //filtering of bad channels out of the distance table
+    GeometryInfo::filterBadChannels(pDistanceMatrix, tFiffInfo, sensorTypeFiffConstant);
+
+    dFuncPtr interpolationFunc = transformInterpolationFromStrToFunc(tInterpolationFunction);
+    //create weight matrix
+    QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = Interpolation::createInterpolationMat(pMappedSubSet,
+                                                                               pDistanceMatrix,
+                                                                               interpolationFunc,
+                                                                               tCancelDist,
+                                                                               tFiffInfo,
+                                                                               sensorTypeFiffConstant);
+
+    //@TODO Set Cols and Rows Uniforms
+
+    //@TODO Set weightmatrix parameter + InterpolatedSignal buffer in material and customMesh
+
+    //@TODO Set workgroupsize in QComputeCommand
+
+
+    //Init complete
+    m_bIsDataInit = true;
 }
 
 void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
@@ -339,7 +436,7 @@ void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &chec
     }
 }
 
-void CshSensorDataTreeItem::onNewRtData(const MatrixX3f &sensorData)
+void CshSensorDataTreeItem::onNewRtData(const VectorXf &sensorData)
 {
     //@TODO uncomment this
 //    QVariant data;
