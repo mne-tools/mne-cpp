@@ -198,9 +198,9 @@ signals:
     /**
     * Emit this signal whenever this item should send new signal data to its listeners.
     *
-    * @param[in] tDataMatrix     The signal data from each sensor.
+    * @param[in] tDataVector     The signal data from each sensor.
     */
-    void newRtData(const Eigen::VectorXf &tDataMatrix);
+    void newRtData(const Eigen::VectorXf &tDataVector);
 };
 
 
