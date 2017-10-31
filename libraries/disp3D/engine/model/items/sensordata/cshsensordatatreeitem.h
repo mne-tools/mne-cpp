@@ -116,19 +116,17 @@ public:
      * Initializes the sensor data item with neccessary information for visualization computations.
      * Constructs and initalizes the worker for this item.
      *
-     * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on
-     * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized
-     * @param[in] fiffInfo                  FiffInfo that holds the sensors information
-     * @param[in] sSensorType               The sensor type that is later used for live interpolation
-     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
-     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values
+     * @param[in] tBemSurface                MNEBemSurface that holds the mesh that should be visualized
+     * @param[in] tFiffInfo                  FiffInfo that holds the sensors information
+     * @param[in] tSensorType               The sensor type that is later used for live interpolation
+     * @param[in] tCancelDist               Distances higher than this are ignored for the interpolation
+     * @param[in] tInterpolationFunction    Function that computes interpolation coefficients using the distance values
      */
-    void init(const MatrixX3f& matSurfaceVertColor,
-              const MNELIB::MNEBemSurface& bemSurface,
-              const FIFFLIB::FiffInfo &fiffInfo,
-              const QString& sSensorType,
-              const double dCancelDist,
-              const QString &sInterpolationFunction);
+    void init(const MNELIB::MNEBemSurface& tBemSurface,
+              const FIFFLIB::FiffInfo &tFiffInfo,
+              const QString& tSensorType,
+              const double tCancelDist,
+              const QString &tInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -247,9 +245,9 @@ protected:
     /**
     * This function gets called whenever this item receives sensor values for each estimated source.
     *
-    * @param[in] sourceColorSamples         The color values for each estimated source for left and right hemisphere.
+    * @param[in] sensorData         The senor values for each estimated source.
     */
-    void onNewRtData(const MatrixX3f &sensorData);
+    void onNewRtData(const Eigen::VectorXf &sensorData);
 
     //=========================================================================================================
     /**
@@ -314,6 +312,7 @@ protected:
     QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
     QVector<int>                     m_iSensorsBad;                     /**< Store bad channel indexes.*/
 
+    //@TODO interpolation function and canceldistance members?
 
 signals:
     //=========================================================================================================
