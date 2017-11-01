@@ -100,7 +100,8 @@ namespace Data3DTreeModelItemTypes
                     SensorSurfaceItem = QStandardItem::UserType + 16,
                     SensorPositionItem = QStandardItem::UserType + 17,
                     AbstractMeshItem = QStandardItem::UserType + 18,
-                    SensorDataItem = QStandardItem::UserType + 19};
+                    SensorDataItem = QStandardItem::UserType + 19,
+                    CshInterpolationItem = QStandardItem::UserType + 20};
 }
 
 namespace MetaTreeItemTypes
