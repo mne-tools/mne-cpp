@@ -264,7 +264,7 @@ void ComputeInterpolationController::setInterpolationData(const MNELIB::MNEBemSu
                                 matVertColor,
                                 Qt3DRender::QGeometryRenderer::Triangles);
     //add interpolated signal Attribute
-    m_pCustomMesh->addAttrib(m_pInterpolatedSignalAttrib);
+    m_pCustomMesh->addAttribute(m_pInterpolatedSignalAttrib);
 }
 
 
