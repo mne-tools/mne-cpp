@@ -198,6 +198,14 @@ void CshInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
 
 //*************************************************************************************************************
 
+QPointer<QBuffer> CshInterpolationMaterial::getInterpolatedSignalBuffer()
+{
+    return m_pInterpolatedSignalBuffer;
+}
+
+
+//*************************************************************************************************************
+
 void CshInterpolationMaterial::init()
 {
     //Compute part
