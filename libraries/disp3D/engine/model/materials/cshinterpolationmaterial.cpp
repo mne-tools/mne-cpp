@@ -58,6 +58,7 @@
 #include <Qt3DRender/QCullFace>
 #include <QUrl>
 #include <QColor>
+#include <QVector3D>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,8 +107,10 @@ CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
     , m_pColsParameter(new QParameter)
     , m_pRowsParameter(new QParameter)
     , m_pWeightMatParameter(new QParameter)
-    , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+    , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pInterpolatedSignalParameter(new QParameter)
+    , m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
+    , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
     , m_pCullFace(new QCullFace)
 {
     init();
@@ -121,6 +124,9 @@ CshInterpolationMaterial::~CshInterpolationMaterial()
 
 }
 
+
+//*************************************************************************************************************
+
 void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
 {
     //Set Rows and Cols
@@ -129,13 +135,27 @@ void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatri
 
     //Set buffer
     m_pWeightMatBuffer->setData(buildWeightMatrixBuffer(tInterpolationMatrix));
+    //Set weight matrix parameter
+    m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
 
-    //@TODO addParameter needed?
+    //Set output buffer
+    m_pInterpolatedSignalBuffer->setData(buildZeroBuffer(tInterpolationMatrix->rows()));
+    m_pInterpolatedSignalParameter->setValue(QVariant::fromValue(m_pInterpolatedSignalBuffer.data()));
 }
+
+
+//*************************************************************************************************************
 
 void CshInterpolationMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
 {
     const uint iBufferSize = tSignalVec.rows();
+
+    if(iBufferSize != m_pColsParameter->value())
+    {
+        qDebug("CshInterpolationMaterial::addSignalData input vector dimension mismatch!");
+        return;
+    }
+
     QByteArray bufferData;
     bufferData.resize(iBufferSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
@@ -161,9 +181,18 @@ float CshInterpolationMaterial::alpha()
 
 //*************************************************************************************************************
 
-void CshInterpolationMaterial::setAlpha(float alpha)
+void CshInterpolationMaterial::setAlpha(const float tAlpha)
 {
-    m_pAlphaParameter->setValue(alpha);
+    m_pAlphaParameter->setValue(tAlpha);
+}
+
+
+//*************************************************************************************************************
+
+void CshInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
+{
+    m_pThresholdXParameter->setValue(QVariant::fromValue(tVecThresholds.x()));
+    m_pThresholdZParameter->setValue(QVariant::fromValue(tVecThresholds.z()));
 }
 
 
@@ -201,6 +230,11 @@ void CshInterpolationMaterial::init()
     m_pWeightMatParameter->setName(QStringLiteral("WeightMat"));
     m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
 
+    //Set default output
+    m_pInterpolatedSignalBuffer->setData(buildZeroBuffer(1));
+    m_pInterpolatedSignalParameter->setName(QStringLiteral("InterpolatedSignal"));
+    m_pInterpolatedSignalParameter->setValue(QVariant::fromValue(m_pInterpolatedSignalBuffer.data()));
+
     m_pComputeRenderPass->addParameter(m_pColsParameter);
     m_pComputeRenderPass->addParameter(m_pRowsParameter);
     m_pComputeRenderPass->addParameter(m_pWeightMatParameter);
@@ -217,6 +251,10 @@ void CshInterpolationMaterial::init()
     m_pDrawRenderPass->addParameter(m_pSpecularParameter);
     m_pDrawRenderPass->addParameter(m_pShininessParameter);
     m_pDrawRenderPass->addParameter(m_pAlphaParameter);
+
+    //Add Threshold parameter
+    m_pDrawRenderPass->addParameter(m_pThresholdXParameter);
+    m_pDrawRenderPass->addParameter(m_pThresholdZParameter);
 
     if(m_bUseAlpha)
     {

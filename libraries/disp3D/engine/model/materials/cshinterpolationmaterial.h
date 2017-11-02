@@ -67,6 +67,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace QtCore {
+        class QVector3D;
+}
 namespace Qt3DCore {
         class QNode;
 }
@@ -168,7 +171,15 @@ public:
     *
     * @param[in] alpha  The new alpha value.
     */
-    void setAlpha(float alpha);
+    void setAlpha(const float tAlpha);
+
+    //=========================================================================================================
+    /**
+    * This function set the normalization value.
+    *
+    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
+    */
+    void setNormalization(const QVector3D& tVecThresholds);
 
 protected:
 
@@ -229,6 +240,11 @@ private:
 
     //Output parameter
     QPointer<Qt3DRender::QParameter>        m_pInterpolatedSignalParameter;
+    QPointer<Qt3DRender::QBuffer>           m_pInterpolatedSignalBuffer;
+
+    //Lower and upper normalization threshold parameter
+    QPointer<Qt3DRender::QParameter>        m_pThresholdXParameter;
+    QPointer<Qt3DRender::QParameter>        m_pThresholdZParameter;
 
     QPointer<Qt3DRender::QCullFace>         m_pCullFace;
 
