@@ -182,7 +182,7 @@ public:
     *
     * @param[in] tAttribute       new QAttribute.
     */
-    void addAttrib(Qt3DRender::QAttribute *tAttribute);
+    void addAttribute(Qt3DRender::QAttribute *tAttribute);
 
 protected:
     //=========================================================================================================
