@@ -139,7 +139,8 @@ SOURCES += \
     engine/view/customframegraph.cpp \
     engine/model/materials/cshinterpolationmaterial.cpp \
     engine/model/items/sensordata/cshsensordatatreeitem.cpp \
-    engine/model/workers/rtSensorData/rtcshsensordataworker.cpp
+    engine/model/workers/rtSensorData/rtcshsensordataworker.cpp \
+    engine/model/items/sensordata/cshinterpolationitem.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -190,7 +191,8 @@ HEADERS += \
     engine/view/customframegraph.h \
     engine/model/materials/cshinterpolationmaterial.h \
     engine/model/items/sensordata/cshsensordatatreeitem.h \
-    engine/model/workers/rtSensorData/rtcshsensordataworker.h
+    engine/model/workers/rtSensorData/rtcshsensordataworker.h \
+    engine/model/items/sensordata/cshinterpolationitem.h
 
 FORMS += \
     engine/control/control3dwidget.ui \
