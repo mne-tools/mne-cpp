@@ -181,6 +181,12 @@ public:
     */
     void setNormalization(const QVector3D& tVecThresholds);
 
+    //=========================================================================================================
+    /**
+     * This function returns a pointer to the interpolated signal buffer.
+     */
+    QPointer<Qt3DRender::QBuffer> getInterpolatedSignalBuffer();
+
 protected:
 
 private:
