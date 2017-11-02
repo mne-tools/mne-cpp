@@ -52,6 +52,8 @@
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
 #include <Qt3DRender/QComputeCommand>
+#include <Qt3DRender/QAttribute>
+#include <Qt3DRender/QGeometryRenderer>
 
 
 //*************************************************************************************************************
@@ -93,6 +95,8 @@ CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                    QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
 {
+    m_pMaterial->setWeightMatrix(tInterpolationMatrix);
+
     //Create draw entity if needed
     if(!m_pMeshDrawEntity)
     {
@@ -102,6 +106,20 @@ void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
         m_pMeshDrawEntity->addComponent(m_pTransform);
 
         m_pCustomMesh = new CustomMesh;
+
+        //Interpolated signal attribute
+        QAttribute *pInterpolatedSignalAttrib = new QAttribute;
+        pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
+        pInterpolatedSignalAttrib->setDataType(Qt3DRender::QAttribute::Float);
+        pInterpolatedSignalAttrib->setVertexSize(1);
+        pInterpolatedSignalAttrib->setByteOffset(0);
+        pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
+        pInterpolatedSignalAttrib->setName(QStringLiteral("InterpolatedSignal"));
+        pInterpolatedSignalAttrib->setBuffer(m_pMaterial->getInterpolatedSignalBuffer().data());
+
+        //add interpolated signal Attribute
+        m_pCustomMesh->addAttribute(pInterpolatedSignalAttrib);
+
         m_pMeshDrawEntity->addComponent(m_pCustomMesh);
 
         m_pMeshDrawEntity->addComponent(m_pMaterial);
@@ -127,15 +145,6 @@ void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
     m_pComputeCommand->setWorkGroupY(iWorkGroupsSize);
     m_pComputeCommand->setWorkGroupZ(1);
 
-    //Interpolated signal attribute
-    m_pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    m_pInterpolatedSignalAttrib->setDataType(Qt3DRender::QAttribute::Float);
-    m_pInterpolatedSignalAttrib->setVertexSize(1);
-    m_pInterpolatedSignalAttrib->setByteOffset(0);
-    m_pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
-    m_pInterpolatedSignalAttrib->setName(sInterpolatedSignalName);
-    m_pInterpolatedSignalAttrib->setBuffer(m_pInterpolatedSignalBuffer);
-
     //Set custom mesh data
     //generate mesh base color
     MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, QColor(80, 80, 80, 255));
@@ -146,8 +155,7 @@ void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                 tMneBemSurface.tris,
                                 matVertColor,
                                 Qt3DRender::QGeometryRenderer::Triangles);
-    //add interpolated signal Attribute
-    m_pCustomMesh->addAttribute(m_pInterpolatedSignalAttrib);
+
 }
 
 
