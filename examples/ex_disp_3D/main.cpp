@@ -43,6 +43,7 @@
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
+#include <disp3d/engine/model/items/sensordata/cshsensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
@@ -312,6 +313,24 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
         pEegSensorTreeItem->setColortable("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
+    }
+
+    //add csh sensor item for EEG data
+    if (CshSensorDataTreeItem* pCshEegSensorTreeItem = p3DDataModel->addCshSensorData(parser.value(subjectOption),
+                                                                             evoked.comment,
+                                                                             evoked.data,
+                                                                             t_Bem[0],
+                                                                             evoked.info,
+                                                                             "EEG",
+                                                                             0.2,
+                                                                             "Cubic")) {
+//        pCshEegSensorTreeItem->setLoopState(true);
+//        pCshEegSensorTreeItem->setTimeInterval(17);
+//        pCshEegSensorTreeItem->setNumberAverages(1);
+//        pCshEegSensorTreeItem->setStreamingActive(false);
+//        pCshEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
+//        pCshEegSensorTreeItem->setColortable("Jet");
+//        pCshEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     if(bAddRtSourceLoc) {
