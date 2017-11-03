@@ -83,6 +83,7 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class CshInterpolationItem;
 
 //=============================================================================================================
 /**
@@ -93,6 +94,7 @@ namespace DISP3DLIB {
 
 class DISP3DSHARED_EXPORT CshSensorDataTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<CshSensorDataTreeItem> SPtr;            /**< Shared pointer type for CshSensorDataTreeItem. */
@@ -116,17 +118,19 @@ public:
      * Initializes the sensor data item with neccessary information for visualization computations.
      * Constructs and initalizes the worker for this item.
      *
-     * @param[in] tBemSurface                MNEBemSurface that holds the mesh that should be visualized
-     * @param[in] tFiffInfo                  FiffInfo that holds the sensors information
+     * @param[in] tBemSurface               MNEBemSurface that holds the mesh that should be visualized
+     * @param[in] tFiffInfo                 FiffInfo that holds the sensors information
      * @param[in] tSensorType               The sensor type that is later used for live interpolation
      * @param[in] tCancelDist               Distances higher than this are ignored for the interpolation
      * @param[in] tInterpolationFunction    Function that computes interpolation coefficients using the distance values
+     * @param[in] t3DEntityParent           The Qt3D entity parent of the new item.
      */
     void init(const MNELIB::MNEBemSurface& tBemSurface,
               const FIFFLIB::FiffInfo &tFiffInfo,
               const QString& tSensorType,
               const double tCancelDist,
-              const QString &tInterpolationFunction);
+              const QString &tInterpolationFunction,
+              Qt3DCore::QEntity *t3DEntityParent);
 
     //=========================================================================================================
     /**
@@ -311,6 +315,8 @@ protected:
     QPointer<RtCshSensorDataWorker>  m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
     QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
     QVector<int>                     m_iSensorsBad;                     /**< Store bad channel indexes.*/
+
+    QPointer<CshInterpolationItem>   m_pInterpolationItem;
 
     //@TODO interpolation function and canceldistance members?
 
