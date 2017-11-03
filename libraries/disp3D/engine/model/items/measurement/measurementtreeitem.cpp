@@ -51,6 +51,7 @@
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
 #include "../sensordata/sensordatatreeitem.h"
+#include "../sensordata/cshsensordatatreeitem.h"
 #include "../bem/bemtreeitem.h"
 #include "../bem/bemsurfacetreeitem.h"
 #include "../sensorspace/sensorsettreeitem.h"
@@ -342,6 +343,97 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
             }
 
             return m_pMEGSensorDataTreeItem;
+        }
+    }
+
+    return Q_NULLPTR;
+}
+
+
+//*************************************************************************************************************
+
+CshSensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
+                                                    const MNEBemSurface &bemSurface,
+                                                    const FiffInfo &fiffInfo,
+                                                    const QString &sSensorType,
+                                                    const double dCancelDist,
+                                                    const QString &sInterpolationFunction,
+                                                    Qt3DCore::QEntity* pParent)
+{
+    if(!tSensorData.size() == 0) {
+        if(sSensorType == "EEG") {
+            if(m_pCshEEGSensorDataTreeItem) {
+                m_pCshEEGSensorDataTreeItem->addData(tSensorData);
+            } else {
+                //Add sensor data as child
+                //If rt data item does not exists yet, create it here!
+                m_pCshEEGSensorDataTreeItem = new CshSensorDataTreeItem();
+                m_pCshEEGSensorDataTreeItem->setText("EEG Data");
+
+                QList<QStandardItem*> list;
+                list << m_pCshEEGSensorDataTreeItem;
+                list << new QStandardItem(m_pCshEEGSensorDataTreeItem->toolTip());
+                this->appendRow(list);
+
+                //Find out current colors
+                //MatrixX3f currentColors = MatrixX3f::Constant(bemSurface.rr.rows(), 3, 100.0f);
+
+//                if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
+//                    QList<QStandardItem*> lBEMChildren = pParent->findChildren(Data3DTreeModelItemTypes::BemItem);
+//                    BemTreeItem* pBemItem = Q_NULLPTR;
+
+//                    //Find BEM head surface from subejct item
+//                    if(!lBEMChildren.isEmpty()) {
+//                        pBemItem = dynamic_cast<BemTreeItem*>(lBEMChildren.first());
+//                    }
+
+//                    if(pBemItem) {
+//                        QList<QStandardItem*> itemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+
+//                        for(int j = 0; j < itemList.size(); ++j) {
+//                            if(BemSurfaceTreeItem* pBemHeadSurfaceTreeItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+//                                if(pBemHeadSurfaceTreeItem->text() == "Head") {
+//                                    currentColors = pBemHeadSurfaceTreeItem->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>();
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+
+                m_pCshEEGSensorDataTreeItem->init(bemSurface, fiffInfo, sSensorType, dCancelDist, sInterpolationFunction, pParent);
+
+//                connect(m_pEEGSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
+//                        this, &MeasurementTreeItem::onSensorEEGColorChanged);
+
+                m_pCshEEGSensorDataTreeItem->addData(tSensorData);
+            }
+
+            return m_pCshEEGSensorDataTreeItem;
+        }
+
+        if(sSensorType == "MEG") {
+            if(m_pCshMEGSensorDataTreeItem) {
+                m_pCshMEGSensorDataTreeItem->addData(tSensorData);
+            } else {
+                //Add sensor data as child
+                //If rt data item does not exists yet, create it here!
+                m_pCshMEGSensorDataTreeItem = new CshSensorDataTreeItem();
+                m_pCshMEGSensorDataTreeItem->setText("MEG Data");
+
+                QList<QStandardItem*> list;
+                list << m_pCshMEGSensorDataTreeItem;
+                list << new QStandardItem(m_pCshMEGSensorDataTreeItem->toolTip());
+                this->appendRow(list);
+
+                m_pCshMEGSensorDataTreeItem->init(bemSurface, fiffInfo, sSensorType, dCancelDist, sInterpolationFunction, pParent);
+
+//                connect(m_pMEGSensorDataTreeItem.data(), &SensorDataTreeItem::rtVertColorChanged,
+//                        this, &MeasurementTreeItem::onSensorMEGColorChanged);
+
+                m_pCshMEGSensorDataTreeItem->addData(tSensorData);
+            }
+
+            return m_pCshMEGSensorDataTreeItem;
         }
     }
 
