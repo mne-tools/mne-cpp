@@ -185,7 +185,7 @@ public:
     /**
      * This function returns a pointer to the interpolated signal buffer.
      */
-    QPointer<Qt3DRender::QBuffer> getInterpolatedSignalBuffer();
+    Qt3DRender::QBuffer *getInterpolatedSignalBuffer();
 
 protected:
 
