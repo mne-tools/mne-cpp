@@ -122,6 +122,7 @@ class DigitizerSetTreeItem;
 class SubjectTreeItem;
 class MeasurementTreeItem;
 class SensorDataTreeItem;
+class CshSensorDataTreeItem;
 
 
 //=============================================================================================================
@@ -349,6 +350,16 @@ public:
                                       const QString &sDataType,
                                       const double dCancelDist,
                                       const QString &sInterpolationFunction);
+
+    //@TODO this is only a temporary soltution
+    CshSensorDataTreeItem *addCshSensorData(const QString& sSubject,
+                                            const QString& sMeasurementSetName,
+                                            const Eigen::MatrixXd& matSensorData,
+                                            const MNELIB::MNEBemSurface& tBemSurface,
+                                            const FIFFLIB::FiffInfo &fiffInfo,
+                                            const QString &sDataType,
+                                            const double dCancelDist,
+                                            const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
