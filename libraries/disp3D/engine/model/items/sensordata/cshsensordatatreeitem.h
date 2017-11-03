@@ -104,8 +104,7 @@ public:
     /**
     * Constructs a CshSensorDataTreeItem object.
     */
-    explicit CshSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
-    //@TODO Data3DTreeModelItemTypes::SensorDataItem correct?
+    explicit CshSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::CshSensorDataItem, const QString& text = "Csh Sensor Data");
 
     //=========================================================================================================
     /**
@@ -321,13 +320,13 @@ protected:
     //@TODO interpolation function and canceldistance members?
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to provide newly generated sensor values from the stream rt data.
-    *
-    * @param[in] sensorValues                 The sensorValues for the compute shader interpolation
-    */
-    void rtCshSensorValuesChanged(const QVariant &sensorValues);
+//    //=========================================================================================================
+//    /**
+//    * Emit this signal whenever you want to provide newly generated sensor values from the stream rt data.
+//    *
+//    * @param[in] sensorValues                 The sensorValues for the compute shader interpolation
+//    */
+//    void rtCshSensorValuesChanged(const QVariant &sensorValues);
 
 };
 
