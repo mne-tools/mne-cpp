@@ -109,6 +109,7 @@ CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
     , m_pWeightMatParameter(new QParameter)
     , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pInterpolatedSignalParameter(new QParameter)
+    , m_pInterpolatedSignalBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
     , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
     , m_pCullFace(new QCullFace)
@@ -198,9 +199,9 @@ void CshInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
 
 //*************************************************************************************************************
 
-QPointer<QBuffer> CshInterpolationMaterial::getInterpolatedSignalBuffer()
+Qt3DRender::QBuffer * CshInterpolationMaterial::getInterpolatedSignalBuffer()
 {
-    return m_pInterpolatedSignalBuffer;
+    return m_pInterpolatedSignalBuffer.data();
 }
 
 
