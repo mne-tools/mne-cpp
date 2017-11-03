@@ -217,7 +217,7 @@ void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         qDebug() << "CshSensorDataTreeItem::addData - sensor data item has not been initialized yet!";
         return;
     }
-    //@TODO implement this
+
     //if more data then needed is provided
     const uint iSensorSize = m_iUsedSensors.size();
     if(tSensorData.rows() > iSensorSize)
