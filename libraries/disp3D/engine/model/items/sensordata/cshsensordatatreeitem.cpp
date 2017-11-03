@@ -43,6 +43,7 @@
 #include "../common/metatreeitem.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
+#include "cshinterpolationitem.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -122,7 +123,8 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
                                  const FiffInfo &tFiffInfo,
                                  const QString &tSensorType,
                                  const double tCancelDist,
-                                 const QString &tInterpolationFunction)
+                                 const QString &tInterpolationFunction,
+                                 Qt3DCore::QEntity* t3DEntityParent)
 {
     //@TODO implement this
 
@@ -190,21 +192,64 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
                                                                                tFiffInfo,
                                                                                sensorTypeFiffConstant);
 
-    //@TODO Set Cols and Rows Uniforms
+    //create new Tree Item
+    if(!m_pInterpolationItem)
+    {
+        m_pInterpolationItem = new CshInterpolationItem(t3DEntityParent, Data3DTreeModelItemTypes::CshInterpolationItem, QStringLiteral("CshInterpolation"));
+        m_pInterpolationItem->initData(tBemSurface, pInterpolationMatrix);
 
-    //@TODO Set weightmatrix parameter + InterpolatedSignal buffer in material and customMesh
-
-    //@TODO Set workgroupsize in QComputeCommand
-
+        QList<QStandardItem*> list;
+        list << m_pInterpolationItem;
+        list << new QStandardItem(m_pInterpolationItem->toolTip());
+        this->appendRow(list);
+    }
 
     //Init complete
     m_bIsDataInit = true;
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 {
+    if(!m_bIsDataInit) {
+        qDebug() << "CshSensorDataTreeItem::addData - sensor data item has not been initialized yet!";
+        return;
+    }
     //@TODO implement this
+    //if more data then needed is provided
+    const uint iSensorSize = m_iUsedSensors.size();
+    if(tSensorData.rows() > iSensorSize)
+    {
+        MatrixXf fSmallSensorData(iSensorSize, tSensorData.cols());
+        for(uint i = 0 ; i < iSensorSize; ++i)
+        {
+            //Set bad channels to zero
+            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
+                fSmallSensorData.row(i).setZero();
+            } else {
+                fSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]).cast<float>();
+            }
+        }
+        m_pSensorRtDataWorker->addData(fSmallSensorData);
+    }
+    else
+    {
+        //Set bad channels to zero
+        MatrixXf fSmallSensorData = tSensorData.cast<float>();
+        for(uint i = 0 ; i < fSmallSensorData.rows(); ++i)
+        {
+            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
+                fSmallSensorData.row(i).setZero();
+            }
+        }
+        m_pSensorRtDataWorker->addData(fSmallSensorData);
+    }
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::setLoopState(bool bState)
 {
@@ -220,6 +265,9 @@ void CshSensorDataTreeItem::setLoopState(bool bState)
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::setStreamingActive(bool bState)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
@@ -233,6 +281,9 @@ void CshSensorDataTreeItem::setStreamingActive(bool bState)
         }
     }
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::setTimeInterval(int iMSec)
 {
@@ -248,6 +299,9 @@ void CshSensorDataTreeItem::setTimeInterval(int iMSec)
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::setNumberAverages(int iNumberAverages)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::NumberAverages);
@@ -262,6 +316,9 @@ void CshSensorDataTreeItem::setNumberAverages(int iNumberAverages)
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::setColortable(const QString &sColortable)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ColormapType);
@@ -275,6 +332,9 @@ void CshSensorDataTreeItem::setColortable(const QString &sColortable)
         }
     }
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::setNormalization(const QVector3D &vecThresholds)
 {
@@ -293,6 +353,9 @@ void CshSensorDataTreeItem::setNormalization(const QVector3D &vecThresholds)
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::setCancelDistance(double dCancelDist)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::CancelDistance);
@@ -306,6 +369,9 @@ void CshSensorDataTreeItem::setCancelDistance(double dCancelDist)
         }
     }
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::setInterpolationFunction(const QString &sInterpolationFunction)
 {
@@ -321,6 +387,9 @@ void CshSensorDataTreeItem::setInterpolationFunction(const QString &sInterpolati
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pSensorRtDataWorker) {
@@ -328,10 +397,16 @@ void CshSensorDataTreeItem::setSFreq(const double dSFreq)
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 {
     //@TODO implement this
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::initItem()
 {
@@ -425,6 +500,9 @@ void CshSensorDataTreeItem::initItem()
     pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &checkState)
 {
     if(m_pSensorRtDataWorker) {
@@ -436,18 +514,32 @@ void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &chec
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::onNewRtData(const VectorXf &sensorData)
 {
-    //@TODO uncomment this
+    //@TODO do this with a signal?
+    if(m_pInterpolationItem)
+    {
+        m_pInterpolationItem->addNewRtData(sensorData);
+
+    }
 //    QVariant data;
 //    data.setValue(sensorData);
 //    emit rtCshSensorValuesChanged(data);
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
 {
     //@TODO implement this
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
 {
@@ -458,13 +550,22 @@ void CshSensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant &vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>())
     {
-        //@TODO implement this
+        if(m_pInterpolationItem)
+        {
+            m_pInterpolationItem->setNormalization(vecThresholds.value<QVector3D>());
+        }
     }
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState &checkState)
 {
@@ -477,6 +578,9 @@ void CshSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState 
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
@@ -486,10 +590,16 @@ void CshSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
     }
 }
 
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
     //@TODO implement this
 }
+
+
+//*************************************************************************************************************
 
 void CshSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
