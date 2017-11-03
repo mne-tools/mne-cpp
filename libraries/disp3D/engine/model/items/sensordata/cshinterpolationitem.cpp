@@ -92,7 +92,7 @@ CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 
 //*************************************************************************************************************
 
-void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
+void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                    QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
 {
     m_pMaterial->setWeightMatrix(tInterpolationMatrix);
@@ -115,7 +115,7 @@ void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
         pInterpolatedSignalAttrib->setByteOffset(0);
         pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
         pInterpolatedSignalAttrib->setName(QStringLiteral("InterpolatedSignal"));
-        pInterpolatedSignalAttrib->setBuffer(m_pMaterial->getInterpolatedSignalBuffer().data());
+        pInterpolatedSignalAttrib->setBuffer(m_pMaterial->getInterpolatedSignalBuffer());
 
         //add interpolated signal Attribute
         m_pCustomMesh->addAttribute(pInterpolatedSignalAttrib);
@@ -147,7 +147,14 @@ void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
 
     //Set custom mesh data
     //generate mesh base color
-    MatrixX3f matVertColor = createColorMat(tMneBemSurface.rr, QColor(80, 80, 80, 255));
+    QColor baseColor = QColor(80, 80, 80, 255);
+    MatrixX3f matVertColor(tMneBemSurface.rr.rows(),3);
+
+    for(int i = 0; i < matVertColor.rows(); ++i) {
+        matVertColor(i,0) = baseColor.redF();
+        matVertColor(i,1) = baseColor.greenF();
+        matVertColor(i,2) = baseColor.blueF();
+    }
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
@@ -155,6 +162,19 @@ void CshInterpolationItem::addData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                 tMneBemSurface.tris,
                                 matVertColor,
                                 Qt3DRender::QGeometryRenderer::Triangles);
+
+}
+
+
+//*************************************************************************************************************
+
+void CshInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
+{
+    //@TODO implement this
+    if(m_pMaterial)
+    {
+        m_pMaterial->addSignalData(tSignalVec);
+    }
 
 }
 

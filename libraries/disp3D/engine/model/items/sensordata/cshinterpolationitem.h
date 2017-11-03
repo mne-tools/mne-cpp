@@ -117,12 +117,20 @@ public:
 
     //=========================================================================================================
     /**
-     * Add interpolation data to this item
+     * Initialize interpolation data to this item
      *
      * @param tMneBemSurface        The Bem data.
      * @param tInterpolationMatrix  The weight matrix for interpolation on the bem surface.
      */
-    void addData(const MNELIB::MNEBemSurface &tMneBemSurface, QSharedPointer<SparseMatrix<double>> tInterpolationMatrix);
+    void initData(const MNELIB::MNEBemSurface &tMneBemSurface, QSharedPointer<SparseMatrix<double>> tInterpolationMatrix);
+
+    //=========================================================================================================
+    /**
+    * Add a new vector with signal data form the sensors.
+    *
+    * @param tSignalVec                Vector with one float value for each sensor.
+    */
+    void addNewRtData(const Eigen::VectorXf &tSignalVec);
 
     //=========================================================================================================
     /**
@@ -153,7 +161,7 @@ protected:
 
     QPointer<CshInterpolationMaterial>      m_pMaterial;
 
-    //@TODO is something missing?
+    //@TODO isInit bool
 
 
 };
