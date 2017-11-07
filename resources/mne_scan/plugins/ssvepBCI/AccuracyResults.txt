@@ -1,0 +1,36 @@
+
+Do Okt 5 13:22:36 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:26:24 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:26:32 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:26:32 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:27:51 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:27:56 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:27:56 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:29:25 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:29:25 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:30:29 2017	:
+Wrong commands:2	Correct commands:15
+
+Do Okt 5 13:32:05 2017	:
+Wrong commands:0	Correct commands:9
+
+Do Okt 5 13:33:11 2017	:
+Wrong commands:2	Correct commands:11
