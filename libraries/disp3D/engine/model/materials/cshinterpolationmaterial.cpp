@@ -244,9 +244,17 @@ void CshInterpolationMaterial::init()
     m_pInterpolatedSignalParameter->setName(QStringLiteral("InterpolatedSignal"));
     m_pInterpolatedSignalParameter->setValue(QVariant::fromValue(m_pInterpolatedSignalBuffer.data()));
 
+    //Set default input
+    m_pSignalDataBuffer->setData(buildZeroBuffer(1));
+    m_pSignalDataParameter->setName(QStringLiteral("InputVec"));
+    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
+
+    //Add compute Parameter
     m_pComputeRenderPass->addParameter(m_pColsParameter);
     m_pComputeRenderPass->addParameter(m_pRowsParameter);
+    m_pComputeRenderPass->addParameter(m_pInterpolatedSignalParameter);
     m_pComputeRenderPass->addParameter(m_pWeightMatParameter);
+    m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
 
     //Draw part
     //Set shader
@@ -287,15 +295,6 @@ void CshInterpolationMaterial::init()
     //Add to technique
     m_pDrawTechnique->addFilterKey(m_pDrawFilterKey);
     m_pDrawTechnique->addRenderPass(m_pDrawRenderPass);
-
-    //init signal processing
-    m_pSignalDataBuffer->setAccessType(Qt3DRender::QBuffer::ReadWrite);
-    m_pSignalDataBuffer->setUsage(Qt3DRender::QBuffer::StreamDraw);
-    m_pSignalDataBuffer->setData(buildZeroBuffer(60));
-    m_pSignalDataParameter->setName(QStringLiteral("InputVec"));
-    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
-    m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
-
 
     //Effect
     //Link shader and uniforms
