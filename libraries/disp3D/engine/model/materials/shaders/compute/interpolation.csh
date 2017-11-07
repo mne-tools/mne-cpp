@@ -39,7 +39,7 @@ void main(void)
         float sum = 0.0;
         for(uint i = 0; i < cols; i++)
         {
-            sum += weights[globalId * cols + i] * intputData[i];
+            sum += weights[globalId * cols + i] * inputData[i];
         }
 
         interpolatedSignal[globalId] = sum;
