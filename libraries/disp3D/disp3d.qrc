@@ -27,5 +27,6 @@
         <file>engine/model/materials/shaders/compute/interpolation.csh</file>
         <file>engine/model/materials/shaders/compute/interpolation.frag</file>
         <file>engine/model/materials/shaders/compute/interpolation.vert</file>
+        <file>engine/model/materials/shaders/compute/light.inc.frag</file>
     </qresource>
 </RCC>
