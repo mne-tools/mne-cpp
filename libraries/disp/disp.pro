@@ -197,7 +197,7 @@ RESOURCE_FILES +=\
     $${MNE_DIR}/resources/general/2DLayouts/magnesWH3600.lout \
     $${MNE_DIR}/resources/general/2DLayouts/standard_waveguard64_duke.lout \
     $${MNE_DIR}/resources/general/2DLayouts/Vectorview-all.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-frad.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-grad.lout \
     $${MNE_DIR}/resources/general/2DLayouts/Vectorview-mag.lout \
     $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw.sel \
     $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_babyMEG.sel \
