@@ -163,11 +163,11 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     ui->m_groupBox_3dControl->setLayout(gridLayout);
 
     //Add sensor surface
-    QFile t_fileBabyMEGSensorSurfaceBEM("./resources/sensorSurfaces/BabyMEG.fif");
+    QFile t_fileBabyMEGSensorSurfaceBEM("./resources/general/sensorSurfaces/BabyMEG.fif");
     MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
     m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM);
 
-    QFile t_fileVVSensorSurfaceBEM("./resources/sensorSurfaces/306m.fif");
+    QFile t_fileVVSensorSurfaceBEM("./resources/general/sensorSurfaces/306m.fif");
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);

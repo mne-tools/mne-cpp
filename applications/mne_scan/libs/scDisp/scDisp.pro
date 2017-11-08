@@ -144,6 +144,26 @@ FORMS += \
 RESOURCES += \
     scDisp.qrc
 
+RESOURCE_FILES +=\
+    $${MNE_DIR}/resources/general/sensorSurfaces/306m.fif \
+    $${MNE_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
+    $${MNE_DIR}/resources/general/sensorSurfaces/BabyMEG.fif \
+    $${MNE_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR ~= s,/,\\,g
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE ~= s,/,\\,g
+    TRGTDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
+
 UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
