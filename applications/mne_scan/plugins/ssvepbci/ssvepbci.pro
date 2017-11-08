@@ -99,6 +99,27 @@ FORMS += \
         FormFiles/ssvepbciaboutwidget.ui \
         FormFiles/ssvepbciconfigurationwidget.ui \
 
+RESOURCE_FILES +=\
+    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/AccuracyResults.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/BCIDebugFile.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/beep.wav \
+    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_128.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_Dry_64.txt \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR ~= s,/,\\,g
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE ~= s,/,\\,g
+    TRGTDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}

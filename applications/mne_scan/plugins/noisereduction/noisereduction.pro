@@ -96,6 +96,28 @@ FORMS += \
         FormFiles/noisereductionabout.ui \
         FormFiles/noisereductionoptionswidget.ui
 
+RESOURCE_FILES +=\
+    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Duke64Dry.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR ~= s,/,\\,g
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE ~= s,/,\\,g
+    TRGTDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}

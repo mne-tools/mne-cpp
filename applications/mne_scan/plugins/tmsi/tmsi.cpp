@@ -68,7 +68,7 @@ using namespace TMSIPlugin;
 
 TMSI::TMSI()
 : m_pRMTSA_TMSI(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/tmsi/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/tmsi/")
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 {
@@ -711,7 +711,7 @@ void TMSI::run()
                 //    QVector<float> impulseResponse(numberCoeff);
                 //    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
 
-                //    ofstream outputFileStream("mne_scan_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
+                //    ofstream outputFileStream("resources/mne_scan/plugins/tmsi/filterToolsTest.txt", ios::out);
 
                 //    outputFileStream << "impulseResponse:\n";
                 //    for(int i=0; i<impulseResponse.size(); i++)
