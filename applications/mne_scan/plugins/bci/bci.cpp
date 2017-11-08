@@ -57,9 +57,13 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BCIPlugin;
+using namespace BCIPLUGIN;
 using namespace std;
 using namespace UTILSLIB;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
+using namespace IOBUFFER;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,7 +71,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BCI::BCI()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ssvepBCI/")
+: m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/bci/")
 , m_bProcessData(false)
 {
 }
@@ -351,7 +355,7 @@ QWidget* BCI::setupWidget()
 
 //*************************************************************************************************************
 
-void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void BCI::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
     if(pRTMSA)
@@ -421,7 +425,7 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void BCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void BCI::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     cout<<"update source"<<endl;
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
@@ -429,14 +433,14 @@ void BCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pBCIBuffer_Source)
-            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTSE->getValue().size(), pRTSE->getArraySize()));
+            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols()));
 
         if(m_bProcessData)
         {
-            MatrixXd t_mat(pRTSE->getValue().size(), pRTSE->getArraySize());
+            MatrixXd t_mat(pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols());
 
-            for(unsigned char i = 0; i < pRTSE->getArraySize(); ++i)
-                t_mat.col(i) = pRTSE->getStc().data.col(i);
+            for(unsigned char i = 0; i < pRTSE->getValue()->data.cols(); ++i)
+                t_mat.col(i) = pRTSE->getValue()->data.col(i);
 
             m_pBCIBuffer_Source->push(&t_mat);
         }

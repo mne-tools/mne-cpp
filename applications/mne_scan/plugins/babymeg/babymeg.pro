@@ -112,6 +112,25 @@ FORMS += \
     FormFiles/babymegsquidcontroldgl.ui \
     FormFiles/babymegprojectdialog.ui \
 
+RESOURCE_FILES +=\
+    $${MNE_DIR}/resources/mne_scan/plugins/babymeg/both.bad \
+    $${MNE_DIR}/resources/mne_scan/plugins/babymeg/header.fif \
+    $${MNE_DIR}/resources/mne_scan/plugins/babymeg/readme.txt \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR ~= s,/,\\,g
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE ~= s,/,\\,g
+    TRGTDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}

@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BCIPlugin;
+using namespace BCIPLUGIN;
 using namespace Eigen;
 
 
@@ -257,7 +257,7 @@ void BCISetupWidget::changeLoadSensorBoundary()
     QString path = QFileDialog::getOpenFileName(
                 this,
                 "Load decision boundary for sensor level",
-                "mne_x_plugins/resources/bci/LDA_linear_boundary.txt",
+                "resources/mne_scan_plugins/bci/LDA_linear_boundary.txt",
                  tr("Text files (*.txt)"));
 
     if(path==NULL)
@@ -276,7 +276,7 @@ void BCISetupWidget::changeLoadSourceBoundary()
     QString path = QFileDialog::getOpenFileName(
                 this,
                 "Load decision boundary for source level",
-                "mne_x_plugins/resources/bci/LDA_linear_boundary.txt",
+                "resources/mne_scan_plugins/bci/LDA_linear_boundary.txt",
                  tr("Text files (*.txt)"));
 
     if(path==NULL)
