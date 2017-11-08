@@ -135,7 +135,7 @@ void SelectionManagerWindow::initComboBoxes()
 
     //Initialise layout as neuromag vectorview with all channels
     QString selectionName("babymeg-mag-inner-layer.lout");
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/2DLayouts/"));
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     selectionName = QString("mne_browse_raw_babyMEG.sel");
@@ -670,7 +670,7 @@ void SelectionManagerWindow::onBtnAddToSelectionGroups()
 void SelectionManagerWindow::onComboBoxLayoutChanged()
 {
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/2DLayouts/"));
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
 }
 
 

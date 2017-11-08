@@ -190,6 +190,15 @@ RESOURCE_FILES +=\
     $${MNE_DIR}/resources/general/default_filters/filter_default_template.txt \
     $${MNE_DIR}/resources/general/default_filters/NOTCH_50Hz_Fs1kHz.txt \
     $${MNE_DIR}/resources/general/default_filters/NOTCH_60Hz_Fs1kHz.txt \
+    $${MNE_DIR}/resources/general/2DLayouts/babymeg-mag-inner-layer.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/babymeg-mag-outer-layer.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/babymeg-mag-ref.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/CTF-275.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/magnesWH3600.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/standard_waveguard64_duke.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-all.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-frad.lout \
+    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-mag.lout \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
