@@ -199,6 +199,12 @@ RESOURCE_FILES +=\
     $${MNE_DIR}/resources/general/2DLayouts/Vectorview-all.lout \
     $${MNE_DIR}/resources/general/2DLayouts/Vectorview-frad.lout \
     $${MNE_DIR}/resources/general/2DLayouts/Vectorview-mag.lout \
+    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw.sel \
+    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_babyMEG.sel \
+    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_CTF_275.sel \
+    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_Magnes_3600WH.sel \
+    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_vv.sel \
+    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_vv_new.sel \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
