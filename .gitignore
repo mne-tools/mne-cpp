@@ -22,10 +22,8 @@
 *.qm
 
 # Bin folder with exceptions
-/lib/*   
-/bin/*              
-/resources/mne_deep/models/examples/datasets/MNIST/*.txt
-/applications/mne_analyze/extensions/deepcntknets/bio
+/lib/   
+/bin/              
 
 # Applications folder
 /applications/mne_analyze/extensions/deepcntknets/bio
