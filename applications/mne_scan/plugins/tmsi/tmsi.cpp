@@ -148,7 +148,7 @@ void TMSI::init()
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./resources/3DLayouts/standard_waveguard128_duke.elc");
+    m_sElcFilePath = QString("./resources/general/3DLayouts/standard_waveguard128_duke.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
