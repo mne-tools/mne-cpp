@@ -92,7 +92,6 @@ FORMS += \
         FormFiles/eegosportssetupprojectwidget.ui \
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/eegosports/EEGoSports_Driver_Debug.txt \
     $${MNE_DIR}/resources/mne_scan/plugins/eegosports/readme.txt \
 
 # Copy resource files to bin resource folder
