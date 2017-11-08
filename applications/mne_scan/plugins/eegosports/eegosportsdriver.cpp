@@ -75,7 +75,7 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_uiSamplingFrequency(512)
 , m_uiSamplesPerBlock(100)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/mne_scan_plugins/resources/eegosports")
+, m_sOutputFilePath("/resources/mne_scan/plugins/eegosports")
 , m_bMeasureImpedances(false)
 {
     m_bDllLoaded = true;
@@ -113,7 +113,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
     //Open debug file to write to
     if(m_bWriteDriverDebugToFile) {
-        m_outputFileStream.open("./mne_scan_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
+        m_outputFileStream.open("./resources/mne_scan/plugins/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
     }
 
     try {
