@@ -376,14 +376,14 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
 
 void HPIWidget::alignFiducials(const QString& fileNameDigData)
 {
-    QFile test("./resources/hpiAlignment/fsaverage-fiducials.fif");
+    QFile test("./resources/general/hpiAlignment/fsaverage-fiducials.fif");
     FiffDigPointSet testdata(test);
     m_pData3DModel->addDigitizerData("Head", "avr", testdata);
 
     //Calculate the alignment of the fiducials
     MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
     MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
-                                             "./resources/hpiAlignment/fsaverage-head.fif",
+                                             "./resources/general/hpiAlignment/fsaverage-head.fif",
                                              FIFFV_BEM_SURF_ID_HEAD,
                                              "head",
                                              1,
@@ -393,7 +393,7 @@ void HPIWidget::alignFiducials(const QString& fileNameDigData)
     QFile t_fileDigData(fileNameDigData);
     FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
 
-    QFile t_fileDigDataReference("./resources/hpiAlignment/fsaverage-fiducials.fif");
+    QFile t_fileDigDataReference("./resources/general/hpiAlignment/fsaverage-fiducials.fif");
     FiffDigitizerData* t_digDataReference = new FiffDigitizerData(t_fileDigDataReference);
 
     MneSurfaceOrVolume::align_fiducials(t_digData,

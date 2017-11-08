@@ -149,6 +149,11 @@ RESOURCE_FILES +=\
     $${MNE_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
     $${MNE_DIR}/resources/general/sensorSurfaces/BabyMEG.fif \
     $${MNE_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
+    $${MNE_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
+    $${MNE_DIR}/resources/general/hpiAlignment/fsaverage-fiducials.fif \
+    $${MNE_DIR}/resources/general/hpiAlignment/fsaverage-head.fif \
+    $${MNE_DIR}/resources/general/hpiAlignment/fsaverage-inner_skull-bem.fif \
+    $${MNE_DIR}/resources/general/hpiAlignment/fsaverage-trans.fif \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
