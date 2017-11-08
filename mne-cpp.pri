@@ -122,3 +122,7 @@ MNE_BINARY_DIR = $$MNE_BINARY_DIR
 isEmpty( MNE_BINARY_DIR ) {
     MNE_BINARY_DIR = $${PWD}/bin
 }
+
+# repository dir
+MNE_DIR = $${PWD}
+

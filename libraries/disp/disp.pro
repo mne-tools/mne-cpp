@@ -184,6 +184,26 @@ qtHaveModule(charts) {
         deepmodelviewer/images.qrc
 }
 
+RESOURCE_FILES +=\
+    $${MNE_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
+    $${MNE_DIR}/resources/general/default_filters/BP_1Hz_70Hz_Fs1kHz.txt \
+    $${MNE_DIR}/resources/general/default_filters/filter_default_template.txt \
+    $${MNE_DIR}/resources/general/default_filters/NOTCH_50Hz_Fs1kHz.txt \
+    $${MNE_DIR}/resources/general/default_filters/NOTCH_60Hz_Fs1kHz.txt \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR ~= s,/,\\,g
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE ~= s,/,\\,g
+    TRGTDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
