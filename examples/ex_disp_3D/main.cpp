@@ -324,13 +324,13 @@ int main(int argc, char *argv[])
                                                                              "EEG",
                                                                              0.2,
                                                                              "Cubic")) {
-//        pCshEegSensorTreeItem->setLoopState(true);
-//        pCshEegSensorTreeItem->setTimeInterval(17);
-//        pCshEegSensorTreeItem->setNumberAverages(1);
-//        pCshEegSensorTreeItem->setStreamingActive(false);
-//        pCshEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
-//        pCshEegSensorTreeItem->setColortable("Jet");
-//        pCshEegSensorTreeItem->setSFreq(evoked.info.sfreq);
+        pCshEegSensorTreeItem->setLoopState(true);
+        pCshEegSensorTreeItem->setTimeInterval(17);
+        pCshEegSensorTreeItem->setNumberAverages(1);
+        pCshEegSensorTreeItem->setStreamingActive(false);
+        pCshEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
+        pCshEegSensorTreeItem->setColortable("Jet");
+        pCshEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     if(bAddRtSourceLoc) {
