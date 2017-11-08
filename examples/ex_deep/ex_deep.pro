@@ -84,7 +84,6 @@ FORMS    +=
 
 RESOURCE_FILES +=\
     $${MNE_DIR}/resources/general/mne_deep/models/trainModel.v2 \
-    $${MNE_DIR}/resources/general/mne_deep/models/examples/ex_deep_one_hidden \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
