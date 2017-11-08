@@ -325,7 +325,7 @@ void EEGoSportsSetupProjectWidget::changeCardinalFile()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change cardinal file",
-                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                "resources/mne_scan/plugins/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL)

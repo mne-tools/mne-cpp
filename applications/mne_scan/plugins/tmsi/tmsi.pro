@@ -123,7 +123,14 @@ FORMS += \
         FormFiles/tmsisetupprojectwidget.ui
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/general/3DLayouts/standard_waveguard128_duke.elc \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/readme.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard.elc \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard8.elc \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard32.elc \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard64.elc \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard128.elc \
+    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard256.elc \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
