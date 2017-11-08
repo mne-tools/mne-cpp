@@ -59,7 +59,7 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace BCIPlugin
+namespace BCIPLUGIN
 {
 
 

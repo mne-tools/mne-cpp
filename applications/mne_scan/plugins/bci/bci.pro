@@ -51,23 +51,21 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lxMeasd \
             -lxDispd \
-            -lmne_xd
+            -lscSharedd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lxMeas \
             -lxDisp \
-            -lmne_x
+            -lscShared
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         bci.cpp \
@@ -85,11 +83,30 @@ HEADERS += \
 FORMS += \
         FormFiles/bcisetup.ui \
         FormFiles/bciabout.ui \
-    FormFiles/bcifeaturewindow.ui
+        FormFiles/bcifeaturewindow.ui
+
+RESOURCE_FILES +=\
+    $${MNE_DIR}/resources/mne_scan/plugins/bci/LDA_linear_boundary_Sensor.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/bci/Pinning_Scheme_Duke_128.txt \
+    $${MNE_DIR}/resources/mne_scan/plugins/bci/readme.txt \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR ~= s,/,\\,g
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE ~= s,/,\\,g
+    TRGTDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 unix:!macx {
     QMAKE_CXXFLAGS += -std=c++0x
