@@ -222,29 +222,42 @@ void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
     const uint iSensorSize = m_iUsedSensors.size();
     if(tSensorData.rows() > iSensorSize)
     {
-        MatrixXf fSmallSensorData(iSensorSize, tSensorData.cols());
+        MatrixXd dSmallSensorData(iSensorSize, tSensorData.cols());
         for(uint i = 0 ; i < iSensorSize; ++i)
         {
             //Set bad channels to zero
             if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
-                fSmallSensorData.row(i).setZero();
+                dSmallSensorData.row(i).setZero();
             } else {
-                fSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]).cast<float>();
+                dSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
             }
         }
-        m_pSensorRtDataWorker->addData(fSmallSensorData);
+        //Set new data into item's data.
+        QVariant data;
+        data.setValue(dSmallSensorData); //@TODO this should use fSmallSensorData
+        this->setData(data, Data3DTreeModelItemRoles::RTData);
+
+        //Add data to worker
+        m_pSensorRtDataWorker->addData(dSmallSensorData.cast<float>());
     }
     else
     {
         //Set bad channels to zero
-        MatrixXf fSmallSensorData = tSensorData.cast<float>();
-        for(uint i = 0 ; i < fSmallSensorData.rows(); ++i)
+        MatrixXd dSmallSensorData = tSensorData;
+        for(uint i = 0 ; i < dSmallSensorData.rows(); ++i)
         {
             if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
-                fSmallSensorData.row(i).setZero();
+                dSmallSensorData.row(i).setZero();
             }
         }
-        m_pSensorRtDataWorker->addData(fSmallSensorData);
+
+        //Set new data into item's data.
+        QVariant data;
+        data.setValue(dSmallSensorData); //@TODO this should use fSmallSensorData
+        this->setData(data, Data3DTreeModelItemRoles::RTData);
+
+        //Add data to worker
+        m_pSensorRtDataWorker->addData(dSmallSensorData.cast<float>());
     }
 }
 

@@ -151,13 +151,13 @@ protected:
 
     QPointer<CustomMesh>                    m_pCustomMesh;
 
-    QPointer<Renderable3DEntity>            m_pMeshDrawEntity;
+    QPointer<Qt3DCore::QEntity>             m_pMeshDrawEntity;
 
     QPointer<Qt3DCore::QEntity>             m_pComputeEntity;
 
     QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;
 
-    QPointer<Qt3DCore::QTransform>          m_pTransform;
+    //QPointer<Qt3DCore::QTransform>          m_pTransform;
 
     QPointer<CshInterpolationMaterial>      m_pMaterial;
 

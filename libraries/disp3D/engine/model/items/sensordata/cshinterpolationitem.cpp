@@ -83,7 +83,7 @@ using namespace Qt3DCore;
 //=============================================================================================================
 
 CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
-    : Abstract3DTreeItem(p3DEntityParent,iType, text)
+    : Abstract3DTreeItem(p3DEntityParent, iType, text)
     , m_pMaterial(new CshInterpolationMaterial)
 {
     initItem();
@@ -97,13 +97,12 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
 {
     m_pMaterial->setWeightMatrix(tInterpolationMatrix);
 
+    //Renderable3DEntity* pRootEntity = new Renderable3DEntity(this);
+
     //Create draw entity if needed
     if(!m_pMeshDrawEntity)
     {
-        m_pMeshDrawEntity = new Renderable3DEntity(this);
-
-        m_pTransform = new Qt3DCore::QTransform;
-        m_pMeshDrawEntity->addComponent(m_pTransform);
+        m_pMeshDrawEntity = new QEntity(this); //@TODO or Renderable3DEntity?
 
         m_pCustomMesh = new CustomMesh;
 
