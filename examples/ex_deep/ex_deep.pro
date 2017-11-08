@@ -82,9 +82,29 @@ HEADERS  +=
 
 FORMS    +=
 
+RESOURCE_FILES +=\
+    $${MNE_DIR}/resources/general/mne_deep/models/trainModel.v2 \
+    $${MNE_DIR}/resources/general/mne_deep/models/examples/ex_deep_one_hidden \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR ~= s,/,\\,g
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE ~= s,/,\\,g
+    TRGTDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
+
+
