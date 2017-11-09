@@ -108,13 +108,12 @@ RESOURCE_FILES +=\
 for(FILE, RESOURCE_FILES) {
     FILEDIR = $$dirname(FILE)
     FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR ~= s,/,\\,g
+    FILEDIR = $$shell_path($${FILEDIR})
     TRGTDIR = $${FILEDIR}
 
     QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
 
-    FILE ~= s,/,\\,g
-    TRGTDIR ~= s,/,\\,g
+    FILE = $$shell_path($${FILE})
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
 }
 
