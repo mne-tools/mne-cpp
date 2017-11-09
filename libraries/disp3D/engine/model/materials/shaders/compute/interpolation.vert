@@ -16,6 +16,8 @@ uniform mat4 mvp; //need for the QCamera and camera controller to work
 uniform float fThresholdX;
 uniform float fThresholdZ;
 
+uniform uint ColormapType;
+
 //FORWARD DECLARATIONS
 float linearSlope(float x, float m, float n);
 vec3 colorMapHot(float x);
@@ -45,7 +47,18 @@ void main()
                 fSample = 0.0;
             }
         }
-        tempColor = colorMapJet(fSample);
+
+        //@TODO Add more colormaps
+        if(ColormapType == 0)
+        {
+            tempColor = colorMapHot(fSample);
+        }
+        else
+        {
+            tempColor = colorMapJet(fSample);
+        }
+
+
     }
 
     color = tempColor;
