@@ -183,6 +183,14 @@ public:
 
     //=========================================================================================================
     /**
+     * This function sets the colormap type
+     *
+     * @param tColormapType                     The new colormap name.
+     */
+    void setColormapType(const QString& tColormapType);
+
+    //=========================================================================================================
+    /**
      * This function returns a pointer to the interpolated signal buffer.
      */
     Qt3DRender::QBuffer *getInterpolatedSignalBuffer();
@@ -251,6 +259,9 @@ private:
     //Lower and upper normalization threshold parameter
     QPointer<Qt3DRender::QParameter>        m_pThresholdXParameter;
     QPointer<Qt3DRender::QParameter>        m_pThresholdZParameter;
+
+    //Colormap type
+    QPointer<Qt3DRender::QParameter>        m_pColormapParameter;
 
     QPointer<Qt3DRender::QCullFace>         m_pCullFace;
 

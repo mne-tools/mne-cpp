@@ -84,6 +84,7 @@ using namespace Qt3DCore;
 
 CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
     : Abstract3DTreeItem(p3DEntityParent, iType, text)
+    , m_bIsDataInit(false)
     , m_pMaterial(new CshInterpolationMaterial)
 {
     initItem();
@@ -95,14 +96,18 @@ CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                    QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
 {
-    m_pMaterial->setWeightMatrix(tInterpolationMatrix);
+    if(m_bIsDataInit == true)
+    {
+       qDebug("CshInterpolationItem::initData data already initialized");
+       return;
+    }
 
-    //Renderable3DEntity* pRootEntity = new Renderable3DEntity(this);
+    m_pMaterial->setWeightMatrix(tInterpolationMatrix);
 
     //Create draw entity if needed
     if(!m_pMeshDrawEntity)
     {
-        m_pMeshDrawEntity = new QEntity(this); //@TODO or Renderable3DEntity?
+        m_pMeshDrawEntity = new QEntity(this);
 
         m_pCustomMesh = new CustomMesh;
 
@@ -162,6 +167,7 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                 matVertColor,
                                 Qt3DRender::QGeometryRenderer::Triangles);
 
+    m_bIsDataInit = true;
 }
 
 
@@ -169,8 +175,7 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
 
 void CshInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 {
-    //@TODO implement this
-    if(m_pMaterial)
+    if(m_pMaterial && m_bIsDataInit)
     {
         m_pMaterial->addSignalData(tSignalVec);
     }
@@ -183,6 +188,14 @@ void CshInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 void CshInterpolationItem::setNormalization(const QVector3D &tVecThresholds)
 {
     m_pMaterial->setNormalization(tVecThresholds);
+}
+
+
+//*************************************************************************************************************
+
+void CshInterpolationItem::setColormapType(const QString &tColormapType)
+{
+    m_pMaterial->setColormapType(tColormapType);
 }
 
 

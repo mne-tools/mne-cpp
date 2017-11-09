@@ -126,9 +126,11 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
                                  const QString &tInterpolationFunction,
                                  Qt3DCore::QEntity* t3DEntityParent)
 {
-    //@TODO implement this
+    if(m_bIsDataInit == true)
+    {
+        qDebug("CshSensorDataTreeItem::init is already initialized");
+    }
 
-    //@TODO check this
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
     if(!m_pSensorRtDataWorker) {
@@ -548,7 +550,13 @@ void CshSensorDataTreeItem::onNewRtData(const VectorXf &sensorData)
 
 void CshSensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
 {
-    //@TODO implement this
+    if(sColormapType.canConvert<QString>())
+    {
+        if(m_pInterpolationItem)
+        {
+            m_pInterpolationItem->setColormapType(sColormapType.toString());
+        }
+    }
 }
 
 

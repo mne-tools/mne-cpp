@@ -112,6 +112,7 @@ CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
     , m_pInterpolatedSignalBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
     , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
+    , m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
     , m_pCullFace(new QCullFace)
 {
     init();
@@ -196,6 +197,19 @@ void CshInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
     m_pThresholdZParameter->setValue(QVariant::fromValue(tVecThresholds.z()));
 }
 
+void CshInterpolationMaterial::setColormapType(const QString &tColormapType)
+{
+    if(tColormapType == "Hot") {
+        m_pColormapParameter->setValue(0);
+    } else if(tColormapType == "Hot Negative 1") {
+        m_pColormapParameter->setValue(1);
+    } else if(tColormapType == "Hot Negative 2") {
+        m_pColormapParameter->setValue(2);
+    } else if(tColormapType == "Jet") {
+        m_pColormapParameter->setValue(3);
+    }
+}
+
 
 //*************************************************************************************************************
 
@@ -272,6 +286,9 @@ void CshInterpolationMaterial::init()
     //Add Threshold parameter
     m_pDrawRenderPass->addParameter(m_pThresholdXParameter);
     m_pDrawRenderPass->addParameter(m_pThresholdZParameter);
+
+    //Add ColormapType
+    m_pDrawRenderPass->addParameter(m_pColormapParameter);
 
     if(m_bUseAlpha)
     {

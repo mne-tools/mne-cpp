@@ -140,6 +140,14 @@ public:
     */
     void setNormalization(const QVector3D& tVecThresholds);
 
+    //=========================================================================================================
+    /**
+     * This function sets the colormap type
+     *
+     * @param tColormapType                     The new colormap name.
+     */
+    void setColormapType(const QString& tColormapType);
+
 protected:
 
     //=========================================================================================================
@@ -148,6 +156,7 @@ protected:
      */
     virtual void initItem() override;
 
+    bool                                    m_bIsDataInit;
 
     QPointer<CustomMesh>                    m_pCustomMesh;
 
@@ -157,12 +166,7 @@ protected:
 
     QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;
 
-    //QPointer<Qt3DCore::QTransform>          m_pTransform;
-
     QPointer<CshInterpolationMaterial>      m_pMaterial;
-
-    //@TODO isInit bool
-
 
 };
 
