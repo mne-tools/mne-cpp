@@ -192,10 +192,14 @@ macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
-    # Copy Resource folder to app bundle
-    brrc.path = Contents/MacOS
-    brrc.files = $${DESTDIR}/Resources
-    QMAKE_BUNDLE_DATA += brrc
+    # Copy resources to app bundle
+    sgrc.path = Contents/MacOS/resources/general/selectionGroups
+    sgrc.files = $${DESTDIR}/resources/general/selectionGroups
+    QMAKE_BUNDLE_DATA += sgrc
+
+    loutrc.path = Contents/MacOS/resources/general/2DLayouts
+    loutrc.files = $${DESTDIR}/resources/general/2DLayouts
+    QMAKE_BUNDLE_DATA += loutrc
 
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
