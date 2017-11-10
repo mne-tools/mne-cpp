@@ -76,7 +76,7 @@ HEADERS += \
     mne_show_fiff_settings.h
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/general/explanations/fiff_explanations.txt \
+    $${ROOT_DIR}/resources/general/explanations/fiff_explanations.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

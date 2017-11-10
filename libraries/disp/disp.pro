@@ -185,26 +185,26 @@ qtHaveModule(charts) {
 }
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
-    $${MNE_DIR}/resources/general/default_filters/BP_1Hz_70Hz_Fs1kHz.txt \
-    $${MNE_DIR}/resources/general/default_filters/filter_default_template.txt \
-    $${MNE_DIR}/resources/general/default_filters/NOTCH_50Hz_Fs1kHz.txt \
-    $${MNE_DIR}/resources/general/default_filters/NOTCH_60Hz_Fs1kHz.txt \
-    $${MNE_DIR}/resources/general/2DLayouts/babymeg-mag-inner-layer.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/babymeg-mag-outer-layer.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/babymeg-mag-ref.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/CTF-275.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/magnesWH3600.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/standard_waveguard64_duke.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-all.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-grad.lout \
-    $${MNE_DIR}/resources/general/2DLayouts/Vectorview-mag.lout \
-    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw.sel \
-    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_babyMEG.sel \
-    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_CTF_275.sel \
-    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_Magnes_3600WH.sel \
-    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_vv.sel \
-    $${MNE_DIR}/resources/general/selectionGroups/mne_browse_raw_vv_new.sel \
+    $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_70Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/default_filters/filter_default_template.txt \
+    $${ROOT_DIR}/resources/general/default_filters/NOTCH_50Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/default_filters/NOTCH_60Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-inner-layer.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-outer-layer.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-ref.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/CTF-275.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/magnesWH3600.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/standard_waveguard64_duke.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-all.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-grad.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-mag.lout \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_babyMEG.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_CTF_275.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_Magnes_3600WH.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv_new.sel \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

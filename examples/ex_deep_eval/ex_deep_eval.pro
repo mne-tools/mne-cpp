@@ -81,7 +81,7 @@ HEADERS  +=
 FORMS    +=
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/general/mne_deep/models/examples/ex_deep_one_hidden.v2 \
+    $${ROOT_DIR}/resources/general/mne_deep/models/examples/ex_deep_one_hidden.v2 \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

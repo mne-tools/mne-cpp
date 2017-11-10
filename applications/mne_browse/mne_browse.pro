@@ -194,11 +194,11 @@ macx {
 
     # Copy resources to app bundle
     sgrc.path = Contents/MacOS/resources/general/selectionGroups
-    sgrc.files = $${MNE_DIR}/resources/general/selectionGroups
+    sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
     QMAKE_BUNDLE_DATA += sgrc
 
     loutrc.path = Contents/MacOS/resources/general/2DLayouts
-    loutrc.files = $${MNE_DIR}/resources/general/2DLayouts
+    loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
     QMAKE_BUNDLE_DATA += loutrc
 
 #    isEmpty(TARGET_EXT) {

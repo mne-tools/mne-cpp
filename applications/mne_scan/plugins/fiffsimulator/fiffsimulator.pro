@@ -95,8 +95,8 @@ FORMS += \
     FormFiles/fiffsimulatorsetup.ui
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/FiffSimulator/inputFile.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml \
+    $${ROOT_DIR}/resources/mne_scan/plugins/FiffSimulator/inputFile.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

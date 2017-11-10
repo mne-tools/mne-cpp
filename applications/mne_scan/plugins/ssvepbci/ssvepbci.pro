@@ -100,11 +100,11 @@ FORMS += \
         FormFiles/ssvepbciconfigurationwidget.ui \
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/AccuracyResults.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/BCIDebugFile.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/beep.wav \
-    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_128.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_Dry_64.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/AccuracyResults.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/BCIDebugFile.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/beep.wav \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_128.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_Dry_64.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

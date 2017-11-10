@@ -87,7 +87,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 OTHER_FILES += fiffsimulator.json \
 
-RESOURCE_FILES += $${MNE_DIR}/resources/mne_rt_server_plugins/FiffSimulation.cfg
+RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/FiffSimulation.cfg
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

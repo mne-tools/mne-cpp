@@ -124,5 +124,5 @@ isEmpty( MNE_BINARY_DIR ) {
 }
 
 # repository dir
-MNE_DIR = $${PWD}
+ROOT_DIR = $${PWD}
 

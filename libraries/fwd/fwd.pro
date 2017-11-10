@@ -123,9 +123,9 @@ HEADERS +=\
     fwd_types.h
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/general/surf2bem/icos.fif \
-    $${MNE_DIR}/resources/general/coilDefinitions/coil_def.dat \
-    $${MNE_DIR}/resources/general/coilDefinitions/coil_def_Elekta.dat \
+    $${ROOT_DIR}/resources/general/surf2bem/icos.fif \
+    $${ROOT_DIR}/resources/general/coilDefinitions/coil_def.dat \
+    $${ROOT_DIR}/resources/general/coilDefinitions/coil_def_Elekta.dat \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

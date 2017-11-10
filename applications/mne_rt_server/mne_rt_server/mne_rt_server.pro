@@ -93,8 +93,8 @@ HEADERS += \
     mne_rt_commands.h
 
 RESOURCE_FILES += \
-    $${MNE_DIR}/resources/mne_rt_server_plugins/plugin.cfg \
-    $${MNE_DIR}/resources/mne_rt_server_plugins/README \
+    $${ROOT_DIR}/resources/mne_rt_server_plugins/plugin.cfg \
+    $${ROOT_DIR}/resources/mne_rt_server_plugins/README \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
