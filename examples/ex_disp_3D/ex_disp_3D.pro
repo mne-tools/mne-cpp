@@ -82,7 +82,7 @@ SOURCES += \
 HEADERS += \
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
+    $${ROOT_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

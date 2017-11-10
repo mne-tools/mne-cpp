@@ -83,7 +83,7 @@ HEADERS  +=
 FORMS    +=
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/general/mne_deep/models/trainModel.v2 \
+    $${ROOT_DIR}/resources/general/mne_deep/models/trainModel.v2 \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

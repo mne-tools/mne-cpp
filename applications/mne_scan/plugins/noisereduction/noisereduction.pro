@@ -97,12 +97,12 @@ FORMS += \
         FormFiles/noisereductionoptionswidget.ui
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Duke64Dry.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Duke64Dry.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

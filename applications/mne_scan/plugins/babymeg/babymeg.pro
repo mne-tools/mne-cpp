@@ -113,9 +113,9 @@ FORMS += \
     FormFiles/babymegprojectdialog.ui \
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/babymeg/both.bad \
-    $${MNE_DIR}/resources/mne_scan/plugins/babymeg/header.fif \
-    $${MNE_DIR}/resources/mne_scan/plugins/babymeg/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/both.bad \
+    $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/header.fif \
+    $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/readme.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

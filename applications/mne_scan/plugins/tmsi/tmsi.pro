@@ -123,14 +123,14 @@ FORMS += \
         FormFiles/tmsisetupprojectwidget.ui
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/readme.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc \
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard.elc \
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard8.elc \
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard32.elc \
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard64.elc \
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard128.elc \
-    $${MNE_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard256.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard8.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard32.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard64.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard128.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard256.elc \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

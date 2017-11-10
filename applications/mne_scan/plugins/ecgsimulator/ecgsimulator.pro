@@ -84,11 +84,11 @@ FORMS += \
         FormFiles/ecgabout.ui
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/ECGSimulator/readme.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_I_256_s30661.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_II_256_s30661.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_III_256_s30661.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ecgdata.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_I_256_s30661.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_II_256_s30661.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_III_256_s30661.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ecgdata.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
