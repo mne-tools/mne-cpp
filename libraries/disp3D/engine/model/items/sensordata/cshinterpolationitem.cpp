@@ -160,6 +160,7 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
         matVertColor(i,2) = baseColor.blueF();
     }
 
+    //@TODO dont give the customMesh a base color(wasted)
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
                                 tMneBemSurface.nn,
@@ -168,6 +169,19 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                 Qt3DRender::QGeometryRenderer::Triangles);
 
     m_bIsDataInit = true;
+}
+
+
+//*************************************************************************************************************
+
+void CshInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
+{
+    if(m_bIsDataInit == false)
+    {
+        qDebug("CshInterpolationItem::setWeightMatrix item data is not initialized!");
+        return;
+    }
+    m_pMaterial->setWeightMatrix(tInterpolationMatrix);
 }
 
 

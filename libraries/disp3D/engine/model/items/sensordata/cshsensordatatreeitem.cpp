@@ -141,11 +141,10 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
             this, &CshSensorDataTreeItem::onNewRtData);
 
     // map passed sensor type string to fiff constant
-    fiff_int_t sensorTypeFiffConstant;
     if (tSensorType.toStdString() == std::string("MEG")) {
-        sensorTypeFiffConstant = FIFFV_MEG_CH;
+        m_iSensorType = FIFFV_MEG_CH;
     } else if (tSensorType.toStdString() == std::string("EEG")) {
-        sensorTypeFiffConstant = FIFFV_EEG_CH;
+        m_iSensorType = FIFFV_EEG_CH;
     } else {
         qDebug() << "SensorDataTreeItem::init - unknown sensor type. Returning ...";
         return;
@@ -157,7 +156,7 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     int iCounter = 0;
     for(const FiffChInfo &info : tFiffInfo.chs) {
         //Only take EEG with V as unit or MEG magnetometers with T as unit
-        if(info.kind == sensorTypeFiffConstant && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
+        if(info.kind == m_iSensorType && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
             vecSensorPos.push_back(info.chpos.r0);
 
             //save the number of the sensor
@@ -176,23 +175,29 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     //Set interpolation function
     setInterpolationFunction(tInterpolationFunction);
 
+    //Set surface data
+    m_bemSurface = tBemSurface;
+    m_fiffInfo = tFiffInfo;
+
     //sensor projecting
-    QSharedPointer<QVector<qint32>> pMappedSubSet = GeometryInfo::projectSensors(tBemSurface, vecSensorPos);
+    m_pVecMappedSubset = GeometryInfo::projectSensors(tBemSurface, vecSensorPos);
+
+    //QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = calculateWeigtMatrix();
 
     //SCDC with cancel distance
-    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(tBemSurface, pMappedSubSet, tCancelDist);
+    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(tBemSurface, m_pVecMappedSubset, tCancelDist);
 
     //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(pDistanceMatrix, tFiffInfo, sensorTypeFiffConstant);
+    GeometryInfo::filterBadChannels(pDistanceMatrix, tFiffInfo, m_iSensorType);
 
     dFuncPtr interpolationFunc = transformInterpolationFromStrToFunc(tInterpolationFunction);
     //create weight matrix
-    QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = Interpolation::createInterpolationMat(pMappedSubSet,
+    QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = Interpolation::createInterpolationMat(m_pVecMappedSubset,
                                                                                pDistanceMatrix,
                                                                                interpolationFunc,
                                                                                tCancelDist,
                                                                                tFiffInfo,
-                                                                               sensorTypeFiffConstant);
+                                                                               m_iSensorType);
 
     //create new Tree Item
     if(!m_pInterpolationItem)
@@ -518,6 +523,32 @@ void CshSensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
+QSharedPointer<SparseMatrix<double>> CshSensorDataTreeItem::calculateWeigtMatrix()
+{
+    //SCDC with cancel distance
+    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(m_bemSurface,
+                                                              m_pVecMappedSubset,
+                                                              m_dCancelDistance);
+
+    //filtering of bad channels out of the distance table
+    GeometryInfo::filterBadChannels(pDistanceMatrix,
+                                    m_fiffInfo,
+                                    m_iSensorType);
+
+
+    //create weight matrix
+    return  Interpolation::createInterpolationMat(m_pVecMappedSubset,
+                                                   pDistanceMatrix,
+                                                   m_interpolationFunction,
+                                                   m_dCancelDistance,
+                                                   m_fiffInfo,
+                                                   m_iSensorType);
+
+}
+
+
+//*************************************************************************************************************
+
 void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &checkState)
 {
     if(m_pSensorRtDataWorker) {
@@ -616,7 +647,15 @@ void CshSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
 
 void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
-    //@TODO implement this
+    if(dCancelDist.canConvert<double>())
+    {
+        m_dCancelDistance = dCancelDist.toDouble();
+
+        if(m_pInterpolationItem != nullptr && m_bIsDataInit == true)
+        {
+            m_pInterpolationItem->setWeightMatrix(calculateWeigtMatrix());
+        }
+    }
 }
 
 
@@ -625,6 +664,10 @@ void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 void CshSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
     //@TODO implement this
+    if(sInterpolationFunction.canConvert<QString>())
+    {
+        m_interpolationFunction = transformInterpolationFromStrToFunc(sInterpolationFunction.toString());
+    }
 }
 
 

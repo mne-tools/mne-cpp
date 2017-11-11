@@ -46,6 +46,7 @@
 #include "../common/abstracttreeitem.h"
 #include "../measurement/measurementtreeitem.h"
 #include "../../workers/rtSensorData/rtcshsensordataworker.h"
+#include <mne/mne_bem_surface.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,9 +67,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB{
-    class MNEBemSurface;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -238,6 +236,13 @@ protected:
 
     //=========================================================================================================
     /**
+     * Calculates a weight matrix which is based on surfaced constrained distances.
+     * Surface data member needs to be initialized first
+     */
+    QSharedPointer<SparseMatrix<double> > calculateWeigtMatrix();
+
+    //=========================================================================================================
+    /**
     * This function gets called whenever the check/activation state of the rt data worker changed.
     *
     * @param[in] checkState                 The check state of the worker.
@@ -309,24 +314,24 @@ protected:
     void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
 
 
-    bool                             m_bIsDataInit;                     /**< The init flag. */
 
-    QPointer<RtCshSensorDataWorker>  m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
-    QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
-    QVector<int>                     m_iSensorsBad;                     /**< Store bad channel indexes.*/
+    bool                                    m_bIsDataInit;                    /**< The init flag. */
 
-    QPointer<CshInterpolationItem>   m_pInterpolationItem;
+    QPointer<RtCshSensorDataWorker>         m_pSensorRtDataWorker;            /**< The source data worker. This worker streams the rt data to this item.*/
+    QVector<int>                            m_iUsedSensors;                   /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
+    QVector<int>                            m_iSensorsBad;                    /**< Store bad channel indexes.*/
+
+    QPointer<CshInterpolationItem>          m_pInterpolationItem;
+
+    //Surface data
+    int                                     m_iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
+    double                                  m_dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
+    QSharedPointer<QVector<qint32>>         m_pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+    MNELIB::MNEBemSurface                   m_bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
+    FIFFLIB::FiffInfo                       m_fiffInfo;                         /**< Contains all information about the sensors. */
+    double (*m_interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */
 
     //@TODO interpolation function and canceldistance members?
-
-signals:
-//    //=========================================================================================================
-//    /**
-//    * Emit this signal whenever you want to provide newly generated sensor values from the stream rt data.
-//    *
-//    * @param[in] sensorValues                 The sensorValues for the compute shader interpolation
-//    */
-//    void rtCshSensorValuesChanged(const QVariant &sensorValues);
 
 };
 
