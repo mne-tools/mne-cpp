@@ -135,6 +135,7 @@ void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatri
     m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
     m_pRowsParameter->setValue(static_cast<uint>(tInterpolationMatrix->rows()));
 
+    //@TODO cols and output only need to be set ones
     //Set buffer
     m_pWeightMatBuffer->setData(buildWeightMatrixBuffer(tInterpolationMatrix));
     //Set weight matrix parameter

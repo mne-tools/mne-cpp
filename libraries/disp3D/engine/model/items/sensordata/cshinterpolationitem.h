@@ -126,6 +126,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the new weight matrix for the interpolation.
+     *
+     * @param tInterpolationMatrix  The weight matrix for interpolation on the bem surface.
+     */
+    void setWeightMatrix(QSharedPointer<SparseMatrix<double>> tInterpolationMatrix);
+
+    //=========================================================================================================
+    /**
     * Add a new vector with signal data form the sensors.
     *
     * @param tSignalVec                Vector with one float value for each sensor.
