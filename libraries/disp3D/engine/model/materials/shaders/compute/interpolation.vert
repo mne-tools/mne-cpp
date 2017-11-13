@@ -7,7 +7,7 @@ in float InterpolatedSignal;
 
 out vec3 worldPosition;
 out vec3 worldNormal;
-out vec3 color;
+out vec4 color;
 
 uniform mat4 modelMatrix;
 uniform mat3 modelNormalMatrix;
@@ -61,7 +61,15 @@ void main()
 
     }
 
-    color = tempColor;
+
+    //Set output color
+    color = vec4(tempColor, 1.0);
+
+    //dont display verts with no activity
+    if(fSample <= fThresholdX)
+    {
+        color.a = 0.0;
+    }
 }
 
 
