@@ -122,6 +122,29 @@ FORMS += \
         FormFiles/tmsiimpedancewidget.ui \
         FormFiles/tmsisetupprojectwidget.ui
 
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard8.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard32.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard64.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard128.elc \
+    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard256.elc \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR = $$shell_path($${FILEDIR})
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE = $$shell_path($${FILE})
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}

@@ -162,7 +162,7 @@ void TMSIImpedanceWidget::initGraphicScene()
     QList<QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
-    QString sElcFilePath = QString("./mne_scan_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
+    QString sElcFilePath = QString("./resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard128.elc");
 
     if(!asaObject->readAsaElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
     {
@@ -269,7 +269,7 @@ void TMSIImpedanceWidget::loadLayout()
 {
     QString sElcFilePath = QFileDialog::getOpenFileName(this,
                                                         tr("Open Layout"),
-                                                        "./mne_scan_plugins/resources/tmsi/loc_files/",
+                                                        "./resources/mne_scan/plugins/tmsi/loc_files/",
                                                         tr("ELC layout file (*.elc)"));
 
     // Load standard layout file

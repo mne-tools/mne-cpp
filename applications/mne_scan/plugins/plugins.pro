@@ -68,7 +68,7 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         averaging \
         covariance \
         noise \
-        #bci \
+        # bci \
         rtsss \
         rthpi \
         noisereduction \

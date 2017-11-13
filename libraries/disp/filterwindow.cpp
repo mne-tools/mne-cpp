@@ -381,7 +381,7 @@ void FilterWindow::initMVC()
 
 void FilterWindow::initFilters()
 {
-    //Init filter data model with all default filters located in the resource directory
+    //Init filter data model with all default filters located in the resource/general directory
 //    m_lDefaultFilters << "NOTCH_60Hz_Fs1kHz"
 //                   << "NOTCH_50Hz_Fs1kHz"
 //                   << "BP_1Hz_70Hz_Fs1kHz"
@@ -391,7 +391,7 @@ void FilterWindow::initFilters()
         FilterData tmpFilter;
         QString fileName = m_lDefaultFilters.at(i);
         fileName.append(".txt");
-        QString path = QCoreApplication::applicationDirPath() + fileName.prepend("/mne_scan_libs/scDisp/default_filters/");
+        QString path = QCoreApplication::applicationDirPath() + fileName.prepend("/resources/general/default_filters/");
 
         if(FilterIO::readFilter(path, tmpFilter))
             m_pFilterDataModel->addFilter(tmpFilter);
