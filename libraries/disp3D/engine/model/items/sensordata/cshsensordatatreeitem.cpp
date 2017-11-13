@@ -667,6 +667,11 @@ void CshSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
     if(sInterpolationFunction.canConvert<QString>())
     {
         m_interpolationFunction = transformInterpolationFromStrToFunc(sInterpolationFunction.toString());
+
+        if(m_pInterpolationItem && m_bIsDataInit == true)
+        {
+            m_pInterpolationItem->setWeightMatrix(calculateWeigtMatrix());
+        }
     }
 }
 
