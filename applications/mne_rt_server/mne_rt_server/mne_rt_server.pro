@@ -92,6 +92,23 @@ HEADERS += \
     commandthread.h \
     mne_rt_commands.h
 
+RESOURCE_FILES += \
+    $${ROOT_DIR}/resources/mne_rt_server_plugins/plugin.cfg \
+    $${ROOT_DIR}/resources/mne_rt_server_plugins/README \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR = $$shell_path($${FILEDIR})
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE = $$shell_path($${FILE})
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
@@ -109,7 +126,7 @@ win32 {
 
     #  # Uncomment the following line to help debug the deploy command when running qmake
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
 unix:!macx {
     # === Unix ===

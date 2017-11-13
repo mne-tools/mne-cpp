@@ -157,7 +157,7 @@ void GUSBAmpSetupProjectWidget::changeOutputFile()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save to fif file",
-                "mne_x_plugins/resources/gusbamp/EEG_data_001_raw.fif",
+                "resources/mne_scan/plugins/gusbamp/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
     if(path==NULL){
@@ -175,7 +175,7 @@ void GUSBAmpSetupProjectWidget::changeCap()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
-                                                "mne_x_plugins/resources/gusbamp/loc_files",
+                                                "resources/mne_scan/plugins/gusbamp/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL){

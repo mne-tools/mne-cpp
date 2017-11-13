@@ -74,7 +74,7 @@ using namespace std;
 //=============================================================================================================
 
 SsvepBci::SsvepBci()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/ssvepbci/")
+: m_qStringResourcePath(qApp->applicationDirPath()+"resources/mne_scan/plugins/ssvepBCI/")
 , m_bProcessData(false)
 , m_dAlpha(0.25)
 , m_iNumberOfHarmonics(2)
