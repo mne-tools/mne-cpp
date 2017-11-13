@@ -160,7 +160,6 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
         matVertColor(i,2) = baseColor.blueF();
     }
 
-    //@TODO dont give the customMesh a base color(wasted)
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
                                 tMneBemSurface.nn,

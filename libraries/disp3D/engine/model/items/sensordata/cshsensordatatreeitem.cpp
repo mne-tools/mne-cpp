@@ -422,7 +422,23 @@ void CshSensorDataTreeItem::setSFreq(const double dSFreq)
 
 void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 {
-    //@TODO implement this
+    //Create bad channel idx list
+    m_iSensorsBad.clear();
+    for(const QString &bad : info.bads)
+    {
+        m_iSensorsBad.push_back(info.ch_names.indexOf(bad));
+    }
+
+    if(!m_bIsDataInit)
+    {
+        return;
+    }
+
+
+    m_fiffInfo = info;
+
+    //Update weight matrix
+    m_pInterpolationItem->setWeightMatrix(calculateWeigtMatrix());
 }
 
 
@@ -663,7 +679,6 @@ void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 
 void CshSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
-    //@TODO implement this
     if(sInterpolationFunction.canConvert<QString>())
     {
         m_interpolationFunction = transformInterpolationFromStrToFunc(sInterpolationFunction.toString());
