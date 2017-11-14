@@ -141,14 +141,15 @@ public:
 
     //=========================================================================================================
     /**
-    * default destructor.
+    * Default destructor.
     */
     ~CshInterpolationMaterial();
 
     //=========================================================================================================
     /**
-     * @brief setWeightMatrix
-     * @param pInterpolationMatrix
+     * Set the new weight matrix for interpolation.
+     *
+     * @param pInterpolationMatrix      The weight matrix.
      */
     void setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
 
@@ -207,10 +208,12 @@ private:
      */
     void init();
 
+    //=========================================================================================================
     /**
-     * @brief buildWeightMatrixBuffer
-     * @param tInterpolationMatrix
-     * @return
+     * Build the content of the weight matrix buffer.
+     *
+     * @param tInterpolationMatrix      The weight matrix.
+     * @return                          Weight matrix is byte array form.
      */
     QByteArray buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
 
