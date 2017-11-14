@@ -56,6 +56,9 @@
 #include <Qt3DRender/QShaderProgram>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <Qt3DRender/QCullFace>
+#include <Qt3DRender/QBlendEquation>
+#include <Qt3DRender/QBlendEquationArguments>
+#include <Qt3DRender/QNoDepthMask>
 #include <QUrl>
 #include <QColor>
 #include <QVector3D>
@@ -114,6 +117,9 @@ CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
     , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
     , m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
     , m_pCullFace(new QCullFace)
+    , m_pNoDepthMask(new QNoDepthMask())
+    , m_pBlendState(new QBlendEquationArguments())
+    , m_pBlendEquation(new QBlendEquation())
 {
     init();
 }
@@ -298,6 +304,15 @@ void CshInterpolationMaterial::init()
     if(m_bUseAlpha)
     {
         //@TODO like phongalpha
+        m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
+        m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
+        m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
+
+        m_pDrawRenderPass->addRenderState(m_pBlendEquation);
+
+        m_pDrawRenderPass->addRenderState(m_pNoDepthMask);
+
+        m_pDrawRenderPass->addRenderState(m_pBlendState);
     }
 
     //Add Face Culling
