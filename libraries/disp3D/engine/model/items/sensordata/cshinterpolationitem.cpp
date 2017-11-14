@@ -115,11 +115,11 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
         QAttribute *pInterpolatedSignalAttrib = new QAttribute;
         pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
         pInterpolatedSignalAttrib->setDataType(Qt3DRender::QAttribute::Float);
-        pInterpolatedSignalAttrib->setVertexSize(1);
+        pInterpolatedSignalAttrib->setVertexSize(4);
         pInterpolatedSignalAttrib->setByteOffset(0);
-        pInterpolatedSignalAttrib->setByteStride(1 * sizeof(float));
-        pInterpolatedSignalAttrib->setName(QStringLiteral("InterpolatedSignal"));
-        pInterpolatedSignalAttrib->setBuffer(m_pMaterial->getInterpolatedSignalBuffer());
+        pInterpolatedSignalAttrib->setByteStride(4 * sizeof(float));
+        pInterpolatedSignalAttrib->setName(QStringLiteral("OutputColor"));
+        pInterpolatedSignalAttrib->setBuffer(m_pMaterial->getOutputColorBuffer());
 
         //add interpolated signal Attribute
         m_pCustomMesh->addAttribute(pInterpolatedSignalAttrib);
