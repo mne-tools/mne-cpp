@@ -40,6 +40,8 @@ layout (std430, binding = 2) buffer InputVec
 //FORWARD DECLARATIONS
 float linearSlope(float x, float m, float n);
 vec3 colorMapHot(float x);
+vec3 colorMapHotNeg1(float x);
+vec3 colorMapHotNeg2(float x);
 vec3 colorMapJet(float x);
 
 void main(void)
@@ -76,6 +78,14 @@ void main(void)
         {
             outputColor[globalId] = vec4(colorMapHot(fSample), 1.0);
         }
+        else if (ColormapType == 1)
+        {
+            outputColor[globalId] = vec4(colorMapHotNeg1(fSample), 1.0);
+        }
+        else if (ColormapType == 2)
+        {
+            outputColor[globalId] = vec4(colorMapHotNeg2(fSample), 1.0);
+        }
         else
         {
             outputColor[globalId] = vec4(colorMapJet(fSample), 1.0);
@@ -103,21 +113,15 @@ float linearSlope(float x, float m, float n)
 //color maps
 vec3 colorMapJet(float x)
 {
-    vec3 outColor;
+    vec3 outColor = vec3(0.0, 0.0, 0.0);
 
     if(x < 0.125)
     {
-        //red
-        outColor.x = 0.0;
-        //green
-        outColor.y = 0.0;
         //blue
         outColor.z = linearSlope(x, 4.0, 0.5);
     }
     else if(x >= 0.125 && x < 0.375)
     {
-        //red
-        outColor.x = 0.0;
         //green
         outColor.y = linearSlope(x, 4.0, -0.5);
         //blue
@@ -138,17 +142,11 @@ vec3 colorMapJet(float x)
         outColor.x = 1.0;
         //green
         outColor.y = linearSlope(x, -4.0, 3.5);
-        //blue
-        outColor.z = 0.0;
     }
     else
     {
         //red
         outColor.x = linearSlope(x, -4.0, 4.5);
-        //green
-        outColor.y = 0.0;
-        //blue
-        outColor.z = 0.0;
     }
 
     return outColor;
@@ -159,15 +157,12 @@ vec3 colorMapJet(float x)
 
 vec3 colorMapHot(float x)
 {
-    vec3 outColor;
+    vec3 outColor = vec3(0.0, 0.0, 0.0);
+
     if(x < 0.375)
     {
         //red
         outColor.x = linearSlope(x, 2.5621, 0.0392);
-        //green
-        outColor.y = 0.0;
-        //blue
-        outColor.z = 0.0;
     }
     else if(x >= 0.375 && x < 0.75)
     {
@@ -175,8 +170,6 @@ vec3 colorMapHot(float x)
         outColor.x = 1.0;
         //green
         outColor.y = linearSlope(x, 2.6667, -1.0);
-        //blue
-        outColor.z = 0.0;
     }
     else
     {
@@ -186,6 +179,74 @@ vec3 colorMapHot(float x)
         outColor.y = 1.0;
         //blue
         outColor.z = linearSlope(x,4.0,-3.0);
+    }
+
+    return outColor;
+}
+
+
+//*************************************************************************
+
+vec3 colorMapHotNeg1(float x)
+{
+    vec3 outColor = vec3(0.0, 0.0, 0.0);
+
+    if(x >= 0.2188 && x < 0.5781)
+    {
+        //red
+        outColor.x = linearSlope(x, 2.7832, -0.6090);
+    }
+    else if( x >= 0.5781 && x < 0.8125)
+    {
+        //red
+        outColor.x = 1.0;
+        //green
+        outColor.y = linearSlope(x, 4.2662, -2.4663);
+    }
+    else if( x >= 0.8125)
+    {
+        //red
+        outColor.x = 1.0;
+        //green
+        outColor.y = 1.0;
+        //blue
+        outColor.z = linearSlope(x,5.3333,-4.3333);
+    }
+
+    return outColor;
+}
+
+
+//*************************************************************************
+
+vec3 colorMapHotNeg2(float x)
+{
+    vec3 outColor = vec3(0.0, 0.0, 0.0);
+
+    if( x >= 0.5625 && x < 0.8438)
+    {
+        //red
+        outColor.x = linearSlope(x, 3.5549, -1.9996);
+        //green
+        outColor.y = 0.0;
+        //blue
+        outColor.z = 0.0;
+    }
+    else if(x >= 0.8438 && x < 0.9531)
+    {
+        //red
+        outColor.x = 1.0;
+        //green
+        outColor.y = linearSlope(x, 9.1491, -7.72);
+    }
+    else if( x >= 0.9531)
+    {
+        //red
+        outColor.x = 1.0;
+        //green
+        outColor.y = 1.0;
+        //blue
+        outColor.z = linearSlope(x,21.3220,-20.3220);
     }
 
     return outColor;
