@@ -108,8 +108,8 @@ CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
     , m_pRowsParameter(new QParameter)
     , m_pWeightMatParameter(new QParameter)
     , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
-    , m_pInterpolatedSignalParameter(new QParameter)
-    , m_pInterpolatedSignalBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+    , m_pOutputColorParameter(new QParameter)
+    , m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
     , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
     , m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
@@ -131,6 +131,8 @@ CshInterpolationMaterial::~CshInterpolationMaterial()
 
 void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
 {
+    //@TODO dont set cols and rows
+
     //Set Rows and Cols
     m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
     m_pRowsParameter->setValue(static_cast<uint>(tInterpolationMatrix->rows()));
@@ -141,8 +143,8 @@ void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatri
     m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
 
     //Set output buffer
-    m_pInterpolatedSignalBuffer->setData(buildZeroBuffer(tInterpolationMatrix->rows()));
-    m_pInterpolatedSignalParameter->setValue(QVariant::fromValue(m_pInterpolatedSignalBuffer.data()));
+    m_pOutputColorBuffer->setData(buildZeroBuffer(4 * tInterpolationMatrix->rows()));
+    m_pOutputColorParameter->setValue(QVariant::fromValue(m_pOutputColorBuffer.data()));
 }
 
 
@@ -197,6 +199,9 @@ void CshInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
     m_pThresholdZParameter->setValue(QVariant::fromValue(tVecThresholds.z()));
 }
 
+
+//*************************************************************************************************************
+
 void CshInterpolationMaterial::setColormapType(const QString &tColormapType)
 {
     if(tColormapType == "Hot") {
@@ -213,9 +218,9 @@ void CshInterpolationMaterial::setColormapType(const QString &tColormapType)
 
 //*************************************************************************************************************
 
-Qt3DRender::QBuffer * CshInterpolationMaterial::getInterpolatedSignalBuffer()
+Qt3DRender::QBuffer * CshInterpolationMaterial::getOutputColorBuffer()
 {
-    return m_pInterpolatedSignalBuffer.data();
+    return m_pOutputColorBuffer.data();
 }
 
 
@@ -254,9 +259,9 @@ void CshInterpolationMaterial::init()
     m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
 
     //Set default output
-    m_pInterpolatedSignalBuffer->setData(buildZeroBuffer(1));
-    m_pInterpolatedSignalParameter->setName(QStringLiteral("InterpolatedSignal"));
-    m_pInterpolatedSignalParameter->setValue(QVariant::fromValue(m_pInterpolatedSignalBuffer.data()));
+    m_pOutputColorBuffer->setData(buildZeroBuffer(4));
+    m_pOutputColorParameter->setName(QStringLiteral("OutputColor"));
+    m_pOutputColorParameter->setValue(QVariant::fromValue(m_pOutputColorBuffer.data()));
 
     //Set default input
     m_pSignalDataBuffer->setData(buildZeroBuffer(1));
@@ -266,9 +271,16 @@ void CshInterpolationMaterial::init()
     //Add compute Parameter
     m_pComputeRenderPass->addParameter(m_pColsParameter);
     m_pComputeRenderPass->addParameter(m_pRowsParameter);
-    m_pComputeRenderPass->addParameter(m_pInterpolatedSignalParameter);
+    m_pComputeRenderPass->addParameter(m_pOutputColorParameter);
     m_pComputeRenderPass->addParameter(m_pWeightMatParameter);
     m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
+
+    //Add Threshold parameter
+    m_pComputeRenderPass->addParameter(m_pThresholdXParameter);
+    m_pComputeRenderPass->addParameter(m_pThresholdZParameter);
+
+    //Add ColormapType
+    m_pComputeRenderPass->addParameter(m_pColormapParameter);
 
     //Draw part
     //Set shader
@@ -282,13 +294,6 @@ void CshInterpolationMaterial::init()
     m_pDrawRenderPass->addParameter(m_pSpecularParameter);
     m_pDrawRenderPass->addParameter(m_pShininessParameter);
     m_pDrawRenderPass->addParameter(m_pAlphaParameter);
-
-    //Add Threshold parameter
-    m_pDrawRenderPass->addParameter(m_pThresholdXParameter);
-    m_pDrawRenderPass->addParameter(m_pThresholdZParameter);
-
-    //Add ColormapType
-    m_pDrawRenderPass->addParameter(m_pColormapParameter);
 
     if(m_bUseAlpha)
     {

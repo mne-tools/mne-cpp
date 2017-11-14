@@ -191,9 +191,9 @@ public:
 
     //=========================================================================================================
     /**
-     * This function returns a pointer to the interpolated signal buffer.
+     * This function returns a pointer to the output color buffer.
      */
-    Qt3DRender::QBuffer *getInterpolatedSignalBuffer();
+    Qt3DRender::QBuffer *getOutputColorBuffer();
 
 protected:
 
@@ -253,8 +253,8 @@ private:
     QPointer<Qt3DRender::QBuffer>           m_pWeightMatBuffer;
 
     //Output parameter
-    QPointer<Qt3DRender::QParameter>        m_pInterpolatedSignalParameter;
-    QPointer<Qt3DRender::QBuffer>           m_pInterpolatedSignalBuffer;
+    QPointer<Qt3DRender::QParameter>        m_pOutputColorParameter;
+    QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;
 
     //Lower and upper normalization threshold parameter
     QPointer<Qt3DRender::QParameter>        m_pThresholdXParameter;
