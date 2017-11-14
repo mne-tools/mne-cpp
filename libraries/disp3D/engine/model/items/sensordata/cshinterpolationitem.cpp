@@ -85,7 +85,7 @@ using namespace Qt3DCore;
 CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
     : Abstract3DTreeItem(p3DEntityParent, iType, text)
     , m_bIsDataInit(false)
-    , m_pMaterial(new CshInterpolationMaterial)
+    , m_pMaterial(new CshInterpolationMaterial(true))
 {
     initItem();
 }
