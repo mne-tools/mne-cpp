@@ -127,8 +127,6 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
         return;
     }
 
-    qDebug() <<"RtSensorDataWorker::addData - m_lData.size()"<<m_lDataQ.size();
-
     //Transform from matrix to list for easier handling in non loop mode
     for(int i = 0; i<data.cols(); i++) {
         if(m_lDataQ.size() < m_dSFreq) {
