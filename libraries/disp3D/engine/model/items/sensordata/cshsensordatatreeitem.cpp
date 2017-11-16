@@ -44,6 +44,7 @@
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "cshinterpolationitem.h"
+#include "../../workers/rtSensorData/rtcshsensordataworker.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
