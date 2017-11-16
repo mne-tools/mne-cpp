@@ -114,6 +114,7 @@ class FsSurfaceTreeItem;
 class SourceSpaceTreeItem;
 class DigitizerSetTreeItem;
 class CshSensorDataTreeItem;
+class CpuSensorDataTreeItem;
 
 
 //=============================================================================================================
@@ -296,8 +297,8 @@ protected:
     void onSensorMEGColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
-    QPointer<SensorDataTreeItem>                 m_pEEGSensorDataTreeItem;       /**< The rt sensor EEG data item of this item. */
-    QPointer<SensorDataTreeItem>                 m_pMEGSensorDataTreeItem;       /**< The rt sensor MEG data item of this item. */
+    QPointer<CpuSensorDataTreeItem>              m_pCpuEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item. */
+    QPointer<CpuSensorDataTreeItem>              m_pCpuMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item. */
     QPointer<CshSensorDataTreeItem>              m_pCshEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item (compute shader version). */
     QPointer<CshSensorDataTreeItem>              m_pCshMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item (compute shader version). */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */

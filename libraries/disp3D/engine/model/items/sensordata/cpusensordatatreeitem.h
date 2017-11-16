@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     cshsensordatatreeitem.h
+* @file     cpusensordatatreeitem.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2017
+* @date     November, 2017
 *
 * @section  LICENSE
 *
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CshSensorDataTreeItem class declaration.
+* @brief     CpuSensorDataTreeItem class declaration.
 *
 */
 
-#ifndef DISP3DLIB_CSHSENSORDATATREEITEM_H
-#define DISP3DLIB_CSHSENSORDATATREEITEM_H
+#ifndef DISP3DLIB_CPUSENSORDATATREEITEM_H
+#define DISP3DLIB_CPUSENSORDATATREEITEM_H
 
 
 //*************************************************************************************************************
@@ -43,9 +43,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstracttreeitem.h"
-#include "../measurement/measurementtreeitem.h"
-#include <mne/mne_bem_surface.h>
+#include "sensordatatreeitem.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +64,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FIFFLIB{
+    class FiffEvoked;
+}
+
+namespace MNELIB{
+    class MNEBemSurface;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,54 +85,54 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class CshInterpolationItem;
-class RtCshSensorDataWorker;
+class RtSensorDataWorker;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This is the version of SensorDataTreeItem that uses the Cpu for interpolation.
 *
-* @brief Brief description of this class.
+* @brief Cpu interpolation.
 */
 
-class DISP3DSHARED_EXPORT CshSensorDataTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT CpuSensorDataTreeItem : public SensorDataTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CshSensorDataTreeItem> SPtr;            /**< Shared pointer type for CshSensorDataTreeItem. */
-    typedef QSharedPointer<const CshSensorDataTreeItem> ConstSPtr; /**< Const shared pointer type for CshSensorDataTreeItem. */
+    typedef QSharedPointer<CpuSensorDataTreeItem> SPtr;            /**< Shared pointer type for CpuSensorDataTreeItem. */
+    typedef QSharedPointer<const CpuSensorDataTreeItem> ConstSPtr; /**< Const shared pointer type for CpuSensorDataTreeItem. */
 
     //=========================================================================================================
     /**
-    * Constructs a CshSensorDataTreeItem object.
+    * Constructs a CpuSensorDataTreeItem object.
     */
-    explicit CshSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::CshSensorDataItem, const QString& text = "Csh Sensor Data");
+    explicit CpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
+    //@TODO Change Itemtype? use the same for both versions?
 
     //=========================================================================================================
     /**
     * Destructor, stops and deletes rtsensordata worker
     */
-    ~CshSensorDataTreeItem();
+    virtual ~CpuSensorDataTreeItem();
 
     //=========================================================================================================
     /**
      * Initializes the sensor data item with neccessary information for visualization computations.
      * Constructs and initalizes the worker for this item.
      *
-     * @param[in] tBemSurface               MNEBemSurface that holds the mesh that should be visualized
-     * @param[in] tFiffInfo                 FiffInfo that holds the sensors information
-     * @param[in] tSensorType               The sensor type that is later used for live interpolation
-     * @param[in] tCancelDist               Distances higher than this are ignored for the interpolation
-     * @param[in] tInterpolationFunction    Function that computes interpolation coefficients using the distance values
-     * @param[in] t3DEntityParent           The Qt3D entity parent of the new item.
+     * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on
+     * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized
+     * @param[in] fiffInfo                  FiffInfo that holds the sensors information
+     * @param[in] sSensorType               The sensor type that is later used for live interpolation
+     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
+     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values
      */
-    void init(const MNELIB::MNEBemSurface& tBemSurface,
-              const FIFFLIB::FiffInfo &tFiffInfo,
-              const QString& tSensorType,
-              const double tCancelDist,
-              const QString &tInterpolationFunction,
-              Qt3DCore::QEntity *t3DEntityParent);
+    void init(const MatrixX3f& matSurfaceVertColor,
+              const MNELIB::MNEBemSurface& bemSurface,
+              const FIFFLIB::FiffInfo &fiffInfo,
+              const QString& sSensorType,
+              const double dCancelDist,
+              const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -135,80 +140,15 @@ public:
     *
     * @param[in] tSensorData                The matrix that holds rt measurement data.
     */
-    void addData(const MatrixXd& tSensorData);
+    virtual void addData(const MatrixXd& tSensorData) override;
 
     //=========================================================================================================
     /**
-    * Returns true if this item is initialized.
+    * This function gets called whenever the origin of the surface vertex color changed.
     *
-    * @return                               Returns true if this item is initialized.
+    * @param[in] matVertColor               The matrix that holds the origin colors for all vertices of the surface
     */
-    inline bool isDataInit() const;
-
-    //=========================================================================================================
-    /**
-    * This function sets the loop flag.
-    *
-    * @param[in] bState                      Whether to loop the data or not.
-    */
-    void setLoopState(bool bState);
-
-    //=========================================================================================================
-    /**
-    * This function sets the data streaming.
-    *
-    * @param[in] bState                      Whether to stream the data to the display or not.
-    */
-    void setStreamingActive(bool bState);
-
-    //=========================================================================================================
-    /**
-    * This function sets the time interval for streaming.
-    *
-    * @param[in] iMSec                      The waiting time inbetween samples.
-    */
-    void setTimeInterval(int iMSec);
-
-    //=========================================================================================================
-    /**
-    * This function sets the number of averages.
-    *
-    * @param[in] iNumberAverages            The new number of averages.
-    */
-    void setNumberAverages(int iNumberAverages);
-
-    //=========================================================================================================
-    /**
-    * This function sets the colortable type.
-    *
-    * @param[in] sColortable                The new colortable ("Hot Negative 1" etc.).
-    */
-    void setColortable(const QString& sColortable);
-
-    //=========================================================================================================
-    /**
-    * This function set the normalization value.
-    *
-    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
-    */
-    void setNormalization(const QVector3D& vecThresholds);
-
-    //=========================================================================================================
-    /**
-     * This function sets the cancel distance used in distance calculations for the interpolation.
-     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
-     *
-     * @param[in] dCancelDist               The new cancel distance value in meters.
-     */
-    void setCancelDistance(double dCancelDist);
-
-    //=========================================================================================================
-    /**
-     * This function sets the function that is used in the interpolation process.
-     *
-     * @param sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
-     */
-    void setInterpolationFunction(const QString &sInterpolationFunction);
+    void setColorOrigin(const MatrixX3f& matVertColor);
 
     //=========================================================================================================
     /**
@@ -216,7 +156,7 @@ public:
     *
     * @param[in] dSFreq                 The new sampling frequency.
     */
-    void setSFreq(const double dSFreq);
+    virtual void setSFreq(const double dSFreq) override;
 
     //=========================================================================================================
     /**
@@ -224,22 +164,9 @@ public:
     *
     * @param[in] info                 The fiff info including the new bad channels.
     */
-    void updateBadChannels(const FIFFLIB::FiffInfo& info);
+    virtual void updateBadChannels(const FIFFLIB::FiffInfo& info) override;
 
 protected:
-
-    //=========================================================================================================
-    /**
-    * This adds all meta tree items and connects them fittingly
-    */
-    void initItem();
-
-    //=========================================================================================================
-    /**
-     * Calculates a weight matrix which is based on surfaced constrained distances.
-     * Surface data member needs to be initialized first
-     */
-    QSharedPointer<SparseMatrix<double> > calculateWeigtMatrix();
 
     //=========================================================================================================
     /**
@@ -247,15 +174,15 @@ protected:
     *
     * @param[in] checkState                 The check state of the worker.
     */
-    void onCheckStateWorkerChanged(const Qt::CheckState& checkState);
+    virtual void onCheckStateWorkerChanged(const Qt::CheckState& checkState) override;
 
     //=========================================================================================================
     /**
-    * This function gets called whenever this item receives sensor values for each estimated source.
+    * This function gets called whenever this item receives new color values for each estimated source.
     *
-    * @param[in] sensorData         The senor values for each estimated source.
+    * @param[in] sourceColorSamples         The color values for each estimated source for left and right hemisphere.
     */
-    void onNewRtData(const Eigen::VectorXf &sensorData);
+    virtual void onNewRtData(const MatrixX3f &sensorData) override;
 
     //=========================================================================================================
     /**
@@ -263,7 +190,7 @@ protected:
     *
     * @param[in] sColormapType              The name of the new colormap type.
     */
-    void onColormapTypeChanged(const QVariant& sColormapType);
+    virtual void onColormapTypeChanged(const QVariant& sColormapType) override;
 
     //=========================================================================================================
     /**
@@ -271,7 +198,7 @@ protected:
     *
     * @param[in] iMSec                      The new time in milliseconds waited in between each streamed sample.
     */
-    void onTimeIntervalChanged(const QVariant &iMSec);
+    virtual void onTimeIntervalChanged(const QVariant &iMSec) override;
 
     //=========================================================================================================
     /**
@@ -279,7 +206,7 @@ protected:
     *
     * @param[in] vecThresholds              The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(const QVariant &vecThresholds);
+    virtual void onDataNormalizationValueChanged(const QVariant &vecThresholds) override;
 
     //=========================================================================================================
     /**
@@ -287,7 +214,7 @@ protected:
     *
     * @param[in] checkState                 The check state of the looped streaming state.
     */
-    void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
+    virtual void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState) override;
 
     //=========================================================================================================
     /**
@@ -295,7 +222,7 @@ protected:
     *
     * @param[in] iNumAvr                    The new number of averages.
     */
-    void onNumberAveragesChanged(const QVariant& iNumAvr);
+    virtual  void onNumberAveragesChanged(const QVariant& iNumAvr) override;
 
     //=========================================================================================================
     /**
@@ -303,7 +230,7 @@ protected:
     *
     * @param[in] dCancelDist     The new cancel distance.
     */
-    void onCancelDistanceChanged(const QVariant& dCancelDist);
+    virtual void onCancelDistanceChanged(const QVariant& dCancelDist) override;
 
     //=========================================================================================================
     /**
@@ -311,27 +238,20 @@ protected:
     *
     * @param[in] sInterpolationFunction     The new function name.
     */
-    void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
+    virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
 
+    QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
 
-    bool                                    m_bIsDataInit;                    /**< The init flag. */
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
+    *
+    * @param[in] vertColors                 The colors for the underlying mesh surface
+    */
+    void rtVertColorChanged(const QVariant &vertColors);
 
-    QPointer<RtCshSensorDataWorker>         m_pSensorRtDataWorker;            /**< The source data worker. This worker streams the rt data to this item.*/
-    QVector<int>                            m_iUsedSensors;                   /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
-    QVector<int>                            m_iSensorsBad;                    /**< Store bad channel indexes.*/
-
-    QPointer<CshInterpolationItem>          m_pInterpolationItem;
-
-    //Surface data
-    int                                     m_iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
-    double                                  m_dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
-    QSharedPointer<QVector<qint32>>         m_pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
-    MNELIB::MNEBemSurface                   m_bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
-    FIFFLIB::FiffInfo                       m_fiffInfo;                         /**< Contains all information about the sensors. */
-    double (*m_interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */
-
-    //@TODO interpolation function and canceldistance members?
 
 };
 
@@ -341,11 +261,7 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool CshSensorDataTreeItem::isDataInit() const
-{
-    return m_bIsDataInit;
-}
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_CSHSENSORDATATREEITEM_H
+#endif // DISP3DLIB_CPUSENSORDATATREEITEM_H

@@ -82,7 +82,6 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtSensorDataWorker;
 
 //=============================================================================================================
 /**
@@ -104,32 +103,13 @@ public:
     /**
     * Constructs a sensordatatreeitem object, calls initItem
     */
-    explicit SensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
+    explicit SensorDataTreeItem(int iType , const QString& text);
 
     //=========================================================================================================
     /**
-    * Destructor, stops and deletes rtsensordata worker
+    * Destructor
     */
-    ~SensorDataTreeItem();
-
-    //=========================================================================================================
-    /**
-     * Initializes the sensor data item with neccessary information for visualization computations.
-     * Constructs and initalizes the worker for this item.
-     *
-     * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on
-     * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized
-     * @param[in] fiffInfo                  FiffInfo that holds the sensors information
-     * @param[in] sSensorType               The sensor type that is later used for live interpolation
-     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
-     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values
-     */
-    void init(const MatrixX3f& matSurfaceVertColor,
-              const MNELIB::MNEBemSurface& bemSurface,
-              const FIFFLIB::FiffInfo &fiffInfo,
-              const QString& sSensorType,
-              const double dCancelDist,
-              const QString &sInterpolationFunction);
+    virtual ~SensorDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -137,7 +117,7 @@ public:
     *
     * @param[in] tSensorData                The matrix that holds rt measurement data.
     */
-    void addData(const MatrixXd& tSensorData);
+    virtual void addData(const MatrixXd& tSensorData) = 0;
 
     //=========================================================================================================
     /**      
@@ -145,7 +125,7 @@ public:
     *
     * @return                               Returns true if this item is initialized.
     */
-    inline bool isDataInit() const;
+    virtual inline bool isDataInit() const;
 
     //=========================================================================================================
     /**
@@ -153,7 +133,7 @@ public:
     *
     * @param[in] bState                      Whether to loop the data or not.
     */
-    void setLoopState(bool bState);
+    virtual void setLoopState(bool bState);
 
     //=========================================================================================================
     /**
@@ -161,7 +141,7 @@ public:
     *
     * @param[in] bState                      Whether to stream the data to the display or not.
     */
-    void setStreamingActive(bool bState);
+    virtual void setStreamingActive(bool bState);
 
     //=========================================================================================================
     /**
@@ -169,7 +149,7 @@ public:
     *
     * @param[in] iMSec                      The waiting time inbetween samples.
     */
-    void setTimeInterval(int iMSec);
+    virtual void setTimeInterval(int iMSec);
 
     //=========================================================================================================
     /**
@@ -177,7 +157,7 @@ public:
     *
     * @param[in] iNumberAverages            The new number of averages.
     */
-    void setNumberAverages(int iNumberAverages);
+    virtual void setNumberAverages(int iNumberAverages);
 
     //=========================================================================================================
     /**
@@ -185,7 +165,7 @@ public:
     *
     * @param[in] sColortable                The new colortable ("Hot Negative 1" etc.).
     */
-    void setColortable(const QString& sColortable);
+    virtual void setColortable(const QString& sColortable);
 
     //=========================================================================================================
     /**
@@ -193,7 +173,7 @@ public:
     *
     * @param[in] vecThresholds              The new threshold values used for normalizing the data.
     */
-    void setNormalization(const QVector3D& vecThresholds);
+    virtual void setNormalization(const QVector3D& vecThresholds);
     
     //=========================================================================================================
     /**
@@ -202,7 +182,7 @@ public:
      * 
      * @param[in] dCancelDist               The new cancel distance value in meters.
      */
-    void setCancelDistance(double dCancelDist);
+    virtual void setCancelDistance(double dCancelDist);
     
     //=========================================================================================================
     /**
@@ -210,15 +190,7 @@ public:
      * 
      * @param sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
      */
-    void setInterpolationFunction(const QString &sInterpolationFunction);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color changed.
-    *
-    * @param[in] matVertColor               The matrix that holds the origin colors for all vertices of the surface
-    */
-    void setColorOrigin(const MatrixX3f& matVertColor);
+    virtual void setInterpolationFunction(const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -226,7 +198,7 @@ public:
     *
     * @param[in] dSFreq                 The new sampling frequency.
     */
-    void setSFreq(const double dSFreq);
+    virtual void setSFreq(const double dSFreq) = 0;
 
     //=========================================================================================================
     /**
@@ -234,14 +206,15 @@ public:
     *
     * @param[in] info                 The fiff info including the new bad channels.
     */
-    void updateBadChannels(const FIFFLIB::FiffInfo& info);
+    virtual void updateBadChannels(const FIFFLIB::FiffInfo& info) = 0;
 
 protected:
     //=========================================================================================================
     /**
     * This adds all meta tree items and connects them fittingly
+    * Don't use this fucntion in the constructor of the abstract class.
     */
-    void initItem();
+    virtual void initItem() override;
 
     //=========================================================================================================
     /**
@@ -249,7 +222,7 @@ protected:
     *
     * @param[in] checkState                 The check state of the worker.
     */
-    void onCheckStateWorkerChanged(const Qt::CheckState& checkState);
+    virtual void onCheckStateWorkerChanged(const Qt::CheckState& checkState) = 0;
 
     //=========================================================================================================
     /**
@@ -257,7 +230,7 @@ protected:
     *
     * @param[in] sourceColorSamples         The color values for each estimated source for left and right hemisphere.
     */
-    void onNewRtData(const MatrixX3f &sensorData);
+    virtual void onNewRtData(const MatrixX3f &sensorData) = 0;
 
     //=========================================================================================================
     /**
@@ -265,7 +238,7 @@ protected:
     *
     * @param[in] sColormapType              The name of the new colormap type.
     */
-    void onColormapTypeChanged(const QVariant& sColormapType);
+    virtual void onColormapTypeChanged(const QVariant& sColormapType) = 0;
 
     //=========================================================================================================
     /**
@@ -273,7 +246,7 @@ protected:
     *
     * @param[in] iMSec                      The new time in milliseconds waited in between each streamed sample.
     */
-    void onTimeIntervalChanged(const QVariant &iMSec);
+    virtual void onTimeIntervalChanged(const QVariant &iMSec) = 0;
 
     //=========================================================================================================
     /**
@@ -281,7 +254,7 @@ protected:
     *
     * @param[in] vecThresholds              The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(const QVariant &vecThresholds);
+    virtual void onDataNormalizationValueChanged(const QVariant &vecThresholds) = 0;
 
     //=========================================================================================================
     /**
@@ -289,7 +262,7 @@ protected:
     *
     * @param[in] checkState                 The check state of the looped streaming state.
     */
-    void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
+    virtual void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState) = 0;
 
     //=========================================================================================================
     /**
@@ -297,7 +270,7 @@ protected:
     *
     * @param[in] iNumAvr                    The new number of averages.
     */
-    void onNumberAveragesChanged(const QVariant& iNumAvr);
+    virtual  void onNumberAveragesChanged(const QVariant& iNumAvr) = 0;
 
     //=========================================================================================================
     /**
@@ -305,7 +278,7 @@ protected:
     *
     * @param[in] dCancelDist     The new cancel distance.
     */
-    void onCancelDistanceChanged(const QVariant& dCancelDist);
+    virtual void onCancelDistanceChanged(const QVariant& dCancelDist) = 0;
 
     //=========================================================================================================
     /**
@@ -313,23 +286,13 @@ protected:
     *
     * @param[in] sInterpolationFunction     The new function name.
     */
-    void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
+    virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) = 0;
 
 
     bool                             m_bIsDataInit;                     /**< The init flag. */
 
-    QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
     QVector<int>                     m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
     QVector<int>                     m_iSensorsBad;                     /**< Store bad channel indexes.*/
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
-    *
-    * @param[in] vertColors                 The colors for the underlying mesh surface
-    */
-    void rtVertColorChanged(const QVariant &vertColors);
 
 };
 
