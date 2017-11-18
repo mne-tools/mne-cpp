@@ -48,7 +48,6 @@
 #include "items/mri/mritreeitem.h"
 #include "items/digitizer/digitizertreeitem.h"
 #include "items/sensordata/sensordatatreeitem.h"
-#include "items/sensordata/cshsensordatatreeitem.h"
 #include "3dhelpers/renderable3Dentity.h"
 
 #include <inverse/dipoleFit/ecd_set.h>
@@ -563,7 +562,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
 
 //*************************************************************************************************************
 
-CshSensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject,
+SensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject,
                                                          const QString &sMeasurementSetName,
                                                          const MatrixXd &matSensorData,
                                                          const MNEBemSurface &tBemSurface,
@@ -572,7 +571,7 @@ CshSensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject
                                                          const double dCancelDist,
                                                          const QString &sInterpolationFunction)
 {
-    CshSensorDataTreeItem* pReturnItem = Q_NULLPTR;
+    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(sSubject);
@@ -583,15 +582,6 @@ CshSensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject
     //Find the "set" items and add the sensor data as items
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            //If measurement data has already been created but in conjunction with a different data type
-            //(i.e. connectivity, dipole fitting, etc.), do the connects here
-//            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::CshSensorDataItem).size() < 2) { // <2 because we can store MEG and EEG
-//                if(sDataType == "EEG") {
-//                    pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-//                } else if (sDataType == "MEG") {
-//                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-//                }
-//            }
 
             pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
         }
@@ -599,12 +589,6 @@ CshSensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
-
-//        if(sDataType == "EEG") {
-//            pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-//        } else if (sDataType == "MEG") {
-//            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-//        }
     }
 
     return pReturnItem;

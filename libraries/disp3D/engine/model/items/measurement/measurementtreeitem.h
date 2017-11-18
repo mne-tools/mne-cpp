@@ -164,7 +164,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds interpolated activation data to this item.
+    * Adds interpolated activation data to the cpu version of this item.
     *
     * @param[in] tSensorData            The SensorData.
     * @param[in] bemSurface             Holds all Bem data used in this item.
@@ -182,10 +182,9 @@ public:
                                 const double dCancelDist,
                                 const QString &sInterpolationFunction);
 
-    //@TODO This is probably on temporary
     //=========================================================================================================
     /**
-    * Adds interpolated activation data to this item.
+    * Adds interpolated activation data to the csh version of this item.
     *
     * @param[in] tSensorData            The SensorData.
     * @param[in] bemSurface             Holds all Bem data used in this item.
@@ -196,7 +195,7 @@ public:
     * @param[in] pParent                Pointer to the QEntity parent.
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
-    CshSensorDataTreeItem *addData(const MatrixXd& tSensorData,
+    SensorDataTreeItem *addData(const MatrixXd& tSensorData,
                                    const MNELIB::MNEBemSurface &bemSurface,
                                    const FIFFLIB::FiffInfo &fiffInfo,
                                    const QString &sSensorType,

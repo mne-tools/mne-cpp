@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "cshsensordatatreeitem.h"
-#include "../common/metatreeitem.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "cshinterpolationitem.h"
@@ -99,10 +98,9 @@ dFuncPtr transformInterpolationFromStrToFunc(const QString &tFunctionName)
 //=============================================================================================================
 
 CshSensorDataTreeItem::CshSensorDataTreeItem(int iType, const QString &text)
-    : AbstractTreeItem(iType,text)
-    , m_bIsDataInit(false)
+    : SensorDataTreeItem(iType,text)
 {
-    initItem();
+    SensorDataTreeItem::initItem();
 }
 
 
@@ -272,145 +270,6 @@ void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::setLoopState(bool bState)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::LoopedStreaming);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            pAbstractItem->setCheckState(bState == true ? Qt::Checked : Qt::Unchecked);
-            QVariant data;
-            data.setValue(bState);
-            pAbstractItem->setData(data, MetaTreeItemRoles::LoopedStreaming);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::setStreamingActive(bool bState)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            pAbstractItem->setCheckState(bState == true ? Qt::Checked : Qt::Unchecked);
-            QVariant data;
-            data.setValue(bState);
-            pAbstractItem->setData(data, MetaTreeItemRoles::StreamStatus);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::setTimeInterval(int iMSec)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamingTimeInterval);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(iMSec);
-            pAbstractItem->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::setNumberAverages(int iNumberAverages)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::NumberAverages);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(iNumberAverages);
-            pAbstractItem->setData(data, MetaTreeItemRoles::NumberAverages);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::setColortable(const QString &sColortable)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ColormapType);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(sColortable);
-            pAbstractItem->setData(data, MetaTreeItemRoles::ColormapType);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::setNormalization(const QVector3D &vecThresholds)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DistributedSourceLocThreshold);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(vecThresholds);
-            pAbstractItem->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
-
-            QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
-            data.setValue(sTemp);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::setCancelDistance(double dCancelDist)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::CancelDistance);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(dCancelDist);
-            pAbstractItem->setData(data, MetaTreeItemRoles::CancelDistance);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::setInterpolationFunction(const QString &sInterpolationFunction)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::InterpolationFunction);
-
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(sInterpolationFunction);
-            pAbstractItem->setData(data, MetaTreeItemRoles::InterpolationFunction);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
 void CshSensorDataTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pSensorRtDataWorker) {
@@ -440,101 +299,6 @@ void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
     //Update weight matrix
     m_pInterpolationItem->setWeightMatrix(calculateWeigtMatrix());
-}
-
-
-//*************************************************************************************************************
-
-void CshSensorDataTreeItem::initItem()
-{
-    this->setEditable(false);
-    this->setToolTip("SensorData item");
-
-    //Add items
-    QList<QStandardItem*> list;
-    QVariant data;
-
-    MetaTreeItem* pItemStreamStatus = new MetaTreeItem(MetaTreeItemTypes::StreamStatus, "Stream data on/off");
-    connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
-            this, &CshSensorDataTreeItem::onCheckStateWorkerChanged);
-    list << pItemStreamStatus;
-    list << new QStandardItem(pItemStreamStatus->toolTip());
-    this->appendRow(list);
-    pItemStreamStatus->setCheckable(true);
-    pItemStreamStatus->setCheckState(Qt::Unchecked);
-
-    data.setValue(false);
-    pItemStreamStatus->setData(data, MetaTreeItemRoles::StreamStatus);
-
-    MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot");
-    connect(pItemColormapType, &MetaTreeItem::dataChanged,
-            this, &CshSensorDataTreeItem::onColormapTypeChanged);
-    list.clear();
-    list << pItemColormapType;
-    list << new QStandardItem(pItemColormapType->toolTip());
-    this->appendRow(list);
-    data.setValue(QString("Hot"));
-    pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
-
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0, 0.5,10.0");
-    connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
-            this, &CshSensorDataTreeItem::onDataNormalizationValueChanged);
-    list.clear();
-    list << pItemSourceLocNormValue;
-    list << new QStandardItem(pItemSourceLocNormValue->toolTip());
-    this->appendRow(list);
-    data.setValue(QVector3D(0.0,5.5,15));
-    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
-
-    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "17");
-    connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
-            this, &CshSensorDataTreeItem::onTimeIntervalChanged);
-    list.clear();
-    list << pItemStreamingInterval;
-    list << new QStandardItem(pItemStreamingInterval->toolTip());
-    this->appendRow(list);
-    data.setValue(17);
-    pItemStreamingInterval->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
-
-    MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
-    connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
-            this, &CshSensorDataTreeItem::onCheckStateLoopedStateChanged);
-    pItemLoopedStreaming->setCheckable(true);
-    pItemLoopedStreaming->setCheckState(Qt::Checked);
-    list.clear();
-    list << pItemLoopedStreaming;
-    list << new QStandardItem(pItemLoopedStreaming->toolTip());
-    this->appendRow(list);
-
-    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
-    connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
-            this, &CshSensorDataTreeItem::onNumberAveragesChanged);
-    list.clear();
-    list << pItemAveragedStreaming;
-    list << new QStandardItem(pItemAveragedStreaming->toolTip());
-    this->appendRow(list);
-    data.setValue(1);
-    pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
-
-    MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.05");
-    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
-            this, &CshSensorDataTreeItem::onCancelDistanceChanged);
-    list.clear();
-    list << pItemCancelDistance;
-    list << new QStandardItem(pItemCancelDistance->toolTip());
-    this->appendRow(list);
-    data.setValue(0.05);
-    pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
-
-    MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Cubic");
-    connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
-            this, &CshSensorDataTreeItem::onInterpolationFunctionChanged);
-    list.clear();
-    list << pInterpolationFunction;
-    list << new QStandardItem(pInterpolationFunction->toolTip());
-    this->appendRow(list);
-    data.setValue(QString("Cubic"));
-    pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
 }
 
 
@@ -582,15 +346,11 @@ void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &chec
 
 void CshSensorDataTreeItem::onNewRtData(const VectorXf &sensorData)
 {
-    //@TODO do this with a signal?
     if(m_pInterpolationItem)
     {
         m_pInterpolationItem->addNewRtData(sensorData);
 
     }
-//    QVariant data;
-//    data.setValue(sensorData);
-//    emit rtCshSensorValuesChanged(data);
 }
 
 
