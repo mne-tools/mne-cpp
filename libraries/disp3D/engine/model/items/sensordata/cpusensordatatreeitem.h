@@ -182,7 +182,7 @@ protected:
     *
     * @param[in] sourceColorSamples         The color values for each estimated source for left and right hemisphere.
     */
-    virtual void onNewRtData(const MatrixX3f &sensorData) override;
+    virtual void onNewRtData(const MatrixX3f &sensorData);
 
     //=========================================================================================================
     /**

@@ -43,7 +43,6 @@
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
-#include <disp3D/engine/model/items/sensordata/cshsensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
@@ -316,7 +315,7 @@ int main(int argc, char *argv[])
     }
 
     //add csh sensor item for EEG data
-    if (CshSensorDataTreeItem* pCshEegSensorTreeItem = p3DDataModel->addCshSensorData(parser.value(subjectOption),
+    if (SensorDataTreeItem* pCshEegSensorTreeItem = p3DDataModel->addCshSensorData(parser.value(subjectOption),
                                                                              evoked.comment,
                                                                              evoked.data,
                                                                              t_Bem[0],

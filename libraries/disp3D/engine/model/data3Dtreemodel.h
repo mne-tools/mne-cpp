@@ -122,7 +122,6 @@ class DigitizerSetTreeItem;
 class SubjectTreeItem;
 class MeasurementTreeItem;
 class SensorDataTreeItem;
-class CshSensorDataTreeItem;
 
 
 //=============================================================================================================
@@ -352,7 +351,7 @@ public:
                                       const QString &sInterpolationFunction);
 
     //@TODO this is only a temporary soltution
-    CshSensorDataTreeItem *addCshSensorData(const QString& sSubject,
+    SensorDataTreeItem *addCshSensorData(const QString& sSubject,
                                             const QString& sMeasurementSetName,
                                             const Eigen::MatrixXd& matSensorData,
                                             const MNELIB::MNEBemSurface& tBemSurface,

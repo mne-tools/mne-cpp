@@ -226,14 +226,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever this item receives new color values for each estimated source.
-    *
-    * @param[in] sourceColorSamples         The color values for each estimated source for left and right hemisphere.
-    */
-    virtual void onNewRtData(const MatrixX3f &sensorData) = 0;
-
-    //=========================================================================================================
-    /**
     * This function gets called whenever the used colormap type changed.
     *
     * @param[in] sColormapType              The name of the new colormap type.
