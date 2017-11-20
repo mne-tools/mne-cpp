@@ -278,6 +278,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    //Create the 3D view
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+
+
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment,
@@ -286,7 +290,8 @@ int main(int argc, char *argv[])
                                                                              evoked.info,
                                                                              "MEG",
                                                                              0.10,
-                                                                             "Cubic")) {
+                                                                             "Cubic",
+                                                                             testWindow->format())) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
@@ -304,7 +309,8 @@ int main(int argc, char *argv[])
                                                                              evoked.info,
                                                                              "EEG",
                                                                              0.2,
-                                                                             "Cubic")) {
+                                                                             "Cubic",
+                                                                             testWindow->format())) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
@@ -312,24 +318,6 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
         pEegSensorTreeItem->setColortable("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
-    }
-
-    //add csh sensor item for EEG data
-    if (SensorDataTreeItem* pCshEegSensorTreeItem = p3DDataModel->addCshSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data,
-                                                                             t_Bem[0],
-                                                                             evoked.info,
-                                                                             "EEG",
-                                                                             0.2,
-                                                                             "Cubic")) {
-        pCshEegSensorTreeItem->setLoopState(true);
-        pCshEegSensorTreeItem->setTimeInterval(17);
-        pCshEegSensorTreeItem->setNumberAverages(1);
-        pCshEegSensorTreeItem->setStreamingActive(false);
-        pCshEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
-        pCshEegSensorTreeItem->setColortable("Jet");
-        pCshEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     if(bAddRtSourceLoc) {
@@ -345,8 +333,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    //Setup window
     testWindow->setModel(p3DDataModel);
     testWindow->show();
 
