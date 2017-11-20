@@ -292,7 +292,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                         m_slAvailableModalities << "MEG";
 
                         //Add MEG helmet
-                        QFile t_filesensorSurfaceVV("./resources/sensorSurfaces/306m_rt.fif");
+                        QFile t_filesensorSurfaceVV("./resources/general/sensorSurfaces/306m_rt.fif");
                         m_pBemSensor = MNEBem::SPtr(new MNEBem(t_filesensorSurfaceVV));
                         m_pData3DModel->addMegSensorInfo("Sensors", "MEG System", QList<FiffChInfo>(), *m_pBemSensor.data());
                     }
