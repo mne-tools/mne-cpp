@@ -193,6 +193,7 @@ public:
     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation.
     * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values.
     * @param[in] pParent                Pointer to the QEntity parent.
+    *
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
     SensorDataTreeItem *addData(const MatrixXd& tSensorData,

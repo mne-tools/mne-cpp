@@ -67,6 +67,8 @@
 
 #include <Qt3DCore/QEntity>
 
+#include <QSurfaceFormat>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -519,7 +521,47 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                         const FiffInfo& fiffInfo,
                                         const QString& sDataType,
                                         const double dCancelDist,
-                                        const QString& sInterpolationFunction)
+                                        const QString& sInterpolationFunction,
+                                        const QSurfaceFormat &tSurfaceFormat)
+{
+    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
+
+    //Test for OpenGL version 4.3
+    if((tSurfaceFormat.majorVersion() == 4
+            && tSurfaceFormat.minorVersion() >= 3
+            || tSurfaceFormat.majorVersion() > 4))
+    {
+        //use compute shader version
+        pReturnItem = addCshSensorData(sSubject,
+                         sMeasurementSetName,
+                         matSensorData,
+                         tBemSurface,
+                         fiffInfo,
+                         sDataType,
+                         dCancelDist,
+                         sInterpolationFunction);
+        qDebug("Using compute shader version of SensorDataTreeItem.");
+    }
+    else
+    {
+        //use cpu version
+        pReturnItem = addCpuSensorData(sSubject,
+                         sMeasurementSetName,
+                         matSensorData,
+                         tBemSurface,
+                         fiffInfo,
+                         sDataType,
+                         dCancelDist,
+                         sInterpolationFunction);
+    }
+
+    return pReturnItem;
+}
+
+
+//*************************************************************************************************************
+
+SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject, const QString &sMeasurementSetName, const MatrixXd &matSensorData, const MNEBemSurface &tBemSurface, const FiffInfo &fiffInfo, const QString &sDataType, const double dCancelDist, const QString &sInterpolationFunction)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -593,3 +635,6 @@ SensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject,
 
     return pReturnItem;
 }
+
+
+//*************************************************************************************************************
