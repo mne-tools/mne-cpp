@@ -113,7 +113,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds a block actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
+    * Adds a block actual rt data which is streamed by this item's worker thread item.
+    * In order for this function to worker, you must call init(...) beforehand.
     *
     * @param[in] tSensorData                The matrix that holds rt measurement data.
     */

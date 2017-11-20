@@ -344,11 +344,11 @@ void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &chec
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onNewRtData(const VectorXf &sensorData)
+void CshSensorDataTreeItem::onNewRtData(const VectorXf &tSensorData)
 {
     if(m_pInterpolationItem)
     {
-        m_pInterpolationItem->addNewRtData(sensorData);
+        m_pInterpolationItem->addNewRtData(tSensorData);
 
     }
 }

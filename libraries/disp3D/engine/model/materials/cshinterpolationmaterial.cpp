@@ -303,7 +303,6 @@ void CshInterpolationMaterial::init()
 
     if(m_bUseAlpha)
     {
-        //@TODO like phongalpha
         m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
         m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
         m_pBlendEquation->setBlendFunction(QBlendEquation::Add);

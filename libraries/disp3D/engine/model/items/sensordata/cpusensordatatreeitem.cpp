@@ -367,3 +367,6 @@ void CpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
         }
     }
 }
+
+
+//*************************************************************************************************************

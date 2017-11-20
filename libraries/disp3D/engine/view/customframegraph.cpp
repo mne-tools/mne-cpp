@@ -153,7 +153,7 @@ void CustomFrameGraph::init()
     m_pClearBuffers->setBuffers(QClearBuffers::ColorDepthBuffer);
     m_pClearBuffers->setClearColor(Qt::black);
 
-    //Set FilterKeys
+    //Set filter keys these need to match with the material.
     m_pComputeKey->setName(QStringLiteral("renderingStyle"));
     m_pComputeKey->setValue(QStringLiteral("compute"));
 
@@ -164,7 +164,7 @@ void CustomFrameGraph::init()
     m_pComputeFilter->addMatch(m_pComputeKey);
     m_pForwardFilter->addMatch(m_pForwardKey);
 
-    //Set Memory Barrier
+    //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
     m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
 }
 

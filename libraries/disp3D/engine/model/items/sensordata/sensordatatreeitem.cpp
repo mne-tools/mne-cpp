@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    sensordatatreeitem class definition.
+* @brief    SensorDataTreeItem class definition.
 *
 */
 
