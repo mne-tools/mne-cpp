@@ -184,6 +184,40 @@ qtHaveModule(charts) {
         deepmodelviewer/images.qrc
 }
 
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_70Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/default_filters/filter_default_template.txt \
+    $${ROOT_DIR}/resources/general/default_filters/NOTCH_50Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/default_filters/NOTCH_60Hz_Fs1kHz.txt \
+    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-inner-layer.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-outer-layer.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-ref.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/CTF-275.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/magnesWH3600.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/standard_waveguard64_duke.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-all.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-grad.lout \
+    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-mag.lout \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_babyMEG.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_CTF_275.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_Magnes_3600WH.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv.sel \
+    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv_new.sel \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR = $$shell_path($${FILEDIR})
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE = $$shell_path($${FILE})
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

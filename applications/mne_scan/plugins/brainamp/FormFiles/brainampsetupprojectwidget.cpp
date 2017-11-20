@@ -316,7 +316,7 @@ void BrainAMPSetupProjectWidget::changeCap()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
-                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                "resources/mne_scan/plugins/tmsi/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL){
@@ -334,7 +334,7 @@ void BrainAMPSetupProjectWidget::changeCardinalFile()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change cardinal file",
-                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                "resources/mne_scan/plugins/tmsi/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL)
