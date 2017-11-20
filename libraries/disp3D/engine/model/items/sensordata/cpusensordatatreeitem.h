@@ -89,11 +89,11 @@ class RtSensorDataWorker;
 
 //=============================================================================================================
 /**
-* This is the version of SensorDataTreeItem that uses the Cpu for interpolation.
+* This item allows on-the-fly changes to parameters of visualization. It integrates the features provided in
+* GeometryInfo and and uses the cpu for interpolation.
 *
-* @brief Cpu interpolation.
+* @brief This item integrates GeometryInfo and  Interpolation into Disp3D structure.
 */
-
 class DISP3DSHARED_EXPORT CpuSensorDataTreeItem : public SensorDataTreeItem
 {
     Q_OBJECT
@@ -107,11 +107,10 @@ public:
     * Constructs a CpuSensorDataTreeItem object.
     */
     explicit CpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
-    //@TODO Change Itemtype? use the same for both versions?
 
     //=========================================================================================================
     /**
-    * Destructor, stops and deletes rtsensordata worker
+    * Destructor, stops and deletes rtsensordata worker.
     */
     virtual ~CpuSensorDataTreeItem();
 
@@ -120,12 +119,12 @@ public:
      * Initializes the sensor data item with neccessary information for visualization computations.
      * Constructs and initalizes the worker for this item.
      *
-     * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on
-     * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized
-     * @param[in] fiffInfo                  FiffInfo that holds the sensors information
-     * @param[in] sSensorType               The sensor type that is later used for live interpolation
-     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation
-     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values
+     * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on.
+     * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized.
+     * @param[in] fiffInfo                  FiffInfo that holds the sensors information.
+     * @param[in] sSensorType               The sensor type that is later used for live interpolation.
+     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation.
+     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values.
      */
     void init(const MatrixX3f& matSurfaceVertColor,
               const MNELIB::MNEBemSurface& bemSurface,
@@ -136,7 +135,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds a block actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
+    * Adds a block actual rt data which is streamed by this item's worker thread item.
+    * In order for this function to worker, you must call init(...) beforehand.
     *
     * @param[in] tSensorData                The matrix that holds rt measurement data.
     */
@@ -202,7 +202,8 @@ protected:
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
+    * This function gets called whenever the normaization value changed.
+    * The normalization value is used to normalize the estimated source activation.
     *
     * @param[in] vecThresholds              The new threshold values used for normalizing the data.
     */

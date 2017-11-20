@@ -112,25 +112,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy constructor disabled.
-    */
-    CustomFrameGraph(const CustomFrameGraph &other) = delete;
-
-    //=========================================================================================================
-    /**
-    * Copy operator disabled.
-    */
-    CustomFrameGraph& operator =(const CustomFrameGraph &other) = delete;
-
-    //=========================================================================================================
-    /**
     * Destructor.
     */
     ~CustomFrameGraph();
 
     //=========================================================================================================
     /**
-     * Sets active camera for use in the framegraphs camera selector.
+     * This function sets active camera for use in the framegraphs camera selector.
      *
      * @param tCamera               Pointer to QCamera object.
      */
@@ -138,7 +126,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the work group size for the computation in each dim.
+     * This function sets the work group size for the computation in each dimension.
      *
      * @param tX                     Size of X work group.
      * @param tY                     Size of Y work group.
@@ -160,7 +148,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Init the  CustomFrameGraph class.
+     * Init the  CustomFrameGraph object.
      */
     void init();
 

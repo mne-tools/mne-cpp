@@ -126,19 +126,6 @@ public:
     */
     explicit CshInterpolationMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
 
-
-    //=========================================================================================================
-    /**
-    * Copy constructor disabled.
-    */
-    CshInterpolationMaterial(const CshInterpolationMaterial &other) = delete;
-
-    //=========================================================================================================
-    /**
-    * Copy operator disabled.
-    */
-    CshInterpolationMaterial& operator =(const CshInterpolationMaterial &other) = delete;
-
     //=========================================================================================================
     /**
     * Default destructor.
@@ -147,7 +134,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the new weight matrix for interpolation.
+     * Set the new interpolation matrix for interpolation.
      *
      * @param pInterpolationMatrix      The weight matrix.
      */
@@ -226,6 +213,7 @@ private:
      */
     QByteArray buildZeroBuffer(const uint tSize);
 
+
     bool                                                m_bUseAlpha;
 
     QPointer<Qt3DRender::QEffect>                       m_pEffect;
@@ -275,8 +263,6 @@ private:
     QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
     QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
     QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;
-
-
 };
 
 

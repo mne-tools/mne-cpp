@@ -180,6 +180,7 @@ void CshInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> >
         qDebug("CshInterpolationItem::setWeightMatrix item data is not initialized!");
         return;
     }
+
     m_pMaterial->setWeightMatrix(tInterpolationMatrix);
 }
 

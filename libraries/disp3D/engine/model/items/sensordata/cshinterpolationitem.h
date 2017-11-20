@@ -90,9 +90,10 @@ class CshInterpolationMaterial;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This item is used for signal interpolation with a compute shader.
+* It stores all Qt3DEnities needed for this process.
 *
-* @brief Brief description of this class.
+* @brief Signal interpolation with qt3d compute shader.
 */
 
 class DISP3DSHARED_EXPORT CshInterpolationItem : public Abstract3DTreeItem
@@ -117,9 +118,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Initialize interpolation data to this item
+     * Initialize interpolation data of this item.
      *
-     * @param tMneBemSurface        The Bem data.
+     * @param tMneBemSurface        The bem surface data.
      * @param tInterpolationMatrix  The weight matrix for interpolation on the bem surface.
      */
     void initData(const MNELIB::MNEBemSurface &tMneBemSurface, QSharedPointer<SparseMatrix<double>> tInterpolationMatrix);
@@ -128,7 +129,7 @@ public:
     /**
      * Set the new weight matrix for the interpolation.
      *
-     * @param tInterpolationMatrix  The weight matrix for interpolation on the bem surface.
+     * @param tInterpolationMatrix  The new weight matrix for interpolation on the bem surface.
      */
     void setWeightMatrix(QSharedPointer<SparseMatrix<double>> tInterpolationMatrix);
 
@@ -136,7 +137,7 @@ public:
     /**
     * Add a new vector with signal data form the sensors.
     *
-    * @param tSignalVec                Vector with one float value for each sensor.
+    * @param tSignalVec              Vector with one float value for each sensor.
     */
     void addNewRtData(const Eigen::VectorXf &tSignalVec);
 
@@ -144,7 +145,7 @@ public:
     /**
     * This function set the normalization value.
     *
-    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
+    * @param[in] vecThresholds       The new threshold values used for normalizing the data.
     */
     void setNormalization(const QVector3D& tVecThresholds);
 
@@ -152,7 +153,7 @@ public:
     /**
      * This function sets the colormap type
      *
-     * @param tColormapType                     The new colormap name.
+     * @param tColormapType           The new colormap name.
      */
     void setColormapType(const QString& tColormapType);
 

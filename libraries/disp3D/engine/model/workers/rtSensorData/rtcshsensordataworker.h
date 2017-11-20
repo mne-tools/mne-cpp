@@ -86,7 +86,7 @@ namespace DISP3DLIB {
 /**
 * Worker which schedules data with the right timing.
 *
-* @brief Data scheduler
+* @brief Data scheduler.
 */
 
 class DISP3DSHARED_EXPORT RtCshSensorDataWorker : public QThread
@@ -116,7 +116,7 @@ public:
     *
     * @param[in] tData         The new data.
     */
-    void addData(const Eigen::MatrixXf& tData); //@TODO is float ok?
+    void addData(const Eigen::MatrixXf& tData);
 
     //=========================================================================================================
     /**
@@ -182,8 +182,8 @@ private:
     //=========================================================================================================
     QMutex                                          m_qMutex;                           /**< The thread's mutex. */
 
-    QLinkedList<Eigen::VectorXf>                    m_lDataQ;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    QLinkedList<Eigen::VectorXf>::const_iterator    m_itCurrentSample;                  /**< Iterator to the current Sample in the linked list. */
+    QLinkedList<Eigen::VectorXf>                    m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QLinkedList<Eigen::VectorXf>::const_iterator    m_itCurrentSample;                  /**< Iterator to the current sample in the linked list. */
 
     bool                                            m_bIsRunning;                       /**< Flag if this thread is running. */
     bool                                            m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
