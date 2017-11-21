@@ -244,6 +244,7 @@ protected:
     int                                     m_iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
     double                                  m_dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
     QSharedPointer<QVector<qint32>>         m_pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+    QSharedPointer<MatrixXd>                m_pDistanceMatrix;                  /**< Distance matrix. */
     MNELIB::MNEBemSurface                   m_bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
     FIFFLIB::FiffInfo                       m_fiffInfo;                         /**< Contains all information about the sensors. */
     double (*m_interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */

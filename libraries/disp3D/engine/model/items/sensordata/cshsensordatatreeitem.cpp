@@ -184,15 +184,15 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     //QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = calculateWeigtMatrix();
 
     //SCDC with cancel distance
-    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(tBemSurface, m_pVecMappedSubset, tCancelDist);
+    m_pDistanceMatrix = GeometryInfo::scdc(tBemSurface, m_pVecMappedSubset, tCancelDist);
 
     //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(pDistanceMatrix, tFiffInfo, m_iSensorType);
+    GeometryInfo::filterBadChannels(m_pDistanceMatrix, tFiffInfo, m_iSensorType);
 
     dFuncPtr interpolationFunc = transformInterpolationFromStrToFunc(tInterpolationFunction);
     //create weight matrix
     QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = Interpolation::createInterpolationMat(m_pVecMappedSubset,
-                                                                               pDistanceMatrix,
+                                                                               m_pDistanceMatrix,
                                                                                interpolationFunc,
                                                                                tCancelDist,
                                                                                tFiffInfo,
@@ -297,8 +297,18 @@ void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
     m_fiffInfo = info;
 
+    //filtering of bad channels out of the distance table
+    GeometryInfo::filterBadChannels(m_pDistanceMatrix,
+                                    m_fiffInfo,
+                                    m_iSensorType);
+
     //Update weight matrix
-    m_pInterpolationItem->setWeightMatrix(calculateWeigtMatrix());
+    m_pInterpolationItem->setWeightMatrix(Interpolation::createInterpolationMat(m_pVecMappedSubset,
+                                                                                m_pDistanceMatrix,
+                                                                                m_interpolationFunction,
+                                                                                m_dCancelDistance,
+                                                                                m_fiffInfo,
+                                                                                m_iSensorType););
 }
 
 
@@ -307,19 +317,19 @@ void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 QSharedPointer<SparseMatrix<double>> CshSensorDataTreeItem::calculateWeigtMatrix()
 {
     //SCDC with cancel distance
-    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(m_bemSurface,
-                                                              m_pVecMappedSubset,
-                                                              m_dCancelDistance);
+    m_pDistanceMatrix = GeometryInfo::scdc(m_bemSurface,
+                                           m_pVecMappedSubset,
+                                           m_dCancelDistance);
 
     //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(pDistanceMatrix,
+    GeometryInfo::filterBadChannels(m_pDistanceMatrix,
                                     m_fiffInfo,
                                     m_iSensorType);
 
 
     //create weight matrix
     return  Interpolation::createInterpolationMat(m_pVecMappedSubset,
-                                                   pDistanceMatrix,
+                                                   m_pDistanceMatrix,
                                                    m_interpolationFunction,
                                                    m_dCancelDistance,
                                                    m_fiffInfo,
@@ -430,7 +440,24 @@ void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 
         if(m_pInterpolationItem != nullptr && m_bIsDataInit == true)
         {
-            m_pInterpolationItem->setWeightMatrix(calculateWeigtMatrix());
+            //SCDC with cancel distance
+            m_pDistanceMatrix = GeometryInfo::scdc(m_bemSurface,
+                                                   m_pVecMappedSubset,
+                                                   m_dCancelDistance);
+
+            //filtering of bad channels out of the distance table
+            GeometryInfo::filterBadChannels(m_pDistanceMatrix,
+                                            m_fiffInfo,
+                                            m_iSensorType);
+
+
+            //create weight matrix
+            m_pInterpolationItem->setWeightMatrix(Interpolation::createInterpolationMat(m_pVecMappedSubset,
+                                                                                        m_pDistanceMatrix,
+                                                                                        m_interpolationFunction,
+                                                                                        m_dCancelDistance,
+                                                                                        m_fiffInfo,
+                                                                                        m_iSensorType););
         }
     }
 }
@@ -446,7 +473,12 @@ void CshSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
 
         if(m_pInterpolationItem && m_bIsDataInit == true)
         {
-            m_pInterpolationItem->setWeightMatrix(calculateWeigtMatrix());
+            m_pInterpolationItem->setWeightMatrix(Interpolation::createInterpolationMat(m_pVecMappedSubset,
+                                                                                        m_pDistanceMatrix,
+                                                                                        m_interpolationFunction,
+                                                                                        m_dCancelDistance,
+                                                                                        m_fiffInfo,
+                                                                                        m_iSensorType););
         }
     }
 }
