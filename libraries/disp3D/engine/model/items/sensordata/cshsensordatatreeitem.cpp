@@ -240,7 +240,7 @@ void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         }
         //Set new data into item's data.
         QVariant data;
-        data.setValue(dSmallSensorData); //@TODO this should use fSmallSensorData
+        data.setValue(dSmallSensorData);
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
         //Add data to worker
@@ -259,7 +259,7 @@ void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 
         //Set new data into item's data.
         QVariant data;
-        data.setValue(dSmallSensorData); //@TODO this should use fSmallSensorData
+        data.setValue(dSmallSensorData);
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
         //Add data to worker
@@ -308,7 +308,7 @@ void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
                                                                                 m_interpolationFunction,
                                                                                 m_dCancelDistance,
                                                                                 m_fiffInfo,
-                                                                                m_iSensorType););
+                                                                                m_iSensorType));
 }
 
 
@@ -457,7 +457,7 @@ void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
                                                                                         m_interpolationFunction,
                                                                                         m_dCancelDistance,
                                                                                         m_fiffInfo,
-                                                                                        m_iSensorType););
+                                                                                        m_iSensorType));
         }
     }
 }
@@ -478,7 +478,7 @@ void CshSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
                                                                                         m_interpolationFunction,
                                                                                         m_dCancelDistance,
                                                                                         m_fiffInfo,
-                                                                                        m_iSensorType););
+                                                                                        m_iSensorType));
         }
     }
 }
