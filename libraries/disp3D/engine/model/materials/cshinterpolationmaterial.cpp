@@ -137,8 +137,6 @@ CshInterpolationMaterial::~CshInterpolationMaterial()
 
 void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
 {
-    //@TODO dont set cols and rows
-
     //Set Rows and Cols
     m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
     m_pRowsParameter->setValue(static_cast<uint>(tInterpolationMatrix->rows()));
