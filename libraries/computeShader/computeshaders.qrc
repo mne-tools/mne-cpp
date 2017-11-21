@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>fragmentshader.frag</file>
-        <file>vertexshader.vert</file>
-        <file>interpolation.csh</file>
-        <file>light.inc.frag</file>
-    </qresource>
-</RCC>

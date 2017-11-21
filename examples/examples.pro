@@ -73,7 +73,6 @@ SUBDIRS += \
             ex_roi_clustered_inverse_pwl_rap_music \
             ex_st_clustered_inverse_pwl_rap_music \
             ex_interpolation \
-            ex_compute_shader
 
         !isEmpty( CNTK_INCLUDE_DIR ) {
             SUBDIRS += \
