@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cshinterpolationmaterial.h
+* @file     gpuinterpolationmaterial.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CshInterpolationMaterial class declaration.
+* @brief     GpuInterpolationMaterial class declaration.
 *
 */
 
-#ifndef DISP3DLIB_CSHINTERPOLATIONMATERIAL_H
-#define DISP3DLIB_CSHINTERPOLATIONMATERIAL_H
+#ifndef DISP3DLIB_GPUINTERPOLATIONMATERIAL_H
+#define DISP3DLIB_GPUINTERPOLATIONMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -112,13 +112,13 @@ namespace DISP3DLIB {
 * @brief Compute shader interpolation material.
 */
 
-class DISP3DSHARED_EXPORT CshInterpolationMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT GpuInterpolationMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CshInterpolationMaterial> SPtr;            /**< Shared pointer type for CshInterpolationMaterial. */
-    typedef QSharedPointer<const CshInterpolationMaterial> ConstSPtr; /**< Const shared pointer type for CshInterpolationMaterial. */
+    typedef QSharedPointer<GpuInterpolationMaterial> SPtr;            /**< Shared pointer type for GpuInterpolationMaterial. */
+    typedef QSharedPointer<const GpuInterpolationMaterial> ConstSPtr; /**< Const shared pointer type for GpuInterpolationMaterial. */
 
     //=========================================================================================================
     /**
@@ -127,13 +127,13 @@ public:
     * @param[in] bUseAlpha      Whether to use alpha/transparency.
     * @param[in] parent         The parent of this class.
     */
-    explicit CshInterpolationMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+    explicit GpuInterpolationMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~CshInterpolationMaterial();
+    ~GpuInterpolationMaterial();
 
     //=========================================================================================================
     /**
@@ -194,7 +194,7 @@ protected:
 private:
     //=========================================================================================================
     /**
-     * Init CshInterpolationMaterial class.
+     * Init GpuInterpolationMaterial class.
      */
     void init();
 
@@ -276,4 +276,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_CSHINTERPOLATIONMATERIAL_H
+#endif // DISP3DLIB_GPUINTERPOLATIONMATERIAL_H

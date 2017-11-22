@@ -90,7 +90,7 @@ namespace DISP3DLIB {
 //=============================================================================================================
 
 class CustomMesh;
-class CshInterpolationMaterial;
+class GpuInterpolationMaterial;
 
 
 //=============================================================================================================
@@ -180,7 +180,7 @@ protected:
 
     QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;      /**< This component issues work for the csh to the gpu. */
 
-    QPointer<CshInterpolationMaterial>      m_pMaterial;            /**< Compute material used for the process. */
+    QPointer<GpuInterpolationMaterial>      m_pMaterial;            /**< Compute material used for the process. */
 
 };
 
