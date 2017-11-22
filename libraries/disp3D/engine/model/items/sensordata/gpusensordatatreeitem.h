@@ -80,8 +80,8 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class CshInterpolationItem;
-class RtCshSensorDataWorker;
+class GpuInterpolationItem;
+class RtGpuSensorDataWorker;
 
 
 //=============================================================================================================
@@ -238,9 +238,9 @@ protected:
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
 
-    QPointer<RtCshSensorDataWorker>         m_pSensorRtDataWorker;              /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtGpuSensorDataWorker>         m_pSensorRtDataWorker;              /**< The source data worker. This worker streams the rt data to this item.*/
 
-    QPointer<CshInterpolationItem>          m_pInterpolationItem;               /**< This item manages all 3d rendering and calculations. */
+    QPointer<GpuInterpolationItem>          m_pInterpolationItem;               /**< This item manages all 3d rendering and calculations. */
 
     //Surface data
     int                                     m_iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */

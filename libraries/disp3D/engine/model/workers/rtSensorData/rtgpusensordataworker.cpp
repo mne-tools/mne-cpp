@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtcshsensordataworker.cpp
+* @file     rtgpusensordataworker.cpp
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RtCshSensorDataWorker class definition.
+* @brief    RtGpuSensorDataWorker class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtcshsensordataworker.h"
+#include "rtgpusensordataworker.h"
 
 
 //*************************************************************************************************************
@@ -77,7 +77,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtCshSensorDataWorker::RtCshSensorDataWorker(QObject *parent)
+RtGpuSensorDataWorker::RtGpuSensorDataWorker(QObject *parent)
     : QThread(parent)
     , m_bIsRunning(false)
     , m_bIsLooping(true)
@@ -90,7 +90,7 @@ RtCshSensorDataWorker::RtCshSensorDataWorker(QObject *parent)
 
 //*************************************************************************************************************
 
-RtCshSensorDataWorker::~RtCshSensorDataWorker()
+RtGpuSensorDataWorker::~RtGpuSensorDataWorker()
 {
     if(this->isRunning()) {
         stop();
@@ -100,7 +100,7 @@ RtCshSensorDataWorker::~RtCshSensorDataWorker()
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::addData(const Eigen::MatrixXf &tData)
+void RtGpuSensorDataWorker::addData(const Eigen::MatrixXf &tData)
 {
     QMutexLocker locker(&m_qMutex);
     if(tData.rows() == 0) {
@@ -112,7 +112,7 @@ void RtCshSensorDataWorker::addData(const Eigen::MatrixXf &tData)
         if(m_lDataQ.size() < m_dSFreq) {
             m_lDataQ.push_back(tData.col(i));
         } else {
-            qDebug() <<"RtCshSensorDataWorker::addData - worker is full!";
+            qDebug() <<"RtGpuSensorDataWorker::addData - worker is full!";
             break;
         }
     }
@@ -121,7 +121,7 @@ void RtCshSensorDataWorker::addData(const Eigen::MatrixXf &tData)
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::clear()
+void RtGpuSensorDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
     m_lDataQ.clear();
@@ -130,7 +130,7 @@ void RtCshSensorDataWorker::clear()
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::setNumberAverages(const uint tNumAvr)
+void RtGpuSensorDataWorker::setNumberAverages(const uint tNumAvr)
 {
     QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = tNumAvr;
@@ -139,7 +139,7 @@ void RtCshSensorDataWorker::setNumberAverages(const uint tNumAvr)
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::setInterval(const uint tMSec)
+void RtGpuSensorDataWorker::setInterval(const uint tMSec)
 {
     QMutexLocker locker(&m_qMutex);
     m_iMSecIntervall = tMSec;
@@ -148,7 +148,7 @@ void RtCshSensorDataWorker::setInterval(const uint tMSec)
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::setLoop(const bool tLooping)
+void RtGpuSensorDataWorker::setLoop(const bool tLooping)
 {
     QMutexLocker locker(&m_qMutex);
     m_bIsLooping = tLooping;
@@ -157,7 +157,7 @@ void RtCshSensorDataWorker::setLoop(const bool tLooping)
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::setSFreq(const double tSFreq)
+void RtGpuSensorDataWorker::setSFreq(const double tSFreq)
 {
     QMutexLocker locker(&m_qMutex);
     m_dSFreq = tSFreq;
@@ -166,7 +166,7 @@ void RtCshSensorDataWorker::setSFreq(const double tSFreq)
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::stop()
+void RtGpuSensorDataWorker::stop()
 {
     m_qMutex.lock();
     m_bIsRunning = false;
@@ -178,7 +178,7 @@ void RtCshSensorDataWorker::stop()
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::start()
+void RtGpuSensorDataWorker::start()
 {
     m_qMutex.lock();
     m_itCurrentSample = m_lDataQ.cbegin();
@@ -189,7 +189,7 @@ void RtCshSensorDataWorker::start()
 
 //*************************************************************************************************************
 
-void RtCshSensorDataWorker::run()
+void RtGpuSensorDataWorker::run()
 {
     VectorXf vecAverage;
     uint iAverageCtr = 0;
