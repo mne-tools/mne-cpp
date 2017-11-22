@@ -29,8 +29,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SENSORDATATREEITEM_H
-#define SENSORDATATREEITEM_H
+#ifndef DISP3DLIB_SENSORDATATREEITEM_H
+#define DISP3DLIB_SENSORDATATREEITEM_H
 
 
 //*************************************************************************************************************
@@ -42,6 +42,7 @@
 #include "../common/abstracttreeitem.h"
 #include "../measurement/measurementtreeitem.h"
 #include <fiff/fiff_types.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -61,6 +62,7 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
 namespace FIFFLIB{
     class FiffEvoked;
 }
@@ -68,6 +70,7 @@ namespace FIFFLIB{
 namespace MNELIB{
     class MNEBemSurface;
 }
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -301,4 +304,4 @@ inline bool SensorDataTreeItem::isDataInit() const
 
 } // namespace DISP3DLIB
 
-#endif // SENSORDATATREEITEM_H
+#endif // DISP3DLIB_SENSORDATATREEITEM_H

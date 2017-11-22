@@ -45,6 +45,7 @@
 #include "../../../../disp3D_global.h"
 #include "../common/abstract3Dtreeitem.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -60,6 +61,7 @@
 
 #include <Eigen/SparseCore>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -72,6 +74,8 @@ namespace MNELIB{
 namespace Qt3DRender {
     class QComputeCommand;
 }
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -87,6 +91,7 @@ namespace DISP3DLIB {
 
 class CustomMesh;
 class CshInterpolationMaterial;
+
 
 //=============================================================================================================
 /**
@@ -114,7 +119,7 @@ public:
     */
     explicit CshInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = nullptr,
                                   int iType = Data3DTreeModelItemTypes::CshInterpolationItem,
-                                  const QString& text = "CshInterpolation");
+                                  const QString& text = "3D Plot");
 
     //=========================================================================================================
     /**
@@ -165,17 +170,17 @@ protected:
      */
     virtual void initItem() override;
 
-    bool                                    m_bIsDataInit;
+    bool                                    m_bIsDataInit;          /**< The initialization flag. */
 
-    QPointer<CustomMesh>                    m_pCustomMesh;
+    QPointer<CustomMesh>                    m_pCustomMesh;          /**< Stores 3D data of the surfce. */
 
-    QPointer<Qt3DCore::QEntity>             m_pMeshDrawEntity;
+    QPointer<Qt3DCore::QEntity>             m_pMeshDrawEntity;      /**< Top level Entity for the draw part. */
 
-    QPointer<Qt3DCore::QEntity>             m_pComputeEntity;
+    QPointer<Qt3DCore::QEntity>             m_pComputeEntity;       /**< Top level Entity for the compute part. */
 
-    QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;
+    QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;      /**< This component issues work for the csh to the gpu. */
 
-    QPointer<CshInterpolationMaterial>      m_pMaterial;
+    QPointer<CshInterpolationMaterial>      m_pMaterial;            /**< Compute material used for the process. */
 
 };
 

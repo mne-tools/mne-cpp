@@ -45,6 +45,7 @@
 #include "../../../../disp3D_global.h"
 #include "sensordatatreeitem.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -72,6 +73,7 @@ namespace MNELIB{
     class MNEBemSurface;
 }
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -87,10 +89,11 @@ namespace DISP3DLIB {
 
 class RtSensorDataWorker;
 
+
 //=============================================================================================================
 /**
 * This item allows on-the-fly changes to parameters of visualization. It integrates the features provided in
-* GeometryInfo and and uses the cpu for interpolation.
+* GeometryInfo and uses the cpu for interpolation.
 *
 * @brief This item integrates GeometryInfo and  Interpolation into Disp3D structure.
 */

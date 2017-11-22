@@ -223,7 +223,7 @@ protected:
     QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
     QPointer<Qt3DRender::QCamera>       m_pCameraEntity;                /**< The camera entity. */
-    QPointer<CustomFrameGraph>          m_pFrameGraph;                   /**< The frameGraph entity. */
+    QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
 
     QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
     QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
@@ -237,12 +237,12 @@ protected:
 
     QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
 
-    QVector3D                           m_vecViewTrans;               /**< The camera translation vector. */
-    QVector3D                           m_vecViewTransOld;            /**< The camera old translation vector. */
-    QVector3D                           m_vecViewRotation;            /**< The camera rotation vector. */
-    QVector3D                           m_vecViewRotationOld;         /**< The camera old rotation vector. */
-    QVector3D                           m_vecModelRotation;           /**< The model rotation vector. */
-    QVector3D                           m_vecModelRotationOld;        /**< The model old rotation vector. */
+    QVector3D                           m_vecViewTrans;                 /**< The camera translation vector. */
+    QVector3D                           m_vecViewTransOld;              /**< The camera old translation vector. */
+    QVector3D                           m_vecViewRotation;              /**< The camera rotation vector. */
+    QVector3D                           m_vecViewRotationOld;           /**< The camera old rotation vector. */
+    QVector3D                           m_vecModelRotation;             /**< The model rotation vector. */
+    QVector3D                           m_vecModelRotationOld;          /**< The model old rotation vector. */
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;        /**< The animations for each 3D object. */
     QList<QPair<QPointer<Qt3DRender::QPointLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */
