@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cshsensordatatreeitem.cpp
+* @file     gpusensordatatreeitem.cpp
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CshSensorDataTreeItem class definition.
+* @brief    GpuSensorDataTreeItem class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "cshsensordatatreeitem.h"
+#include "gpusensordatatreeitem.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "cshinterpolationitem.h"
@@ -101,7 +101,7 @@ dFuncPtr transformInterpolationFromStrToFunc(const QString &tFunctionName)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CshSensorDataTreeItem::CshSensorDataTreeItem(int iType, const QString &text)
+GpuSensorDataTreeItem::GpuSensorDataTreeItem(int iType, const QString &text)
     : SensorDataTreeItem(iType,text)
 {
     SensorDataTreeItem::initItem();
@@ -110,7 +110,7 @@ CshSensorDataTreeItem::CshSensorDataTreeItem(int iType, const QString &text)
 
 //*************************************************************************************************************
 
-CshSensorDataTreeItem::~CshSensorDataTreeItem()
+GpuSensorDataTreeItem::~GpuSensorDataTreeItem()
 {
     if(m_pSensorRtDataWorker->isRunning())
     {
@@ -122,7 +122,7 @@ CshSensorDataTreeItem::~CshSensorDataTreeItem()
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
+void GpuSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
                                  const FiffInfo &tFiffInfo,
                                  const QString &tSensorType,
                                  const double tCancelDist,
@@ -131,7 +131,7 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
 {
     if(m_bIsDataInit == true)
     {
-        qDebug("CshSensorDataTreeItem::init is already initialized");
+        qDebug("GpuSensorDataTreeItem::init is already initialized");
     }
 
     this->setData(0, Data3DTreeModelItemRoles::RTData);
@@ -141,7 +141,7 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     }
 
     connect(m_pSensorRtDataWorker.data(), &RtCshSensorDataWorker::newRtData,
-            this, &CshSensorDataTreeItem::onNewRtData);
+            this, &GpuSensorDataTreeItem::onNewRtData);
 
     // map passed sensor type string to fiff constant
     if (tSensorType.toStdString() == std::string("MEG")) {
@@ -149,7 +149,7 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     } else if (tSensorType.toStdString() == std::string("EEG")) {
         m_iSensorType = FIFFV_EEG_CH;
     } else {
-        qDebug() << "SensorDataTreeItem::init - unknown sensor type. Returning ...";
+        qDebug() << "GpuSensorDataTreeItem::init - unknown sensor type. Returning ...";
         return;
     }
 
@@ -219,10 +219,10 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
+void GpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 {
     if(!m_bIsDataInit) {
-        qDebug() << "CshSensorDataTreeItem::addData - sensor data item has not been initialized yet!";
+        qDebug() << "GpuSensorDataTreeItem::addData - sensor data item has not been initialized yet!";
         return;
     }
 
@@ -272,7 +272,7 @@ void CshSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::setSFreq(const double dSFreq)
+void GpuSensorDataTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pSensorRtDataWorker) {
         m_pSensorRtDataWorker->setSFreq(dSFreq);
@@ -282,7 +282,7 @@ void CshSensorDataTreeItem::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
+void GpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 {
     //Create bad channel idx list
     m_iSensorsBad.clear();
@@ -316,7 +316,7 @@ void CshSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
 //*************************************************************************************************************
 
-QSharedPointer<SparseMatrix<double>> CshSensorDataTreeItem::calculateWeigtMatrix()
+QSharedPointer<SparseMatrix<double>> GpuSensorDataTreeItem::calculateWeigtMatrix()
 {
     //SCDC with cancel distance
     m_pDistanceMatrix = GeometryInfo::scdc(m_bemSurface,
@@ -342,7 +342,7 @@ QSharedPointer<SparseMatrix<double>> CshSensorDataTreeItem::calculateWeigtMatrix
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &checkState)
+void GpuSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &checkState)
 {
     if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
@@ -356,7 +356,7 @@ void CshSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &chec
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onNewRtData(const VectorXf &tSensorData)
+void GpuSensorDataTreeItem::onNewRtData(const VectorXf &tSensorData)
 {
     if(m_pInterpolationItem)
     {
@@ -368,7 +368,7 @@ void CshSensorDataTreeItem::onNewRtData(const VectorXf &tSensorData)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
+void GpuSensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
 {
     if(sColormapType.canConvert<QString>())
     {
@@ -382,7 +382,7 @@ void CshSensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
+void GpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
 {
     if(iMSec.canConvert<int>()) {
         if(m_pSensorRtDataWorker) {
@@ -394,7 +394,7 @@ void CshSensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant &vecThresholds)
+void GpuSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant &vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>())
     {
@@ -408,7 +408,7 @@ void CshSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant &vecT
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState &checkState)
+void GpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState &checkState)
 {
     if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
@@ -422,7 +422,7 @@ void CshSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState 
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
+void GpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
         if(m_pSensorRtDataWorker) {
@@ -434,7 +434,7 @@ void CshSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
+void GpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
     if(dCancelDist.canConvert<double>())
     {
@@ -467,7 +467,7 @@ void CshSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 
 //*************************************************************************************************************
 
-void CshSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
+void GpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
     if(sInterpolationFunction.canConvert<QString>())
     {

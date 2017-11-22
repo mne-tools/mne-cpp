@@ -113,7 +113,7 @@ class EcdDataTreeItem;
 class FsSurfaceTreeItem;
 class SourceSpaceTreeItem;
 class DigitizerSetTreeItem;
-class CshSensorDataTreeItem;
+class GpuSensorDataTreeItem;
 class CpuSensorDataTreeItem;
 
 
@@ -299,8 +299,8 @@ protected:
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
     QPointer<CpuSensorDataTreeItem>              m_pCpuEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item. */
     QPointer<CpuSensorDataTreeItem>              m_pCpuMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item. */
-    QPointer<CshSensorDataTreeItem>              m_pCshEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item (compute shader version). */
-    QPointer<CshSensorDataTreeItem>              m_pCshMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item (compute shader version). */
+    QPointer<GpuSensorDataTreeItem>              m_pCshEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item (compute shader version). */
+    QPointer<GpuSensorDataTreeItem>              m_pCshMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item (compute shader version). */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 
