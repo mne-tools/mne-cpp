@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cshinterpolationitem.cpp
+* @file     gpuinterpolationitem.cpp
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CshInterpolationItem class definition.
+* @brief    GpuInterpolationItem class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "cshinterpolationitem.h"
+#include "gpuinterpolationitem.h"
 #include "../../materials/cshinterpolationmaterial.h"
 #include "../../3dhelpers/custommesh.h"
 #include <mne/mne_bem_surface.h>
@@ -84,7 +84,7 @@ using namespace Qt3DCore;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
+GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
     : Abstract3DTreeItem(p3DEntityParent, iType, text)
     , m_bIsDataInit(false)
     , m_pMaterial(new CshInterpolationMaterial(true))
@@ -95,12 +95,12 @@ CshInterpolationItem::CshInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 
 //*************************************************************************************************************
 
-void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
+void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
                                    QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
 {
     if(m_bIsDataInit == true)
     {
-       qDebug("CshInterpolationItem::initData data already initialized");
+       qDebug("GpuInterpolationItem::initData data already initialized");
        return;
     }
 
@@ -175,11 +175,11 @@ void CshInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
 
 //*************************************************************************************************************
 
-void CshInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
+void GpuInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
 {
     if(m_bIsDataInit == false)
     {
-        qDebug("CshInterpolationItem::setWeightMatrix item data is not initialized!");
+        qDebug("GpuInterpolationItem::setWeightMatrix item data is not initialized!");
         return;
     }
 
@@ -189,7 +189,7 @@ void CshInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> >
 
 //*************************************************************************************************************
 
-void CshInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
+void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 {
     if(m_pMaterial && m_bIsDataInit)
     {
@@ -201,7 +201,7 @@ void CshInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 
 //*************************************************************************************************************
 
-void CshInterpolationItem::setNormalization(const QVector3D &tVecThresholds)
+void GpuInterpolationItem::setNormalization(const QVector3D &tVecThresholds)
 {
     m_pMaterial->setNormalization(tVecThresholds);
 }
@@ -209,7 +209,7 @@ void CshInterpolationItem::setNormalization(const QVector3D &tVecThresholds)
 
 //*************************************************************************************************************
 
-void CshInterpolationItem::setColormapType(const QString &tColormapType)
+void GpuInterpolationItem::setColormapType(const QString &tColormapType)
 {
     m_pMaterial->setColormapType(tColormapType);
 }
@@ -217,7 +217,7 @@ void CshInterpolationItem::setColormapType(const QString &tColormapType)
 
 //*************************************************************************************************************
 
-void CshInterpolationItem::initItem()
+void GpuInterpolationItem::initItem()
 {
     this->setEditable(false);
     this->setCheckable(true);
