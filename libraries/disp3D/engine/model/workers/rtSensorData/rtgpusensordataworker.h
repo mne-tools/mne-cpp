@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtcshsensordataworker.h
+* @file     rtgpusensordataworker.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtCshSensorDataWorker class declaration.
+* @brief     RtGpuSensorDataWorker class declaration.
 *
 */
 
-#ifndef DISP3DLIB_RTCSHSENSORDATAWORKER_H
-#define DISP3DLIB_RTCSHSENSORDATAWORKER_H
+#ifndef DISP3DLIB_RTGPUSENSORDATAWORKER_H
+#define DISP3DLIB_RTGPUSENSORDATAWORKER_H
 
 
 //*************************************************************************************************************
@@ -91,12 +91,12 @@ namespace DISP3DLIB {
 * @brief Data scheduler.
 */
 
-class DISP3DSHARED_EXPORT RtCshSensorDataWorker : public QThread
+class DISP3DSHARED_EXPORT RtGpuSensorDataWorker : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RtCshSensorDataWorker> SPtr;            /**< Shared pointer type for RtCshSensorDataWorker. */
-    typedef QSharedPointer<const RtCshSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtCshSensorDataWorker. */
+    typedef QSharedPointer<RtGpuSensorDataWorker> SPtr;            /**< Shared pointer type for RtGpuSensorDataWorker. */
+    typedef QSharedPointer<const RtGpuSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtGpuSensorDataWorker. */
 
     //=========================================================================================================
     /**
@@ -104,13 +104,13 @@ public:
     *
     * @param[in] parent      The parent of the QObject.
     */
-    explicit RtCshSensorDataWorker(QObject* parent = 0);
+    explicit RtGpuSensorDataWorker(QObject* parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~RtCshSensorDataWorker();
+    ~RtGpuSensorDataWorker();
 
     //=========================================================================================================
     /**
@@ -214,4 +214,4 @@ signals:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_RTCSHSENSORDATAWORKER_H
+#endif // DISP3DLIB_RTGPUSENSORDATAWORKER_H

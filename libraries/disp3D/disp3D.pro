@@ -138,10 +138,10 @@ SOURCES += \
     engine/model/materials/geometrymultipliermaterial.cpp \
     engine/view/customframegraph.cpp \
     engine/model/materials/cshinterpolationmaterial.cpp \
-    engine/model/workers/rtSensorData/rtcshsensordataworker.cpp \
     engine/model/items/sensordata/cpusensordatatreeitem.cpp \
     engine/model/items/sensordata/gpusensordatatreeitem.cpp \
-    engine/model/items/sensordata/gpuinterpolationitem.cpp
+    engine/model/items/sensordata/gpuinterpolationitem.cpp \
+    engine/model/workers/rtSensorData/rtgpusensordataworker.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -191,10 +191,10 @@ HEADERS += \
     engine/model/materials/geometrymultipliermaterial.h \
     engine/view/customframegraph.h \
     engine/model/materials/cshinterpolationmaterial.h \
-    engine/model/workers/rtSensorData/rtcshsensordataworker.h \
     engine/model/items/sensordata/cpusensordatatreeitem.h \
     engine/model/items/sensordata/gpusensordatatreeitem.h \
-    engine/model/items/sensordata/gpuinterpolationitem.h
+    engine/model/items/sensordata/gpuinterpolationitem.h \
+    engine/model/workers/rtSensorData/rtgpusensordataworker.h
 
 FORMS += \
     engine/control/control3dwidget.ui \

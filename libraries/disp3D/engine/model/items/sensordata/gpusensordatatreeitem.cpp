@@ -42,8 +42,8 @@
 #include "gpusensordatatreeitem.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
-#include "cshinterpolationitem.h"
-#include "../../workers/rtSensorData/rtcshsensordataworker.h"
+#include "gpuinterpolationitem.h"
+#include "../../workers/rtSensorData/rtgpusensordataworker.h"
 
 
 //*************************************************************************************************************
@@ -137,10 +137,10 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
     if(!m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker = new RtCshSensorDataWorker();
+        m_pSensorRtDataWorker = new RtGpuSensorDataWorker();
     }
 
-    connect(m_pSensorRtDataWorker.data(), &RtCshSensorDataWorker::newRtData,
+    connect(m_pSensorRtDataWorker.data(), &RtGpuSensorDataWorker::newRtData,
             this, &GpuSensorDataTreeItem::onNewRtData);
 
     // map passed sensor type string to fiff constant
@@ -203,7 +203,7 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     //create new Tree Item
     if(!m_pInterpolationItem)
     {
-        m_pInterpolationItem = new CshInterpolationItem(t3DEntityParent, Data3DTreeModelItemTypes::CshInterpolationItem, QStringLiteral("3D Plot"));
+        m_pInterpolationItem = new GpuInterpolationItem(t3DEntityParent, Data3DTreeModelItemTypes::GpuInterpolationItem, QStringLiteral("3D Plot"));
         m_pInterpolationItem->initData(tBemSurface, pInterpolationMatrix);
 
         QList<QStandardItem*> list;
