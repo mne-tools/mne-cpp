@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cshinterpolationmaterial.cpp
+* @file     Gpuinterpolationmaterial.cpp
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CshInterpolationMaterial class definition.
+* @brief    GpuInterpolationMaterial class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "cshinterpolationmaterial.h"
+#include "gpuinterpolationmaterial.h"
 
 
 //*************************************************************************************************************
@@ -91,7 +91,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNode *parent)
+GpuInterpolationMaterial::GpuInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNode *parent)
     : QMaterial(parent)
     , m_bUseAlpha(bUseAlpha)
     , m_pEffect(new QEffect)
@@ -129,7 +129,7 @@ CshInterpolationMaterial::CshInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
 
 //*************************************************************************************************************
 
-CshInterpolationMaterial::~CshInterpolationMaterial()
+GpuInterpolationMaterial::~GpuInterpolationMaterial()
 {
 
 }
@@ -137,7 +137,7 @@ CshInterpolationMaterial::~CshInterpolationMaterial()
 
 //*************************************************************************************************************
 
-void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
+void GpuInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
 {
     //Set Rows and Cols
     m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
@@ -156,13 +156,13 @@ void CshInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatri
 
 //*************************************************************************************************************
 
-void CshInterpolationMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
+void GpuInterpolationMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
 {
     const uint iBufferSize = tSignalVec.rows();
 
     if(iBufferSize != m_pColsParameter->value())
     {
-        qDebug("CshInterpolationMaterial::addSignalData input vector dimension mismatch!");
+        qDebug("GpuInterpolationMaterial::addSignalData input vector dimension mismatch!");
         return;
     }
 
@@ -183,7 +183,7 @@ void CshInterpolationMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
 
 //*************************************************************************************************************
 
-float CshInterpolationMaterial::alpha()
+float GpuInterpolationMaterial::alpha()
 {
     return m_pAlphaParameter->value().toFloat();
 }
@@ -191,7 +191,7 @@ float CshInterpolationMaterial::alpha()
 
 //*************************************************************************************************************
 
-void CshInterpolationMaterial::setAlpha(const float tAlpha)
+void GpuInterpolationMaterial::setAlpha(const float tAlpha)
 {
     m_pAlphaParameter->setValue(tAlpha);
 }
@@ -199,7 +199,7 @@ void CshInterpolationMaterial::setAlpha(const float tAlpha)
 
 //*************************************************************************************************************
 
-void CshInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
+void GpuInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
 {
     m_pThresholdXParameter->setValue(QVariant::fromValue(tVecThresholds.x()));
     m_pThresholdZParameter->setValue(QVariant::fromValue(tVecThresholds.z()));
@@ -208,7 +208,7 @@ void CshInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
 
 //*************************************************************************************************************
 
-void CshInterpolationMaterial::setColormapType(const QString &tColormapType)
+void GpuInterpolationMaterial::setColormapType(const QString &tColormapType)
 {
     if(tColormapType == "Hot") {
         m_pColormapParameter->setValue(0);
@@ -224,7 +224,7 @@ void CshInterpolationMaterial::setColormapType(const QString &tColormapType)
 
 //*************************************************************************************************************
 
-Qt3DRender::QBuffer * CshInterpolationMaterial::getOutputColorBuffer()
+Qt3DRender::QBuffer * GpuInterpolationMaterial::getOutputColorBuffer()
 {
     return m_pOutputColorBuffer.data();
 }
@@ -232,7 +232,7 @@ Qt3DRender::QBuffer * CshInterpolationMaterial::getOutputColorBuffer()
 
 //*************************************************************************************************************
 
-void CshInterpolationMaterial::init()
+void GpuInterpolationMaterial::init()
 {
     //Compute part
     //Set shader
@@ -344,7 +344,7 @@ void CshInterpolationMaterial::init()
 
 //*************************************************************************************************************
 
-QByteArray CshInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
+QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
 {
     QByteArray bufferData;
 
@@ -371,7 +371,7 @@ QByteArray CshInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eige
 
 //*************************************************************************************************************
 
-QByteArray CshInterpolationMaterial::buildZeroBuffer(const uint tSize)
+QByteArray GpuInterpolationMaterial::buildZeroBuffer(const uint tSize)
 {
     QByteArray bufferData;
     bufferData.resize(tSize * (int)sizeof(float));
