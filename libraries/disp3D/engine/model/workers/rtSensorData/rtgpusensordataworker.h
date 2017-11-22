@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     custommesh.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     rtgpusensordataworker.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     September, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CustomMesh class declaration
+* @brief     RtGpuSensorDataWorker class declaration.
 *
 */
 
-#ifndef CUSTOMMESH_H
-#define CUSTOMMESH_H
+#ifndef DISP3DLIB_RTGPUSENSORDATAWORKER_H
+#define DISP3DLIB_RTGPUSENSORDATAWORKER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../disp3D_global.h"
+#include "../../../../disp3D_global.h"
 
 
 //*************************************************************************************************************
@@ -49,8 +50,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/QGeometryRenderer>
-#include <QPointer>
+#include <QSharedPointer>
+#include <QThread>
+#include <QMutex>
+#include <QLinkedList>
 
 
 //*************************************************************************************************************
@@ -66,146 +69,149 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Qt3DRender {
-    class QBuffer;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
+namespace DISP3DLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Custom mesh functionality.
+* Worker which schedules data with the right timing.
 *
-* @brief Custom mesh functionality.
+* @brief Data scheduler.
 */
-class DISP3DSHARED_EXPORT CustomMesh : public Qt3DRender::QGeometryRenderer
+
+class DISP3DSHARED_EXPORT RtGpuSensorDataWorker : public QThread
 {
     Q_OBJECT
-
 public:
-    typedef QSharedPointer<CustomMesh> SPtr;             /**< Shared pointer type for CustomMesh class. */
-    typedef QSharedPointer<const CustomMesh> ConstSPtr;  /**< Const shared pointer type for CustomMesh class. */
-
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    */
-    CustomMesh();
+    typedef QSharedPointer<RtGpuSensorDataWorker> SPtr;            /**< Shared pointer type for RtGpuSensorDataWorker. */
+    typedef QSharedPointer<const RtGpuSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtGpuSensorDataWorker. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The vertex colors. If empty a default value will be used.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+    * @param[in] parent      The parent of the QObject.
     */
-    CustomMesh(const Eigen::MatrixX3f& tMatVert,
-                const Eigen::MatrixX3f& tMatNorm,
-                const Eigen::MatrixXi& tMatTris,
-                const Eigen::MatrixX3f& tMatColors,
-                Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
+    explicit RtGpuSensorDataWorker(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Default destructor.
     */
-    ~CustomMesh();
+    ~RtGpuSensorDataWorker();
 
     //=========================================================================================================
     /**
-    * Set the vertices colors of the mesh.
+    * Add data which is to be streamed.
     *
-    * @param[in] tMatColors     New color information for the vertices.
+    * @param[in] tData         The new data.
     */
-    void setColor(const Eigen::MatrixX3f &tMatColors);
+    void addData(const Eigen::MatrixXf& tData);
 
     //=========================================================================================================
     /**
-    * Set the normals the mesh.
-    *
-    * @param[in] tMatNorm       Normals in form of a matrix.
+    * Clear this worker, empties the m_lData field that holds the current block of sensor activity
     */
-    void setNormals(const Eigen::MatrixX3f& tMatNorm);
+    void clear();
 
     //=========================================================================================================
     /**
-    * Set the vertices the mesh.
+    * Set the number of average to take after emitting the data to the listening threads.
     *
-    * @param[in] tMatVert       Vertices in form of a matrix.
+    * @param[in] tNumAvr                The new number of averages.
     */
-    void setVertex(const Eigen::MatrixX3f& tMatVert);
+    void setNumberAverages(const uint tNumAvr);
 
     //=========================================================================================================
     /**
-    * Set the triangles/index of the mesh.
+    * Set the length in milli Seconds to wait inbetween data samples.
     *
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tMSec                  The new length in milli Seconds to wait inbetween data samples.
     */
-    void setIndex(const Eigen::MatrixXi &tMatTris);
+    void setInterval(const uint tMSec);
 
     //=========================================================================================================
     /**
-    * Set the needed information to create the mesh and then creates a new mesh.
+    * Set the loop functionality on or off.
     *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The color info of all the vertices.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+    * @param[in] tLooping                The new looping state.
     */
-    void setMeshData(const Eigen::MatrixX3f& tMatVert,
-                     const Eigen::MatrixX3f& tMatNorm,
-                     const Eigen::MatrixXi& tMatTris,
-                     const Eigen::MatrixX3f& tMatColors,
-                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
+    void setLoop(const bool tLooping);
 
     //=========================================================================================================
     /**
-    * Add new Attribute to the geometry.
+    * Set the sampling frequency.
     *
-    * @param[in] pAttribute       New QAttribute.
+    * @param[in] tSFreq                 The new sampling frequency.
     */
-    void addAttribute(Qt3DRender::QAttribute *pAttribute);
+    void setSFreq(const double tSFreq);
+
+    //=========================================================================================================
+    /**
+    * Sets the running flag to false and waits for the worker to stop.
+    */
+    void stop();
+
+    //=========================================================================================================
+    /**
+    * Resets the index of the current sample and starts the worker.
+    */
+    void start();
 
 protected:
+
     //=========================================================================================================
     /**
-    * Init the custom mesh.
+    * Main method of this worker: Checks whether it is time for the worker to output new data for visualization.
+    * If so, it averages the specified amount of data samples and calculates the output.
     */
-    void init();
+    virtual void run() override;
 
-    QPointer<Qt3DRender::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
+private:
 
-    QPointer<Qt3DRender::QGeometry>     m_pCustomGeometry;         /**< The custom geometry. */
+    //=========================================================================================================
+    QMutex                                          m_qMutex;                           /**< The thread's mutex. */
 
-    QPointer<Qt3DRender::QAttribute>    m_pIndexAttribute;         /**< The index attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;      /**< The position attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pNormalAttribute;        /**< The normal attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pColorAttribute;         /**< The color attribute. */
+    QLinkedList<Eigen::VectorXf>                    m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QLinkedList<Eigen::VectorXf>::const_iterator    m_itCurrentSample;                  /**< Iterator to the current sample in the linked list. */
 
-    int                                 m_iNumVert;                 /**< The total number of set vertices. */
+    bool                                            m_bIsRunning;                       /**< Flag if this thread is running. */
+    bool                                            m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
+
+    uint                                            m_iAverageSamples;                  /**< Number of average to compute. */
+    uint                                            m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
+
+    double                                          m_dSFreq;                           /**< The current sampling frequency. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever this item should send new signal data to its listeners.
+    *
+    * @param[in] tDataVector     The signal data from each sensor.
+    */
+    void newRtData(const Eigen::VectorXf &tDataVector);
 };
 
-} // NAMESPACE
 
-#endif // CUSTOMMESH_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace DISP3DLIB
+
+#endif // DISP3DLIB_RTGPUSENSORDATAWORKER_H

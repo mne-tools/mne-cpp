@@ -278,6 +278,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    //Create the 3D view
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+
+
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment,
@@ -286,7 +290,8 @@ int main(int argc, char *argv[])
                                                                              evoked.info,
                                                                              "MEG",
                                                                              0.10,
-                                                                             "Cubic")) {
+                                                                             "Cubic",
+                                                                             testWindow->format())) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
@@ -304,7 +309,8 @@ int main(int argc, char *argv[])
                                                                              evoked.info,
                                                                              "EEG",
                                                                              0.2,
-                                                                             "Cubic")) {
+                                                                             "Cubic",
+                                                                             testWindow->format())) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
@@ -327,8 +333,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    //Setup window
     testWindow->setModel(p3DDataModel);
     testWindow->show();
 

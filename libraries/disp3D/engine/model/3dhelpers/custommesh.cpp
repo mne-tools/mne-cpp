@@ -291,3 +291,11 @@ void CustomMesh::setMeshData(const MatrixX3f& tMatVert,
     ////    //this->setFirstVertex(0);
     ////    this->setFirstInstance(0);
 }
+
+
+//*************************************************************************************************************
+
+void CustomMesh::addAttribute(Qt3DRender::QAttribute *pAttribute)
+{
+    m_pCustomGeometry->addAttribute(pAttribute);
+}

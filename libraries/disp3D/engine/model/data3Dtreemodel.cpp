@@ -67,6 +67,8 @@
 
 #include <Qt3DCore/QEntity>
 
+#include <QSurfaceFormat>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -519,7 +521,47 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                         const FiffInfo& fiffInfo,
                                         const QString& sDataType,
                                         const double dCancelDist,
-                                        const QString& sInterpolationFunction)
+                                        const QString& sInterpolationFunction,
+                                        const QSurfaceFormat &tSurfaceFormat)
+{
+    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
+
+    //Test for OpenGL version 4.3
+    if((tSurfaceFormat.majorVersion() == 4
+            && tSurfaceFormat.minorVersion() >= 3
+            || tSurfaceFormat.majorVersion() > 4))
+    {
+        //use compute shader version
+        pReturnItem = addCshSensorData(sSubject,
+                         sMeasurementSetName,
+                         matSensorData,
+                         tBemSurface,
+                         fiffInfo,
+                         sDataType,
+                         dCancelDist,
+                         sInterpolationFunction);
+        qDebug("Using compute shader version of SensorDataTreeItem.");
+    }
+    else
+    {
+        //use cpu version
+        pReturnItem = addCpuSensorData(sSubject,
+                         sMeasurementSetName,
+                         matSensorData,
+                         tBemSurface,
+                         fiffInfo,
+                         sDataType,
+                         dCancelDist,
+                         sInterpolationFunction);
+    }
+
+    return pReturnItem;
+}
+
+
+//*************************************************************************************************************
+
+SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject, const QString &sMeasurementSetName, const MatrixXd &matSensorData, const MNEBemSurface &tBemSurface, const FiffInfo &fiffInfo, const QString &sDataType, const double dCancelDist, const QString &sInterpolationFunction)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -558,3 +600,40 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
 
     return pReturnItem;
 }
+
+
+//*************************************************************************************************************
+
+SensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject,
+                                                         const QString &sMeasurementSetName,
+                                                         const MatrixXd &matSensorData,
+                                                         const MNEBemSurface &tBemSurface,
+                                                         const FiffInfo &fiffInfo,
+                                                         const QString &sDataType,
+                                                         const double dCancelDist,
+                                                         const QString &sInterpolationFunction)
+{
+    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
+
+    //Handle subject item
+    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
+
+    //Find already existing surface items and add the new data to the first search result
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
+
+    //Find the "set" items and add the sensor data as items
+    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
+            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
+        }
+    } else {
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
+        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
+    }
+
+    return pReturnItem;
+}
+
+
+//*************************************************************************************************************

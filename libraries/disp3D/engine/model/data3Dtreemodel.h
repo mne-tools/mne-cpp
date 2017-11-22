@@ -73,6 +73,9 @@ namespace Qt3DCore {
     class QEntity;
 }
 
+class QSurfaceFormat;
+
+
 namespace FSLIB {
     class SurfaceSet;
     class AnnotationSet;
@@ -334,10 +337,11 @@ public:
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
     * @param[in] matSensorData          The Sensor Data.
     * @param[in] tBemSurface            The Bem Surface data.
-    * @param[in] fiffInfo             The FiffInfo that holds all information about the sensors.
+    * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
     * @param[in] sDataType              The data type ("MEG" or "EEG").
     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
     * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+    * @param[in] tSurfaceFormat         Surface format form View3D. It is used to determine the OpenGL version.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
@@ -348,7 +352,8 @@ public:
                                       const FIFFLIB::FiffInfo &fiffInfo,
                                       const QString &sDataType,
                                       const double dCancelDist,
-                                      const QString &sInterpolationFunction);
+                                      const QString &sInterpolationFunction,
+                                      const QSurfaceFormat &tSurfaceFormat);
 
     //=========================================================================================================
     /**
@@ -383,6 +388,54 @@ protected:
     * @param[in] pItemAdd            The item which is added as a row to the parent item.
     */
     void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
+
+    //=========================================================================================================
+    /**
+    * Adds live sensor data for interpolation with the cpu.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] matSensorData          The Sensor Data.
+    * @param[in] tBemSurface            The Bem Surface data.
+    * @param[in] fiffInfo             The FiffInfo that holds all information about the sensors.
+    * @param[in] sDataType              The data type ("MEG" or "EEG").
+    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
+    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+    *
+    * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    SensorDataTreeItem *addCpuSensorData(const QString& sSubject,
+                                         const QString& sMeasurementSetName,
+                                         const Eigen::MatrixXd& matSensorData,
+                                         const MNELIB::MNEBemSurface& tBemSurface,
+                                         const FIFFLIB::FiffInfo &fiffInfo,
+                                         const QString &sDataType,
+                                         const double dCancelDist,
+                                         const QString &sInterpolationFunction);
+
+    //=========================================================================================================
+    /**
+    * Adds live sensor data for interpolation with a compute shader.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] matSensorData          The Sensor Data.
+    * @param[in] tBemSurface            The Bem Surface data.
+    * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
+    * @param[in] sDataType              The data type ("MEG" or "EEG").
+    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
+    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+    *
+    * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    SensorDataTreeItem *addCshSensorData(const QString& sSubject,
+                                            const QString& sMeasurementSetName,
+                                            const Eigen::MatrixXd& matSensorData,
+                                            const MNELIB::MNEBemSurface& tBemSurface,
+                                            const FIFFLIB::FiffInfo &fiffInfo,
+                                            const QString &sDataType,
+                                            const double dCancelDist,
+                                            const QString &sInterpolationFunction);
 
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */

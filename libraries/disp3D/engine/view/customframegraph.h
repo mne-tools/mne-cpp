@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     custommesh.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     customframegraph.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     August, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CustomMesh class declaration
+* @brief    CustomFrameGraph class declaration.
 *
 */
 
-#ifndef CUSTOMMESH_H
-#define CUSTOMMESH_H
+#ifndef DISP3DLIB_CUSTOMFRAMEGRAPH_H
+#define DISP3DLIB_CUSTOMFRAMEGRAPH_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../disp3D_global.h"
+#include <disp3D_global.h>
 
 
 //*************************************************************************************************************
@@ -49,16 +50,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/QGeometryRenderer>
+#include <QSharedPointer>
 #include <QPointer>
+#include <Qt3DRender/QViewport>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -67,7 +67,16 @@
 //=============================================================================================================
 
 namespace Qt3DRender {
-    class QBuffer;
+        class QRenderSurfaceSelector;
+        class QClearBuffers;
+        class QNoDraw;
+        class QDispatchCompute;
+        class QTechniqueFilter;
+        class QCameraSelector;
+        class QCamera;
+        class QFilterKey;
+        class QMemoryBarrier;
+        class QCamera;
 }
 
 
@@ -76,136 +85,105 @@ namespace Qt3DRender {
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
+namespace DISP3DLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Custom mesh functionality.
+* This class holds a custom framegraph that can be used for computations with OpenGL compute shadern.
 *
-* @brief Custom mesh functionality.
+* @brief Custom framegaph class.
 */
-class DISP3DSHARED_EXPORT CustomMesh : public Qt3DRender::QGeometryRenderer
+
+class DISP3DSHARED_EXPORT CustomFrameGraph : public Qt3DRender::QViewport
 {
     Q_OBJECT
-
 public:
-    typedef QSharedPointer<CustomMesh> SPtr;             /**< Shared pointer type for CustomMesh class. */
-    typedef QSharedPointer<const CustomMesh> ConstSPtr;  /**< Const shared pointer type for CustomMesh class. */
+    typedef QSharedPointer<CustomFrameGraph> SPtr;            /**< Shared pointer type for CustomFrameGraph. */
+    typedef QSharedPointer<const CustomFrameGraph> ConstSPtr; /**< Const shared pointer type for CustomFrameGraph. */
 
     //=========================================================================================================
     /**
-    * Default constructor.
+    * Constructs a CustomFrameGraph object.
     */
-    CustomMesh();
+    explicit CustomFrameGraph(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The vertex colors. If empty a default value will be used.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+    * Destructor.
     */
-    CustomMesh(const Eigen::MatrixX3f& tMatVert,
-                const Eigen::MatrixX3f& tMatNorm,
-                const Eigen::MatrixXi& tMatTris,
-                const Eigen::MatrixX3f& tMatColors,
-                Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
+    ~CustomFrameGraph();
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~CustomMesh();
+     * This function sets active camera for use in the framegraphs camera selector.
+     *
+     * @param tCamera               Pointer to QCamera object.
+     */
+    void setCamera(Qt3DRender::QCamera *tCamera);
 
     //=========================================================================================================
     /**
-    * Set the vertices colors of the mesh.
-    *
-    * @param[in] tMatColors     New color information for the vertices.
-    */
-    void setColor(const Eigen::MatrixX3f &tMatColors);
+     * This function sets the work group size for the computation in each dimension.
+     *
+     * @param tX                     Size of X work group.
+     * @param tY                     Size of Y work group.
+     * @param tZ                     Size of Z work group.
+     */
+    void setWorkGroupSize(const uint tX, const uint tY , const uint tZ);
 
     //=========================================================================================================
     /**
-    * Set the normals the mesh.
-    *
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    */
-    void setNormals(const Eigen::MatrixX3f& tMatNorm);
-
-    //=========================================================================================================
-    /**
-    * Set the vertices the mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    */
-    void setVertex(const Eigen::MatrixX3f& tMatVert);
-
-    //=========================================================================================================
-    /**
-    * Set the triangles/index of the mesh.
-    *
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    */
-    void setIndex(const Eigen::MatrixXi &tMatTris);
-
-    //=========================================================================================================
-    /**
-    * Set the needed information to create the mesh and then creates a new mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The color info of all the vertices.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
-    */
-    void setMeshData(const Eigen::MatrixX3f& tMatVert,
-                     const Eigen::MatrixX3f& tMatNorm,
-                     const Eigen::MatrixXi& tMatTris,
-                     const Eigen::MatrixX3f& tMatColors,
-                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
-
-    //=========================================================================================================
-    /**
-    * Add new Attribute to the geometry.
-    *
-    * @param[in] pAttribute       New QAttribute.
-    */
-    void addAttribute(Qt3DRender::QAttribute *pAttribute);
+     * Sets the clear color of the framegraph.
+     *
+     * @param tColor        New clear color.
+     */
+    void setClearColor(const QColor &tColor);
 
 protected:
+
+private:
+
     //=========================================================================================================
     /**
-    * Init the custom mesh.
-    */
+     * Init the  CustomFrameGraph object.
+     */
     void init();
 
-    QPointer<Qt3DRender::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
+    QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;    /**< Frame graph node that declares the render surface. */
 
-    QPointer<Qt3DRender::QGeometry>     m_pCustomGeometry;         /**< The custom geometry. */
+    QPointer<Qt3DRender::QClearBuffers> m_pClearBuffers;                /**< Frame graph node that clears buffers in the branch. */
 
-    QPointer<Qt3DRender::QAttribute>    m_pIndexAttribute;         /**< The index attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;      /**< The position attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pNormalAttribute;        /**< The normal attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pColorAttribute;         /**< The color attribute. */
+    QPointer<Qt3DRender::QNoDraw> m_pNoDraw;                            /**< Frame graph node that prevents rendering in the branch. */
 
-    int                                 m_iNumVert;                 /**< The total number of set vertices. */
+    QPointer<Qt3DRender::QDispatchCompute> m_pDispatchCompute;          /**< Frame graph node that issues work to the compute shader. */
+
+    QPointer<Qt3DRender::QTechniqueFilter> m_pComputeFilter;            /**< Frame graph node selects the compute technique. */
+
+    QPointer<Qt3DRender::QCameraSelector> m_pCameraSelector;            /**< Frame graph node that selects the camera. */
+
+    QPointer<Qt3DRender::QTechniqueFilter> m_pForwardFilter;            /**< Frame graph node that selects the forward rendering technique. */
+
+    QPointer<Qt3DRender::QMemoryBarrier> m_pMemoryBarrier;              /**< Frame graph node that emplaces a memory barrier to synchronize computing and rendering. */
+
+    QPointer<Qt3DRender::QFilterKey> m_pForwardKey;                     /**< Filter key for the compute filter. */
+
+    QPointer<Qt3DRender::QFilterKey> m_pComputeKey;                     /**< Filter key for the forward rendering filter. */
 };
 
-} // NAMESPACE
 
-#endif // CUSTOMMESH_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace DISP3DLIB
+
+#endif // DISP3DLIB_CUSTOMFRAMEGRAPH_H

@@ -72,7 +72,7 @@ SUBDIRS += \
             ex_read_fwd_disp_3D \
             ex_roi_clustered_inverse_pwl_rap_music \
             ex_st_clustered_inverse_pwl_rap_music \
-            ex_interpolation
+            ex_interpolation \
 
         !isEmpty( CNTK_INCLUDE_DIR ) {
             SUBDIRS += \
