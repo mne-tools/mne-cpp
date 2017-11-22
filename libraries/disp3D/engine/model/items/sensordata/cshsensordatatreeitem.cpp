@@ -45,12 +45,14 @@
 #include "cshinterpolationitem.h"
 #include "../../workers/rtSensorData/rtcshsensordataworker.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QVector3D>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,6 +69,7 @@ using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,6 +92,7 @@ dFuncPtr transformInterpolationFromStrToFunc(const QString &tFunctionName)
     else if(tFunctionName == "Gaussian") {
         return Interpolation::gaussian;
     }
+    return nullptr;
 }
 
 
@@ -181,8 +185,6 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     //sensor projecting
     m_pVecMappedSubset = GeometryInfo::projectSensors(tBemSurface, vecSensorPos);
 
-    //QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = calculateWeigtMatrix();
-
     //SCDC with cancel distance
     m_pDistanceMatrix = GeometryInfo::scdc(tBemSurface, m_pVecMappedSubset, tCancelDist);
 
@@ -201,7 +203,7 @@ void CshSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     //create new Tree Item
     if(!m_pInterpolationItem)
     {
-        m_pInterpolationItem = new CshInterpolationItem(t3DEntityParent, Data3DTreeModelItemTypes::CshInterpolationItem, QStringLiteral("CshInterpolation"));
+        m_pInterpolationItem = new CshInterpolationItem(t3DEntityParent, Data3DTreeModelItemTypes::CshInterpolationItem, QStringLiteral("3D Plot"));
         m_pInterpolationItem->initData(tBemSurface, pInterpolationMatrix);
 
         QList<QStandardItem*> list;

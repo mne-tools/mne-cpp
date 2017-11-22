@@ -44,6 +44,7 @@
 
 #include <disp3D_global.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -61,6 +62,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,6 +89,7 @@ namespace Qt3DRender {
         class QBlendEquationArguments;
         class QBlendEquation;
 }
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -213,56 +216,55 @@ private:
      */
     QByteArray buildZeroBuffer(const uint tSize);
 
+    bool                                                m_bUseAlpha;                /**< Declares if the rendered object is transparent. */
 
-    bool                                                m_bUseAlpha;
-
-    QPointer<Qt3DRender::QEffect>                       m_pEffect;
+    QPointer<Qt3DRender::QEffect>                       m_pEffect;                  /**< The effect of this material. */
 
     //Phongalpha parameter
-    QPointer<Qt3DRender::QParameter>                    m_pDiffuseParameter;
-    QPointer<Qt3DRender::QParameter>                    m_pSpecularParameter;
-    QPointer<Qt3DRender::QParameter>                    m_pShininessParameter;
-    QPointer<Qt3DRender::QParameter>                    m_pAlphaParameter;
+    QPointer<Qt3DRender::QParameter>                    m_pDiffuseParameter;        /**< Parameter that determines the diffuse value. */
+    QPointer<Qt3DRender::QParameter>                    m_pSpecularParameter;       /**< Parameter that determines the specular value. */
+    QPointer<Qt3DRender::QParameter>                    m_pShininessParameter;      /**< Parameter that determines the shininess value. */
+    QPointer<Qt3DRender::QParameter>                    m_pAlphaParameter;          /**< Parameter that determines the alpha value. */
 
     //Compute Part
-    QPointer<Qt3DRender::QShaderProgram>                m_pComputeShader;
-    QPointer<Qt3DRender::QRenderPass>                   m_pComputeRenderPass;
-    QPointer<Qt3DRender::QFilterKey>                    m_pComputeFilterKey;
-    QPointer<Qt3DRender::QTechnique>                    m_pComputeTechnique;
+    QPointer<Qt3DRender::QShaderProgram>                m_pComputeShader;           /**< Stores the shader program of the compute shader. */
+    QPointer<Qt3DRender::QRenderPass>                   m_pComputeRenderPass;       /**< The render pass for the compute run. */
+    QPointer<Qt3DRender::QFilterKey>                    m_pComputeFilterKey;        /**< The compute filter key. */
+    QPointer<Qt3DRender::QTechnique>                    m_pComputeTechnique;        /**< The technique of the compute shader. This should match with the frame graph. */
 
     //Draw Part
-    QPointer<Qt3DRender::QShaderProgram>                m_pDrawShader;
-    QPointer<Qt3DRender::QRenderPass>                   m_pDrawRenderPass;
-    QPointer<Qt3DRender::QFilterKey>                    m_pDrawFilterKey;
-    QPointer<Qt3DRender::QTechnique>                    m_pDrawTechnique;
+    QPointer<Qt3DRender::QShaderProgram>                m_pDrawShader;              /**< Stores the shader program of the draw shader. */
+    QPointer<Qt3DRender::QRenderPass>                   m_pDrawRenderPass;          /**< The render pass for the draw run. */
+    QPointer<Qt3DRender::QFilterKey>                    m_pDrawFilterKey;           /**< The draw filter key. */
+    QPointer<Qt3DRender::QTechnique>                    m_pDrawTechnique;           /**< The technique of the draw shader. This should match with the frame graph. */
 
     //Measurement signal
-    QPointer<Qt3DRender::QBuffer>                       m_pSignalDataBuffer;
-    QPointer<Qt3DRender::QParameter>                    m_pSignalDataParameter;
+    QPointer<Qt3DRender::QBuffer>                       m_pSignalDataBuffer;        /**< This buffer stores signal input data. */
+    QPointer<Qt3DRender::QParameter>                    m_pSignalDataParameter;     /**< This parameter holds the signal data buffer. */
 
     //Weight matrix parameter
-    QPointer<Qt3DRender::QParameter>                    m_pColsParameter;
-    QPointer<Qt3DRender::QParameter>                    m_pRowsParameter;
-    QPointer<Qt3DRender::QParameter>                    m_pWeightMatParameter;
-    QPointer<Qt3DRender::QBuffer>                       m_pWeightMatBuffer;
+    QPointer<Qt3DRender::QParameter>                    m_pColsParameter;           /**< This parameter holds the number of columns in the weight matrix. */
+    QPointer<Qt3DRender::QParameter>                    m_pRowsParameter;           /**< This parameter holds the number of rows in the weight matrix. */
+    QPointer<Qt3DRender::QParameter>                    m_pWeightMatParameter;      /**< This parameter holds the weight matrix buffer. */
+    QPointer<Qt3DRender::QBuffer>                       m_pWeightMatBuffer;         /**< This buffer the interpolation matrix. */
 
     //Output parameter
-    QPointer<Qt3DRender::QParameter>                    m_pOutputColorParameter;
-    QPointer<Qt3DRender::QBuffer>                       m_pOutputColorBuffer;
+    QPointer<Qt3DRender::QParameter>                    m_pOutputColorParameter;    /**< This parameter holds the output color buffer. */
+    QPointer<Qt3DRender::QBuffer>                       m_pOutputColorBuffer;       /**< This buffer the color output from the compute shader. */
 
     //Lower and upper normalization threshold parameter
-    QPointer<Qt3DRender::QParameter>                    m_pThresholdXParameter;
-    QPointer<Qt3DRender::QParameter>                    m_pThresholdZParameter;
+    QPointer<Qt3DRender::QParameter>                    m_pThresholdXParameter;     /**< This parameter holds the lower threshold value. */
+    QPointer<Qt3DRender::QParameter>                    m_pThresholdZParameter;     /**< This parameter holds the upper threshold value. */
 
     //Colormap type
-    QPointer<Qt3DRender::QParameter>                    m_pColormapParameter;
+    QPointer<Qt3DRender::QParameter>                    m_pColormapParameter;       /**< This parameter stores the colormap type. */
 
-    QPointer<Qt3DRender::QCullFace>                     m_pCullFace;
+    QPointer<Qt3DRender::QCullFace>                     m_pCullFace;                /**< This render state activates face culling. */
 
     //Alpha states
-    QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
-    QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
-    QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;
+    QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;             /**< This render state disables depth write. */
+    QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;              /**< This render state specifes how blend values are handled. */
+    QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;           /**< This render state specifies the blend equation. */
 };
 
 

@@ -421,7 +421,7 @@ protected:
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
     * @param[in] matSensorData          The Sensor Data.
     * @param[in] tBemSurface            The Bem Surface data.
-    * @param[in] fiffInfo             The FiffInfo that holds all information about the sensors.
+    * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
     * @param[in] sDataType              The data type ("MEG" or "EEG").
     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
     * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values

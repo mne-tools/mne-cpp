@@ -180,9 +180,9 @@ public:
     /**
     * Add new Attribute to the geometry.
     *
-    * @param[in] tAttribute       New QAttribute.
+    * @param[in] pAttribute       New QAttribute.
     */
-    void addAttribute(Qt3DRender::QAttribute *tAttribute);
+    void addAttribute(Qt3DRender::QAttribute *pAttribute);
 
 protected:
     //=========================================================================================================

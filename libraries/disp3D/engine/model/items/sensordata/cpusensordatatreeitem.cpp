@@ -45,6 +45,7 @@
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -165,7 +166,7 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
 void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 {
     if(!m_bIsDataInit) {
-        qDebug() << "SensorDataTreeItem::addData - sensor data item has not been initialized yet!";
+        qDebug() << "CpuSensorDataTreeItem::addData - sensor data item has not been initialized yet!";
         return;
     }
 
@@ -193,7 +194,7 @@ void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
              m_pSensorRtDataWorker->addData(dSmallSensorData);
         }
         else {
-            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
+            qDebug() << "CpuSensorDataTreeItem::addData - worker has not been initialized yet!";
         }
     }
     else
@@ -216,7 +217,7 @@ void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
              m_pSensorRtDataWorker->addData(dSmallSensorData);
         }
         else {
-            qDebug() << "SensorDataTreeItem::addData - worker has not been initialized yet!";
+            qDebug() << "CpuSensorDataTreeItem::addData - worker has not been initialized yet!";
         }
     }
 }
