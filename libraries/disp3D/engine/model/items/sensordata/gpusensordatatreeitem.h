@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cshsensordatatreeitem.h
+* @file     gpusensordatatreeitem.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CshSensorDataTreeItem class declaration.
+* @brief     GpuSensorDataTreeItem class declaration.
 *
 */
 
-#ifndef DISP3DLIB_CSHSENSORDATATREEITEM_H
-#define DISP3DLIB_CSHSENSORDATATREEITEM_H
+#ifndef DISP3DLIB_GPUSENSORDATATREEITEM_H
+#define DISP3DLIB_GPUSENSORDATATREEITEM_H
 
 
 //*************************************************************************************************************
@@ -92,25 +92,25 @@ class RtCshSensorDataWorker;
 * @brief This item integrates GeometryInfo and compute shader interpolation into Disp3D structure.
 */
 
-class DISP3DSHARED_EXPORT CshSensorDataTreeItem : public SensorDataTreeItem
+class DISP3DSHARED_EXPORT GpuSensorDataTreeItem : public SensorDataTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CshSensorDataTreeItem> SPtr;            /**< Shared pointer type for CshSensorDataTreeItem. */
-    typedef QSharedPointer<const CshSensorDataTreeItem> ConstSPtr; /**< Const shared pointer type for CshSensorDataTreeItem. */
+    typedef QSharedPointer<GpuSensorDataTreeItem> SPtr;            /**< Shared pointer type for GpuSensorDataTreeItem. */
+    typedef QSharedPointer<const GpuSensorDataTreeItem> ConstSPtr; /**< Const shared pointer type for GpuSensorDataTreeItem. */
 
     //=========================================================================================================
     /**
-    * Constructs a CshSensorDataTreeItem object.
+    * Constructs a GpuSensorDataTreeItem object.
     */
-    explicit CshSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
+    explicit GpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
 
     //=========================================================================================================
     /**
     * Destructor, stops and deletes rtsensordata worker.
     */
-    virtual ~CshSensorDataTreeItem();
+    virtual ~GpuSensorDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -262,4 +262,4 @@ protected:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_CSHSENSORDATATREEITEM_H
+#endif // DISP3DLIB_GPUSENSORDATATREEITEM_H

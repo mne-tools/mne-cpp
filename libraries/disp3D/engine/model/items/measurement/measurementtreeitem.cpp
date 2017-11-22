@@ -51,7 +51,7 @@
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
 #include "../sensordata/cpusensordatatreeitem.h"
-#include "../sensordata/cshsensordatatreeitem.h"
+#include "../sensordata/gpusensordatatreeitem.h"
 #include "../bem/bemtreeitem.h"
 #include "../bem/bemsurfacetreeitem.h"
 #include "../sensorspace/sensorsettreeitem.h"
@@ -367,7 +367,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
             } else {
                 //Add sensor data as child
                 //If rt data item does not exists yet, create it here!
-                m_pCshEEGSensorDataTreeItem = new CshSensorDataTreeItem();
+                m_pCshEEGSensorDataTreeItem = new GpuSensorDataTreeItem();
                 m_pCshEEGSensorDataTreeItem->setText("EEG Data");
 
                 QList<QStandardItem*> list;
@@ -389,7 +389,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
             } else {
                 //Add sensor data as child
                 //If rt data item does not exists yet, create it here!
-                m_pCshMEGSensorDataTreeItem = new CshSensorDataTreeItem();
+                m_pCshMEGSensorDataTreeItem = new GpuSensorDataTreeItem();
                 m_pCshMEGSensorDataTreeItem->setText("MEG Data");
 
                 QList<QStandardItem*> list;
