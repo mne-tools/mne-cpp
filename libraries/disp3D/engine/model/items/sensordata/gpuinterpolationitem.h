@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cshinterpolationitem.h
+* @file     gpuinterpolationitem.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CshInterpolationItem class declaration.
+* @brief     GpuInterpolationItem class declaration.
 *
 */
 
-#ifndef DISP3DLIB_CSHINTERPOLATIONITEM_H
-#define DISP3DLIB_CSHINTERPOLATIONITEM_H
+#ifndef DISP3DLIB_GPUINTERPOLATIONITEM_H
+#define DISP3DLIB_GPUINTERPOLATIONITEM_H
 
 
 //*************************************************************************************************************
@@ -101,13 +101,13 @@ class CshInterpolationMaterial;
 * @brief Signal interpolation with qt3d compute shader.
 */
 
-class DISP3DSHARED_EXPORT CshInterpolationItem : public Abstract3DTreeItem
+class DISP3DSHARED_EXPORT GpuInterpolationItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CshInterpolationItem> SPtr;            /**< Shared pointer type for CshInterpolationItem. */
-    typedef QSharedPointer<const CshInterpolationItem> ConstSPtr; /**< Const shared pointer type for CshInterpolationItem. */
+    typedef QSharedPointer<GpuInterpolationItem> SPtr;            /**< Shared pointer type for GpuInterpolationItem. */
+    typedef QSharedPointer<const GpuInterpolationItem> ConstSPtr; /**< Const shared pointer type for GpuInterpolationItem. */
 
     //=========================================================================================================
     /**
@@ -117,8 +117,8 @@ public:
     * @param[in] iType              The type of the item. See types.h for declaration and definition.
     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit CshInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = nullptr,
-                                  int iType = Data3DTreeModelItemTypes::CshInterpolationItem,
+    explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = nullptr,
+                                  int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
                                   const QString& text = "3D Plot");
 
     //=========================================================================================================
@@ -193,4 +193,4 @@ protected:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_CSHINTERPOLATIONITEM_H
+#endif // DISP3DLIB_GPUINTERPOLATIONITEM_H
