@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef BEMTREEITEM_H
-#define BEMTREEITEM_H
+#ifndef DISP3DLIB_BEMTREEITEM_H
+#define DISP3DLIB_BEMTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -137,4 +137,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BEMTREEITEM_H
+#endif // DISP3DLIB_BEMTREEITEM_H

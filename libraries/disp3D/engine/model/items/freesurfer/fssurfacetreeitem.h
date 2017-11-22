@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef FSSURFACETREEITEM_H
-#define FSSURFACETREEITEM_H
+#ifndef DISP3DLIB_FSSURFACETREEITEM_H
+#define DISP3DLIB_FSSURFACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -171,4 +171,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // FSSURFACETREEITEM_H
+#endif // DISP3DLIB_FSSURFACETREEITEM_H

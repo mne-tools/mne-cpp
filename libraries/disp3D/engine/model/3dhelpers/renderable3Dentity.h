@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef RENDERABLE3DENTITY_H
-#define RENDERABLE3DENTITY_H
+#ifndef DISP3DLIB_RENDERABLE3DENTITY_H
+#define DISP3DLIB_RENDERABLE3DENTITY_H
 
 
 //*************************************************************************************************************
@@ -300,4 +300,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // RENDERABLE3DENTITY_H
+#endif // DISP3DLIB_RENDERABLE3DENTITY_H

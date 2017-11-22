@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef DIGITIZERTREEITEM_H
-#define DIGITIZERTREEITEM_H
+#ifndef DISP3DLIB_DIGITIZERTREEITEM_H
+#define DISP3DLIB_DIGITIZERTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -136,4 +136,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // DIGITIZERTREEITEM_H
+#endif // DISP3DLIB_DIGITIZERTREEITEM_H

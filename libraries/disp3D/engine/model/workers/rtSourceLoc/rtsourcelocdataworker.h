@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef RTSOURCELOCDATAWORKER_H
-#define RTSOURCELOCDATAWORKER_H
+#ifndef DISP3DLIB_RTSOURCELOCDATAWORKER_H
+#define DISP3DLIB_RTSOURCELOCDATAWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -335,4 +335,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // RTSOURCELOCDATAWORKER_H
+#endif // DISP3DLIB_RTSOURCELOCDATAWORKER_H

@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef FSANNOTATIONTREEITEM_H
-#define FSANNOTATIONTREEITEM_H
+#ifndef DISP3DLIB_FSANNOTATIONTREEITEM_H
+#define DISP3DLIB_FSANNOTATIONTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -146,4 +146,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // FSANNOTATIONTREEITEM_H
+#endif // DISP3DLIB_FSANNOTATIONTREEITEM_H

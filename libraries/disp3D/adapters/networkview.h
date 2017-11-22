@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef NETWORKVIEW_H
-#define NETWORKVIEW_H
+#ifndef DISP3DLIB_NETWORKVIEW_H
+#define DISP3DLIB_NETWORKVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,4 +115,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // NETWORKVIEW_H
+#endif // DISP3DLIB_NETWORKVIEW_H

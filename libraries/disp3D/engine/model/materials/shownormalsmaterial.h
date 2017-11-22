@@ -32,8 +32,8 @@
 * @brief    ShowNormalsMaterial class declaration
 */
 
-#ifndef SHOWNORMALSMATERIAL_H
-#define SHOWNORMALSMATERIAL_H
+#ifndef DISP3DLIB_SHOWNORMALSMATERIAL_H
+#define DISP3DLIB_SHOWNORMALSMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -142,4 +142,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // SHOWNORMALSMATERIAL_H
+#endif // DISP3DLIB_SHOWNORMALSMATERIAL_H

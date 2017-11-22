@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef MEASUREMENTTREEITEM_H
-#define MEASUREMENTTREEITEM_H
+#ifndef DISP3DLIB_MEASUREMENTTREEITEM_H
+#define DISP3DLIB_MEASUREMENTTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -332,4 +332,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // MEASUREMENTTREEITEM_H
+#endif // DISP3DLIB_MEASUREMENTTREEITEM_H

@@ -32,8 +32,8 @@
 * @brief    NetworkMaterial class declaration
 */
 
-#ifndef NETWORKMATERIAL_H
-#define NETWORKMATERIAL_H
+#ifndef DISP3DLIB_NETWORKMATERIAL_H
+#define DISP3DLIB_NETWORKMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -173,4 +173,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // NETWORKMATERIAL_H
+#endif // DISP3DLIB_NETWORKMATERIAL_H

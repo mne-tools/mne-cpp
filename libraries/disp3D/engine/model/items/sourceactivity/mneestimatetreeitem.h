@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef MNEESTIMATETREEITEM_H
-#define MNEESTIMATETREEITEM_H
+#ifndef DISP3DLIB_MNEESTIMATETREEITEM_H
+#define DISP3DLIB_MNEESTIMATETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -324,4 +324,4 @@ inline bool MneEstimateTreeItem::isDataInit() const
 
 } //NAMESPACE DISP3DLIB
 
-#endif // MneEstimateTreeItem_H
+#endif // DISP3DLIB_MneEstimateTreeItem_H

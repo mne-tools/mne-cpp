@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef HEMISPHERETREEITEM_H
-#define HEMISPHERETREEITEM_H
+#ifndef DISP3DLIB_HEMISPHERETREEITEM_H
+#define DISP3DLIB_HEMISPHERETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -174,4 +174,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // HEMISPHERETREEITEM_H
+#endif // DISP3DLIB_HEMISPHERETREEITEM_H

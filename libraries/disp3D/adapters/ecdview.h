@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef ECDVIEW_H
-#define ECDVIEW_H
+#ifndef DISP3DLIB_ECDVIEW_H
+#define DISP3DLIB_ECDVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,4 +111,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // ECDVIEW_H
+#endif // DISP3DLIB_ECDVIEW_H

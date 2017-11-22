@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef SENSORSETTREEITEM_H
-#define SENSORSETTREEITEM_H
+#ifndef DISP3DLIB_SENSORSETTREEITEM_H
+#define DISP3DLIB_SENSORSETTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -135,4 +135,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // SENSORSETTREEITEM_H
+#endif // DISP3DLIB_SENSORSETTREEITEM_H

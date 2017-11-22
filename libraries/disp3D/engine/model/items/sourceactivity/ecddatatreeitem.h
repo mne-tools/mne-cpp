@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef ECDDATATREEITEM_H
-#define ECDDATATREEITEM_H
+#ifndef DISP3DLIB_ECDDATATREEITEM_H
+#define DISP3DLIB_ECDDATATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -143,4 +143,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // ECDDATATREEITEM_H
+#endif // DISP3DLIB_ECDDATATREEITEM_H

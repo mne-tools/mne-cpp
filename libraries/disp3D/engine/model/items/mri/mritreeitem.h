@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef MRITREEITEM_H
-#define MRITREEITEM_H
+#ifndef DISP3DLIB_MRITREEITEM_H
+#define DISP3DLIB_MRITREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -180,4 +180,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // MRITREEITEM_H
+#endif // DISP3DLIB_MRITREEITEM_H

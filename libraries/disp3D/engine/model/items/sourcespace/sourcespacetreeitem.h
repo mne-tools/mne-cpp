@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef SOURCESPACETREEITEM_H
-#define SOURCESPACETREEITEM_H
+#ifndef DISP3DLIB_SOURCESPACETREEITEM_H
+#define DISP3DLIB_SOURCESPACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -140,4 +140,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // SOURCESPACETREEITEM_H
+#endif // DISP3DLIB_SOURCESPACETREEITEM_H

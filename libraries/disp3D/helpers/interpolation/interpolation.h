@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef INTERPOLATION_H
-#define INTERPOLATION_H
+#ifndef DISP3DLIB_INTERPOLATION_H
+#define DISP3DLIB_INTERPOLATION_H
 
 
 //*************************************************************************************************************
@@ -210,4 +210,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // INTERPOLATION_H
+#endif // DISP3DLIB_INTERPOLATION_H
