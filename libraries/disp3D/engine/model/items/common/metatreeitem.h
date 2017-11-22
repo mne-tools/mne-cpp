@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef METATREEITEM_H
-#define METATREEITEM_H
+#ifndef DISP3DLIB_METATREEITEM_H
+#define DISP3DLIB_METATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -119,4 +119,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // METATREEITEM_H
+#endif // DISP3DLIB_METATREEITEM_H

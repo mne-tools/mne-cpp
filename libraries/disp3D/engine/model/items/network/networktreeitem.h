@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef NETWORKTREEITEM_H
-#define NETWORKTREEITEM_H
+#ifndef DISP3DLIB_NETWORKTREEITEM_H
+#define DISP3DLIB_NETWORKTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -170,4 +170,4 @@ private:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // NETWORKTREEITEM_H
+#endif // DISP3DLIB_NETWORKTREEITEM_H

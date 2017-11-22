@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef SUBJECTTREEITEM_H
-#define SUBJECTTREEITEM_H
+#ifndef DISP3DLIB_SUBJECTTREEITEM_H
+#define DISP3DLIB_SUBJECTTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -133,4 +133,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // SUBJECTTREEITEM_H
+#endif // DISP3DLIB_SUBJECTTREEITEM_H

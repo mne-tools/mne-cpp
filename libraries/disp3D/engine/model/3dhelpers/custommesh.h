@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef CUSTOMMESH_H
-#define CUSTOMMESH_H
+#ifndef DISP3DLIB_CUSTOMMESH_H
+#define DISP3DLIB_CUSTOMMESH_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -208,4 +208,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // CUSTOMMESH_H
+#endif // DISP3DLIB_CUSTOMMESH_H

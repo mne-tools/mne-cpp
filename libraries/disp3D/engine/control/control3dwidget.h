@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef CONTROL3DWIDGET_H
-#define CONTROL3DWIDGET_H
+#ifndef DISP3DLIB_CONTROL3DWIDGET_H
+#define DISP3DLIB_CONTROL3DWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -286,4 +286,4 @@ signals:
 
 } // NAMESPACE DISP3DLIB
 
-#endif // CONTROL3DWIDGET_H
+#endif // DISP3DLIB_CONTROL3DWIDGET_H

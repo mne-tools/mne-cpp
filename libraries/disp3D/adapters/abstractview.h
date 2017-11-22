@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef ABSTRACTVIEW_H
-#define ABSTRACTVIEW_H
+#ifndef DISP3DLIB_ABSTRACTVIEW_H
+#define DISP3DLIB_ABSTRACTVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -119,4 +119,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // ABSTRACTVIEW_H
+#endif // DISP3DLIB_ABSTRACTVIEW_H

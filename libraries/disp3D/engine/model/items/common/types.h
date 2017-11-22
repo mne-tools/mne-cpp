@@ -32,8 +32,8 @@
 * @brief    Contains general application specific types
 *
 */
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef DISP3DLIB_TYPES_H
+#define DISP3DLIB_TYPES_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -212,44 +212,44 @@ namespace MetaTreeItemRoles
 
 // Metatype declaration for correct QVariant usage
 // DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE VIEW3D initMetatypes())
-#ifndef metatype_matrixx3i
+#ifndef DISP3DLIB_metatype_matrixx3i
 #define metatype_matrixx3i
 Q_DECLARE_METATYPE(Eigen::MatrixX3i);
 #endif
 
-#ifndef metatype_matrixXd
+#ifndef DISP3DLIB_metatype_matrixXd
 #define metatype_matrixXd
 Q_DECLARE_METATYPE(Eigen::MatrixXd);
 #endif
 
-#ifndef metatype_matrixx3f
+#ifndef DISP3DLIB_metatype_matrixx3f
 #define metatype_matrixx3f
 Q_DECLARE_METATYPE(Eigen::MatrixX3f);
 #endif
 
-#ifndef metatype_vectorxf
+#ifndef DISP3DLIB_metatype_vectorxf
 #define metatype_vectorxf
 Q_DECLARE_METATYPE(Eigen::VectorXf);
 #endif
 
-#ifndef metatype_vectorxi
+#ifndef DISP3DLIB_metatype_vectorxi
 #define metatype_vectorxi
 Q_DECLARE_METATYPE(Eigen::VectorXi);
 #endif
 
-#ifndef metatype_vectorxd
+#ifndef DISP3DLIB_metatype_vectorxd
 #define metatype_vectorxd
 Q_DECLARE_METATYPE(Eigen::VectorXd);
 #endif
 
-#ifndef metatype_rowvectorxf
+#ifndef DISP3DLIB_metatype_rowvectorxf
 #define metatype_rowvectorxf
 Q_DECLARE_METATYPE(Eigen::RowVectorXf);
 #endif
 
-#ifndef metatype_vector3f
+#ifndef DISP3DLIB_metatype_vector3f
 #define metatype_vector3f
 Q_DECLARE_METATYPE(Eigen::Vector3f);
 #endif
 
-#endif // TYPES_H
+#endif // DISP3DLIB_TYPES_H

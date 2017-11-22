@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef ABSTRACTTREEITEM_H
-#define ABSTRACTTREEITEM_H
+#ifndef DISP3DLIB_ABSTRACTTREEITEM_H
+#define DISP3DLIB_ABSTRACTTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -167,4 +167,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // ABSTRACTTREEITEM_H
+#endif // DISP3DLIB_ABSTRACTTREEITEM_H

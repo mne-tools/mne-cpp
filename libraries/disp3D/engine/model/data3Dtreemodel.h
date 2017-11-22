@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef DATA3DTREEMODEL_H
-#define DATA3DTREEMODEL_H
+#ifndef DISP3DLIB_DATA3DTREEMODEL_H
+#define DISP3DLIB_DATA3DTREEMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -443,4 +443,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // DATA3DTREEMODEL_H
+#endif // DISP3DLIB_DATA3DTREEMODEL_H

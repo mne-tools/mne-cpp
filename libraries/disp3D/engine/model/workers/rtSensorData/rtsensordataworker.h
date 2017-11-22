@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef RTSENSORDATAWORKER_H
-#define RTSENSORDATAWORKER_H
+#ifndef DISP3DLIB_RTSENSORDATAWORKER_H
+#define DISP3DLIB_RTSENSORDATAWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
