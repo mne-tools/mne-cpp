@@ -135,7 +135,13 @@ SOURCES += \
     helpers/interpolation/interpolation.cpp \
     helpers/geometryinfo/geometryinfo.cpp \
     engine/model/3dhelpers/geometrymultiplier.cpp \
-    engine/model/materials/geometrymultipliermaterial.cpp
+    engine/model/materials/geometrymultipliermaterial.cpp \
+    engine/view/customframegraph.cpp \
+    engine/model/items/sensordata/cpusensordatatreeitem.cpp \
+    engine/model/items/sensordata/gpusensordatatreeitem.cpp \
+    engine/model/items/sensordata/gpuinterpolationitem.cpp \
+    engine/model/workers/rtSensorData/rtgpusensordataworker.cpp \
+    engine/model/materials/gpuinterpolationmaterial.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -182,7 +188,13 @@ HEADERS += \
     helpers/interpolation/interpolation.h \
     helpers/geometryinfo/geometryinfo.h \
     engine/model/3dhelpers/geometrymultiplier.h \
-    engine/model/materials/geometrymultipliermaterial.h
+    engine/model/materials/geometrymultipliermaterial.h \
+    engine/view/customframegraph.h \
+    engine/model/items/sensordata/cpusensordatatreeitem.h \
+    engine/model/items/sensordata/gpusensordatatreeitem.h \
+    engine/model/items/sensordata/gpuinterpolationitem.h \
+    engine/model/workers/rtSensorData/rtgpusensordataworker.h \
+    engine/model/materials/gpuinterpolationmaterial.h
 
 FORMS += \
     engine/control/control3dwidget.ui \

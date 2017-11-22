@@ -48,6 +48,7 @@ SUBDIRS += \
     connectivity \
     realtime \
 
+
 !contains(MNECPP_CONFIG, minimalVersion) {
 
     !isEmpty( CNTK_INCLUDE_DIR ) {
@@ -60,10 +61,11 @@ SUBDIRS += \
 
     qtHaveModule(charts) {
         SUBDIRS += \
-            disp3D
+            disp3D \
     } else {
         message("libraries.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
 }
+
 
 CONFIG += ordered

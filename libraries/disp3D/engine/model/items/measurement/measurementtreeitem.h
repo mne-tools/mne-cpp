@@ -113,6 +113,8 @@ class EcdDataTreeItem;
 class FsSurfaceTreeItem;
 class SourceSpaceTreeItem;
 class DigitizerSetTreeItem;
+class GpuSensorDataTreeItem;
+class CpuSensorDataTreeItem;
 
 
 //=============================================================================================================
@@ -162,14 +164,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds interpolated activation data to this item.
+    * Adds interpolated activation data to the cpu version of this item.
     *
     * @param[in] tSensorData            The SensorData.
     * @param[in] bemSurface             Holds all Bem data used in this item.
     * @param[in] fiffInfo               Holds all information needed about the sensors.
     * @param[in] sSensorType            Name of the sensor type EEG or MEG.
-    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
-    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation.
+    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values.
     *
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
@@ -179,6 +181,28 @@ public:
                                 const QString &sSensorType,
                                 const double dCancelDist,
                                 const QString &sInterpolationFunction);
+
+    //=========================================================================================================
+    /**
+    * Adds interpolated activation data to the csh version of this item.
+    *
+    * @param[in] tSensorData            The SensorData.
+    * @param[in] bemSurface             Holds all Bem data used in this item.
+    * @param[in] fiffInfo               Holds all information needed about the sensors.
+    * @param[in] sSensorType            Name of the sensor type EEG or MEG.
+    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation.
+    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values.
+    * @param[in] pParent                Pointer to the QEntity parent.
+    *
+    * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+    */
+    SensorDataTreeItem *addData(const MatrixXd& tSensorData,
+                                   const MNELIB::MNEBemSurface &bemSurface,
+                                   const FIFFLIB::FiffInfo &fiffInfo,
+                                   const QString &sSensorType,
+                                   const double dCancelDist,
+                                   const QString &sInterpolationFunction,
+                                   Qt3DCore::QEntity *pParent);
 
     //=========================================================================================================
     /**
@@ -273,8 +297,10 @@ protected:
     void onSensorMEGColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
-    QPointer<SensorDataTreeItem>                 m_pEEGSensorDataTreeItem;       /**< The rt sensor EEG data item of this item. */
-    QPointer<SensorDataTreeItem>                 m_pMEGSensorDataTreeItem;       /**< The rt sensor MEG data item of this item. */
+    QPointer<CpuSensorDataTreeItem>              m_pCpuEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item. */
+    QPointer<CpuSensorDataTreeItem>              m_pCpuMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item. */
+    QPointer<GpuSensorDataTreeItem>              m_pCshEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item (compute shader version). */
+    QPointer<GpuSensorDataTreeItem>              m_pCshMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item (compute shader version). */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 

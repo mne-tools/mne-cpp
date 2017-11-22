@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     custommesh.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     gpuinterpolationitem.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     October, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    CustomMesh class declaration
+* @brief     GpuInterpolationItem class declaration.
 *
 */
 
-#ifndef CUSTOMMESH_H
-#define CUSTOMMESH_H
+#ifndef DISP3DLIB_GPUINTERPOLATIONITEM_H
+#define DISP3DLIB_GPUINTERPOLATIONITEM_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../disp3D_global.h"
+#include "../../../../disp3D_global.h"
+#include "../common/abstract3Dtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -49,8 +51,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/QGeometryRenderer>
-#include <QPointer>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -58,7 +59,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -66,8 +67,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB{
+    class MNEBemSurface;
+}
+
 namespace Qt3DRender {
-    class QBuffer;
+    class QComputeCommand;
 }
 
 
@@ -76,136 +81,116 @@ namespace Qt3DRender {
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
+namespace DISP3DLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class CustomMesh;
+class GpuInterpolationMaterial;
 
 
 //=============================================================================================================
 /**
-* Custom mesh functionality.
+* This item is used for signal interpolation with a compute shader.
+* It stores all Qt3DEnities needed for this process.
 *
-* @brief Custom mesh functionality.
+* @brief Signal interpolation with qt3d compute shader.
 */
-class DISP3DSHARED_EXPORT CustomMesh : public Qt3DRender::QGeometryRenderer
+
+class DISP3DSHARED_EXPORT GpuInterpolationItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CustomMesh> SPtr;             /**< Shared pointer type for CustomMesh class. */
-    typedef QSharedPointer<const CustomMesh> ConstSPtr;  /**< Const shared pointer type for CustomMesh class. */
-
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    */
-    CustomMesh();
+    typedef QSharedPointer<GpuInterpolationItem> SPtr;            /**< Shared pointer type for GpuInterpolationItem. */
+    typedef QSharedPointer<const GpuInterpolationItem> ConstSPtr; /**< Const shared pointer type for GpuInterpolationItem. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The vertex colors. If empty a default value will be used.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    CustomMesh(const Eigen::MatrixX3f& tMatVert,
-                const Eigen::MatrixX3f& tMatNorm,
-                const Eigen::MatrixXi& tMatTris,
-                const Eigen::MatrixX3f& tMatColors,
-                Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
+    explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = nullptr,
+                                  int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                  const QString& text = "3D Plot");
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~CustomMesh();
+     * Initialize interpolation data of this item.
+     *
+     * @param tMneBemSurface        The bem surface data.
+     * @param tInterpolationMatrix  The weight matrix for interpolation on the bem surface.
+     */
+    void initData(const MNELIB::MNEBemSurface &tMneBemSurface, QSharedPointer<SparseMatrix<double>> tInterpolationMatrix);
 
     //=========================================================================================================
     /**
-    * Set the vertices colors of the mesh.
+     * Set the new weight matrix for the interpolation.
+     *
+     * @param tInterpolationMatrix  The new weight matrix for interpolation on the bem surface.
+     */
+    void setWeightMatrix(QSharedPointer<SparseMatrix<double>> tInterpolationMatrix);
+
+    //=========================================================================================================
+    /**
+    * Add a new vector with signal data form the sensors.
     *
-    * @param[in] tMatColors     New color information for the vertices.
+    * @param tSignalVec              Vector with one float value for each sensor.
     */
-    void setColor(const Eigen::MatrixX3f &tMatColors);
+    void addNewRtData(const Eigen::VectorXf &tSignalVec);
 
     //=========================================================================================================
     /**
-    * Set the normals the mesh.
+    * This function set the normalization value.
     *
-    * @param[in] tMatNorm       Normals in form of a matrix.
+    * @param[in] vecThresholds       The new threshold values used for normalizing the data.
     */
-    void setNormals(const Eigen::MatrixX3f& tMatNorm);
+    void setNormalization(const QVector3D& tVecThresholds);
 
     //=========================================================================================================
     /**
-    * Set the vertices the mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    */
-    void setVertex(const Eigen::MatrixX3f& tMatVert);
-
-    //=========================================================================================================
-    /**
-    * Set the triangles/index of the mesh.
-    *
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    */
-    void setIndex(const Eigen::MatrixXi &tMatTris);
-
-    //=========================================================================================================
-    /**
-    * Set the needed information to create the mesh and then creates a new mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The color info of all the vertices.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
-    */
-    void setMeshData(const Eigen::MatrixX3f& tMatVert,
-                     const Eigen::MatrixX3f& tMatNorm,
-                     const Eigen::MatrixXi& tMatTris,
-                     const Eigen::MatrixX3f& tMatColors,
-                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
-
-    //=========================================================================================================
-    /**
-    * Add new Attribute to the geometry.
-    *
-    * @param[in] pAttribute       New QAttribute.
-    */
-    void addAttribute(Qt3DRender::QAttribute *pAttribute);
+     * This function sets the colormap type
+     *
+     * @param tColormapType           The new colormap name.
+     */
+    void setColormapType(const QString& tColormapType);
 
 protected:
+
     //=========================================================================================================
     /**
-    * Init the custom mesh.
-    */
-    void init();
+     * Initialze the Item.
+     */
+    virtual void initItem() override;
 
-    QPointer<Qt3DRender::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
+    bool                                    m_bIsDataInit;          /**< The initialization flag. */
 
-    QPointer<Qt3DRender::QGeometry>     m_pCustomGeometry;         /**< The custom geometry. */
+    QPointer<CustomMesh>                    m_pCustomMesh;          /**< Stores 3D data of the surfce. */
 
-    QPointer<Qt3DRender::QAttribute>    m_pIndexAttribute;         /**< The index attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;      /**< The position attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pNormalAttribute;        /**< The normal attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pColorAttribute;         /**< The color attribute. */
+    QPointer<Qt3DCore::QEntity>             m_pMeshDrawEntity;      /**< Top level Entity for the draw part. */
 
-    int                                 m_iNumVert;                 /**< The total number of set vertices. */
+    QPointer<Qt3DCore::QEntity>             m_pComputeEntity;       /**< Top level Entity for the compute part. */
+
+    QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;      /**< This component issues work for the csh to the gpu. */
+
+    QPointer<GpuInterpolationMaterial>      m_pMaterial;            /**< Compute material used for the process. */
+
 };
 
-} // NAMESPACE
 
-#endif // CUSTOMMESH_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace DISP3DLIB
+
+#endif // DISP3DLIB_GPUINTERPOLATIONITEM_H
