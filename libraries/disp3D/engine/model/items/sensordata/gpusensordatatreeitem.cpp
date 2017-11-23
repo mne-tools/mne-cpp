@@ -76,25 +76,6 @@ using namespace MNELIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-typedef double (*dFuncPtr)(double);
-
-dFuncPtr transformInterpolationFromStrToFunc(const QString &tFunctionName)
-{
-    if(tFunctionName == "Linear") {
-        return Interpolation::linear;
-    }
-    else if(tFunctionName == "Square") {
-        return Interpolation::square;
-    }
-    else if(tFunctionName == "Cubic") {
-        return Interpolation::cubic;
-    }
-    else if(tFunctionName == "Gaussian") {
-        return Interpolation::gaussian;
-    }
-    return nullptr;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
