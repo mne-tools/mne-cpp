@@ -234,7 +234,6 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 
 void View3D::startModelRotationRecursive(QObject* pObject)
 {
-    //TODO this won't work with QEntities
     if(Abstract3DTreeItem* pItem = dynamic_cast<Abstract3DTreeItem*>(pObject)) {
         QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
         anim->setDuration(30000);
@@ -461,7 +460,7 @@ void View3D::mouseReleaseEvent(QMouseEvent* e)
 void View3D::setRotationRecursive(QObject* obj)
 {
     for(int i = 0; i < obj->children().size(); i++) {
-        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(obj->children().at(i))) {
+        if(Abstract3DTreeItem* pItem = dynamic_cast<Abstract3DTreeItem*>(obj->children().at(i))) {
             pItem->setRotZ(m_vecModelRotation.y());
             pItem->setRotX(m_vecModelRotation.x());
         }
