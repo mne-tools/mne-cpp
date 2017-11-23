@@ -52,7 +52,6 @@
 #include <scMeas/newrealtimemultisamplearray.h>
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -94,14 +93,14 @@ class SerialPort;
 * DECLARE CLASS TriggerControl
 *
 
-* @brief The TriggerControl is a MNE-X plugin which contains an intuitive terminal for manual
+* @brief The TriggerControl is a MNE Scan plugin which contains an intuitive terminal for manual
 * configurations of output channels and an automated processing of connected signal channels.
 *
 */
 class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "triggercontrol.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "triggercontrol.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
@@ -163,7 +162,6 @@ public:
     */
     virtual QString getName() const;
 
-
     //=========================================================================================================
     /**
     * [...]
@@ -188,15 +186,11 @@ public:
     */
     void byteReceived();
 
-
-
 signals:
 //    void sendByte(int value);
     void sendByte(int value, int channel);
 
-
 protected:
-
     //=========================================================================================================
     /**
     * Runs the run method
@@ -209,8 +203,6 @@ protected:
     */
 
     void sendByteTo(int value, int channel);
-
-
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
@@ -239,8 +231,6 @@ private:
     bool m_bIsRunning;
     bool m_isReceived;
 
-
-
     //alpha locked stuff
 
     double m_fs;
@@ -252,8 +242,6 @@ private:
     VectorXd m_vecCorr;
 
     double corr(VectorXd a, VectorXd b);
-
-
 };
 
 } // NAMESPACE
