@@ -43,7 +43,7 @@
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "gpuinterpolationitem.h"
-#include "../../workers/rtSensorData/rtgpusensordataworker.h"
+#include "../../workers/rtSensorData/RtSensorDataWorker.h"
 
 
 //*************************************************************************************************************
@@ -122,32 +122,33 @@ GpuSensorDataTreeItem::~GpuSensorDataTreeItem()
 
 //*************************************************************************************************************
 
-void GpuSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
-                                 const FiffInfo &tFiffInfo,
-                                 const QString &tSensorType,
-                                 const double tCancelDist,
-                                 const QString &tInterpolationFunction,
-                                 Qt3DCore::QEntity* t3DEntityParent)
+void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
+                                 const FiffInfo &fiffInfo,
+                                 const QString &sSensorType,
+                                 const double dCancelDist,
+                                 const QString &sInterpolationFunction,
+                                 Qt3DCore::QEntity* p3DEntityParent)
 {
     if(m_bIsDataInit == true)
     {
-        qDebug("GpuSensorDataTreeItem::init is already initialized");
+        qDebug("GpuSensorDataTreeItem::init - Item is already initialized");
     }
 
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
     if(!m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker = new RtGpuSensorDataWorker();
+        m_pSensorRtDataWorker = new RtSensorDataWorker(0, false);
     }
 
-    connect(m_pSensorRtDataWorker.data(), &RtGpuSensorDataWorker::newRtData,
-            this, &GpuSensorDataTreeItem::onNewRtData);
+    connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtRawData,
+            this, &GpuSensorDataTreeItem::onNewRtRawData);
 
     // map passed sensor type string to fiff constant
-    if (tSensorType.toStdString() == std::string("MEG")) {
-        m_iSensorType = FIFFV_MEG_CH;
-    } else if (tSensorType.toStdString() == std::string("EEG")) {
-        m_iSensorType = FIFFV_EEG_CH;
+    fiff_int_t sensorTypeFiffConstant;
+    if (sSensorType.toStdString() == std::string("MEG")) {
+        sensorTypeFiffConstant = FIFFV_MEG_CH;
+    } else if (sSensorType.toStdString() == std::string("EEG")) {
+        sensorTypeFiffConstant = FIFFV_EEG_CH;
     } else {
         qDebug() << "GpuSensorDataTreeItem::init - unknown sensor type. Returning ...";
         return;
@@ -157,9 +158,9 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     QVector<Vector3f> vecSensorPos;
     m_iUsedSensors.clear();
     int iCounter = 0;
-    for(const FiffChInfo &info : tFiffInfo.chs) {
+    for(const FiffChInfo &info : fiffInfo.chs) {
         //Only take EEG with V as unit or MEG magnetometers with T as unit
-        if(info.kind == m_iSensorType && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
+        if(info.kind == sensorTypeFiffConstant && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
             vecSensorPos.push_back(info.chpos.r0);
 
             //save the number of the sensor
@@ -169,42 +170,26 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &tBemSurface,
     }
 
     //Create bad channel idx list
-    for(const QString &bad : tFiffInfo.bads) {
-        m_iSensorsBad.push_back(tFiffInfo.ch_names.indexOf(bad));
+    for(const QString &bad : fiffInfo.bads) {
+        m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
     }
 
-    //Set cancle distance
-    setCancelDistance(tCancelDist);
+    //Set cancel distance
+    setCancelDistance(dCancelDist);
+
     //Set interpolation function
-    setInterpolationFunction(tInterpolationFunction);
+    setInterpolationFunction(sInterpolationFunction);
 
-    //Set surface data
-    m_bemSurface = tBemSurface;
-    m_fiffInfo = tFiffInfo;
-
-    //sensor projecting
-    m_pVecMappedSubset = GeometryInfo::projectSensors(tBemSurface, vecSensorPos);
-
-    //SCDC with cancel distance
-    m_pDistanceMatrix = GeometryInfo::scdc(tBemSurface, m_pVecMappedSubset, tCancelDist);
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_pDistanceMatrix, tFiffInfo, m_iSensorType);
-
-    dFuncPtr interpolationFunc = transformInterpolationFromStrToFunc(tInterpolationFunction);
-    //create weight matrix
-    QSharedPointer<SparseMatrix<double>> pInterpolationMatrix = Interpolation::createInterpolationMat(m_pVecMappedSubset,
-                                                                               m_pDistanceMatrix,
-                                                                               interpolationFunc,
-                                                                               tCancelDist,
-                                                                               tFiffInfo,
-                                                                               m_iSensorType);
+    m_pSensorRtDataWorker->setInterpolationInfo(bemSurface,
+                                                vecSensorPos,
+                                                fiffInfo,
+                                                sensorTypeFiffConstant);
 
     //create new Tree Item
     if(!m_pInterpolationItem)
     {
-        m_pInterpolationItem = new GpuInterpolationItem(t3DEntityParent, Data3DTreeModelItemTypes::GpuInterpolationItem, QStringLiteral("3D Plot"));
-        m_pInterpolationItem->initData(tBemSurface, pInterpolationMatrix);
+        m_pInterpolationItem = new GpuInterpolationItem(p3DEntityParent, Data3DTreeModelItemTypes::GpuInterpolationItem, QStringLiteral("3D Plot"));
+        m_pInterpolationItem->initData(bemSurface, m_pSensorRtDataWorker->getInterpolationOperator());
 
         QList<QStandardItem*> list;
         list << m_pInterpolationItem;
@@ -246,7 +231,7 @@ void GpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
         //Add data to worker
-        m_pSensorRtDataWorker->addData(dSmallSensorData.cast<float>());
+        m_pSensorRtDataWorker->addData(dSmallSensorData);
     }
     else
     {
@@ -265,7 +250,7 @@ void GpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
         //Add data to worker
-        m_pSensorRtDataWorker->addData(dSmallSensorData.cast<float>());
+        m_pSensorRtDataWorker->addData(dSmallSensorData);
     }
 }
 
@@ -284,59 +269,18 @@ void GpuSensorDataTreeItem::setSFreq(const double dSFreq)
 
 void GpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 {
-    //Create bad channel idx list
-    m_iSensorsBad.clear();
-    for(const QString &bad : info.bads)
-    {
-        m_iSensorsBad.push_back(info.ch_names.indexOf(bad));
+    if(m_pSensorRtDataWorker) {
+        //Create bad channel idx list
+        m_iSensorsBad.clear();
+        for(const QString &bad : info.bads) {
+            m_iSensorsBad.push_back(info.ch_names.indexOf(bad));
+        }
+
+        //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
+        m_pSensorRtDataWorker->updateBadChannels(info);
+
+        m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
     }
-
-    if(!m_bIsDataInit)
-    {
-        return;
-    }
-
-
-    m_fiffInfo = info;
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_pDistanceMatrix,
-                                    m_fiffInfo,
-                                    m_iSensorType);
-
-    //Update weight matrix
-    m_pInterpolationItem->setWeightMatrix(Interpolation::createInterpolationMat(m_pVecMappedSubset,
-                                                                                m_pDistanceMatrix,
-                                                                                m_interpolationFunction,
-                                                                                m_dCancelDistance,
-                                                                                m_fiffInfo,
-                                                                                m_iSensorType));
-}
-
-
-//*************************************************************************************************************
-
-QSharedPointer<SparseMatrix<double>> GpuSensorDataTreeItem::calculateWeigtMatrix()
-{
-    //SCDC with cancel distance
-    m_pDistanceMatrix = GeometryInfo::scdc(m_bemSurface,
-                                           m_pVecMappedSubset,
-                                           m_dCancelDistance);
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_pDistanceMatrix,
-                                    m_fiffInfo,
-                                    m_iSensorType);
-
-
-    //create weight matrix
-    return  Interpolation::createInterpolationMat(m_pVecMappedSubset,
-                                                   m_pDistanceMatrix,
-                                                   m_interpolationFunction,
-                                                   m_dCancelDistance,
-                                                   m_fiffInfo,
-                                                   m_iSensorType);
-
 }
 
 
@@ -356,12 +300,11 @@ void GpuSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &chec
 
 //*************************************************************************************************************
 
-void GpuSensorDataTreeItem::onNewRtData(const VectorXf &tSensorData)
+void GpuSensorDataTreeItem::onNewRtRawData(const VectorXd &vecDataVector)
 {
     if(m_pInterpolationItem)
     {
-        m_pInterpolationItem->addNewRtData(tSensorData);
-
+        m_pInterpolationItem->addNewRtData(vecDataVector.cast<float>());
     }
 }
 
@@ -438,28 +381,12 @@ void GpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
     if(dCancelDist.canConvert<double>())
     {
-        m_dCancelDistance = dCancelDist.toDouble();
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
 
-        if(m_pInterpolationItem != nullptr && m_bIsDataInit == true)
-        {
-            //SCDC with cancel distance
-            m_pDistanceMatrix = GeometryInfo::scdc(m_bemSurface,
-                                                   m_pVecMappedSubset,
-                                                   m_dCancelDistance);
-
-            //filtering of bad channels out of the distance table
-            GeometryInfo::filterBadChannels(m_pDistanceMatrix,
-                                            m_fiffInfo,
-                                            m_iSensorType);
-
-
-            //create weight matrix
-            m_pInterpolationItem->setWeightMatrix(Interpolation::createInterpolationMat(m_pVecMappedSubset,
-                                                                                        m_pDistanceMatrix,
-                                                                                        m_interpolationFunction,
-                                                                                        m_dCancelDistance,
-                                                                                        m_fiffInfo,
-                                                                                        m_iSensorType));
+            if(m_pInterpolationItem) {
+                m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
+            }
         }
     }
 }
@@ -471,16 +398,12 @@ void GpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
 {
     if(sInterpolationFunction.canConvert<QString>())
     {
-        m_interpolationFunction = transformInterpolationFromStrToFunc(sInterpolationFunction.toString());
+        if(m_pSensorRtDataWorker) {
+            m_pSensorRtDataWorker->setInterpolationFunction(sInterpolationFunction.toString());
 
-        if(m_pInterpolationItem && m_bIsDataInit == true)
-        {
-            m_pInterpolationItem->setWeightMatrix(Interpolation::createInterpolationMat(m_pVecMappedSubset,
-                                                                                        m_pDistanceMatrix,
-                                                                                        m_interpolationFunction,
-                                                                                        m_dCancelDistance,
-                                                                                        m_fiffInfo,
-                                                                                        m_iSensorType));
+            if(m_pInterpolationItem) {
+                m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
+            }
         }
     }
 }

@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "false");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
@@ -255,10 +255,10 @@ int main(int argc, char *argv[])
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV);
 
-    // Read & show digitizer points
-    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffDigPointSet t_Dig(t_fileDig);
-    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+//    // Read & show digitizer points
+//    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    FiffDigPointSet t_Dig(t_fileDig);
+//    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
     //Co-Register EEG points
     QFile coordTransfile("./MNE-sample-data/MEG/sample/all-trans.fif");
@@ -280,7 +280,6 @@ int main(int argc, char *argv[])
 
     //Create the 3D view
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),

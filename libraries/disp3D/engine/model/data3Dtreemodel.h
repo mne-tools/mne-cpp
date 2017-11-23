@@ -428,7 +428,7 @@ protected:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorDataTreeItem *addCshSensorData(const QString& sSubject,
+    SensorDataTreeItem *addGpuSensorData(const QString& sSubject,
                                             const QString& sMeasurementSetName,
                                             const Eigen::MatrixXd& matSensorData,
                                             const MNELIB::MNEBemSurface& tBemSurface,

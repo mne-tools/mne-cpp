@@ -81,7 +81,7 @@ namespace DISP3DLIB {
 //=============================================================================================================
 
 class GpuInterpolationItem;
-class RtGpuSensorDataWorker;
+class RtSensorDataWorker;
 
 
 //=============================================================================================================
@@ -119,17 +119,17 @@ public:
      *
      * @param[in] tBemSurface               MNEBemSurface that holds the mesh that should be visualized.
      * @param[in] tFiffInfo                 FiffInfo that holds the sensors information.
-     * @param[in] tSensorType               The sensor type that is later used for live interpolation.
-     * @param[in] tCancelDist               Distances higher than this are ignored for the interpolation.
-     * @param[in] tInterpolationFunction    Function that computes interpolation coefficients using the distance values.
-     * @param[in] t3DEntityParent           The Qt3D entity parent of the new item.
+     * @param[in] sSensorType               The sensor type that is later used for live interpolation.
+     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation.
+     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values.
+     * @param[in] p3DEntityParent           The Qt3D entity parent of the new item.
      */
     void init(const MNELIB::MNEBemSurface& tBemSurface,
               const FIFFLIB::FiffInfo &tFiffInfo,
-              const QString& tSensorType,
-              const double tCancelDist,
-              const QString &tInterpolationFunction,
-              Qt3DCore::QEntity *t3DEntityParent);
+              const QString& sSensorType,
+              const double dCancelDist,
+              const QString &sInterpolationFunction,
+              Qt3DCore::QEntity *p3DEntityParent);
 
     //=========================================================================================================
     /**
@@ -156,14 +156,6 @@ public:
     virtual void updateBadChannels(const FIFFLIB::FiffInfo& info) override;
 
 protected:
-
-    //=========================================================================================================
-    /**
-     * Calculates a interpolation matrix which is based on surfaced constrained distances.
-     * Surface data members needs to be initialized first.
-     */
-    QSharedPointer<SparseMatrix<double> > calculateWeigtMatrix();
-
     //=========================================================================================================
     /**
     * This function gets called whenever the check/activation state of the rt data worker changed.
@@ -176,9 +168,9 @@ protected:
     /**
     * This function gets called whenever this item receives sensor values for each estimated source.
     *
-    * @param[in] tSensorData         The senor values for each estimated source.
+    * @param[in] vecDataVector         The streamed raw data.
     */
-    virtual void onNewRtData(const Eigen::VectorXf &tSensorData);
+    virtual void onNewRtRawData(const Eigen::VectorXd &vecDataVector);
 
     //=========================================================================================================
     /**
@@ -237,8 +229,7 @@ protected:
     */
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
-
-    QPointer<RtGpuSensorDataWorker>         m_pSensorRtDataWorker;              /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataWorker>            m_pSensorRtDataWorker;              /**< The source data worker. This worker streams the rt data to this item.*/
 
     QPointer<GpuInterpolationItem>          m_pInterpolationItem;               /**< This item manages all 3d rendering and calculations. */
 

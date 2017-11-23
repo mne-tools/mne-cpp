@@ -353,12 +353,12 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
 //*************************************************************************************************************
 
 SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
-                                                    const MNEBemSurface &bemSurface,
-                                                    const FiffInfo &fiffInfo,
-                                                    const QString &sSensorType,
-                                                    const double dCancelDist,
-                                                    const QString &sInterpolationFunction,
-                                                    Qt3DCore::QEntity* pParent)
+                                                 const MNEBemSurface &bemSurface,
+                                                 const FiffInfo &fiffInfo,
+                                                 const QString &sSensorType,
+                                                 const double dCancelDist,
+                                                 const QString &sInterpolationFunction,
+                                                 Qt3DCore::QEntity* pParent)
 {
     if(!tSensorData.size() == 0) {
         if(sSensorType == "EEG") {

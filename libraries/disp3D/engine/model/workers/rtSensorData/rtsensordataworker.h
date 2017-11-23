@@ -147,7 +147,7 @@ public:
     *
     * @param[in] parent      The parent of the QObject.
     */
-    explicit RtSensorDataWorker(QObject* parent = 0);
+    explicit RtSensorDataWorker(QObject* parent = 0, bool bStreamSmoothedData = true);
 
     //=========================================================================================================
     /**
@@ -171,19 +171,21 @@ public:
     
     //=========================================================================================================
     /**
-     * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
-     * In the end calls calculateSurfaceData().
-     * 
-     * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
-     * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
-     * @param[in] fiffEvoked                Holds all information about the sensors.
-     * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
-     */
-    void calculateSurfaceData(const MNELIB::MNEBemSurface &bemSurface,
+    * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
+    * In the end calls calculateSurfaceData().
+    *
+    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
+    * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
+    * @param[in] fiffEvoked                Holds all information about the sensors.
+    * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
+    *
+    * @return Returns the created interpolation matrix.
+    */
+    void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
                               const QVector<Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
-   
+
     //=========================================================================================================
     /**
     * Set base surface color which the streamed data is plotted on.
@@ -191,7 +193,6 @@ public:
     * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted
     */
     void setSurfaceColor(const MatrixX3f &matSurfaceVertColor);
-
 
     //=========================================================================================================
     /**
@@ -262,6 +263,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the created interpolation operator.
+    *
+    * @return Returns the created interpolation operator.
+    */
+    QSharedPointer<SparseMatrix<double>> getInterpolationOperator();
+
+    //=========================================================================================================
+    /**
     * Update bad channels and recalculate interpolation matrix.
     *
     * @param[in] info                 The fiff info including the new bad channels.
@@ -283,12 +292,17 @@ public:
 protected:
     //=========================================================================================================
     /**
+    * Calculate the interpolation operator based on the set interpolation info.
+    */
+    void calculateInterpolationOperator();
+
+    //=========================================================================================================
+    /**
     * Main method of this worker: Checks whether it is time for the worker to output new data for visualization.
     * If so, it averages the specified amount of data samples and calculates the output.
     */
     virtual void run() override;
 
-private:
     //=========================================================================================================
     /**
      * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
@@ -312,13 +326,6 @@ private:
     Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 
     //=========================================================================================================
-    /**
-     * Prepares the necessary data for the later ongoing interpolation of signals.
-     * Calculates a weight matrix which is based on surfaced constrained distances.
-     */
-    void calculateSurfaceData();
-
-    //=========================================================================================================
     QMutex                                              m_qMutex;                           /**< The thread's mutex. */
 
     QLinkedList<Eigen::VectorXd>                        m_lDataQ;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
@@ -326,7 +333,8 @@ private:
 
     bool                                                m_bIsRunning;                       /**< Flag if this thread is running. */
     bool                                                m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
-    bool                                                m_bSurfaceDataIsInit;               /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                                                m_bInterpolationInfoIsInit;         /**< Flag if this thread's interpoaltion data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                                                m_bStreamSmoothedData;              /**< Flag if this thread's streams the raw or already smoothed data. Latter are produced by multiplying the smoothing operator here in this thread. */
 
     int                                                 m_iNumSensors;                      /**< Number of sensors that this worker does expect when receiving rt data. */
     int                                                 m_iAverageSamples;                  /**< Number of average to compute. */
@@ -345,7 +353,8 @@ signals:
     *
     * @param[in] colorMatrix     The samples data in form of rgb colors for the mesh.
     */
-    void newRtData(const Eigen::MatrixX3f &colorMatrix);
+    void newRtRawData(const Eigen::VectorXd &vecDataVector);
+    void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrix);
 };
 
 } // NAMESPACE

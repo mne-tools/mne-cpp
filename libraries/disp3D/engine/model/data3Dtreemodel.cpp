@@ -114,7 +114,8 @@ Data3DTreeModel::~Data3DTreeModel()
 
 //*************************************************************************************************************
 
-QVariant Data3DTreeModel::data(const QModelIndex& index, int role) const
+QVariant Data3DTreeModel::data(const QModelIndex& index,
+                               int role) const
 {
 //    qDebug() << "Data3DTreeModel::data - index.column(): " << index.column();
 
@@ -139,7 +140,8 @@ int Data3DTreeModel::columnCount(const QModelIndex &parent) const
 
 //*************************************************************************************************************
 
-QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation,
+                                     int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         QVariant data;
@@ -171,7 +173,10 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject, const QString& sMriSetName, const SurfaceSet& surfaceSet, const AnnotationSet& annotationSet)
+QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject,
+                                                         const QString& sMriSetName,
+                                                         const SurfaceSet& surfaceSet,
+                                                         const AnnotationSet& annotationSet)
 {
     QList<FsSurfaceTreeItem*> returnItemList;
 
@@ -189,7 +194,10 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject
 
 //*************************************************************************************************************
 
-FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QString& sMriSetName, const Surface& surface, const Annotation &annotation)
+FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
+                                               const QString& sMriSetName,
+                                               const Surface& surface,
+                                               const Annotation &annotation)
 {
     FsSurfaceTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -214,7 +222,9 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QSt
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject, const QString& sMeasurementSetName, const MNESourceSpace& sourceSpace)
+SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject,
+                                                     const QString& sMeasurementSetName,
+                                                     const MNESourceSpace& sourceSpace)
 {
     SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -239,7 +249,9 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject, co
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject, const QString& sMeasurementSetName, const MNEForwardSolution& forwardSolution)
+SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject,
+                                                         const QString& sMeasurementSetName,
+                                                         const MNEForwardSolution& forwardSolution)
 {
     return this->addSourceSpace(sSubject, sMeasurementSetName, forwardSolution.src);
 }
@@ -247,7 +259,10 @@ SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, const QString& sMeasurementSetName, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
+                                                    const QString& sMeasurementSetName,
+                                                    const MNESourceEstimate& tSourceEstimate,
+                                                    const MNEForwardSolution& tForwardSolution)
 {
     MneEstimateTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -281,7 +296,9 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, con
 
 //*************************************************************************************************************
 
-EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject, const QString& sSet, const INVERSELIB::ECDSet& ecdSet)
+EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
+                                                   const QString& sSet,
+                                                   const INVERSELIB::ECDSet& ecdSet)
 {
     EcdDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -308,7 +325,9 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject, cons
 
 //*************************************************************************************************************
 
-NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject, const QString& sMeasurementSetName, const Network& networkData)
+NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
+                                                      const QString& sMeasurementSetName,
+                                                      const Network& networkData)
 {
     NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -334,7 +353,9 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject, c
 
 //*************************************************************************************************************
 
-BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString& sBemSetName, const MNELIB::MNEBem& bem)
+BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
+                                         const QString& sBemSetName,
+                                         const MNELIB::MNEBem& bem)
 {
     BemTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -360,9 +381,9 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString&
 //*************************************************************************************************************
 
 SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
-                                                       const QString& sSensorSetName,
-                                                        const QList<FIFFLIB::FiffChInfo>& lChInfo,
-                                                       const MNELIB::MNEBem& sensor)
+                                                     const QString& sSensorSetName,
+                                                     const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                                     const MNELIB::MNEBem& sensor)
 {
     SensorSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -388,8 +409,8 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 //*************************************************************************************************************
 
 SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
-                                                       const QString& sSensorSetName,
-                                                       const QList<FIFFLIB::FiffChInfo>& lChInfo)
+                                                     const QString& sSensorSetName,
+                                                     const QList<FIFFLIB::FiffChInfo>& lChInfo)
 {
     SensorSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -501,7 +522,8 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 
 //*************************************************************************************************************
 
-void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd)
+void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent,
+                                             QStandardItem* pItemAdd)
 {
     if(pItemParent && pItemAdd) {
         QList<QStandardItem*> list;
@@ -515,14 +537,14 @@ void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStanda
 //*************************************************************************************************************
 
 SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
-                                        const QString& sMeasurementSetName,
-                                        const MatrixXd& matSensorData,
-                                        const MNEBemSurface& tBemSurface,
-                                        const FiffInfo& fiffInfo,
-                                        const QString& sDataType,
-                                        const double dCancelDist,
-                                        const QString& sInterpolationFunction,
-                                        const QSurfaceFormat &tSurfaceFormat)
+                                                   const QString& sMeasurementSetName,
+                                                   const MatrixXd& matSensorData,
+                                                   const MNEBemSurface& tBemSurface,
+                                                   const FiffInfo& fiffInfo,
+                                                   const QString& sDataType,
+                                                   const double dCancelDist,
+                                                   const QString& sInterpolationFunction,
+                                                   const QSurfaceFormat &tSurfaceFormat)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -532,7 +554,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
             || tSurfaceFormat.majorVersion() > 4))
     {
         //use compute shader version
-        pReturnItem = addCshSensorData(sSubject,
+        pReturnItem = addGpuSensorData(sSubject,
                          sMeasurementSetName,
                          matSensorData,
                          tBemSurface,
@@ -541,9 +563,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                          dCancelDist,
                          sInterpolationFunction);
         qDebug("Using compute shader version of SensorDataTreeItem.");
-    }
-    else
-    {
+    } else {
         //use cpu version
         pReturnItem = addCpuSensorData(sSubject,
                          sMeasurementSetName,
@@ -561,7 +581,14 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
 
 //*************************************************************************************************************
 
-SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject, const QString &sMeasurementSetName, const MatrixXd &matSensorData, const MNEBemSurface &tBemSurface, const FiffInfo &fiffInfo, const QString &sDataType, const double dCancelDist, const QString &sInterpolationFunction)
+SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject,
+                                                      const QString &sMeasurementSetName,
+                                                      const MatrixXd &matSensorData,
+                                                      const MNEBemSurface &tBemSurface,
+                                                      const FiffInfo &fiffInfo,
+                                                      const QString &sDataType,
+                                                      const double dCancelDist,
+                                                      const QString &sInterpolationFunction)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -604,14 +631,14 @@ SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject, c
 
 //*************************************************************************************************************
 
-SensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject,
-                                                         const QString &sMeasurementSetName,
-                                                         const MatrixXd &matSensorData,
-                                                         const MNEBemSurface &tBemSurface,
-                                                         const FiffInfo &fiffInfo,
-                                                         const QString &sDataType,
-                                                         const double dCancelDist,
-                                                         const QString &sInterpolationFunction)
+SensorDataTreeItem *Data3DTreeModel::addGpuSensorData(const QString &sSubject,
+                                                      const QString &sMeasurementSetName,
+                                                      const MatrixXd &matSensorData,
+                                                      const MNEBemSurface &tBemSurface,
+                                                      const FiffInfo &fiffInfo,
+                                                      const QString &sDataType,
+                                                      const double dCancelDist,
+                                                      const QString &sInterpolationFunction)
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
