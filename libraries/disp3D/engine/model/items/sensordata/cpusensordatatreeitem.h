@@ -170,7 +170,6 @@ public:
     virtual void updateBadChannels(const FIFFLIB::FiffInfo& info) override;
 
 protected:
-
     //=========================================================================================================
     /**
     * This function gets called whenever the check/activation state of the rt data worker changed.
@@ -183,9 +182,9 @@ protected:
     /**
     * This function gets called whenever this item receives new color values for each estimated source.
     *
-    * @param[in] sourceColorSamples         The color values for each estimated source for left and right hemisphere.
+    * @param[in] sourceColorSamples         The color values for the streamed data.
     */
-    virtual void onNewRtData(const MatrixX3f &sensorData);
+    virtual void onNewRtSmoothedData(const MatrixX3f &matColorMatrix);
 
     //=========================================================================================================
     /**
@@ -244,7 +243,6 @@ protected:
     */
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
-
     QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
@@ -255,7 +253,6 @@ signals:
     * @param[in] vertColors                 The colors for the underlying mesh surface
     */
     void rtVertColorChanged(const QVariant &vertColors);
-
 
 };
 

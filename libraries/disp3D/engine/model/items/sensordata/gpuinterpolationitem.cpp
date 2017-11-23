@@ -96,7 +96,7 @@ GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 //*************************************************************************************************************
 
 void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
-                                   QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
+                                   QSharedPointer<SparseMatrix<double> > pInterpolationMatrix)
 {
     if(m_bIsDataInit == true)
     {
@@ -104,7 +104,7 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
        return;
     }
 
-    m_pMaterial->setWeightMatrix(tInterpolationMatrix);
+    m_pMaterial->setWeightMatrix(pInterpolationMatrix);
 
     //Create draw entity if needed
     if(!m_pMeshDrawEntity)
@@ -175,7 +175,7 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> > tInterpolationMatrix)
+void GpuInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> > pInterpolationMatrix)
 {
     if(m_bIsDataInit == false)
     {
@@ -183,7 +183,9 @@ void GpuInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> >
         return;
     }
 
-    m_pMaterial->setWeightMatrix(tInterpolationMatrix);
+    if(pInterpolationMatrix) {
+        m_pMaterial->setWeightMatrix(pInterpolationMatrix);
+    }
 }
 
 

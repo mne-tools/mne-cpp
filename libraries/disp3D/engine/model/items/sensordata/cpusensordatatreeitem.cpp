@@ -107,14 +107,19 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
                               const double dCancelDist,
                               const QString& sInterpolationFunction)
 {
+    if(m_bIsDataInit == true)
+    {
+        qDebug("CpuSensorDataTreeItem::init - Item is already initialized");
+    }
+
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
     if(!m_pSensorRtDataWorker) {
         m_pSensorRtDataWorker = new RtSensorDataWorker();
     }
 
-    connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtData,
-            this, &CpuSensorDataTreeItem::onNewRtData);
+    connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtSmoothedData,
+            this, &CpuSensorDataTreeItem::onNewRtSmoothedData);
 
     // map passed sensor type string to fiff constant
     fiff_int_t sensorTypeFiffConstant;
@@ -123,7 +128,7 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
     } else if (sSensorType.toStdString() == std::string("EEG")) {
         sensorTypeFiffConstant = FIFFV_EEG_CH;
     } else {
-        qDebug() << "SensorDataTreeItem::init - unknown sensor type. Returning ...";
+        qDebug() << "CpuSensorDataTreeItem::init - Unknown sensor type. Returning ...";
         return;
     }
 
@@ -147,10 +152,13 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
         m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
     }
 
+    //Set cancle distance
     setCancelDistance(dCancelDist);
+
+    //Set interpolation function
     setInterpolationFunction(sInterpolationFunction);
 
-    m_pSensorRtDataWorker->calculateSurfaceData(bemSurface,
+    m_pSensorRtDataWorker->setInterpolationInfo(bemSurface,
                                                 vecSensorPos,
                                                 fiffInfo,
                                                 sensorTypeFiffConstant);
@@ -253,7 +261,7 @@ void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
             m_iSensorsBad.push_back(info.ch_names.indexOf(bad));
         }
 
-        qDebug() << "m_iSensorsBad" << m_iSensorsBad;
+        //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
 
         m_pSensorRtDataWorker->updateBadChannels(info);
     }
@@ -276,10 +284,10 @@ void CpuSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& chec
 
 //*************************************************************************************************************
 
-void CpuSensorDataTreeItem::onNewRtData(const MatrixX3f &sensorData)
+void CpuSensorDataTreeItem::onNewRtSmoothedData(const MatrixX3f &matColorMatrix)
 {
     QVariant data;
-    data.setValue(sensorData);
+    data.setValue(matColorMatrix);
     emit rtVertColorChanged(data);
 }
 

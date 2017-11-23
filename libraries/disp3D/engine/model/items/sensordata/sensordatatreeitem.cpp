@@ -274,6 +274,7 @@ void SensorDataTreeItem::setColortable(const QString& sColortable)
     }
 }
 
+
 //*************************************************************************************************************
 
 void SensorDataTreeItem::setNormalization(const QVector3D& vecThresholds)
