@@ -96,7 +96,7 @@ GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 //*************************************************************************************************************
 
 void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
-                                   QSharedPointer<SparseMatrix<double> > pInterpolationMatrix)
+                                   QSharedPointer<SparseMatrix<float> > pInterpolationMatrix)
 {
     if(m_bIsDataInit == true)
     {
@@ -175,7 +175,7 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<double> > pInterpolationMatrix)
+void GpuInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<float> > pInterpolationMatrix)
 {
     if(m_bIsDataInit == false)
     {

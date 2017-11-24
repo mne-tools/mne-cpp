@@ -87,7 +87,7 @@ namespace MNELIB {
 
 namespace DISP3DLIB {
 
-#define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
+#define FLOAT_INFINITY std::numeric_limits<float>::infinity()
 
 
 //*************************************************************************************************************
@@ -129,8 +129,9 @@ public:
      *
      * @return                  A shared pointer to a double matrix. One column represents the distances for one vertex inside of the passed subset
      */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &tBemSurface, const QSharedPointer<QVector<qint32>> pVecVertSubset = QSharedPointer<QVector<qint32>>::create(),
-                                                double dCancelDist = DOUBLE_INFINITY);
+    static QSharedPointer<Eigen::MatrixXd> scdc(const MNELIB::MNEBemSurface &tBemSurface,
+                                                const QSharedPointer<QVector<qint32>> pVecVertSubset = QSharedPointer<QVector<qint32>>::create(),
+                                                double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
     /**

@@ -234,7 +234,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> pOutputDistMatrix,
     qint32 n = vecAdjacency.size();
     QVector<double> vecMinDists(n);
     std::set< std::pair< double, qint32> > vertexQ;
-    const double INF = DOUBLE_INFINITY;
+    const double INF = FLOAT_INFINITY;
 
     // outer loop, iterated for each vertex of 'vertSubset' between 'begin' and 'end'
     for (qint32 i = iBegin; i < iEnd; ++i) {
@@ -309,7 +309,7 @@ QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<MatrixXd> pDistan
                 // found index of our bad channel, set whole column to infinity
                 vecBadColumns.push_back(col);
                 for(int row = 0; row < pDistanceTable->rows(); ++row){
-                    (*pDistanceTable)(row, col) = DOUBLE_INFINITY;
+                    (*pDistanceTable)(row, col) = FLOAT_INFINITY;
                 }
                 break;
             }
