@@ -85,7 +85,6 @@ RtSensorDataWorker::RtSensorDataWorker(bool bStreamSmoothedData)
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(bStreamSmoothedData)
 {
-    m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
 }
 

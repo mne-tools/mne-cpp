@@ -113,6 +113,7 @@ void SensorDataTreeItem::initItem()
     list << new QStandardItem(pItemStreamStatus->toolTip());
     this->appendRow(list);
     pItemStreamStatus->setCheckable(true);
+    pItemStreamStatus->setEditable(false);
     pItemStreamStatus->setCheckState(Qt::Unchecked);
 
     data.setValue(false);
