@@ -370,7 +370,7 @@ void RtSensorDataWorker::streamData()
             //reset sample counter
             iSampleCtr = 0;
         }
-        qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
+        //qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
         //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
     }
 }

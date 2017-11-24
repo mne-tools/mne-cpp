@@ -351,8 +351,6 @@ public:
 
         connect(&timer, &QTimer::timeout,
                 worker, &RtSensorDataWorker::streamData);
-
-        workerThread.start();
     }
     ~RtSensorDataController() {
         workerThread.quit();
@@ -372,9 +370,11 @@ public slots:
         if(streamingState) {
             qDebug() << "RtSensorDataController::setStreamingState - start streaming";
             timer.start(m_iMSecInterval);
+            workerThread.start();
         } else {
             qDebug() << "RtSensorDataController::setStreamingState - stop streaming";
             timer.stop();
+            workerThread.stop();
         }
     }
 
@@ -388,7 +388,7 @@ public slots:
 
     //=========================================================================================================
     /**
-    * Set the length in milli Seconds to wait inbetween data samples.
+    * Set the length in MSec to wait inbetween data samples.
     *
     * @param[in] iMSec                  The new length in milli Seconds to wait inbetween data samples.
     */
