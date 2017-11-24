@@ -282,23 +282,23 @@ int main(int argc, char *argv[])
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
 
     //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data,
-                                                                             t_sensorSurfaceVV[0],
-                                                                             evoked.info,
-                                                                             "MEG",
-                                                                             0.10,
-                                                                             "Cubic",
-                                                                             testWindow->format())) {
-        pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(17);
-        pMegSensorTreeItem->setNumberAverages(1);
-        pMegSensorTreeItem->setStreamingState(false);
-        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
-        pMegSensorTreeItem->setColortable("Jet");
-        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
-    }
+//    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+//                                                                             evoked.comment,
+//                                                                             evoked.data,
+//                                                                             t_sensorSurfaceVV[0],
+//                                                                             evoked.info,
+//                                                                             "MEG",
+//                                                                             0.10,
+//                                                                             "Cubic",
+//                                                                             testWindow->format())) {
+//        pMegSensorTreeItem->setLoopState(true);
+//        pMegSensorTreeItem->setTimeInterval(17);
+//        pMegSensorTreeItem->setNumberAverages(1);
+//        pMegSensorTreeItem->setStreamingState(false);
+//        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
+//        pMegSensorTreeItem->setColortable("Jet");
+//        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
+//    }
 
     //add sensor item for EEG data
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),

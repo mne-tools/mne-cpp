@@ -241,7 +241,9 @@ void GpuSensorDataTreeItem::setSFreq(const double dSFreq)
 
 void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator)
 {
-    m_pInterpolationItem->setWeightMatrix(matInterpolationOperator);
+    if(m_pInterpolationItem) {
+        m_pInterpolationItem->setWeightMatrix(matInterpolationOperator);
+    }
 }
 
 
@@ -360,7 +362,7 @@ void GpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
     if(dCancelDist.canConvert<double>())
     {
         if(m_pSensorRtDataWorkController) {
-            //m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
+            m_pSensorRtDataWorkController->setCancelDistance(dCancelDist.toDouble());
         }
     }
 }
@@ -374,10 +376,6 @@ void GpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
     {
         if(m_pSensorRtDataWorkController) {
             m_pSensorRtDataWorkController->setInterpolationFunction(sInterpolationFunction.toString());
-
-            if(m_pInterpolationItem) {
-                //m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
-            }
         }
     }
 }

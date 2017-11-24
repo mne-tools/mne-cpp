@@ -91,43 +91,6 @@ namespace DISP3DLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// Declare all structures to be used
-//=============================================================================================================
-//=============================================================================================================
-
-/**
-* The struct specifing visualization info.
-*/
-struct VisualizationInfo {
-    double                      dThresholdX;
-    double                      dThresholdZ;
-
-    MatrixX3f                   matOriginalVertColor;
-    MatrixX3f                   matFinalVertColor;
-
-    QRgb (*functionHandlerColorMap)(double v);
-};
-
-//=============================================================================================================
-/**
- * The struct specifing all data that is used in the interpolation process
- */
-struct InterpolationData {
-    int                                     iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
-    double                                  dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
-    
-    QSharedPointer<SparseMatrix<float> >    pWeightMatrix;                    /**< Weight matrix that holds all coefficients for a signal interpolation. */
-    QSharedPointer<MatrixXd>                pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
-    QSharedPointer<QVector<qint32>>         pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
-
-    MNELIB::MNEBemSurface                   bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
-    FIFFLIB::FiffInfo                       fiffInfo;                         /**< Contains all information about the sensors. */
-    
-    double (*interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */
-};
-
 //=============================================================================================================
 
 //*************************************************************************************************************
@@ -149,6 +112,20 @@ class DISP3DSHARED_EXPORT RtSensorDataWorker : public QObject
 public:
     typedef QSharedPointer<RtSensorDataWorker> SPtr;            /**< Shared pointer type for RtSensorDataWorker class. */
     typedef QSharedPointer<const RtSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtSensorDataWorker class. */
+
+    //=========================================================================================================
+    /**
+    * The struct specifing visualization info.
+    */
+    struct VisualizationInfo {
+        double                      dThresholdX;
+        double                      dThresholdZ;
+
+        MatrixX3f                   matOriginalVertColor;
+        MatrixX3f                   matFinalVertColor;
+
+        QRgb (*functionHandlerColorMap)(double v);
+    } m_lVisualizationInfo;               /**< Container for the visualization info. */
 
     //=========================================================================================================
     /**
@@ -313,8 +290,6 @@ public:
 
     double                                              m_dSFreq;                           /**< The current sampling frequency. */
 
-    VisualizationInfo   m_lVisualizationInfo;               /**< Container for the visualization info. */
-
     QSharedPointer<SparseMatrix<float>> m_matInterpolationOperator;
 
     VectorXd vecAverage;
@@ -340,16 +315,31 @@ class DISP3DSHARED_EXPORT RtInterpolationMatWorker : public QObject
     Q_OBJECT
 
 public:
+    //=============================================================================================================
+    /**
+     * The struct specifing all data that is used in the interpolation process
+     */
+    struct InterpolationData {
+        int                                     iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
+        double                                  dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
+
+        QSharedPointer<SparseMatrix<float> >    pWeightMatrix;                    /**< Weight matrix that holds all coefficients for a signal interpolation. */
+        QSharedPointer<MatrixXd>                pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+        QSharedPointer<QVector<qint32>>         pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+
+        MNELIB::MNEBemSurface                   bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
+        FIFFLIB::FiffInfo                       fiffInfo;                         /**< Contains all information about the sensors. */
+
+        double (*interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */
+    } m_lInterpolationData; /**< Container for the interpolation data. */
+
     RtInterpolationMatWorker() {
-        m_lInterpolationData = InterpolationData();
         //5cm cancel distance and cubic function as default
         m_lInterpolationData.dCancelDistance = 0.20;
         m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
     }
 
-    bool                m_bInterpolationInfoIsInit;         /**< Flag if this thread's interpoaltion data was initialized. This flag is used to decide whether specific visualization types can be computed. */
-
-    InterpolationData   m_lInterpolationData;               /**< Container for the interpolation data. */
+    bool                m_bInterpolationInfoIsInit = false;         /**< Flag if this thread's interpoaltion data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
 public slots:
     void setInterpolationFunction(const QString &sInterpolationFunction)
@@ -382,12 +372,13 @@ public slots:
 
     void setCancelDistance(double dCancelDist)
     {
+        qDebug() << "RtInterpolationMatWorker::setCancelDistance - 1"<<this->thread();
         m_lInterpolationData.dCancelDistance = dCancelDist;
 
-        if(m_bInterpolationInfoIsInit){
-            //recalculate everything because parameters changed
-            calculateInterpolationOperator();
-        }
+        //recalculate everything because parameters changed
+        qDebug() << "RtInterpolationMatWorker::setCancelDistance - 2"<<this->thread();
+        calculateInterpolationOperator();
+        qDebug() << "RtInterpolationMatWorker::setCancelDistance - 3"<<this->thread();
     }
 
     void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
@@ -416,6 +407,7 @@ public slots:
     void updateBadChannels(const FIFFLIB::FiffInfo& info)
     {
         if(!m_bInterpolationInfoIsInit) {
+            qDebug() << "RtInterpolationMatWorker::updateBadChannels - Set interpolation info first.";
             return;
         }
 
@@ -437,23 +429,28 @@ public slots:
         emit newInterpolationMatrixCalculated(m_lInterpolationData.pWeightMatrix);
     }
 
+protected:
     void calculateInterpolationOperator()
     {
         if(!m_bInterpolationInfoIsInit) {
-            qDebug() << "RtSensorDataWorker::calculateInterpolationOperator - Set interpolation info first.";
+            qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
             return;
         }
+
+        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 1"<<this->thread();
 
         //SCDC with cancel distance
         m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
                                                                   m_lInterpolationData.pVecMappedSubset,
                                                                   m_lInterpolationData.dCancelDistance);
 
+        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 2"<<this->thread();
         //filtering of bad channels out of the distance table
         GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
                                         m_lInterpolationData.fiffInfo,
                                         m_lInterpolationData.iSensorType);
 
+        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 3"<<this->thread();
         //create weight matrix
         m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
                                                                                    m_lInterpolationData.pDistanceMatrix,
@@ -462,6 +459,7 @@ public slots:
                                                                                    m_lInterpolationData.fiffInfo,
                                                                                    m_lInterpolationData.iSensorType);
 
+        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 4"<<this->thread();
         emit newInterpolationMatrixCalculated(m_lInterpolationData.pWeightMatrix);
     }
 
@@ -509,6 +507,9 @@ public:
         connect(this, &RtSensorDataController::interpolationFunctionChanged,
                 workerMat, &RtInterpolationMatWorker::setInterpolationFunction);
 
+        connect(this, &RtSensorDataController::cancelDistanceChanged,
+                workerMat, &RtInterpolationMatWorker::setCancelDistance);
+
         connect(workerMat, &RtInterpolationMatWorker::newInterpolationMatrixCalculated,
                 this, &RtSensorDataController::onNewInterpolationMatrixCalculated);
 
@@ -555,6 +556,10 @@ public slots:
         emit interpolationFunctionChanged(sInterpolationFunction);
     }
 
+    void setCancelDistance(double dCancelDist) {
+        emit cancelDistanceChanged(dCancelDist);
+    }
+
     //=========================================================================================================
     /**
     * Set the length in MSec to wait inbetween data samples.
@@ -567,8 +572,8 @@ public slots:
     }
 
     void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
-                          const QVector<Vector3f> &vecSensorPos,
-                          const FIFFLIB::FiffInfo &fiffInfo,
+                              const QVector<Vector3f> &vecSensorPos,
+                              const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType) {
         emit newInterpolationInfo(bemSurface,
                                   vecSensorPos,
@@ -589,6 +594,7 @@ signals:
     void streamingStateChanged(bool streamingState);
     void newRtRawData(const Eigen::VectorXd &vecDataVector);
     void interpolationFunctionChanged(const QString &sInterpolationFunction);
+    void cancelDistanceChanged(double dCancelDist);
     void newDataReceived(const Eigen::MatrixXd& data);
 };
 

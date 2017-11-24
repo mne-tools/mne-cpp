@@ -38,8 +38,10 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "geometryinfo.h"
 #include <mne/mne_bem_surface.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,6 +51,7 @@
 #include <cmath>
 #include <fstream>
 #include <set>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,7 +88,9 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &tBemSurface, const QSharedPointer<QVector<qint32>> pVecVertSubset, double dCancelDist)
+QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &tBemSurface,
+                                            const QSharedPointer<QVector<qint32>> pVecVertSubset,
+                                            double dCancelDist)
 {
     // create matrix and check for empty subset:
     qint32 iCols = pVecVertSubset->size();
@@ -121,19 +126,14 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MNEBemSurface &tBemSurface, co
     iterativeDijkstra(pReturnMat, tBemSurface, pVecVertSubset, iBegin, pVecVertSubset->size(), dCancelDist);
 
     // wait for all other threads to finish
-    bool bFinished = false;
-    while (bFinished == false) {
-        bFinished = true;
-        for (const QFuture<void>& f : vecThreads) {
-            if (f.isFinished() == false) {
-                bFinished = false;
-            }
-        }
-        QThread::msleep(2);
+    for (QFuture<void>& f : vecThreads) {
+        f.waitForFinished();
     }
 
     return pReturnMat;
 }
+
+
 //*************************************************************************************************************
 
 QSharedPointer<QVector<qint32> > GeometryInfo::projectSensors(const MNEBemSurface &tBemSurface, const QVector<Vector3f> &vecSensorPositions)
@@ -178,17 +178,10 @@ QSharedPointer<QVector<qint32> > GeometryInfo::projectSensors(const MNEBemSurfac
     pOutputArray->append(nearestNeighbor(tBemSurface, vecSensorPositions.constBegin(), vecSensorPositions.constBegin() + iSubArraySize));
 
     //wait for threads to finish
-    bool iFinished = false;
-        while (!iFinished) {
-            iFinished = true;
-            for (const auto &f : vecThreads) {
-                if (f.isFinished() == false) {
-                    iFinished = false;
-                }
-            }
-            // @todo optimal value for this ?
-            QThread::msleep(2);
+    for (QFuture<QVector<qint32>>& f : vecThreads) {
+        f.waitForFinished();
     }
+
     //move sub arrays back into output
     for(qint32 i = 0; i < vecThreads.size(); ++i)
     {
@@ -197,6 +190,8 @@ QSharedPointer<QVector<qint32> > GeometryInfo::projectSensors(const MNEBemSurfac
 
     return pOutputArray;
 }
+
+
 //*************************************************************************************************************
 
 QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &tBemSurface,  QVector<Vector3f>::const_iterator itSensorBegin, QVector<Vector3f>::const_iterator itSensorEnd)
@@ -225,6 +220,8 @@ QVector<qint32> GeometryInfo::nearestNeighbor(const MNEBemSurface &tBemSurface, 
     }
     return vecMappedSensors;
 }
+
+
 //*************************************************************************************************************
 
 void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> pOutputDistMatrix, const MNEBemSurface &tBemSurface,
@@ -280,6 +277,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> pOutputDistMatrix,
     }
 }
 
+
 //*************************************************************************************************************
 
 void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> pMatrix, std::string sFilename) {
@@ -289,6 +287,8 @@ void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> pMatrix, std::string sFil
     oFileStream << *pMatrix;
     qDebug() << "Finished writing !";
 }
+
+
 //*************************************************************************************************************
 
 QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<MatrixXd> pDistanceTable, const FIFFLIB::FiffInfo& fiffInfo, qint32 iSensorType) {
