@@ -95,16 +95,13 @@ GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface,
-                                   QSharedPointer<SparseMatrix<float> > pInterpolationMatrix)
+void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
 {
     if(m_bIsDataInit == true)
     {
        qDebug("GpuInterpolationItem::initData data already initialized");
        return;
     }
-
-    m_pMaterial->setWeightMatrix(pInterpolationMatrix);
 
     //Create draw entity if needed
     if(!m_pMeshDrawEntity)

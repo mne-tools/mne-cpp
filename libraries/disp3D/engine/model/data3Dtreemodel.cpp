@@ -55,6 +55,8 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
+#include <mne/mne_bem_surface.h>
+
 #include <fiff/fiff_dig_point_set.h>
 
 
@@ -475,25 +477,43 @@ QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
 void Data3DTreeModel::initMetatypes()
 {
     //Init metatypes
-    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >("QPair<MatrixX3f, MatrixX3f>");
+    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >();
+
+    qRegisterMetaType<QVector<Vector3f> >();
+    qRegisterMetaType<QVector<Eigen::Vector3f> >();
+
+    qRegisterMetaType<FIFFLIB::FiffInfo>();
+    qRegisterMetaType<FiffInfo>();
 
     qRegisterMetaType<Eigen::MatrixX3i>();
-    qRegisterMetaType<Eigen::MatrixXd>();
-    qRegisterMetaType<Eigen::MatrixX3f>();
-    qRegisterMetaType<Eigen::VectorXf>();
-    qRegisterMetaType<Eigen::VectorXi>();
-    qRegisterMetaType<Eigen::VectorXd>();
-    qRegisterMetaType<Eigen::RowVectorXf>();
-    qRegisterMetaType<Eigen::Vector3f>();
-
     qRegisterMetaType<MatrixX3i>();
+
+    qRegisterMetaType<Eigen::MatrixXd>();
     qRegisterMetaType<MatrixXd>();
+
+    qRegisterMetaType<Eigen::MatrixX3f>();
     qRegisterMetaType<MatrixX3f>();
+
+    qRegisterMetaType<Eigen::VectorXf>();
     qRegisterMetaType<VectorXf>();
+
+    qRegisterMetaType<Eigen::VectorXi>();
     qRegisterMetaType<VectorXi>();
+
+    qRegisterMetaType<Eigen::VectorXd>();
     qRegisterMetaType<VectorXd>();
+
+    qRegisterMetaType<Eigen::RowVectorXf>();
     qRegisterMetaType<RowVectorXf>();
+
+    qRegisterMetaType<Eigen::Vector3f>();
     qRegisterMetaType<Vector3f>();
+
+    qRegisterMetaType<MNELIB::MNEBemSurface>();
+    qRegisterMetaType<MNEBemSurface>();
+
+    qRegisterMetaType<QSharedPointer<Eigen::SparseMatrix<float> > >();
+    qRegisterMetaType<QSharedPointer<SparseMatrix<float> > >();
 }
 
 

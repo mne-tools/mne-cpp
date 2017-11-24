@@ -126,9 +126,8 @@ public:
      * Initialize interpolation data of this item.
      *
      * @param tMneBemSurface        The bem surface data.
-     * @param pInterpolationMatrix  The weight matrix for interpolation on the bem surface.
      */
-    void initData(const MNELIB::MNEBemSurface &tMneBemSurface, QSharedPointer<SparseMatrix<float>> pInterpolationMatrix);
+    void initData(const MNELIB::MNEBemSurface &tMneBemSurface);
 
     //=========================================================================================================
     /**
