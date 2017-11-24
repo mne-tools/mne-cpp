@@ -107,11 +107,13 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
 
     if(!m_pSensorRtDataWorkController) {
         m_pSensorRtDataWorkController = new RtSensorDataController(false);
-        m_pSensorRtDataWorker = m_pSensorRtDataWorkController->getWorker();
+
+        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newInterpolationMatrixAvailable,
+                this, &GpuSensorDataTreeItem::setInterpolationMatrix);
+        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtRawData,
+                this, &GpuSensorDataTreeItem::onNewRtRawData);
     }
 
-    connect(m_pSensorRtDataWorker, &RtSensorDataWorker::newRtRawData,
-            this, &GpuSensorDataTreeItem::onNewRtRawData);
 
     // map passed sensor type string to fiff constant
     fiff_int_t sensorTypeFiffConstant;
@@ -150,7 +152,7 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
     //Set interpolation function
     setInterpolationFunction(sInterpolationFunction);
 
-    m_pSensorRtDataWorker->setInterpolationInfo(bemSurface,
+    m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface,
                                                 vecSensorPos,
                                                 fiffInfo,
                                                 sensorTypeFiffConstant);
@@ -159,7 +161,7 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
     if(!m_pInterpolationItem)
     {
         m_pInterpolationItem = new GpuInterpolationItem(p3DEntityParent, Data3DTreeModelItemTypes::GpuInterpolationItem, QStringLiteral("3D Plot"));
-        m_pInterpolationItem->initData(bemSurface, m_pSensorRtDataWorker->getInterpolationOperator());
+        m_pInterpolationItem->initData(bemSurface);
 
         QList<QStandardItem*> list;
         list << m_pInterpolationItem;
@@ -201,7 +203,7 @@ void GpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
         //Add data to worker
-        m_pSensorRtDataWorker->addData(dSmallSensorData);
+        m_pSensorRtDataWorkController->addData(dSmallSensorData);
     }
     else
     {
@@ -220,7 +222,7 @@ void GpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
         //Add data to worker
-        m_pSensorRtDataWorker->addData(dSmallSensorData);
+        m_pSensorRtDataWorkController->addData(dSmallSensorData);
     }
 }
 
@@ -229,9 +231,17 @@ void GpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 
 void GpuSensorDataTreeItem::setSFreq(const double dSFreq)
 {
-    if(m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker->setSFreq(dSFreq);
+    if(m_pSensorRtDataWorkController) {
+        //m_pSensorRtDataWorker->setSFreq(dSFreq);
     }
+}
+
+
+//*************************************************************************************************************
+
+void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator)
+{
+    m_pInterpolationItem->setWeightMatrix(matInterpolationOperator);
 }
 
 
@@ -239,7 +249,7 @@ void GpuSensorDataTreeItem::setSFreq(const double dSFreq)
 
 void GpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 {
-    if(m_pSensorRtDataWorker) {
+    if(m_pSensorRtDataWorkController) {
         //Create bad channel idx list
         m_iSensorsBad.clear();
         for(const QString &bad : info.bads) {
@@ -247,9 +257,7 @@ void GpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
         }
 
         //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
-        m_pSensorRtDataWorker->updateBadChannels(info);
-
-        m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
+        //m_pSensorRtDataWorker->updateBadChannels(info);
     }
 }
 
@@ -323,11 +331,11 @@ void GpuSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant &vecT
 
 void GpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState &checkState)
 {
-    if(m_pSensorRtDataWorker) {
+    if(m_pSensorRtDataWorkController) {
         if(checkState == Qt::Checked) {
-           m_pSensorRtDataWorker->setLoop(true);
+           //m_pSensorRtDataWorker->setLoop(true);
         } else if(checkState == Qt::Unchecked) {
-           m_pSensorRtDataWorker->setLoop(false);
+           //m_pSensorRtDataWorker->setLoop(false);
         }
     }
 }
@@ -338,8 +346,8 @@ void GpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState 
 void GpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
-        if(m_pSensorRtDataWorker) {
-           m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
+        if(m_pSensorRtDataWorkController) {
+           //m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
         }
     }
 }
@@ -351,12 +359,8 @@ void GpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
     if(dCancelDist.canConvert<double>())
     {
-        if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
-
-            if(m_pInterpolationItem) {
-                //m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
-            }
+        if(m_pSensorRtDataWorkController) {
+            //m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
         }
     }
 }

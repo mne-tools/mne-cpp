@@ -142,6 +142,8 @@ public:
     */
     virtual void setSFreq(const double dSFreq) override;
 
+    void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator);
+
     //=========================================================================================================
     /**
     * Update bad channels and recalculate interpolation matrix.
@@ -224,10 +226,9 @@ protected:
     */
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
-    QPointer<RtSensorDataController>            m_pSensorRtDataWorkController;          /**< The source data worker. This worker streams the rt data to this item.*/
-    QPointer<RtSensorDataWorker>                    m_pSensorRtDataWorker;                  /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataController>        m_pSensorRtDataWorkController;          /**< The source data worker. This worker streams the rt data to this item.*/
 
-    QPointer<GpuInterpolationItem>          m_pInterpolationItem;                           /**< This item manages all 3d rendering and calculations. */
+    QPointer<GpuInterpolationItem>          m_pInterpolationItem;                   /**< This item manages all 3d rendering and calculations. */
 };
 
 

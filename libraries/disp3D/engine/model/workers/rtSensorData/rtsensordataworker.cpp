@@ -41,14 +41,6 @@
 #include "rtsensordataworker.h"
 #include "../../items/common/types.h"
 
-#include <disp/helpers/colormap.h>
-#include <utils/ioutils.h>
-#include "../../../../helpers/interpolation/interpolation.h"
-#include "../../../../helpers/geometryinfo/geometryinfo.h"
-#include <mne/mne_bem_surface.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -90,19 +82,11 @@ using namespace UTILSLIB;
 RtSensorDataWorker::RtSensorDataWorker(bool bStreamSmoothedData)
 : m_bIsLooping(true)
 , m_iAverageSamples(1)
-, m_bInterpolationInfoIsInit(false)
-, m_iNumSensors(0)
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(bStreamSmoothedData)
 {
     m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
-
-    m_lInterpolationData = InterpolationData();
-
-    //5cm cancel distance and cubic function as default
-    m_lInterpolationData.dCancelDistance = 0.05;
-    m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
 }
 
 
@@ -123,33 +107,6 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
             break;
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::setInterpolationInfo(const MNEBemSurface &bemSurface,
-                                              const QVector<Vector3f> &vecSensorPos,
-                                              const FIFFLIB::FiffInfo &fiffInfo,
-                                              int iSensorType)
-{
-    if(bemSurface.rr.rows() == 0) {
-        qDebug() << "RtSensorDataWorker::calculateSurfaceData - Surface data is empty. Returning ...";
-        return;
-    }
-
-    //set members
-    m_iNumSensors = vecSensorPos.size();
-    m_lInterpolationData.bemSurface = bemSurface;
-    m_lInterpolationData.fiffInfo = fiffInfo;
-    m_lInterpolationData.iSensorType = iSensorType;
-    
-    //sensor projecting: One time operation because surface and sensors can not change 
-    m_lInterpolationData.pVecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.bemSurface, vecSensorPos);
-
-    m_bInterpolationInfoIsInit = true;
-
-    calculateInterpolationOperator();
 }
 
 
@@ -202,50 +159,6 @@ void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setCancelDistance(double dCancelDist)
-{
-    m_lInterpolationData.dCancelDistance = dCancelDist;
-
-    if(m_bInterpolationInfoIsInit){
-        //recalculate everything because parameters changed
-        calculateInterpolationOperator();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::setInterpolationFunction(const QString &sInterpolationFunction)
-{
-    if(sInterpolationFunction == "Linear") {
-        m_lInterpolationData.interpolationFunction = Interpolation::linear;
-    }
-    else if(sInterpolationFunction == "Square") {
-        m_lInterpolationData.interpolationFunction = Interpolation::square;
-    }
-    else if(sInterpolationFunction == "Cubic") {
-        m_lInterpolationData.interpolationFunction = Interpolation::cubic;
-    }
-    else if(sInterpolationFunction == "Gaussian") {
-        m_lInterpolationData.interpolationFunction = Interpolation::gaussian;
-    }
-
-    if(m_bInterpolationInfoIsInit == true){
-        //recalculate weight matrix parameters changed
-        qDebug()<<"RtSensorDataWorker::setInterpolationFunction 1";
-        m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                                   m_lInterpolationData.pDistanceMatrix,
-                                                                                   m_lInterpolationData.interpolationFunction,
-                                                                                   m_lInterpolationData.dCancelDistance,
-                                                                                   m_lInterpolationData.fiffInfo,
-                                                                                   m_lInterpolationData.iSensorType);
-        qDebug()<<"RtSensorDataWorker::setInterpolationFunction 2";
-    }
-}
-
-
-//*************************************************************************************************************
-
 void RtSensorDataWorker::setLoop(bool bLooping)
 {
     m_bIsLooping = bLooping;
@@ -257,68 +170,6 @@ void RtSensorDataWorker::setLoop(bool bLooping)
 void RtSensorDataWorker::setSFreq(const double dSFreq)
 {
     m_dSFreq = dSFreq;
-}
-
-
-//*************************************************************************************************************
-
-QSharedPointer<SparseMatrix<float>> RtSensorDataWorker::getInterpolationOperator()
-{
-    return m_lInterpolationData.pWeightMatrix;
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::updateBadChannels(const FiffInfo& info)
-{
-    if(!m_bInterpolationInfoIsInit) {
-        return;
-    }
-
-    m_lInterpolationData.fiffInfo = info;
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
-                                    m_lInterpolationData.fiffInfo,
-                                    m_lInterpolationData.iSensorType);
-
-    //create weight matrix
-    m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                               m_lInterpolationData.pDistanceMatrix,
-                                                                               m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance,
-                                                                               m_lInterpolationData.fiffInfo,
-                                                                               m_lInterpolationData.iSensorType);
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::calculateInterpolationOperator()
-{
-    if(!m_bInterpolationInfoIsInit) {
-        qDebug() << "RtSensorDataWorker::calculateInterpolationOperator - Set interpolation info first.";
-        return;
-    }
-
-    //SCDC with cancel distance
-    m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
-                                                              m_lInterpolationData.pVecMappedSubset,
-                                                              m_lInterpolationData.dCancelDistance);
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
-                                    m_lInterpolationData.fiffInfo,
-                                    m_lInterpolationData.iSensorType);
-
-    //create weight matrix
-    m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                               m_lInterpolationData.pDistanceMatrix,
-                                                                               m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance,
-                                                                               m_lInterpolationData.fiffInfo,
-                                                                               m_lInterpolationData.iSensorType);
 }
 
 
@@ -380,26 +231,21 @@ void RtSensorDataWorker::streamData()
 
 MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vecSensorValues)
 {
+    if(m_matInterpolationOperator.isNull()) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Interpolation matrix was not defined. Returning ...";
+        MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
+        return matColor;
+    }
+
     // NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-    if(vecSensorValues.rows() != m_iNumSensors) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of vertices (" << m_iNumSensors << "). Returning...";
+    if(vecSensorValues.rows() != m_matInterpolationOperator->cols()) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << m_matInterpolationOperator->cols() << "). Returning...";
         MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
         return matColor;
-    }
-
-    if(!m_bInterpolationInfoIsInit) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Surface data was not initialized. Returning ...";
-        MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
-        return matColor;
-    }
-
-
-    if(!m_lInterpolationData.pWeightMatrix) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - weight matrix is no initialized. Returning ...";
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = *Interpolation::interpolateSignal(m_lInterpolationData.pWeightMatrix, vecSensorValues);
+    VectorXf vecIntrpltdVals = *Interpolation::interpolateSignal(m_matInterpolationOperator, vecSensorValues);
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;

@@ -120,6 +120,7 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
     }
     qDebug()<<"magic number"<<((iRows-sensorLookup.size())*iCols)+(sensorLookup.size()*iRows);
 
+    int counter = 0;
     // main loop: go through all rows of distance table and calculate weights
     for (qint32 r = 0; r < iRows; ++r) {
         if (sensorLookup.contains(r) == false) {
@@ -138,8 +139,8 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
             }
 
             //Resize vecNonZeroEntries
-            vecNonZeroEntries.resize(vecNonZeroEntries.size()+vecBelowThresh.size());
             for (const QPair<qint32, float> &qp : vecBelowThresh) {
+                counter++;
                 vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, qp.first, qp.second / dWeightsSum));
             }
         } else {
@@ -147,12 +148,13 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
             const int iIndexInSubset = pProjectedSensors->indexOf(r);
 
             //Resize vecNonZeroEntries
-            vecNonZeroEntries.resize(vecNonZeroEntries.size()+1);
             vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, iIndexInSubset, 1));
+            counter++;
         }
     }
 
     qDebug()<<"vecNonZeroEntries.size() "<<vecNonZeroEntries.size();
+    qDebug()<<"counter "<<counter;
 
     pInterpolationMatrix->setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
     return pInterpolationMatrix;

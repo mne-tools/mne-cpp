@@ -158,10 +158,10 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
     //Set interpolation function
     setInterpolationFunction(sInterpolationFunction);
 
-    m_pSensorRtDataWorker->setInterpolationInfo(bemSurface,
-                                                vecSensorPos,
-                                                fiffInfo,
-                                                sensorTypeFiffConstant);
+//    m_pSensorRtDataWorker->setInterpolationInfo(bemSurface,
+//                                                vecSensorPos,
+//                                                fiffInfo,
+//                                                sensorTypeFiffConstant);
 
     m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
 
@@ -263,7 +263,7 @@ void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
         //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
 
-        m_pSensorRtDataWorker->updateBadChannels(info);
+        //m_pSensorRtDataWorker->updateBadChannels(info);
     }
 }
 
@@ -360,7 +360,7 @@ void CpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
     if(dCancelDist.canConvert<double>()) {
         if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
+            //m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
         }
     }
 }
@@ -372,7 +372,7 @@ void CpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
 {
     if(sInterpolationFunction.canConvert<QString>()) {
         if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setInterpolationFunction(sInterpolationFunction.toString());
+            //m_pSensorRtDataWorker->setInterpolationFunction(sInterpolationFunction.toString());
         }
     }
 }

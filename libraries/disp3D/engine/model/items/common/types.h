@@ -42,6 +42,7 @@
 
 #include <fs/label.h>
 #include <inverse/dipoleFit/ecd_set.h>
+#include <mne/mne_bem_surface.h>
 
 
 //*************************************************************************************************************
@@ -211,45 +212,65 @@ namespace MetaTreeItemRoles
 } //NAMESPACE DISP3DLIB
 
 // Metatype declaration for correct QVariant usage
-// DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE VIEW3D initMetatypes())
+// DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE Data3DTreeModel initMetatypes())
 #ifndef DISP3DLIB_metatype_matrixx3i
-#define metatype_matrixx3i
+#define DISP3DLIB_metatype_matrixx3i
 Q_DECLARE_METATYPE(Eigen::MatrixX3i);
 #endif
 
 #ifndef DISP3DLIB_metatype_matrixXd
-#define metatype_matrixXd
+#define DISP3DLIB_metatype_matrixXd
 Q_DECLARE_METATYPE(Eigen::MatrixXd);
 #endif
 
 #ifndef DISP3DLIB_metatype_matrixx3f
-#define metatype_matrixx3f
+#define DISP3DLIB_metatype_matrixx3f
 Q_DECLARE_METATYPE(Eigen::MatrixX3f);
 #endif
 
 #ifndef DISP3DLIB_metatype_vectorxf
-#define metatype_vectorxf
+#define DISP3DLIB_metatype_vectorxf
 Q_DECLARE_METATYPE(Eigen::VectorXf);
 #endif
 
 #ifndef DISP3DLIB_metatype_vectorxi
-#define metatype_vectorxi
+#define DISP3DLIB_metatype_vectorxi
 Q_DECLARE_METATYPE(Eigen::VectorXi);
 #endif
 
 #ifndef DISP3DLIB_metatype_vectorxd
-#define metatype_vectorxd
+#define DISP3DLIB_metatype_vectorxd
 Q_DECLARE_METATYPE(Eigen::VectorXd);
 #endif
 
 #ifndef DISP3DLIB_metatype_rowvectorxf
-#define metatype_rowvectorxf
+#define DISP3DLIB_metatype_rowvectorxf
 Q_DECLARE_METATYPE(Eigen::RowVectorXf);
 #endif
 
 #ifndef DISP3DLIB_metatype_vector3f
-#define metatype_vector3f
+#define DISP3DLIB_metatype_vector3f
 Q_DECLARE_METATYPE(Eigen::Vector3f);
+#endif
+
+#ifndef DISP3DLIB_metatype_bemsurface
+#define DISP3DLIB_metatype_bemsurface
+Q_DECLARE_METATYPE(MNELIB::MNEBemSurface);
+#endif
+
+#ifndef DISP3DLIB_metatype_fiffinfo
+#define DISP3DLIB_metatype_fiffinfo
+Q_DECLARE_METATYPE(FIFFLIB::FiffInfo);
+#endif
+
+#ifndef DISP3DLIB_metatype_qvectorvector3f
+#define DISP3DLIB_metatype_qvectorvector3f
+Q_DECLARE_METATYPE(QVector<Eigen::Vector3f>);
+#endif
+
+#ifndef DISP3DLIB_metatype_sharedptrsparsematf
+#define DISP3DLIB_metatype_sharedptrsparsematf
+Q_DECLARE_METATYPE(QSharedPointer<Eigen::SparseMatrix<float> >);
 #endif
 
 #endif // DISP3DLIB_TYPES_H
