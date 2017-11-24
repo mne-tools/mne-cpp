@@ -149,7 +149,7 @@ void RtSensorDataWorker::setColormapType(const QString& sColormapType)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
+void RtSensorDataWorker::setThresholds(const QVector3D& vecThresholds)
 {
     m_lVisualizationInfo.dThresholdX = vecThresholds.x();
     m_lVisualizationInfo.dThresholdZ = vecThresholds.z();

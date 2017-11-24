@@ -110,10 +110,9 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
 
         connect(m_pSensorRtDataWorkController, &RtSensorDataController::newInterpolationMatrixAvailable,
                 this, &GpuSensorDataTreeItem::setInterpolationMatrix);
-        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtRawData,
+        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtRawDataAvailable,
                 this, &GpuSensorDataTreeItem::onNewRtRawData);
     }
-
 
     // map passed sensor type string to fiff constant
     fiff_int_t sensorTypeFiffConstant;

@@ -91,10 +91,6 @@ CpuSensorDataTreeItem::CpuSensorDataTreeItem(int iType, const QString &text)
 
 CpuSensorDataTreeItem::~CpuSensorDataTreeItem()
 {
-//    if(m_pSensorRtDataWorker->isRunning()) {
-//        m_pSensorRtDataWorker->stop();
-//        delete m_pSensorRtDataWorker;
-//    }
 }
 
 
@@ -114,12 +110,13 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
 
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
-    if(!m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker = new RtSensorDataWorker();
+    if(!m_pSensorRtDataWorkController) {
+        m_pSensorRtDataWorkController = new RtSensorDataController(true);
+
+        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtSmoothedDataAvailable,
+                this, &CpuSensorDataTreeItem::onNewRtSmoothedData);
     }
 
-    connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtSmoothedData,
-            this, &CpuSensorDataTreeItem::onNewRtSmoothedData);
 
     // map passed sensor type string to fiff constant
     fiff_int_t sensorTypeFiffConstant;
@@ -158,12 +155,12 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
     //Set interpolation function
     setInterpolationFunction(sInterpolationFunction);
 
-//    m_pSensorRtDataWorker->setInterpolationInfo(bemSurface,
-//                                                vecSensorPos,
-//                                                fiffInfo,
-//                                                sensorTypeFiffConstant);
+    m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface,
+                                                vecSensorPos,
+                                                fiffInfo,
+                                                sensorTypeFiffConstant);
 
-    m_pSensorRtDataWorker->setSurfaceColor(matSurfaceVertColor);
+    m_pSensorRtDataWorkController->setSurfaceColor(matSurfaceVertColor);
 
     m_bIsDataInit = true;
 }
@@ -198,8 +195,8 @@ void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         data.setValue(dSmallSensorData);
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-        if(m_pSensorRtDataWorker) {
-             m_pSensorRtDataWorker->addData(dSmallSensorData);
+        if(m_pSensorRtDataWorkController) {
+             m_pSensorRtDataWorkController->addData(dSmallSensorData);
         }
         else {
             qDebug() << "CpuSensorDataTreeItem::addData - worker has not been initialized yet!";
@@ -221,8 +218,8 @@ void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
         data.setValue(dSmallSensorData);
         this->setData(data, Data3DTreeModelItemRoles::RTData);
 
-        if(m_pSensorRtDataWorker) {
-             m_pSensorRtDataWorker->addData(dSmallSensorData);
+        if(m_pSensorRtDataWorkController) {
+             m_pSensorRtDataWorkController->addData(dSmallSensorData);
         }
         else {
             qDebug() << "CpuSensorDataTreeItem::addData - worker has not been initialized yet!";
@@ -235,8 +232,8 @@ void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 
 void CpuSensorDataTreeItem::setColorOrigin(const MatrixX3f &matVertColor)
 {
-    if(m_pSensorRtDataWorker){
-        m_pSensorRtDataWorker->setSurfaceColor(matVertColor);
+    if(m_pSensorRtDataWorkController){
+        m_pSensorRtDataWorkController->setSurfaceColor(matVertColor);
     }
 }
 
@@ -245,8 +242,8 @@ void CpuSensorDataTreeItem::setColorOrigin(const MatrixX3f &matVertColor)
 
 void CpuSensorDataTreeItem::setSFreq(const double dSFreq)
 {
-    if(m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker->setSFreq(dSFreq);
+    if(m_pSensorRtDataWorkController) {
+        //m_pSensorRtDataWorkController->setSFreq(dSFreq);
     }
 }
 
@@ -254,7 +251,7 @@ void CpuSensorDataTreeItem::setSFreq(const double dSFreq)
 
 void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 {
-    if(m_pSensorRtDataWorker) {
+    if(m_pSensorRtDataWorkController) {
         //Create bad channel idx list
         m_iSensorsBad.clear();
         for(const QString &bad : info.bads) {
@@ -263,7 +260,7 @@ void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
         //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
 
-        //m_pSensorRtDataWorker->updateBadChannels(info);
+        //m_pSensorRtDataWorkController->updateBadChannels(info);
     }
 }
 
@@ -272,11 +269,11 @@ void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
 void CpuSensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState& checkState)
 {
-    if(m_pSensorRtDataWorker) {
+    if(m_pSensorRtDataWorkController) {
         if(checkState == Qt::Checked) {
-          //  m_pSensorRtDataWorker->start();
+            m_pSensorRtDataWorkController->setStreamingState(true);
         } else if(checkState == Qt::Unchecked) {
-          //  m_pSensorRtDataWorker->stop();
+            m_pSensorRtDataWorkController->setStreamingState(false);
         }
     }
 }
@@ -297,8 +294,8 @@ void CpuSensorDataTreeItem::onNewRtSmoothedData(const MatrixX3f &matColorMatrix)
 void CpuSensorDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
-        if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setColormapType(sColormapType.toString());
+        if(m_pSensorRtDataWorkController) {
+            //m_pSensorRtDataWorkController->setColormapType(sColormapType.toString());
         }
     }
 }
@@ -309,8 +306,8 @@ void CpuSensorDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 void CpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 {
     if(iMSec.canConvert<int>()) {
-        if(m_pSensorRtDataWorker) {
-            //m_pSensorRtDataWorker->setInterval(iMSec.toInt());
+        if(m_pSensorRtDataWorkController) {
+            m_pSensorRtDataWorkController->setTimeInterval(iMSec.toInt());
         }
     }
 }
@@ -321,8 +318,8 @@ void CpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 void CpuSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
+        if(m_pSensorRtDataWorkController) {
+            m_pSensorRtDataWorkController->setThresholds(vecThresholds.value<QVector3D>());
         }
     }
 }
@@ -332,11 +329,11 @@ void CpuSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant& vecT
 
 void CpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
-    if(m_pSensorRtDataWorker) {
+    if(m_pSensorRtDataWorkController) {
         if(checkState == Qt::Checked) {
-            m_pSensorRtDataWorker->setLoop(true);
+            //m_pSensorRtDataWorker->setLoop(true);
         } else if(checkState == Qt::Unchecked) {
-            m_pSensorRtDataWorker->setLoop(false);
+            //m_pSensorRtDataWorker->setLoop(false);
         }
     }
 }
@@ -347,8 +344,8 @@ void CpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState&
 void CpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
-        if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
+        if(m_pSensorRtDataWorkController) {
+            //m_pSensorRtDataWorkController->setNumberAverages(iNumAvr.toInt());
         }
     }
 }
@@ -359,8 +356,8 @@ void CpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 void CpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 {
     if(dCancelDist.canConvert<double>()) {
-        if(m_pSensorRtDataWorker) {
-            //m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
+        if(m_pSensorRtDataWorkController) {
+            m_pSensorRtDataWorkController->setCancelDistance(dCancelDist.toDouble());
         }
     }
 }
@@ -371,8 +368,8 @@ void CpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 void CpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
     if(sInterpolationFunction.canConvert<QString>()) {
-        if(m_pSensorRtDataWorker) {
-            //m_pSensorRtDataWorker->setInterpolationFunction(sInterpolationFunction.toString());
+        if(m_pSensorRtDataWorkController) {
+            m_pSensorRtDataWorkController->setInterpolationFunction(sInterpolationFunction.toString());
         }
     }
 }
