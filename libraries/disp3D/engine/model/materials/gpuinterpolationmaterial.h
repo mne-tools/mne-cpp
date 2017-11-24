@@ -141,7 +141,7 @@ public:
      *
      * @param pInterpolationMatrix      The weight matrix.
      */
-    void setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
+    void setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<float>> tInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -205,7 +205,7 @@ private:
      * @param tInterpolationMatrix      The weight matrix.
      * @return                          Weight matrix is byte array form.
      */
-    QByteArray buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
+    QByteArray buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float>> tInterpolationMatrix);
 
     //=========================================================================================================
     /**

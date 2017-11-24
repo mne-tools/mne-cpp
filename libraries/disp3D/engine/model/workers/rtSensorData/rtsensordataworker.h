@@ -108,10 +108,9 @@ struct VisualizationInfo {
  */
 struct InterpolationData {
     int                                     iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
-
     double                                  dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
     
-    QSharedPointer<SparseMatrix<double> >   pWeightMatrix;                    /**< Weight matrix that holds all coefficients for a signal interpolation. */
+    QSharedPointer<SparseMatrix<float> >    pWeightMatrix;                    /**< Weight matrix that holds all coefficients for a signal interpolation. */
     QSharedPointer<MatrixXd>                pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
     QSharedPointer<QVector<qint32>>         pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
 
@@ -255,7 +254,7 @@ public:
     *
     * @return Returns the created interpolation operator.
     */
-    QSharedPointer<SparseMatrix<double>> getInterpolationOperator();
+    QSharedPointer<SparseMatrix<float>> getInterpolationOperator();
 
     //=========================================================================================================
     /**
@@ -303,7 +302,6 @@ public:
     QLinkedList<Eigen::VectorXd>                        m_lDataQ;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     QLinkedList<Eigen::VectorXd>::const_iterator        m_itCurrentSample = 0;                  /**< Iterator to current sample which is/was streamed. */
 
-    bool                                                m_bIsRunning;                       /**< Flag if this thread is running. */
     bool                                                m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                                                m_bInterpolationInfoIsInit;         /**< Flag if this thread's interpoaltion data was initialized. This flag is used to decide whether specific visualization types can be computed. */
     bool                                                m_bStreamSmoothedData;              /**< Flag if this thread's streams the raw or already smoothed data. Latter are produced by multiplying the smoothing operator here in this thread. */
@@ -320,8 +318,6 @@ public:
     VectorXd vecAverage;
     uint iSampleCtr = 0;
 
-    QMutex m_mutex;
-
 signals:
     //=========================================================================================================
     /**
@@ -333,24 +329,24 @@ signals:
     void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrix);
 };
 
-class DISP3DSHARED_EXPORT RtSensorDataWorkController : public QObject
+class DISP3DSHARED_EXPORT RtSensorDataController : public QObject
 {
     Q_OBJECT
 
 public:
-    RtSensorDataWorkController(bool bStreamSmoothedData = true) {
+    RtSensorDataController(bool bStreamSmoothedData = true) {
         worker = new RtSensorDataWorker(bStreamSmoothedData);
-        qDebug() << "RtSensorDataWorkController - worker->thread() before " << worker->thread();
+        qDebug() << "RtSensorDataController - worker->thread() before " << worker->thread();
         worker->moveToThread(&workerThread);
-        qDebug() << "RtSensorDataWorkController - worker->thread() after " << worker->thread();
+        qDebug() << "RtSensorDataController - worker->thread() after " << worker->thread();
 
         connect(&workerThread, &QThread::finished,
                 worker, &QObject::deleteLater);
 
         connect(worker, &RtSensorDataWorker::newRtRawData,
-                this, &RtSensorDataWorkController::onNewRtRawData);
+                this, &RtSensorDataController::onNewRtRawData);
 
-        connect(this, &RtSensorDataWorkController::interpolationFunctionChanged,
+        connect(this, &RtSensorDataController::interpolationFunctionChanged,
                 worker, &RtSensorDataWorker::setInterpolationFunction);
 
         connect(&timer, &QTimer::timeout,
@@ -358,7 +354,7 @@ public:
 
         workerThread.start();
     }
-    ~RtSensorDataWorkController() {
+    ~RtSensorDataController() {
         workerThread.quit();
         workerThread.wait();
     }
@@ -374,10 +370,10 @@ public slots:
     }
     void setStreamingState(bool streamingState) {
         if(streamingState) {
-            qDebug() << "RtSensorDataWorkController::setStreamingState - start streaming";
+            qDebug() << "RtSensorDataController::setStreamingState - start streaming";
             timer.start(m_iMSecInterval);
         } else {
-            qDebug() << "RtSensorDataWorkController::setStreamingState - stop streaming";
+            qDebug() << "RtSensorDataController::setStreamingState - stop streaming";
             timer.stop();
         }
     }

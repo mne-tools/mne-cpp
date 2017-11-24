@@ -137,7 +137,7 @@ GpuInterpolationMaterial::~GpuInterpolationMaterial()
 
 //*************************************************************************************************************
 
-void GpuInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
+void GpuInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<float> > tInterpolationMatrix)
 {
     //Set Rows and Cols
     m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
@@ -344,7 +344,7 @@ void GpuInterpolationMaterial::init()
 
 //*************************************************************************************************************
 
-QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
+QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float> > tInterpolationMatrix)
 {
     QByteArray bufferData;
 

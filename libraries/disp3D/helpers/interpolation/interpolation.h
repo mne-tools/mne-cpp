@@ -79,7 +79,7 @@
 
 namespace DISP3DLIB {
 
-#define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
+#define FLOAT_INFINITY std::numeric_limits<float>::infinity()
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -129,10 +129,10 @@ public:
      *
      * @return                                  A shared pointer to the distance matrix created
      */
-    static QSharedPointer<Eigen::SparseMatrix<double> > createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
+    static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
                                                                                const QSharedPointer<Eigen::MatrixXd> pDistanceTable,
                                                                                double (*interpolationFunction) (double),
-                                                                               const double dCancelDist = DOUBLE_INFINITY,
+                                                                               const double dCancelDist = FLOAT_INFINITY,
                                                                                const FIFFLIB::FiffInfo &fiffInfo = FIFFLIB::FiffInfo(),
                                                                                qint32 iSensorType = FIFFV_EEG_CH);
 
@@ -149,7 +149,7 @@ public:
      *
      * @return                              Interpolated values for all vertices of the mesh
      */
-    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<double> > pInterpolationMatrix, const Eigen::VectorXd &vecMeasurementData);
+    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > pInterpolationMatrix, const Eigen::VectorXd &vecMeasurementData);
 
     //=========================================================================================================
     /**

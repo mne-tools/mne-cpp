@@ -88,8 +88,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 RtSensorDataWorker::RtSensorDataWorker(bool bStreamSmoothedData)
-: m_bIsRunning(false)
-, m_bIsLooping(true)
+: m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_bInterpolationInfoIsInit(false)
 , m_iNumSensors(0)
@@ -205,7 +204,6 @@ void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
 
 void RtSensorDataWorker::setCancelDistance(double dCancelDist)
 {
-    QMutexLocker locker (&m_mutex);
     m_lInterpolationData.dCancelDistance = dCancelDist;
 
     if(m_bInterpolationInfoIsInit){
@@ -219,8 +217,6 @@ void RtSensorDataWorker::setCancelDistance(double dCancelDist)
 
 void RtSensorDataWorker::setInterpolationFunction(const QString &sInterpolationFunction)
 {
-    QMutexLocker locker (&m_mutex);
-
     if(sInterpolationFunction == "Linear") {
         m_lInterpolationData.interpolationFunction = Interpolation::linear;
     }
@@ -266,7 +262,7 @@ void RtSensorDataWorker::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-QSharedPointer<SparseMatrix<double>> RtSensorDataWorker::getInterpolationOperator()
+QSharedPointer<SparseMatrix<float>> RtSensorDataWorker::getInterpolationOperator()
 {
     return m_lInterpolationData.pWeightMatrix;
 }
@@ -330,8 +326,6 @@ void RtSensorDataWorker::calculateInterpolationOperator()
 
 void RtSensorDataWorker::streamData()
 {
-    QMutexLocker locker (&m_mutex);
-
     if(m_lDataQ.size() > 0) {
         if(m_itCurrentSample == 0) {
             m_itCurrentSample = m_lDataQ.cbegin();
@@ -359,8 +353,7 @@ void RtSensorDataWorker::streamData()
         iSampleCtr++;
 
         //Set iterator back to the front if needed
-        if(m_itCurrentSample == m_lDataQ.cend())
-        {
+        if(m_itCurrentSample == m_lDataQ.cend()) {
             m_itCurrentSample = m_lDataQ.cbegin();
         }
 
@@ -377,7 +370,8 @@ void RtSensorDataWorker::streamData()
             //reset sample counter
             iSampleCtr = 0;
         }
-        qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
+        qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
+        //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
     }
 }
 

@@ -154,7 +154,7 @@ void TestInterpolation::initTestCase() {
 void TestInterpolation::testDimensionsForInterpolation() {
     // create weight matrix from distance table
     QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface, smallSubset);
-    QSharedPointer<SparseMatrix<double>> testWeightMatrix = Interpolation::createInterpolationMat(smallSubset, distTable, Interpolation::linear);
+    QSharedPointer<SparseMatrix<float>> testWeightMatrix = Interpolation::createInterpolationMat(smallSubset, distTable, Interpolation::linear);
 
     QVERIFY(testWeightMatrix->rows() == distTable->rows());
     QVERIFY(testWeightMatrix->cols() == distTable->cols());
@@ -183,7 +183,7 @@ void TestInterpolation::testSumOfRow() {
     GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
 
     // weight matrix creation
-    QSharedPointer<SparseMatrix<double> > w = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, 0.20, evoked.info, FIFFV_MEG_CH);
+    QSharedPointer<SparseMatrix<float> > w = Interpolation::createInterpolationMat(mappedSubSet, distanceMatrix, Interpolation::linear, 0.20, evoked.info, FIFFV_MEG_CH);
 
     qint32 n = w->rows();
     qint32 m = w->cols();

@@ -106,7 +106,7 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
     if(!m_pSensorRtDataWorkController) {
-        m_pSensorRtDataWorkController = new RtSensorDataWorkController(false);
+        m_pSensorRtDataWorkController = new RtSensorDataController(false);
         m_pSensorRtDataWorker = m_pSensorRtDataWorkController->getWorker();
     }
 

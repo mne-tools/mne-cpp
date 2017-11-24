@@ -161,7 +161,7 @@ void TestGeometryInfo::testBadChannelFiltering() {
     for (qint32 col : erasedColums) {
         qint64 notInfCount = 0;
         for (qint32 row = 0; row < distanceMatrix->rows(); ++row) {
-            if ((*distanceMatrix)(row, col) != DOUBLE_INFINITY) {
+            if ((*distanceMatrix)(row, col) != FLOAT_INFINITY) {
                 notInfCount++;
             }
         }
