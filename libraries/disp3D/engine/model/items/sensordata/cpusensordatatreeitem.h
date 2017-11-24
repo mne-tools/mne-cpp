@@ -87,7 +87,7 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtSensorDataWorker;
+class RtSensorDataController;
 
 
 //=============================================================================================================
@@ -243,7 +243,7 @@ protected:
     */
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
-    QPointer<RtSensorDataWorker>     m_pSensorRtDataWorker;             /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataController>     m_pSensorRtDataWorkController;             /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
     //=========================================================================================================

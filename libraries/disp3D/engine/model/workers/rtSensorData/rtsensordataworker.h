@@ -196,7 +196,7 @@ public:
     *
     * @param[in] vecThresholds          The new threshold values used for normalizing the data.
     */
-    void setNormalization(const QVector3D &vecThresholds);
+    void setThresholds(const QVector3D &vecThresholds);
     
 //    //=========================================================================================================
 //    /**
@@ -372,13 +372,10 @@ public slots:
 
     void setCancelDistance(double dCancelDist)
     {
-        qDebug() << "RtInterpolationMatWorker::setCancelDistance - 1"<<this->thread();
         m_lInterpolationData.dCancelDistance = dCancelDist;
 
         //recalculate everything because parameters changed
-        qDebug() << "RtInterpolationMatWorker::setCancelDistance - 2"<<this->thread();
         calculateInterpolationOperator();
-        qDebug() << "RtInterpolationMatWorker::setCancelDistance - 3"<<this->thread();
     }
 
     void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
@@ -437,20 +434,16 @@ protected:
             return;
         }
 
-        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 1"<<this->thread();
-
         //SCDC with cancel distance
         m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
                                                                   m_lInterpolationData.pVecMappedSubset,
                                                                   m_lInterpolationData.dCancelDistance);
 
-        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 2"<<this->thread();
         //filtering of bad channels out of the distance table
         GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
                                         m_lInterpolationData.fiffInfo,
                                         m_lInterpolationData.iSensorType);
 
-        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 3"<<this->thread();
         //create weight matrix
         m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
                                                                                    m_lInterpolationData.pDistanceMatrix,
@@ -459,7 +452,6 @@ protected:
                                                                                    m_lInterpolationData.fiffInfo,
                                                                                    m_lInterpolationData.iSensorType);
 
-        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - 4"<<this->thread();
         emit newInterpolationMatrixCalculated(m_lInterpolationData.pWeightMatrix);
     }
 
@@ -489,6 +481,9 @@ public:
         connect(worker, &RtSensorDataWorker::newRtRawData,
                 this, &RtSensorDataController::onNewRtRawData);
 
+        connect(worker, &RtSensorDataWorker::newRtSmoothedData,
+                this, &RtSensorDataController::onNewSmoothedRtRawData);
+
         connect(&timer, &QTimer::timeout,
                 worker, &RtSensorDataWorker::streamData);
 
@@ -497,6 +492,12 @@ public:
 
         connect(this, &RtSensorDataController::newInterpolationMatrixAvailable,
                 worker, &RtSensorDataWorker::setInterpolationMatrix);
+
+        connect(this, &RtSensorDataController::newSurfaceColor,
+                worker, &RtSensorDataWorker::setSurfaceColor);
+
+        connect(this, &RtSensorDataController::newThresholds,
+                worker, &RtSensorDataWorker::setThresholds);
 
         streamThread.start();
 
@@ -516,6 +517,7 @@ public:
         connect(this, &RtSensorDataController::newInterpolationInfo,
                 workerMat, &RtInterpolationMatWorker::setInterpolationInfo);
 
+
         interpolationMatThread.start();
     }
     ~RtSensorDataController() {
@@ -534,12 +536,13 @@ public:
 
 public slots:
     void onNewRtRawData(const Eigen::VectorXd &vecDataVector){
-        emit newRtRawData(vecDataVector);
+        emit newRtRawDataAvailable(vecDataVector);
     }
-
+    void onNewSmoothedRtRawData(const Eigen::MatrixX3f &matColorMatrix){
+        emit newRtSmoothedDataAvailable(matColorMatrix);
+    }
     void onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float>> matInterpolationOperator){
         emit newInterpolationMatrixAvailable(matInterpolationOperator);
-        qDebug() << "RtSensorDataController::onNewInterpolationMatrixCalculated - New interpolation matrix received";
     }
 
     void setStreamingState(bool streamingState) {
@@ -581,6 +584,14 @@ public slots:
                                   iSensorType);
     }
 
+    void setSurfaceColor(const MatrixX3f& matSurfaceVertColor) {
+        emit newSurfaceColor(matSurfaceVertColor);
+    }
+
+    void setThresholds(const QVector3D &vecThresholds) {
+        emit newThresholds(vecThresholds);
+    }
+
     void addData(const Eigen::MatrixXd& data) {
         emit newDataReceived(data);
     }
@@ -591,8 +602,11 @@ signals:
                               const QVector<Eigen::Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
+    void newSurfaceColor(const Eigen::MatrixX3f& matSurfaceVertColor);
+    void newThresholds(const QVector3D &vecThresholds);
     void streamingStateChanged(bool streamingState);
-    void newRtRawData(const Eigen::VectorXd &vecDataVector);
+    void newRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
+    void newRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
     void interpolationFunctionChanged(const QString &sInterpolationFunction);
     void cancelDistanceChanged(double dCancelDist);
     void newDataReceived(const Eigen::MatrixXd& data);
