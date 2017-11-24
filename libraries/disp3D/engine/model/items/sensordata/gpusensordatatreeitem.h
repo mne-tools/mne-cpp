@@ -81,6 +81,7 @@ namespace DISP3DLIB {
 //=============================================================================================================
 
 class GpuInterpolationItem;
+class RtSensorDataWorkController;
 class RtSensorDataWorker;
 
 
@@ -105,12 +106,6 @@ public:
     * Constructs a GpuSensorDataTreeItem object.
     */
     explicit GpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
-
-    //=========================================================================================================
-    /**
-    * Destructor, stops and deletes rtsensordata worker.
-    */
-    virtual ~GpuSensorDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -162,7 +157,7 @@ protected:
     *
     * @param[in] checkState                 The check state of the worker.
     */
-    virtual void onCheckStateWorkerChanged(const Qt::CheckState& checkState) override;
+    virtual void onStreamingStateChanged(const Qt::CheckState& checkState) override;
 
     //=========================================================================================================
     /**
@@ -229,9 +224,10 @@ protected:
     */
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
-    QPointer<RtSensorDataWorker>            m_pSensorRtDataWorker;              /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataWorkController>            m_pSensorRtDataWorkController;          /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataWorker>                    m_pSensorRtDataWorker;                  /**< The source data worker. This worker streams the rt data to this item.*/
 
-    QPointer<GpuInterpolationItem>          m_pInterpolationItem;               /**< This item manages all 3d rendering and calculations. */
+    QPointer<GpuInterpolationItem>          m_pInterpolationItem;                           /**< This item manages all 3d rendering and calculations. */
 };
 
 

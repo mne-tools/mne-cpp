@@ -91,18 +91,6 @@ GpuSensorDataTreeItem::GpuSensorDataTreeItem(int iType, const QString &text)
 
 //*************************************************************************************************************
 
-GpuSensorDataTreeItem::~GpuSensorDataTreeItem()
-{
-    if(m_pSensorRtDataWorker->isRunning())
-    {
-        m_pSensorRtDataWorker->stop();
-        delete m_pSensorRtDataWorker;
-    }
-}
-
-
-//*************************************************************************************************************
-
 void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
                                  const FiffInfo &fiffInfo,
                                  const QString &sSensorType,
@@ -117,11 +105,12 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
 
     this->setData(0, Data3DTreeModelItemRoles::RTData);
 
-    if(!m_pSensorRtDataWorker) {
-        m_pSensorRtDataWorker = new RtSensorDataWorker(0, false);
+    if(!m_pSensorRtDataWorkController) {
+        m_pSensorRtDataWorkController = new RtSensorDataWorkController(false);
+        m_pSensorRtDataWorker = m_pSensorRtDataWorkController->getWorker();
     }
 
-    connect(m_pSensorRtDataWorker.data(), &RtSensorDataWorker::newRtRawData,
+    connect(m_pSensorRtDataWorker, &RtSensorDataWorker::newRtRawData,
             this, &GpuSensorDataTreeItem::onNewRtRawData);
 
     // map passed sensor type string to fiff constant
@@ -267,13 +256,13 @@ void GpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
 //*************************************************************************************************************
 
-void GpuSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState &checkState)
+void GpuSensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState &checkState)
 {
-    if(m_pSensorRtDataWorker) {
+    if(m_pSensorRtDataWorkController) {
         if(checkState == Qt::Checked) {
-            m_pSensorRtDataWorker->start();
+            m_pSensorRtDataWorkController->setStreamingState(true);
         } else if(checkState == Qt::Unchecked) {
-            m_pSensorRtDataWorker->stop();
+            m_pSensorRtDataWorkController->setStreamingState(false);
         }
     }
 }
@@ -309,8 +298,8 @@ void GpuSensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
 void GpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
 {
     if(iMSec.canConvert<int>()) {
-        if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setInterval(iMSec.toInt());
+        if(m_pSensorRtDataWorkController) {
+            m_pSensorRtDataWorkController->setTimeInterval(iMSec.toInt());
         }
     }
 }
@@ -336,9 +325,9 @@ void GpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState 
 {
     if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
-            m_pSensorRtDataWorker->setLoop(true);
+           m_pSensorRtDataWorker->setLoop(true);
         } else if(checkState == Qt::Unchecked) {
-            m_pSensorRtDataWorker->setLoop(false);
+           m_pSensorRtDataWorker->setLoop(false);
         }
     }
 }
@@ -350,7 +339,7 @@ void GpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
         if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
+           m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
         }
     }
 }
@@ -366,7 +355,7 @@ void GpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
             m_pSensorRtDataWorker->setCancelDistance(dCancelDist.toDouble());
 
             if(m_pInterpolationItem) {
-                m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
+                //m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
             }
         }
     }
@@ -379,11 +368,11 @@ void GpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInte
 {
     if(sInterpolationFunction.canConvert<QString>())
     {
-        if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setInterpolationFunction(sInterpolationFunction.toString());
+        if(m_pSensorRtDataWorkController) {
+            m_pSensorRtDataWorkController->setInterpolationFunction(sInterpolationFunction.toString());
 
             if(m_pInterpolationItem) {
-                m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
+                //m_pInterpolationItem->setWeightMatrix(m_pSensorRtDataWorker->getInterpolationOperator());
             }
         }
     }

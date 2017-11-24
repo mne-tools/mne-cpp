@@ -57,6 +57,7 @@
 #include <QVector3D>
 #include <QSharedPointer>
 #include <QLinkedList>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -134,9 +135,10 @@ struct InterpolationData {
 *
 * @brief Data scheduler
 */
-class DISP3DSHARED_EXPORT RtSensorDataWorker : public QThread
+class DISP3DSHARED_EXPORT RtSensorDataWorker : public QObject
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtSensorDataWorker> SPtr;            /**< Shared pointer type for RtSensorDataWorker class. */
     typedef QSharedPointer<const RtSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtSensorDataWorker class. */
@@ -147,13 +149,7 @@ public:
     *
     * @param[in] parent      The parent of the QObject.
     */
-    explicit RtSensorDataWorker(QObject* parent = 0, bool bStreamSmoothedData = true);
-
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~RtSensorDataWorker();
+    explicit RtSensorDataWorker(bool bStreamSmoothedData = true);
 
     //=========================================================================================================
     /**
@@ -201,14 +197,6 @@ public:
     * @param[in] iNumAvr                The new number of averages.
     */
     void setNumberAverages(int iNumAvr);
-
-    //=========================================================================================================
-    /**
-    * Set the length in milli Seconds to wait inbetween data samples.
-    *
-    * @param[in] iMSec                  The new length in milli Seconds to wait inbetween data samples.
-    */
-    void setInterval(int iMSec);
 
     //=========================================================================================================
     /**
@@ -279,19 +267,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the running flag to false and waits for the worker to stop.
-    */
-    void stop();
-
-    //=========================================================================================================
-    /**
-    * Resets the index of the current sample and starts the worker.
-    */
-    void start();
-
-protected:
-    //=========================================================================================================
-    /**
     * Calculate the interpolation operator based on the set interpolation info.
     */
     void calculateInterpolationOperator();
@@ -301,7 +276,7 @@ protected:
     * Main method of this worker: Checks whether it is time for the worker to output new data for visualization.
     * If so, it averages the specified amount of data samples and calculates the output.
     */
-    virtual void run() override;
+    void streamData();
 
     //=========================================================================================================
     /**
@@ -325,11 +300,8 @@ protected:
      */
     Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 
-    //=========================================================================================================
-    QMutex                                              m_qMutex;                           /**< The thread's mutex. */
-
     QLinkedList<Eigen::VectorXd>                        m_lDataQ;                            /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    QLinkedList<Eigen::VectorXd>::const_iterator        m_itCurrentSample;                  /**< Iterator to current sample which is/was streamed. */
+    QLinkedList<Eigen::VectorXd>::const_iterator        m_itCurrentSample = 0;                  /**< Iterator to current sample which is/was streamed. */
 
     bool                                                m_bIsRunning;                       /**< Flag if this thread is running. */
     bool                                                m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
@@ -338,14 +310,18 @@ protected:
 
     int                                                 m_iNumSensors;                      /**< Number of sensors that this worker does expect when receiving rt data. */
     int                                                 m_iAverageSamples;                  /**< Number of average to compute. */
-    int                                                 m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
-    
+
     double                                              m_dSFreq;                           /**< The current sampling frequency. */
 
     VisualizationInfo                                   m_lVisualizationInfo;               /**< Container for the visualization info. */
 
     InterpolationData                                   m_lInterpolationData;               /**< Container for the interpolation data. */
-    
+
+    VectorXd vecAverage;
+    uint iSampleCtr = 0;
+
+    QMutex m_mutex;
+
 signals:
     //=========================================================================================================
     /**
@@ -355,6 +331,80 @@ signals:
     */
     void newRtRawData(const Eigen::VectorXd &vecDataVector);
     void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrix);
+};
+
+class DISP3DSHARED_EXPORT RtSensorDataWorkController : public QObject
+{
+    Q_OBJECT
+
+public:
+    RtSensorDataWorkController(bool bStreamSmoothedData = true) {
+        worker = new RtSensorDataWorker(bStreamSmoothedData);
+        qDebug() << "RtSensorDataWorkController - worker->thread() before " << worker->thread();
+        worker->moveToThread(&workerThread);
+        qDebug() << "RtSensorDataWorkController - worker->thread() after " << worker->thread();
+
+        connect(&workerThread, &QThread::finished,
+                worker, &QObject::deleteLater);
+
+        connect(worker, &RtSensorDataWorker::newRtRawData,
+                this, &RtSensorDataWorkController::onNewRtRawData);
+
+        connect(this, &RtSensorDataWorkController::interpolationFunctionChanged,
+                worker, &RtSensorDataWorker::setInterpolationFunction);
+
+        connect(&timer, &QTimer::timeout,
+                worker, &RtSensorDataWorker::streamData);
+
+        workerThread.start();
+    }
+    ~RtSensorDataWorkController() {
+        workerThread.quit();
+        workerThread.wait();
+    }
+
+    QTimer timer;
+    QThread workerThread;
+    RtSensorDataWorker* worker;
+    int m_iMSecInterval = 17;                   /**< Length in milli Seconds to wait inbetween data samples. */
+
+public slots:
+    void onNewRtRawData(const Eigen::VectorXd &vecDataVector){
+        emit newRtRawData(vecDataVector);
+    }
+    void setStreamingState(bool streamingState) {
+        if(streamingState) {
+            qDebug() << "RtSensorDataWorkController::setStreamingState - start streaming";
+            timer.start(m_iMSecInterval);
+        } else {
+            qDebug() << "RtSensorDataWorkController::setStreamingState - stop streaming";
+            timer.stop();
+        }
+    }
+
+    void setInterpolationFunction(const QString &sInterpolationFunction) {
+        emit interpolationFunctionChanged(sInterpolationFunction);
+    }
+
+    RtSensorDataWorker* getWorker(){
+        return worker;
+    }
+
+    //=========================================================================================================
+    /**
+    * Set the length in milli Seconds to wait inbetween data samples.
+    *
+    * @param[in] iMSec                  The new length in milli Seconds to wait inbetween data samples.
+    */
+    void setTimeInterval(int iMSec) {
+        m_iMSecInterval = iMSec;
+        timer.setInterval(m_iMSecInterval);
+    }
+
+signals:
+    void streamingStateChanged(bool streamingState);
+    void newRtRawData(const Eigen::VectorXd &vecDataVector);
+    void interpolationFunctionChanged(const QString &sInterpolationFunction);
 };
 
 } // NAMESPACE

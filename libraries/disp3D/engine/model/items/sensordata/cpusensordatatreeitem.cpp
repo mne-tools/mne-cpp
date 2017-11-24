@@ -91,10 +91,10 @@ CpuSensorDataTreeItem::CpuSensorDataTreeItem(int iType, const QString &text)
 
 CpuSensorDataTreeItem::~CpuSensorDataTreeItem()
 {
-    if(m_pSensorRtDataWorker->isRunning()) {
-        m_pSensorRtDataWorker->stop();
-        delete m_pSensorRtDataWorker;
-    }
+//    if(m_pSensorRtDataWorker->isRunning()) {
+//        m_pSensorRtDataWorker->stop();
+//        delete m_pSensorRtDataWorker;
+//    }
 }
 
 
@@ -270,13 +270,13 @@ void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
 //*************************************************************************************************************
 
-void CpuSensorDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
+void CpuSensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState& checkState)
 {
     if(m_pSensorRtDataWorker) {
         if(checkState == Qt::Checked) {
-            m_pSensorRtDataWorker->start();
+          //  m_pSensorRtDataWorker->start();
         } else if(checkState == Qt::Unchecked) {
-            m_pSensorRtDataWorker->stop();
+          //  m_pSensorRtDataWorker->stop();
         }
     }
 }
@@ -310,7 +310,7 @@ void CpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 {
     if(iMSec.canConvert<int>()) {
         if(m_pSensorRtDataWorker) {
-            m_pSensorRtDataWorker->setInterval(iMSec.toInt());
+            //m_pSensorRtDataWorker->setInterval(iMSec.toInt());
         }
     }
 }

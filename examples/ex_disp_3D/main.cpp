@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");//sample-5120-5120-5120-bem
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
-        pMegSensorTreeItem->setStreamingActive(false);
+        pMegSensorTreeItem->setStreamingState(false);
         pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
         pMegSensorTreeItem->setColortable("Jet");
         pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
@@ -308,12 +308,12 @@ int main(int argc, char *argv[])
                                                                              evoked.info,
                                                                              "EEG",
                                                                              0.2,
-                                                                             "Cubic",
+                                                                             "linear",
                                                                              testWindow->format())) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
-        pEegSensorTreeItem->setStreamingActive(false);
+        pEegSensorTreeItem->setStreamingState(false);
         pEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
         pEegSensorTreeItem->setColortable("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
