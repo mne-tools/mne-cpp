@@ -176,7 +176,7 @@ protected:
     *
     * @param[in] checkState                 The check state of the worker.
     */
-    virtual void onCheckStateWorkerChanged(const Qt::CheckState& checkState) override;
+    virtual void onStreamingStateChanged(const Qt::CheckState& checkState) override;
 
     //=========================================================================================================
     /**

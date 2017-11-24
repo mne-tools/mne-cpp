@@ -333,7 +333,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                     m_pRtEEGSensorDataItem->setLoopState(false);
                     m_pRtEEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
                     m_pRtEEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
-                    m_pRtEEGSensorDataItem->setStreamingActive(true);
+                    m_pRtEEGSensorDataItem->setStreamingState(true);
                     m_pRtEEGSensorDataItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
                     m_pRtEEGSensorDataItem->setColortable("Jet");
                     m_pRtEEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);
@@ -362,7 +362,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                     m_pRtMEGSensorDataItem->setLoopState(false);
                     m_pRtMEGSensorDataItem->setTimeInterval(17); // 1sec/60Hz = 17 -> maximum display rate
                     m_pRtMEGSensorDataItem->setNumberAverages(m_pFiffInfo->sfreq/30); // 30 changes per seconds 30Hz on a display is enough for visualization
-                    m_pRtMEGSensorDataItem->setStreamingActive(true);
+                    m_pRtMEGSensorDataItem->setStreamingState(true);
                     m_pRtMEGSensorDataItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
                     m_pRtMEGSensorDataItem->setColortable("Jet");
                     m_pRtMEGSensorDataItem->setSFreq(m_pRTMSA->info()->sfreq);

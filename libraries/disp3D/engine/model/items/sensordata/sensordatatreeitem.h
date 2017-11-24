@@ -145,7 +145,7 @@ public:
     *
     * @param[in] bState                      Whether to stream the data to the display or not.
     */
-    virtual void setStreamingActive(bool bState);
+    virtual void setStreamingState(bool bState);
 
     //=========================================================================================================
     /**
@@ -226,7 +226,7 @@ protected:
     *
     * @param[in] checkState                 The check state of the worker.
     */
-    virtual void onCheckStateWorkerChanged(const Qt::CheckState& checkState) = 0;
+    virtual void onStreamingStateChanged(const Qt::CheckState& checkState) = 0;
 
     //=========================================================================================================
     /**

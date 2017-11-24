@@ -108,7 +108,7 @@ void SensorDataTreeItem::initItem()
 
     MetaTreeItem* pItemStreamStatus = new MetaTreeItem(MetaTreeItemTypes::StreamStatus, "Stream data on/off");
     connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
-            this, &SensorDataTreeItem::onCheckStateWorkerChanged);
+            this, &SensorDataTreeItem::onStreamingStateChanged);
     list << pItemStreamStatus;
     list << new QStandardItem(pItemStreamStatus->toolTip());
     this->appendRow(list);
@@ -209,7 +209,7 @@ void SensorDataTreeItem::setLoopState(bool bState)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setStreamingActive(bool bState)
+void SensorDataTreeItem::setStreamingState(bool bState)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
 

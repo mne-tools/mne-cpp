@@ -118,6 +118,7 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             idx++;
         }
     }
+    qDebug()<<"magic number"<<((iRows-sensorLookup.size())*iCols)+(sensorLookup.size()*iRows);
 
     // main loop: go through all rows of distance table and calculate weights
     for (qint32 r = 0; r < iRows; ++r) {
@@ -125,10 +126,8 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
             // "normal" node, i.e. one which was not assigned a sensor
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
             QVector<QPair<qint32, double> > vecBelowThresh;
-            vecBelowThresh.reserve(iCols);
             double dWeightsSum = 0.0;
             const RowVectorXd& rowVec = pDistanceTable->row(r);
-
             for (qint32 c = 0; c < iCols; ++c) {
                 const double dDist = rowVec[c];
                 if (dDist < dCancelDist) {
@@ -138,15 +137,22 @@ QSharedPointer<SparseMatrix<double> > Interpolation::createInterpolationMat(cons
                 }
             }
 
+            //Resize vecNonZeroEntries
+            vecNonZeroEntries.resize(vecNonZeroEntries.size()+vecBelowThresh.size());
             for (const QPair<qint32, double> &qp : vecBelowThresh) {
                 vecNonZeroEntries.push_back(Eigen::Triplet<double> (r, qp.first, qp.second / dWeightsSum));
             }
         } else {
             // a sensor has been assigned to this node, we do not need to interpolate anything (final vertex signal is equal to sensor input signal, thus factor 1)
             const int iIndexInSubset = pProjectedSensors->indexOf(r);
+
+            //Resize vecNonZeroEntries
+            vecNonZeroEntries.resize(vecNonZeroEntries.size()+1);
             vecNonZeroEntries.push_back(Eigen::Triplet<double> (r, iIndexInSubset, 1));
         }
     }
+
+    qDebug()<<"vecNonZeroEntries.size() "<<vecNonZeroEntries.size();
 
     pInterpolationMatrix->setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
     return pInterpolationMatrix;
