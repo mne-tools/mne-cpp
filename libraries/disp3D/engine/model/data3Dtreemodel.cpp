@@ -568,22 +568,22 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
 {
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
-//    //Test for OpenGL version 4.3
-//    if((tSurfaceFormat.majorVersion() == 4
-//            && tSurfaceFormat.minorVersion() >= 3
-//            || tSurfaceFormat.majorVersion() > 4))
-//    {
-//        //use compute shader version
-//        pReturnItem = addGpuSensorData(sSubject,
-//                         sMeasurementSetName,
-//                         matSensorData,
-//                         tBemSurface,
-//                         fiffInfo,
-//                         sDataType,
-//                         dCancelDist,
-//                         sInterpolationFunction);
-//        qDebug("Using compute shader version of SensorDataTreeItem.");
-//    } else {
+    //Test for OpenGL version 4.3
+    if((tSurfaceFormat.majorVersion() == 4
+            && tSurfaceFormat.minorVersion() >= 3
+            || tSurfaceFormat.majorVersion() > 4))
+    {
+        //use compute shader version
+        pReturnItem = addGpuSensorData(sSubject,
+                         sMeasurementSetName,
+                         matSensorData,
+                         tBemSurface,
+                         fiffInfo,
+                         sDataType,
+                         dCancelDist,
+                         sInterpolationFunction);
+        qDebug("Using compute shader version of SensorDataTreeItem.");
+    } else {
         //use cpu version
         pReturnItem = addCpuSensorData(sSubject,
                          sMeasurementSetName,
@@ -593,7 +593,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                          sDataType,
                          dCancelDist,
                          sInterpolationFunction);
-//    }
+    }
 
     return pReturnItem;
 }
