@@ -78,6 +78,7 @@
 
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -360,7 +361,7 @@ QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eige
         for(uint j = 0; j < iCols; ++j)
         {
             //@TODO this is probably not the best way to extract the weight matrix components
-            rawVertexArray[iCtr] = static_cast<float>(tInterpolationMatrix->coeff(i, j));
+            rawVertexArray[iCtr] = tInterpolationMatrix->coeffRef(i, j);
             iCtr++;
         }
     }

@@ -66,7 +66,7 @@
 #include <QSharedPointer>
 #include <QLinkedList>
 #include <QTimer>
-#include <QPointer>
+#include <QPointer   >
 
 
 //*************************************************************************************************************
@@ -499,7 +499,6 @@ public:
         connect(this, &RtSensorDataController::colormapTypeChanged,
                 m_pRtSensorDataWorker, &RtSensorDataWorker::setColormapType);
 
-
         m_rtSensorDataWorkerThread.start();
 
         //Calculate interpolation matrix
@@ -508,6 +507,9 @@ public:
 
         connect(this, &RtSensorDataController::interpolationFunctionChanged,
                 m_pRtInterpolationWorker, &RtInterpolationMatWorker::setInterpolationFunction);
+
+        connect(&m_rtInterpolationWorkerThread, &QThread::finished,
+                m_pRtInterpolationWorker, &QObject::deleteLater);
 
         connect(this, &RtSensorDataController::cancelDistanceChanged,
                 m_pRtInterpolationWorker, &RtInterpolationMatWorker::setCancelDistance);
@@ -544,7 +546,7 @@ public:
     void onNewSmoothedRtRawData(const Eigen::MatrixX3f &matColorMatrix){
         emit newRtSmoothedDataAvailable(matColorMatrix);
     }
-    void onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float>> matInterpolationOperator){
+    void onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float> > matInterpolationOperator){
         emit interpolationMatrixChanged(matInterpolationOperator);
     }
 

@@ -92,7 +92,7 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
 {
     if (! pDistanceTable) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table. Returning null pointer...";
-        return QSharedPointer<SparseMatrix<float> >(nullptr);
+        return QSharedPointer<SparseMatrix<float> >();
     }
 
     // initialization
@@ -118,7 +118,6 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
             idx++;
         }
     }
-    qDebug()<<"magic number"<<((iRows-sensorLookup.size())*iCols)+(sensorLookup.size()*iRows);
 
     int counter = 0;
     // main loop: go through all rows of distance table and calculate weights
@@ -153,9 +152,6 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
         }
     }
 
-    qDebug()<<"vecNonZeroEntries.size() "<<vecNonZeroEntries.size();
-    qDebug()<<"counter "<<counter;
-
     pInterpolationMatrix->setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
     return pInterpolationMatrix;
 }
@@ -163,19 +159,20 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
 
 //*************************************************************************************************************
 
-QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float> > pInterpolationMatrix, const VectorXd &vecMeasurementData)
+QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float> > pInterpolationMatrix,
+                                                          const VectorXd &vecMeasurementData)
 {
     if(pInterpolationMatrix){
         QSharedPointer<VectorXf> pOutVec = QSharedPointer<VectorXf>::create();
         if (pInterpolationMatrix->cols() != vecMeasurementData.rows()) {
             qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
-            return QSharedPointer<VectorXf>(nullptr);
+            return QSharedPointer<VectorXf>();
         }
         (*pOutVec) = (*pInterpolationMatrix) * vecMeasurementData.cast<float>();
         return pOutVec;
     } else {
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Null pointer for interpolationMatrix, weight matrix was not created. Return null pointer...";
-        return QSharedPointer<VectorXf>(nullptr);
+        return QSharedPointer<VectorXf>();
     }
 }
 

@@ -152,9 +152,9 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
     setInterpolationFunction(sInterpolationFunction);
 
     m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface,
-                                                vecSensorPos,
-                                                fiffInfo,
-                                                sensorTypeFiffConstant);
+                                                        vecSensorPos,
+                                                        fiffInfo,
+                                                        sensorTypeFiffConstant);
 
     //create new Tree Item
     if(!m_pInterpolationItem)
