@@ -951,7 +951,7 @@ void RealTimeMultiSampleArrayWidget::markChBad()
 
     //Update 3D plot and interpolation
     if(m_bVisualize3DSensorData) {
-        m_pRtEEGSensorDataItem->updateBadChannels(*m_pFiffInfo.data());
+        m_pRtEEGSensorDataItem->setBadChannels(*m_pFiffInfo.data());
     }
 }
 

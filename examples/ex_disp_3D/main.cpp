@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
                                                                              evoked.info,
                                                                              "EEG",
                                                                              0.05,
-                                                                             "linear",
+                                                                             "Cubic",
                                                                              testWindow->format())) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);

@@ -66,7 +66,7 @@
 #include <QSharedPointer>
 #include <QLinkedList>
 #include <QTimer>
-#include <QPointer   >
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -472,7 +472,7 @@ public:
         connect(m_pRtSensorDataWorker, &RtSensorDataWorker::newRtSmoothedData,
                 this, &RtSensorDataController::onNewSmoothedRtRawData);
 
-        connect(&timer, &QTimer::timeout,
+        connect(&m_timer, &QTimer::timeout,
                 m_pRtSensorDataWorker, &RtSensorDataWorker::streamData);
 
         connect(this, &RtSensorDataController::newDataReceived,
@@ -532,12 +532,12 @@ public:
         m_rtInterpolationWorkerThread.wait();
     }
 
-    QTimer timer;
-    QThread m_rtSensorDataWorkerThread;
-    QThread m_rtInterpolationWorkerThread;
-    QPointer<RtSensorDataWorker> m_pRtSensorDataWorker;
-    QPointer<RtInterpolationMatWorker> m_pRtInterpolationWorker;
-    int m_iMSecInterval = 17;                   /**< Length in milli Seconds to wait inbetween data samples. */
+    QTimer                                  m_timer;
+    QThread                                 m_rtSensorDataWorkerThread;
+    QThread                                 m_rtInterpolationWorkerThread;
+    QPointer<RtSensorDataWorker>            m_pRtSensorDataWorker;
+    QPointer<RtInterpolationMatWorker>      m_pRtInterpolationWorker;
+    int                                     m_iMSecInterval = 17;               /**< Length in milli Seconds to wait inbetween data samples. */
 
 public:
     void onNewRtRawData(const Eigen::VectorXd &vecDataVector){
@@ -553,10 +553,10 @@ public:
     void setStreamingState(bool streamingState) {
         if(streamingState) {
             qDebug() << "RtSensorDataController::setStreamingState - start streaming";
-            timer.start(m_iMSecInterval);
+            m_timer.start(m_iMSecInterval);
         } else {
             qDebug() << "RtSensorDataController::setStreamingState - stop streaming";
-            timer.stop();
+            m_timer.stop();
         }
     }
 
@@ -580,7 +580,7 @@ public:
     */
     void setTimeInterval(int iMSec) {
         m_iMSecInterval = iMSec;
-        timer.setInterval(m_iMSecInterval);
+        m_timer.setInterval(m_iMSecInterval);
     }
 
     void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
@@ -639,8 +639,6 @@ signals:
     void colormapTypeChanged(const QString &sColormapType);
     void cancelDistanceChanged(double dCancelDist);
     void newDataReceived(const Eigen::MatrixXd& data);
-
-
     void newRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
     void newRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
 };

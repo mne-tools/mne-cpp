@@ -248,7 +248,7 @@ void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<f
 
 //*************************************************************************************************************
 
-void GpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
+void GpuSensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
 {
     if(m_pSensorRtDataWorkController) {
         //Create bad channel idx list

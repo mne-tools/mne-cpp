@@ -249,7 +249,7 @@ void CpuSensorDataTreeItem::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
+void CpuSensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
 {
     if(m_pSensorRtDataWorkController) {
         //Create bad channel idx list
