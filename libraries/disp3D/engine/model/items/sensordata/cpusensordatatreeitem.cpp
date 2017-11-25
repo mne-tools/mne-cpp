@@ -243,7 +243,7 @@ void CpuSensorDataTreeItem::setColorOrigin(const MatrixX3f &matVertColor)
 void CpuSensorDataTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pSensorRtDataWorkController) {
-        //m_pSensorRtDataWorkController->setSFreq(dSFreq);
+        m_pSensorRtDataWorkController->setSFreq(dSFreq);
     }
 }
 
@@ -260,7 +260,7 @@ void CpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
 
         //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
 
-        //m_pSensorRtDataWorkController->updateBadChannels(info);
+        m_pSensorRtDataWorkController->setBadChannels(info);
     }
 }
 
@@ -295,7 +295,7 @@ void CpuSensorDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
         if(m_pSensorRtDataWorkController) {
-            //m_pSensorRtDataWorkController->setColormapType(sColormapType.toString());
+            m_pSensorRtDataWorkController->setColormapType(sColormapType.toString());
         }
     }
 }
@@ -331,9 +331,9 @@ void CpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState&
 {
     if(m_pSensorRtDataWorkController) {
         if(checkState == Qt::Checked) {
-            //m_pSensorRtDataWorker->setLoop(true);
+            m_pSensorRtDataWorkController->setLoopState(true);
         } else if(checkState == Qt::Unchecked) {
-            //m_pSensorRtDataWorker->setLoop(false);
+            m_pSensorRtDataWorkController->setLoopState(false);
         }
     }
 }
@@ -345,7 +345,7 @@ void CpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
         if(m_pSensorRtDataWorkController) {
-            //m_pSensorRtDataWorkController->setNumberAverages(iNumAvr.toInt());
+            m_pSensorRtDataWorkController->setNumberAverages(iNumAvr.toInt());
         }
     }
 }

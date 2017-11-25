@@ -158,9 +158,9 @@ void RtSensorDataWorker::setThresholds(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setLoop(bool bLooping)
+void RtSensorDataWorker::setLoopState(bool bLoopState)
 {
-    m_bIsLooping = bLooping;
+    m_bIsLooping = bLoopState;
 }
 
 
