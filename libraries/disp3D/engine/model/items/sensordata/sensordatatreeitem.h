@@ -210,7 +210,7 @@ public:
     *
     * @param[in] info                 The fiff info including the new bad channels.
     */
-    virtual void updateBadChannels(const FIFFLIB::FiffInfo& info) = 0;
+    virtual void setBadChannels(const FIFFLIB::FiffInfo& info) = 0;
 
 protected:
     //=========================================================================================================

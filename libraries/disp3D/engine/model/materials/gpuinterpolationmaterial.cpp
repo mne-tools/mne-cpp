@@ -345,7 +345,7 @@ void GpuInterpolationMaterial::init()
 
 //*************************************************************************************************************
 
-QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float> > tInterpolationMatrix)
+QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<SparseMatrix<float> > tInterpolationMatrix)
 {
     QByteArray bufferData;
 
@@ -353,16 +353,15 @@ QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eige
     const uint iCols = tInterpolationMatrix->cols();
 
     bufferData.resize(iRows * iCols * (int)sizeof(float));
+    bufferData.fill(0.0);
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
-    unsigned int iCtr = 0;
-    for(uint i = 0; i < iRows; ++i)
-    {
-        for(uint j = 0; j < iCols; ++j)
+    //Iterate over non zero entries and transform to row major
+    for (int k=0; k<tInterpolationMatrix->outerSize(); ++k) {
+        for (SparseMatrix<float>::InnerIterator it(*tInterpolationMatrix,k); it; ++it)
         {
-            //@TODO this is probably not the best way to extract the weight matrix components
-            rawVertexArray[iCtr] = tInterpolationMatrix->coeffRef(i, j);
-            iCtr++;
+            //rawVertexArray[(it.col()*iRows)+it.row()] = it.value();
+            rawVertexArray[(it.row()*iCols)+it.col()] = it.value();
         }
     }
 
@@ -376,13 +375,7 @@ QByteArray GpuInterpolationMaterial::buildZeroBuffer(const uint tSize)
 {
     QByteArray bufferData;
     bufferData.resize(tSize * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    //Set default values
-    for(uint i = 0; i < tSize; ++i)
-    {
-        rawVertexArray[i] = 0.0f;
-    }
+    bufferData.fill(0.0);
     return bufferData;
 }
 
