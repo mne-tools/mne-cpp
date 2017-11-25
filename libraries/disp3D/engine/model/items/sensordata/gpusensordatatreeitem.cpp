@@ -108,7 +108,7 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
     if(!m_pSensorRtDataWorkController) {
         m_pSensorRtDataWorkController = new RtSensorDataController(false);
 
-        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newInterpolationMatrixAvailable,
+        connect(m_pSensorRtDataWorkController, &RtSensorDataController::interpolationMatrixChanged,
                 this, &GpuSensorDataTreeItem::setInterpolationMatrix);
         connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtRawDataAvailable,
                 this, &GpuSensorDataTreeItem::onNewRtRawData);
@@ -231,7 +231,7 @@ void GpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 void GpuSensorDataTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pSensorRtDataWorkController) {
-        //m_pSensorRtDataWorker->setSFreq(dSFreq);
+        m_pSensorRtDataWorkController->setSFreq(dSFreq);
     }
 }
 
@@ -258,7 +258,7 @@ void GpuSensorDataTreeItem::updateBadChannels(const FIFFLIB::FiffInfo &info)
         }
 
         //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
-        //m_pSensorRtDataWorker->updateBadChannels(info);
+        m_pSensorRtDataWorkController->setBadChannels(info);
     }
 }
 
@@ -334,9 +334,9 @@ void GpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState 
 {
     if(m_pSensorRtDataWorkController) {
         if(checkState == Qt::Checked) {
-           //m_pSensorRtDataWorker->setLoop(true);
+           m_pSensorRtDataWorkController->setLoopState(true);
         } else if(checkState == Qt::Unchecked) {
-           //m_pSensorRtDataWorker->setLoop(false);
+           m_pSensorRtDataWorkController->setLoopState(false);
         }
     }
 }
@@ -348,7 +348,7 @@ void GpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
         if(m_pSensorRtDataWorkController) {
-           //m_pSensorRtDataWorker->setNumberAverages(iNumAvr.toInt());
+           m_pSensorRtDataWorkController->setNumberAverages(iNumAvr.toInt());
         }
     }
 }

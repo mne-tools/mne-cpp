@@ -66,6 +66,7 @@
 #include <QSharedPointer>
 #include <QLinkedList>
 #include <QTimer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -149,23 +150,6 @@ public:
     */
     void clear();
     
-//    //=========================================================================================================
-//    /**
-//    * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
-//    * In the end calls calculateSurfaceData().
-//    *
-//    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
-//    * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
-//    * @param[in] fiffEvoked                Holds all information about the sensors.
-//    * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
-//    *
-//    * @return Returns the created interpolation matrix.
-//    */
-//    void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
-//                              const QVector<Vector3f> &vecSensorPos,
-//                              const FIFFLIB::FiffInfo &fiffInfo,
-//                              int iSensorType);
-
     //=========================================================================================================
     /**
     * Set base surface color which the streamed data is plotted on.
@@ -198,32 +182,13 @@ public:
     */
     void setThresholds(const QVector3D &vecThresholds);
     
-//    //=========================================================================================================
-//    /**
-//     * This function sets the cancel distance used in distance calculations for the interpolation.
-//     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
-//     * Warning: Using this function can take some seconds because recalculation are required.
-//     *
-//     * @param[in] dCancelDist           The new cancel distance value in meters.
-//     */
-//    void setCancelDistance(double dCancelDist);
-    
-//    //=========================================================================================================
-//    /**
-//     * This function sets the function that is used in the interpolation process.
-//     * Warning: Using this function can take some seconds because recalculation are required.
-//     *
-//     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
-//     */
-//    void setInterpolationFunction(const QString &sInterpolationFunction);
-
     //=========================================================================================================
     /**
     * Set the loop functionality on or off.
     *
-    * @param[in] bLooping                The new looping state.
+    * @param[in] bLoopState                The new looping state.
     */
-    void setLoop(bool bLooping);
+    void setLoopState(bool bLoopState);
 
     //=========================================================================================================
     /**
@@ -232,20 +197,6 @@ public:
     * @param[in] dSFreq                 The new sampling frequency.
     */
     void setSFreq(const double dSFreq);
-
-//    //=========================================================================================================
-//    /**
-//    * Update bad channels and recalculate interpolation matrix.
-//    *
-//    * @param[in] info                 The fiff info including the new bad channels.
-//    */
-//    void updateBadChannels(const FIFFLIB::FiffInfo& info);
-
-//    //=========================================================================================================
-//    /**
-//    * Calculate the interpolation operator based on the set interpolation info.
-//    */
-//    void calculateInterpolationOperator();
 
     //=========================================================================================================
     /**
@@ -341,7 +292,14 @@ public:
 
     bool                m_bInterpolationInfoIsInit = false;         /**< Flag if this thread's interpoaltion data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-public slots:
+public:
+    //=========================================================================================================
+    /**
+     * This function sets the function that is used in the interpolation process.
+     * Warning: Using this function can take some seconds because recalculation are required.
+     *
+     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
+     */
     void setInterpolationFunction(const QString &sInterpolationFunction)
     {
         if(sInterpolationFunction == "Linear") {
@@ -370,6 +328,14 @@ public slots:
         }
     }
 
+    //=========================================================================================================
+    /**
+     * This function sets the cancel distance used in distance calculations for the interpolation.
+     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     * Warning: Using this function can take some seconds because recalculation are required.
+     *
+     * @param[in] dCancelDist           The new cancel distance value in meters.
+     */
     void setCancelDistance(double dCancelDist)
     {
         m_lInterpolationData.dCancelDistance = dCancelDist;
@@ -378,6 +344,18 @@ public slots:
         calculateInterpolationOperator();
     }
 
+    //=========================================================================================================
+    /**
+    * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
+    * In the end calls calculateSurfaceData().
+    *
+    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
+    * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
+    * @param[in] fiffEvoked                Holds all information about the sensors.
+    * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
+    *
+    * @return Returns the created interpolation matrix.
+    */
     void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
                               const QVector<Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
@@ -401,7 +379,13 @@ public slots:
         calculateInterpolationOperator();
     }
 
-    void updateBadChannels(const FIFFLIB::FiffInfo& info)
+    //=========================================================================================================
+    /**
+    * Sets bad channels and recalculate interpolation matrix.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
+    void setBadChannels(const FIFFLIB::FiffInfo& info)
     {
         if(!m_bInterpolationInfoIsInit) {
             qDebug() << "RtInterpolationMatWorker::updateBadChannels - Set interpolation info first.";
@@ -426,7 +410,11 @@ public slots:
         emit newInterpolationMatrixCalculated(m_lInterpolationData.pWeightMatrix);
     }
 
-protected:
+protected:    
+    //=========================================================================================================
+    /**
+    * Calculate the interpolation operator based on the set interpolation info.
+    */
     void calculateInterpolationOperator()
     {
         if(!m_bInterpolationInfoIsInit) {
@@ -472,69 +460,84 @@ class DISP3DSHARED_EXPORT RtSensorDataController : public QObject
 public:
     RtSensorDataController(bool bStreamSmoothedData = true) {
         //Stream data
-        worker = new RtSensorDataWorker(bStreamSmoothedData);
-        worker->moveToThread(&streamThread);
+        m_pRtSensorDataWorker = new RtSensorDataWorker(bStreamSmoothedData);
+        m_pRtSensorDataWorker->moveToThread(&m_rtSensorDataWorkerThread);
 
-        connect(&streamThread, &QThread::finished,
-                worker, &QObject::deleteLater);
+        connect(&m_rtSensorDataWorkerThread, &QThread::finished,
+                m_pRtSensorDataWorker, &QObject::deleteLater);
 
-        connect(worker, &RtSensorDataWorker::newRtRawData,
+        connect(m_pRtSensorDataWorker, &RtSensorDataWorker::newRtRawData,
                 this, &RtSensorDataController::onNewRtRawData);
 
-        connect(worker, &RtSensorDataWorker::newRtSmoothedData,
+        connect(m_pRtSensorDataWorker, &RtSensorDataWorker::newRtSmoothedData,
                 this, &RtSensorDataController::onNewSmoothedRtRawData);
 
         connect(&timer, &QTimer::timeout,
-                worker, &RtSensorDataWorker::streamData);
+                m_pRtSensorDataWorker, &RtSensorDataWorker::streamData);
 
         connect(this, &RtSensorDataController::newDataReceived,
-                worker, &RtSensorDataWorker::addData);
+                m_pRtSensorDataWorker, &RtSensorDataWorker::addData);
 
-        connect(this, &RtSensorDataController::newInterpolationMatrixAvailable,
-                worker, &RtSensorDataWorker::setInterpolationMatrix);
+        connect(this, &RtSensorDataController::interpolationMatrixChanged,
+                m_pRtSensorDataWorker, &RtSensorDataWorker::setInterpolationMatrix);
 
-        connect(this, &RtSensorDataController::newSurfaceColor,
-                worker, &RtSensorDataWorker::setSurfaceColor);
+        connect(this, &RtSensorDataController::surfaceColorChanged,
+                m_pRtSensorDataWorker, &RtSensorDataWorker::setSurfaceColor);
 
-        connect(this, &RtSensorDataController::newThresholds,
-                worker, &RtSensorDataWorker::setThresholds);
+        connect(this, &RtSensorDataController::thresholdsChanged,
+                m_pRtSensorDataWorker, &RtSensorDataWorker::setThresholds);
 
-        streamThread.start();
+        connect(this, &RtSensorDataController::sFreqChanged,
+                m_pRtSensorDataWorker, &RtSensorDataWorker::setSFreq);
+
+        connect(this, &RtSensorDataController::loopStateChanged,
+                m_pRtSensorDataWorker, &RtSensorDataWorker::setLoopState);
+
+        connect(this, &RtSensorDataController::numberAveragesChanged,
+                m_pRtSensorDataWorker, &RtSensorDataWorker::setNumberAverages);
+
+        connect(this, &RtSensorDataController::colormapTypeChanged,
+                m_pRtSensorDataWorker, &RtSensorDataWorker::setColormapType);
+
+
+        m_rtSensorDataWorkerThread.start();
 
         //Calculate interpolation matrix
-        workerMat = new RtInterpolationMatWorker();
-        workerMat->moveToThread(&interpolationMatThread);
+        m_pRtInterpolationWorker = new RtInterpolationMatWorker();
+        m_pRtInterpolationWorker->moveToThread(&m_rtInterpolationWorkerThread);
 
         connect(this, &RtSensorDataController::interpolationFunctionChanged,
-                workerMat, &RtInterpolationMatWorker::setInterpolationFunction);
+                m_pRtInterpolationWorker, &RtInterpolationMatWorker::setInterpolationFunction);
 
         connect(this, &RtSensorDataController::cancelDistanceChanged,
-                workerMat, &RtInterpolationMatWorker::setCancelDistance);
+                m_pRtInterpolationWorker, &RtInterpolationMatWorker::setCancelDistance);
 
-        connect(workerMat, &RtInterpolationMatWorker::newInterpolationMatrixCalculated,
+        connect(m_pRtInterpolationWorker, &RtInterpolationMatWorker::newInterpolationMatrixCalculated,
                 this, &RtSensorDataController::onNewInterpolationMatrixCalculated);
 
-        connect(this, &RtSensorDataController::newInterpolationInfo,
-                workerMat, &RtInterpolationMatWorker::setInterpolationInfo);
+        connect(this, &RtSensorDataController::interpolationInfoChanged,
+                m_pRtInterpolationWorker, &RtInterpolationMatWorker::setInterpolationInfo);
 
+        connect(this, &RtSensorDataController::badChannelsChanged,
+                m_pRtInterpolationWorker, &RtInterpolationMatWorker::setBadChannels);
 
-        interpolationMatThread.start();
+        m_rtInterpolationWorkerThread.start();
     }
     ~RtSensorDataController() {
-        streamThread.quit();
-        streamThread.wait();
-        interpolationMatThread.quit();
-        interpolationMatThread.wait();
+        m_rtSensorDataWorkerThread.quit();
+        m_rtSensorDataWorkerThread.wait();
+        m_rtInterpolationWorkerThread.quit();
+        m_rtInterpolationWorkerThread.wait();
     }
 
     QTimer timer;
-    QThread streamThread;
-    QThread interpolationMatThread;
-    RtSensorDataWorker* worker;
-    RtInterpolationMatWorker* workerMat;
+    QThread m_rtSensorDataWorkerThread;
+    QThread m_rtInterpolationWorkerThread;
+    QPointer<RtSensorDataWorker> m_pRtSensorDataWorker;
+    QPointer<RtInterpolationMatWorker> m_pRtInterpolationWorker;
     int m_iMSecInterval = 17;                   /**< Length in milli Seconds to wait inbetween data samples. */
 
-public slots:
+public:
     void onNewRtRawData(const Eigen::VectorXd &vecDataVector){
         emit newRtRawDataAvailable(vecDataVector);
     }
@@ -542,7 +545,7 @@ public slots:
         emit newRtSmoothedDataAvailable(matColorMatrix);
     }
     void onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float>> matInterpolationOperator){
-        emit newInterpolationMatrixAvailable(matInterpolationOperator);
+        emit interpolationMatrixChanged(matInterpolationOperator);
     }
 
     void setStreamingState(bool streamingState) {
@@ -557,6 +560,10 @@ public slots:
 
     void setInterpolationFunction(const QString &sInterpolationFunction) {
         emit interpolationFunctionChanged(sInterpolationFunction);
+    }
+
+    void setLoopState(bool bLoopState) {
+        emit loopStateChanged(bLoopState);
     }
 
     void setCancelDistance(double dCancelDist) {
@@ -578,18 +585,34 @@ public slots:
                               const QVector<Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType) {
-        emit newInterpolationInfo(bemSurface,
+        emit interpolationInfoChanged(bemSurface,
                                   vecSensorPos,
                                   fiffInfo,
                                   iSensorType);
     }
 
     void setSurfaceColor(const MatrixX3f& matSurfaceVertColor) {
-        emit newSurfaceColor(matSurfaceVertColor);
+        emit surfaceColorChanged(matSurfaceVertColor);
     }
 
     void setThresholds(const QVector3D &vecThresholds) {
-        emit newThresholds(vecThresholds);
+        emit thresholdsChanged(vecThresholds);
+    }
+
+    void setColormapType(const QString &sColormapType) {
+        emit colormapTypeChanged(sColormapType);
+    }
+
+    void setNumberAverages(int iNumAvr) {
+        emit numberAveragesChanged(iNumAvr);
+    }
+
+    void setSFreq(const double dSFreq) {
+        emit sFreqChanged(dSFreq);
+    }
+
+    void setBadChannels(const FIFFLIB::FiffInfo &info) {
+        emit badChannelsChanged(info);
     }
 
     void addData(const Eigen::MatrixXd& data) {
@@ -597,19 +620,27 @@ public slots:
     }
 
 signals:
-    void newInterpolationMatrixAvailable(QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationOperator);
-    void newInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
+    //Signals to inform updated parameters
+    void interpolationMatrixChanged(QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationOperator);
+    void interpolationInfoChanged(const MNELIB::MNEBemSurface &bemSurface,
                               const QVector<Eigen::Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
-    void newSurfaceColor(const Eigen::MatrixX3f& matSurfaceVertColor);
-    void newThresholds(const QVector3D &vecThresholds);
+    void surfaceColorChanged(const Eigen::MatrixX3f& matSurfaceVertColor);
+    void thresholdsChanged(const QVector3D &vecThresholds);
+    void sFreqChanged(double dSFreq);
+    void badChannelsChanged(const FIFFLIB::FiffInfo &info);
+    void numberAveragesChanged(int iNumAvr);
+    void loopStateChanged(bool bLoopState);
     void streamingStateChanged(bool streamingState);
-    void newRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
-    void newRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
     void interpolationFunctionChanged(const QString &sInterpolationFunction);
+    void colormapTypeChanged(const QString &sColormapType);
     void cancelDistanceChanged(double dCancelDist);
     void newDataReceived(const Eigen::MatrixXd& data);
+
+
+    void newRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
+    void newRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
 };
 
 } // NAMESPACE

@@ -82,7 +82,6 @@ namespace DISP3DLIB {
 
 class GpuInterpolationItem;
 class RtSensorDataController;
-class RtSensorDataWorker;
 
 
 //=============================================================================================================
