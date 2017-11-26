@@ -42,9 +42,7 @@
 #include "cpusensordatatreeitem.h"
 #include "cpuinterpolationitem.h"
 #include "../../workers/rtSensorData/rtsensordatacontroller.h"
-#include <mne/mne_bem_surface.h>
-#include "../../../../helpers/interpolation/interpolation.h"
-#include "../../../../helpers/geometryinfo/geometryinfo.h"
+#include <mne/mne_bem.h>
 
 
 //*************************************************************************************************************
@@ -67,7 +65,6 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
 
@@ -84,202 +81,30 @@ using namespace MNELIB;
 //=============================================================================================================
 
 CpuSensorDataTreeItem::CpuSensorDataTreeItem(int iType, const QString &text)
-    : SensorDataTreeItem(iType, text)
+: SensorDataTreeItem(iType, text)
 {
-    SensorDataTreeItem::initItem();
+    connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtSmoothedDataAvailable,
+            this, &CpuSensorDataTreeItem::onNewRtSmoothedData);
 }
 
 
 //*************************************************************************************************************
 
-CpuSensorDataTreeItem::~CpuSensorDataTreeItem()
+void CpuSensorDataTreeItem::initInterpolationItem(const MNEBemSurface &bemSurface,
+                                                  Qt3DCore::QEntity* p3DEntityParent)
 {
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::init(const MNEBemSurface& bemSurface,
-                                 const FiffInfo& fiffInfo,
-                                 const QString& sSensorType,
-                                 const double dCancelDist,
-                                 const QString& sInterpolationFunction,
-                                 Qt3DCore::QEntity* p3DEntityParent)
-{
-    if(m_bIsDataInit == true)
-    {
-        qDebug("CpuSensorDataTreeItem::init - Item is already initialized");
-    }
-
-    this->setData(0, Data3DTreeModelItemRoles::RTData);
-
-    if(!m_pSensorRtDataWorkController) {
-        m_pSensorRtDataWorkController = new RtSensorDataController(true);
-
-        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtSmoothedDataAvailable,
-                this, &CpuSensorDataTreeItem::onNewRtSmoothedData);
-    }
-
-
-    // map passed sensor type string to fiff constant
-    fiff_int_t sensorTypeFiffConstant;
-    if (sSensorType.toStdString() == std::string("MEG")) {
-        sensorTypeFiffConstant = FIFFV_MEG_CH;
-    } else if (sSensorType.toStdString() == std::string("EEG")) {
-        sensorTypeFiffConstant = FIFFV_EEG_CH;
-    } else {
-        qDebug() << "CpuSensorDataTreeItem::init - Unknown sensor type. Returning ...";
-        return;
-    }
-
-    //fill QVector with the right sensor positions
-    QVector<Vector3f> vecSensorPos;
-    m_iUsedSensors.clear();
-    int iCounter = 0;
-    for(const FiffChInfo &info : fiffInfo.chs) {
-        //Only take EEG with V as unit or MEG magnetometers with T as unit
-        if(info.kind == sensorTypeFiffConstant && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
-            vecSensorPos.push_back(info.chpos.r0);
-
-            //save the number of the sensor
-            m_iUsedSensors.push_back(iCounter);
-        }
-        iCounter++;
-    }
-
-    //Create bad channel idx list
-    for(const QString &bad : fiffInfo.bads) {
-        m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
-    }
-
-    //Set cancle distance
-    setCancelDistance(dCancelDist);
-
-    //Set interpolation function
-    setInterpolationFunction(sInterpolationFunction);
-
-    m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface,
-                                                vecSensorPos,
-                                                fiffInfo,
-                                                sensorTypeFiffConstant);
-
     //create new Tree Item
     if(!m_pInterpolationItem)
     {
         m_pInterpolationItem = new CpuInterpolationItem(p3DEntityParent,
-                                                        Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                                        Data3DTreeModelItemTypes::CpuInterpolationItem,
                                                         QStringLiteral("3D Plot"));
-        m_pInterpolationItem->addData(bemSurface);
+        m_pInterpolationItem->initData(bemSurface);
 
         QList<QStandardItem*> list;
         list << m_pInterpolationItem;
         list << new QStandardItem(m_pInterpolationItem->toolTip());
         this->appendRow(list);
-    }
-
-    m_bIsDataInit = true;
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
-{
-    if(!m_bIsDataInit) {
-        qDebug() << "CpuSensorDataTreeItem::addData - sensor data item has not been initialized yet!";
-        return;
-    }
-
-    //if more data then needed is provided
-    const int sensorSize = m_iUsedSensors.size();
-    if(tSensorData.rows() > sensorSize)
-    {
-        MatrixXd dSmallSensorData(sensorSize, tSensorData.cols());
-        for(int i = 0 ; i < sensorSize; ++i)
-        {
-            //Set bad channels to zero so they do not corrupt the histogram thresholding
-            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
-                dSmallSensorData.row(i).setZero();
-            } else {
-                dSmallSensorData.row(i) = tSensorData.row(m_iUsedSensors[i]);
-            }
-        }
-
-        //Set new data into item's data.
-        QVariant data;
-        data.setValue(dSmallSensorData);
-        this->setData(data, Data3DTreeModelItemRoles::RTData);
-
-        if(m_pSensorRtDataWorkController) {
-             m_pSensorRtDataWorkController->addData(dSmallSensorData);
-        }
-        else {
-            qDebug() << "CpuSensorDataTreeItem::addData - worker has not been initialized yet!";
-        }
-    }
-    else
-    {
-        //Set bad channels to zero so they do not corrupt the histogram thresholding
-        MatrixXd dSmallSensorData = tSensorData;
-        for(int i = 0 ; i < dSmallSensorData.rows(); ++i)
-        {
-            if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
-                dSmallSensorData.row(i).setZero();
-            }
-        }
-
-        //Set new data into item's data.
-        QVariant data;
-        data.setValue(dSmallSensorData);
-        this->setData(data, Data3DTreeModelItemRoles::RTData);
-
-        if(m_pSensorRtDataWorkController) {
-             m_pSensorRtDataWorkController->addData(dSmallSensorData);
-        }
-        else {
-            qDebug() << "CpuSensorDataTreeItem::addData - worker has not been initialized yet!";
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::setSFreq(const double dSFreq)
-{
-    if(m_pSensorRtDataWorkController) {
-        m_pSensorRtDataWorkController->setSFreq(dSFreq);
-    }
-}
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
-{
-    if(m_pSensorRtDataWorkController) {
-        //Create bad channel idx list
-        m_iSensorsBad.clear();
-        for(const QString &bad : info.bads) {
-            m_iSensorsBad.push_back(info.ch_names.indexOf(bad));
-        }
-
-        //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
-
-        m_pSensorRtDataWorkController->setBadChannels(info);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState& checkState)
-{
-    if(m_pSensorRtDataWorkController) {
-        if(checkState == Qt::Checked) {
-            m_pSensorRtDataWorkController->setStreamingState(true);
-        } else if(checkState == Qt::Unchecked) {
-            m_pSensorRtDataWorkController->setStreamingState(false);
-        }
     }
 }
 
@@ -295,92 +120,3 @@ void CpuSensorDataTreeItem::onNewRtSmoothedData(const MatrixX3f &matColorMatrix)
         m_pInterpolationItem->setVertColor(data);
     }
 }
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
-{
-    if(sColormapType.canConvert<QString>()) {
-        if(m_pSensorRtDataWorkController) {
-            m_pSensorRtDataWorkController->setColormapType(sColormapType.toString());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
-{
-    if(iMSec.canConvert<int>()) {
-        if(m_pSensorRtDataWorkController) {
-            m_pSensorRtDataWorkController->setTimeInterval(iMSec.toInt());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
-{
-    if(vecThresholds.canConvert<QVector3D>()) {
-        if(m_pSensorRtDataWorkController) {
-            m_pSensorRtDataWorkController->setThresholds(vecThresholds.value<QVector3D>());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
-{
-    if(m_pSensorRtDataWorkController) {
-        if(checkState == Qt::Checked) {
-            m_pSensorRtDataWorkController->setLoopState(true);
-        } else if(checkState == Qt::Unchecked) {
-            m_pSensorRtDataWorkController->setLoopState(false);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
-{
-    if(iNumAvr.canConvert<int>()) {
-        if(m_pSensorRtDataWorkController) {
-            m_pSensorRtDataWorkController->setNumberAverages(iNumAvr.toInt());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
-{
-    if(dCancelDist.canConvert<double>()) {
-        if(m_pSensorRtDataWorkController) {
-            m_pSensorRtDataWorkController->setCancelDistance(dCancelDist.toDouble());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void CpuSensorDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
-{
-    if(sInterpolationFunction.canConvert<QString>()) {
-        if(m_pSensorRtDataWorkController) {
-            m_pSensorRtDataWorkController->setInterpolationFunction(sInterpolationFunction.toString());
-        }
-    }
-}
-
-
-//*************************************************************************************************************
