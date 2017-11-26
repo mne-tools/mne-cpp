@@ -286,7 +286,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     list << new QStandardItem(m_pCshEEGSensorDataTreeItem->toolTip());
                     this->appendRow(list);
 
-                    m_pCshEEGSensorDataTreeItem->init(bemSurface,
+                    m_pCshEEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
                                                       dCancelDist,
@@ -312,7 +312,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     list << new QStandardItem(m_pCpuEEGSensorDataTreeItem->toolTip());
                     this->appendRow(list);
 
-                    m_pCpuEEGSensorDataTreeItem->init(bemSurface,
+                    m_pCpuEEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
                                                       dCancelDist,
@@ -342,7 +342,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     list << new QStandardItem(m_pCshMEGSensorDataTreeItem->toolTip());
                     this->appendRow(list);
 
-                    m_pCshMEGSensorDataTreeItem->init(bemSurface,
+                    m_pCshMEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
                                                       dCancelDist,
@@ -368,7 +368,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     list << new QStandardItem(m_pCpuMEGSensorDataTreeItem->toolTip());
                     this->appendRow(list);
 
-                    m_pCpuMEGSensorDataTreeItem->init(bemSurface,
+                    m_pCpuMEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
                                                       dCancelDist,

@@ -108,14 +108,6 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent)
 
 //*************************************************************************************************************
 
-Data3DTreeModel::~Data3DTreeModel()
-{
-    //delete m_pRootItem;
-}
-
-
-//*************************************************************************************************************
-
 QVariant Data3DTreeModel::data(const QModelIndex& index,
                                int role) const
 {
@@ -532,8 +524,6 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
         bUseGPU = true;
         qDebug("Using compute shader version of SensorDataTreeItem.");
     }
-
-    bUseGPU = false;
 
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 

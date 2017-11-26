@@ -151,12 +151,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
-    ~Data3DTreeModel();
-
-    //=========================================================================================================
-    /**
     * QStandardItemModel functions
     */
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;

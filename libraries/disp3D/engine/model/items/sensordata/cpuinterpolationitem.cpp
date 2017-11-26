@@ -96,7 +96,7 @@ void CpuInterpolationItem::initItem()
 
 //*************************************************************************************************************
 
-void CpuInterpolationItem::addData(const MNEBemSurface& tBemSurface)
+void CpuInterpolationItem::initData(const MNEBemSurface& tBemSurface)
 {
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matVertColor = createVertColor(tBemSurface.rr);

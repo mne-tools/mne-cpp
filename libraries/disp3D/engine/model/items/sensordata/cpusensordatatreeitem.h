@@ -65,10 +65,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffEvoked;
-}
-
 namespace MNELIB{
     class MNEBemSurface;
 }
@@ -84,10 +80,9 @@ namespace DISP3DLIB {
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DISP3DLIB FORWARD DECLARATIONS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtSensorDataController;
 class CpuInterpolationItem;
 
 
@@ -110,67 +105,13 @@ public:
     /**
     * Constructs a CpuSensorDataTreeItem object.
     */
-    explicit CpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
+    explicit CpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem,
+                                   const QString& text = "Sensor Data");
 
-    //=========================================================================================================
-    /**
-    * Destructor, stops and deletes rtsensordata worker.
-    */
-    virtual ~CpuSensorDataTreeItem();
-
-    //=========================================================================================================
-    /**
-     * Initializes the sensor data item with neccessary information for visualization computations.
-     * Constructs and initalizes the worker for this item.
-     *
-     * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized.
-     * @param[in] fiffInfo                  FiffInfo that holds the sensors information.
-     * @param[in] sSensorType               The sensor type that is later used for live interpolation.
-     * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation.
-     * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values.
-     * @param[in] p3DEntityParent           The Qt3D entity parent of the new item.
-     */
-    void init(const MNELIB::MNEBemSurface& bemSurface,
-              const FIFFLIB::FiffInfo &fiffInfo,
-              const QString& sSensorType,
-              const double dCancelDist,
-              const QString &sInterpolationFunction,
-              Qt3DCore::QEntity *p3DEntityParent);
-
-    //=========================================================================================================
-    /**
-    * Adds a block actual rt data which is streamed by this item's worker thread item.
-    * In order for this function to worker, you must call init(...) beforehand.
-    *
-    * @param[in] tSensorData                The matrix that holds rt measurement data.
-    */
-    virtual void addData(const MatrixXd& tSensorData) override;
-
-    //=========================================================================================================
-    /**
-    * Set the sampling frequency.
-    *
-    * @param[in] dSFreq                 The new sampling frequency.
-    */
-    virtual void setSFreq(const double dSFreq) override;
-
-    //=========================================================================================================
-    /**
-    * Update bad channels and recalculate interpolation matrix.
-    *
-    * @param[in] info                 The fiff info including the new bad channels.
-    */
-    virtual void setBadChannels(const FIFFLIB::FiffInfo& info) override;
+    virtual void initInterpolationItem(const MNELIB::MNEBemSurface &bemSurface,
+                                       Qt3DCore::QEntity* p3DEntityParent) override;
 
 protected:
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the check/activation state of the rt data worker changed.
-    *
-    * @param[in] checkState                 The check state of the worker.
-    */
-    virtual void onStreamingStateChanged(const Qt::CheckState& checkState) override;
-
     //=========================================================================================================
     /**
     * This function gets called whenever this item receives new color values for each estimated source.
@@ -179,75 +120,7 @@ protected:
     */
     virtual void onNewRtSmoothedData(const MatrixX3f &matColorMatrix);
 
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the used colormap type changed.
-    *
-    * @param[in] sColormapType              The name of the new colormap type.
-    */
-    virtual void onColormapTypeChanged(const QVariant& sColormapType) override;
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the time interval in between the streamed samples changed.
-    *
-    * @param[in] iMSec                      The new time in milliseconds waited in between each streamed sample.
-    */
-    virtual void onTimeIntervalChanged(const QVariant &iMSec) override;
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the normaization value changed.
-    * The normalization value is used to normalize the estimated source activation.
-    *
-    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
-    */
-    virtual void onDataThresholdChanged(const QVariant &vecThresholds) override;
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the check/activation state of the looped streaming state changed.
-    *
-    * @param[in] checkState                 The check state of the looped streaming state.
-    */
-    virtual void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState) override;
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the number of averages of the streamed samples changed.
-    *
-    * @param[in] iNumAvr                    The new number of averages.
-    */
-    virtual  void onNumberAveragesChanged(const QVariant& iNumAvr) override;
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the cancel distance of the interpolation changed.
-    *
-    * @param[in] dCancelDist     The new cancel distance.
-    */
-    virtual void onCancelDistanceChanged(const QVariant& dCancelDist) override;
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the function of the interpolation changed.
-    *
-    * @param[in] sInterpolationFunction     The new function name.
-    */
-    virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
-
-    QPointer<RtSensorDataController>        m_pSensorRtDataWorkController;          /**< The source data worker. This worker streams the rt data to this item.*/
-
     QPointer<CpuInterpolationItem>          m_pInterpolationItem;                   /**< This item manages all 3d rendering and calculations. */
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
-    *
-    * @param[in] vertColors                 The colors for the underlying mesh surface
-    */
-    void rtVertColorChanged(const QVariant &vertColors);
 
 };
 
