@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     gpuinterpolationitem.h
-* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
+* @file     cpuinterpolationitem.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2017
+* @date     November, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     GpuInterpolationItem class declaration.
+* @brief     CpuInterpolationItem class declaration.
 *
 */
 
-#ifndef DISP3DLIB_GPUINTERPOLATIONITEM_H
-#define DISP3DLIB_GPUINTERPOLATIONITEM_H
+#ifndef DISP3DLIB_CPUINTERPOLATIONITEM_H
+#define DISP3DLIB_CPUINTERPOLATIONITEM_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstract3Dtreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -101,13 +101,13 @@ class GpuInterpolationMaterial;
 * @brief Signal interpolation with qt3d compute shader.
 */
 
-class DISP3DSHARED_EXPORT GpuInterpolationItem : public Abstract3DTreeItem
+class DISP3DSHARED_EXPORT CpuInterpolationItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<GpuInterpolationItem> SPtr;            /**< Shared pointer type for GpuInterpolationItem. */
-    typedef QSharedPointer<const GpuInterpolationItem> ConstSPtr; /**< Const shared pointer type for GpuInterpolationItem. */
+    typedef QSharedPointer<CpuInterpolationItem> SPtr;            /**< Shared pointer type for CpuInterpolationItem. */
+    typedef QSharedPointer<const CpuInterpolationItem> ConstSPtr; /**< Const shared pointer type for CpuInterpolationItem. */
 
     //=========================================================================================================
     /**
@@ -117,49 +117,17 @@ public:
     * @param[in] iType              The type of the item. See types.h for declaration and definition.
     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = nullptr,
-                                  int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
+    explicit CpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = nullptr,
+                                  int iType = Data3DTreeModelItemTypes::CpuInterpolationItem,
                                   const QString& text = "3D Plot");
 
     //=========================================================================================================
     /**
-     * Initialize interpolation data of this item.
-     *
-     * @param tMneBemSurface        The bem surface data.
-     */
-    void initData(const MNELIB::MNEBemSurface &tMneBemSurface);
-
-    //=========================================================================================================
-    /**
-     * Set the new Interpolation matrix for the interpolation.
-     *
-     * @param pInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
-     */
-    void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> pInterpolationMatrix);
-
-    //=========================================================================================================
-    /**
-    * Add a new vector with signal data form the sensors.
+    * Adds BEM model data.
     *
-    * @param tSignalVec              Vector with one float value for each sensor.
+    * @param[in] tBemSurface        The bem data.
     */
-    void addNewRtData(const Eigen::VectorXf &tSignalVec);
-
-    //=========================================================================================================
-    /**
-    * This function set the normalization value.
-    *
-    * @param[in] vecThresholds       The new threshold values used for normalizing the data.
-    */
-    void setNormalization(const QVector3D& tVecThresholds);
-
-    //=========================================================================================================
-    /**
-     * This function sets the colormap type
-     *
-     * @param tColormapType           The new colormap name.
-     */
-    void setColormapType(const QString& tColormapType);
+    void addData(const MNELIB::MNEBemSurface &tBemSurface);
 
 protected:
     //=========================================================================================================
@@ -167,18 +135,6 @@ protected:
      * Initialze the Item.
      */
     virtual void initItem() override;
-
-    bool                                    m_bIsDataInit;          /**< The initialization flag. */
-
-    QPointer<CustomMesh>                    m_pCustomMesh;          /**< Stores 3D data of the surfce. */
-
-    QPointer<Qt3DCore::QEntity>             m_pMeshDrawEntity;      /**< Top level Entity for the draw part. */
-
-    QPointer<Qt3DCore::QEntity>             m_pComputeEntity;       /**< Top level Entity for the compute part. */
-
-    QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;      /**< This component issues work for the csh to the gpu. */
-
-    QPointer<GpuInterpolationMaterial>      m_pMaterial;            /**< Compute material used for the process. */
 
 };
 
@@ -191,4 +147,4 @@ protected:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_GPUINTERPOLATIONITEM_H
+#endif // DISP3DLIB_CPUINTERPOLATIONITEM_H

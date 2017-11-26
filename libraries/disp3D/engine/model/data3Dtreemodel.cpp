@@ -623,26 +623,26 @@ SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject,
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
             //If measurement data has already been created but in conjunction with a different data type
             //(i.e. connectivity, dipole fitting, etc.), do the connects here
-            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() < 2) { // <2 because we can store MEG and EEG
-                if(sDataType == "EEG") {
-                    pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-                } else if (sDataType == "MEG") {
-                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-                }
-            }
+//            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() < 2) { // <2 because we can store MEG and EEG
+//                if(sDataType == "EEG") {
+//                    pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
+//                } else if (sDataType == "MEG") {
+//                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
+//                }
+//            }
 
-            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction);
+            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction);
+        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
 
-        if(sDataType == "EEG") {
-            pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-        } else if (sDataType == "MEG") {
-            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-        }
+//        if(sDataType == "EEG") {
+//            pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
+//        } else if (sDataType == "MEG") {
+//            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
+//        }
     }
 
     return pReturnItem;

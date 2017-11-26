@@ -108,7 +108,7 @@ void GpuSensorDataTreeItem::init(const MNEBemSurface &bemSurface,
     if(!m_pSensorRtDataWorkController) {
         m_pSensorRtDataWorkController = new RtSensorDataController(false);
 
-        connect(m_pSensorRtDataWorkController, &RtSensorDataController::interpolationMatrixChanged,
+        connect(m_pSensorRtDataWorkController, &RtSensorDataController::newInterpolationMatrixAvailable,
                 this, &GpuSensorDataTreeItem::setInterpolationMatrix);
         connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtRawDataAvailable,
                 this, &GpuSensorDataTreeItem::onNewRtRawData);
