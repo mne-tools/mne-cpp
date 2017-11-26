@@ -92,7 +92,7 @@ RtSensorDataController::RtSensorDataController(bool bStreamSmoothedData)
        connect(&m_timer, &QTimer::timeout,
                m_pRtSensorDataWorker, &RtSensorDataWorker::streamData);
 
-       connect(this, &RtSensorDataController::newDataReceived,
+       connect(this, &RtSensorDataController::rawDataChanged,
                m_pRtSensorDataWorker, &RtSensorDataWorker::addData);
 
        connect(this, &RtSensorDataController::interpolationMatrixChanged,
@@ -266,7 +266,7 @@ void RtSensorDataController::setBadChannels(const FiffInfo &info)
 
 void RtSensorDataController::addData(const MatrixXd& data)
 {
-    emit newDataReceived(data);
+    emit rawDataChanged(data);
 }
 
 

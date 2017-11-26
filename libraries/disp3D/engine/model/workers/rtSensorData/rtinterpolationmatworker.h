@@ -101,9 +101,16 @@ class DISP3DSHARED_EXPORT RtInterpolationMatWorker : public QObject
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<RtInterpolationMatWorker> SPtr;            /**< Shared pointer type for RtInterpolationMatWorker class. */
+    typedef QSharedPointer<const RtInterpolationMatWorker> ConstSPtr; /**< Const shared pointer type for RtInterpolationMatWorker class. */
+
+
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    */
     RtInterpolationMatWorker();
 
-public:
     //=========================================================================================================
     /**
     * This function sets the function that is used in the interpolation process.

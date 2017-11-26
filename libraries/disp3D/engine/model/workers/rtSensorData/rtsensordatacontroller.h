@@ -106,6 +106,9 @@ class DISP3DSHARED_EXPORT RtSensorDataController : public QObject
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<RtSensorDataController> SPtr;            /**< Shared pointer type for RtSensorDataController class. */
+    typedef QSharedPointer<const RtSensorDataController> ConstSPtr; /**< Const shared pointer type for RtSensorDataController class. */
+
     //=========================================================================================================
     /**
     * Default constructor.
@@ -120,7 +123,6 @@ public:
     */
     ~RtSensorDataController();
 
-public:
     //=========================================================================================================
     /**
     * Set the streaming state (start/stop streaming).
@@ -255,23 +257,122 @@ protected:
     int                                     m_iMSecInterval;                    /**< Length in milli Seconds to wait inbetween data samples. */
 
 signals:
-    void interpolationMatrixChanged(QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationOperator);
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the interpolation info changed.
+    *
+    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
+    * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
+    * @param[in] fiffEvoked                Holds all information about the sensors.
+    * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
+    */
     void interpolationInfoChanged(const MNELIB::MNEBemSurface &bemSurface,
                               const QVector<Eigen::Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
-    void surfaceColorChanged(const Eigen::MatrixX3f& matSurfaceVertColor);
-    void thresholdsChanged(const QVector3D &vecThresholds);
-    void sFreqChanged(double dSFreq);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the bad channels changed.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
     void badChannelsChanged(const FIFFLIB::FiffInfo &info);
-    void numberAveragesChanged(int iNumAvr);
-    void loopStateChanged(bool bLoopState);
-    void streamingStateChanged(bool streamingState);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the interpolation function changed.
+    *
+    * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
+    */
     void interpolationFunctionChanged(const QString &sInterpolationFunction);
-    void colormapTypeChanged(const QString &sColormapType);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the cancel dsitance changed.
+    *
+    * @param[in] dCancelDist           The new cancel distance value in meters.
+    */
     void cancelDistanceChanged(double dCancelDist);
-    void newDataReceived(const Eigen::MatrixXd& data);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface color changed.
+    *
+    * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted
+    */
+    void surfaceColorChanged(const Eigen::MatrixX3f& matSurfaceVertColor);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the thresholds changed.
+    *
+    * @param[in] vecThresholds          The new threshold values used for normalizing the data.
+    */
+    void thresholdsChanged(const QVector3D &vecThresholds);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the sampling frequency changed.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void sFreqChanged(double dSFreq);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the number of averages changed.
+    *
+    * @param[in] iNumAvr                The new number of averages.
+    */
+    void numberAveragesChanged(int iNumAvr);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the loop state changed.
+    *
+    * @param[in] bLoopState                The new looping state.
+    */
+    void loopStateChanged(bool bLoopState);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the colormap changed.
+    *
+    * @param[in] sColormapType          The new colormap type.
+    */
+    void colormapTypeChanged(const QString &sColormapType);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever new data to be streamed was added.
+    *
+    * @param[in] data          The new data.
+    */
+    void rawDataChanged(const Eigen::MatrixXd& data);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever a new interpolation matrix is available.
+    *
+    * @param[in] matInterpolationOperator          The new interpolation matrix.
+    */
+    void newInterpolationMatrixAvailable(QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationOperator);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever a new raw data is streamed.
+    *
+    * @param[in] vecDataVector          The new streamed raw data.
+    */
     void newRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever a new interpolated raw data is streamed.
+    *
+    * @param[in] matColorMatrix          The new streamed interpolated raw data in form of RGB colors per vertex.
+    */
     void newRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
 };
 
