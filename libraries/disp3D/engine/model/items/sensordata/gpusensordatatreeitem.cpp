@@ -88,6 +88,30 @@ GpuSensorDataTreeItem::GpuSensorDataTreeItem(int iType, const QString &text)
 
     connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtRawDataAvailable,
             this, &GpuSensorDataTreeItem::onNewRtRawData);
+
+    m_pSensorRtDataWorkController->setStreamSmoothedData(false);
+}
+
+
+//*************************************************************************************************************
+
+void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator)
+{
+    if(m_pInterpolationItem)
+    {
+        m_pInterpolationItem->setInterpolationMatrix(matInterpolationOperator);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void GpuSensorDataTreeItem::onNewRtRawData(const VectorXd &vecDataVector)
+{
+    if(m_pInterpolationItem)
+    {
+        m_pInterpolationItem->addNewRtData(vecDataVector.cast<float>());
+    }
 }
 
 
@@ -108,27 +132,6 @@ void GpuSensorDataTreeItem::initInterpolationItem(const MNEBemSurface &bemSurfac
         list << m_pInterpolationItem;
         list << new QStandardItem(m_pInterpolationItem->toolTip());
         this->appendRow(list);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator)
-{
-    if(m_pInterpolationItem) {
-        m_pInterpolationItem->setInterpolationMatrix(matInterpolationOperator);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void GpuSensorDataTreeItem::onNewRtRawData(const VectorXd &vecDataVector)
-{
-    if(m_pInterpolationItem)
-    {
-        m_pInterpolationItem->addNewRtData(vecDataVector.cast<float>());
     }
 }
 

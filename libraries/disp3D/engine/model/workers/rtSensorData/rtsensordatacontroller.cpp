@@ -73,11 +73,11 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSensorDataController::RtSensorDataController(bool bStreamSmoothedData)
+RtSensorDataController::RtSensorDataController()
 : m_iMSecInterval(17)
 {
        //Stream data
-       m_pRtSensorDataWorker = new RtSensorDataWorker(bStreamSmoothedData);
+       m_pRtSensorDataWorker = new RtSensorDataWorker();
        m_pRtSensorDataWorker->moveToThread(&m_rtSensorDataWorkerThread);
 
        connect(&m_rtSensorDataWorkerThread, &QThread::finished,
@@ -115,6 +115,9 @@ RtSensorDataController::RtSensorDataController(bool bStreamSmoothedData)
 
        connect(this, &RtSensorDataController::colormapTypeChanged,
                m_pRtSensorDataWorker, &RtSensorDataWorker::setColormapType);
+
+       connect(this, &RtSensorDataController::streamSmoothedDataChanged,
+               m_pRtSensorDataWorker, &RtSensorDataWorker::setStreamSmoothedData);
 
        m_rtSensorDataWorkerThread.start();
 
@@ -261,6 +264,14 @@ void RtSensorDataController::setSFreq(double dSFreq)
 void RtSensorDataController::setBadChannels(const FiffInfo &info)
 {
     emit badChannelsChanged(info);
+}
+
+
+//*************************************************************************************************************
+
+void RtSensorDataController::setStreamSmoothedData(bool bStreamSmoothedData)
+{
+    emit streamSmoothedDataChanged(bStreamSmoothedData);
 }
 
 

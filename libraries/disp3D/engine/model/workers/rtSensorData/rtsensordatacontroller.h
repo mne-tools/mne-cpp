@@ -112,10 +112,8 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
-    *
-    * @param[in] bStreamSmoothedData      Flag whether to stream raw or interpolated raw data. This is used by the GPU and CPU usage of the SensorDataTreeItem.
     */
-    RtSensorDataController(bool bStreamSmoothedData = true);
+    RtSensorDataController();
 
     //=========================================================================================================
     /**
@@ -233,6 +231,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the state whether to stream smoothed or raw data
+    *
+    * @param[in] bStreamSmoothedData                 The new state.
+    */
+    void setStreamSmoothedData(bool bStreamSmoothedData);
+
+    //=========================================================================================================
+    /**
     * Add data which is to be streamed.
     *
     * @param[in] data         The new data.
@@ -255,7 +261,6 @@ protected:
     QPointer<RtInterpolationMatWorker>      m_pRtInterpolationWorker;           /**< The pointer to the RtInterpolationMatWorker, which is running in the RtInterpolationMatWorker thread. */
 
     int                                     m_iMSecInterval;                    /**< Length in milli Seconds to wait inbetween data samples. */
-
 signals:
     //=========================================================================================================
     /**
@@ -286,6 +291,14 @@ signals:
     * @param[in] info                 The fiff info including the new bad channels.
     */
     void badChannelsChanged(const FIFFLIB::FiffInfo &info);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the state to whether stream smoothed/interpolated or raw data changed.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
+    void streamSmoothedDataChanged(bool bStreamSmoothedData);
 
     //=========================================================================================================
     /**

@@ -104,12 +104,25 @@ public:
     explicit GpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem,
                                    const QString& text = "Sensor Data");
 
+protected:
+    //=========================================================================================================
+    /**
+    * Set the new interpolation matrix.
+    *
+    * @param[in] matInterpolationOperator                 The new interpolation matrix.
+    */
+    void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator);
+
+    //=========================================================================================================
+    /**
+    * Init the interpolation items. This cannot be done here because they might differ from GPU to CPU version.
+    *
+    * @param[in] bemSurface                 MNEBemSurface that holds the mesh that should be visualized.
+    * @param[in] p3DEntityParent            The Qt3D entity parent of the new item.
+    */
     virtual void initInterpolationItem(const MNELIB::MNEBemSurface &bemSurface,
                                        Qt3DCore::QEntity* p3DEntityParent) override;
 
-    void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator);
-
-protected:
     //=========================================================================================================
     /**
     * This function gets called whenever this item receives sensor values for each estimated source.

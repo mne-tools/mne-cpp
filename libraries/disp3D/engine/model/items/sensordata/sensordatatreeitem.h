@@ -109,7 +109,8 @@ public:
     /**
     * Constructs a sensordatatreeitem object, calls initItem
     */
-    explicit SensorDataTreeItem(int iType , const QString& text);
+    explicit SensorDataTreeItem(int iType ,
+                                const QString& text);
 
     //=========================================================================================================
     /**
@@ -135,10 +136,6 @@ public:
                   const double dCancelDist,
                   const QString &sInterpolationFunction,
                   Qt3DCore::QEntity *p3DEntityParent);
-
-
-    virtual void initInterpolationItem(const MNELIB::MNEBemSurface &bemSurface,
-                                       Qt3DCore::QEntity* p3DEntityParent) = 0;
 
     //=========================================================================================================
     /**
@@ -238,6 +235,8 @@ public:
     */
     virtual void setBadChannels(const FIFFLIB::FiffInfo& info);
 
+
+
 protected:
     //=========================================================================================================
     /**
@@ -245,6 +244,16 @@ protected:
     * Don't use this fucntion in the constructor of the abstract class.
     */
     virtual void initItem() override;
+
+    //=========================================================================================================
+    /**
+    * Init the interpolation items. This cannot be done here because they might differ from GPU to CPU version.
+    *
+    * @param[in] bemSurface                 MNEBemSurface that holds the mesh that should be visualized.
+    * @param[in] p3DEntityParent            The Qt3D entity parent of the new item.
+    */
+    virtual void initInterpolationItem(const MNELIB::MNEBemSurface &bemSurface,
+                                       Qt3DCore::QEntity* p3DEntityParent) = 0;
 
     //=========================================================================================================
     /**
