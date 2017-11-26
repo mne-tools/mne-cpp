@@ -139,9 +139,9 @@ public:
     /**
      * Set the new interpolation matrix for interpolation.
      *
-     * @param pInterpolationMatrix      The weight matrix.
+     * @param pInterpolationMatrix      The Interpolation matrix.
      */
-    void setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<float>> tInterpolationMatrix);
+    void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float>> tInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -200,12 +200,12 @@ private:
 
     //=========================================================================================================
     /**
-     * Build the content of the weight matrix buffer.
+     * Build the content of the Interpolation matrix buffer.
      *
-     * @param tInterpolationMatrix      The weight matrix.
-     * @return                          Weight matrix is byte array form.
+     * @param tInterpolationMatrix      The Interpolation matrix.
+     * @return                          Interpolation matrix is byte array form.
      */
-    QByteArray buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float>> tInterpolationMatrix);
+    QByteArray buildInterpolationMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float>> tInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -242,11 +242,11 @@ private:
     QPointer<Qt3DRender::QBuffer>                       m_pSignalDataBuffer;        /**< This buffer stores signal input data. */
     QPointer<Qt3DRender::QParameter>                    m_pSignalDataParameter;     /**< This parameter holds the signal data buffer. */
 
-    //Weight matrix parameter
-    QPointer<Qt3DRender::QParameter>                    m_pColsParameter;           /**< This parameter holds the number of columns in the weight matrix. */
-    QPointer<Qt3DRender::QParameter>                    m_pRowsParameter;           /**< This parameter holds the number of rows in the weight matrix. */
-    QPointer<Qt3DRender::QParameter>                    m_pWeightMatParameter;      /**< This parameter holds the weight matrix buffer. */
-    QPointer<Qt3DRender::QBuffer>                       m_pWeightMatBuffer;         /**< This buffer the interpolation matrix. */
+    //Interpolation matrix parameter
+    QPointer<Qt3DRender::QParameter>                    m_pColsParameter;           /**< This parameter holds the number of columns in the Interpolation matrix. */
+    QPointer<Qt3DRender::QParameter>                    m_pRowsParameter;           /**< This parameter holds the number of rows in the Interpolation matrix. */
+    QPointer<Qt3DRender::QParameter>                    m_pInterpolationMatParameter;/**< This parameter holds the Interpolation matrix buffer. */
+    QPointer<Qt3DRender::QBuffer>                       m_pInterpolationMatBuffer;  /**< This buffer the interpolation matrix. */
 
     //Output parameter
     QPointer<Qt3DRender::QParameter>                    m_pOutputColorParameter;    /**< This parameter holds the output color buffer. */
