@@ -44,7 +44,6 @@
 
 #include "../../disp3D_global.h"
 #include <limits>
-
 #include <fiff/fiff_info.h>
 
 
@@ -149,7 +148,8 @@ public:
      *
      * @return                              Interpolated values for all vertices of the mesh
      */
-    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > pInterpolationMatrix, const Eigen::VectorXd &vecMeasurementData);
+    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > pInterpolationMatrix,
+                                                             const Eigen::VectorXd &vecMeasurementData);
 
     //=========================================================================================================
     /**

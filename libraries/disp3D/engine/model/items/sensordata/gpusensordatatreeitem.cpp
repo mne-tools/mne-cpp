@@ -40,10 +40,10 @@
 //=============================================================================================================
 
 #include "gpusensordatatreeitem.h"
+#include "../../workers/rtSensorData/rtsensordatacontroller.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "gpuinterpolationitem.h"
-#include "../../workers/rtSensorData/RtSensorDataWorker.h"
 
 
 //*************************************************************************************************************

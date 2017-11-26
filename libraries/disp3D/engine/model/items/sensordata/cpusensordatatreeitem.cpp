@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "cpusensordatatreeitem.h"
-#include "../../workers/rtSensorData/rtsensordataworker.h"
+#include "../../workers/rtSensorData/rtsensordatacontroller.h"
 #include <mne/mne_bem_surface.h>
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
@@ -50,6 +50,8 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QVector3D>
 
 
 //*************************************************************************************************************

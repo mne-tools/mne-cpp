@@ -91,7 +91,6 @@ class RtSensorDataController;
 *
 * @brief This item integrates GeometryInfo and compute shader interpolation into Disp3D structure.
 */
-
 class DISP3DSHARED_EXPORT GpuSensorDataTreeItem : public SensorDataTreeItem
 {
     Q_OBJECT
@@ -104,7 +103,8 @@ public:
     /**
     * Constructs a GpuSensorDataTreeItem object.
     */
-    explicit GpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem, const QString& text = "Sensor Data");
+    explicit GpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem,
+                                   const QString& text = "Sensor Data");
 
     //=========================================================================================================
     /**

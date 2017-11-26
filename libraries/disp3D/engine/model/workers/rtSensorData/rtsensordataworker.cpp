@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "rtsensordataworker.h"
-#include "../../items/common/types.h"
-
+#include <disp/helpers/colormap.h>
+#include "../../../../helpers/interpolation/interpolation.h"
 
 
 //*************************************************************************************************************
@@ -48,9 +48,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
+#include <QVector3D>
 #include <QDebug>
-#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -69,9 +68,7 @@
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace DISPLIB;
-using namespace MNELIB;
 using namespace FIFFLIB;
-using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -84,6 +81,8 @@ RtSensorDataWorker::RtSensorDataWorker(bool bStreamSmoothedData)
 , m_iAverageSamples(1)
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(bStreamSmoothedData)
+, m_itCurrentSample(0)
+, m_iSampleCtr(0)
 {
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
 }
@@ -174,6 +173,13 @@ void RtSensorDataWorker::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
+void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator) {
+    m_matInterpolationOperator = matInterpolationOperator;
+}
+
+
+//*************************************************************************************************************
+
 void RtSensorDataWorker::streamData()
 {
     if(m_lDataQ.size() > 0) {
@@ -183,42 +189,42 @@ void RtSensorDataWorker::streamData()
 
         if(m_bIsLooping) {
             //Down sampling in loop mode
-            if(vecAverage.rows() != m_lDataQ.front().rows()) {
-                vecAverage = *m_itCurrentSample;
+            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+                m_vecAverage = *m_itCurrentSample;
             } else {
-                vecAverage += *m_itCurrentSample;
+                m_vecAverage += *m_itCurrentSample;
             }
         } else {
             //Down sampling in stream mode
-            if(vecAverage.rows() != m_lDataQ.front().rows()) {
-                vecAverage = m_lDataQ.front();
+            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+                m_vecAverage = m_lDataQ.front();
             } else {
-                vecAverage += m_lDataQ.front();
+                m_vecAverage += m_lDataQ.front();
             }
 
             m_lDataQ.pop_front();
         }
 
         m_itCurrentSample++;
-        iSampleCtr++;
+        m_iSampleCtr++;
 
         //Set iterator back to the front if needed
         if(m_itCurrentSample == m_lDataQ.cend()) {
             m_itCurrentSample = m_lDataQ.cbegin();
         }
 
-        if(iSampleCtr % m_iAverageSamples == 0) {
+        if(m_iSampleCtr % m_iAverageSamples == 0) {
             //Perform the actual interpolation and send signal
-            vecAverage /= (double)m_iAverageSamples;
+            m_vecAverage /= (double)m_iAverageSamples;
             if(m_bStreamSmoothedData) {
-                emit newRtSmoothedData(generateColorsFromSensorValues(vecAverage));
+                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage));
             } else {
-                emit newRtRawData(vecAverage);
+                emit newRtRawData(m_vecAverage);
             }
-            vecAverage.setZero(vecAverage.rows());
+            m_vecAverage.setZero(m_vecAverage.rows());
 
             //reset sample counter
-            iSampleCtr = 0;
+            m_iSampleCtr = 0;
         }
         //qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
         //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();

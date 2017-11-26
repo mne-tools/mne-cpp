@@ -120,6 +120,8 @@ SOURCES += \
     engine/model/items/common/abstractmeshtreeitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     engine/model/workers/rtSensorData/rtsensordataworker.cpp \
+    engine/model/workers/rtSensorData/rtsensordatacontroller.cpp \
+    engine/model/workers/rtSensorData/rtinterpolationmatworker.cpp \
     engine/model/3dhelpers/renderable3Dentity.cpp \
     engine/model/3dhelpers/custommesh.cpp \
     engine/model/materials/pervertexphongalphamaterial.cpp \
@@ -170,6 +172,8 @@ HEADERS += \
     engine/model/items/common/types.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     engine/model/workers/rtSensorData/rtsensordataworker.h \
+    engine/model/workers/rtSensorData/rtsensordatacontroller.h \
+    engine/model/workers/rtSensorData/rtinterpolationmatworker.h \
     engine/model/3dhelpers/renderable3Dentity.h \
     engine/model/3dhelpers/custommesh.h \
     engine/model/items/common/types.h \
