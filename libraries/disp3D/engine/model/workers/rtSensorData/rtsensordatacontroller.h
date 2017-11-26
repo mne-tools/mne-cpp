@@ -261,7 +261,7 @@ signals:
     /**
     * Emit this signal whenever the interpolation info changed.
     *
-    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
+    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information.
     * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
     * @param[in] fiffEvoked                Holds all information about the sensors.
     * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
@@ -270,6 +270,14 @@ signals:
                               const QVector<Eigen::Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the number of vertices changed.
+    *
+    * @param[in] iNumberVerts                The new number of vertices.
+    */
+    void numberVerticesChanged(int iNumberVerts);
 
     //=========================================================================================================
     /**

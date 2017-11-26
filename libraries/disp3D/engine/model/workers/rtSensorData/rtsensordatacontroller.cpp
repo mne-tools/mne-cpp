@@ -95,11 +95,11 @@ RtSensorDataController::RtSensorDataController(bool bStreamSmoothedData)
        connect(this, &RtSensorDataController::rawDataChanged,
                m_pRtSensorDataWorker, &RtSensorDataWorker::addData);
 
+       connect(this, &RtSensorDataController::numberVerticesChanged,
+               m_pRtSensorDataWorker, &RtSensorDataWorker::setNumberVertices);
+
        connect(this, &RtSensorDataController::newInterpolationMatrixAvailable,
                m_pRtSensorDataWorker, &RtSensorDataWorker::setInterpolationMatrix);
-
-       connect(this, &RtSensorDataController::surfaceColorChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setSurfaceColor);
 
        connect(this, &RtSensorDataController::thresholdsChanged,
                m_pRtSensorDataWorker, &RtSensorDataWorker::setThresholds);
@@ -211,6 +211,8 @@ void RtSensorDataController::setInterpolationInfo(const MNEBemSurface &bemSurfac
                               vecSensorPos,
                               fiffInfo,
                               iSensorType);
+
+    emit numberVerticesChanged(bemSurface.rr.rows());
 }
 
 

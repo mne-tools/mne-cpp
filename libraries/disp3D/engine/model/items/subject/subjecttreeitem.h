@@ -105,23 +105,6 @@ public:
     */
     void connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem);
 
-    //=========================================================================================================
-    /**
-    * Connects measurement items and their data (i.e. MNE source data) to already loaded head BEM data
-    *
-    * @param[in] pMeasurementItem       The measurement item which is to be connected.
-    */
-    void connectEEGMeasurementToBemHeadItems(MeasurementTreeItem* pMeasurementItem);
-
-    //=========================================================================================================
-    /**
-    * Connects measurement items and their data (i.e. MNE source data) to already loaded sensor BEM data
-    *
-    * @param[in] pMeasurementItem       The measurement item which is to be connected.
-    * @param[in] parent                 The parent of this item.
-    */
-    void connectMEGMeasurementToSensorItems(MeasurementTreeItem* pMeasurementItem, QStandardItem* parent);
-
 protected:
     //=========================================================================================================
     /**

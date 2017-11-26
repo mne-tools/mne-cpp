@@ -88,6 +88,7 @@ namespace DISP3DLIB {
 //=============================================================================================================
 
 class RtSensorDataController;
+class CpuInterpolationItem;
 
 
 //=============================================================================================================
@@ -122,19 +123,19 @@ public:
      * Initializes the sensor data item with neccessary information for visualization computations.
      * Constructs and initalizes the worker for this item.
      *
-     * @param[in] matSurfaceVertColor       The base color for the vertices which the streamed data is later plotted on.
      * @param[in] bemSurface                MNEBemSurface that holds the mesh that should be visualized.
      * @param[in] fiffInfo                  FiffInfo that holds the sensors information.
      * @param[in] sSensorType               The sensor type that is later used for live interpolation.
      * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation.
      * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values.
+     * @param[in] p3DEntityParent           The Qt3D entity parent of the new item.
      */
-    void init(const MatrixX3f& matSurfaceVertColor,
-              const MNELIB::MNEBemSurface& bemSurface,
+    void init(const MNELIB::MNEBemSurface& bemSurface,
               const FIFFLIB::FiffInfo &fiffInfo,
               const QString& sSensorType,
               const double dCancelDist,
-              const QString &sInterpolationFunction);
+              const QString &sInterpolationFunction,
+              Qt3DCore::QEntity *p3DEntityParent);
 
     //=========================================================================================================
     /**
@@ -144,14 +145,6 @@ public:
     * @param[in] tSensorData                The matrix that holds rt measurement data.
     */
     virtual void addData(const MatrixXd& tSensorData) override;
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color changed.
-    *
-    * @param[in] matVertColor               The matrix that holds the origin colors for all vertices of the surface
-    */
-    void setColorOrigin(const MatrixX3f& matVertColor);
 
     //=========================================================================================================
     /**
@@ -243,7 +236,9 @@ protected:
     */
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction) override;
 
-    QPointer<RtSensorDataController>     m_pSensorRtDataWorkController;             /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataController>        m_pSensorRtDataWorkController;          /**< The source data worker. This worker streams the rt data to this item.*/
+
+    QPointer<CpuInterpolationItem>          m_pInterpolationItem;                   /**< This item manages all 3d rendering and calculations. */
 
 signals:
     //=========================================================================================================

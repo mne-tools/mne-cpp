@@ -138,7 +138,8 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit MeasurementTreeItem(int iType = Data3DTreeModelItemTypes::MeasurementItem, const QString& text = "Unknown measurement");
+    explicit MeasurementTreeItem(int iType = Data3DTreeModelItemTypes::MeasurementItem,
+                                 const QString& text = "Unknown measurement");
 
     //=========================================================================================================
     /**
@@ -149,7 +150,8 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
+    SourceSpaceTreeItem* addData(const MNELIB::MNESourceSpace& tSourceSpace,
+                                 Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -160,27 +162,28 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate,
+                                 const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
-    //=========================================================================================================
-    /**
-    * Adds interpolated activation data to the cpu version of this item.
-    *
-    * @param[in] tSensorData            The SensorData.
-    * @param[in] bemSurface             Holds all Bem data used in this item.
-    * @param[in] fiffInfo               Holds all information needed about the sensors.
-    * @param[in] sSensorType            Name of the sensor type EEG or MEG.
-    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation.
-    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values.
-    *
-    * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
-    */
-    SensorDataTreeItem* addData(const MatrixXd& tSensorData,
-                                const MNELIB::MNEBemSurface &bemSurface,
-                                const FIFFLIB::FiffInfo &fiffInfo,
-                                const QString &sSensorType,
-                                const double dCancelDist,
-                                const QString &sInterpolationFunction);
+//    //=========================================================================================================
+//    /**
+//    * Adds interpolated activation data to the cpu version of this item.
+//    *
+//    * @param[in] tSensorData            The SensorData.
+//    * @param[in] bemSurface             Holds all Bem data used in this item.
+//    * @param[in] fiffInfo               Holds all information needed about the sensors.
+//    * @param[in] sSensorType            Name of the sensor type EEG or MEG.
+//    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation.
+//    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values.
+//    *
+//    * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+//    */
+//    SensorDataTreeItem* addData(const MatrixXd& tSensorData,
+//                                const MNELIB::MNEBemSurface &bemSurface,
+//                                const FIFFLIB::FiffInfo &fiffInfo,
+//                                const QString &sSensorType,
+//                                const double dCancelDist,
+//                                const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -193,6 +196,7 @@ public:
     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation.
     * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values.
     * @param[in] pParent                Pointer to the QEntity parent.
+    * @param[in] bUseGPU                Whether to use GPU support for visualizing real-time data.
     *
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
@@ -202,7 +206,8 @@ public:
                                    const QString &sSensorType,
                                    const double dCancelDist,
                                    const QString &sInterpolationFunction,
-                                   Qt3DCore::QEntity *pParent);
+                                   Qt3DCore::QEntity *pParent,
+                                   bool bUseGPU = false);
 
     //=========================================================================================================
     /**
@@ -213,7 +218,8 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    EcdDataTreeItem* addData(const INVERSELIB::ECDSet& tECDSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    EcdDataTreeItem* addData(const INVERSELIB::ECDSet& tECDSet,
+                             Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -225,7 +231,8 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    DigitizerSetTreeItem* addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* p3DEntityParent = 0);
+    DigitizerSetTreeItem* addData(const FIFFLIB::FiffDigPointSet& tDigitizer,
+                                  Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -235,7 +242,8 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData, Qt3DCore::QEntity* p3DEntityParent = 0);
+    NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData,
+                             Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -245,25 +253,8 @@ public:
     * @param[in] leftHemiColor        Color of the left hemisphere.
     * @param[in] rightHemiColor       Color of the right hemisphere.
     */
-    void setSourceColors(const MatrixX3f &leftHemiColor, const MatrixX3f &rightHemiColor);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color (surface color) used for displaying MEG data changed.
-    * The color generation then based on the current user chosen color origin.
-    *
-    * @param[in] sensorColor        Color of sensor surface.
-    */
-    void setSensorMEGColors(const MatrixX3f& sensorColor);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color (surface color) used for displaying EEG data changed.
-    * The color generation then based on the current user chosen color origin.
-    *
-    * @param[in] sensorColor        Color of sensor surface.
-    */
-    void setSensorEEGColors(const MatrixX3f& sensorColor);
+    void setSourceColors(const MatrixX3f &leftHemiColor,
+                         const MatrixX3f &rightHemiColor);
 
 protected:
     //=========================================================================================================

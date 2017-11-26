@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "cpusensordatatreeitem.h"
+#include "cpuinterpolationitem.h"
 #include "../../workers/rtSensorData/rtsensordatacontroller.h"
 #include <mne/mne_bem_surface.h>
 #include "../../../../helpers/interpolation/interpolation.h"
@@ -98,12 +99,12 @@ CpuSensorDataTreeItem::~CpuSensorDataTreeItem()
 
 //*************************************************************************************************************
 
-void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
-                              const MNEBemSurface& bemSurface,
-                              const FiffInfo& fiffInfo,
-                              const QString& sSensorType,
-                              const double dCancelDist,
-                              const QString& sInterpolationFunction)
+void CpuSensorDataTreeItem::init(const MNEBemSurface& bemSurface,
+                                 const FiffInfo& fiffInfo,
+                                 const QString& sSensorType,
+                                 const double dCancelDist,
+                                 const QString& sInterpolationFunction,
+                                 Qt3DCore::QEntity* p3DEntityParent)
 {
     if(m_bIsDataInit == true)
     {
@@ -162,7 +163,19 @@ void CpuSensorDataTreeItem::init(const MatrixX3f& matSurfaceVertColor,
                                                 fiffInfo,
                                                 sensorTypeFiffConstant);
 
-    m_pSensorRtDataWorkController->setSurfaceColor(matSurfaceVertColor);
+    //create new Tree Item
+    if(!m_pInterpolationItem)
+    {
+        m_pInterpolationItem = new CpuInterpolationItem(p3DEntityParent,
+                                                        Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                                        QStringLiteral("3D Plot"));
+        m_pInterpolationItem->addData(bemSurface);
+
+        QList<QStandardItem*> list;
+        list << m_pInterpolationItem;
+        list << new QStandardItem(m_pInterpolationItem->toolTip());
+        this->appendRow(list);
+    }
 
     m_bIsDataInit = true;
 }
@@ -232,16 +245,6 @@ void CpuSensorDataTreeItem::addData(const MatrixXd &tSensorData)
 
 //*************************************************************************************************************
 
-void CpuSensorDataTreeItem::setColorOrigin(const MatrixX3f &matVertColor)
-{
-    if(m_pSensorRtDataWorkController){
-        m_pSensorRtDataWorkController->setSurfaceColor(matVertColor);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void CpuSensorDataTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pSensorRtDataWorkController) {
@@ -285,9 +288,12 @@ void CpuSensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState& checkS
 
 void CpuSensorDataTreeItem::onNewRtSmoothedData(const MatrixX3f &matColorMatrix)
 {
-    QVariant data;
-    data.setValue(matColorMatrix);
-    emit rtVertColorChanged(data);
+    if(m_pInterpolationItem)
+    {
+        QVariant data;
+        data.setValue(matColorMatrix);
+        m_pInterpolationItem->setVertColor(data);
+    }
 }
 
 
