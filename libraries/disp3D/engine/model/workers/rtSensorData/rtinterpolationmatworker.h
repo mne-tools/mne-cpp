@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtSensorDataWorker class declaration..
+* @brief     RtInterpolationMatWorker class declaration..
 *
 */
 
@@ -43,31 +43,14 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../../items/common/types.h"
 #include <mne/mne_bem_surface.h>
-#include <fiff/fiff_evoked.h>
-#include "../../../../helpers/geometryinfo/geometryinfo.h"
-#include "../../../../helpers/interpolation/interpolation.h"
-#include <mne/mne_bem_surface.h>
-#include <disp/helpers/colormap.h>
-#include <utils/ioutils.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_types.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QThread>
-#include <QMutex>
-#include <QVector3D>
-#include <QSharedPointer>
-#include <QLinkedList>
-#include <QTimer>
-#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -82,6 +65,14 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace MNELIB {
+    class MNEBemSurface;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -145,7 +136,7 @@ public:
     * @return Returns the created interpolation matrix.
     */
     void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
-                              const QVector<Vector3f> &vecSensorPos,
+                              const QVector<Eigen::Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
 
@@ -171,15 +162,15 @@ protected:
      * The struct specifing all data that is used in the interpolation process
      */
     struct InterpolationData {
-        int                                     iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
-        double                                  dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
+        int                                             iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
+        double                                          dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
 
-        QSharedPointer<SparseMatrix<float> >    pInterpolationMatrix;             /**< Interpolation matrix that holds all coefficients for a signal interpolation. */
-        QSharedPointer<MatrixXd>                pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
-        QSharedPointer<QVector<qint32>>         pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QSharedPointer<Eigen::SparseMatrix<float> >     pInterpolationMatrix;             /**< Interpolation matrix that holds all coefficients for a signal interpolation. */
+        QSharedPointer<Eigen::MatrixXd>                 pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+        QSharedPointer<QVector<qint32>>                 pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
 
-        MNELIB::MNEBemSurface                   bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
-        FIFFLIB::FiffInfo                       fiffInfo;                         /**< Contains all information about the sensors. */
+        MNELIB::MNEBemSurface                           bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
+        FIFFLIB::FiffInfo                               fiffInfo;                         /**< Contains all information about the sensors. */
 
         double (*interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */
     } m_lInterpolationData; /**< Container for the interpolation data. */

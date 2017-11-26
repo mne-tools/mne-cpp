@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RtSensorDataWorker class definition.
+* @brief    RtInterpolationMatWorker class definition.
 *
 */
 
@@ -40,6 +40,8 @@
 //=============================================================================================================
 
 #include "rtinterpolationmatworker.h"
+#include "../../../../helpers/geometryinfo/geometryinfo.h"
+#include "../../../../helpers/interpolation/interpolation.h"
 
 
 //*************************************************************************************************************
@@ -47,17 +49,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-//#include <QObject>
-//#include <QDebug>
-//#include <QtConcurrent>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -66,11 +62,8 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-using namespace Eigen;
-using namespace DISPLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
-using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -130,9 +123,9 @@ void RtInterpolationMatWorker::setCancelDistance(double dCancelDist)
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
+void RtInterpolationMatWorker::setInterpolationInfo(const MNEBemSurface &bemSurface,
                           const QVector<Vector3f> &vecSensorPos,
-                          const FIFFLIB::FiffInfo &fiffInfo,
+                          const FiffInfo &fiffInfo,
                           int iSensorType)
 {
     if(bemSurface.rr.rows() == 0) {
@@ -156,7 +149,7 @@ void RtInterpolationMatWorker::setInterpolationInfo(const MNELIB::MNEBemSurface 
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setBadChannels(const FIFFLIB::FiffInfo& info)
+void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
 {
     if(!m_bInterpolationInfoIsInit) {
         qDebug() << "RtInterpolationMatWorker::updateBadChannels - Set interpolation info first.";
