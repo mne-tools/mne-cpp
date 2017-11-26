@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RtSensorDataWorker class definition.
+* @brief    RtSensorDataController class definition.
 *
 */
 
