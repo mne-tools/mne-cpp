@@ -142,6 +142,7 @@ SOURCES += \
     engine/model/items/sensordata/cpusensordatatreeitem.cpp \
     engine/model/items/sensordata/gpusensordatatreeitem.cpp \
     engine/model/items/sensordata/gpuinterpolationitem.cpp \
+    engine/model/items/sensordata/cpuinterpolationitem.cpp \
     engine/model/materials/gpuinterpolationmaterial.cpp
 
 HEADERS += \
@@ -196,6 +197,7 @@ HEADERS += \
     engine/model/items/sensordata/cpusensordatatreeitem.h \
     engine/model/items/sensordata/gpusensordatatreeitem.h \
     engine/model/items/sensordata/gpuinterpolationitem.h \
+    engine/model/items/sensordata/cpuinterpolationitem.h \
     engine/model/materials/gpuinterpolationmaterial.h
 
 FORMS += \

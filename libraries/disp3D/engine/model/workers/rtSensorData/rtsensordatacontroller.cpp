@@ -95,7 +95,7 @@ RtSensorDataController::RtSensorDataController(bool bStreamSmoothedData)
        connect(this, &RtSensorDataController::rawDataChanged,
                m_pRtSensorDataWorker, &RtSensorDataWorker::addData);
 
-       connect(this, &RtSensorDataController::interpolationMatrixChanged,
+       connect(this, &RtSensorDataController::newInterpolationMatrixAvailable,
                m_pRtSensorDataWorker, &RtSensorDataWorker::setInterpolationMatrix);
 
        connect(this, &RtSensorDataController::surfaceColorChanged,
@@ -291,5 +291,5 @@ void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMat
 void RtSensorDataController::onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float> > matInterpolationOperator)
 {
     qDebug()<<"onNewInterpolationMatrixCalculated";
-    emit interpolationMatrixChanged(matInterpolationOperator);
+    emit newInterpolationMatrixAvailable(matInterpolationOperator);
 }

@@ -262,7 +262,8 @@ SensorDataTreeItem* MeasurementTreeItem::addData(const MatrixXd& tSensorData,
                                                  const FiffInfo &fiffInfo,
                                                  const QString &sSensorType,
                                                  const double dCancelDist,
-                                                 const QString &sInterpolationFunction)
+                                                 const QString &sInterpolationFunction,
+                                                 Qt3DCore::QEntity* pParent)
 {
     if(!tSensorData.size() == 0) {
         if(sSensorType == "EEG") {
