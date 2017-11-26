@@ -315,7 +315,7 @@ void CpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 
 //*************************************************************************************************************
 
-void CpuSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
+void CpuSensorDataTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
         if(m_pSensorRtDataWorkController) {

@@ -129,7 +129,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         case MetaTreeItemTypes::DataThreshold: {
             Spline* pSpline = new Spline("Set Threshold", 0);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
-            this, &Data3DTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             return pSpline;
         }
 
@@ -298,7 +298,6 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             return pComboBox;
         }
 
-        // Do nothing by default
         default: {
                 break;
         }
@@ -315,7 +314,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
     const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
-    //Only catch non-standard Qt types such as QColorDialog or items which need special handling for display role (e.g. Thresholding) etc.
+    // Only catch non-standard Qt types such as QColorDialog or items which need special handling for display role (e.g. Thresholding) etc.
     switch(pAbstractItem->type()) {
         case MetaTreeItemTypes::SurfaceColorGyri: {
             QColor color = index.model()->data(index, MetaTreeItemRoles::SurfaceColorGyri).value<QColor>();
@@ -418,9 +417,9 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
         // Handle basic types (QString, int, double, etc.) by default via QItemDelegate::setEditorData
         default: {
             QItemDelegate::setEditorData(editor, index);
-            break;
         }
     }
+
 }
 
 

@@ -139,7 +139,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DataThreshold, "0.0,5.5,15");
     connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onDataNormalizationValueChanged);
+            this, &MneEstimateTreeItem::onDataThresholdChanged);
     list.clear();
     list << pItemSourceLocNormValue;
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
@@ -485,7 +485,7 @@ void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onDataNormalizationValueChanged(const QVariant& vecThresholds)
+void MneEstimateTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
         if(m_pSourceLocRtDataWorker) {
