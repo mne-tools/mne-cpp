@@ -273,30 +273,30 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
         if(sSensorType == "EEG") {
             if(bUseGPU) {
                 //GPU for EEG data
-                if(m_pCshEEGSensorDataTreeItem) {
-                    m_pCshEEGSensorDataTreeItem->addData(tSensorData);
+                if(m_pGpuEEGSensorDataTreeItem) {
+                    m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
                 } else {
                     //Add sensor data as child
                     //If rt data item does not exists yet, create it here!
-                    m_pCshEEGSensorDataTreeItem = new GpuSensorDataTreeItem();
-                    m_pCshEEGSensorDataTreeItem->setText("EEG Data");
+                    m_pGpuEEGSensorDataTreeItem = new GpuSensorDataTreeItem();
+                    m_pGpuEEGSensorDataTreeItem->setText("EEG Data");
 
                     QList<QStandardItem*> list;
-                    list << m_pCshEEGSensorDataTreeItem;
-                    list << new QStandardItem(m_pCshEEGSensorDataTreeItem->toolTip());
+                    list << m_pGpuEEGSensorDataTreeItem;
+                    list << new QStandardItem(m_pGpuEEGSensorDataTreeItem->toolTip());
                     this->appendRow(list);
 
-                    m_pCshEEGSensorDataTreeItem->initData(bemSurface,
+                    m_pGpuEEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
                                                       dCancelDist,
                                                       sInterpolationFunction,
                                                       pParent);
 
-                    m_pCshEEGSensorDataTreeItem->addData(tSensorData);
+                    m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
                 }
 
-                return dynamic_cast<SensorDataTreeItem*>(m_pCshEEGSensorDataTreeItem.data());
+                return dynamic_cast<SensorDataTreeItem*>(m_pGpuEEGSensorDataTreeItem.data());
             } else {
                 //CPU for EEG data
                 if(m_pCpuEEGSensorDataTreeItem) {
@@ -322,7 +322,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pCpuEEGSensorDataTreeItem->addData(tSensorData);
                 }
 
-                return dynamic_cast<SensorDataTreeItem*>(m_pCshEEGSensorDataTreeItem.data());
+                return dynamic_cast<SensorDataTreeItem*>(m_pGpuEEGSensorDataTreeItem.data());
             }
         }
 

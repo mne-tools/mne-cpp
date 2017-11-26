@@ -77,11 +77,11 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSensorDataWorker::RtSensorDataWorker(bool bStreamSmoothedData)
+RtSensorDataWorker::RtSensorDataWorker()
 : m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_dSFreq(1000.0)
-, m_bStreamSmoothedData(bStreamSmoothedData)
+, m_bStreamSmoothedData(true)
 , m_itCurrentSample(0)
 , m_iSampleCtr(0)
 {
@@ -123,6 +123,14 @@ void RtSensorDataWorker::setNumberVertices(int iNumberVerts)
 void RtSensorDataWorker::setNumberAverages(int iNumAvr)
 {
     m_iAverageSamples = iNumAvr;
+}
+
+
+//*************************************************************************************************************
+
+void RtSensorDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
+{
+    m_bStreamSmoothedData = bStreamSmoothedData;
 }
 
 

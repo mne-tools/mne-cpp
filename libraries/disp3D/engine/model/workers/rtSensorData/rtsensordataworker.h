@@ -102,10 +102,8 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
-    *
-    * @param[in] bStreamSmoothedData      Flag whether to stream raw or interpolated raw data. This is used by the GPU and CPU usage of the SensorDataTreeItem.
     */
-    explicit RtSensorDataWorker(bool bStreamSmoothedData = true);
+    explicit RtSensorDataWorker();
 
     //=========================================================================================================
     /**
@@ -136,6 +134,14 @@ public:
     * @param[in] iNumAvr                The new number of averages.
     */
     void setNumberAverages(int iNumAvr);
+
+    //=========================================================================================================
+    /**
+    * Sets the state whether to stream smoothed or raw data
+    *
+    * @param[in] bStreamSmoothedData                 The new state.
+    */
+    void setStreamSmoothedData(bool bStreamSmoothedData);
 
     //=========================================================================================================
     /**
