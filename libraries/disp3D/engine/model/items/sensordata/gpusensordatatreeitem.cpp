@@ -316,7 +316,7 @@ void GpuSensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
 
 //*************************************************************************************************************
 
-void GpuSensorDataTreeItem::onDataNormalizationValueChanged(const QVariant &vecThresholds)
+void GpuSensorDataTreeItem::onDataThresholdChanged(const QVariant &vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>())
     {

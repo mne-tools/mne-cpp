@@ -131,7 +131,7 @@ void SensorDataTreeItem::initItem()
 
     MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DataThreshold, "0.0, 0.5,10.0");
     connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onDataNormalizationValueChanged);
+            this, &SensorDataTreeItem::onDataThresholdChanged);
     list.clear();
     list << pItemSourceLocNormValue;
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());

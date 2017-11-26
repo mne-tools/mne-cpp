@@ -179,7 +179,7 @@ void MetaTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
-    if(role <= Qt::UserRole) {
+    if(role >= Qt::UserRole) {
         emit dataChanged(value);
     }
 }

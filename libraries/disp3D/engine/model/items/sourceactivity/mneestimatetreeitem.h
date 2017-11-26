@@ -272,7 +272,7 @@ protected:
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(const QVariant &vecThresholds);
+    void onDataThresholdChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
