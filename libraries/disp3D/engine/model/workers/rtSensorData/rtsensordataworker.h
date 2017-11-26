@@ -183,6 +183,7 @@ public:
     */
     void streamData();
 
+protected:
     //=========================================================================================================
     /**
     * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
