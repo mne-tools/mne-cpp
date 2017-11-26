@@ -51,7 +51,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <Qrgb>
 #include <QSharedPointer>
 #include <QLinkedList>
@@ -104,7 +103,7 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] parent      The parent of the QObject.
+    * @param[in] bStreamSmoothedData      Flag whether to stream raw or interpolated raw data. This is used by the GPU and CPU usage of the SensorDataTreeItem.
     */
     explicit RtSensorDataWorker(bool bStreamSmoothedData = true);
 

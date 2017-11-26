@@ -157,13 +157,11 @@ RtSensorDataController::~RtSensorDataController()
 
 //*************************************************************************************************************
 
-void RtSensorDataController::setStreamingState(bool streamingState)
+void RtSensorDataController::setStreamingState(bool bStreamingState)
 {
-    if(streamingState) {
-        qDebug() << "RtSensorDataController::setStreamingState - start streaming";
+    if(bStreamingState) {
         m_timer.start(m_iMSecInterval);
     } else {
-        qDebug() << "RtSensorDataController::setStreamingState - stop streaming";
         m_timer.stop();
     }
 }
@@ -250,7 +248,7 @@ void RtSensorDataController::setNumberAverages(int iNumAvr)
 
 //*************************************************************************************************************
 
-void RtSensorDataController::setSFreq(const double dSFreq)
+void RtSensorDataController::setSFreq(double dSFreq)
 {
     emit sFreqChanged(dSFreq);
 }

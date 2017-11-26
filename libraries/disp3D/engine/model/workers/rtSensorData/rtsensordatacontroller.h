@@ -97,25 +97,63 @@ class RtInterpolationMatWorker;
 
 //=============================================================================================================
 /**
-* This controller organizes data streaming and interpolation matrix calculations.
+* This controller organizes data streaming and interpolation matrix calculations. It only uses Queued signals in order to be thread safe with the underlying workers.
 *
-* @brief This controller organizes data streaming and interpolation matrix calculations.
+* @brief This controller organizes data streaming and interpolation matrix calculations. It only uses Queued signals in order to be thread safe with the underlying workers.
 */
 class DISP3DSHARED_EXPORT RtSensorDataController : public QObject
 {
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] bStreamSmoothedData      Flag whether to stream raw or interpolated raw data. This is used by the GPU and CPU usage of the SensorDataTreeItem.
+    */
     RtSensorDataController(bool bStreamSmoothedData = true);
+
+    //=========================================================================================================
+    /**
+    * Default destructor.
+    */
     ~RtSensorDataController();
 
 public:
-    void setStreamingState(bool streamingState);
+    //=========================================================================================================
+    /**
+    * Set the streaming state (start/stop streaming).
+    *
+    * @param[in] bStreamingState                The new straming state.
+    */
+    void setStreamingState(bool bStreamingState);
 
+    //=========================================================================================================
+    /**
+    * This function sets the function that is used in the interpolation process.
+    * Warning: Using this function can take some seconds because recalculation are required.
+    *
+    * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
+    */
     void setInterpolationFunction(const QString &sInterpolationFunction);
 
+    //=========================================================================================================
+    /**
+    * Set the loop functionality on or off.
+    *
+    * @param[in] bLoopState                The new looping state.
+    */
     void setLoopState(bool bLoopState);
 
+    //=========================================================================================================
+    /**
+    * This function sets the cancel distance used in distance calculations for the interpolation.
+    * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+    * Warning: Using this function can take some seconds because recalculation are required.
+    *
+    * @param[in] dCancelDist           The new cancel distance value in meters.
+    */
     void setCancelDistance(double dCancelDist);
 
     //=========================================================================================================
@@ -126,23 +164,77 @@ public:
     */
     void setTimeInterval(int iMSec);
 
+    //=========================================================================================================
+    /**
+    * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
+    * Warning: Using this function can take some seconds because recalculation are required.
+    *
+    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
+    * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
+    * @param[in] fiffEvoked                Holds all information about the sensors.
+    * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
+    *
+    * @return Returns the created interpolation matrix.
+    */
     void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
                               const QVector<Eigen::Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
 
+    //=========================================================================================================
+    /**
+    * Set base surface color which the streamed data is plotted on.
+    *
+    * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted
+    */
     void setSurfaceColor(const Eigen::MatrixX3f& matSurfaceVertColor);
 
+    //=========================================================================================================
+    /**
+    * Set the normalization value.
+    *
+    * @param[in] vecThresholds          The new threshold values used for normalizing the data.
+    */
     void setThresholds(const QVector3D &vecThresholds);
 
+    //=========================================================================================================
+    /**
+    * Set the type of the colormap.
+    *
+    * @param[in] sColormapType          The new colormap type.
+    */
     void setColormapType(const QString &sColormapType);
 
+    //=========================================================================================================
+    /**
+    * Set the number of average to take after emitting the data to the listening threads.
+    *
+    * @param[in] iNumAvr                The new number of averages.
+    */
     void setNumberAverages(int iNumAvr);
 
-    void setSFreq(const double dSFreq);
+    //=========================================================================================================
+    /**
+    * Set the sampling frequency.
+    *
+    * @param[in] dSFreq                 The new sampling frequency.
+    */
+    void setSFreq(double dSFreq);
 
+    //=========================================================================================================
+    /**
+    * Sets bad channels and recalculate interpolation matrix.
+    *
+    * @param[in] info                 The fiff info including the new bad channels.
+    */
     void setBadChannels(const FIFFLIB::FiffInfo &info);
 
+    //=========================================================================================================
+    /**
+    * Add data which is to be streamed.
+    *
+    * @param[in] data         The new data.
+    */
     void addData(const Eigen::MatrixXd& data);
 
 protected:
@@ -152,13 +244,13 @@ protected:
 
     void onNewInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationOperator);
 
-    QTimer                                  m_timer;
+    QTimer                                  m_timer;                            /**< The timer to control the streaming speed. */
 
-    QThread                                 m_rtSensorDataWorkerThread;
-    QThread                                 m_rtInterpolationWorkerThread;
+    QThread                                 m_rtSensorDataWorkerThread;         /**< The RtSensorDataWorker thread. */
+    QThread                                 m_rtInterpolationWorkerThread;      /**< The RtInterpolationMatWorker thread. */
 
-    QPointer<RtSensorDataWorker>            m_pRtSensorDataWorker;
-    QPointer<RtInterpolationMatWorker>      m_pRtInterpolationWorker;
+    QPointer<RtSensorDataWorker>            m_pRtSensorDataWorker;              /**< The pointer to the RtSensorDataWorker, which is running in the RtSensorDataWorker thread. */
+    QPointer<RtInterpolationMatWorker>      m_pRtInterpolationWorker;           /**< The pointer to the RtInterpolationMatWorker, which is running in the RtInterpolationMatWorker thread. */
 
     int                                     m_iMSecInterval;                    /**< Length in milli Seconds to wait inbetween data samples. */
 
