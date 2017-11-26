@@ -114,7 +114,7 @@ void MetaTreeItem::initItem()
         case MetaTreeItemTypes::NumberAverages:
             sToolTip = "The number of samples averaged together (downsampling)";
             break;
-        case MetaTreeItemTypes::DistributedSourceLocThreshold:
+        case MetaTreeItemTypes::DataThreshold:
             sToolTip = "The value to normalize the distributed source localization result";
             break;
         case MetaTreeItemTypes::VisualizationType:
@@ -179,6 +179,8 @@ void MetaTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
-    emit dataChanged(value);
+    if(role <= Qt::UserRole) {
+        emit dataChanged(value);
+    }
 }
 
