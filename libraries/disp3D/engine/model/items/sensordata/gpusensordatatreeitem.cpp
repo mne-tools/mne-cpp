@@ -241,7 +241,7 @@ void GpuSensorDataTreeItem::setSFreq(const double dSFreq)
 void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator)
 {
     if(m_pInterpolationItem) {
-        m_pInterpolationItem->setWeightMatrix(matInterpolationOperator);
+        m_pInterpolationItem->setInterpolationMatrix(matInterpolationOperator);
     }
 }
 

@@ -112,8 +112,8 @@ GpuInterpolationMaterial::GpuInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNo
     , m_pSignalDataParameter(new QParameter)
     , m_pColsParameter(new QParameter)
     , m_pRowsParameter(new QParameter)
-    , m_pWeightMatParameter(new QParameter)
-    , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
+    , m_pInterpolationMatParameter(new QParameter)
+    , m_pInterpolationMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pOutputColorParameter(new QParameter)
     , m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
@@ -138,16 +138,16 @@ GpuInterpolationMaterial::~GpuInterpolationMaterial()
 
 //*************************************************************************************************************
 
-void GpuInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<float> > tInterpolationMatrix)
+void GpuInterpolationMaterial::setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > tInterpolationMatrix)
 {
     //Set Rows and Cols
     m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
     m_pRowsParameter->setValue(static_cast<uint>(tInterpolationMatrix->rows()));
 
     //Set buffer
-    m_pWeightMatBuffer->setData(buildWeightMatrixBuffer(tInterpolationMatrix));
-    //Set weight matrix parameter
-    m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
+    m_pInterpolationMatBuffer->setData(buildInterpolationMatrixBuffer(tInterpolationMatrix));
+    //Set Interpolation matrix parameter
+    m_pInterpolationMatParameter->setValue(QVariant::fromValue(m_pInterpolationMatBuffer.data()));
 
     //Set output buffer
     m_pOutputColorBuffer->setData(buildZeroBuffer(4 * tInterpolationMatrix->rows()));
@@ -255,15 +255,15 @@ void GpuInterpolationMaterial::init()
     m_pComputeTechnique->addFilterKey(m_pComputeFilterKey);
     m_pComputeTechnique->addRenderPass(m_pComputeRenderPass);
 
-    //Set default weight matrix parameters
+    //Set default Interpolation matrix parameters
     m_pColsParameter->setName(QStringLiteral("cols"));
     m_pColsParameter->setValue(1);
     m_pRowsParameter->setName(QStringLiteral("rows"));
     m_pRowsParameter->setValue(1);
 
-    m_pWeightMatBuffer->setData(buildZeroBuffer(1));
-    m_pWeightMatParameter->setName(QStringLiteral("WeightMat"));
-    m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
+    m_pInterpolationMatBuffer->setData(buildZeroBuffer(1));
+    m_pInterpolationMatParameter->setName(QStringLiteral("InterpolationMat"));
+    m_pInterpolationMatParameter->setValue(QVariant::fromValue(m_pInterpolationMatBuffer.data()));
 
     //Set default output
     m_pOutputColorBuffer->setData(buildZeroBuffer(4));
@@ -279,7 +279,7 @@ void GpuInterpolationMaterial::init()
     m_pComputeRenderPass->addParameter(m_pColsParameter);
     m_pComputeRenderPass->addParameter(m_pRowsParameter);
     m_pComputeRenderPass->addParameter(m_pOutputColorParameter);
-    m_pComputeRenderPass->addParameter(m_pWeightMatParameter);
+    m_pComputeRenderPass->addParameter(m_pInterpolationMatParameter);
     m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
 
     //Add Threshold parameter
@@ -345,7 +345,7 @@ void GpuInterpolationMaterial::init()
 
 //*************************************************************************************************************
 
-QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<SparseMatrix<float> > tInterpolationMatrix)
+QByteArray GpuInterpolationMaterial::buildInterpolationMatrixBuffer(QSharedPointer<SparseMatrix<float> > tInterpolationMatrix)
 {
     QByteArray bufferData;
 
@@ -361,7 +361,7 @@ QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Spar
         for (SparseMatrix<float>::InnerIterator it(*tInterpolationMatrix,k); it; ++it)
         {
             //rawVertexArray[(it.col()*iRows)+it.row()] = it.value();
-            rawVertexArray[(it.row()*iCols)+it.col()] = it.value();
+            rawVertexArray[(it.row()*iCols)+it.col()] = it.valueRef();
         }
     }
 

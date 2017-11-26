@@ -139,10 +139,10 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
         m_pComputeEntity->addComponent(m_pMaterial);
     }
 
-    const uint iWeightMatRows = tMneBemSurface.rr.rows();
+    const uint iInterpolationMatRows = tMneBemSurface.rr.rows();
 
     //Set work group size
-    const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iWeightMatRows)));
+    const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iInterpolationMatRows)));
 
     m_pComputeCommand->setWorkGroupX(iWorkGroupsSize);
     m_pComputeCommand->setWorkGroupY(iWorkGroupsSize);
@@ -172,16 +172,18 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::setWeightMatrix(QSharedPointer<SparseMatrix<float> > pInterpolationMatrix)
+void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<float> > pInterpolationMatrix)
 {
     if(m_bIsDataInit == false)
     {
-        qDebug("GpuInterpolationItem::setWeightMatrix item data is not initialized!");
+        qDebug("GpuInterpolationItem::setInterpolationMatrix - item data is not initialized!");
         return;
     }
 
     if(pInterpolationMatrix) {
-        m_pMaterial->setWeightMatrix(pInterpolationMatrix);
+        m_pMaterial->setInterpolationMatrix(pInterpolationMatrix);
+    } else {
+        qDebug("GpuInterpolationItem::setInterpolationMatrix - Interpolation matrix is a NULL ptr!");
     }
 }
 

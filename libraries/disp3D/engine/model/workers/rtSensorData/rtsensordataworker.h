@@ -274,7 +274,7 @@ public:
         int                                     iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
         double                                  dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
 
-        QSharedPointer<SparseMatrix<float> >    pWeightMatrix;                    /**< Weight matrix that holds all coefficients for a signal interpolation. */
+        QSharedPointer<SparseMatrix<float> >    pInterpolationMatrix;             /**< Interpolation matrix that holds all coefficients for a signal interpolation. */
         QSharedPointer<MatrixXd>                pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
         QSharedPointer<QVector<qint32>>         pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
 
@@ -316,15 +316,15 @@ public:
         }
 
         if(m_bInterpolationInfoIsInit == true){
-            //recalculate weight matrix parameters changed
-            m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
+            //recalculate Interpolation matrix parameters changed
+            m_lInterpolationData.pInterpolationMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
                                                                                        m_lInterpolationData.pDistanceMatrix,
                                                                                        m_lInterpolationData.interpolationFunction,
                                                                                        m_lInterpolationData.dCancelDistance,
                                                                                        m_lInterpolationData.fiffInfo,
                                                                                        m_lInterpolationData.iSensorType);
 
-            emit newInterpolationMatrixCalculated(m_lInterpolationData.pWeightMatrix);
+            emit newInterpolationMatrixCalculated(m_lInterpolationData.pInterpolationMatrix);
         }
     }
 
@@ -399,15 +399,15 @@ public:
                                         m_lInterpolationData.fiffInfo,
                                         m_lInterpolationData.iSensorType);
 
-        //create weight matrix
-        m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
+        //create Interpolation matrix
+        m_lInterpolationData.pInterpolationMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
                                                                                    m_lInterpolationData.pDistanceMatrix,
                                                                                    m_lInterpolationData.interpolationFunction,
                                                                                    m_lInterpolationData.dCancelDistance,
                                                                                    m_lInterpolationData.fiffInfo,
                                                                                    m_lInterpolationData.iSensorType);
 
-        emit newInterpolationMatrixCalculated(m_lInterpolationData.pWeightMatrix);
+        emit newInterpolationMatrixCalculated(m_lInterpolationData.pInterpolationMatrix);
     }
 
 protected:    
@@ -432,15 +432,15 @@ protected:
                                         m_lInterpolationData.fiffInfo,
                                         m_lInterpolationData.iSensorType);
 
-        //create weight matrix
-        m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
+        //create Interpolation matrix
+        m_lInterpolationData.pInterpolationMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
                                                                                    m_lInterpolationData.pDistanceMatrix,
                                                                                    m_lInterpolationData.interpolationFunction,
                                                                                    m_lInterpolationData.dCancelDistance,
                                                                                    m_lInterpolationData.fiffInfo,
                                                                                    m_lInterpolationData.iSensorType);
 
-        emit newInterpolationMatrixCalculated(m_lInterpolationData.pWeightMatrix);
+        emit newInterpolationMatrixCalculated(m_lInterpolationData.pInterpolationMatrix);
     }
 
 signals:

@@ -131,11 +131,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the new weight matrix for the interpolation.
+     * Set the new Interpolation matrix for the interpolation.
      *
-     * @param pInterpolationMatrix  The new weight matrix for interpolation on the bem surface.
+     * @param pInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
      */
-    void setWeightMatrix(QSharedPointer<SparseMatrix<float>> pInterpolationMatrix);
+    void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> pInterpolationMatrix);
 
     //=========================================================================================================
     /**
