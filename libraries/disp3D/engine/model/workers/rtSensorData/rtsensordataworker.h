@@ -547,6 +547,7 @@ public:
         emit newRtSmoothedDataAvailable(matColorMatrix);
     }
     void onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float> > matInterpolationOperator){
+        qDebug()<<"onNewInterpolationMatrixCalculated";
         emit interpolationMatrixChanged(matInterpolationOperator);
     }
 

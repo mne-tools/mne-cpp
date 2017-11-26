@@ -137,7 +137,7 @@ void MneEstimateTreeItem::initItem()
     data.setValue(QString("Hot"));
     pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DistributedSourceLocThreshold, "0.0,5.5,15");
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DataThreshold, "0.0,5.5,15");
     connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onDataNormalizationValueChanged);
     list.clear();
@@ -145,7 +145,7 @@ void MneEstimateTreeItem::initItem()
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
     this->appendRow(list);
     data.setValue(QVector3D(0.0,5.5,15));
-    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
+    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DataThreshold);
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "17");
     connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
@@ -399,13 +399,13 @@ void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType
 
 void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
 {
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DistributedSourceLocThreshold);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DataThreshold);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(vecThresholds);
-            pAbstractItem->setData(data, MetaTreeItemRoles::DistributedSourceLocThreshold);
+            pAbstractItem->setData(data, MetaTreeItemRoles::DataThreshold);
 
             QString sTemp = QString("%1,%2,%3").arg(vecThresholds.x()).arg(vecThresholds.y()).arg(vecThresholds.z());
             data.setValue(sTemp);
