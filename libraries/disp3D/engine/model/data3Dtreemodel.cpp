@@ -474,51 +474,6 @@ QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
 
 //*************************************************************************************************************
 
-void Data3DTreeModel::initMetatypes()
-{
-    //Init metatypes
-    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >();
-
-    qRegisterMetaType<QVector<Vector3f> >();
-    qRegisterMetaType<QVector<Eigen::Vector3f> >();
-
-    qRegisterMetaType<FIFFLIB::FiffInfo>();
-    qRegisterMetaType<FiffInfo>();
-
-    qRegisterMetaType<Eigen::MatrixX3i>();
-    qRegisterMetaType<MatrixX3i>();
-
-    qRegisterMetaType<Eigen::MatrixXd>();
-    qRegisterMetaType<MatrixXd>();
-
-    qRegisterMetaType<Eigen::MatrixX3f>();
-    qRegisterMetaType<MatrixX3f>();
-
-    qRegisterMetaType<Eigen::VectorXf>();
-    qRegisterMetaType<VectorXf>();
-
-    qRegisterMetaType<Eigen::VectorXi>();
-    qRegisterMetaType<VectorXi>();
-
-    qRegisterMetaType<Eigen::VectorXd>();
-    qRegisterMetaType<VectorXd>();
-
-    qRegisterMetaType<Eigen::RowVectorXf>();
-    qRegisterMetaType<RowVectorXf>();
-
-    qRegisterMetaType<Eigen::Vector3f>();
-    qRegisterMetaType<Vector3f>();
-
-    qRegisterMetaType<MNELIB::MNEBemSurface>();
-    qRegisterMetaType<MNEBemSurface>();
-
-    qRegisterMetaType<QSharedPointer<Eigen::SparseMatrix<float> > >();
-    qRegisterMetaType<QSharedPointer<SparseMatrix<float> > >();
-}
-
-
-//*************************************************************************************************************
-
 SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 {
     SubjectTreeItem* pReturnItem= Q_NULLPTR;
@@ -565,8 +520,8 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                                    const double dCancelDist,
                                                    const QString& sInterpolationFunction,
                                                    const QSurfaceFormat &tSurfaceFormat)
-{
-    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
+{    
+    bool bUseGPU = false;
 
     //Test for OpenGL version 4.3
     if((tSurfaceFormat.majorVersion() == 4
@@ -574,42 +529,12 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
             || tSurfaceFormat.majorVersion() > 4))
     {
         //use compute shader version
-        pReturnItem = addGpuSensorData(sSubject,
-                         sMeasurementSetName,
-                         matSensorData,
-                         tBemSurface,
-                         fiffInfo,
-                         sDataType,
-                         dCancelDist,
-                         sInterpolationFunction);
+        bUseGPU = true;
         qDebug("Using compute shader version of SensorDataTreeItem.");
-    } else {
-        //use cpu version
-        pReturnItem = addCpuSensorData(sSubject,
-                         sMeasurementSetName,
-                         matSensorData,
-                         tBemSurface,
-                         fiffInfo,
-                         sDataType,
-                         dCancelDist,
-                         sInterpolationFunction);
     }
 
-    return pReturnItem;
-}
+    bUseGPU = false;
 
-
-//*************************************************************************************************************
-
-SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject,
-                                                      const QString &sMeasurementSetName,
-                                                      const MatrixXd &matSensorData,
-                                                      const MNEBemSurface &tBemSurface,
-                                                      const FiffInfo &fiffInfo,
-                                                      const QString &sDataType,
-                                                      const double dCancelDist,
-                                                      const QString &sInterpolationFunction)
-{
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
@@ -621,28 +546,25 @@ SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject,
     //Find the "set" items and add the sensor data as items
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
         if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            //If measurement data has already been created but in conjunction with a different data type
-            //(i.e. connectivity, dipole fitting, etc.), do the connects here
-//            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() < 2) { // <2 because we can store MEG and EEG
-//                if(sDataType == "EEG") {
-//                    pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-//                } else if (sDataType == "MEG") {
-//                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-//                }
-//            }
-
-            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
+            pReturnItem = pMeasurementItem->addData(matSensorData,
+                                                    tBemSurface,
+                                                    fiffInfo, sDataType,
+                                                    dCancelDist,
+                                                    sInterpolationFunction,
+                                                    m_pModelEntity,
+                                                    bUseGPU);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
         addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
-
-//        if(sDataType == "EEG") {
-//            pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-//        } else if (sDataType == "MEG") {
-//            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-//        }
+        pReturnItem = pMeasurementItem->addData(matSensorData,
+                                                tBemSurface,
+                                                fiffInfo,
+                                                sDataType,
+                                                dCancelDist,
+                                                sInterpolationFunction,
+                                                m_pModelEntity,
+                                                bUseGPU);
     }
 
     return pReturnItem;
@@ -651,36 +573,44 @@ SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject,
 
 //*************************************************************************************************************
 
-SensorDataTreeItem *Data3DTreeModel::addGpuSensorData(const QString &sSubject,
-                                                      const QString &sMeasurementSetName,
-                                                      const MatrixXd &matSensorData,
-                                                      const MNEBemSurface &tBemSurface,
-                                                      const FiffInfo &fiffInfo,
-                                                      const QString &sDataType,
-                                                      const double dCancelDist,
-                                                      const QString &sInterpolationFunction)
+void Data3DTreeModel::initMetatypes()
 {
-    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
+    //Init metatypes
+    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >();
 
-    //Handle subject item
-    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
+    qRegisterMetaType<QVector<Vector3f> >();
+    qRegisterMetaType<QVector<Eigen::Vector3f> >();
 
-    //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
+    qRegisterMetaType<FIFFLIB::FiffInfo>();
+    qRegisterMetaType<FiffInfo>();
 
-    //Find the "set" items and add the sensor data as items
-    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
-        }
-    } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
-    }
+    qRegisterMetaType<Eigen::MatrixX3i>();
+    qRegisterMetaType<MatrixX3i>();
 
-    return pReturnItem;
+    qRegisterMetaType<Eigen::MatrixXd>();
+    qRegisterMetaType<MatrixXd>();
+
+    qRegisterMetaType<Eigen::MatrixX3f>();
+    qRegisterMetaType<MatrixX3f>();
+
+    qRegisterMetaType<Eigen::VectorXf>();
+    qRegisterMetaType<VectorXf>();
+
+    qRegisterMetaType<Eigen::VectorXi>();
+    qRegisterMetaType<VectorXi>();
+
+    qRegisterMetaType<Eigen::VectorXd>();
+    qRegisterMetaType<VectorXd>();
+
+    qRegisterMetaType<Eigen::RowVectorXf>();
+    qRegisterMetaType<RowVectorXf>();
+
+    qRegisterMetaType<Eigen::Vector3f>();
+    qRegisterMetaType<Vector3f>();
+
+    qRegisterMetaType<MNELIB::MNEBemSurface>();
+    qRegisterMetaType<MNEBemSurface>();
+
+    qRegisterMetaType<QSharedPointer<Eigen::SparseMatrix<float> > >();
+    qRegisterMetaType<QSharedPointer<SparseMatrix<float> > >();
 }
-
-
-//*************************************************************************************************************

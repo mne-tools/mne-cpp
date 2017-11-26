@@ -123,11 +123,11 @@ public:
     
     //=========================================================================================================
     /**
-    * Set base surface color which the streamed data is plotted on.
+    * Set number of vertices.
     *
-    * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted
+    * @param[in] iNumberVerts      The number of vertices.
     */
-    void setSurfaceColor(const Eigen::MatrixX3f &matSurfaceVertColor);
+    void setNumberVertices(int iNumberVerts);
 
     //=========================================================================================================
     /**

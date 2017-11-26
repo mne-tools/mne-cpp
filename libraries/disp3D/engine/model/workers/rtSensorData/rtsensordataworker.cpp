@@ -111,14 +111,10 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setSurfaceColor(const MatrixX3f& matSurfaceVertColor)
+void RtSensorDataWorker::setNumberVertices(int iNumberVerts)
 {
-    if(matSurfaceVertColor.size() == 0) {
-        qDebug() << "RtSensorDataWorker::setSurfaceColor - Surface color data is empty. Returning ...";
-        return;
-    }
-
-    m_lVisualizationInfo.matOriginalVertColor = matSurfaceVertColor;
+    m_lVisualizationInfo.matOriginalVertColor.resize(iNumberVerts,3);
+    m_lVisualizationInfo.matOriginalVertColor.setZero();
 }
 
 
