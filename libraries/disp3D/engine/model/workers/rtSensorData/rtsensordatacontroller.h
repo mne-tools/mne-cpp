@@ -97,9 +97,9 @@ class RtInterpolationMatWorker;
 
 //=============================================================================================================
 /**
-* This worker streams either interpolated or raw data.
+* This controller organizes data streaming and interpolation matrix calculations.
 *
-* @brief This worker streams either interpolated or raw data.
+* @brief This controller organizes data streaming and interpolation matrix calculations.
 */
 class DISP3DSHARED_EXPORT RtSensorDataController : public QObject
 {
