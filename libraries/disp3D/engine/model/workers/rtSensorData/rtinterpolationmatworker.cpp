@@ -73,7 +73,6 @@ using namespace FIFFLIB;
 
 RtInterpolationMatWorker::RtInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false) {
-    //5cm cancel distance and cubic function as default
     m_lInterpolationData.dCancelDistance = 0.20;
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
 }

@@ -106,27 +106,27 @@ public:
 public:
     //=========================================================================================================
     /**
-     * This function sets the function that is used in the interpolation process.
-     * Warning: Using this function can take some seconds because recalculation are required.
-     *
-     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
-     */
+    * This function sets the function that is used in the interpolation process.
+    * Warning: Using this function can take some seconds because recalculation are required.
+    *
+    * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
+    */
     void setInterpolationFunction(const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
-     * This function sets the cancel distance used in distance calculations for the interpolation.
-     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
-     * Warning: Using this function can take some seconds because recalculation are required.
-     *
-     * @param[in] dCancelDist           The new cancel distance value in meters.
-     */
+    * This function sets the cancel distance used in distance calculations for the interpolation.
+    * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+    * Warning: Using this function can take some seconds because recalculation are required.
+    *
+    * @param[in] dCancelDist           The new cancel distance value in meters.
+    */
     void setCancelDistance(double dCancelDist);
 
     //=========================================================================================================
     /**
     * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
-    * In the end calls calculateSurfaceData().
+    * Warning: Using this function can take some seconds because recalculation are required.
     *
     * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
     * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
@@ -155,27 +155,33 @@ protected:
     */
     void calculateInterpolationOperator();
 
-    bool                m_bInterpolationInfoIsInit;                 /**< Flag if this thread's interpoaltion data was initialized. */
-
     //=============================================================================================================
     /**
-     * The struct specifing all data that is used in the interpolation process
-     */
+    * The struct specifing all data that is used in the interpolation process
+    */
     struct InterpolationData {
-        int                                             iSensorType;                      /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
-        double                                          dCancelDistance;                  /**< Cancel distance for the interpolaion in meters. */
+        int                                             iSensorType;                    /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
+        double                                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
-        QSharedPointer<Eigen::SparseMatrix<float> >     pInterpolationMatrix;             /**< Interpolation matrix that holds all coefficients for a signal interpolation. */
-        QSharedPointer<Eigen::MatrixXd>                 pDistanceMatrix;                  /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
-        QSharedPointer<QVector<qint32>>                 pVecMappedSubset;                 /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QSharedPointer<Eigen::SparseMatrix<float> >     pInterpolationMatrix;           /**< Interpolation matrix that holds all coefficients for a signal interpolation. */
+        QSharedPointer<Eigen::MatrixXd>                 pDistanceMatrix;                /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+        QSharedPointer<QVector<qint32>>                 pVecMappedSubset;               /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
 
-        MNELIB::MNEBemSurface                           bemSurface;                       /**< Holds all vertex information that is needed (public member rr). */
-        FIFFLIB::FiffInfo                               fiffInfo;                         /**< Contains all information about the sensors. */
+        MNELIB::MNEBemSurface                           bemSurface;                     /**< Holds all vertex information that is needed (public member rr). */
+        FIFFLIB::FiffInfo                               fiffInfo;                       /**< Contains all information about the sensors. */
 
-        double (*interpolationFunction) (double);                                 /**< Function that computes interpolation coefficients using the distance values. */
-    } m_lInterpolationData; /**< Container for the interpolation data. */
+        double (*interpolationFunction) (double);                                       /**< Function that computes interpolation coefficients using the distance values. */
+    }       m_lInterpolationData;           /**< Container for the interpolation data. */
+
+    bool    m_bInterpolationInfoIsInit;     /**< Flag if this thread's interpoaltion data was initialized. */
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever a new interpolation matrix was calcualted.
+    *
+    * @param[in] matInterpolationOperator     The new interpolation matrix.
+    */
     void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationOperator);
 };
 
