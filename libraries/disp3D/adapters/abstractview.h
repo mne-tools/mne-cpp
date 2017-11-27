@@ -105,6 +105,12 @@ public:
     */
     ~AbstractView();
 
+    QSharedPointer<DISP3DLIB::View3D> getView();
+
+    QSharedPointer<DISP3DLIB::Control3DWidget> getControlView();
+
+    QSharedPointer<DISP3DLIB::Data3DTreeModel> getTreeModel();
+
 protected:
     //=========================================================================================================
     /**
