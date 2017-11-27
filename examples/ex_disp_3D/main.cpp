@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/adapters/abstractview.h>
 #include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
@@ -240,7 +240,8 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     //Create 3D data model
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     //Add fressurfer surface set including both hemispheres
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
@@ -330,13 +331,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //Setup window
-    testWindow->setModel(p3DDataModel);
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
+    p3DAbstractView->show();
 
     return a.exec();
 }
