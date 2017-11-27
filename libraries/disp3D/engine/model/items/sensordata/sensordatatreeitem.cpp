@@ -106,8 +106,6 @@ SensorDataTreeItem::~SensorDataTreeItem()
 void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
                                   const FiffInfo &fiffInfo,
                                   const QString &sSensorType,
-                                  const double dCancelDist,
-                                  const QString &sInterpolationFunction,
                                   Qt3DCore::QEntity* p3DEntityParent)
 {
     if(m_bIsDataInit == true)
@@ -147,12 +145,6 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
     for(const QString &bad : fiffInfo.bads) {
         m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
     }
-
-    //Set cancel distance
-    setCancelDistance(dCancelDist);
-
-    //Set interpolation function
-    setInterpolationFunction(sInterpolationFunction);
 
     m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface,
                                                         vecSensorPos,

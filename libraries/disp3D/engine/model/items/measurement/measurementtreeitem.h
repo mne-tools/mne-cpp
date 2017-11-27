@@ -173,8 +173,6 @@ public:
     * @param[in] bemSurface             Holds all Bem data used in this item.
     * @param[in] fiffInfo               Holds all information needed about the sensors.
     * @param[in] sSensorType            Name of the sensor type EEG or MEG.
-    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation.
-    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values.
     * @param[in] pParent                Pointer to the QEntity parent.
     * @param[in] bUseGPU                Whether to use GPU support for visualizing real-time data.
     *
@@ -184,8 +182,6 @@ public:
                                 const MNELIB::MNEBemSurface &bemSurface,
                                 const FIFFLIB::FiffInfo &fiffInfo,
                                 const QString &sSensorType,
-                                const double dCancelDist,
-                                const QString &sInterpolationFunction,
                                 Qt3DCore::QEntity *pParent,
                                 bool bUseGPU = false);
 
