@@ -99,18 +99,7 @@ void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<f
 {
     if(m_pInterpolationItem)
     {
-        //m_pInterpolationItem->setInterpolationMatrix(matInterpolationOperator);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void GpuSensorDataTreeItem::onNewRtRawData(const VectorXd &vecDataVector)
-{
-    if(m_pInterpolationItem)
-    {
-        m_pInterpolationItem->addNewRtData(vecDataVector.cast<float>());
+        m_pInterpolationItem->setInterpolationMatrix(matInterpolationOperator);
     }
 }
 
@@ -132,6 +121,17 @@ void GpuSensorDataTreeItem::initInterpolationItem(const MNEBemSurface &bemSurfac
         list << m_pInterpolationItem;
         list << new QStandardItem(m_pInterpolationItem->toolTip());
         this->appendRow(list);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void GpuSensorDataTreeItem::onNewRtRawData(const VectorXd &vecDataVector)
+{
+    if(m_pInterpolationItem)
+    {
+        m_pInterpolationItem->addNewRtData(vecDataVector.cast<float>());
     }
 }
 

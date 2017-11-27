@@ -182,8 +182,6 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<fl
 
     if(pInterpolationMatrix) {
         m_pMaterial->setInterpolationMatrix(pInterpolationMatrix);
-    } else {
-        qDebug("GpuInterpolationItem::setInterpolationMatrix - Interpolation matrix is a NULL ptr!");
     }
 }
 

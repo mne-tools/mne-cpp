@@ -141,8 +141,9 @@ GpuInterpolationMaterial::~GpuInterpolationMaterial()
 void GpuInterpolationMaterial::setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > tInterpolationMatrix)
 {
     //Set Rows and Cols
-    m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
-    m_pRowsParameter->setValue(static_cast<uint>(tInterpolationMatrix->rows()));
+    m_pColsParameter->setValue(QVariant::fromValue(static_cast<uint>(tInterpolationMatrix->cols())));
+    m_pRowsParameter->setValue(QVariant::fromValue(static_cast<uint>(tInterpolationMatrix->rows())));
+
 
     //Set buffer
     m_pInterpolationMatBuffer->setData(buildInterpolationMatrixBuffer(tInterpolationMatrix));
@@ -353,18 +354,20 @@ QByteArray GpuInterpolationMaterial::buildInterpolationMatrixBuffer(QSharedPoint
     const uint iCols = tInterpolationMatrix->cols();
 
     bufferData.resize(iRows * iCols * (int)sizeof(float));
-    bufferData.fill(0.0);
+    qDebug()<<"tInterpolationMatrix->rows(): "<<tInterpolationMatrix->rows();
+    qDebug()<<"tInterpolationMatrix->cols(): "<<tInterpolationMatrix->cols();
+    qDebug()<<"the motherfucking size (in kB) of the this motherfucking array from hell: "<<bufferData.size()/10e03;
+    bufferData.fill(0.0f);
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
-    //Iterate over non zero entries and transform to row major
+    //Iterate over non zero entries only and transform from col major to row major (shader works with row major)
     for (int k=0; k<tInterpolationMatrix->outerSize(); ++k) {
         for (SparseMatrix<float>::InnerIterator it(*tInterpolationMatrix,k); it; ++it)
         {
             //rawVertexArray[(it.col()*iRows)+it.row()] = it.value();
-            rawVertexArray[(it.row()*iCols)+it.col()] = it.valueRef();
+            rawVertexArray[(it.row()*iCols)+it.col()] = it.value();
         }
     }
-
     return bufferData;
 }
 
@@ -375,7 +378,7 @@ QByteArray GpuInterpolationMaterial::buildZeroBuffer(const uint tSize)
 {
     QByteArray bufferData;
     bufferData.resize(tSize * (int)sizeof(float));
-    bufferData.fill(0.0);
+    bufferData.fill(0.0f);
     return bufferData;
 }
 
