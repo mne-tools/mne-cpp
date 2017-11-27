@@ -122,28 +122,28 @@ public:
 
     //=========================================================================================================
     /**
-     * This function sets active camera for use in the framegraphs camera selector.
-     *
-     * @param tCamera               Pointer to QCamera object.
-     */
+    * This function sets active camera for use in the framegraphs camera selector.
+    *
+    * @param tCamera               Pointer to QCamera object.
+    */
     void setCamera(Qt3DRender::QCamera *tCamera);
 
     //=========================================================================================================
     /**
-     * This function sets the work group size for the computation in each dimension.
-     *
-     * @param tX                     Size of X work group.
-     * @param tY                     Size of Y work group.
-     * @param tZ                     Size of Z work group.
-     */
+    * This function sets the work group size for the computation in each dimension.
+    *
+    * @param tX                     Size of X work group.
+    * @param tY                     Size of Y work group.
+    * @param tZ                     Size of Z work group.
+    */
     void setWorkGroupSize(const uint tX, const uint tY , const uint tZ);
 
     //=========================================================================================================
     /**
-     * Sets the clear color of the framegraph.
-     *
-     * @param tColor        New clear color.
-     */
+    * Sets the clear color of the framegraph.
+    *
+    * @param tColor        New clear color.
+    */
     void setClearColor(const QColor &tColor);
 
 protected:
@@ -156,25 +156,25 @@ private:
      */
     void init();
 
-    QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;    /**< Frame graph node that declares the render surface. */
+    QPointer<Qt3DRender::QRenderSurfaceSelector>    m_pSurfaceSelector;     /**< Frame graph node that declares the render surface. */
 
-    QPointer<Qt3DRender::QClearBuffers> m_pClearBuffers;                /**< Frame graph node that clears buffers in the branch. */
+    QPointer<Qt3DRender::QClearBuffers>             m_pClearBuffers;        /**< Frame graph node that clears buffers in the branch. */
 
-    QPointer<Qt3DRender::QNoDraw> m_pNoDraw;                            /**< Frame graph node that prevents rendering in the branch. */
+    QPointer<Qt3DRender::QNoDraw>                   m_pNoDraw;              /**< Frame graph node that prevents rendering in the branch. */
 
-    QPointer<Qt3DRender::QDispatchCompute> m_pDispatchCompute;          /**< Frame graph node that issues work to the compute shader. */
+    QPointer<Qt3DRender::QDispatchCompute>          m_pDispatchCompute;     /**< Frame graph node that issues work to the compute shader. */
 
-    QPointer<Qt3DRender::QTechniqueFilter> m_pComputeFilter;            /**< Frame graph node selects the compute technique. */
+    QPointer<Qt3DRender::QTechniqueFilter>          m_pComputeFilter;       /**< Frame graph node selects the compute technique. */
 
-    QPointer<Qt3DRender::QCameraSelector> m_pCameraSelector;            /**< Frame graph node that selects the camera. */
+    QPointer<Qt3DRender::QCameraSelector>           m_pCameraSelector;      /**< Frame graph node that selects the camera. */
 
-    QPointer<Qt3DRender::QTechniqueFilter> m_pForwardFilter;            /**< Frame graph node that selects the forward rendering technique. */
+    QPointer<Qt3DRender::QTechniqueFilter>          m_pForwardFilter;       /**< Frame graph node that selects the forward rendering technique. */
 
-    QPointer<Qt3DRender::QMemoryBarrier> m_pMemoryBarrier;              /**< Frame graph node that emplaces a memory barrier to synchronize computing and rendering. */
+    QPointer<Qt3DRender::QMemoryBarrier>            m_pMemoryBarrier;       /**< Frame graph node that emplaces a memory barrier to synchronize computing and rendering. */
 
-    QPointer<Qt3DRender::QFilterKey> m_pForwardKey;                     /**< Filter key for the compute filter. */
+    QPointer<Qt3DRender::QFilterKey>                m_pForwardKey;          /**< Filter key for the compute filter. */
 
-    QPointer<Qt3DRender::QFilterKey> m_pComputeKey;                     /**< Filter key for the forward rendering filter. */
+    QPointer<Qt3DRender::QFilterKey>                m_pComputeKey;          /**< Filter key for the forward rendering filter. */
 };
 
 

@@ -95,7 +95,6 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
-    *
     */
     explicit AbstractView(QWidget *parent = 0);
 
@@ -105,10 +104,28 @@ public:
     */
     ~AbstractView();
 
+    //=========================================================================================================
+    /**
+    * Returns the View3D.
+    *
+    * @return The currently set View3D.
+    */
     QSharedPointer<DISP3DLIB::View3D> getView();
 
+    //=========================================================================================================
+    /**
+    * Returns the Control3D.
+    *
+    * @return The currently set Control3D.
+    */
     QSharedPointer<DISP3DLIB::Control3DWidget> getControlView();
 
+    //=========================================================================================================
+    /**
+    * Returns the Data3DTreeModel.
+    *
+    * @return The currently set Data3DTreeModel.
+    */
     QSharedPointer<DISP3DLIB::Data3DTreeModel> getTreeModel();
 
 protected:
