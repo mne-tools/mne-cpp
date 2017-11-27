@@ -57,6 +57,7 @@
 #include <Qt3DRender/QMemoryBarrier>
 #include <Qt3DRender/QFilterKey>
 #include <Qt3DRender/QCamera>
+#include <Qt3DRender/QSortPolicy>
 
 
 //*************************************************************************************************************
@@ -94,7 +95,8 @@ CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
     , m_pComputeFilter(new QTechniqueFilter(m_pDispatchCompute))
     , m_pCameraSelector(new QCameraSelector(m_pSurfaceSelector))
     , m_pForwardFilter(new QTechniqueFilter(m_pCameraSelector))
-    , m_pMemoryBarrier(new QMemoryBarrier(m_pForwardFilter))
+    , m_pSortPolicy(new QSortPolicy(m_pForwardFilter))
+    , m_pMemoryBarrier(new QMemoryBarrier(m_pSortPolicy))
     , m_pForwardKey(new QFilterKey)
     , m_pComputeKey(new QFilterKey)
 {
@@ -113,6 +115,7 @@ CustomFrameGraph::~CustomFrameGraph()
     m_pComputeFilter->deleteLater();
     m_pCameraSelector->deleteLater();
     m_pForwardFilter->deleteLater();
+    m_pSortPolicy->deleteLater();
     m_pMemoryBarrier->deleteLater();
     m_pForwardKey->deleteLater();
     m_pComputeKey->deleteLater();
@@ -165,6 +168,10 @@ void CustomFrameGraph::init()
     //Add Matches
     m_pComputeFilter->addMatch(m_pComputeKey);
     m_pForwardFilter->addMatch(m_pForwardKey);
+
+    //Set draw policy
+    QVector<QSortPolicy::SortType> sortTypes = {Qt3DRender::QSortPolicy::BackToFront};
+    m_pSortPolicy->setSortTypes(sortTypes);
 
     //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
     m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
