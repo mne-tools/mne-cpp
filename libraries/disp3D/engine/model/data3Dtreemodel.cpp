@@ -566,7 +566,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
 void Data3DTreeModel::initMetatypes()
 {
     //Init metatypes
-    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >();
+    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >("QPair<MatrixX3f, MatrixX3f>");
 
     qRegisterMetaType<QVector<Vector3f> >();
     qRegisterMetaType<QVector<Eigen::Vector3f> >();
