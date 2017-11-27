@@ -73,7 +73,7 @@ using namespace FIFFLIB;
 
 RtInterpolationMatWorker::RtInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false) {
-    m_lInterpolationData.dCancelDistance = 0.20;
+    m_lInterpolationData.dCancelDistance = 0.05;
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
 }
 
@@ -178,6 +178,8 @@ void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
 
 void RtInterpolationMatWorker::calculateInterpolationOperator()
 {
+    qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator.";
+
     if(!m_bInterpolationInfoIsInit) {
         qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
         return;

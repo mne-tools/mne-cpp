@@ -333,8 +333,6 @@ public:
     * @param[in] tBemSurface            The Bem Surface data.
     * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
     * @param[in] sDataType              The data type ("MEG" or "EEG").
-    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
-    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
     * @param[in] tSurfaceFormat         Surface format form View3D. It is used to determine the OpenGL version.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
@@ -345,8 +343,6 @@ public:
                                       const MNELIB::MNEBemSurface& tBemSurface,
                                       const FIFFLIB::FiffInfo &fiffInfo,
                                       const QString &sDataType,
-                                      const double dCancelDist,
-                                      const QString &sInterpolationFunction,
                                       const QSurfaceFormat &tSurfaceFormat);
 
     //=========================================================================================================

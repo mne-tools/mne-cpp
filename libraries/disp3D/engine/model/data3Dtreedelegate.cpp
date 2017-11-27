@@ -284,6 +284,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
 
         case MetaTreeItemTypes::InterpolationFunction: {
             QComboBox* pComboBox = new QComboBox(parent);
+            connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pComboBox->addItem("Linear");
             pComboBox->addItem("Square");
             pComboBox->addItem("Cubic");
