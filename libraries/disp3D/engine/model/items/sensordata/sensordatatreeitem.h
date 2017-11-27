@@ -126,15 +126,11 @@ public:
     * @param[in] tBemSurface               MNEBemSurface that holds the mesh that should be visualized.
     * @param[in] tFiffInfo                 FiffInfo that holds the sensors information.
     * @param[in] sSensorType               The sensor type that is later used for live interpolation.
-    * @param[in] dCancelDist               Distances higher than this are ignored for the interpolation.
-    * @param[in] sInterpolationFunction    Function that computes interpolation coefficients using the distance values.
     * @param[in] p3DEntityParent           The Qt3D entity parent of the new item.
      */
     virtual void initData(const MNELIB::MNEBemSurface& tBemSurface,
                   const FIFFLIB::FiffInfo &tFiffInfo,
                   const QString& sSensorType,
-                  const double dCancelDist,
-                  const QString &sInterpolationFunction,
                   Qt3DCore::QEntity *p3DEntityParent);
 
     //=========================================================================================================

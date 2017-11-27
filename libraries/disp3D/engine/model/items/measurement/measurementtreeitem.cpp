@@ -264,8 +264,6 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                                                  const MNEBemSurface &bemSurface,
                                                  const FiffInfo &fiffInfo,
                                                  const QString &sSensorType,
-                                                 const double dCancelDist,
-                                                 const QString &sInterpolationFunction,
                                                  Qt3DCore::QEntity* pParent,
                                                  bool bUseGPU)
 {
@@ -289,8 +287,6 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pGpuEEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      dCancelDist,
-                                                      sInterpolationFunction,
                                                       pParent);
 
                     m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
@@ -315,8 +311,6 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pCpuEEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      dCancelDist,
-                                                      sInterpolationFunction,
                                                       pParent);
 
                     m_pCpuEEGSensorDataTreeItem->addData(tSensorData);
@@ -345,8 +339,6 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pGpuMEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      dCancelDist,
-                                                      sInterpolationFunction,
                                                       pParent);
 
                     m_pGpuMEGSensorDataTreeItem->addData(tSensorData);
@@ -371,8 +363,6 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pCpuMEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      dCancelDist,
-                                                      sInterpolationFunction,
                                                       pParent);
 
                     m_pCpuMEGSensorDataTreeItem->addData(tSensorData);

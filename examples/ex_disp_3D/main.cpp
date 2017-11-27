@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
 //        pMegSensorTreeItem->setTimeInterval(17);
 //        pMegSensorTreeItem->setNumberAverages(1);
 //        pMegSensorTreeItem->setStreamingState(false);
-//        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
+//        pMegSensorTreeItem->setNormalization(QVector3D(0.0f, 3e-12f*0.5f, 3e-12));
 //        pMegSensorTreeItem->setColormapType("Jet");
 //        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
 //    }
@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingState(false);
-        pEegSensorTreeItem->setThresholds(QVector3D(0.0, 6e-6/2, 6e-6));
+        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 6.0e-6f*0.5f, 6.0e-6f));
         pEegSensorTreeItem->setColormapType("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setTimeInterval(0);
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingActive(false);
-            pRTDataItem->setThresholds(QVector3D(0.0,0.5,10.0));
+            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColormapType("Jet");
         }

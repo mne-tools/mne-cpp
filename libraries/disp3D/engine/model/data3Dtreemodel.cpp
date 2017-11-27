@@ -541,8 +541,6 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
             pReturnItem = pMeasurementItem->addData(matSensorData,
                                                     tBemSurface,
                                                     fiffInfo, sDataType,
-                                                    dCancelDist,
-                                                    sInterpolationFunction,
                                                     m_pModelEntity,
                                                     bUseGPU);
         }
@@ -553,8 +551,6 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                                 tBemSurface,
                                                 fiffInfo,
                                                 sDataType,
-                                                dCancelDist,
-                                                sInterpolationFunction,
                                                 m_pModelEntity,
                                                 bUseGPU);
     }
