@@ -318,6 +318,10 @@ void View3D::keyPressEvent(QKeyEvent* e)
 {
     switch ( e->key() )
     {
+        case Qt::Key_Escape:
+            this->showNormal();
+            break;
+
         case Qt::Key_Space:
             m_bModelRotationMode = !m_bModelRotationMode;
             break;
