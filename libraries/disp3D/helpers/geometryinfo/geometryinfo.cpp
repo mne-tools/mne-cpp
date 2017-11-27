@@ -280,7 +280,8 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> pOutputDistMatrix,
 
 //*************************************************************************************************************
 
-void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> pMatrix, std::string sFilename) {
+void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> pMatrix,
+                              std::string sFilename) {
     qDebug() << "Start writing matrix to file: " << sFilename.c_str();
     std::ofstream oFileStream;
     oFileStream.open(sFilename.c_str());
@@ -291,7 +292,9 @@ void GeometryInfo::matrixDump(QSharedPointer<MatrixXd> pMatrix, std::string sFil
 
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<MatrixXd> pDistanceTable, const FIFFLIB::FiffInfo& fiffInfo, qint32 iSensorType) {
+QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<MatrixXd> pDistanceTable,
+                                                const FIFFLIB::FiffInfo& fiffInfo,
+                                                qint32 iSensorType) {
     // use pointer to avoid copying of FiffChInfo objects
     QVector<qint32> vecBadColumns;
     QVector<const FiffChInfo*> vecSensors;

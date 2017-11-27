@@ -51,7 +51,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qrgb>
+#include <QRgb>
 #include <QSharedPointer>
 #include <QLinkedList>
 
