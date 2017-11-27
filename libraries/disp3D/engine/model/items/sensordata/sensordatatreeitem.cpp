@@ -119,9 +119,9 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
 
     // map passed sensor type string to fiff constant
     fiff_int_t sensorTypeFiffConstant;
-    if (sSensorType.toStdString() == std::string("MEG")) {
+    if (sSensorType.toStdString() == "MEG") {
         sensorTypeFiffConstant = FIFFV_MEG_CH;
-    } else if (sSensorType.toStdString() == std::string("EEG")) {
+    } else if (sSensorType.toStdString() == "EEG") {
         sensorTypeFiffConstant = FIFFV_EEG_CH;
     } else {
         qDebug() << "SensorDataTreeItem::initData - unknown sensor type. Returning ...";
@@ -419,15 +419,15 @@ void SensorDataTreeItem::initItem()
     data.setValue(QString("Hot"));
     pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
 
-    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DataThreshold, "0.0, 0.5,10.0");
-    connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
+    MetaTreeItem* pItemThreshold = new MetaTreeItem(MetaTreeItemTypes::DataThreshold, "0.0, 0.5,10.0");
+    connect(pItemThreshold, &MetaTreeItem::dataChanged,
             this, &SensorDataTreeItem::onDataThresholdChanged);
     list.clear();
-    list << pItemSourceLocNormValue;
-    list << new QStandardItem(pItemSourceLocNormValue->toolTip());
+    list << pItemThreshold;
+    list << new QStandardItem(pItemThreshold->toolTip());
     this->appendRow(list);
     data.setValue(QVector3D(0.0,5.5,15));
-    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::DataThreshold);
+    pItemThreshold->setData(data, MetaTreeItemRoles::DataThreshold);
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "17");
     connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
@@ -441,7 +441,7 @@ void SensorDataTreeItem::initItem()
 
     MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
     connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
-            this, &SensorDataTreeItem::onCheckStateLoopedStateChanged);
+            this, &SensorDataTreeItem::onLoopStateChanged);
     pItemLoopedStreaming->setCheckable(true);
     pItemLoopedStreaming->setCheckState(Qt::Checked);
     list.clear();
@@ -537,7 +537,7 @@ void SensorDataTreeItem::onDataThresholdChanged(const QVariant &vecThresholds)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState &checkState)
+void SensorDataTreeItem::onLoopStateChanged(const Qt::CheckState &checkState)
 {
     if(m_pSensorRtDataWorkController) {
         if(checkState == Qt::Checked) {

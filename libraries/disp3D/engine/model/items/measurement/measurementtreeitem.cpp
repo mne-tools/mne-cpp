@@ -277,7 +277,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
                 } else {
                     //Add sensor data as child
-                    //If rt data item does not exists yet, create it here!
+                    //If item does not exists yet, create it here!
                     m_pGpuEEGSensorDataTreeItem = new GpuSensorDataTreeItem();
                     m_pGpuEEGSensorDataTreeItem->setText("EEG Data");
 
@@ -303,7 +303,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pCpuEEGSensorDataTreeItem->addData(tSensorData);
                 } else {
                     //Add sensor data as child
-                    //If rt data item does not exists yet, create it here!
+                    //If item does not exists yet, create it here!
                     m_pCpuEEGSensorDataTreeItem = new CpuSensorDataTreeItem();
                     m_pCpuEEGSensorDataTreeItem->setText("EEG Data");
 
@@ -322,44 +322,44 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pCpuEEGSensorDataTreeItem->addData(tSensorData);
                 }
 
-                return dynamic_cast<SensorDataTreeItem*>(m_pGpuEEGSensorDataTreeItem.data());
+                return dynamic_cast<SensorDataTreeItem*>(m_pCpuEEGSensorDataTreeItem.data());
             }
         }
 
         if(sSensorType == "MEG") {
             if(bUseGPU) {
                 //GPU for MEG data
-                if(m_pCshMEGSensorDataTreeItem) {
-                    m_pCshMEGSensorDataTreeItem->addData(tSensorData);
+                if(m_pGpuMEGSensorDataTreeItem) {
+                    m_pGpuMEGSensorDataTreeItem->addData(tSensorData);
                 } else {
                     //Add sensor data as child
-                    //If rt data item does not exists yet, create it here!
-                    m_pCshMEGSensorDataTreeItem = new GpuSensorDataTreeItem();
-                    m_pCshMEGSensorDataTreeItem->setText("MEG Data");
+                    //If item does not exists yet, create it here!
+                    m_pGpuMEGSensorDataTreeItem = new GpuSensorDataTreeItem();
+                    m_pGpuMEGSensorDataTreeItem->setText("MEG Data");
 
                     QList<QStandardItem*> list;
-                    list << m_pCshMEGSensorDataTreeItem;
-                    list << new QStandardItem(m_pCshMEGSensorDataTreeItem->toolTip());
+                    list << m_pGpuMEGSensorDataTreeItem;
+                    list << new QStandardItem(m_pGpuMEGSensorDataTreeItem->toolTip());
                     this->appendRow(list);
 
-                    m_pCshMEGSensorDataTreeItem->initData(bemSurface,
+                    m_pGpuMEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
                                                       dCancelDist,
                                                       sInterpolationFunction,
                                                       pParent);
 
-                    m_pCshMEGSensorDataTreeItem->addData(tSensorData);
+                    m_pGpuMEGSensorDataTreeItem->addData(tSensorData);
                 }
 
-                return dynamic_cast<SensorDataTreeItem*>(m_pCshMEGSensorDataTreeItem.data());
+                return dynamic_cast<SensorDataTreeItem*>(m_pGpuMEGSensorDataTreeItem.data());
             } else {
                 //CPU for MEG data
                 if(m_pCpuMEGSensorDataTreeItem) {
                     m_pCpuMEGSensorDataTreeItem->addData(tSensorData);
                 } else {
                     //Add sensor data as child
-                    //If rt data item does not exists yet, create it here!
+                    //If item does not exists yet, create it here!
                     m_pCpuMEGSensorDataTreeItem = new CpuSensorDataTreeItem();
                     m_pCpuMEGSensorDataTreeItem->setText("MEG Data");
 
