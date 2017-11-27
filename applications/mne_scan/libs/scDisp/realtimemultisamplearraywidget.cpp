@@ -325,8 +325,6 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                                                                     (*m_pBemHead.data())[0],
                                                                     *m_pFiffInfo.data(),
                                                                     "EEG",
-                                                                    0.05,
-                                                                    "Cubic",
                                                                     m_p3DView->format());
 
                 if(m_pRtEEGSensorDataItem) {
@@ -354,8 +352,6 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                                                                     (*m_pBemSensor.data())[0],
                                                                     *m_pFiffInfo.data(),
                                                                     "MEG",
-                                                                    0.05,
-                                                                    "Cubic",
                                                                     m_p3DView->format());
 
                 if(m_pRtMEGSensorDataItem) {

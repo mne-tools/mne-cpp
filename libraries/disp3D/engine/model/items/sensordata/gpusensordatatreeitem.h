@@ -111,7 +111,7 @@ protected:
     *
     * @param[in] matInterpolationOperator                 The new interpolation matrix.
     */
-    void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator);
+    virtual void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator);
 
     //=========================================================================================================
     /**

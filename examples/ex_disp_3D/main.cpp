@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");//sample-5120-5120-5120-bem
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");//sample-5120-5120-5120-bem
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
@@ -307,8 +307,6 @@ int main(int argc, char *argv[])
                                                                              t_Bem[0],
                                                                              evoked.info,
                                                                              "EEG",
-                                                                             0.05,
-                                                                             "Cubic",
                                                                              testWindow->format())) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);

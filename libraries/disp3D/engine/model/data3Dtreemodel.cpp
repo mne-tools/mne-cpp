@@ -509,8 +509,6 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                                    const MNEBemSurface& tBemSurface,
                                                    const FiffInfo& fiffInfo,
                                                    const QString& sDataType,
-                                                   const double dCancelDist,
-                                                   const QString& sInterpolationFunction,
                                                    const QSurfaceFormat &tSurfaceFormat)
 {    
     bool bUseGPU = false;
@@ -524,7 +522,6 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
         bUseGPU = true;
         qDebug("Using compute shader version of SensorDataTreeItem.");
     }
-
     bUseGPU = false;
 
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;

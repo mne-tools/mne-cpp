@@ -169,11 +169,11 @@ void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
     }
 
     //if more data then needed is provided
-    const uint iSensorSize = m_iUsedSensors.size();
+    const int iSensorSize = m_iUsedSensors.size();
     if(tSensorData.rows() > iSensorSize)
     {
         MatrixXd dSmallSensorData(iSensorSize, tSensorData.cols());
-        for(uint i = 0 ; i < iSensorSize; ++i)
+        for(int i = 0 ; i < iSensorSize; ++i)
         {
             //Set bad channels to zero
             if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
@@ -194,7 +194,7 @@ void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
     {
         //Set bad channels to zero
         MatrixXd dSmallSensorData = tSensorData;
-        for(uint i = 0 ; i < dSmallSensorData.rows(); ++i)
+        for(int i = 0 ; i < dSmallSensorData.rows(); ++i)
         {
             if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
                 dSmallSensorData.row(i).setZero();
@@ -389,87 +389,87 @@ void SensorDataTreeItem::initItem()
     QVariant data;
 
     MetaTreeItem* pItemStreamStatus = new MetaTreeItem(MetaTreeItemTypes::StreamStatus, "Stream data on/off");
-    connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
-            this, &SensorDataTreeItem::onStreamingStateChanged);
     list << pItemStreamStatus;
     list << new QStandardItem(pItemStreamStatus->toolTip());
     this->appendRow(list);
     pItemStreamStatus->setCheckable(true);
     pItemStreamStatus->setEditable(false);
     pItemStreamStatus->setCheckState(Qt::Unchecked);
+    connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
+            this, &SensorDataTreeItem::onStreamingStateChanged);
 
     data.setValue(false);
     pItemStreamStatus->setData(data, MetaTreeItemRoles::StreamStatus);
 
     MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot");
-    connect(pItemColormapType, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onColormapTypeChanged);
     list.clear();
     list << pItemColormapType;
     list << new QStandardItem(pItemColormapType->toolTip());
     this->appendRow(list);
     data.setValue(QString("Hot"));
     pItemColormapType->setData(data, MetaTreeItemRoles::ColormapType);
+    connect(pItemColormapType, &MetaTreeItem::dataChanged,
+            this, &SensorDataTreeItem::onColormapTypeChanged);
 
     MetaTreeItem* pItemThreshold = new MetaTreeItem(MetaTreeItemTypes::DataThreshold, "0.0, 0.5,10.0");
-    connect(pItemThreshold, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onDataThresholdChanged);
     list.clear();
     list << pItemThreshold;
     list << new QStandardItem(pItemThreshold->toolTip());
     this->appendRow(list);
     data.setValue(QVector3D(0.0,5.5,15));
     pItemThreshold->setData(data, MetaTreeItemRoles::DataThreshold);
+    connect(pItemThreshold, &MetaTreeItem::dataChanged,
+            this, &SensorDataTreeItem::onDataThresholdChanged);
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "17");
-    connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onTimeIntervalChanged);
     list.clear();
     list << pItemStreamingInterval;
     list << new QStandardItem(pItemStreamingInterval->toolTip());
     this->appendRow(list);
     data.setValue(17);
     pItemStreamingInterval->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
+    connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
+            this, &SensorDataTreeItem::onTimeIntervalChanged);
 
     MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
-    connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
-            this, &SensorDataTreeItem::onLoopStateChanged);
     pItemLoopedStreaming->setCheckable(true);
     pItemLoopedStreaming->setCheckState(Qt::Checked);
     list.clear();
     list << pItemLoopedStreaming;
     list << new QStandardItem(pItemLoopedStreaming->toolTip());
     this->appendRow(list);
+    connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
+            this, &SensorDataTreeItem::onLoopStateChanged);
 
     MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
-    connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onNumberAveragesChanged);
     list.clear();
     list << pItemAveragedStreaming;
     list << new QStandardItem(pItemAveragedStreaming->toolTip());
     this->appendRow(list);
     data.setValue(1);
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
+    connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
+            this, &SensorDataTreeItem::onNumberAveragesChanged);
 
     MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.05");
-    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onCancelDistanceChanged);
     list.clear();
     list << pItemCancelDistance;
     list << new QStandardItem(pItemCancelDistance->toolTip());
     this->appendRow(list);
     data.setValue(0.05);
     pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
+    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
+            this, &SensorDataTreeItem::onCancelDistanceChanged);
 
     MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Cubic");
-    connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
-            this, &SensorDataTreeItem::onInterpolationFunctionChanged);
     list.clear();
     list << pInterpolationFunction;
     list << new QStandardItem(pInterpolationFunction->toolTip());
     this->appendRow(list);
     data.setValue(QString("Cubic"));
     pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
+    connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
+            this, &SensorDataTreeItem::onInterpolationFunctionChanged);
 }
 
 
