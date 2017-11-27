@@ -115,7 +115,7 @@ void MetaTreeItem::initItem()
             sToolTip = "The number of samples averaged together (downsampling)";
             break;
         case MetaTreeItemTypes::DataThreshold:
-            sToolTip = "The value to normalize the distributed source localization result";
+            sToolTip = "The threshold used to scale the data";
             break;
         case MetaTreeItemTypes::VisualizationType:
             sToolTip = "The visualization type";
@@ -143,9 +143,6 @@ void MetaTreeItem::initItem()
             break;
         case MetaTreeItemTypes::TranslateZ:
             sToolTip = "z translation value";
-            break;
-        case MetaTreeItemTypes::NetworkThreshold:
-            sToolTip = "The threshold used to scale the network";
             break;
         case MetaTreeItemTypes::NetworkMatrix:
             sToolTip = "The network distance matrix";

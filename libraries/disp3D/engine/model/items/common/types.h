@@ -128,7 +128,7 @@ namespace MetaTreeItemTypes
                     TranslateX = QStandardItem::UserType + 117,
                     TranslateY = QStandardItem::UserType + 118,
                     TranslateZ = QStandardItem::UserType + 119,
-                    NetworkThreshold = QStandardItem::UserType + 120,
+                    InterpolationFunction = QStandardItem::UserType + 120,
                     NetworkMatrix = QStandardItem::UserType + 121,
                     SurfaceTessInner = QStandardItem::UserType + 122,
                     SurfaceTessOuter = QStandardItem::UserType + 123,
@@ -137,8 +137,7 @@ namespace MetaTreeItemTypes
                     MaterialType = QStandardItem::UserType + 126,
                     ShowNormals = QStandardItem::UserType + 127,
                     Scale = QStandardItem::UserType + 128,
-                    CancelDistance = QStandardItem::UserType + 129,
-                    InterpolationFunction = QStandardItem::UserType + 130};
+                    CancelDistance = QStandardItem::UserType + 129};
 }
 
 // Model item roles
@@ -160,7 +159,7 @@ namespace Data3DTreeModelItemRoles
                     FilePath = Qt::UserRole + 115,
                     LabeList = Qt::UserRole + 116,
                     LabeIds = Qt::UserRole + 117,
-                    RTData = Qt::UserRole + 118,
+                    Data = Qt::UserRole + 118,
                     RTVertNoLeftHemi = Qt::UserRole + 119,
                     RTTimes = Qt::UserRole + 120,
                     RTHemi = Qt::UserRole + 121,
@@ -174,8 +173,7 @@ namespace Data3DTreeModelItemRoles
                     RTEndIdxRightHemi = Qt::UserRole + 129,
                     RTVertNoRightHemi = Qt::UserRole + 130,
                     SourceVertices = Qt::UserRole + 131,
-                    NetworkData = Qt::UserRole + 132,
-                    ECDSetData = Qt::UserRole + 133};
+                    ECDSetData = Qt::UserRole + 132};
 }
 
 namespace MetaTreeItemRoles
@@ -200,14 +198,13 @@ namespace MetaTreeItemRoles
                     TranslateX = Qt::UserRole + 18,
                     TranslateY = Qt::UserRole + 19,
                     TranslateZ = Qt::UserRole + 20,
-                    NetworkThreshold = Qt::UserRole + 22,
+                    InterpolationFunction = Qt::UserRole + 22,
                     SurfaceTessInner = Qt::UserRole + 23,
                     SurfaceTessOuter = Qt::UserRole + 24,
                     SurfaceTriangleScale = Qt::UserRole + 25,
                     SurfaceMaterial = Qt::UserRole + 26,
                     Scale = Qt::UserRole + 27,
-                    CancelDistance = Qt::UserRole + 28,
-                    InterpolationFunction = Qt::UserRole + 29};
+                    CancelDistance = Qt::UserRole + 28};
 }
 
 } //NAMESPACE DISP3DLIB

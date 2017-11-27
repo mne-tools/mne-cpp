@@ -112,15 +112,15 @@ void NetworkTreeItem::initItem()
 
     QVector3D vecEdgeTrehshold(0,5,10);
     if(!m_pItemNetworkThreshold) {
-        m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::NetworkThreshold,
-                                                    QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
+        m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::DataThreshold,
+                                                   QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
     }
 
     list << m_pItemNetworkThreshold;
     list << new QStandardItem(m_pItemNetworkThreshold->toolTip());
     this->appendRow(list);
     data.setValue(vecEdgeTrehshold);
-    m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::NetworkThreshold);
+    m_pItemNetworkThreshold->setData(data, MetaTreeItemRoles::DataThreshold);
     connect(m_pItemNetworkThreshold.data(), &MetaTreeItem::dataChanged,
             this, &NetworkTreeItem::onNetworkThresholdChanged);
 
@@ -148,7 +148,7 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     QVariant data;
 
     data.setValue(tNetworkData);
-    this->setData(data, Data3DTreeModelItemRoles::NetworkData);
+    this->setData(data, Data3DTreeModelItemRoles::Data);
 
     MatrixXd matDist = tNetworkData.getConnectivityMatrix();
     data.setValue(matDist);
@@ -157,7 +157,7 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     //Plot network
     if(m_pItemNetworkThreshold) {
         plotNetwork(tNetworkData,
-                    m_pItemNetworkThreshold->data(MetaTreeItemRoles::NetworkThreshold).value<QVector3D>());
+                    m_pItemNetworkThreshold->data(MetaTreeItemRoles::DataThreshold).value<QVector3D>());
     }
 }
 
@@ -167,7 +167,7 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
 void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        Network tNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network>();
+        Network tNetwork = this->data(Data3DTreeModelItemRoles::Data).value<Network>();
 
         plotNetwork(tNetwork, vecThresholds.value<QVector3D>());
     }

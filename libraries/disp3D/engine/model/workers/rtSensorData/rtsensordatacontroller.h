@@ -246,10 +246,28 @@ public:
     void addData(const Eigen::MatrixXd& data);
 
 protected:
+    //=========================================================================================================
+    /**
+    * Call this function whenever new raw data is available to be dispatched.
+    *
+    * @param[in] vecDataVector         The new raw data.
+    */
     void onNewRtRawData(const Eigen::VectorXd &vecDataVector);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever new interpolated raw data is available to be dispatched.
+    *
+    * @param[in] matColorMatrix         The new interpolated data as RGB colors per vertex.
+    */
     void onNewSmoothedRtRawData(const Eigen::MatrixX3f &matColorMatrix);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever a new interpolation matrix is available to be dispatched.
+    *
+    * @param[in] matInterpolationOperator         The new interpolation matrix data.
+    */
     void onNewInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationOperator);
 
     QTimer                                  m_timer;                            /**< The timer to control the streaming speed. */
