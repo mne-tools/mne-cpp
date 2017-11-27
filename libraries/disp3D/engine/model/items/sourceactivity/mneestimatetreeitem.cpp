@@ -363,14 +363,14 @@ void MneEstimateTreeItem::setNumberAverages(int iNumberAverages)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setColortable(const QString& sColortable)
+void MneEstimateTreeItem::setColormapType(const QString& sColormap)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ColormapType);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
-            data.setValue(sColortable);
+            data.setValue(sColormap);
             pAbstractItem->setData(data, MetaTreeItemRoles::ColormapType);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
@@ -397,7 +397,7 @@ void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setNormalization(const QVector3D& vecThresholds)
+void MneEstimateTreeItem::setThresholds(const QVector3D& vecThresholds)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DataThreshold);
 

@@ -188,19 +188,19 @@ public:
 
     //=========================================================================================================
     /**
-    * This function sets the colortable type.
+    * This function sets the colormap type.
     *
-    * @param[in] sColortable                The new colortable ("Hot Negative 1" etc.).
+    * @param[in] sColortable                The new colormap ("Hot Negative 1" etc.).
     */
-    virtual void setColortable(const QString& sColortable);
+    virtual void setColormapType(const QString& sColormap);
 
     //=========================================================================================================
     /**
-    * This function set the normalization value.
+    * This function set the threshold values.
     *
     * @param[in] vecThresholds              The new threshold values used for normalizing the data.
     */
-    virtual void setNormalization(const QVector3D& vecThresholds);
+    virtual void setThresholds(const QVector3D& vecThresholds);
     
     //=========================================================================================================
     /**

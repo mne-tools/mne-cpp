@@ -140,6 +140,7 @@ void GpuSensorDataTreeItem::initInterpolationItem(const MNEBemSurface &bemSurfac
 
 void GpuSensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
 {
+    qDebug()<<"GpuSensorDataTreeItem::onColormapTypeChanged";
     if(sColormapType.canConvert<QString>())
     {
         if(m_pInterpolationItem)
