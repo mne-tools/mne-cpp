@@ -99,7 +99,7 @@ void GpuSensorDataTreeItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<f
 {
     if(m_pInterpolationItem)
     {
-        m_pInterpolationItem->setInterpolationMatrix(matInterpolationOperator);
+        //m_pInterpolationItem->setInterpolationMatrix(matInterpolationOperator);
     }
 }
 

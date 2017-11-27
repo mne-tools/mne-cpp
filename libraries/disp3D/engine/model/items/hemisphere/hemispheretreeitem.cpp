@@ -42,7 +42,7 @@
 #include "../freesurfer/fssurfacetreeitem.h"
 #include "../freesurfer/fsannotationtreeitem.h"
 #include "../sourcespace/sourcespacetreeitem.h"
-#include "../sourceactivity/mneestimatetreeitem.h"
+#include "../sourcedata/mneestimatetreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
