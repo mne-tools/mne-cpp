@@ -82,7 +82,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DWidget::Control3DWidget(QWidget* parent, const QStringList& slFlags, Qt::WindowType type)
+Control3DWidget::Control3DWidget(QWidget* parent,
+                                 const QStringList& slFlags,
+                                 Qt::WindowType type)
 : QWidget(parent, type)/*RoundedEdgesWidget(parent, type)*/
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
@@ -180,7 +182,8 @@ Control3DWidget::~Control3DWidget()
 
 //*************************************************************************************************************
 
-void Control3DWidget::init(QSharedPointer<Data3DTreeModel> pData3DTreeModel, QSharedPointer<View3D> pView3D)
+void Control3DWidget::init(QSharedPointer<Data3DTreeModel> pData3DTreeModel,
+                           QSharedPointer<View3D> pView3D)
 {
     //Do the connects from this control widget to the View3D
     ui->m_treeView_loadedData->setModel(pData3DTreeModel.data());

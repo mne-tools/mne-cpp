@@ -137,7 +137,6 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
                 }
             }
 
-            //Resize vecNonZeroEntries
             for (const QPair<qint32, float> &qp : vecBelowThresh) {
                 counter++;
                 vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, qp.first, qp.second / dWeightsSum));
@@ -146,7 +145,6 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
             // a sensor has been assigned to this node, we do not need to interpolate anything (final vertex signal is equal to sensor input signal, thus factor 1)
             const int iIndexInSubset = pProjectedSensors->indexOf(r);
 
-            //Resize vecNonZeroEntries
             vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, iIndexInSubset, 1));
             counter++;
         }
