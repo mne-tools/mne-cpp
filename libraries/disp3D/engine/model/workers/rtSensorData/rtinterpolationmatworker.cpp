@@ -164,11 +164,11 @@ void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
 
     //create Interpolation matrix
     m_lInterpolationData.pInterpolationMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                               m_lInterpolationData.pDistanceMatrix,
-                                                                               m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance,
-                                                                               m_lInterpolationData.fiffInfo,
-                                                                               m_lInterpolationData.iSensorType);
+                                                                                      m_lInterpolationData.pDistanceMatrix,
+                                                                                      m_lInterpolationData.interpolationFunction,
+                                                                                      m_lInterpolationData.dCancelDistance,
+                                                                                      m_lInterpolationData.fiffInfo,
+                                                                                      m_lInterpolationData.iSensorType);
 
     emit newInterpolationMatrixCalculated(m_lInterpolationData.pInterpolationMatrix);
 }
@@ -178,8 +178,6 @@ void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
 
 void RtInterpolationMatWorker::calculateInterpolationOperator()
 {
-    qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator.";
-
     if(!m_bInterpolationInfoIsInit) {
         qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
         return;
