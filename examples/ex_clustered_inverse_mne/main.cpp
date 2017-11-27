@@ -299,9 +299,9 @@ int main(int argc, char *argv[])
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);
         pRTDataItem->setStreamingActive(true);
-        pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
+        pRTDataItem->setThresholds(QVector3D(0.0,0.5,10.0));
         pRTDataItem->setVisualizationType("Smoothing based");
-        pRTDataItem->setColortable("Hot");
+        pRTDataItem->setColormapType("Hot");
     }
 
     testWindow->show();

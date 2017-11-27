@@ -169,8 +169,8 @@ void RealTimeSourceEstimateWidget::getData()
 
             m_pRtItem->setLoopState(false);
             m_pRtItem->setTimeInterval(17);
-            m_pRtItem->setNormalization(QVector3D(0.0,5,10));
-            m_pRtItem->setColortable("Hot");
+            m_pRtItem->setThresholds(QVector3D(0.0,5,10));
+            m_pRtItem->setColormapType("Hot");
             m_pRtItem->setVisualizationType("Annotation based");
             m_pRtItem->setNumberAverages(1);
             m_pRtItem->setStreamingActive(true);

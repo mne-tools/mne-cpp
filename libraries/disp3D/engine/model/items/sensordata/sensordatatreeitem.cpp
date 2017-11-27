@@ -290,14 +290,14 @@ void SensorDataTreeItem::setNumberAverages(int iNumberAverages)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setColortable(const QString& sColortable)
+void SensorDataTreeItem::setColormapType(const QString& sColormap)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ColormapType);
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
-            data.setValue(sColortable);
+            data.setValue(sColormap);
             pAbstractItem->setData(data, MetaTreeItemRoles::ColormapType);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
@@ -307,7 +307,7 @@ void SensorDataTreeItem::setColortable(const QString& sColortable)
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::setNormalization(const QVector3D& vecThresholds)
+void SensorDataTreeItem::setThresholds(const QVector3D& vecThresholds)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DataThreshold);
 
