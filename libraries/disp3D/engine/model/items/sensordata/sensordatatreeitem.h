@@ -235,8 +235,6 @@ public:
     */
     virtual void setBadChannels(const FIFFLIB::FiffInfo& info);
 
-
-
 protected:
     //=========================================================================================================
     /**
@@ -293,7 +291,7 @@ protected:
     *
     * @param[in] checkState                 The check state of the looped streaming state.
     */
-    virtual void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
+    virtual void onLoopStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**

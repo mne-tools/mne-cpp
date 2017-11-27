@@ -255,7 +255,7 @@ protected:
     QPointer<CpuSensorDataTreeItem>              m_pCpuEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item. */
     QPointer<CpuSensorDataTreeItem>              m_pCpuMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item. */
     QPointer<GpuSensorDataTreeItem>              m_pGpuEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item (compute shader version). */
-    QPointer<GpuSensorDataTreeItem>              m_pCshMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item (compute shader version). */
+    QPointer<GpuSensorDataTreeItem>              m_pGpuMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item (compute shader version). */
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 

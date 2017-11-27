@@ -525,6 +525,8 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
         qDebug("Using compute shader version of SensorDataTreeItem.");
     }
 
+    bUseGPU = false;
+
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
