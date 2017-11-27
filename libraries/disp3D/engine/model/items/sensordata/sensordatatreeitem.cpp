@@ -115,7 +115,7 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
         qDebug("SensorDataTreeItem::initData - Item is already initialized");
     }
 
-    this->setData(0, Data3DTreeModelItemRoles::RTData);
+    this->setData(0, Data3DTreeModelItemRoles::Data);
 
     // map passed sensor type string to fiff constant
     fiff_int_t sensorTypeFiffConstant;
@@ -193,7 +193,7 @@ void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
         //Set new data into item's data.
         QVariant data;
         data.setValue(dSmallSensorData);
-        this->setData(data, Data3DTreeModelItemRoles::RTData);
+        this->setData(data, Data3DTreeModelItemRoles::Data);
 
         //Add data to worker
         m_pSensorRtDataWorkController->addData(dSmallSensorData);
@@ -212,7 +212,7 @@ void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
         //Set new data into item's data.
         QVariant data;
         data.setValue(dSmallSensorData);
-        this->setData(data, Data3DTreeModelItemRoles::RTData);
+        this->setData(data, Data3DTreeModelItemRoles::Data);
 
         //Add data to worker
         m_pSensorRtDataWorkController->addData(dSmallSensorData);

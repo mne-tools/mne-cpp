@@ -285,7 +285,7 @@ void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
     //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
     QVariant data;
     data.setValue(tSourceEstimate.data);
-    this->setData(data, Data3DTreeModelItemRoles::RTData);
+    this->setData(data, Data3DTreeModelItemRoles::Data);
 
     if(m_pSourceLocRtDataWorker) {
         m_pSourceLocRtDataWorker->addData(tSourceEstimate.data);
