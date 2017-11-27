@@ -188,11 +188,11 @@ void TestInterpolation::testSumOfRow() {
     qint32 n = w->rows();
     qint32 m = w->cols();
 
-    const double LOWER_TRESH = 0.99999999;
-    const double UPPER_TRESH = 1.000000001;
+    const float LOWER_TRESH = 0.99999f;
+    const float UPPER_TRESH = 1.00001f;
 
     for (int r = 0; r < n; ++r) {
-        double rowSum = 0.0;
+        float rowSum = 0.0f;
         for (int c = 0; c < m; ++c) {
             rowSum += w->coeff(r, c);
         }

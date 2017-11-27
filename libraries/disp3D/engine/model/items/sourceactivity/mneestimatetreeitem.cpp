@@ -181,7 +181,7 @@ void MneEstimateTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::init(const MNEForwardSolution& tForwardSolution,
+void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                 const MatrixX3f& matSurfaceVertColorLeftHemi,
                                 const MatrixX3f& matSurfaceVertColorRightHemi,
                                 const VectorXi& vecLabelIdsLeftHemi,
@@ -282,7 +282,7 @@ void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
         return;
     }
 
-    //Set new data into item's data. The set data is for eample needed in the delegate to calculate the histogram.
+    //Set new data into item's data. The set data is for example needed in the delegate to calculate the histogram.
     QVariant data;
     data.setValue(tSourceEstimate.data);
     this->setData(data, Data3DTreeModelItemRoles::Data);

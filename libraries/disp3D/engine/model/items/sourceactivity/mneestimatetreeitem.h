@@ -130,7 +130,7 @@ public:
     * @param[in] lLabelsLeftHemi                    The label list for the left hemisphere.
     * @param[in] lLabelsRightHemi                   The label list for the right hemisphere.
     */
-    void init(const MNELIB::MNEForwardSolution& tForwardSolution,
+    void initData(const MNELIB::MNEForwardSolution& tForwardSolution,
             const MatrixX3f &matSurfaceVertColorLeftHemi,
             const MatrixX3f &matSurfaceVertColorRightHemi,
             const Eigen::VectorXi& vecLabelIdsLeftHemi = FIFFLIB::defaultVectorXi,
