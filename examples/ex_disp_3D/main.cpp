@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingState(false);
-        //pEegSensorTreeItem->setThresholds(QVector3D(0.0, 6e-6/2, 6e-6));
+        pEegSensorTreeItem->setThresholds(QVector3D(0.0, 6e-6/2, 6e-6));
         pEegSensorTreeItem->setColormapType("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
