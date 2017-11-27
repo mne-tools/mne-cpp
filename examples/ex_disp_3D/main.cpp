@@ -41,7 +41,7 @@
 
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/adapters/abstractview.h>
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "false");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"); //sample-5120-5120-5120-bem
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
@@ -282,22 +282,22 @@ int main(int argc, char *argv[])
     //Create the 3D view
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
 
-    //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data,
-                                                                             t_sensorSurfaceVV[0],
-                                                                             evoked.info,
-                                                                             "MEG",
-                                                                             testWindow->format())) {
-        pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(17);
-        pMegSensorTreeItem->setNumberAverages(1);
-        pMegSensorTreeItem->setStreamingState(false);
-        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 3e-12f*0.5f, 3e-12f));
-        pMegSensorTreeItem->setColormapType("Jet");
-        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
-    }
+//    //add sensor item for MEG data
+//    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+//                                                                             evoked.comment,
+//                                                                             evoked.data,
+//                                                                             t_sensorSurfaceVV[0],
+//                                                                             evoked.info,
+//                                                                             "MEG",
+//                                                                             testWindow->format())) {
+//        pMegSensorTreeItem->setLoopState(true);
+//        pMegSensorTreeItem->setTimeInterval(17);
+//        pMegSensorTreeItem->setNumberAverages(1);
+//        pMegSensorTreeItem->setStreamingState(false);
+//        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 3e-12f*0.5f, 3e-12f));
+//        pMegSensorTreeItem->setColormapType("Jet");
+//        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
+//    }
 
     //add sensor item for EEG data
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),

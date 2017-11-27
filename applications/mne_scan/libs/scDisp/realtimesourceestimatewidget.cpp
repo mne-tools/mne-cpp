@@ -44,7 +44,7 @@
 
 #include <scMeas/realtimesourceestimate.h>
 
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
