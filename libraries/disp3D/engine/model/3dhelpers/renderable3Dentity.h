@@ -145,15 +145,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the value of a specific paramater of the materials for this entity.
-    *
-    * @param[in] data             The value to be set.
-    * @param[in] sParameterName   The name of the parameter to be set.
-    */
-    virtual void setMaterialParameter(QVariant data, QString sParameterName);
-
-    //=========================================================================================================
-    /**
     * Returns the current scaling value.
     *
     * @return The scaling value.
@@ -240,7 +231,56 @@ public:
     */
     virtual void setScale(float scale);
 
+    //=========================================================================================================
+    /**
+    * Sets the value of a specific parameter of the materials for this entity.
+    *
+    * @param[in] data             The value to be set.
+    * @param[in] sParameterName   The parameters name.
+    */
+    virtual void setMaterialParameter(QVariant data, QString sParameterName);
+
+    //=========================================================================================================
+    /**
+    * Gets the value of a specific parameter of the materials for this entity.
+    *
+    * @param[in] sParameterName             The parameters name.
+    *
+    * @return   The data of the parameter.
+    */
+    virtual QVariant getMaterialParameter(QString sParameterName);
+
 protected: 
+    //=========================================================================================================
+    /**
+    * Sets the current scale recusivley.
+    *
+    * @param[in] pObject            The QObject to be scanned for parameters.
+    * @param[in] data               The new data.
+    * @param[in] sParameterName     The parameters name.
+    */
+    virtual void setMaterialParameterRecursive(QObject * pObject,
+                                               QVariant data,
+                                               QString sParameterName);
+
+    //=========================================================================================================
+    /**
+    * Gets the value of a specific parameter of the materials for this entity.
+    *
+    * @param[in] pObject             The QObject to be scanned for parameters.
+    * @param[in] sParameterName     The parameters name.
+    *
+    * @return   The data of the parameter.
+    */
+    virtual QPair<bool, QVariant> getMaterialParameterRecursive(QObject * pObject,
+                                                   QString sParameterName);
+
+    //=========================================================================================================
+    /**
+    * Update the set transformation with the currently set translation and rotation values.
+    */
+    virtual void updateTransform();
+
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
 
     float                                       m_fScale;                /**< The scaling value. */
@@ -249,11 +289,7 @@ protected:
     float                                       m_fRotZ;                 /**< The z axis rotation value. */
     QVector3D                                   m_position;              /**< The position/translation value. */
 
-    //=========================================================================================================
-    /**
-    * Update the set transformation with the currently set translation and rotation values.
-    */
-    virtual void updateTransform();
+
 
 signals:
     //=========================================================================================================

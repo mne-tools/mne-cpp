@@ -256,15 +256,12 @@ void View3D::startStopModelRotation(bool checked)
 {
     if(checked) {
         //Start animation
-        m_lPropertyAnimations.clear();
-
-        for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-            startModelRotationRecursive(m_p3DObjectsEntity->children().at(i));
-        }
+        startModelRotationRecursive(m_p3DObjectsEntity);
     } else {
         for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
             m_lPropertyAnimations.at(i)->stop();
         }
+        m_lPropertyAnimations.clear();
     }
 }
 

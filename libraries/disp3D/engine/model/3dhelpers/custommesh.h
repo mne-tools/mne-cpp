@@ -199,7 +199,7 @@ protected:
     QPointer<Qt3DRender::QGeometry>     m_pCustomGeometry;         /**< The custom geometry. */
 
     QPointer<Qt3DRender::QAttribute>    m_pIndexAttribute;         /**< The index attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;      /**< The position attribute. */
+    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;        /**< The position attribute. */
     QPointer<Qt3DRender::QAttribute>    m_pNormalAttribute;        /**< The normal attribute. */
     QPointer<Qt3DRender::QAttribute>    m_pColorAttribute;         /**< The color attribute. */
 

@@ -285,7 +285,7 @@ void RtSensorDataController::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void RtSensorDataController::onNewRtRawData(const VectorXd &vecDataVector)
+void RtSensorDataController::onNewRtRawData(VectorXd vecDataVector)
 {
     emit newRtRawDataAvailable(vecDataVector);
 }
@@ -301,8 +301,8 @@ void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMat
 
 //*************************************************************************************************************
 
-void RtSensorDataController::onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float> > matInterpolationOperator)
+void RtSensorDataController::onNewInterpolationMatrixCalculated(Eigen::SparseMatrix<float> matInterpolationMatrix)
 {
     qDebug()<<"onNewInterpolationMatrixCalculated";
-    emit newInterpolationMatrixAvailable(matInterpolationOperator);
+    emit newInterpolationMatrixAvailable(matInterpolationMatrix);
 }

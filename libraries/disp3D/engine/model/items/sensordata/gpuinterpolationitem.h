@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstract3Dtreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -73,6 +74,8 @@ namespace MNELIB{
 
 namespace Qt3DRender {
     class QComputeCommand;
+    class QBuffer;
+    class QAttribute;
 }
 
 
@@ -101,7 +104,7 @@ class GpuInterpolationMaterial;
 * @brief Signal interpolation with qt3d compute shader.
 */
 
-class DISP3DSHARED_EXPORT GpuInterpolationItem : public Abstract3DTreeItem
+class DISP3DSHARED_EXPORT GpuInterpolationItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
@@ -117,9 +120,14 @@ public:
     * @param[in] iType              The type of the item. See types.h for declaration and definition.
     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = nullptr,
+    explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
                                   int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
                                   const QString& text = "3D Plot");
+    //=========================================================================================================
+    /**
+    * Default destructor.
+    */
+    ~GpuInterpolationItem();
 
     //=========================================================================================================
     /**
@@ -127,15 +135,15 @@ public:
      *
      * @param tMneBemSurface        The bem surface data.
      */
-    void initData(const MNELIB::MNEBemSurface &tMneBemSurface);
+    virtual void initData(const MNELIB::MNEBemSurface &tMneBemSurface);
 
     //=========================================================================================================
     /**
      * Set the new Interpolation matrix for the interpolation.
      *
-     * @param pInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
+     * @param matInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
      */
-    void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> pInterpolationMatrix);
+    virtual void setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -143,7 +151,7 @@ public:
     *
     * @param tSignalVec              Vector with one float value for each sensor.
     */
-    void addNewRtData(const Eigen::VectorXf &tSignalVec);
+    virtual void addNewRtData(Eigen::VectorXf tSignalVec);
 
     //=========================================================================================================
     /**
@@ -151,7 +159,7 @@ public:
     *
     * @param[in] vecThresholds       The new threshold values used for normalizing the data.
     */
-    void setNormalization(const QVector3D& tVecThresholds);
+    virtual void setNormalization(const QVector3D& tVecThresholds);
 
     //=========================================================================================================
     /**
@@ -159,27 +167,40 @@ public:
      *
      * @param tColormapType           The new colormap name.
      */
-    void setColormapType(const QString& tColormapType);
+    virtual void setColormapType(const QString& tColormapType);
 
 protected:
     //=========================================================================================================
     /**
-     * Initialze the Item.
+     * Build the content of the Interpolation matrix buffer.
+     *
+     * @param matInterpolationMatrix    The Interpolation matrix.
+     *
+     * @return                          Interpolation matrix is byte array form.
      */
-    virtual void initItem() override;
+    virtual QByteArray buildInterpolationMatrixBuffer(Eigen::SparseMatrix<float> matInterpolationMatrix);
 
-    bool                                    m_bIsDataInit;          /**< The initialization flag. */
+    //=========================================================================================================
+    /**
+     * Build buffer filled with 0.0f.
+     *
+     * @param tSize         Number of zeros.
+     *
+     * @return              Buffer content.
+     */
+    virtual QByteArray buildZeroBuffer(const uint tSize);
 
-    QPointer<CustomMesh>                    m_pCustomMesh;          /**< Stores 3D data of the surfce. */
+    bool                                    m_bIsDataInit;                  /**< The initialization flag. */
 
-    QPointer<Qt3DCore::QEntity>             m_pMeshDrawEntity;      /**< Top level Entity for the draw part. */
+    QPointer<Qt3DCore::QEntity>             m_pComputeEntity;               /**< Top level Entity for the compute part. */
 
-    QPointer<Qt3DCore::QEntity>             m_pComputeEntity;       /**< Top level Entity for the compute part. */
+    QPointer<GpuInterpolationMaterial>      m_pGPUMaterial;                 /**< Compute material used for the process. */
 
-    QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;      /**< This component issues work for the csh to the gpu. */
+    QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;
+    QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;
+    QPointer<Qt3DRender::QBuffer>           m_pSignalDataBuffer;
 
-    QPointer<GpuInterpolationMaterial>      m_pMaterial;            /**< Compute material used for the process. */
-
+    Qt3DRender::QAttribute* pInterpolatedSignalAttrib;
 };
 
 

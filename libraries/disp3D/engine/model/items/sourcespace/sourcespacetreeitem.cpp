@@ -103,7 +103,7 @@ void SourceSpaceTreeItem::initItem()
 void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
 {
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tHemisphere.rr);
+    MatrixX3f matVertColor = createVertColor(tHemisphere.rr.rows());
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tHemisphere.rr,
@@ -115,8 +115,8 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
     //Add data which is held by this SourceSpaceTreeItem
     QVariant data;
 
-    data.setValue(tHemisphere.rr);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+    data.setValue(tHemisphere.rr.rows());
+    this->setData(data, Data3DTreeModelItemRoles::NumberVertices);
 
     plotSources(tHemisphere);
 }

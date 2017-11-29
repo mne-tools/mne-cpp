@@ -99,7 +99,7 @@ void CpuInterpolationItem::initItem()
 void CpuInterpolationItem::initData(const MNEBemSurface& tBemSurface)
 {
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
+    MatrixX3f matVertColor = createVertColor(tBemSurface.rr.rows());
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tBemSurface.rr,
@@ -114,6 +114,6 @@ void CpuInterpolationItem::initData(const MNEBemSurface& tBemSurface)
     //Add data which is held by this BemSurfaceTreeItem
     QVariant data;
 
-    data.setValue(tBemSurface.rr);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+    data.setValue(tBemSurface.rr.rows());
+    this->setData(data, Data3DTreeModelItemRoles::NumberVertices);
 }

@@ -97,14 +97,14 @@ void RtInterpolationMatWorker::setInterpolationFunction(const QString &sInterpol
 
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
-        m_lInterpolationData.pInterpolationMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                                   m_lInterpolationData.pDistanceMatrix,
-                                                                                   m_lInterpolationData.interpolationFunction,
-                                                                                   m_lInterpolationData.dCancelDistance,
-                                                                                   m_lInterpolationData.fiffInfo,
-                                                                                   m_lInterpolationData.iSensorType);
+        SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                            m_lInterpolationData.matDistanceMatrix,
+                                                                                            m_lInterpolationData.interpolationFunction,
+                                                                                            m_lInterpolationData.dCancelDistance,
+                                                                                            m_lInterpolationData.fiffInfo,
+                                                                                            m_lInterpolationData.iSensorType);
 
-        emit newInterpolationMatrixCalculated(m_lInterpolationData.pInterpolationMatrix);
+        emit newInterpolationMatrixCalculated(matInterpolationMat);
     }
 }
 
@@ -138,7 +138,7 @@ void RtInterpolationMatWorker::setInterpolationInfo(const MNEBemSurface &bemSurf
     m_lInterpolationData.iSensorType = iSensorType;
 
     //sensor projecting: One time operation because surface and sensors can not change
-    m_lInterpolationData.pVecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.bemSurface, vecSensorPos);
+    m_lInterpolationData.vecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.bemSurface, vecSensorPos);
 
     m_bInterpolationInfoIsInit = true;
 
@@ -158,19 +158,19 @@ void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
     m_lInterpolationData.fiffInfo = info;
 
     //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
+    GeometryInfo::filterBadChannels(m_lInterpolationData.matDistanceMatrix,
                                     m_lInterpolationData.fiffInfo,
                                     m_lInterpolationData.iSensorType);
 
     //create Interpolation matrix
-    m_lInterpolationData.pInterpolationMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                                      m_lInterpolationData.pDistanceMatrix,
-                                                                                      m_lInterpolationData.interpolationFunction,
-                                                                                      m_lInterpolationData.dCancelDistance,
-                                                                                      m_lInterpolationData.fiffInfo,
-                                                                                      m_lInterpolationData.iSensorType);
+    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                        m_lInterpolationData.matDistanceMatrix,
+                                                                                        m_lInterpolationData.interpolationFunction,
+                                                                                        m_lInterpolationData.dCancelDistance,
+                                                                                        m_lInterpolationData.fiffInfo,
+                                                                                        m_lInterpolationData.iSensorType);
 
-    emit newInterpolationMatrixCalculated(m_lInterpolationData.pInterpolationMatrix);
+    emit newInterpolationMatrixCalculated(matInterpolationMat);
 }
 
 
@@ -184,22 +184,22 @@ void RtInterpolationMatWorker::calculateInterpolationOperator()
     }
 
     //SCDC with cancel distance
-    m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
-                                                              m_lInterpolationData.pVecMappedSubset,
+    m_lInterpolationData.matDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
+                                                              m_lInterpolationData.vecMappedSubset,
                                                               m_lInterpolationData.dCancelDistance);
 
     //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
+    GeometryInfo::filterBadChannels(m_lInterpolationData.matDistanceMatrix,
                                     m_lInterpolationData.fiffInfo,
                                     m_lInterpolationData.iSensorType);
 
     //create Interpolation matrix
-    m_lInterpolationData.pInterpolationMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                               m_lInterpolationData.pDistanceMatrix,
-                                                                               m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance,
-                                                                               m_lInterpolationData.fiffInfo,
-                                                                               m_lInterpolationData.iSensorType);
+    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                        m_lInterpolationData.matDistanceMatrix,
+                                                                                        m_lInterpolationData.interpolationFunction,
+                                                                                        m_lInterpolationData.dCancelDistance,
+                                                                                        m_lInterpolationData.fiffInfo,
+                                                                                        m_lInterpolationData.iSensorType);
 
-    emit newInterpolationMatrixCalculated(m_lInterpolationData.pInterpolationMatrix);
+    emit newInterpolationMatrixCalculated(matInterpolationMat);
 }

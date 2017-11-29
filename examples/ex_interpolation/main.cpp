@@ -145,12 +145,12 @@ int main(int argc, char *argv[])
 
     //projecting with MEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<QVector<qint32>> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0], megSensors);
+    QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0], megSensors);
     std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
 
     //SCDC with cancel distance 0.03
     qint64 startTimeScdc = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0], mappedSubSet, 0.03);
+    MatrixXd distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0], mappedSubSet, 0.03);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
     //filter out bad MEG channels
@@ -158,12 +158,12 @@ int main(int argc, char *argv[])
 
     //weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<SparseMatrix<float> > interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
-                                                                                                     distanceMatrix,
-                                                                                                     Interpolation::linear,
-                                                                                                     FLOAT_INFINITY,
-                                                                                                     evoked.info,
-                                                                                                     FIFFV_MEG_CH);
+    SparseMatrix<float> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
+                                                                                    distanceMatrix,
+                                                                                    Interpolation::linear,
+                                                                                    FLOAT_INFINITY,
+                                                                                    evoked.info,
+                                                                                    FIFFV_MEG_CH);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
     //realtime interpolation (1 iteration)

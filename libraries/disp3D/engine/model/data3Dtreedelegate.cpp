@@ -130,6 +130,17 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             Spline* pSpline = new Spline("Set Threshold", 0);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
+
+            int width = pSpline->size().width();
+            int height = pSpline->size().height();
+            if (pSpline->size().width() < 200 && pSpline->size().height() < 200) {
+                pSpline->resize(600,400);   //resize histogram to be readable with default size
+            } else {
+                width = pSpline->size().width();   //keeps the size of the histogram
+                height = pSpline->size().height();
+                pSpline->resize(width,height);
+            }
+
             return pSpline;
         }
 
@@ -270,6 +281,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pComboBox->addItem("Phong Alpha Tesselation");
             pComboBox->addItem("Phong Alpha");
             pComboBox->addItem("Show normals");
+            pComboBox->addItem("GPU Interpolation");
             return pComboBox;
         }
         
@@ -375,16 +387,6 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
                         QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::ColormapType).value<QString>();
                         pSpline->setColorMap(colorMap);
                     }
-                }
-
-                int width = pSpline->size().width();
-                int height = pSpline->size().height();
-                if (pSpline->size().width() < 200 && pSpline->size().height() < 200) {
-                    pSpline->resize(600,400);   //resize histogram to be readable with default size
-                } else {
-                    width = pSpline->size().width();   //keeps the size of the histogram
-                    height = pSpline->size().height();
-                    pSpline->resize(width,height);
                 }
             }
 

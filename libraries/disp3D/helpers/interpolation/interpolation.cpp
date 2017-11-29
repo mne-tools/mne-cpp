@@ -83,25 +83,26 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
-                                                                            const QSharedPointer<MatrixXd> pDistanceTable,
-                                                                            double (*interpolationFunction) (double),
-                                                                            const double dCancelDist,
-                                                                            const FIFFLIB::FiffInfo& fiffInfo,
-                                                                            qint32 iSensorType)
+SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
+                                                          const MatrixXd &matDistanceTable,
+                                                          double (*interpolationFunction) (double),
+                                                          const double dCancelDist,
+                                                          const FIFFLIB::FiffInfo& fiffInfo,
+                                                          qint32 iSensorType)
 {
-    if (! pDistanceTable) {
-        qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table. Returning null pointer...";
-        return QSharedPointer<SparseMatrix<float> >();
+
+    if(matDistanceTable.rows() == 0 && matDistanceTable.cols() == 0) {
+        qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table.";
+        return SparseMatrix<float>();
     }
 
     // initialization
-    QSharedPointer<SparseMatrix<float> > pInterpolationMatrix = QSharedPointer<SparseMatrix<float> >::create(pDistanceTable->rows(), pProjectedSensors->size());
+    SparseMatrix<float> matInterpolationMatrix(matDistanceTable.rows(), vecProjectedSensors.size());
 
     // temporary helper structure for filling sparse matrix
-    QVector<Eigen::Triplet<float> > vecNonZeroEntries;
-    const qint32 iRows = pInterpolationMatrix->rows();
-    const qint32 iCols = pInterpolationMatrix->cols();
+    QVector<Triplet<float> > vecNonZeroEntries;
+    const qint32 iRows = matInterpolationMatrix.rows();
+    const qint32 iCols = matInterpolationMatrix.cols();
 
     // insert all sensor nodes into set for faster lookup during later computation. Also consider bad channels here.
     QSet<qint32> sensorLookup;
@@ -112,7 +113,7 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
         //Only take EEG with V as unit or MEG magnetometers with T as unit
         if(s.kind == iSensorType && (s.unit == FIFF_UNIT_T || s.unit == FIFF_UNIT_V)){
             if(!fiffInfo.bads.contains(s.ch_name)){
-                sensorLookup.insert (pProjectedSensors->at(idx));
+                sensorLookup.insert (vecProjectedSensors.at(idx));
             }
 
             idx++;
@@ -127,9 +128,11 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
             QVector<QPair<qint32, float> > vecBelowThresh;
             float dWeightsSum = 0.0;
-            const RowVectorXd& rowVec = pDistanceTable->row(r);
+            const RowVectorXd& rowVec = matDistanceTable.row(r);
+
             for (qint32 c = 0; c < iCols; ++c) {
                 const float dDist = rowVec[c];
+
                 if (dDist < dCancelDist) {
                     const float dValueWeight = std::fabs(1.0 / interpolationFunction(dDist));
                     dWeightsSum += dValueWeight;
@@ -143,35 +146,32 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
             }
         } else {
             // a sensor has been assigned to this node, we do not need to interpolate anything (final vertex signal is equal to sensor input signal, thus factor 1)
-            const int iIndexInSubset = pProjectedSensors->indexOf(r);
+            const int iIndexInSubset = vecProjectedSensors.indexOf(r);
 
             vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, iIndexInSubset, 1));
             counter++;
         }
     }
 
-    pInterpolationMatrix->setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
-    return pInterpolationMatrix;
+    matInterpolationMatrix.setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
+
+    return matInterpolationMatrix;
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<VectorXf> Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float> > pInterpolationMatrix,
-                                                          const VectorXd &vecMeasurementData)
+VectorXf Interpolation::interpolateSignal(const Eigen::SparseMatrix<float> &matInterpolationMatrix,
+                                          const VectorXd &vecMeasurementData)
 {
-    if(pInterpolationMatrix){
-        QSharedPointer<VectorXf> pOutVec = QSharedPointer<VectorXf>::create();
-        if (pInterpolationMatrix->cols() != vecMeasurementData.rows()) {
-            qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
-            return QSharedPointer<VectorXf>();
-        }
-        (*pOutVec) = (*pInterpolationMatrix) * vecMeasurementData.cast<float>();
-        return pOutVec;
-    } else {
-        qDebug() << "[WARNING] Interpolation::interpolateSignal - Null pointer for interpolationMatrix, weight matrix was not created. Return null pointer...";
-        return QSharedPointer<VectorXf>();
+    if (matInterpolationMatrix.cols() != vecMeasurementData.rows()) {
+        qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
+        return VectorXf();
     }
+
+    VectorXf pOutVec = matInterpolationMatrix * vecMeasurementData.cast<float>();
+
+    return pOutVec;
 }
 
 

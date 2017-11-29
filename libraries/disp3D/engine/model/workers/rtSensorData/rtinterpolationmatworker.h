@@ -169,9 +169,8 @@ protected:
         int                                             iSensorType;                    /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
         double                                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
-        QSharedPointer<Eigen::SparseMatrix<float> >     pInterpolationMatrix;           /**< Interpolation matrix that holds all coefficients for a signal interpolation. */
-        QSharedPointer<Eigen::MatrixXd>                 pDistanceMatrix;                /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
-        QSharedPointer<QVector<qint32>>                 pVecMappedSubset;               /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        Eigen::MatrixXd                                 matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+        QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
 
         MNELIB::MNEBemSurface                           bemSurface;                     /**< Holds all vertex information that is needed (public member rr). */
         FIFFLIB::FiffInfo                               fiffInfo;                       /**< Contains all information about the sensors. */
@@ -186,9 +185,9 @@ signals:
     /**
     * Emit this signal whenever a new interpolation matrix was calcualted.
     *
-    * @param[in] matInterpolationOperator     The new interpolation matrix.
+    * @param[in] matInterpolationMatrix     The new interpolation matrix.
     */
-    void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationOperator);
+    void newInterpolationMatrixCalculated(Eigen::SparseMatrix<float> matInterpolationMatrix);
 };
 
 } // NAMESPACE

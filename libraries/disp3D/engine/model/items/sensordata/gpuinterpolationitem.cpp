@@ -55,6 +55,7 @@
 #include <Qt3DRender/QComputeCommand>
 #include <Qt3DRender/QAttribute>
 #include <Qt3DRender/QGeometryRenderer>
+#include <Qt3DRender/QBuffer>
 
 
 //*************************************************************************************************************
@@ -85,11 +86,23 @@ using namespace Qt3DCore;
 //=============================================================================================================
 
 GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
-    : Abstract3DTreeItem(p3DEntityParent, iType, text)
-    , m_bIsDataInit(false)
-    , m_pMaterial(new GpuInterpolationMaterial(true))
+: AbstractMeshTreeItem(p3DEntityParent, iType, text)
+, m_bIsDataInit(false)
+, m_pGPUMaterial(new GpuInterpolationMaterial(true))
+, m_pInterpolationMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
+, m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
 {
-    initItem();
+}
+
+
+//*************************************************************************************************************
+
+GpuInterpolationItem::~GpuInterpolationItem()
+{
+    m_pInterpolationMatBuffer->deleteLater();
+    m_pOutputColorBuffer->deleteLater();
+    m_pSignalDataBuffer->deleteLater();
 }
 
 
@@ -103,68 +116,50 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
        return;
     }
 
-    //Create draw entity if needed
-    if(!m_pMeshDrawEntity)
-    {
-        m_pMeshDrawEntity = new QEntity(this);
+    //Create and add interpolated color signal attribute
+    pInterpolatedSignalAttrib = new QAttribute;
+    pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
+    pInterpolatedSignalAttrib->setDataType(Qt3DRender::QAttribute::Float);
+    pInterpolatedSignalAttrib->setVertexSize(4);
+    pInterpolatedSignalAttrib->setByteOffset(0);
+    pInterpolatedSignalAttrib->setByteStride(4 * sizeof(float));
+    pInterpolatedSignalAttrib->setName(QStringLiteral("OutputColor"));
+    //pInterpolatedSignalAttrib->setCount(tMneBemSurface.rr.rows());
 
-        m_pCustomMesh = new CustomMesh;
+    //Critical? Can't we instead access the new data directly from shader level?
+    pInterpolatedSignalAttrib->setBuffer(m_pOutputColorBuffer);
 
-        //Interpolated signal attribute
-        QAttribute *pInterpolatedSignalAttrib = new QAttribute;
-        pInterpolatedSignalAttrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-        pInterpolatedSignalAttrib->setDataType(Qt3DRender::QAttribute::Float);
-        pInterpolatedSignalAttrib->setVertexSize(4);
-        pInterpolatedSignalAttrib->setByteOffset(0);
-        pInterpolatedSignalAttrib->setByteStride(4 * sizeof(float));
-        pInterpolatedSignalAttrib->setName(QStringLiteral("OutputColor"));
-        pInterpolatedSignalAttrib->setBuffer(m_pMaterial->getOutputColorBuffer());
+    m_pCustomMesh->addAttribute(pInterpolatedSignalAttrib);
 
-        //add interpolated signal Attribute
-        m_pCustomMesh->addAttribute(pInterpolatedSignalAttrib);
+    //Create material, init and connect all necessary buffers
+    this->setMaterial(m_pGPUMaterial);
+    m_pInterpolationMatBuffer->setData(buildZeroBuffer(1));//2562*60
+    m_pOutputColorBuffer->setData(buildZeroBuffer(4));//2562*4
+    m_pSignalDataBuffer->setData(buildZeroBuffer(1));//60
+    this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), "InputVec");
+    this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), "InterpolationMat");
+    this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), "OutputColor");
 
-        m_pMeshDrawEntity->addComponent(m_pCustomMesh);
-
-        m_pMeshDrawEntity->addComponent(m_pMaterial);
-    }
-
-    //Create compute entity if needed
-    if(!m_pComputeEntity)
-    {
-        m_pComputeEntity = new QEntity(this);
-
-        m_pComputeCommand = new QComputeCommand;
-        m_pComputeEntity->addComponent(m_pComputeCommand);
-
-        m_pComputeEntity->addComponent(m_pMaterial);
-    }
+    //Create and add compute shader
+    QPointer<Qt3DRender::QComputeCommand> pComputeCommand = new QComputeCommand();
+    this->addComponent(pComputeCommand);
 
     const uint iInterpolationMatRows = tMneBemSurface.rr.rows();
-
-    //Set work group size
     const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iInterpolationMatRows)));
-
-    m_pComputeCommand->setWorkGroupX(iWorkGroupsSize);
-    m_pComputeCommand->setWorkGroupY(iWorkGroupsSize);
-    m_pComputeCommand->setWorkGroupZ(1);
+    pComputeCommand->setWorkGroupX(iWorkGroupsSize);
+    pComputeCommand->setWorkGroupY(iWorkGroupsSize);
+    pComputeCommand->setWorkGroupZ(1);
 
     //Set custom mesh data
     //generate mesh base color
-    QColor baseColor = QColor(80, 80, 80, 255);
-    MatrixX3f matVertColor(tMneBemSurface.rr.rows(),3);
-
-    for(int i = 0; i < matVertColor.rows(); ++i) {
-        matVertColor(i,0) = baseColor.redF();
-        matVertColor(i,1) = baseColor.greenF();
-        matVertColor(i,2) = baseColor.blueF();
-    }
+    MatrixX3f matVertColor = createVertColor(tMneBemSurface.rr.rows(), QColor(0,0,0));
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tMneBemSurface.rr,
-                                tMneBemSurface.nn,
-                                tMneBemSurface.tris,
-                                matVertColor,
-                                Qt3DRender::QGeometryRenderer::Triangles);
+                               tMneBemSurface.nn,
+                               tMneBemSurface.tris,
+                               matVertColor,
+                               Qt3DRender::QGeometryRenderer::Triangles);
 
     m_bIsDataInit = true;
 }
@@ -172,7 +167,7 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<float> > pInterpolationMatrix)
+void GpuInterpolationItem::setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix)
 {
     if(m_bIsDataInit == false)
     {
@@ -180,29 +175,95 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<SparseMatrix<fl
         return;
     }
 
-    if(pInterpolationMatrix) {
-        m_pMaterial->setInterpolationMatrix(pInterpolationMatrix);
-    }
+    qDebug()<<"GpuInterpolationMaterial::setInterpolationMatrix";
+    //Set Rows and Cols
+    this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.cols()), "cols");
+    this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.rows()), "rows");
+
+    //Set buffer
+    QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(matInterpolationMatrix);
+
+    // Solution 1
+    //Qt3DRender::QBuffer* pInterpolationMatBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer);
+    //pInterpolationMatBuffer->setData(interpolationBufferData);
+    //qDebug()<<"matInterpolationMatrix.rows()"<<matInterpolationMatrix.rows();
+    //qDebug()<<"matInterpolationMatrix.cols()"<<matInterpolationMatrix.cols();
+
+    // Solution 2
+    //m_pInterpolationMatBuffer->updateData(0, interpolationBufferData);
+
+    // Solution 3
+    m_pInterpolationMatBuffer->setData(interpolationBufferData);
+
+    //this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), "InterpolationMat");
+
+    //Set output buffer
+    QByteArray outputDataBufferData = buildZeroBuffer(4 * matInterpolationMatrix.rows());
+
+    // Solution 1
+    //Qt3DRender::QBuffer* pOutputColorBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
+    //pOutputColorBuffer->(outputDataBufferData);
+    //pInterpolatedSignalAttrib->setBuffer(pOutputColorBuffer);
+
+    // Solution 2
+    //m_pOutputColorBuffer->updateData(0, outputDataBufferData);
+
+    // Solution 3
+    m_pOutputColorBuffer->setData(outputDataBufferData);
+
+    //this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), "OutputColor");
 }
 
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
+void GpuInterpolationItem::addNewRtData(VectorXf tSignalVec)
 {
-    if(m_pMaterial && m_bIsDataInit)
+    if(m_bIsDataInit == false)
     {
-        m_pMaterial->addSignalData(tSignalVec);
+        qDebug("GpuInterpolationItem::addNewRtData - item data is not initialized!");
+        return;
     }
 
+    const uint iBufferSize = tSignalVec.rows();
+    //qDebug()<<"tSignalVec.rows()"<<tSignalVec.rows();
+
+    if(iBufferSize != this->getMaterialParameter("cols").toInt())
+    {
+        qDebug("GpuInterpolationMaterial::addSignalData input vector dimension mismatch!");
+        return;
+    }
+
+    QByteArray bufferData;
+    bufferData.resize(iBufferSize * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    for(uint i = 0; i < iBufferSize; ++i)
+    {
+        rawVertexArray[i] = static_cast<float>(tSignalVec[i]);
+    }
+
+    //Set buffer and parameter
+    // Solution 1
+    //Qt3DRender::QBuffer* pSignalDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer);
+    //pSignalDataBuffer->setData(bufferData);
+
+    // Solution 2
+    //m_pSignalDataBuffer->updateData(0, bufferData);
+
+    // Solution 3
+    m_pSignalDataBuffer->setData(bufferData);
+
+    //this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), "InputVec");
 }
 
 
 //*************************************************************************************************************
 
 void GpuInterpolationItem::setNormalization(const QVector3D &tVecThresholds)
-{
-    m_pMaterial->setNormalization(tVecThresholds);
+{   
+    this->setMaterialParameter(QVariant::fromValue(tVecThresholds.x()), "fThresholdX");
+    this->setMaterialParameter(QVariant::fromValue(tVecThresholds.z()), "fThresholdZ");
 }
 
 
@@ -210,19 +271,62 @@ void GpuInterpolationItem::setNormalization(const QVector3D &tVecThresholds)
 
 void GpuInterpolationItem::setColormapType(const QString &tColormapType)
 {
-    m_pMaterial->setColormapType(tColormapType);
+    int colorMapId = 0;
+    if(tColormapType == "Hot") {
+        colorMapId = 0;
+    } else if(tColormapType == "Hot Negative 1") {
+        colorMapId = 1;
+    } else if(tColormapType == "Hot Negative 2") {
+        colorMapId = 2;
+    } else if(tColormapType == "Jet") {
+        colorMapId = 3;
+    }
+
+    this->setMaterialParameter(QVariant::fromValue(colorMapId), "ColormapType");
 }
 
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::initItem()
+QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(SparseMatrix<float> matInterpolationMatrix)
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip(this->text());
+    QByteArray bufferData;
+
+    const uint iRows = matInterpolationMatrix.rows();
+    const uint iCols = matInterpolationMatrix.cols();
+
+    //bufferData.resize(iRows * iCols * (int)sizeof(float));
+    bufferData = buildZeroBuffer(iRows * iCols);
+    qDebug()<<"the motherfucking size (in kB) of the this motherfucking array from hell: "<<bufferData.size()/10e03;
+
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    //Iterate over non zero entries only and transform from col major to row major (shader works with row major)
+    for (int k=0; k<matInterpolationMatrix.outerSize(); ++k) {
+        for (SparseMatrix<float>::InnerIterator it(matInterpolationMatrix,k); it; ++it)
+        {
+            //rawVertexArray[(it.col()*iRows)+it.row()] = static_cast<float>(it.value()); //Col major as result
+            rawVertexArray[(it.row()*iCols)+it.col()] = static_cast<float>(it.value()); //Row major as result
+        }
+    }
+
+    return bufferData;
 }
 
 
 //*************************************************************************************************************
+
+QByteArray GpuInterpolationItem::buildZeroBuffer(const uint tSize)
+{
+    QByteArray bufferData;
+    bufferData.resize(tSize * (int)sizeof(float));
+    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    //Set default values
+    for(uint i = 0; i < tSize; ++i)
+    {
+        rawVertexArray[i] = static_cast<float>(0.0);
+    }
+
+    return bufferData;
+}

@@ -130,13 +130,9 @@ void NetworkTreeItem::initItem()
     list << new QStandardItem(pItemNetworkMatrix->toolTip());
     this->appendRow(list);
 
-    //Set shaders
-    this->removeComponent(m_pMaterial);
-    this->removeComponent(m_pTessMaterial);
-    this->removeComponent(m_pNormalMaterial);
-
+    //Set material
     NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
-    this->addComponent(pNetworkMaterial);
+    this->setMaterial(pNetworkMaterial);
 }
 
 

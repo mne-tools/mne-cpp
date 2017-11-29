@@ -151,8 +151,8 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface)
     data.setValue(tSurface.curv());
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
 
-    data.setValue(tSurface.rr());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+    data.setValue(tSurface.rr().rows());
+    this->setData(data, Data3DTreeModelItemRoles::NumberVertices);
 
      //Add data which is held by this FsSurfaceTreeItem
     QList<QStandardItem*> list;
