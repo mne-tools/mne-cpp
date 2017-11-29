@@ -109,9 +109,9 @@ protected:
     /**
     * Set the new interpolation matrix.
     *
-    * @param[in] matInterpolationOperator                 The new interpolation matrix.
+    * @param[in] matInterpolationMatrix                 The new interpolation matrix.
     */
-    virtual void setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator);
+    virtual void setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -129,7 +129,7 @@ protected:
     *
     * @param[in] vecDataVector         The streamed raw data.
     */
-    void virtual onNewRtRawData(const Eigen::VectorXd &vecDataVector);
+    void virtual onNewRtRawData(VectorXd vecDataVector);
 
     //=========================================================================================================
     /**

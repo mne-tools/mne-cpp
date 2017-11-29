@@ -595,6 +595,6 @@ void Data3DTreeModel::initMetatypes()
     qRegisterMetaType<MNELIB::MNEBemSurface>();
     qRegisterMetaType<MNEBemSurface>();
 
-    qRegisterMetaType<QSharedPointer<Eigen::SparseMatrix<float> > >();
-    qRegisterMetaType<QSharedPointer<SparseMatrix<float> > >();
+    qRegisterMetaType<Eigen::SparseMatrix<float> >();
+    qRegisterMetaType<SparseMatrix<float> >();
 }

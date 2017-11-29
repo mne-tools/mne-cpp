@@ -121,19 +121,20 @@ public:
     *    -# if not: the values are calculated to give a total of 1 (a lot of values will stay 0, because they are too far away to influence) by using the above mentioned formula
     *
     * @brief <i>createInterpolationMat</i>     Calculate weight matrix for later interpolation
-    * @param pProjectedSensors                 Vector of IDs of sensor vertices
-    * @param pDistanceTable                    Matrix that contains all needed distances
+    *
+    * @param vecProjectedSensors               Vector of IDs of sensor vertices
+    * @param matDistanceTable                  Matrix that contains all needed distances
     * @param interpolationFunction             Function that computes interpolation coefficients using the distance values
     * @param dCancelDist                       Distances higher than this are ignored, i.e. the respective coefficients are set to zero
     *
-    * @return                                  A shared pointer to the distance matrix created
+    * @return                                  The distance matrix created
     */
-    static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const QSharedPointer<QVector<qint32>> pProjectedSensors,
-                                                                              const QSharedPointer<Eigen::MatrixXd> pDistanceTable,
-                                                                              double (*interpolationFunction) (double),
-                                                                              const double dCancelDist = FLOAT_INFINITY,
-                                                                              const FIFFLIB::FiffInfo &fiffInfo = FIFFLIB::FiffInfo(),
-                                                                              qint32 iSensorType = FIFFV_EEG_CH);
+    static Eigen::SparseMatrix<float> createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
+                                                             const Eigen::MatrixXd &matDistanceTable,
+                                                             double (*interpolationFunction) (double),
+                                                             const double dCancelDist = FLOAT_INFINITY,
+                                                             const FIFFLIB::FiffInfo &fiffInfo = FIFFLIB::FiffInfo(),
+                                                             qint32 iSensorType = FIFFV_EEG_CH);
 
     //=========================================================================================================
     /**
@@ -143,13 +144,13 @@ public:
     * i.e. in first instance the distance table that the weight matrix is based on.
     *
     * @brief <i>interpolateSignals</i>     Interpolate sensor data
-    * @param pInterpolationMatrix          The weight matrix which should be used for multiplying
+    * @param matInterpolationMatrix        The weight matrix which should be used for multiplying
     * @param vecMeasurementData            A vector with measured sensor data
     *
     * @return                              Interpolated values for all vertices of the mesh
     */
-    static QSharedPointer<Eigen::VectorXf> interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > pInterpolationMatrix,
-                                                             const Eigen::VectorXd &vecMeasurementData);
+    static Eigen::VectorXf interpolateSignal(const Eigen::SparseMatrix<float> &matInterpolationMatrix,
+                                             const Eigen::VectorXd &vecMeasurementData);
 
     //=========================================================================================================
     /**

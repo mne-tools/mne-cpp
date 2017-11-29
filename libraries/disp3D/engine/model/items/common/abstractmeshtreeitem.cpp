@@ -40,6 +40,7 @@
 
 #include "abstractmeshtreeitem.h"
 #include "../common/metatreeitem.h"
+#include "../../materials/gpuinterpolationmaterial.h"
 #include "../../materials/pervertexphongalphamaterial.h"
 #include "../../materials/pervertextessphongalphamaterial.h"
 #include "../../materials/shownormalsmaterial.h"
@@ -76,9 +77,6 @@ using namespace Eigen;
 
 AbstractMeshTreeItem::AbstractMeshTreeItem(QEntity* p3DEntityParent, int iType, const QString& text)
 : Abstract3DTreeItem(p3DEntityParent, iType, text)
-, m_pMaterial(new PerVertexPhongAlphaMaterial(true))
-, m_pTessMaterial(new PerVertexTessPhongAlphaMaterial(true))
-, m_pNormalMaterial(new ShowNormalsMaterial())
 , m_pCustomMesh(new CustomMesh())
 {
     initItem();
@@ -108,7 +106,6 @@ void AbstractMeshTreeItem::initItem()
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Abstract Surface item");
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
@@ -168,7 +165,7 @@ void AbstractMeshTreeItem::initItem()
     itemTriangleScale->setData(data, MetaTreeItemRoles::SurfaceTriangleScale);
 
     //Init materials
-    this->addComponent(m_pMaterial);
+    this->onSurfaceMaterialChanged("Phong Alpha");
 
     //Init custom mesh
     this->addComponent(m_pCustomMesh);
@@ -191,6 +188,26 @@ void AbstractMeshTreeItem::setData(const QVariant& value, int role)
         default: // do nothing;
             break;
     }
+}
+
+
+//*************************************************************************************************************
+
+void AbstractMeshTreeItem::setMaterial(Qt3DRender::QMaterial* pMaterial)
+{
+    if(!pMaterial) {
+        return;
+    }
+
+    //Remove material here. This should also call delete since we did not specify a parent for the material
+    //before adding it as a component. Hence, QEntity should take care of delete.
+    if(m_pMaterial) {
+        this->removeComponent(m_pMaterial);
+    }
+
+    //Set new material
+    m_pMaterial = pMaterial;
+    this->addComponent(m_pMaterial);
 }
 
 
@@ -223,7 +240,7 @@ void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriang
 void AbstractMeshTreeItem::onColorChanged(const QVariant& color)
 {
     QVariant data;
-    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(),
+    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::NumberVertices).toInt(),
                                                 color.value<QColor>());
 
     data.setValue(matNewVertColor);
@@ -237,36 +254,41 @@ void AbstractMeshTreeItem::onColorChanged(const QVariant& color)
 
 void AbstractMeshTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
 {
-    this->removeComponent(m_pTessMaterial);
-    this->removeComponent(m_pMaterial);
-    this->removeComponent(m_pNormalMaterial);
+    QPointer<Qt3DRender::QMaterial> pMaterial;
 
     if(sMaterial.toString() == "Phong Alpha") {
-        this->addComponent(m_pMaterial);
+        pMaterial = new PerVertexPhongAlphaMaterial(true);
         if(m_pCustomMesh) {
             m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
         }
     } else if(sMaterial.toString() == "Phong Alpha Tesselation") {
-        this->addComponent(m_pTessMaterial);
+        pMaterial = new PerVertexTessPhongAlphaMaterial(true);
         if(m_pCustomMesh) {
             m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Patches);
         }
     } else if(sMaterial.toString() == "Show normals") {
-        this->addComponent(m_pNormalMaterial);
+        pMaterial = new ShowNormalsMaterial();
+        if(m_pCustomMesh) {
+            m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
+        }
+    } else if(sMaterial.toString() == "GPU Interpolation") {
+        pMaterial = new GpuInterpolationMaterial();
         if(m_pCustomMesh) {
             m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
         }
     }
+
+    this->setMaterial(pMaterial);
 }
 
 
 //*************************************************************************************************************
 
-MatrixX3f AbstractMeshTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
+MatrixX3f AbstractMeshTreeItem::createVertColor(int numVert, const QColor& color) const
 {
-    MatrixX3f matColor(vertices.rows(),3);
+    MatrixX3f matColor(numVert,3);
 
-    for(int i = 0; i < matColor.rows(); ++i) {
+    for(int i = 0; i < numVert; ++i) {
         matColor(i,0) = color.redF();
         matColor(i,1) = color.greenF();
         matColor(i,2) = color.blueF();

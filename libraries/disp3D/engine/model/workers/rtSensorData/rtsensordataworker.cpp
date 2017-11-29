@@ -178,8 +178,8 @@ void RtSensorDataWorker::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<float>> matInterpolationOperator) {
-    m_matInterpolationOperator = matInterpolationOperator;
+void RtSensorDataWorker::setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix) {
+    m_matInterpolationMatrix = matInterpolationMatrix;
 }
 
 
@@ -241,21 +241,14 @@ void RtSensorDataWorker::streamData()
 
 MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vecSensorValues)
 {
-    if(m_matInterpolationOperator.isNull()) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Interpolation matrix was not defined. Returning ...";
-        MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
-        return matColor;
-    }
-
-    // NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-    if(vecSensorValues.rows() != m_matInterpolationOperator->cols()) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << m_matInterpolationOperator->cols() << "). Returning...";
+    if(vecSensorValues.rows() != m_matInterpolationMatrix.cols()) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << m_matInterpolationMatrix.cols() << "). Returning...";
         MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
         return matColor;
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = *Interpolation::interpolateSignal(m_matInterpolationOperator, vecSensorValues);
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(m_matInterpolationMatrix, vecSensorValues);
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;

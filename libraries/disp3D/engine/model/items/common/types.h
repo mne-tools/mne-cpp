@@ -144,7 +144,7 @@ namespace MetaTreeItemTypes
 namespace Data3DTreeModelItemRoles
 {
     enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
-                    SurfaceVert = Qt::UserRole + 101,
+                    NumberVertices = Qt::UserRole + 101,
                     SurfaceTris = Qt::UserRole + 102,
                     SurfaceNorm = Qt::UserRole + 103,
                     SurfaceCurv = Qt::UserRole + 104,
@@ -266,9 +266,9 @@ Q_DECLARE_METATYPE(FIFFLIB::FiffInfo);
 Q_DECLARE_METATYPE(QVector<Eigen::Vector3f>);
 #endif
 
-#ifndef DISP3DLIB_metatype_sharedptrsparsematf
-#define DISP3DLIB_metatype_sharedptrsparsematf
-Q_DECLARE_METATYPE(QSharedPointer<Eigen::SparseMatrix<float> >);
+#ifndef DISP3DLIB_metatype_sparsematf
+#define DISP3DLIB_metatype_sparsematf
+Q_DECLARE_METATYPE(Eigen::SparseMatrix<float>);
 #endif
 
 #endif // DISP3DLIB_TYPES_H

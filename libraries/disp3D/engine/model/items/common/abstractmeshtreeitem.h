@@ -114,15 +114,17 @@ public:
     * @param[in] iType              The type of the item. See types.h for declaration and definition.
     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit AbstractMeshTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
+    explicit AbstractMeshTreeItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
                                   int iType = Data3DTreeModelItemTypes::AbstractMeshItem,
-                                  const QString& text = "Abstract Mesh");
+                                  const QString& text = "Abstract Mesh Item");
 
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    virtual void setMaterial(Qt3DRender::QMaterial *pMaterial);
 
     //=========================================================================================================
     /**
@@ -193,17 +195,14 @@ protected:
     /**
     * Creates a QByteArray of colors for given color for the input vertices.
     *
-    * @param[in] vertices       The vertices information.
+    * @param[in] numVert        The number of vertices.
     * @param[in] color          The vertex color information.
     *
     * @return The colors per vertex
     */
-    virtual MatrixX3f createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
+    virtual MatrixX3f createVertColor(int numVert, const QColor& color = QColor(100,100,100)) const;
 
     QPointer<Qt3DRender::QMaterial>     m_pMaterial;                        /**< The material. Ownership belongs to RenderableEntity. */
-    QPointer<Qt3DRender::QMaterial>     m_pTessMaterial;                    /**< The tesselation material. Ownership belongs to RenderableEntity. */
-    QPointer<Qt3DRender::QMaterial>     m_pNormalMaterial;                  /**< The normal material. Ownership belongs to RenderableEntity. */
-
     QPointer<CustomMesh>                m_pCustomMesh;                      /**< The actual mesh information (vertices, normals, colors). */
 
 signals:

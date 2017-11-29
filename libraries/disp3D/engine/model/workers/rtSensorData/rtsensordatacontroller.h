@@ -252,7 +252,7 @@ protected:
     *
     * @param[in] vecDataVector         The new raw data.
     */
-    void onNewRtRawData(const Eigen::VectorXd &vecDataVector);
+    void onNewRtRawData(Eigen::VectorXd vecDataVector);
 
     //=========================================================================================================
     /**
@@ -266,9 +266,9 @@ protected:
     /**
     * Call this function whenever a new interpolation matrix is available to be dispatched.
     *
-    * @param[in] matInterpolationOperator         The new interpolation matrix data.
+    * @param[in] matInterpolationMatrix         The new interpolation matrix data.
     */
-    void onNewInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationOperator);
+    void onNewInterpolationMatrixCalculated(Eigen::SparseMatrix<float> matInterpolationMatrix);
 
     QTimer                                  m_timer;                            /**< The timer to control the streaming speed. */
 
@@ -394,9 +394,9 @@ signals:
     /**
     * Emit this signal whenever a new interpolation matrix is available.
     *
-    * @param[in] matInterpolationOperator          The new interpolation matrix.
+    * @param[in] matInterpolationMatrix          The new interpolation matrix.
     */
-    void newInterpolationMatrixAvailable(QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationOperator);
+    void newInterpolationMatrixAvailable(Eigen::SparseMatrix<float> matInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -404,7 +404,7 @@ signals:
     *
     * @param[in] vecDataVector          The new streamed raw data.
     */
-    void newRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
+    void newRtRawDataAvailable(Eigen::VectorXd vecDataVector);
 
     //=========================================================================================================
     /**
