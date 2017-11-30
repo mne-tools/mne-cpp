@@ -190,17 +190,15 @@ protected:
      */
     virtual QByteArray buildZeroBuffer(const uint tSize);
 
-    bool                                    m_bIsDataInit;                  /**< The initialization flag. */
+    bool                                    m_bIsDataInit;                  /**< The data initialization flag. */
 
     QPointer<Qt3DCore::QEntity>             m_pComputeEntity;               /**< Top level Entity for the compute part. */
 
     QPointer<GpuInterpolationMaterial>      m_pGPUMaterial;                 /**< Compute material used for the process. */
 
-    QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;
-    QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;
-    QPointer<Qt3DRender::QBuffer>           m_pSignalDataBuffer;
-
-    Qt3DRender::QAttribute* pInterpolatedSignalAttrib;
+    QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
+    QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;           /**< The QBuffer/GLBuffer holding the output color (interpolated) data. */
+    QPointer<Qt3DRender::QBuffer>           m_pSignalDataBuffer;            /**< The QBuffer/GLBuffer holding the signal data. */
 };
 
 
