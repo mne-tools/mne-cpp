@@ -49,8 +49,7 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/adapters/abstractview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
@@ -67,6 +66,7 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QSet>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -287,10 +287,8 @@ int main(int argc, char *argv[])
 //    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-    testWindow->setModel(p3DDataModel);
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", t_surfSet, t_annotationSet);
 
@@ -304,18 +302,13 @@ int main(int argc, char *argv[])
         pRTDataItem->setColormapType("Hot");
     }
 
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
-
     if(!t_sFileNameStc.isEmpty())
     {
         QFile t_fileClusteredStc(t_sFileNameStc);
         sourceEstimate.write(t_fileClusteredStc);
     }
 
-//*/
+    p3DAbstractView->show();
+
     return app.exec();//1;
 }
