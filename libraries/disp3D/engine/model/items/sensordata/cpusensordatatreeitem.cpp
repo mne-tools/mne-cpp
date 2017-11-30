@@ -83,7 +83,7 @@ using namespace MNELIB;
 CpuSensorDataTreeItem::CpuSensorDataTreeItem(int iType, const QString &text)
 : SensorDataTreeItem(iType, text)
 {
-    connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtSmoothedDataAvailable,
+    connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newRtSmoothedDataAvailable,
             this, &CpuSensorDataTreeItem::onNewRtSmoothedData);
 }
 

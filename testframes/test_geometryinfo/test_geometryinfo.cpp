@@ -180,7 +180,8 @@ void TestGeometryInfo::testEmptyInputsForProjecting() {
 //*************************************************************************************************************
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface);
+    QVector<qint32> vecVertSubset;
+    MatrixXd distTable = GeometryInfo::scdc(smallSurface, vecVertSubset);
     QVERIFY(distTable.rows() == distTable.cols());
 }
 

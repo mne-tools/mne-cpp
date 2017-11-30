@@ -131,7 +131,7 @@ public:
     * @return                      A double matrix. One column represents the distances for one vertex inside of the passed subset
     */
     static Eigen::MatrixXd scdc(const MNELIB::MNEBemSurface &bemSurface,
-                                QVector<qint32> &pVecVertSubset = QVector<qint32>(),
+                                QVector<qint32> &pVecVertSubset,
                                 double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
