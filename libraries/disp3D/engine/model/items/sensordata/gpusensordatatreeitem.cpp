@@ -83,10 +83,10 @@ using namespace MNELIB;
 GpuSensorDataTreeItem::GpuSensorDataTreeItem(int iType, const QString &text)
 : SensorDataTreeItem(iType,text)
 {
-    connect(m_pSensorRtDataWorkController, &RtSensorDataController::newInterpolationMatrixAvailable,
+    connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newInterpolationMatrixAvailable,
                     this, &GpuSensorDataTreeItem::setInterpolationMatrix);
 
-    connect(m_pSensorRtDataWorkController, &RtSensorDataController::newRtRawDataAvailable,
+    connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newRtRawDataAvailable,
             this, &GpuSensorDataTreeItem::onNewRtRawData);
 
     m_pSensorRtDataWorkController->setStreamSmoothedData(false);

@@ -81,43 +81,43 @@ RtSensorDataController::RtSensorDataController()
        m_pRtSensorDataWorker->moveToThread(&m_rtSensorDataWorkerThread);
 
        connect(&m_rtSensorDataWorkerThread, &QThread::finished,
-               m_pRtSensorDataWorker, &QObject::deleteLater);
+               m_pRtSensorDataWorker.data(), &QObject::deleteLater);
 
-       connect(m_pRtSensorDataWorker, &RtSensorDataWorker::newRtRawData,
+       connect(m_pRtSensorDataWorker.data(), &RtSensorDataWorker::newRtRawData,
                this, &RtSensorDataController::onNewRtRawData);
 
-       connect(m_pRtSensorDataWorker, &RtSensorDataWorker::newRtSmoothedData,
+       connect(m_pRtSensorDataWorker.data(), &RtSensorDataWorker::newRtSmoothedData,
                this, &RtSensorDataController::onNewSmoothedRtRawData);
 
        connect(&m_timer, &QTimer::timeout,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::streamData);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::streamData);
 
        connect(this, &RtSensorDataController::rawDataChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::addData);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::addData);
 
        connect(this, &RtSensorDataController::numberVerticesChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setNumberVertices);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberVertices);
 
        connect(this, &RtSensorDataController::newInterpolationMatrixAvailable,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setInterpolationMatrix);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setInterpolationMatrix);
 
        connect(this, &RtSensorDataController::thresholdsChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setThresholds);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setThresholds);
 
        connect(this, &RtSensorDataController::sFreqChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setSFreq);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setSFreq);
 
        connect(this, &RtSensorDataController::loopStateChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setLoopState);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setLoopState);
 
        connect(this, &RtSensorDataController::numberAveragesChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setNumberAverages);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberAverages);
 
        connect(this, &RtSensorDataController::colormapTypeChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setColormapType);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setColormapType);
 
        connect(this, &RtSensorDataController::streamSmoothedDataChanged,
-               m_pRtSensorDataWorker, &RtSensorDataWorker::setStreamSmoothedData);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setStreamSmoothedData);
 
        m_rtSensorDataWorkerThread.start();
 
@@ -126,22 +126,22 @@ RtSensorDataController::RtSensorDataController()
        m_pRtInterpolationWorker->moveToThread(&m_rtInterpolationWorkerThread);
 
        connect(this, &RtSensorDataController::interpolationFunctionChanged,
-               m_pRtInterpolationWorker, &RtInterpolationMatWorker::setInterpolationFunction);
+               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setInterpolationFunction);
 
        connect(&m_rtInterpolationWorkerThread, &QThread::finished,
-               m_pRtInterpolationWorker, &QObject::deleteLater);
+               m_pRtInterpolationWorker.data(), &QObject::deleteLater);
 
        connect(this, &RtSensorDataController::cancelDistanceChanged,
-               m_pRtInterpolationWorker, &RtInterpolationMatWorker::setCancelDistance);
+               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setCancelDistance);
 
-       connect(m_pRtInterpolationWorker, &RtInterpolationMatWorker::newInterpolationMatrixCalculated,
+       connect(m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::newInterpolationMatrixCalculated,
                this, &RtSensorDataController::onNewInterpolationMatrixCalculated);
 
        connect(this, &RtSensorDataController::interpolationInfoChanged,
-               m_pRtInterpolationWorker, &RtInterpolationMatWorker::setInterpolationInfo);
+               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setInterpolationInfo);
 
        connect(this, &RtSensorDataController::badChannelsChanged,
-               m_pRtInterpolationWorker, &RtInterpolationMatWorker::setBadChannels);
+               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setBadChannels);
 
        m_rtInterpolationWorkerThread.start();
 }
