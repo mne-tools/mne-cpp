@@ -39,8 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/adapters/abstractview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <mne/mne_forwardsolution.h>
@@ -53,6 +52,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -108,9 +108,8 @@ int main(int argc, char *argv[])
     QFile t_File(parser.value(fwdFileOption));
     MNEForwardSolution t_forwardSolution(t_File);
 
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-    testWindow->setModel(p3DDataModel);
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     //Option 1 - Visualize full source space
     p3DDataModel->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_forwardSolution);
@@ -122,10 +121,7 @@ int main(int argc, char *argv[])
 //    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
 
     //Visualize result in 3D
-    testWindow->show();
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
+    p3DAbstractView->show();
 
     return a.exec();
 }

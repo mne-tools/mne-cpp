@@ -39,11 +39,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/engine/view/view3D.h>
 #include <disp3D/adapters/abstractview.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/view/view3D.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -66,6 +66,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -279,9 +280,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment,
@@ -289,7 +287,7 @@ int main(int argc, char *argv[])
                                                                              t_sensorSurfaceVV[0],
                                                                              evoked.info,
                                                                              "MEG",
-                                                                             testWindow->format())) {
+                                                                             p3DAbstractView->getView()->format())) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
@@ -306,7 +304,7 @@ int main(int argc, char *argv[])
                                                                              t_Bem[0],
                                                                              evoked.info,
                                                                              "EEG",
-                                                                             testWindow->format())) {
+                                                                             p3DAbstractView->getView()->format())) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);

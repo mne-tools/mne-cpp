@@ -59,8 +59,6 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
 
 
 //*************************************************************************************************************
@@ -91,7 +89,6 @@ using namespace std;
 using namespace DISPLIB;
 using namespace FSLIB;
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 

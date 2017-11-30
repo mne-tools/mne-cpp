@@ -53,8 +53,7 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/rapMusic/pwlrapmusic.h>
 
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/adapters/abstractview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
@@ -369,18 +368,14 @@ int main(int argc, char *argv[])
 //    }
 //    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-    testWindow->setModel(p3DDataModel);
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
     MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
+    p3DAbstractView->show();
 
     if(!t_sFileNameStc.isEmpty())
     {
