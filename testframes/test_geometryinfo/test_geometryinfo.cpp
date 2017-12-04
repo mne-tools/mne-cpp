@@ -181,14 +181,14 @@ void TestGeometryInfo::testEmptyInputsForProjecting() {
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
     QVector<qint32> vecVertSubset;
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, realSurface.neighbor_vert, vecVertSubset);
+    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vecVertSubset);
     QVERIFY(distTable.rows() == distTable.cols());
 }
 
 //*************************************************************************************************************
 
 void TestGeometryInfo::testDimensionsForSCDC() {
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, realSurface.neighbor_vert, smallSubset);
+    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
     QVERIFY(distTable.rows() == smallSurface.rr.rows());
     QVERIFY(distTable.cols() == smallSubset.size());
 }
