@@ -146,7 +146,8 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
         m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
     }
 
-    m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface,
+    m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface.rr,
+                                                        bemSurface.neighbor_vert,
                                                         vecSensorPos,
                                                         fiffInfo,
                                                         sensorTypeFiffConstant);

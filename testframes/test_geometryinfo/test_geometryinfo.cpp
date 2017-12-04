@@ -151,9 +151,9 @@ void TestGeometryInfo::testBadChannelFiltering() {
     }
 
     // projecting with MEG:
-    QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(realSurface, megSensors);
+    QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr, megSensors);
     // SCDC with cancel distance 0.03:
-    MatrixXd distanceMatrix = GeometryInfo::scdc(realSurface, mappedSubSet, 0.03);
+    MatrixXd distanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
     // filter for bad MEG channels:
     QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
 
@@ -173,7 +173,7 @@ void TestGeometryInfo::testBadChannelFiltering() {
 void TestGeometryInfo::testEmptyInputsForProjecting() {
     // sensor projecting:
     QVector<Vector3f> emptySensors;
-    QVector<qint32> emptyMapping = GeometryInfo::projectSensors(realSurface, emptySensors);
+    QVector<qint32> emptyMapping = GeometryInfo::projectSensors(realSurface.rr, emptySensors);
     QVERIFY(emptyMapping.size() == 0);
 }
 
@@ -181,14 +181,14 @@ void TestGeometryInfo::testEmptyInputsForProjecting() {
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
     QVector<qint32> vecVertSubset;
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface, vecVertSubset);
+    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, realSurface.neighbor_vert, vecVertSubset);
     QVERIFY(distTable.rows() == distTable.cols());
 }
 
 //*************************************************************************************************************
 
 void TestGeometryInfo::testDimensionsForSCDC() {
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface, smallSubset);
+    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, realSurface.neighbor_vert, smallSubset);
     QVERIFY(distTable.rows() == smallSurface.rr.rows());
     QVERIFY(distTable.cols() == smallSubset.size());
 }

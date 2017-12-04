@@ -32,6 +32,7 @@
 * @brief    Contains general application specific types
 *
 */
+
 #ifndef DISP3DLIB_TYPES_H
 #define DISP3DLIB_TYPES_H
 
@@ -42,7 +43,7 @@
 
 #include <fs/label.h>
 #include <inverse/dipoleFit/ecd_set.h>
-#include <mne/mne_bem_surface.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -60,6 +61,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Sparse>
 
 
 //*************************************************************************************************************
@@ -251,11 +253,6 @@ Q_DECLARE_METATYPE(Eigen::RowVectorXf);
 Q_DECLARE_METATYPE(Eigen::Vector3f);
 #endif
 
-#ifndef DISP3DLIB_metatype_bemsurface
-#define DISP3DLIB_metatype_bemsurface
-Q_DECLARE_METATYPE(MNELIB::MNEBemSurface);
-#endif
-
 #ifndef DISP3DLIB_metatype_fiffinfo
 #define DISP3DLIB_metatype_fiffinfo
 Q_DECLARE_METATYPE(FIFFLIB::FiffInfo);
@@ -265,6 +262,12 @@ Q_DECLARE_METATYPE(FIFFLIB::FiffInfo);
 #define DISP3DLIB_metatype_qvectorvector3f
 Q_DECLARE_METATYPE(QVector<Eigen::Vector3f>);
 #endif
+
+#ifndef DISP3DLIB_metatype_qvectorvectorint
+#define DISP3DLIB_metatype_qvectorvectorint
+Q_DECLARE_METATYPE(QVector<QVector<int> >);
+#endif
+
 
 #ifndef DISP3DLIB_metatype_sparsematf
 #define DISP3DLIB_metatype_sparsematf

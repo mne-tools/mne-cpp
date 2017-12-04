@@ -64,7 +64,6 @@
 
 using namespace DISP3DLIB;
 using namespace Eigen;
-using namespace MNELIB;
 using namespace FIFFLIB;
 
 
@@ -205,17 +204,19 @@ void RtSensorDataController::setTimeInterval(int iMSec)
 
 //*************************************************************************************************************
 
-void RtSensorDataController::setInterpolationInfo(const MNEBemSurface &bemSurface,
-                          const QVector<Vector3f> &vecSensorPos,
-                          const FiffInfo &fiffInfo,
-                          int iSensorType)
+void RtSensorDataController::setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
+                                                  const QVector<QVector<int> > &vecNeighborVertices,
+                                                  const QVector<Vector3f> &vecSensorPos,
+                                                  const FiffInfo &fiffInfo,
+                                                  int iSensorType)
 {
-    emit interpolationInfoChanged(bemSurface,
-                              vecSensorPos,
-                              fiffInfo,
-                              iSensorType);
+    emit interpolationInfoChanged(matVertices,
+                                  vecNeighborVertices,
+                                  vecSensorPos,
+                                  fiffInfo,
+                                  iSensorType);
 
-    emit numberVerticesChanged(bemSurface.rr.rows());
+    emit numberVerticesChanged(matVertices.rows());
 }
 
 

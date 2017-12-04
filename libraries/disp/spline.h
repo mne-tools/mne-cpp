@@ -114,12 +114,11 @@ public:
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the bar histogram
     */
     template<typename T>
-    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
+    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData);
     template<typename T>
-    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
+    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData);
 
     //=========================================================================================================
     /**
@@ -127,10 +126,9 @@ public:
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the bar histogram
     */
     template<typename T>
-    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
+    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData);
 
     //=========================================================================================================
     /**
@@ -230,29 +228,29 @@ signals:
 //=============================================================================================================
 
 template <typename T>
-void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
+void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0) = matClassLimitData;
-    this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
+    this->updatePlot(matrixName, matClassFrequencyData);
 }
 
 
 //=========================================================================================================
 
 template <typename T>
-void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
+void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0) = matClassLimitData;
-    this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
+    this->updatePlot(matrixName, matClassFrequencyData);
 }
 
 
 //=========================================================================================================
 
 template<typename T>
-void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
+void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData)
 {
     Eigen::VectorXd resultDisplayValues;
     int iClassAmount = matClassFrequencyData.rows();

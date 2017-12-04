@@ -55,8 +55,6 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
-#include <mne/mne_bem_surface.h>
-
 #include <fiff/fiff_dig_point_set.h>
 
 
@@ -562,6 +560,7 @@ void Data3DTreeModel::initMetatypes()
     //Init metatypes
     qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >("QPair<MatrixX3f, MatrixX3f>");
 
+    qRegisterMetaType<QVector<QVector<int> > >();
     qRegisterMetaType<QVector<Vector3f> >();
     qRegisterMetaType<QVector<Eigen::Vector3f> >();
 
@@ -591,9 +590,6 @@ void Data3DTreeModel::initMetatypes()
 
     qRegisterMetaType<Eigen::Vector3f>();
     qRegisterMetaType<Vector3f>();
-
-    qRegisterMetaType<MNELIB::MNEBemSurface>();
-    qRegisterMetaType<MNEBemSurface>();
 
     qRegisterMetaType<Eigen::SparseMatrix<float> >();
     qRegisterMetaType<SparseMatrix<float> >();
