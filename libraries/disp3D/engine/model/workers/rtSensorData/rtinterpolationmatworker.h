@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include <mne/mne_bem_surface.h>
 #include <fiff/fiff_info.h>
 
 
@@ -65,10 +64,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace MNELIB {
-    class MNEBemSurface;
-}
 
 namespace FIFFLIB {
     class FiffInfo;
@@ -131,17 +126,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
+    * Sets the information needed creating the interpolation matrix.
     * Warning: Using this function can take some seconds because recalculation are required.
     *
-    * @param[in] bemSurface                The MNEBemSurface that holds the mesh information
+    * @param[in] matVertices               The mesh information in form of vertices.
+    * @param[in] vecNeighborVertices       The neighbor vertex information.
     * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
     * @param[in] fiffEvoked                Holds all information about the sensors.
     * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
     *
     * @return Returns the created interpolation matrix.
     */
-    void setInterpolationInfo(const MNELIB::MNEBemSurface &bemSurface,
+    void setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
+                              const QVector<QVector<int> > &vecNeighborVertices,
                               const QVector<Eigen::Vector3f> &vecSensorPos,
                               const FIFFLIB::FiffInfo &fiffInfo,
                               int iSensorType);
@@ -170,9 +167,11 @@ protected:
         double                                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
         Eigen::MatrixXd                                 matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
-        QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        Eigen::MatrixX3f                                matVertices;                    /**< Holds all vertex information. */
 
-        MNELIB::MNEBemSurface                           bemSurface;                     /**< Holds all vertex information that is needed (public member rr). */
+        QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QVector<QVector<int> >                          vecNeighborVertices;            /**< The neighbor vertex information. */
+
         FIFFLIB::FiffInfo                               fiffInfo;                       /**< Contains all information about the sensors. */
 
         double (*interpolationFunction) (double);                                       /**< Function that computes interpolation coefficients using the distance values. */

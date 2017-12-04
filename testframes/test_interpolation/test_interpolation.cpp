@@ -158,7 +158,7 @@ void TestInterpolation::initTestCase()
 void TestInterpolation::testDimensionsForInterpolation()
 {
     // create weight matrix from distance table
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface, smallSubset);
+    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
     SparseMatrix<float> testWeightMatrix = Interpolation::createInterpolationMat(smallSubset, distTable, Interpolation::linear);
 
     QVERIFY(testWeightMatrix.rows() == distTable.rows());
@@ -182,11 +182,12 @@ void TestInterpolation::testDimensionsForInterpolation()
 void TestInterpolation::testSumOfRow()
 {
     // projecting with MEG:
-    QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(realSurface,
+    QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr,
                                                                 megSensors);
 
     // SCDC with cancel distance 0.20 m:
-    MatrixXd distanceMatrix = GeometryInfo::scdc(realSurface,
+    MatrixXd distanceMatrix = GeometryInfo::scdc(realSurface.rr,
+                                                 realSurface.neighbor_vert,
                                                  mappedSubSet,
                                                  0.20);
 
@@ -224,7 +225,7 @@ void TestInterpolation::testSumOfRow()
 void TestInterpolation::testEmptyInputsForWeightMatrix()
 {
     // SCDC with cancel distance 0.03:
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface, smallSubset, 0.03);
+    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset, 0.03);
 
     // ---------- empty sensor indices ----------
     QVector<qint32> emptySensors;

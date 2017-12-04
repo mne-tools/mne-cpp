@@ -370,7 +370,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
                     MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
 
                     //Create histogram plot
-                    pSpline->setData(resultClassLimit, resultFrequency, 0);
+                    pSpline->setData(resultClassLimit, resultFrequency);
                     QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::DataThreshold).value<QVector3D>();
                     pSpline->setThreshold(vecThresholdValues);
 
