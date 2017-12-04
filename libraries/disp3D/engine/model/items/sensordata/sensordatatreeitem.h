@@ -295,7 +295,7 @@ protected:
     *
     * @param[in] iNumAvr                    The new number of averages.
     */
-    virtual  void onNumberAveragesChanged(const QVariant& iNumAvr);
+    virtual void onNumberAveragesChanged(const QVariant& iNumAvr);
 
     //=========================================================================================================
     /**

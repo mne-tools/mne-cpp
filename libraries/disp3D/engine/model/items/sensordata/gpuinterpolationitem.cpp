@@ -205,12 +205,6 @@ void GpuInterpolationItem::addNewRtData(VectorXf tSignalVec)
 
     const uint iBufferSize = tSignalVec.rows();
 
-    if(iBufferSize != this->getMaterialParameter("cols").toInt())
-    {
-        qDebug("GpuInterpolationMaterial::addNewRtData input vector dimension mismatch!");
-        return;
-    }
-
     QByteArray bufferData;
     bufferData.resize(iBufferSize * (int)sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
