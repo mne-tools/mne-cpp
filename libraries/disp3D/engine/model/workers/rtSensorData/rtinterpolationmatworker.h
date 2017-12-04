@@ -187,7 +187,7 @@ signals:
     *
     * @param[in] matInterpolationMatrix     The new interpolation matrix.
     */
-    void newInterpolationMatrixCalculated(Eigen::SparseMatrix<float> matInterpolationMatrix);
+    void newInterpolationMatrixCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 };
 
 } // NAMESPACE

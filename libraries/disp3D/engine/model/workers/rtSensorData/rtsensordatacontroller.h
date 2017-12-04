@@ -268,7 +268,7 @@ protected:
     *
     * @param[in] matInterpolationMatrix         The new interpolation matrix data.
     */
-    void onNewInterpolationMatrixCalculated(Eigen::SparseMatrix<float> matInterpolationMatrix);
+    void onNewInterpolationMatrixCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
     QTimer                                  m_timer;                            /**< The timer to control the streaming speed. */
 
@@ -396,7 +396,7 @@ signals:
     *
     * @param[in] matInterpolationMatrix          The new interpolation matrix.
     */
-    void newInterpolationMatrixAvailable(Eigen::SparseMatrix<float> matInterpolationMatrix);
+    void newInterpolationMatrixAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
     //=========================================================================================================
     /**

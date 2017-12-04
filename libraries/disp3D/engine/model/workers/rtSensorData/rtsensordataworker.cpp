@@ -178,7 +178,7 @@ void RtSensorDataWorker::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix) {
+void RtSensorDataWorker::setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix) {
     m_matInterpolationMatrix = matInterpolationMatrix;
 }
 
