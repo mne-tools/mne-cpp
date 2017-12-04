@@ -107,14 +107,6 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Set the new interpolation matrix.
-    *
-    * @param[in] matInterpolationMatrix                 The new interpolation matrix.
-    */
-    virtual void setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix);
-
-    //=========================================================================================================
-    /**
     * Init the interpolation items. This cannot be done here because they might differ from GPU to CPU version.
     *
     * @param[in] bemSurface                 MNEBemSurface that holds the mesh that should be visualized.
@@ -122,6 +114,14 @@ protected:
     */
     virtual void initInterpolationItem(const MNELIB::MNEBemSurface &bemSurface,
                                        Qt3DCore::QEntity* p3DEntityParent) override;
+
+    //=========================================================================================================
+    /**
+    * Set the new interpolation matrix.
+    *
+    * @param[in] matInterpolationMatrix                 The new interpolation matrix.
+    */
+    virtual void onNewInterpolationMatrixAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
     //=========================================================================================================
     /**

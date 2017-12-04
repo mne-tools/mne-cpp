@@ -181,7 +181,7 @@ public:
     *
     * @param[in] matInterpolationMatrix                 The new interpolation matrix.
     */
-    void setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix);
+    void setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
     //=========================================================================================================
     /**

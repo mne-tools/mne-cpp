@@ -301,8 +301,7 @@ void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMat
 
 //*************************************************************************************************************
 
-void RtSensorDataController::onNewInterpolationMatrixCalculated(Eigen::SparseMatrix<float> matInterpolationMatrix)
+void RtSensorDataController::onNewInterpolationMatrixCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrix)
 {
-    qDebug()<<"onNewInterpolationMatrixCalculated";
     emit newInterpolationMatrixAvailable(matInterpolationMatrix);
 }

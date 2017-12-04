@@ -143,7 +143,7 @@ public:
      *
      * @param matInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
      */
-    virtual void setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix);
+    virtual void setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
     //=========================================================================================================
     /**

@@ -165,7 +165,7 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::setInterpolationMatrix(Eigen::SparseMatrix<float> matInterpolationMatrix)
+void GpuInterpolationItem::setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix)
 {
     if(m_bIsDataInit == false)
     {
