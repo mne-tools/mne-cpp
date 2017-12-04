@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtsensordataworker.cpp
+* @file     rtinterpolationmatworker.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>

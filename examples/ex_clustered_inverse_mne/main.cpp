@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);
-        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setStreamingState(true);
         pRTDataItem->setThresholds(QVector3D(0.0,0.5,10.0));
         pRTDataItem->setVisualizationType("Smoothing based");
         pRTDataItem->setColormapType("Hot");

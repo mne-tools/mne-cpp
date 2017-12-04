@@ -158,7 +158,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the length in MSec to wait inbetween data samples.
+    * Set the time in MSec to wait inbetween data samples.
     *
     * @param[in] iMSec                  The new length in milli Seconds to wait inbetween data samples.
     */
@@ -207,7 +207,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the number of average to take after emitting the data to the listening threads.
+    * Set the number of averages.
     *
     * @param[in] iNumAvr                The new number of averages.
     */
@@ -328,7 +328,7 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the cancel dsitance changed.
+    * Emit this signal whenever the cancel distance changed.
     *
     * @param[in] dCancelDist           The new cancel distance value in meters.
     */

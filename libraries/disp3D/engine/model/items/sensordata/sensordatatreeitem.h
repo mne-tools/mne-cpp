@@ -318,7 +318,7 @@ protected:
     QVector<int>                        m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
     QVector<int>                        m_iSensorsBad;                     /**< Store bad channel indexes.*/
 
-    QPointer<RtSensorDataController>    m_pSensorRtDataWorkController;          /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSensorDataController>    m_pSensorRtDataWorkController;     /**< The source data worker. This worker streams the rt data to this item.*/
 };
 
 

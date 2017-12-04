@@ -173,16 +173,17 @@ void GpuInterpolationItem::setInterpolationMatrix(Eigen::SparseMatrix<float> mat
         return;
     }
 
-    //Set Rows and Cols
-    this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.cols()), "cols");
-    this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.rows()), "rows");
-
     //Init and set interpolation buffer
     QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(matInterpolationMatrix);
 
     if(m_pInterpolationMatBuffer->data().size() != interpolationBufferData.size()) {
+        //Set Rows and Cols
+        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.cols()), "cols");
+        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.rows()), "rows");
+
         m_pInterpolationMatBuffer->setData(interpolationBufferData);
         this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), "InterpolationMat");
+
         m_pOutputColorBuffer->setData(buildZeroBuffer(4 * matInterpolationMatrix.rows()));
         this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), "OutputColor");
     } else {
@@ -206,7 +207,7 @@ void GpuInterpolationItem::addNewRtData(VectorXf tSignalVec)
 
     if(iBufferSize != this->getMaterialParameter("cols").toInt())
     {
-        qDebug("GpuInterpolationMaterial::addSignalData input vector dimension mismatch!");
+        qDebug("GpuInterpolationMaterial::addNewRtData input vector dimension mismatch!");
         return;
     }
 

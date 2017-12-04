@@ -131,15 +131,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
 
-            int width = pSpline->size().width();
-            int height = pSpline->size().height();
-            if (pSpline->size().width() < 200 && pSpline->size().height() < 200) {
-                pSpline->resize(600,400);   //resize histogram to be readable with default size
-            } else {
-                width = pSpline->size().width();   //keeps the size of the histogram
-                height = pSpline->size().height();
-                pSpline->resize(width,height);
-            }
+            //resize histogram to be readable with default size
+            pSpline->resize(600,400);
 
             return pSpline;
         }

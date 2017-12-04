@@ -312,7 +312,7 @@ void MneEstimateTreeItem::setLoopState(bool state)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setStreamingActive(bool state)
+void MneEstimateTreeItem::setStreamingState(bool state)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
 

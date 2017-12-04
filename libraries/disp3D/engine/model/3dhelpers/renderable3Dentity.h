@@ -238,7 +238,8 @@ public:
     * @param[in] data             The value to be set.
     * @param[in] sParameterName   The parameters name.
     */
-    virtual void setMaterialParameter(QVariant data, QString sParameterName);
+    virtual void setMaterialParameter(QVariant data,
+                                      QString sParameterName);
 
     //=========================================================================================================
     /**
@@ -253,7 +254,7 @@ public:
 protected: 
     //=========================================================================================================
     /**
-    * Sets the current scale recusivley.
+    * Sets the value of a specific parameter of the materials for this entity.
     *
     * @param[in] pObject            The QObject to be scanned for parameters.
     * @param[in] data               The new data.
@@ -267,13 +268,13 @@ protected:
     /**
     * Gets the value of a specific parameter of the materials for this entity.
     *
-    * @param[in] pObject             The QObject to be scanned for parameters.
+    * @param[in] pObject            The QObject to be scanned for parameters.
     * @param[in] sParameterName     The parameters name.
     *
     * @return   The data of the parameter.
     */
     virtual QPair<bool, QVariant> getMaterialParameterRecursive(QObject * pObject,
-                                                   QString sParameterName);
+                                                                QString sParameterName);
 
     //=========================================================================================================
     /**

@@ -192,8 +192,6 @@ protected:
 
     bool                                    m_bIsDataInit;                  /**< The data initialization flag. */
 
-    QPointer<Qt3DCore::QEntity>             m_pComputeEntity;               /**< Top level Entity for the compute part. */
-
     QPointer<GpuInterpolationMaterial>      m_pGPUMaterial;                 /**< Compute material used for the process. */
 
     QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
