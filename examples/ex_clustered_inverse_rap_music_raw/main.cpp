@@ -538,7 +538,7 @@ int main(int argc, char *argv[])
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);
-        pRTDataItem->setStreamingActive(true);
+        pRTDataItem->setStreamingState(true);
         pRTDataItem->setThresholds(QVector3D(0.01f,0.5f,1.0f));
         pRTDataItem->setVisualizationType("Annotation based");
         pRTDataItem->setColormapType("Hot");

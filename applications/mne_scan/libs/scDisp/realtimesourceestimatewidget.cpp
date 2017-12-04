@@ -173,7 +173,7 @@ void RealTimeSourceEstimateWidget::getData()
             m_pRtItem->setColormapType("Hot");
             m_pRtItem->setVisualizationType("Annotation based");
             m_pRtItem->setNumberAverages(1);
-            m_pRtItem->setStreamingActive(true);
+            m_pRtItem->setStreamingState(true);
             m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
         } else {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";

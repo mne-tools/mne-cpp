@@ -267,7 +267,7 @@ void Music::calculate()
 //        pRTDataItem->setLoopState(true);
 //        pRTDataItem->setTimeInterval(17);
 //        pRTDataItem->setNumberAverages(1);
-//        pRTDataItem->setStreamingActive(true);
+//        pRTDataItem->setStreamingState(true);
 //        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
 //        pRTDataItem->setVisualizationType("Annotation based");
 //        pRTDataItem->setColortable("Hot");

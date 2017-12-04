@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(0);
             pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingActive(false);
+            pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Smoothing based");
             pRTDataItem->setColormapType("Jet");

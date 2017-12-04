@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cpuinterpolationitem.cpp
+* @file     cpuinterpolationitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -95,10 +95,9 @@ class GpuInterpolationMaterial;
 
 //=============================================================================================================
 /**
-* This item is used for signal interpolation with a compute shader.
-* It stores all Qt3DEnities needed for this process.
+* This item is used for signal interpolation with CPU support.
 *
-* @brief Signal interpolation with qt3d compute shader.
+* @brief This item is used for signal interpolation with CPU support.
 */
 
 class DISP3DSHARED_EXPORT CpuInterpolationItem : public AbstractMeshTreeItem

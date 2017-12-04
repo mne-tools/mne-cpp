@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtsensordataworker.h
+* @file     rtinterpolationmatworker.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtInterpolationMatWorker class declaration..
+* @brief     RtInterpolationMatWorker class declaration.
 *
 */
 

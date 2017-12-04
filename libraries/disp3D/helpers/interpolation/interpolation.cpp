@@ -120,7 +120,6 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
         }
     }
 
-    int counter = 0;
     // main loop: go through all rows of distance table and calculate weights
     for (qint32 r = 0; r < iRows; ++r) {
         if (sensorLookup.contains(r) == false) {
@@ -141,7 +140,6 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
             }
 
             for (const QPair<qint32, float> &qp : vecBelowThresh) {
-                counter++;
                 vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, qp.first, qp.second / dWeightsSum));
             }
         } else {
@@ -149,7 +147,6 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
             const int iIndexInSubset = vecProjectedSensors.indexOf(r);
 
             vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, iIndexInSubset, 1));
-            counter++;
         }
     }
 

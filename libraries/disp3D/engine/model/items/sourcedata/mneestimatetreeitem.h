@@ -168,7 +168,7 @@ public:
     *
     * @param[in] state     Whether to stream the data to the display or not.
     */
-    void setStreamingActive(bool state);
+    void setStreamingState(bool state);
 
     //=========================================================================================================
     /**
@@ -188,7 +188,7 @@ public:
 
     //=========================================================================================================
     /**
-    * This function sets the color myp type.
+    * This function sets the color map type.
     *
     * @param[in] sColortable     The new colortable ("Hot Negative 1" etc.).
     */
@@ -324,4 +324,4 @@ inline bool MneEstimateTreeItem::isDataInit() const
 
 } //NAMESPACE DISP3DLIB
 
-#endif // DISP3DLIB_MneEstimateTreeItem_H
+#endif // DISP3DLIB_MNEESTIMATTREEITEM_H
