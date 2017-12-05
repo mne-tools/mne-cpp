@@ -524,7 +524,7 @@ int main(int argc, char *argv[])
 #else
     int iWinSize = 200;
     if(doMovie) {
-        t_pwlRapMusic.setStcAttr(iWinSize, 0.6);
+        t_pwlRapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
@@ -583,7 +583,7 @@ int main(int argc, char *argv[])
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);
         pRTDataItem->setStreamingState(true);
-        pRTDataItem->setThresholds(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setThresholds(QVector3D(0.01f,0.5f,1.0f));
         pRTDataItem->setVisualizationType("Annotation based");
         pRTDataItem->setColormapType("Hot");
     }

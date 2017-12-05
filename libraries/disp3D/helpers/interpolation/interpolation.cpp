@@ -86,9 +86,7 @@ using namespace Eigen;
 SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
                                                           const MatrixXd &matDistanceTable,
                                                           double (*interpolationFunction) (double),
-                                                          const double dCancelDist,
-                                                          const FIFFLIB::FiffInfo& fiffInfo,
-                                                          qint32 iSensorType)
+                                                          const double dCancelDist)
 {
 
     if(matDistanceTable.rows() == 0 && matDistanceTable.cols() == 0) {
@@ -104,25 +102,9 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
     const qint32 iRows = matInterpolationMatrix.rows();
     const qint32 iCols = matInterpolationMatrix.cols();
 
-    // insert all sensor nodes into set for faster lookup during later computation. Also consider bad channels here.
-    QSet<qint32> sensorLookup;
-
-    int idx = 0;
-
-    for(const FIFFLIB::FiffChInfo& s : fiffInfo.chs){
-        //Only take EEG with V as unit or MEG magnetometers with T as unit
-        if(s.kind == iSensorType && (s.unit == FIFF_UNIT_T || s.unit == FIFF_UNIT_V)){
-            if(!fiffInfo.bads.contains(s.ch_name)){
-                sensorLookup.insert (vecProjectedSensors.at(idx));
-            }
-
-            idx++;
-        }
-    }
-
     // main loop: go through all rows of distance table and calculate weights
     for (qint32 r = 0; r < iRows; ++r) {
-        if (sensorLookup.contains(r) == false) {
+        if (vecProjectedSensors.contains(r) == false) {
             // "normal" node, i.e. one which was not assigned a sensor
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
             QVector<QPair<qint32, float> > vecBelowThresh;

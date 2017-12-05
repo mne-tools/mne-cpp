@@ -101,9 +101,7 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
         SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
                                                                                         m_lInterpolationData.matDistanceMatrix,
                                                                                         m_lInterpolationData.interpolationFunction,
-                                                                                        m_lInterpolationData.dCancelDistance,
-                                                                                        m_lInterpolationData.fiffInfo,
-                                                                                        m_lInterpolationData.iSensorType);
+                                                                                        m_lInterpolationData.dCancelDistance);
 
         emit newInterpolationMatrixCalculated(matInterpolationMat);
     }
@@ -159,11 +157,10 @@ void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
                                                                 m_lInterpolationData.dCancelDistance);
 
     //create Interpolation matrix
-    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.matDistanceMatrix,
+    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                    m_lInterpolationData.matDistanceMatrix,
                                                                                     m_lInterpolationData.interpolationFunction,
-                                                                                    m_lInterpolationData.dCancelDistance,
-                                                                                    m_lInterpolationData.fiffInfo,
-                                                                                    m_lInterpolationData.iSensorType);
+                                                                                    m_lInterpolationData.dCancelDistance);
 
     emit newInterpolationMatrixCalculated(matInterpolationMat);
 }

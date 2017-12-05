@@ -485,7 +485,7 @@ int main(int argc, char *argv[])
 
     int iWinSize = 200;
     if(doMovie) {
-        t_rapMusic.setStcAttr(iWinSize, 0.6);
+        t_rapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);

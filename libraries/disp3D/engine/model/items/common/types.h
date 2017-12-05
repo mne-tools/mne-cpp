@@ -268,6 +268,10 @@ Q_DECLARE_METATYPE(QVector<Eigen::Vector3f>);
 Q_DECLARE_METATYPE(QVector<QVector<int> >);
 #endif
 
+#ifndef DISP3DLIB_metatype_qvectorint32
+#define DISP3DLIB_metatype_qvectorint32
+Q_DECLARE_METATYPE(QVector<qint32>);
+#endif
 
 #ifndef DISP3DLIB_metatype_sparsematf
 #define DISP3DLIB_metatype_sparsematf

@@ -161,9 +161,7 @@ int main(int argc, char *argv[])
     SparseMatrix<float> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
                                                                                     distanceMatrix,
                                                                                     Interpolation::linear,
-                                                                                    FLOAT_INFINITY,
-                                                                                    evoked.info,
-                                                                                    FIFFV_MEG_CH);
+                                                                                    FLOAT_INFINITY);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
     //realtime interpolation (1 iteration)
