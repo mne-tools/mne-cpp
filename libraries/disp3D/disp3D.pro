@@ -119,6 +119,9 @@ SOURCES += \
     engine/model/items/common/metatreeitem.cpp \
     engine/model/items/common/abstractmeshtreeitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
+    engine/model/workers/rtSourceLoc/rtsourcedataworker.cpp \
+    engine/model/workers/rtSourceLoc/rtsourcedatacontroller.cpp \
+    engine/model/workers/rtSourceLoc/rtsourceinterpolationmatworker.cpp \
     engine/model/workers/rtSensorData/rtsensordataworker.cpp \
     engine/model/workers/rtSensorData/rtsensordatacontroller.cpp \
     engine/model/workers/rtSensorData/rtinterpolationmatworker.cpp \
@@ -172,6 +175,9 @@ HEADERS += \
     engine/model/items/common/abstractmeshtreeitem.h \
     engine/model/items/common/types.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
+    engine/model/workers/rtSourceLoc/rtsourcedataworker.h \
+    engine/model/workers/rtSourceLoc/rtsourcedatacontroller.h \
+    engine/model/workers/rtSourceLoc/rtsourceinterpolationmatworker.h \
     engine/model/workers/rtSensorData/rtsensordataworker.h \
     engine/model/workers/rtSensorData/rtsensordatacontroller.h \
     engine/model/workers/rtSensorData/rtinterpolationmatworker.h \

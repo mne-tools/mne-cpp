@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtinterpolationmatworker.cpp
+* @file     rtsourceinterpolationmatworker.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RtInterpolationMatWorker class definition.
+* @brief    RtSourceInterpolationMatWorker class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtinterpolationmatworker.h"
+#include "rtsourceinterpolationmatworker.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 
@@ -63,7 +63,7 @@
 
 using namespace DISP3DLIB;
 using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -71,7 +71,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtInterpolationMatWorker::RtInterpolationMatWorker()
+RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false)
 {
     m_lInterpolationData.dCancelDistance = 0.05;
@@ -81,7 +81,7 @@ RtInterpolationMatWorker::RtInterpolationMatWorker()
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setInterpolationFunction(const QString &sInterpolationFunction)
+void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sInterpolationFunction)
 {
     if(sInterpolationFunction == "Linear") {
         m_lInterpolationData.interpolationFunction = Interpolation::linear;
@@ -99,11 +99,11 @@ void RtInterpolationMatWorker::setInterpolationFunction(const QString &sInterpol
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
         SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                            m_lInterpolationData.matDistanceMatrix,
-                                                                                            m_lInterpolationData.interpolationFunction,
-                                                                                            m_lInterpolationData.dCancelDistance,
-                                                                                            m_lInterpolationData.fiffInfo,
-                                                                                            m_lInterpolationData.iSensorType);
+                                                                                        m_lInterpolationData.matDistanceMatrix,
+                                                                                        m_lInterpolationData.interpolationFunction,
+                                                                                        m_lInterpolationData.dCancelDistance,
+                                                                                        m_lInterpolationData.fiffInfo,
+                                                                                        m_lInterpolationData.iSensorType);
 
         emit newInterpolationMatrixCalculated(matInterpolationMat);
     }
@@ -112,7 +112,7 @@ void RtInterpolationMatWorker::setInterpolationFunction(const QString &sInterpol
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setCancelDistance(double dCancelDist)
+void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 {
     m_lInterpolationData.dCancelDistance = dCancelDist;
 
@@ -123,27 +123,19 @@ void RtInterpolationMatWorker::setCancelDistance(double dCancelDist)
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
-                                                    const QVector<QVector<int> > &vecNeighborVertices,
-                                                    const QVector<Vector3f> &vecSensorPos,
-                                                    const FiffInfo &fiffInfo,
-                                                    int iSensorType)
+void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
+                                                          const QVector<QVector<int> > &vecNeighborVertices,
+                                                          const QVector<qint32> &vecMappedSubset)
 {
     if(matVertices.rows() == 0) {
-        qDebug() << "RtInterpolationMatWorker::calculateSurfaceData - Surface data is empty. Returning ...";
+        qDebug() << "RtSourceInterpolationMatWorker::calculateSurfaceData - Surface data is empty. Returning ...";
         return;
     }
 
     //set members
     m_lInterpolationData.matVertices = matVertices;
-    m_lInterpolationData.fiffInfo = fiffInfo;
-    m_lInterpolationData.iSensorType = iSensorType;
     m_lInterpolationData.vecNeighborVertices = vecNeighborVertices;
-
-
-    //sensor projecting: One time operation because surface and sensors can not change
-    m_lInterpolationData.vecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.matVertices,
-                                                                        vecSensorPos);
+    m_lInterpolationData.vecMappedSubset = vecMappedSubset;
 
     m_bInterpolationInfoIsInit = true;
 
@@ -153,38 +145,10 @@ void RtInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f &matV
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
+void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
 {
     if(!m_bInterpolationInfoIsInit) {
-        qDebug() << "RtInterpolationMatWorker::updateBadChannels - Set interpolation info first.";
-        return;
-    }
-
-    m_lInterpolationData.fiffInfo = info;
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.matDistanceMatrix,
-                                    m_lInterpolationData.fiffInfo,
-                                    m_lInterpolationData.iSensorType);
-
-    //create Interpolation matrix
-    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                    m_lInterpolationData.matDistanceMatrix,
-                                                                                    m_lInterpolationData.interpolationFunction,
-                                                                                    m_lInterpolationData.dCancelDistance,
-                                                                                    m_lInterpolationData.fiffInfo,
-                                                                                    m_lInterpolationData.iSensorType);
-
-    emit newInterpolationMatrixCalculated(matInterpolationMat);
-}
-
-
-//*************************************************************************************************************
-
-void RtInterpolationMatWorker::calculateInterpolationOperator()
-{
-    if(!m_bInterpolationInfoIsInit) {
-        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
+        qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
         return;
     }
 
@@ -194,14 +158,8 @@ void RtInterpolationMatWorker::calculateInterpolationOperator()
                                                                 m_lInterpolationData.vecMappedSubset,
                                                                 m_lInterpolationData.dCancelDistance);
 
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.matDistanceMatrix,
-                                    m_lInterpolationData.fiffInfo,
-                                    m_lInterpolationData.iSensorType);
-
     //create Interpolation matrix
-    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                    m_lInterpolationData.matDistanceMatrix,
+    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.matDistanceMatrix,
                                                                                     m_lInterpolationData.interpolationFunction,
                                                                                     m_lInterpolationData.dCancelDistance,
                                                                                     m_lInterpolationData.fiffInfo,

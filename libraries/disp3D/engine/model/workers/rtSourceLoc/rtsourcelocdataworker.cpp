@@ -467,7 +467,7 @@ void RtSourceLocDataWorker::setSurfaceData(const Eigen::VectorXi& vecVertNoLeftH
 //*************************************************************************************************************
 
 void RtSourceLocDataWorker::setSurfaceColor(const MatrixX3f& matSurfaceVertColorLeftHemi,
-                                           const MatrixX3f& matSurfaceVertColorRightHemi)
+                                            const MatrixX3f& matSurfaceVertColorRightHemi)
 {
     QMutexLocker locker(&m_qMutex);
 
