@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "rtsensordatacontroller.h"
-#include "rtinterpolationmatworker.h"
+#include "rtsensorinterpolationmatworker.h"
 #include "rtsensordataworker.h"
 
 
@@ -121,26 +121,26 @@ RtSensorDataController::RtSensorDataController()
        m_rtSensorDataWorkerThread.start();
 
        //Calculate interpolation matrix
-       m_pRtInterpolationWorker = new RtInterpolationMatWorker();
+       m_pRtInterpolationWorker = new RtSensorInterpolationMatWorker();
        m_pRtInterpolationWorker->moveToThread(&m_rtInterpolationWorkerThread);
 
        connect(this, &RtSensorDataController::interpolationFunctionChanged,
-               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setInterpolationFunction);
+               m_pRtInterpolationWorker.data(), &RtSensorInterpolationMatWorker::setInterpolationFunction);
 
        connect(&m_rtInterpolationWorkerThread, &QThread::finished,
                m_pRtInterpolationWorker.data(), &QObject::deleteLater);
 
        connect(this, &RtSensorDataController::cancelDistanceChanged,
-               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setCancelDistance);
+               m_pRtInterpolationWorker.data(), &RtSensorInterpolationMatWorker::setCancelDistance);
 
-       connect(m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::newInterpolationMatrixCalculated,
+       connect(m_pRtInterpolationWorker.data(), &RtSensorInterpolationMatWorker::newInterpolationMatrixCalculated,
                this, &RtSensorDataController::onNewInterpolationMatrixCalculated);
 
        connect(this, &RtSensorDataController::interpolationInfoChanged,
-               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setInterpolationInfo);
+               m_pRtInterpolationWorker.data(), &RtSensorInterpolationMatWorker::setInterpolationInfo);
 
        connect(this, &RtSensorDataController::badChannelsChanged,
-               m_pRtInterpolationWorker.data(), &RtInterpolationMatWorker::setBadChannels);
+               m_pRtInterpolationWorker.data(), &RtSensorInterpolationMatWorker::setBadChannels);
 
        m_rtInterpolationWorkerThread.start();
 }
