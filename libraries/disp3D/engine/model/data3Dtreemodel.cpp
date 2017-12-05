@@ -563,6 +563,7 @@ void Data3DTreeModel::initMetatypes()
     qRegisterMetaType<QVector<QVector<int> > >();
     qRegisterMetaType<QVector<Vector3f> >();
     qRegisterMetaType<QVector<Eigen::Vector3f> >();
+    qRegisterMetaType<QVector<qint32> >();
 
     qRegisterMetaType<FIFFLIB::FiffInfo>();
     qRegisterMetaType<FiffInfo>();

@@ -130,9 +130,7 @@ public:
     static Eigen::SparseMatrix<float> createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
                                                              const Eigen::MatrixXd &matDistanceTable,
                                                              double (*interpolationFunction) (double),
-                                                             const double dCancelDist = FLOAT_INFINITY,
-                                                             const FIFFLIB::FiffInfo &fiffInfo = FIFFLIB::FiffInfo(),
-                                                             qint32 iSensorType = FIFFV_EEG_CH);
+                                                             const double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
     /**

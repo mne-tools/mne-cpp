@@ -159,7 +159,9 @@ void TestInterpolation::testDimensionsForInterpolation()
 {
     // create weight matrix from distance table
     MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
-    SparseMatrix<float> testWeightMatrix = Interpolation::createInterpolationMat(smallSubset, distTable, Interpolation::linear);
+    SparseMatrix<float> testWeightMatrix = Interpolation::createInterpolationMat(smallSubset,
+                                                                                 distTable,
+                                                                                 Interpolation::linear);
 
     QVERIFY(testWeightMatrix.rows() == distTable.rows());
     QVERIFY(testWeightMatrix.cols() == distTable.cols());
@@ -200,9 +202,7 @@ void TestInterpolation::testSumOfRow()
     SparseMatrix<float> w = Interpolation::createInterpolationMat(mappedSubSet,
                                                                   distanceMatrix,
                                                                   Interpolation::linear,
-                                                                  0.20,
-                                                                  evoked.info,
-                                                                  FIFFV_MEG_CH);
+                                                                  0.20);
 
     qint32 n = w.rows();
     qint32 m = w.cols();

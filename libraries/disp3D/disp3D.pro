@@ -124,7 +124,7 @@ SOURCES += \
     engine/model/workers/rtSourceLoc/rtsourceinterpolationmatworker.cpp \
     engine/model/workers/rtSensorData/rtsensordataworker.cpp \
     engine/model/workers/rtSensorData/rtsensordatacontroller.cpp \
-    engine/model/workers/rtSensorData/rtinterpolationmatworker.cpp \
+    engine/model/workers/rtSensorData/rtsensorinterpolationmatworker.cpp \
     engine/model/3dhelpers/renderable3Dentity.cpp \
     engine/model/3dhelpers/custommesh.cpp \
     engine/model/materials/pervertexphongalphamaterial.cpp \
@@ -180,7 +180,7 @@ HEADERS += \
     engine/model/workers/rtSourceLoc/rtsourceinterpolationmatworker.h \
     engine/model/workers/rtSensorData/rtsensordataworker.h \
     engine/model/workers/rtSensorData/rtsensordatacontroller.h \
-    engine/model/workers/rtSensorData/rtinterpolationmatworker.h \
+    engine/model/workers/rtSensorData/rtsensorinterpolationmatworker.h \
     engine/model/3dhelpers/renderable3Dentity.h \
     engine/model/3dhelpers/custommesh.h \
     engine/model/items/common/types.h \
