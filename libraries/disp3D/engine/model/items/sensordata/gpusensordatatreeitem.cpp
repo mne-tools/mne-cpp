@@ -127,7 +127,7 @@ void GpuSensorDataTreeItem::onNewInterpolationMatrixAvailable(const Eigen::Spars
 
 //*************************************************************************************************************
 
-void GpuSensorDataTreeItem::onNewRtRawData(VectorXd vecDataVector)
+void GpuSensorDataTreeItem::onNewRtRawData(const VectorXd &vecDataVector)
 {
     if(m_pInterpolationItem)
     {

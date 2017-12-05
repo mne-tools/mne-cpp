@@ -152,7 +152,7 @@ public:
     *
     * @param tSignalVec              Vector with one float value for each sensor.
     */
-    virtual void addNewRtData(Eigen::VectorXf tSignalVec);
+    virtual void addNewRtData(const VectorXf &tSignalVec);
 
     //=========================================================================================================
     /**

@@ -175,6 +175,26 @@ void MneEstimateTreeItem::initItem()
     this->appendRow(list);
     data.setValue(1);
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
+
+    MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.05");
+    list.clear();
+    list << pItemCancelDistance;
+    list << new QStandardItem(pItemCancelDistance->toolTip());
+    this->appendRow(list);
+    data.setValue(0.05);
+    pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
+    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
+            this, &MneEstimateTreeItem::onCancelDistanceChanged);
+
+    MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Cubic");
+    list.clear();
+    list << pInterpolationFunction;
+    list << new QStandardItem(pInterpolationFunction->toolTip());
+    this->appendRow(list);
+    data.setValue(QString("Cubic"));
+    pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
+    connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
+            this, &MneEstimateTreeItem::onInterpolationFunctionChanged);
 }
 
 
@@ -416,6 +436,40 @@ void MneEstimateTreeItem::setThresholds(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
+void MneEstimateTreeItem::setCancelDistance(double dCancelDist)
+{
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::CancelDistance);
+
+    for(int i = 0; i < lItems.size(); i++) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
+            QVariant data;
+            data.setValue(dCancelDist);
+            pAbstractItem->setData(data, MetaTreeItemRoles::CancelDistance);
+            pAbstractItem->setData(data, Qt::DisplayRole);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::setInterpolationFunction(const QString &sInterpolationFunction)
+{
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::InterpolationFunction);
+
+    for(int i = 0; i < lItems.size(); i++) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
+            QVariant data;
+            data.setValue(sInterpolationFunction);
+            pAbstractItem->setData(data, MetaTreeItemRoles::InterpolationFunction);
+            pAbstractItem->setData(data, Qt::DisplayRole);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere,
                                          const MatrixX3f& matVertColorRightHemisphere)
 {
@@ -544,3 +598,28 @@ void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
     }
 }
 
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
+{
+    if(dCancelDist.canConvert<double>())
+    {
+        if(m_pRtSourceDataController) {
+            m_pRtSourceDataController->setCancelDistance(dCancelDist.toDouble());
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
+{
+    if(sInterpolationFunction.canConvert<QString>())
+    {
+        if(m_pRtSourceDataController) {
+            m_pRtSourceDataController->setInterpolationFunction(sInterpolationFunction.toString());
+        }
+    }
+}

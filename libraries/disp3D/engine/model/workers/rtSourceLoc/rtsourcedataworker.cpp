@@ -242,8 +242,8 @@ void RtSourceDataWorker::streamData()
             //Perform the actual interpolation and send signal
             m_vecAverage /= (double)m_iAverageSamples;
             if(m_bStreamSmoothedData) {
-                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.rows()), m_lVisualizationInfoLeft),
-                                       generateColorsFromSensorValues(m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.rows(), m_lVisualizationInfoRight.matInterpolationMatrix.rows()), m_lVisualizationInfoRight));
+                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.cols()), m_lVisualizationInfoLeft),
+                                       generateColorsFromSensorValues(m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.cols(), m_lVisualizationInfoRight.matInterpolationMatrix.cols()), m_lVisualizationInfoRight));
             } else {
                 emit newRtRawData(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.rows()),
                                   m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.rows(), m_lVisualizationInfoRight.matInterpolationMatrix.rows()));
@@ -295,11 +295,9 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                                                       double dThreholdZ,
                                                       QRgb (*functionHandlerColorMap)(double v))
 {
-    //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
-    //      Otherwise we would have to check which color map to take for each vertex.
-
+    //Note: This function needs to be implemented extremly efficient.
     if(vecData.rows() != matFinalVertColor.rows()) {
-        qDebug() << "RtSourceDataWorker::transformDataToColor - Sizes of input data (" << vecData.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
+        qDebug() << "RtSourceDataWorker::normalizeAndTransformToColor - Sizes of input data (" << vecData.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
         return;
     }
 

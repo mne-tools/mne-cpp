@@ -272,11 +272,9 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                                                       double dThreholdZ,
                                                       QRgb (*functionHandlerColorMap)(double v))
 {
-    //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
-    //      Otherwise we would have to check which color map to take for each vertex.
-
+    //Note: This function needs to be implemented extremly efficient.
     if(vecData.rows() != matFinalVertColor.rows()) {
-        qDebug() << "RtSensorDataWorker::transformDataToColor - Sizes of input data (" << vecData.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
+        qDebug() << "RtSensorDataWorker::normalizeAndTransformToColor - Sizes of input data (" << vecData.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
         return;
     }
 
