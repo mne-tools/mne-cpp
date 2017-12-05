@@ -176,15 +176,15 @@ void MneEstimateTreeItem::initItem()
     data.setValue(1);
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::NumberAverages);
 
-    MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.05");
-    list.clear();
-    list << pItemCancelDistance;
-    list << new QStandardItem(pItemCancelDistance->toolTip());
-    this->appendRow(list);
-    data.setValue(0.05);
-    pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
-    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onCancelDistanceChanged);
+//    MetaTreeItem *pItemCancelDistance = new MetaTreeItem(MetaTreeItemTypes::CancelDistance, "0.05");
+//    list.clear();
+//    list << pItemCancelDistance;
+//    list << new QStandardItem(pItemCancelDistance->toolTip());
+//    this->appendRow(list);
+//    data.setValue(0.05);
+//    pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
+//    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
+//            this, &MneEstimateTreeItem::onCancelDistanceChanged);
 
     MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Cubic");
     list.clear();
@@ -215,45 +215,29 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     //Set data based on clusterd or full source space
     bool isClustered = tForwardSolution.src[0].isClustered();
 
-    if(isClustered) {
-        //Source Space IS clustered        
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
-
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    } else {
-        //Source Space is NOT clustered
-        this->setData(0, Data3DTreeModelItemRoles::RTStartIdxLeftHemi);
-        this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxLeftHemi);
-
-        this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdxRightHemi);
-        this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdxRightHemi);
-    }
-
-    QVariant data;
+    VectorXi clustVertNoTemp, clustVertNoLeft, clustVertNoRight;
 
     for(int i = 0; i < tForwardSolution.src.size(); ++i) {
         if(isClustered) {
             //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
-            VectorXi clustVertNo(tForwardSolution.src[i].cluster_info.centroidVertno.size());
-            for(int j = 0; j < clustVertNo.rows(); ++j) {
-                clustVertNo(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
+            clustVertNoTemp.resize(tForwardSolution.src[i].cluster_info.centroidVertno.size());
+            for(int j = 0; j < clustVertNoTemp.rows(); ++j) {
+                clustVertNoTemp(j) = tForwardSolution.src[i].cluster_info.centroidVertno.at(j);
             }
-            data.setValue(clustVertNo);
         } else {
-            data.setValue(tForwardSolution.src[i].vertno);
+            clustVertNoTemp = tForwardSolution.src[i].vertno;
         }
 
         if(i == 0) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoLeftHemi);
+            clustVertNoLeft = clustVertNoTemp;
         } else if (i == 1) {
-            this->setData(data, Data3DTreeModelItemRoles::RTVertNoRightHemi);
+            clustVertNoRight = clustVertNoTemp;
         }
     }
 
     //Add meta information as item children
     QList<QStandardItem*> list;
+    QVariant data;
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
     MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::SourceSpaceType, sIsClustered);
@@ -277,8 +261,8 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                     tForwardSolution.src[1].rr,
                                                     tForwardSolution.src[0].neighbor_vert,
                                                     tForwardSolution.src[1].neighbor_vert,
-                                                    this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
-                                                    this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>());
+                                                    clustVertNoLeft,
+                                                    clustVertNoRight);
 
     m_pRtSourceDataController->setSurfaceColor(matSurfaceVertColorLeftHemi,
                                                matSurfaceVertColorRightHemi);
@@ -436,19 +420,19 @@ void MneEstimateTreeItem::setThresholds(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setCancelDistance(double dCancelDist)
-{
-    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::CancelDistance);
+//void MneEstimateTreeItem::setCancelDistance(double dCancelDist)
+//{
+//    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::CancelDistance);
 
-    for(int i = 0; i < lItems.size(); i++) {
-        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            QVariant data;
-            data.setValue(dCancelDist);
-            pAbstractItem->setData(data, MetaTreeItemRoles::CancelDistance);
-            pAbstractItem->setData(data, Qt::DisplayRole);
-        }
-    }
-}
+//    for(int i = 0; i < lItems.size(); i++) {
+//        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
+//            QVariant data;
+//            data.setValue(dCancelDist);
+//            pAbstractItem->setData(data, MetaTreeItemRoles::CancelDistance);
+//            pAbstractItem->setData(data, Qt::DisplayRole);
+//        }
+//    }
+//}
 
 
 //*************************************************************************************************************
@@ -601,15 +585,15 @@ void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
-{
-    if(dCancelDist.canConvert<double>())
-    {
-        if(m_pRtSourceDataController) {
-            m_pRtSourceDataController->setCancelDistance(dCancelDist.toDouble());
-        }
-    }
-}
+//void MneEstimateTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
+//{
+//    if(dCancelDist.canConvert<double>())
+//    {
+//        if(m_pRtSourceDataController) {
+//            m_pRtSourceDataController->setCancelDistance(dCancelDist.toDouble());
+//        }
+//    }
+//}
 
 
 //*************************************************************************************************************

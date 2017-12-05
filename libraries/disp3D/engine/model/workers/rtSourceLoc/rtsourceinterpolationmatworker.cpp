@@ -147,27 +147,22 @@ void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
 
 void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
 {
-    qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - 1";
     if(!m_bInterpolationInfoIsInit) {
         qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
         return;
     }
 
-    qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - 2";
     //SCDC with cancel distance
     m_lInterpolationData.matDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.matVertices,
                                                                 m_lInterpolationData.vecNeighborVertices,
                                                                 m_lInterpolationData.vecMappedSubset,
                                                                 m_lInterpolationData.dCancelDistance);
 
-    qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - 3";
     //create Interpolation matrix
     SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
                                                                                     m_lInterpolationData.matDistanceMatrix,
                                                                                     m_lInterpolationData.interpolationFunction,
                                                                                     m_lInterpolationData.dCancelDistance);
 
-    qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - 4";
     emit newInterpolationMatrixCalculated(matInterpolationMat);
-    qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - 5";
 }

@@ -217,7 +217,7 @@ public:
      *
      * @param[in] dCancelDist               The new cancel distance value in meters.
      */
-    virtual void setCancelDistance(double dCancelDist);
+    //virtual void setCancelDistance(double dCancelDist);
 
     //=========================================================================================================
     /**
@@ -323,7 +323,7 @@ protected:
     *
     * @param[in] dCancelDist     The new cancel distance.
     */
-    virtual void onCancelDistanceChanged(const QVariant& dCancelDist);
+    //virtual void onCancelDistanceChanged(const QVariant& dCancelDist);
 
     //=========================================================================================================
     /**
