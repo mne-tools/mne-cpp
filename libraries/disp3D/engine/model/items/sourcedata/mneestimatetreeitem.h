@@ -86,7 +86,7 @@ namespace DISP3DLIB
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtSourceLocDataWorker;
+class RtSourceDataController;
 
 
 //=============================================================================================================
@@ -246,9 +246,11 @@ protected:
     /**
     * This function gets called whenever this item receives new color values for each estimated source.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
+    * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
     */
-    void onNewRtData(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
+    void onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
+                                      const Eigen::MatrixX3f &matColorMatrixRightHemi);
 
     //=========================================================================================================
     /**
@@ -300,7 +302,7 @@ protected:
 
     bool                                m_bIsDataInit;                      /**< The init flag. */
 
-    QPointer<RtSourceLocDataWorker>     m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<RtSourceDataController>    m_pRtSourceDataController;          /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
     //=========================================================================================================

@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "mneestimatetreeitem.h"
-#include "../../workers/rtSourceLoc/rtsourcelocdataworker.h"
+#include "../../workers/rtSourceLoc/rtsourcedatacontroller.h"
 #include "../common/metatreeitem.h"
 
 #include <mne/mne_sourceestimate.h>
@@ -50,6 +50,8 @@
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
+
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -87,10 +89,7 @@ MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
 
 MneEstimateTreeItem::~MneEstimateTreeItem()
 {
-    if(m_pSourceLocRtDataWorker->isRunning()) {
-        m_pSourceLocRtDataWorker->stop();
-        delete m_pSourceLocRtDataWorker;
-    }
+    m_pRtSourceDataController->deleteLater();
 }
 
 
@@ -182,12 +181,12 @@ void MneEstimateTreeItem::initItem()
 //*************************************************************************************************************
 
 void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
-                                const MatrixX3f& matSurfaceVertColorLeftHemi,
-                                const MatrixX3f& matSurfaceVertColorRightHemi,
-                                const VectorXi& vecLabelIdsLeftHemi,
-                                const VectorXi& vecLabelIdsRightHemi,
-                                const QList<FSLIB::Label>& lLabelsLeftHemi,
-                                const QList<FSLIB::Label>& lLabelsRightHemi)
+                                   const MatrixX3f& matSurfaceVertColorLeftHemi,
+                                   const MatrixX3f& matSurfaceVertColorRightHemi,
+                                   const VectorXi& vecLabelIdsLeftHemi,
+                                   const VectorXi& vecLabelIdsRightHemi,
+                                   const QList<FSLIB::Label>& lLabelsLeftHemi,
+                                   const QList<FSLIB::Label>& lLabelsRightHemi)
 {   
     if(tForwardSolution.src.size() < 2) {
         return;
@@ -247,27 +246,27 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
     //set rt data corresponding to the hemisphere
-    if(!m_pSourceLocRtDataWorker) {
-        m_pSourceLocRtDataWorker = new RtSourceLocDataWorker();
+    if(!m_pRtSourceDataController) {
+        m_pRtSourceDataController = new RtSourceDataController();
     }
 
-    connect(m_pSourceLocRtDataWorker.data(), &RtSourceLocDataWorker::newRtData,
-            this, &MneEstimateTreeItem::onNewRtData);
+    connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtSmoothedDataAvailable,
+            this, &MneEstimateTreeItem::onNewRtSmoothedDataAvailable);
 
-    m_pSourceLocRtDataWorker->setSurfaceData(this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
-                                             this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>(),
-                                             tForwardSolution.src[0].neighbor_vert,
-                                             tForwardSolution.src[1].neighbor_vert,
-                                             tForwardSolution.src[0].rr,
-                                             tForwardSolution.src[1].rr);
+    m_pRtSourceDataController->setInterpolationInfo(tForwardSolution.src[0].rr,
+                                                    tForwardSolution.src[1].rr,
+                                                    tForwardSolution.src[0].neighbor_vert,
+                                                    tForwardSolution.src[1].neighbor_vert,
+                                                    this->data(Data3DTreeModelItemRoles::RTVertNoLeftHemi).value<VectorXi>(),
+                                                    this->data(Data3DTreeModelItemRoles::RTVertNoRightHemi).value<VectorXi>());
 
-    m_pSourceLocRtDataWorker->setSurfaceColor(matSurfaceVertColorLeftHemi,
-                                             matSurfaceVertColorRightHemi);
+    m_pRtSourceDataController->setSurfaceColor(matSurfaceVertColorLeftHemi,
+                                               matSurfaceVertColorRightHemi);
 
-    m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIdsLeftHemi,
-                                                vecLabelIdsRightHemi,
-                                                lLabelsLeftHemi,
-                                                lLabelsRightHemi);
+//    m_pRtSourceDataController->setAnnotationData(vecLabelIdsLeftHemi,
+//                                                vecLabelIdsRightHemi,
+//                                                lLabelsLeftHemi,
+//                                                lLabelsRightHemi);
 
     m_bIsDataInit = true;
 }
@@ -287,8 +286,8 @@ void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
     data.setValue(tSourceEstimate.data);
     this->setData(data, Data3DTreeModelItemRoles::Data);
 
-    if(m_pSourceLocRtDataWorker) {
-        m_pSourceLocRtDataWorker->addData(tSourceEstimate.data);
+    if(m_pRtSourceDataController) {
+        m_pRtSourceDataController->addData(tSourceEstimate.data);
     }
 }
 
@@ -417,10 +416,11 @@ void MneEstimateTreeItem::setThresholds(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere)
+void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere,
+                                         const MatrixX3f& matVertColorRightHemisphere)
 {
-    m_pSourceLocRtDataWorker->setSurfaceColor(matVertColorLeftHemisphere,
-                                             matVertColorRightHemisphere);
+    m_pRtSourceDataController->setSurfaceColor(matVertColorLeftHemisphere,
+                                               matVertColorRightHemisphere);
 }
 
 
@@ -428,8 +428,8 @@ void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisp
 
 void MneEstimateTreeItem::setSFreq(const double dSFreq)
 {
-    if(m_pSourceLocRtDataWorker) {
-        m_pSourceLocRtDataWorker->setSFreq(dSFreq);
+    if(m_pRtSourceDataController) {
+        m_pRtSourceDataController->setSFreq(dSFreq);
     }
 }
 
@@ -438,11 +438,11 @@ void MneEstimateTreeItem::setSFreq(const double dSFreq)
 
 void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
-    if(m_pSourceLocRtDataWorker) {
+    if(m_pRtSourceDataController) {
         if(checkState == Qt::Checked) {
-            m_pSourceLocRtDataWorker->start();
+            m_pRtSourceDataController->setStreamingState(true);
         } else if(checkState == Qt::Unchecked) {
-            m_pSourceLocRtDataWorker->stop();
+            m_pRtSourceDataController->setStreamingState(false);
         }
     }
 }
@@ -450,8 +450,10 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceColors)
+void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
+                                                       const Eigen::MatrixX3f &matColorMatrixRightHemi)
 {    
+    QPair<MatrixX3f, MatrixX3f> sourceColors(matColorMatrixLeftHemi, matColorMatrixRightHemi);
     QVariant data;
     data.setValue(sourceColors);
 
@@ -464,8 +466,8 @@ void MneEstimateTreeItem::onNewRtData(const QPair<MatrixX3f, MatrixX3f>& sourceC
 void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setColormapType(sColormapType.toString());
+        if(m_pRtSourceDataController) {
+            m_pRtSourceDataController->setColormapType(sColormapType.toString());
         }
     }
 }
@@ -476,8 +478,8 @@ void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 {
     if(iMSec.canConvert<int>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setInterval(iMSec.toInt());
+        if(m_pRtSourceDataController) {
+            m_pRtSourceDataController->setTimeInterval(iMSec.toInt());
         }
     }
 }
@@ -488,8 +490,8 @@ void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 void MneEstimateTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setNormalization(vecThresholds.value<QVector3D>());
+        if(m_pRtSourceDataController) {
+            m_pRtSourceDataController->setThresholds(vecThresholds.value<QVector3D>());
         }
     }
 }
@@ -510,8 +512,8 @@ void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
             iVisType = Data3DTreeModelItemRoles::SmoothingBased;
         }
 
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
+        if(m_pRtSourceDataController) {
+            //m_pRtSourceDataController->setVisualizationType(iVisType);
         }
     }
 }
@@ -521,11 +523,11 @@ void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
 
 void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
-    if(m_pSourceLocRtDataWorker) {
+    if(m_pRtSourceDataController) {
         if(checkState == Qt::Checked) {
-            m_pSourceLocRtDataWorker->setLoop(true);
+            m_pRtSourceDataController->setLoopState(true);
         } else if(checkState == Qt::Unchecked) {
-            m_pSourceLocRtDataWorker->setLoop(false);
+            m_pRtSourceDataController->setLoopState(false);
         }
     }
 }
@@ -536,8 +538,8 @@ void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
-        if(m_pSourceLocRtDataWorker) {
-            m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr.toInt());
+        if(m_pRtSourceDataController) {
+            m_pRtSourceDataController->setNumberAverages(iNumAvr.toInt());
         }
     }
 }

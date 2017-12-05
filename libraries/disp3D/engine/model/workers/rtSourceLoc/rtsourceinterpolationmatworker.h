@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtinterpolationmatworker.h
+* @file     rtsourceinterpolationmatworker.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtInterpolationMatWorker class declaration.
+* @brief     RtSourceInterpolationMatWorker class declaration.
 *
 */
 
-#ifndef DISP3DLIB_RTINTERPOLATIONMATWORKER_H
-#define DISP3DLIB_RTINTERPOLATIONMATWORKER_H
+#ifndef DISP3DLIB_RTSOURCEINTERPOLATIONMATWORKER_H
+#define DISP3DLIB_RTSOURCEINTERPOLATIONMATWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,13 +43,15 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QSharedPointer>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -87,19 +89,19 @@ namespace DISP3DLIB
 *
 * @brief This worker calculates the interpolation matrix.
 */
-class DISP3DSHARED_EXPORT RtInterpolationMatWorker : public QObject
+class DISP3DSHARED_EXPORT RtSourceInterpolationMatWorker : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtInterpolationMatWorker> SPtr;            /**< Shared pointer type for RtInterpolationMatWorker class. */
-    typedef QSharedPointer<const RtInterpolationMatWorker> ConstSPtr; /**< Const shared pointer type for RtInterpolationMatWorker class. */
+    typedef QSharedPointer<RtSourceInterpolationMatWorker> SPtr;            /**< Shared pointer type for RtSourceInterpolationMatWorker class. */
+    typedef QSharedPointer<const RtSourceInterpolationMatWorker> ConstSPtr; /**< Const shared pointer type for RtSourceInterpolationMatWorker class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     */
-    RtInterpolationMatWorker();
+    RtSourceInterpolationMatWorker();
 
     //=========================================================================================================
     /**
@@ -127,25 +129,13 @@ public:
     *
     * @param[in] matVertices               The mesh information in form of vertices.
     * @param[in] vecNeighborVertices       The neighbor vertex information.
-    * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
-    * @param[in] fiffEvoked                Holds all information about the sensors.
-    * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
+    * @param[in] vecMappedSubset           Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to.
     *
     * @return Returns the created interpolation matrix.
     */
     void setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
                               const QVector<QVector<int> > &vecNeighborVertices,
-                              const QVector<Eigen::Vector3f> &vecSensorPos,
-                              const FIFFLIB::FiffInfo &fiffInfo,
-                              int iSensorType);
-
-    //=========================================================================================================
-    /**
-    * Sets bad channels and recalculate interpolation matrix.
-    *
-    * @param[in] info                 The fiff info including the new bad channels.
-    */
-    void setBadChannels(const FIFFLIB::FiffInfo& info);
+                              const QVector<qint32> &vecMappedSubset);
 
 protected:    
     //=========================================================================================================
@@ -159,7 +149,6 @@ protected:
     * The struct specifing all data that is used in the interpolation process
     */
     struct InterpolationData {
-        int                                             iSensorType;                    /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
         double                                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
         Eigen::MatrixXd                                 matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
@@ -167,8 +156,6 @@ protected:
 
         QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
         QVector<QVector<int> >                          vecNeighborVertices;            /**< The neighbor vertex information. */
-
-        FIFFLIB::FiffInfo                               fiffInfo;                       /**< Contains all information about the sensors. */
 
         double (*interpolationFunction) (double);                                       /**< Function that computes interpolation coefficients using the distance values. */
     }       m_lInterpolationData;           /**< Container for the interpolation data. */
@@ -187,4 +174,4 @@ signals:
 
 } // NAMESPACE
 
-#endif //DISP3DLIB_RTINTERPOLATIONMATWORKER_H
+#endif //DISP3DLIB_RTSOURCEINTERPOLATIONMATWORKER_H

@@ -123,6 +123,7 @@ public:
     explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
                                   int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
                                   const QString& text = "3D Plot");
+
     //=========================================================================================================
     /**
     * Default destructor.

@@ -165,7 +165,7 @@ public:
     *
     * @param[in] data         The new data.
     */
-    void addData(const Eigen::MatrixXd& data);
+    void addData(const Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
@@ -184,12 +184,12 @@ public:
     * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
     * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
     */
-    void setSurfaceData(const Eigen::VectorXi& vecVertNoLeftHemi,
-                        const Eigen::VectorXi& vecVertNoRightHemi,
-                        const QVector<QVector<int> >& vecVertexNeighborsLeftHemi,
-                        const QVector<QVector<int> >& vecVertexNeighborsRightHemi,
-                        const MatrixX3f& matVertPosLeftHemi,
-                        const MatrixX3f& matVertPosRightHemi);
+    void setSurfaceData(const Eigen::VectorXi &vecVertNoLeftHemi,
+                        const Eigen::VectorXi &vecVertNoRightHemi,
+                        const QVector<QVector<int> > &vecVertexNeighborsLeftHemi,
+                        const QVector<QVector<int> > &vecVertexNeighborsRightHemi,
+                        const MatrixX3f &matVertPosLeftHemi,
+                        const MatrixX3f &matVertPosRightHemi);
 
     //=========================================================================================================
     /**
@@ -199,7 +199,7 @@ public:
     * @param[in] matSurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
     */
     void setSurfaceColor(const MatrixX3f &matSurfaceVertColorLeftHemi,
-                        const MatrixX3f &matSurfaceVertColorRightHemi);
+                         const MatrixX3f &matSurfaceVertColorRightHemi);
 
     //=========================================================================================================
     /**
@@ -210,10 +210,10 @@ public:
     * @param[in] lLabelsLeftHemi            The label information for the left hemipshere.
     * @param[in] lLabelsRightHemi           The label information for the right hemipshere.
     */
-    void setAnnotationData(const Eigen::VectorXi& vecLabelIdsLeftHemi,
-                           const Eigen::VectorXi& vecLabelIdsRightHemi,
-                           const QList<FSLIB::Label>& lLabelsLeftHemi,
-                           const QList<FSLIB::Label>& lLabelsRightHemi);
+    void setAnnotationData(const Eigen::VectorXi &vecLabelIdsLeftHemi,
+                           const Eigen::VectorXi &vecLabelIdsRightHemi,
+                           const QList<FSLIB::Label> &lLabelsLeftHemi,
+                           const QList<FSLIB::Label> &lLabelsRightHemi);
 
     //=========================================================================================================
     /**
@@ -245,7 +245,7 @@ public:
     *
     * @param[in] sColormapType          The new colormap type.
     */
-    void setColormapType(const QString& sColormapType);
+    void setColormapType(const QString &sColormapType);
 
     //=========================================================================================================
     /**
@@ -294,7 +294,7 @@ private:
     *
     * @return                               Returns the final colors in for the left and right hemisphere.
     */
-    QPair<MatrixX3f, MatrixX3f> performVisualizationTypeCalculation(const Eigen::VectorXd& vSourceColorSamples);
+    QPair<MatrixX3f, MatrixX3f> performVisualizationTypeCalculation(const Eigen::VectorXd &vSourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -303,7 +303,7 @@ private:
     * @param[in] matVertPosLeftHemi                 The surface vertices in 3D space for the left hemisphere.
     * @param[in] matVertPosRightHemi                The surface vertices in 3D space for the right hemisphere.
     */
-    void createSmoothingOperator(const MatrixX3f& matVertPosLeftHemi, const MatrixX3f& matVertPosRightHemi);
+    void createSmoothingOperator(const MatrixX3f &matVertPosLeftHemi, const MatrixX3f &matVertPosRightHemi);
 
     QMutex                                          m_qMutex;                           /**< The thread's mutex. */
 
@@ -330,7 +330,7 @@ signals:
     *
     * @param[in] colorPair     The samples data in form of a QPair rgb colors for each (left, right) hemisphere.
     */
-    void newRtData(const QPair<MatrixX3f, MatrixX3f>& colorPair);
+    void newRtData(const QPair<MatrixX3f, MatrixX3f> &colorPair);
 };
 
 } // NAMESPACE

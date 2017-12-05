@@ -107,7 +107,7 @@ public:
 
     //=========================================================================================================
     /**
-    * deleted default constructor (static class).
+    * Deleted default constructor (static class).
     */
     Interpolation() = delete;
 
@@ -120,12 +120,10 @@ public:
     *    -# if the vertex belongs to a sensor: The value at the position of the sensor is 1 and all other values in this row are set to 0
     *    -# if not: the values are calculated to give a total of 1 (a lot of values will stay 0, because they are too far away to influence) by using the above mentioned formula
     *
-    * @brief <i>createInterpolationMat</i>     Calculate weight matrix for later interpolation
-    *
-    * @param vecProjectedSensors               Vector of IDs of sensor vertices
-    * @param matDistanceTable                  Matrix that contains all needed distances
-    * @param interpolationFunction             Function that computes interpolation coefficients using the distance values
-    * @param dCancelDist                       Distances higher than this are ignored, i.e. the respective coefficients are set to zero
+    * @param[in] vecProjectedSensors           Vector of IDs of sensor vertices
+    * @param[in] matDistanceTable              atrix that contains all needed distances
+    * @param[in] interpolationFunction         Function that computes interpolation coefficients using the distance values
+    * @param[in] dCancelDist                   Distances higher than this are ignored, i.e. the respective coefficients are set to zero
     *
     * @return                                  The distance matrix created
     */
@@ -143,9 +141,8 @@ public:
     * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
     * i.e. in first instance the distance table that the weight matrix is based on.
     *
-    * @brief <i>interpolateSignals</i>     Interpolate sensor data
-    * @param matInterpolationMatrix        The weight matrix which should be used for multiplying
-    * @param vecMeasurementData            A vector with measured sensor data
+    * @param[in] matInterpolationMatrix    The weight matrix which should be used for multiplying
+    * @param[in] vecMeasurementData        A vector with measured sensor data
     *
     * @return                              Interpolated values for all vertices of the mesh
     */
@@ -154,10 +151,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Serves as a placeholder for other functions and is needed in case a linear interpolation is wanted when calling <i>createInterplationMat</i>.
+    * Serves as a placeholder for other functions and is needed in case a linear interpolation is wanted when calling <i>createInterplationMat</i>.Returns input argument unchanged.
     *
-    * @brief linear                        Returns input argument unchanged
-    * @param dIn                           Distance value
+    * @param[in] dIn                       Distance value
     *
     * @return                              Same value interpreted as a interpolation weight
     */
@@ -165,10 +161,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates interpolation weights based on distance values
+    * Calculates interpolation weights based on distance values. Returns interpolation weight that corresponds to gauss curve with sigma set to 1.
     *
-    * @brief <i>gaussian</i>               Returns interpolation weight that corresponds to gauss curve with sigma set to 1
-    * @param dIn                           Distance value
+    * @param[in] dIn                       Distance value
     *
     * @return                              The function value of the gauss curve at d
     */
@@ -176,10 +171,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates interpolation weights based on distance values
+    * Calculates interpolation weights based on distance values. Returns interpolation weight that corresponds to negative parabel with an y-offset of 1.
     *
-    * @brief <i>square</i>                 Returns interpolation weight that corresponds to negative parabel with an y-offset of 1.
-    * @param dIn                           Distance value
+    * @param[in] dIn                       Distance value
     *
     * @return                              The function value of the negative parabel at d
     */
@@ -187,10 +181,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates interpolation weights based on distance values
+    * Calculates interpolation weights based on distance values. Returns interpolation weight that corresponds to cubic hyperbel.
     *
-    * @brief <i>square</i>                 Returns interpolation weight that corresponds to cubic hyperbel
-    * @param dIn                           Distance value
+    * @param[in] dIn                           Distance value
     *
     * @return                              The function value of the cubic hyperbel at d
     */

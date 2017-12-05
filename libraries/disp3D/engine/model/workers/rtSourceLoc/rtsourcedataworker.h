@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtsensordataworker.h
+* @file     rtsourcedataworker.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtSensorDataWorker class declaration.
+* @brief     RtSourceDataWorker class declaration.
 *
 */
 
-#ifndef DISP3DLIB_RTSENSORDATAWORKER_H
-#define DISP3DLIB_RTSENSORDATAWORKER_H
+#ifndef DISP3DLIB_RTSOURCEDATAWORKER_H
+#define DISP3DLIB_RTSOURCEDATAWORKER_H
 
 
 //*************************************************************************************************************
@@ -91,19 +91,19 @@ namespace DISP3DLIB
 *
 * @brief This worker streams either interpolated or raw data.
 */
-class DISP3DSHARED_EXPORT RtSensorDataWorker : public QObject
+class DISP3DSHARED_EXPORT RtSourceDataWorker : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtSensorDataWorker> SPtr;            /**< Shared pointer type for RtSensorDataWorker class. */
-    typedef QSharedPointer<const RtSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtSensorDataWorker class. */
+    typedef QSharedPointer<RtSourceDataWorker> SPtr;            /**< Shared pointer type for RtSourceDataWorker class. */
+    typedef QSharedPointer<const RtSourceDataWorker> ConstSPtr; /**< Const shared pointer type for RtSourceDataWorker class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     */
-    explicit RtSensorDataWorker();
+    explicit RtSourceDataWorker();
 
     //=========================================================================================================
     /**
@@ -123,9 +123,11 @@ public:
     /**
     * Set number of vertices.
     *
-    * @param[in] iNumberVerts      The number of vertices.
+    * @param[in] iNumberVertsLeft      The number of vertices for the left hemisphere.
+    * @param[in] iNumberVertsRight     The number of vertices for the right hemisphere.
     */
-    void setNumberVertices(int iNumberVerts);
+    void setNumberVertices(int iNumberVertsLeft,
+                           int iNumberVertsRight);
 
     //=========================================================================================================
     /**
@@ -177,11 +179,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the interpolation matrix.
+    * Set the interpolation matrix for the left hemisphere.
     *
-    * @param[in] matInterpolationMatrix                 The new interpolation matrix.
+    * @param[in] matInterpolationMatrixLeft                 The new interpolation matrix.
     */
-    void setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    void setInterpolationMatrixLeft(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeft);
+
+    //=========================================================================================================
+    /**
+    * Set the interpolation matrix for the right hemisphere.
+    *
+    * @param[in] matInterpolationMatrixRight                 The new interpolation matrix.
+    */
+    void setInterpolationMatrixRight(const Eigen::SparseMatrix<float> &matInterpolationMatrixRight);
 
     //=========================================================================================================
     /**
@@ -190,6 +200,22 @@ public:
     void streamData();
 
 protected:
+    //=========================================================================================================
+    /**
+    * The struct specifing visualization info.
+    */
+    struct VisualizationInfo {
+        double                      dThresholdX;
+        double                      dThresholdZ;
+
+        Eigen::MatrixX3f            matOriginalVertColor;
+        Eigen::MatrixX3f            matFinalVertColor;
+
+        Eigen::SparseMatrix<float>  matInterpolationMatrix;         /**< The interpolation matrix. */
+
+        QRgb (*functionHandlerColorMap)(double v);
+    } m_lVisualizationInfoLeft, m_lVisualizationInfoRight;          /**< Container for the visualization info. */
+
     //=========================================================================================================
     /**
     * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
@@ -211,15 +237,16 @@ protected:
     * @brief generateColorsFromSensorValues        Produces the final color matrix that is to be emitted
     *
     * @param[in] vecSensorValues                   A vector of sensor signals
+    * @param[in/out] visualizationInfoHemi             The needed visualization info
     *
     * @return The final color values for the underlying mesh surface
     */
-    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
+    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd &vecSensorValues,
+                                                    VisualizationInfo &visualizationInfoHemi);
 
     QLinkedList<Eigen::VectorXd>                        m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     QLinkedList<Eigen::VectorXd>::const_iterator        m_itCurrentSample;                  /**< Iterator to current sample which is/was streamed. */
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */
-    Eigen::SparseMatrix<float>                          m_matInterpolationMatrix;           /**< The interpolation matrix. */
 
     bool                                                m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                                                m_bStreamSmoothedData;              /**< Flag if this thread's streams the raw or already smoothed data. Latter are produced by multiplying the smoothing operator here in this thread. */
@@ -229,39 +256,29 @@ protected:
 
     double                                              m_dSFreq;                           /**< The current sampling frequency. */
 
-    //=========================================================================================================
-    /**
-    * The struct specifing visualization info.
-    */
-    struct VisualizationInfo {
-        double                      dThresholdX;
-        double                      dThresholdZ;
-
-        Eigen::MatrixX3f            matOriginalVertColor;
-        Eigen::MatrixX3f            matFinalVertColor;
-
-        QRgb (*functionHandlerColorMap)(double v);
-    } m_lVisualizationInfo;               /**< Container for the visualization info. */
-
 
 signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever this item should stream new raw data to its listeners.
     *
-    * @param[in] vecDataVector     The raw data.
+    * @param[in] vecDataVectorLeftHemi          The new streamed raw data for the left hemispehre.
+    * @param[in] vecDataVectorRightHemi         The new streamed raw data for the right hemispehre.
     */
-    void newRtRawData(Eigen::VectorXd vecDataVector);
+    void newRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
+                      const Eigen::VectorXd &vecDataVectorRightHemi);
 
     //=========================================================================================================
     /**
     * Emit this signal whenever this item should stream interpolated raw data to its listeners.
     *
-    * @param[in] matColorMatrix     The interpolated raw data in form of rgb colors for each vertex.
+    * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
+    * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
     */
-    void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrix);
+    void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
+                           const Eigen::MatrixX3f &matColorMatrixRightHemi);
 };
 
 } // NAMESPACE
 
-#endif //DISP3DLIB_RTSENSORDATAWORKER_H
+#endif //DISP3DLIB_RTSOURCEDATAWORKER_H
