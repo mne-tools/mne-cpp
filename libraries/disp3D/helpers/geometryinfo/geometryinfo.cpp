@@ -94,7 +94,6 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
                             QVector<qint32> &vecVertSubset,
                             double dCancelDist)
 {
-    qDebug()<<"GeometryInfo::scdc - matVertices.rows() "<<matVertices.rows();
     // create matrix and check for empty subset:
     qint32 iCols = vecVertSubset.size();
     if(vecVertSubset.empty()) {
