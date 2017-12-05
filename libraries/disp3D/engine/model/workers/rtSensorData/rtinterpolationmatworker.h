@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtinterpolationmatworker.h
+* @file     rtsensorinterpolationmatworker.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtInterpolationMatWorker class declaration.
+* @brief     RtSensorInterpolationMatWorker class declaration.
 *
 */
 
-#ifndef DISP3DLIB_RTINTERPOLATIONMATWORKER_H
-#define DISP3DLIB_RTINTERPOLATIONMATWORKER_H
+#ifndef DISP3DLIB_RTSENSORINTERPOLATIONMATWORKER_H
+#define DISP3DLIB_RTSENSORINTERPOLATIONMATWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,19 +87,19 @@ namespace DISP3DLIB
 *
 * @brief This worker calculates the interpolation matrix.
 */
-class DISP3DSHARED_EXPORT RtInterpolationMatWorker : public QObject
+class DISP3DSHARED_EXPORT RtSensorInterpolationMatWorker : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtInterpolationMatWorker> SPtr;            /**< Shared pointer type for RtInterpolationMatWorker class. */
-    typedef QSharedPointer<const RtInterpolationMatWorker> ConstSPtr; /**< Const shared pointer type for RtInterpolationMatWorker class. */
+    typedef QSharedPointer<RtSensorInterpolationMatWorker> SPtr;            /**< Shared pointer type for RtSensorInterpolationMatWorker class. */
+    typedef QSharedPointer<const RtSensorInterpolationMatWorker> ConstSPtr; /**< Const shared pointer type for RtSensorInterpolationMatWorker class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     */
-    RtInterpolationMatWorker();
+    RtSensorInterpolationMatWorker();
 
     //=========================================================================================================
     /**
@@ -187,4 +187,4 @@ signals:
 
 } // NAMESPACE
 
-#endif //DISP3DLIB_RTINTERPOLATIONMATWORKER_H
+#endif //DISP3DLIB_RTSENSORINTERPOLATIONMATWORKER_H

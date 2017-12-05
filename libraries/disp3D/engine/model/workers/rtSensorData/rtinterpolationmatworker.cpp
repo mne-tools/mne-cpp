@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtinterpolationmatworker.cpp
+* @file     rtsensorinterpolationmatworker.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RtInterpolationMatWorker class definition.
+* @brief    RtSensorInterpolationMatWorker class definition.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtinterpolationmatworker.h"
+#include "rtsensorinterpolationmatworker.h"
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 
@@ -71,7 +71,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtInterpolationMatWorker::RtInterpolationMatWorker()
+RtSensorInterpolationMatWorker::RtSensorInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false)
 {
     m_lInterpolationData.dCancelDistance = 0.05;
@@ -81,7 +81,7 @@ RtInterpolationMatWorker::RtInterpolationMatWorker()
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setInterpolationFunction(const QString &sInterpolationFunction)
+void RtSensorInterpolationMatWorker::setInterpolationFunction(const QString &sInterpolationFunction)
 {
     if(sInterpolationFunction == "Linear") {
         m_lInterpolationData.interpolationFunction = Interpolation::linear;
@@ -112,7 +112,7 @@ void RtInterpolationMatWorker::setInterpolationFunction(const QString &sInterpol
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setCancelDistance(double dCancelDist)
+void RtSensorInterpolationMatWorker::setCancelDistance(double dCancelDist)
 {
     m_lInterpolationData.dCancelDistance = dCancelDist;
 
@@ -123,14 +123,14 @@ void RtInterpolationMatWorker::setCancelDistance(double dCancelDist)
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
+void RtSensorInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
                                                     const QVector<QVector<int> > &vecNeighborVertices,
                                                     const QVector<Vector3f> &vecSensorPos,
                                                     const FiffInfo &fiffInfo,
                                                     int iSensorType)
 {
     if(matVertices.rows() == 0) {
-        qDebug() << "RtInterpolationMatWorker::calculateSurfaceData - Surface data is empty. Returning ...";
+        qDebug() << "RtSensorInterpolationMatWorker::calculateSurfaceData - Surface data is empty. Returning ...";
         return;
     }
 
@@ -153,10 +153,10 @@ void RtInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f &matV
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
+void RtSensorInterpolationMatWorker::setBadChannels(const FiffInfo& info)
 {
     if(!m_bInterpolationInfoIsInit) {
-        qDebug() << "RtInterpolationMatWorker::updateBadChannels - Set interpolation info first.";
+        qDebug() << "RtSensorInterpolationMatWorker::updateBadChannels - Set interpolation info first.";
         return;
     }
 
@@ -181,10 +181,10 @@ void RtInterpolationMatWorker::setBadChannels(const FiffInfo& info)
 
 //*************************************************************************************************************
 
-void RtInterpolationMatWorker::calculateInterpolationOperator()
+void RtSensorInterpolationMatWorker::calculateInterpolationOperator()
 {
     if(!m_bInterpolationInfoIsInit) {
-        qDebug() << "RtInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
+        qDebug() << "RtSensorInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
         return;
     }
 

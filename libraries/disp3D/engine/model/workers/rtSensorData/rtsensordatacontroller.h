@@ -89,7 +89,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class RtSensorDataWorker;
-class RtInterpolationMatWorker;
+class RtSensorInterpolationMatWorker;
 
 
 //=============================================================================================================
@@ -272,10 +272,10 @@ protected:
     QTimer                                  m_timer;                            /**< The timer to control the streaming speed. */
 
     QThread                                 m_rtSensorDataWorkerThread;         /**< The RtSensorDataWorker thread. */
-    QThread                                 m_rtInterpolationWorkerThread;      /**< The RtInterpolationMatWorker thread. */
+    QThread                                 m_rtInterpolationWorkerThread;      /**< The RtSensorInterpolationMatWorker thread. */
 
     QPointer<RtSensorDataWorker>            m_pRtSensorDataWorker;              /**< The pointer to the RtSensorDataWorker, which is running in the RtSensorDataWorker thread. */
-    QPointer<RtInterpolationMatWorker>      m_pRtInterpolationWorker;           /**< The pointer to the RtInterpolationMatWorker, which is running in the RtInterpolationMatWorker thread. */
+    QPointer<RtSensorInterpolationMatWorker>      m_pRtInterpolationWorker;           /**< The pointer to the RtSensorInterpolationMatWorker, which is running in the RtSensorInterpolationMatWorker thread. */
 
     int                                     m_iMSecInterval;                    /**< Length in milli Seconds to wait inbetween data samples. */
 signals:
