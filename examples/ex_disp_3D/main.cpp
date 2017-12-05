@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
         //Add rt source loc data and init some visualization values
         if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
             pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(0);
+            pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));

@@ -251,7 +251,7 @@ protected:
     *
     * @param[in] vecDataVector         The new raw data.
     */
-    void onNewRtRawData(Eigen::VectorXd vecDataVector);
+    void onNewRtRawData(const Eigen::VectorXd &vecDataVector);
 
     //=========================================================================================================
     /**
@@ -405,7 +405,7 @@ signals:
     *
     * @param[in] vecDataVector          The new streamed raw data.
     */
-    void newRtRawDataAvailable(Eigen::VectorXd vecDataVector);
+    void newRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
 
     //=========================================================================================================
     /**

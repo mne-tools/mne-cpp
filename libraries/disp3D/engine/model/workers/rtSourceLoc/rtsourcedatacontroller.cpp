@@ -48,6 +48,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -219,6 +221,11 @@ void RtSourceDataController::setCancelDistance(double dCancelDist)
 
 void RtSourceDataController::setTimeInterval(int iMSec)
 {
+    if(iMSec < 17) {
+        qDebug() << "RtSourceDataController::setTimeInterval - The minimum time interval is 17mSec.";
+        iMSec = 17;
+    }
+
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);
 }
@@ -233,6 +240,7 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
                                                   const VectorXi &vecVertNoLeftHemi,
                                                   const VectorXi &vecVertNoRightHemi)
 {
+    qDebug() << "RtSourceDataController::setInterpolationInfo";
     QVector<qint32> vecMappedSubsetLeft, vecMappedSubsetRight;
 
     for(int i = 0; i < vecVertNoLeftHemi.rows(); ++i) {
@@ -338,6 +346,7 @@ void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMat
 
 void RtSourceDataController::onNewInterpolationMatrixLeftCalculated(const SparseMatrix<float> &matInterpolationMatrixLeftHemi)
 {
+    qDebug() << "RtSourceDataController::onNewInterpolationMatrixLeftCalculated";
     emit newInterpolationMatrixLeftAvailable(matInterpolationMatrixLeftHemi);
 }
 
@@ -346,6 +355,7 @@ void RtSourceDataController::onNewInterpolationMatrixLeftCalculated(const Sparse
 
 void RtSourceDataController::onNewInterpolationMatrixRightCalculated(const SparseMatrix<float> &matInterpolationMatrixRightHemi)
 {
+    qDebug() << "RtSourceDataController::onNewInterpolationMatrixRightCalculated";
     emit newInterpolationMatrixRightAvailable(matInterpolationMatrixRightHemi);
 }
 

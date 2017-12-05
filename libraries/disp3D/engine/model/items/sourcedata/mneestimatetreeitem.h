@@ -212,6 +212,23 @@ public:
 
     //=========================================================================================================
     /**
+     * This function sets the cancel distance used in distance calculations for the interpolation.
+     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     *
+     * @param[in] dCancelDist               The new cancel distance value in meters.
+     */
+    virtual void setCancelDistance(double dCancelDist);
+
+    //=========================================================================================================
+    /**
+     * This function sets the function that is used in the interpolation process.
+     *
+     * @param sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
+     */
+    virtual void setInterpolationFunction(const QString &sInterpolationFunction);
+
+    //=========================================================================================================
+    /**
     * This function gets called whenever the origin of the surface vertex color changed.
     *
     * @param[in] matVertColorLeftHemisphere       The new vertex colors for the left hemisphere.
@@ -299,6 +316,22 @@ protected:
     * @param[in] iNumAvr     The new number of averages.
     */
     void onNumberAveragesChanged(const QVariant& iNumAvr);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the cancel distance of the interpolation changed.
+    *
+    * @param[in] dCancelDist     The new cancel distance.
+    */
+    virtual void onCancelDistanceChanged(const QVariant& dCancelDist);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the function of the interpolation changed.
+    *
+    * @param[in] sInterpolationFunction     The new function name.
+    */
+    virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
 
     bool                                m_bIsDataInit;                      /**< The init flag. */
 

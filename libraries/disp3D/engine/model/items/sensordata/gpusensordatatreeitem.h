@@ -129,7 +129,7 @@ protected:
     *
     * @param[in] vecDataVector         The streamed raw data.
     */
-    void virtual onNewRtRawData(VectorXd vecDataVector);
+    void virtual onNewRtRawData(const VectorXd &vecDataVector);
 
     //=========================================================================================================
     /**

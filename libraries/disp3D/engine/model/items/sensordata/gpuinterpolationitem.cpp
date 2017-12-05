@@ -195,7 +195,7 @@ void GpuInterpolationItem::setInterpolationMatrix(const Eigen::SparseMatrix<floa
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::addNewRtData(VectorXf tSignalVec)
+void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 {
     if(m_bIsDataInit == false)
     {

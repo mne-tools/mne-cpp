@@ -197,6 +197,11 @@ void RtSensorDataController::setCancelDistance(double dCancelDist)
 
 void RtSensorDataController::setTimeInterval(int iMSec)
 {
+    if(iMSec < 17) {
+        qDebug() << "RtSensorDataController::setTimeInterval - The minimum time interval is 17mSec.";
+        iMSec = 17;
+    }
+
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);
 }
@@ -286,7 +291,7 @@ void RtSensorDataController::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void RtSensorDataController::onNewRtRawData(VectorXd vecDataVector)
+void RtSensorDataController::onNewRtRawData(const VectorXd &vecDataVector)
 {
     emit newRtRawDataAvailable(vecDataVector);
 }
