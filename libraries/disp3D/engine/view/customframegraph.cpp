@@ -94,10 +94,12 @@ CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
     , m_pDispatchCompute(new QDispatchCompute(m_pSurfaceSelector))
     , m_pComputeFilter(new QTechniqueFilter(m_pDispatchCompute))
     , m_pCameraSelector(new QCameraSelector(m_pSurfaceSelector))
-    , m_pForwardFilter(new QTechniqueFilter(m_pCameraSelector))
-    , m_pSortPolicy(new QSortPolicy(m_pForwardFilter))
-    , m_pMemoryBarrier(new QMemoryBarrier(m_pSortPolicy))
+    , m_pMemoryBarrier(new QMemoryBarrier(m_pCameraSelector))
+    , m_pForwardFilter(new QTechniqueFilter(m_pMemoryBarrier))
+    , m_pForwardSortedFilter(new QTechniqueFilter(m_pMemoryBarrier))
+    , m_pSortPolicy(new QSortPolicy(m_pForwardSortedFilter))
     , m_pForwardKey(new QFilterKey)
+    , m_pForwardSortedKey(new QFilterKey)
     , m_pComputeKey(new QFilterKey)
 {
     init();
@@ -165,12 +167,16 @@ void CustomFrameGraph::init()
     m_pForwardKey->setName(QStringLiteral("renderingStyle"));
     m_pForwardKey->setValue(QStringLiteral("forward"));
 
+    m_pForwardSortedKey->setName(QStringLiteral("renderingStyle"));
+    m_pForwardSortedKey->setValue(QStringLiteral("forwardSorted"));
+
     //Add Matches
     m_pComputeFilter->addMatch(m_pComputeKey);
     m_pForwardFilter->addMatch(m_pForwardKey);
+    m_pForwardSortedFilter->addMatch(m_pForwardSortedKey);
 
     //Set draw policy
-    QVector<QSortPolicy::SortType> sortTypes = {Qt3DRender::QSortPolicy::BackToFront};
+    QVector<QSortPolicy::SortType> sortTypes = {QSortPolicy::StateChangeCost, QSortPolicy::BackToFront};
     m_pSortPolicy->setSortTypes(sortTypes);
 
     //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
