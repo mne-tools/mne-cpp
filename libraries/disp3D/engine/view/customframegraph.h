@@ -169,13 +169,17 @@ private:
 
     QPointer<Qt3DRender::QCameraSelector>           m_pCameraSelector;      /**< Frame graph node that selects the camera. */
 
+    QPointer<Qt3DRender::QMemoryBarrier>            m_pMemoryBarrier;       /**< Frame graph node that emplaces a memory barrier to synchronize computing and rendering. */
+
     QPointer<Qt3DRender::QTechniqueFilter>          m_pForwardFilter;       /**< Frame graph node that selects the forward rendering technique. */
+
+    QPointer<Qt3DRender::QTechniqueFilter>          m_pForwardSortedFilter; /**< Frame graph node that selects the forward sorted rendering technique. */
 
     QPointer<Qt3DRender::QSortPolicy>               m_pSortPolicy;          /**< Frame graph node that defines the drawing order. */
 
-    QPointer<Qt3DRender::QMemoryBarrier>            m_pMemoryBarrier;       /**< Frame graph node that emplaces a memory barrier to synchronize computing and rendering. */
+    QPointer<Qt3DRender::QFilterKey>                m_pForwardKey;          /**< Filter key for the forward filter. */
 
-    QPointer<Qt3DRender::QFilterKey>                m_pForwardKey;          /**< Filter key for the compute filter. */
+    QPointer<Qt3DRender::QFilterKey>                m_pForwardSortedKey;    /**< Filter key for the sorted forward filter. */
 
     QPointer<Qt3DRender::QFilterKey>                m_pComputeKey;          /**< Filter key for the forward rendering filter. */
 };
