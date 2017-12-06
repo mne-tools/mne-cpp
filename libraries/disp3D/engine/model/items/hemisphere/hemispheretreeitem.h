@@ -145,31 +145,12 @@ public:
     */
     SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-    //=========================================================================================================
-    /**
-    * Returns the surface tree item.
-    *
-    * @return The current surface tree item.
-    */
-    FsSurfaceTreeItem* getSurfaceItem();
-
-    //=========================================================================================================
-    /**
-    * Returns the annotation tree item.
-    *
-    * @return The current annotation tree item.
-    */
-    FsAnnotationTreeItem* getAnnotItem();
-
 protected:
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     void initItem();
-
-    QPointer<FsSurfaceTreeItem>           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    QPointer<FsAnnotationTreeItem>        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
 };
 
 } //NAMESPACE DISP3DLIB

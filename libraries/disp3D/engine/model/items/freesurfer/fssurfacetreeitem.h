@@ -162,11 +162,6 @@ protected:
     QPointer<MetaTreeItem>          m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    */
-    void colorOriginChanged();
 };
 
 } //NAMESPACE DISP3DLIB

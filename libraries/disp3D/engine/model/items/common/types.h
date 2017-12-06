@@ -148,16 +148,15 @@ namespace Data3DTreeModelItemRoles
     enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
                     NumberVertices = Qt::UserRole + 101,
                     SurfaceCurv = Qt::UserRole + 102,
-                    SurfaceCurvatureColorVert = Qt::UserRole + 103,
-                    NetworkDataMatrix = Qt::UserRole + 104,
-                    SurfaceHemi = Qt::UserRole + 105,
-                    AnnotColors = Qt::UserRole + 106,
-                    FileName = Qt::UserRole + 107,
-                    FilePath = Qt::UserRole + 108,
-                    Data = Qt::UserRole + 109,
-                    VertexBased = Qt::UserRole + 110,
-                    SmoothingBased = Qt::UserRole + 111,
-                    AnnotationBased = Qt::UserRole + 112};
+                    NetworkDataMatrix = Qt::UserRole + 103,
+                    SurfaceHemi = Qt::UserRole + 104,
+                    AnnotColors = Qt::UserRole + 105,
+                    FileName = Qt::UserRole + 106,
+                    FilePath = Qt::UserRole + 107,
+                    Data = Qt::UserRole + 108,
+                    VertexBased = Qt::UserRole + 109,
+                    SmoothingBased = Qt::UserRole + 110,
+                    AnnotationBased = Qt::UserRole + 111};
 }
 
 namespace MetaTreeItemRoles

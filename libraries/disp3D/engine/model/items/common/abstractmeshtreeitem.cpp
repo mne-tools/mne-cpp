@@ -262,8 +262,6 @@ void AbstractMeshTreeItem::onColorChanged(const QVariant& color)
 
     data.setValue(matNewVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-
-    emit colorOriginChanged(matNewVertColor);
 }
 
 

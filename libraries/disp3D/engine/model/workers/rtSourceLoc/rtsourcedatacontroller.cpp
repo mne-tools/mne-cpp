@@ -335,7 +335,6 @@ void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMat
 
 void RtSourceDataController::onNewInterpolationMatrixLeftCalculated(const SparseMatrix<float> &matInterpolationMatrixLeftHemi)
 {
-    qDebug() << "RtSourceDataController::onNewInterpolationMatrixLeftCalculated";
     emit newInterpolationMatrixLeftAvailable(matInterpolationMatrixLeftHemi);
 }
 
@@ -344,7 +343,6 @@ void RtSourceDataController::onNewInterpolationMatrixLeftCalculated(const Sparse
 
 void RtSourceDataController::onNewInterpolationMatrixRightCalculated(const SparseMatrix<float> &matInterpolationMatrixRightHemi)
 {
-    qDebug() << "RtSourceDataController::onNewInterpolationMatrixRightCalculated";
     emit newInterpolationMatrixRightAvailable(matInterpolationMatrixRightHemi);
 }
 
