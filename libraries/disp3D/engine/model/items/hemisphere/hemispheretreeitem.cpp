@@ -124,35 +124,31 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
     //Add childs
     //Add surface child
-    if(!m_pSurfaceItem) {
-        m_pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SurfaceItem, "Surface");
-    }
+    FsSurfaceTreeItem* pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SurfaceItem, "Surface");
 
     QList<QStandardItem*> list;
-    list << m_pSurfaceItem;
-    list << new QStandardItem(m_pSurfaceItem->toolTip());
+    list << pSurfaceItem;
+    list << new QStandardItem(pSurfaceItem->toolTip());
     this->appendRow(list);
 
-    m_pSurfaceItem->addData(tSurface);
+    pSurfaceItem->addData(tSurface);
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
-        if(!m_pAnnotItem) {
-            m_pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
-        }
+        FsAnnotationTreeItem* pAnnotItem = new FsAnnotationTreeItem(Data3DTreeModelItemTypes::AnnotationItem);
 
-        connect(m_pAnnotItem.data(), &FsAnnotationTreeItem::annotationVisibiltyChanged,
-                m_pSurfaceItem.data(), &FsSurfaceTreeItem::onAnnotationVisibilityChanged);
+        connect(pAnnotItem, &FsAnnotationTreeItem::annotationVisibiltyChanged,
+                pSurfaceItem, &FsSurfaceTreeItem::onAnnotationVisibilityChanged);
 
         list.clear();
-        list << m_pAnnotItem;
-        list << new QStandardItem(m_pAnnotItem->toolTip());
+        list << pAnnotItem;
+        list << new QStandardItem(pAnnotItem->toolTip());
         this->appendRow(list);
 
-        m_pAnnotItem->addData(tSurface, tAnnotation);
+        pAnnotItem->addData(tSurface, tAnnotation);
     }
 
-    return m_pSurfaceItem;
+    return pSurfaceItem;
 }
 
 
@@ -191,20 +187,4 @@ SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemispher
     pSourceSpaceItem->addData(tHemisphere);
 
     return pSourceSpaceItem;
-}
-
-
-//*************************************************************************************************************
-
-FsSurfaceTreeItem* HemisphereTreeItem::getSurfaceItem()
-{
-   return m_pSurfaceItem;
-}
-
-
-//*************************************************************************************************************
-
-FsAnnotationTreeItem* HemisphereTreeItem::getAnnotItem()
-{
-    return m_pAnnotItem;
 }
