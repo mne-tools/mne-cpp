@@ -182,14 +182,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Set base surface color which the streamed data is plotted on.
-    *
-    * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted
-    */
-    void setSurfaceColor(const Eigen::MatrixX3f& matSurfaceVertColor);
-
-    //=========================================================================================================
-    /**
     * Set the normalization value.
     *
     * @param[in] vecThresholds          The new threshold values used for normalizing the data.

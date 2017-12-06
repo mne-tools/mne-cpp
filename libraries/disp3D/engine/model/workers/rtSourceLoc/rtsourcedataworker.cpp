@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "RtSourceDataWorker.h"
+#include "rtsourcedataworker.h"
 #include <disp/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
 

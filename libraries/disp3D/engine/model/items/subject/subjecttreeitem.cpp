@@ -90,22 +90,3 @@ void SubjectTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Subject");
 }
-
-
-//*************************************************************************************************************
-
-void SubjectTreeItem::connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem)
-{
-    //Connect mri item with the measurement tree items in case the real time color changes (i.e. rt source loc)
-    //or the user changes the color origin
-    QList<QStandardItem*> mriItemList = this->findChildren(Data3DTreeModelItemTypes::MriItem);
-
-    foreach(QStandardItem* item, mriItemList) {
-        if(MriTreeItem* pMriItem = dynamic_cast<MriTreeItem*>(item)) {
-            connect(pMeasurementItem, &MeasurementTreeItem::sourceColorChanged,
-                pMriItem, &MriTreeItem::setRtVertColor);
-            connect(pMriItem, &MriTreeItem::colorOriginChanged,
-                pMeasurementItem, &MeasurementTreeItem::setSourceColors);
-        }
-    }
-}

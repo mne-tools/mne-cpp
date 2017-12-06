@@ -44,6 +44,8 @@
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
 
 
 //*************************************************************************************************************
@@ -52,6 +54,7 @@
 //=============================================================================================================
 
 #include <QVector3D>
+#include <Qt3DCore/QEntity>
 
 
 //*************************************************************************************************************
@@ -201,12 +204,9 @@ void MneEstimateTreeItem::initItem()
 //*************************************************************************************************************
 
 void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
-                                   const MatrixX3f& matSurfaceVertColorLeftHemi,
-                                   const MatrixX3f& matSurfaceVertColorRightHemi,
-                                   const VectorXi& vecLabelIdsLeftHemi,
-                                   const VectorXi& vecLabelIdsRightHemi,
-                                   const QList<FSLIB::Label>& lLabelsLeftHemi,
-                                   const QList<FSLIB::Label>& lLabelsRightHemi)
+                                   const SurfaceSet& tSurfSet,
+                                   const AnnotationSet& tAnnotSet,
+                                   Qt3DCore::QEntity* p3DEntityParent)
 {   
     if(tForwardSolution.src.size() < 2) {
         return;
@@ -263,9 +263,6 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                     tForwardSolution.src[1].neighbor_vert,
                                                     clustVertNoLeft,
                                                     clustVertNoRight);
-
-    m_pRtSourceDataController->setSurfaceColor(matSurfaceVertColorLeftHemi,
-                                               matSurfaceVertColorRightHemi);
 
 //    m_pRtSourceDataController->setAnnotationData(vecLabelIdsLeftHemi,
 //                                                vecLabelIdsRightHemi,
@@ -454,16 +451,6 @@ void MneEstimateTreeItem::setInterpolationFunction(const QString &sInterpolation
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere,
-                                         const MatrixX3f& matVertColorRightHemisphere)
-{
-    m_pRtSourceDataController->setSurfaceColor(matVertColorLeftHemisphere,
-                                               matVertColorRightHemisphere);
-}
-
-
-//*************************************************************************************************************
-
 void MneEstimateTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pRtSourceDataController) {
@@ -491,11 +478,7 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
                                                        const Eigen::MatrixX3f &matColorMatrixRightHemi)
 {    
-    QPair<MatrixX3f, MatrixX3f> sourceColors(matColorMatrixLeftHemi, matColorMatrixRightHemi);
-    QVariant data;
-    data.setValue(sourceColors);
 
-    emit sourceVertColorChanged(data);
 }
 
 

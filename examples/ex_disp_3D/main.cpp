@@ -245,7 +245,10 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     //Add fressurfer surface set including both hemispheres
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption),
+                                "MRI",
+                                tSurfSet,
+                                tAnnotSet);
 
     //Read and show BEM
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"); //sample-5120-5120-5120-bem
@@ -316,7 +319,13 @@ int main(int argc, char *argv[])
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
-        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+                                                                          evoked.comment,
+                                                                          sourceEstimate,
+                                                                          t_clusteredFwd,
+                                                                          tSurfSet,
+                                                                          tAnnotSet,
+                                                                          p3DAbstractView->getView()->format())) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);

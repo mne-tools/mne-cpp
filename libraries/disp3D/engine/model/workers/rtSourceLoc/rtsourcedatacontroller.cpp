@@ -266,16 +266,6 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
 
 //*************************************************************************************************************
 
-void RtSourceDataController::setSurfaceColor(const MatrixX3f &matSurfaceVertColorLeftHemi,
-                                             const MatrixX3f &matSurfaceVertColorRightHemi)
-{
-    emit surfaceColorChanged(matSurfaceVertColorLeftHemi,
-                             matSurfaceVertColorRightHemi);
-}
-
-
-//*************************************************************************************************************
-
 void RtSourceDataController::setThresholds(const QVector3D &vecThresholds)
 {
     emit thresholdsChanged(vecThresholds);

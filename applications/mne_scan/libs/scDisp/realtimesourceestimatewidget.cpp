@@ -165,7 +165,12 @@ void RealTimeSourceEstimateWidget::getData()
         //
         if(!m_pRtItem) {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+            m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data",
+                                                      *m_pRTSE->getValue(),
+                                                      *m_pRTSE->getFwdSolution(),
+                                                      m_surfSet,
+                                                      m_annotationSet,
+                                                      m_p3DView->format());
 
             m_pRtItem->setLoopState(false);
             m_pRtItem->setTimeInterval(17);

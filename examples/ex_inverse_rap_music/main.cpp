@@ -53,6 +53,7 @@
 #include <inverse/rapMusic/rapmusic.h>
 
 #include <disp3D/adapters/abstractview.h>
+#include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
@@ -211,7 +212,13 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, t_surfSet, t_annotationSet);
 
     //Add rt source loc data and init some visualization values
-    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+                                                                      evoked.comment,
+                                                                      sourceEstimate,
+                                                                      t_clusteredFwd,
+                                                                      t_surfSet,
+                                                                      t_annotationSet,
+                                                                      p3DAbstractView->getView()->format())) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);

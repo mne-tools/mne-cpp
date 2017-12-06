@@ -102,15 +102,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit SubjectTreeItem(int iType = Data3DTreeModelItemTypes::SubjectItem, const QString& text = "");
-
-    //=========================================================================================================
-    /**
-    * Connects measurement items and their data (i.e. MNE source data) to already loaded MRI data
-    *
-    * @param[in] pMeasurementItem       The measurement item which is to be connected.
-    */
-    void connectMeasurementToMriItems(MeasurementTreeItem* pMeasurementItem);
+    explicit SubjectTreeItem(int iType = Data3DTreeModelItemTypes::SubjectItem, const QString& text = "Subject");
 
 protected:
     //=========================================================================================================

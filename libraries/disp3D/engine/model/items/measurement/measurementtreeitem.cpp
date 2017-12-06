@@ -166,95 +166,62 @@ SourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceS
 //*************************************************************************************************************
 
 MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate,
-                                                  const MNEForwardSolution& tForwardSolution)
+                                                  const MNEForwardSolution& tForwardSolution,
+                                                  const SurfaceSet& tSurfSet,
+                                                  const AnnotationSet& tAnnotSet,
+                                                  Qt3DCore::QEntity* p3DEntityParent,
+                                                  bool bUseGPU)
 {
     if(!tSourceEstimate.isEmpty()) {
-        //Add source estimation data as child
-        if(this->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).size() == 0) {
-            //If rt data item does not exists yet, create it here!
-            if(!tForwardSolution.isEmpty()) {
-                if(!m_pMneEstimateTreeItem) {
-                    m_pMneEstimateTreeItem = new MneEstimateTreeItem();
-                }
+        if(bUseGPU) {
+//            //GPU for EEG data
+//            if(m_pGpuEEGSensorDataTreeItem) {
+//                m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
+//            } else {
+//                //Add sensor data as child
+//                //If item does not exists yet, create it here!
+//                m_pGpuEEGSensorDataTreeItem = new GpuSensorDataTreeItem();
+//                m_pGpuEEGSensorDataTreeItem->setText("EEG Data");
+
+//                QList<QStandardItem*> list;
+//                list << m_pGpuEEGSensorDataTreeItem;
+//                list << new QStandardItem(m_pGpuEEGSensorDataTreeItem->toolTip());
+//                this->appendRow(list);
+
+//                m_pGpuEEGSensorDataTreeItem->initData(bemSurface,
+//                                                  fiffInfo,
+//                                                  sSensorType,
+//                                                  pParent);
+
+//                m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
+//            }
+
+//            return dynamic_cast<SensorDataTreeItem*>(m_pGpuEEGSensorDataTreeItem.data());
+        } else {
+            //CPU for source data
+            if(m_pMneEstimateTreeItem) {
+                m_pMneEstimateTreeItem->addData(tSourceEstimate);
+            } else {
+                //Add sensor data as child
+                //If item does not exists yet, create it here!
+                m_pMneEstimateTreeItem = new MneEstimateTreeItem();
 
                 QList<QStandardItem*> list;
                 list << m_pMneEstimateTreeItem;
                 list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
                 this->appendRow(list);
 
-                connect(m_pMneEstimateTreeItem.data(), &MneEstimateTreeItem::sourceVertColorChanged,
-                        this, &MeasurementTreeItem::onSourceColorChanged);
-
-                //Divide into left right hemi
-                if(SubjectTreeItem* pParent = dynamic_cast<SubjectTreeItem*>(this->QStandardItem::parent())) {
-                    QList<QStandardItem*> lMRIChildren = pParent->findChildren(Data3DTreeModelItemTypes::MriItem);
-                    MriTreeItem* pMriItem = Q_NULLPTR;
-
-                    //Find MRI data set and hemisphere from parent item
-                    //Option 1 - Choose first found MRI set
-                    if(!lMRIChildren.isEmpty()) {
-                        pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.first());
-                    }
-
-                    //                    //Option 2 - Choose MRI set by its name
-                    //                    QString sMRISetName = "MRI";
-
-                    //                    for(int i = 0; i < lMRIChildren.size(); ++i) {
-                    //                        if(lMRIChildren.at(i)->text() == sMRISetName) {
-                    //                            if(pMriItem = dynamic_cast<MriTreeItem*>(lMRIChildren.at(i))) {
-                    //                                i = lMRIChildren.size();
-                    //                            }
-                    //                        }
-                    //                    }
-
-                    if(pMriItem) {
-                        QList<QStandardItem*> itemList = pMriItem->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-
-                        FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
-                        FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
-                        FsAnnotationTreeItem* pAnnotTreeItemLeft = Q_NULLPTR;
-                        FsAnnotationTreeItem* pAnnotTreeItemRight = Q_NULLPTR;
-
-                        for(int j = 0; j < itemList.size(); ++j) {
-                            if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-                                if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                                    pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
-                                    pAnnotTreeItemLeft = pHemiItem->getAnnotItem();
-                                } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                                    pSurfaceTreeItemRight = pHemiItem->getSurfaceItem();
-                                    pAnnotTreeItemRight = pHemiItem->getAnnotItem();
-                                }
-                            }
-                        }
-
-                        if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight && pAnnotTreeItemLeft && pAnnotTreeItemRight) {
-                            m_pMneEstimateTreeItem->initData(tForwardSolution,
-                                                         pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
-                                                         pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
-                                                         pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                         pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
-                                                         pAnnotTreeItemLeft->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>(),
-                                                         pAnnotTreeItemRight->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
-                        }
-                    }
-                }
+                m_pMneEstimateTreeItem->initData(tForwardSolution,
+                                                 tSurfSet,
+                                                 tAnnotSet,
+                                                 p3DEntityParent);
 
                 m_pMneEstimateTreeItem->addData(tSourceEstimate);
-            } else {
-                qDebug() << "MeasurementTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
             }
-        } else {
-            if(m_pMneEstimateTreeItem) {
-                m_pMneEstimateTreeItem->addData(tSourceEstimate);
-            }
+
+            return m_pMneEstimateTreeItem;
         }
-
-        return m_pMneEstimateTreeItem;
-    } else {
-        qDebug() << "MeasurementTreeItem::addData - tSourceEstimate is empty";
     }
-
-    return Q_NULLPTR;
 }
 
 
@@ -264,7 +231,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                                                  const MNEBemSurface &bemSurface,
                                                  const FiffInfo &fiffInfo,
                                                  const QString &sSensorType,
-                                                 Qt3DCore::QEntity* pParent,
+                                                 Qt3DCore::QEntity* p3DEntityParent,
                                                  bool bUseGPU)
 {
     if(!tSensorData.size() == 0) {
@@ -287,7 +254,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pGpuEEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      pParent);
+                                                      p3DEntityParent);
 
                     m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
                 }
@@ -311,7 +278,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pCpuEEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      pParent);
+                                                      p3DEntityParent);
 
                     m_pCpuEEGSensorDataTreeItem->addData(tSensorData);
                 }
@@ -339,7 +306,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pGpuMEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      pParent);
+                                                      p3DEntityParent);
 
                     m_pGpuMEGSensorDataTreeItem->addData(tSensorData);
                 }
@@ -363,7 +330,7 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
                     m_pCpuMEGSensorDataTreeItem->initData(bemSurface,
                                                       fiffInfo,
                                                       sSensorType,
-                                                      pParent);
+                                                      p3DEntityParent);
 
                     m_pCpuMEGSensorDataTreeItem->addData(tSensorData);
                 }
@@ -380,7 +347,8 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
 
 //*************************************************************************************************************
 
-EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::QEntity* p3DEntityParent)
+EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet,
+                                              Qt3DCore::QEntity* p3DEntityParent)
 {
     if(pECDSet.size() > 0) {
         //Add source estimation data as child
@@ -414,7 +382,8 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet, Qt3DCore::Q
 
 //*************************************************************************************************************
 
-DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigitizer, Qt3DCore::QEntity *p3DEntityParent)
+DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigitizer,
+                                                   Qt3DCore::QEntity *p3DEntityParent)
 {
     //Find the digitizer kind
     QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
@@ -442,7 +411,8 @@ DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigit
 
 //*************************************************************************************************************
 
-NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DCore::QEntity* p3DEntityParent)
+NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData,
+                                              Qt3DCore::QEntity* p3DEntityParent)
 {
     if(!tNetworkData.getNodes().isEmpty()) {
         //Add source estimation data as child
@@ -470,22 +440,4 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData, Qt3DC
     }
 
     return Q_NULLPTR;
-}
-
-
-//*************************************************************************************************************
-
-void MeasurementTreeItem::setSourceColors(const MatrixX3f& leftHemiColor, const MatrixX3f& rightHemiColor)
-{
-    if(m_pMneEstimateTreeItem) {
-        m_pMneEstimateTreeItem->setColorOrigin(leftHemiColor, rightHemiColor);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MeasurementTreeItem::onSourceColorChanged(const QVariant &vertColors)
-{
-    emit sourceColorChanged(vertColors);
 }

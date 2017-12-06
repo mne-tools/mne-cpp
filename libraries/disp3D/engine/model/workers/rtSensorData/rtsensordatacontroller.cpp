@@ -227,14 +227,6 @@ void RtSensorDataController::setInterpolationInfo(const Eigen::MatrixX3f &matVer
 
 //*************************************************************************************************************
 
-void RtSensorDataController::setSurfaceColor(const MatrixX3f& matSurfaceVertColor)
-{
-    emit surfaceColorChanged(matSurfaceVertColor);
-}
-
-
-//*************************************************************************************************************
-
 void RtSensorDataController::setThresholds(const QVector3D &vecThresholds)
 {
     emit thresholdsChanged(vecThresholds);

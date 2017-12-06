@@ -179,16 +179,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Set base surface color which the streamed data is plotted on.
-    *
-    * @param[in] matSurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
-    * @param[in] matSurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
-    */
-    void setSurfaceColor(const Eigen::MatrixX3f& matSurfaceVertColorLeftHemi,
-                         const Eigen::MatrixX3f &matSurfaceVertColorRightHemi);
-
-    //=========================================================================================================
-    /**
     * Set the normalization value.
     *
     * @param[in] vecThresholds          The new threshold values used for normalizing the data.
@@ -342,16 +332,6 @@ signals:
     * @param[in] dCancelDist           The new cancel distance value in meters.
     */
     void cancelDistanceChanged(double dCancelDist);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the surface color changed.
-    *
-    * @param[in] matSurfaceVertColorLeftHemi      The vertex colors for the left hemipshere surface where the data is to be plotted on.
-    * @param[in] matSurfaceVertColorRightHemi     The vertex colors for the right hemipshere surface where the data is to be plotted on.
-    */
-    void surfaceColorChanged(const Eigen::MatrixX3f &matSurfaceVertColorLeftHemi,
-                             const Eigen::MatrixX3f &matSurfaceVertColorRightHemi);
 
     //=========================================================================================================
     /**

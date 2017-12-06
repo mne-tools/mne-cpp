@@ -159,11 +159,19 @@ public:
     *
     * @param[in] tSourceEstimate    The MNESourceEstimate.
     * @param[in] tForwardSolution   The MNEForwardSolution.
+    * @param[in] tSurfSet           The surface set holding the left and right hemisphere surfaces.
+    * @param[in] tAnnotSet          The annotation set holding the left and right hemisphere annotations.
+    * @param[in] p3DEntityParent    Pointer to the QEntity parent.
+    * @param[in] bUseGPU            Whether to use GPU support for visualizing real-time data.
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate,
-                                 const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+                                 const MNELIB::MNEForwardSolution& tForwardSolution,
+                                 const FSLIB::SurfaceSet &tSurfSet,
+                                 const FSLIB::AnnotationSet &tAnnotSet,
+                                 Qt3DCore::QEntity *p3DEntityParent,
+                                 bool bUseGPU = false);
 
     //=========================================================================================================
     /**
@@ -173,7 +181,7 @@ public:
     * @param[in] bemSurface             Holds all Bem data used in this item.
     * @param[in] fiffInfo               Holds all information needed about the sensors.
     * @param[in] sSensorType            Name of the sensor type EEG or MEG.
-    * @param[in] pParent                Pointer to the QEntity parent.
+    * @param[in] p3DEntityParent        Pointer to the QEntity parent.
     * @param[in] bUseGPU                Whether to use GPU support for visualizing real-time data.
     *
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
@@ -182,7 +190,7 @@ public:
                                 const MNELIB::MNEBemSurface &bemSurface,
                                 const FIFFLIB::FiffInfo &fiffInfo,
                                 const QString &sSensorType,
-                                Qt3DCore::QEntity *pParent,
+                                Qt3DCore::QEntity *p3DEntityParent,
                                 bool bUseGPU = false);
 
     //=========================================================================================================
@@ -221,17 +229,6 @@ public:
     NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData,
                              Qt3DCore::QEntity* p3DEntityParent = 0);
 
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color (curvature, annotation, etc.) changed.
-    * The color generation then based on the current user chosen color origin.
-    *
-    * @param[in] leftHemiColor        Color of the left hemisphere.
-    * @param[in] rightHemiColor       Color of the right hemisphere.
-    */
-    void setSourceColors(const MatrixX3f &leftHemiColor,
-                         const MatrixX3f &rightHemiColor);
-
 protected:
     //=========================================================================================================
     /**
@@ -248,21 +245,18 @@ protected:
     void onSourceColorChanged(const QVariant& vertColors);
 
     QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
+
     QPointer<CpuSensorDataTreeItem>              m_pCpuEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item. */
     QPointer<CpuSensorDataTreeItem>              m_pCpuMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item. */
     QPointer<GpuSensorDataTreeItem>              m_pGpuEEGSensorDataTreeItem;    /**< The rt sensor EEG data item of this item (compute shader version). */
     QPointer<GpuSensorDataTreeItem>              m_pGpuMEGSensorDataTreeItem;    /**< The rt sensor MEG data item of this item (compute shader version). */
+
     QPointer<NetworkTreeItem>                    m_pNetworkTreeItem;             /**< The rt connectivity data item of this item. */
+
     QPointer<EcdDataTreeItem>                    m_EcdDataTreeItem;              /**< The rt dipole fit data item of this item. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * emit this signal whenver the source level color changed.
-    *
-    * @param[in] vertColors        Real tiem colors for both hemispheres.
-    */
-    void sourceColorChanged(const QVariant& vertColors);
+
 };
 
 } //NAMESPACE DISP3DLIB
