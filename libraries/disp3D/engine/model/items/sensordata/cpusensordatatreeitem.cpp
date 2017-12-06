@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "cpusensordatatreeitem.h"
-#include "cpuinterpolationitem.h"
+#include "../common/cpuinterpolationitem.h"
 #include "../../workers/rtSensorData/rtsensordatacontroller.h"
 #include <mne/mne_bem.h>
 

@@ -240,7 +240,6 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
                                                   const VectorXi &vecVertNoLeftHemi,
                                                   const VectorXi &vecVertNoRightHemi)
 {
-    qDebug() << "RtSourceDataController::setInterpolationInfo";
     QVector<qint32> vecMappedSubsetLeft, vecMappedSubsetRight;
 
     for(int i = 0; i < vecVertNoLeftHemi.rows(); ++i) {

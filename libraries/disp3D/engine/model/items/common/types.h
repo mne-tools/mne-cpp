@@ -147,27 +147,17 @@ namespace Data3DTreeModelItemRoles
 {
     enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
                     NumberVertices = Qt::UserRole + 101,
-                    SurfaceTris = Qt::UserRole + 102,
-                    SurfaceNorm = Qt::UserRole + 103,
-                    SurfaceCurv = Qt::UserRole + 104,
-                    SurfaceOffset = Qt::UserRole + 105,
-                    SurfaceCurvatureColorVert = Qt::UserRole + 106,
-                    NetworkDataMatrix = Qt::UserRole + 107,
-                    SurfaceAnnotationColorVert = Qt::UserRole + 108,
-                    SurfaceSetName = Qt::UserRole + 109,
-                    SurfaceHemi = Qt::UserRole + 110,
-                    AnnotColors = Qt::UserRole + 111,
-                    FileName = Qt::UserRole + 112,
-                    FilePath = Qt::UserRole + 113,
-                    LabeList = Qt::UserRole + 114,
-                    LabeIds = Qt::UserRole + 115,
-                    Data = Qt::UserRole + 116,
-                    VertexBased = Qt::UserRole + 117,
-                    SmoothingBased = Qt::UserRole + 118,
-                    AnnotationBased = Qt::UserRole + 119,
-                    BemName = Qt::UserRole + 120,
-                    SourceVertices = Qt::UserRole + 121,
-                    ECDSetData = Qt::UserRole + 122};
+                    SurfaceCurv = Qt::UserRole + 102,
+                    SurfaceCurvatureColorVert = Qt::UserRole + 103,
+                    NetworkDataMatrix = Qt::UserRole + 104,
+                    SurfaceHemi = Qt::UserRole + 105,
+                    AnnotColors = Qt::UserRole + 106,
+                    FileName = Qt::UserRole + 107,
+                    FilePath = Qt::UserRole + 108,
+                    Data = Qt::UserRole + 109,
+                    VertexBased = Qt::UserRole + 110,
+                    SmoothingBased = Qt::UserRole + 111,
+                    AnnotationBased = Qt::UserRole + 112};
 }
 
 namespace MetaTreeItemRoles
