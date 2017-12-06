@@ -120,7 +120,8 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
+    explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem,
+                                const QString& text = "Unknown");
 
     //=========================================================================================================
     /**
@@ -132,7 +133,9 @@ public:
     *
     * @return                       Returns a pointer to the added tree item.
     */
-    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface,
+                               const FSLIB::Annotation& tAnnotation,
+                               Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -143,7 +146,8 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
+    SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere,
+                                 Qt3DCore::QEntity* p3DEntityParent = 0);
 
 protected:
     //=========================================================================================================

@@ -82,7 +82,8 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HemisphereTreeItem::HemisphereTreeItem(int iType, const QString& text)
+HemisphereTreeItem::HemisphereTreeItem(int iType,
+                                       const QString& text)
 : AbstractTreeItem(iType, text)
 {
     initItem();
@@ -102,7 +103,9 @@ void HemisphereTreeItem::initItem()
 
 //*************************************************************************************************************
 
-FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface,
+                                               const Annotation& tAnnotation,
+                                               Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of HemisphereTreeItem based on the hemisphere information
     switch (tSurface.hemi()) {
@@ -124,7 +127,8 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
     //Add childs
     //Add surface child
-    FsSurfaceTreeItem* pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SurfaceItem, "Surface");
+    FsSurfaceTreeItem* pSurfaceItem = new FsSurfaceTreeItem(p3DEntityParent,
+                                                            Data3DTreeModelItemTypes::SurfaceItem, "Surface");
 
     QList<QStandardItem*> list;
     list << pSurfaceItem;
@@ -154,7 +158,8 @@ FsSurfaceTreeItem* HemisphereTreeItem::addData(const Surface& tSurface, const An
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
+SourceSpaceTreeItem* HemisphereTreeItem::addData(const MNEHemisphere& tHemisphere,
+                                                 Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of HemisphereTreeItem based on the hemisphere information
     QVariant data;
