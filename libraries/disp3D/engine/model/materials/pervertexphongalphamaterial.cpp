@@ -78,7 +78,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseAlpha, QNode *parent)
+PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseAlpha, bool bUseSortPolicy, QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
@@ -98,6 +98,7 @@ PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseAlpha, QNode *
 , m_pBlendState(new QBlendEquationArguments())
 , m_pBlendEquation(new QBlendEquation())
 , m_bUseAlpha(bUseAlpha)
+, m_bUseSortPolicy(bUseSortPolicy)
 {
     this->init();
 }
@@ -161,7 +162,15 @@ void PerVertexPhongAlphaMaterial::init()
     }
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
-    m_pFilterKey->setValue(QStringLiteral("forward"));
+
+    if(m_bUseSortPolicy)
+    {
+        m_pFilterKey->setValue(QStringLiteral("forwardSorted"));
+    }
+    else
+    {
+        m_pFilterKey->setValue(QStringLiteral("forward"));
+    }
 
     m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
     m_pVertexGL2Technique->addFilterKey(m_pFilterKey);

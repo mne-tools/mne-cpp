@@ -92,6 +92,11 @@ void FsSurfaceTreeItem::initItem()
 {
     this->setToolTip("Brain hemisphere surface item");
 
+    //Use SortPolicy in frame graph
+    this->removeComponent(m_pMaterial);
+    m_pMaterial = new PerVertexPhongAlphaMaterial(true, true);
+    this->addComponent(m_pMaterial);
+
     //Add surface meta information as item children
     QList<QStandardItem*> list;
     QVariant data;

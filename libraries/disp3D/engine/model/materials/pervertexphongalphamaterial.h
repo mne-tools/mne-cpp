@@ -110,10 +110,11 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] bUseAlpha      Whether to use alpha/transparency.
-    * @param[in] parent         The parent of this class.
+    * @param[in] bUseAlpha          Whether to use alpha/transparency.
+    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+    * @param[in] parent             The parent of this class.
     */
-    explicit PerVertexPhongAlphaMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+    explicit PerVertexPhongAlphaMaterial(bool bUseAlpha = false, bool bUseSortPolicy = false, Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
@@ -168,6 +169,7 @@ private:
     QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;
 
     bool        m_bUseAlpha;
+    bool        m_bUseSortPolicy;
 };
 
 } // namespace DISP3DLIB
