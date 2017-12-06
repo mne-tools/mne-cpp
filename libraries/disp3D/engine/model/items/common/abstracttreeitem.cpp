@@ -79,9 +79,9 @@ void AbstractTreeItem::initItem()
 {
     this->setToolTip("Abstract Tree Item");
 
-     //Do the connects
-     connect(this, &AbstractTreeItem::checkStateChanged,
-             this, &AbstractTreeItem::onCheckStateChanged);
+    //Do the connects
+    connect(this, &AbstractTreeItem::checkStateChanged,
+         this, &AbstractTreeItem::onCheckStateChanged);
 }
 
 

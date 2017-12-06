@@ -71,6 +71,15 @@ namespace MNELIB {
     class MNESourceEstimate;
 }
 
+namespace FSLIB {
+    class SurfaceSet;
+    class AnnotationSet;
+}
+
+namespace Qt3DCore {
+    class QEntity;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -122,21 +131,15 @@ public:
     /**
     * Initializes the rt data item with neccessary information for visualization computations.
     *
-    * @param[in] tForwardSolution                   The MNEForwardSolution.
-    * @param[in] matSurfaceVertColorLeftHemi        The vertex colors for the left hemisphere surface where the data is to be plotted on.
-    * @param[in] matSurfaceVertColorRightHemi       The vertex colors for the right hemisphere surface where the data is to be plotted on.
-    * @param[in] vecLabelIdsLeftHemi                The label ids for each left hemisphere surface vertex index.
-    * @param[in] vecLabelIdsRightHemi               The label ids for each right hemispheresurface vertex index.
-    * @param[in] lLabelsLeftHemi                    The label list for the left hemisphere.
-    * @param[in] lLabelsRightHemi                   The label list for the right hemisphere.
+    * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
+    * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
+    * @param[in] p3DEntityParent    Pointer to the QEntity parent.
     */
     void initData(const MNELIB::MNEForwardSolution& tForwardSolution,
-            const MatrixX3f &matSurfaceVertColorLeftHemi,
-            const MatrixX3f &matSurfaceVertColorRightHemi,
-            const Eigen::VectorXi& vecLabelIdsLeftHemi = FIFFLIB::defaultVectorXi,
-            const Eigen::VectorXi &vecLabelIdsRightHemi = FIFFLIB::defaultVectorXi,
-            const QList<FSLIB::Label> &lLabelsRightHemi = QList<FSLIB::Label>(),
-            const QList<FSLIB::Label>& lLabelsLeftHemi = QList<FSLIB::Label>());
+                  const FSLIB::SurfaceSet& tSurfSet,
+                  const FSLIB::AnnotationSet& tAnnotSet,
+                  Qt3DCore::QEntity* p3DEntityParent);
 
     //=========================================================================================================
     /**
@@ -226,15 +229,6 @@ public:
      * @param sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
      */
     virtual void setInterpolationFunction(const QString &sInterpolationFunction);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the surface vertex color changed.
-    *
-    * @param[in] matVertColorLeftHemisphere       The new vertex colors for the left hemisphere.
-    * @param[in] matVertColorRightHemisphere      The new vertex colors for the right hemisphere.
-    */
-    void setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere);
 
     //=========================================================================================================
     /**
@@ -338,13 +332,7 @@ protected:
     QPointer<RtSourceDataController>    m_pRtSourceDataController;          /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
-    *
-    * @param[in] sourceColors     The color values for each estimated source for left and right hemisphere.
-    */
-    void sourceVertColorChanged(const QVariant& sourceColors);
+
 };
 
 //*************************************************************************************************************

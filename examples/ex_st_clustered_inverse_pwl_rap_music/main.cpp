@@ -54,6 +54,7 @@
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D/adapters/abstractview.h>
+#include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <utils/mnemath.h>
@@ -373,7 +374,13 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), "HemiLRSet", sourceEstimate, t_clusteredFwd);
+    MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+                                                                   "HemiLRSet",
+                                                                   sourceEstimate,
+                                                                   t_clusteredFwd,
+                                                                   t_surfSet,
+                                                                   t_annotationSet,
+                                                                   p3DAbstractView->getView()->format());
 
     p3DAbstractView->show();
 
