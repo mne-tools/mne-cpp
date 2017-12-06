@@ -122,7 +122,7 @@ void AbstractMeshTreeItem::initItem()
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Abstract 3D Mesh Tree Item");
+    this->setToolTip("Abstract Mesh Tree Item");
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;

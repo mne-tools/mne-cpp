@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     cpusensordatatreeitem.h
+* @file     gpuinterpolationitem.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2017
+* @date     October, 2017
 *
 * @section  LICENSE
 *
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     CpuSensorDataTreeItem class declaration.
+* @brief     GpuInterpolationItem class declaration.
 *
 */
 
-#ifndef DISP3DLIB_CPUSENSORDATATREEITEM_H
-#define DISP3DLIB_CPUSENSORDATATREEITEM_H
+#ifndef DISP3DLIB_GPUINTERPOLATIONITEM_H
+#define DISP3DLIB_GPUINTERPOLATIONITEM_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "sensordatatreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -59,11 +60,19 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/SparseCore>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace Qt3DRender {
+    class QComputeCommand;
+    class QBuffer;
+    class QAttribute;
+}
 
 
 //*************************************************************************************************************
@@ -79,55 +88,115 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class AbstractMeshTreeItem;
+class CustomMesh;
+class GpuInterpolationMaterial;
 
 
 //=============================================================================================================
 /**
-* This item allows on-the-fly changes to parameters of visualization. It integrates the features provided in
-* GeometryInfo and uses the cpu for interpolation.
+* This item is used for signal interpolation with GPU support.
 *
-* @brief This item integrates GeometryInfo and  Interpolation into Disp3D structure.
+* @brief This item is used for signal interpolation with GPU support.
 */
-class DISP3DSHARED_EXPORT CpuSensorDataTreeItem : public SensorDataTreeItem
+
+class DISP3DSHARED_EXPORT GpuInterpolationItem : public AbstractMeshTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CpuSensorDataTreeItem> SPtr;            /**< Shared pointer type for CpuSensorDataTreeItem. */
-    typedef QSharedPointer<const CpuSensorDataTreeItem> ConstSPtr; /**< Const shared pointer type for CpuSensorDataTreeItem. */
+    typedef QSharedPointer<GpuInterpolationItem> SPtr;            /**< Shared pointer type for GpuInterpolationItem. */
+    typedef QSharedPointer<const GpuInterpolationItem> ConstSPtr; /**< Const shared pointer type for GpuInterpolationItem. */
 
     //=========================================================================================================
     /**
-    * Constructs a CpuSensorDataTreeItem object.
+    * Default constructor.
+    *
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit CpuSensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem,
-                                   const QString& text = "Sensor Data");
+    explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
+                                  int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                  const QString& text = "3D Plot");
 
-protected:
     //=========================================================================================================
     /**
-    * Init the interpolation items. This cannot be done here because they might differ from GPU to CPU version.
+    * Default destructor.
+    */
+    ~GpuInterpolationItem();
+
+    //=========================================================================================================
+    /**
+    * Initialize interpolation data of this item.
     *
     * @param[in] matVertices       The surface vertices.
     * @param[in] matNormals        The surface normals.
     * @param[in] matTriangles      The surface triangles.
-    * @param[in] p3DEntityParent   The Qt3D entity parent of the new item.
     */
-    virtual void initInterpolationItem(const Eigen::MatrixX3f &matVertices,
-                                       const Eigen::MatrixX3f &matNormals,
-                                       const Eigen::MatrixX3i &matTriangles,
-                                       Qt3DCore::QEntity* p3DEntityParent) override;
+    virtual void initData(const Eigen::MatrixX3f &matVertices,
+                          const Eigen::MatrixX3f &matNormals,
+                          const Eigen::MatrixX3i &matTriangles);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever this item receives new color values for each estimated source.
+    * Set the new Interpolation matrix for the interpolation.
     *
-    * @param[in] sourceColorSamples         The color values for the streamed data.
+    * @param[in] matInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
     */
-    virtual void onNewRtSmoothedData(const MatrixX3f &matColorMatrix);
+    virtual void setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
-    QPointer<AbstractMeshTreeItem>          m_pInterpolationItem;           /**< This item manages all 3d rendering and calculations. */
+    //=========================================================================================================
+    /**
+    * Add a new vector with signal data form the sensors.
+    *
+    * @param[in] tSignalVec              Vector with one float value for each sensor.
+    */
+    virtual void addNewRtData(const VectorXf &tSignalVec);
+
+    //=========================================================================================================
+    /**
+    * This function set the normalization value.
+    *
+    * @param[in] vecThresholds       The new threshold values used for normalizing the data.
+    */
+    virtual void setNormalization(const QVector3D& tVecThresholds);
+
+    //=========================================================================================================
+    /**
+    * This function sets the colormap type
+    *
+    * @param[in] tColormapType           The new colormap name.
+    */
+    virtual void setColormapType(const QString& tColormapType);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Build the content of the Interpolation matrix buffer.
+    *
+    * @param[in] matInterpolationMatrix    The Interpolation matrix.
+    *
+    * @return                          Interpolation matrix is byte array form.
+    */
+    virtual QByteArray buildInterpolationMatrixBuffer(Eigen::SparseMatrix<float> matInterpolationMatrix);
+
+    //=========================================================================================================
+    /**
+    * Build buffer filled with 0.0f.
+    *
+    * @param[in] tSize         Number of zeros.
+    *
+    * @return              Buffer content.
+    */
+    virtual QByteArray buildZeroBuffer(const uint tSize);
+
+    bool                                    m_bIsDataInit;                  /**< The data initialization flag. */
+
+    QPointer<GpuInterpolationMaterial>      m_pGPUMaterial;                 /**< Compute material used for the process. */
+
+    QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
+    QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;           /**< The QBuffer/GLBuffer holding the output color (interpolated) data. */
+    QPointer<Qt3DRender::QBuffer>           m_pSignalDataBuffer;            /**< The QBuffer/GLBuffer holding the signal data. */
 };
 
 
@@ -139,4 +208,4 @@ protected:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_CPUSENSORDATATREEITEM_H
+#endif // DISP3DLIB_GPUINTERPOLATIONITEM_H

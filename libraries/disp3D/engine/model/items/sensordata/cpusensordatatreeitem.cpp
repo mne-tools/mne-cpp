@@ -40,9 +40,9 @@
 //=============================================================================================================
 
 #include "cpusensordatatreeitem.h"
-#include "../common/cpuinterpolationitem.h"
+#include "../common/abstractmeshtreeitem.h"
 #include "../../workers/rtSensorData/rtsensordatacontroller.h"
-#include <mne/mne_bem.h>
+#include "../../3dhelpers/custommesh.h"
 
 
 //*************************************************************************************************************
@@ -98,12 +98,18 @@ void CpuSensorDataTreeItem::initInterpolationItem(const MatrixX3f &matVertices,
     //create new Tree Item
     if(!m_pInterpolationItem)
     {
-        m_pInterpolationItem = new CpuInterpolationItem(p3DEntityParent,
-                                                        Data3DTreeModelItemTypes::CpuInterpolationItem,
+        m_pInterpolationItem = new AbstractMeshTreeItem(p3DEntityParent,
+                                                        Data3DTreeModelItemTypes::AbstractMeshItem,
                                                         QStringLiteral("3D Plot"));
-        m_pInterpolationItem->initData(matVertices,
-                                       matNormals,
-                                       matTriangles);
+
+        //Create color from curvature information with default gyri and sulcus colors
+        MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(matVertices.rows());
+
+        m_pInterpolationItem->getCustomMesh()->setMeshData(matVertices,
+                                                                matNormals,
+                                                                matTriangles,
+                                                                matVertColor,
+                                                                Qt3DRender::QGeometryRenderer::Triangles);
 
         QList<QStandardItem*> list;
         list << m_pInterpolationItem;

@@ -119,7 +119,6 @@ SOURCES += \
     engine/model/items/common/metatreeitem.cpp \
     engine/model/items/common/abstractmeshtreeitem.cpp \
     engine/model/items/common/gpuinterpolationitem.cpp \
-    engine/model/items/common/cpuinterpolationitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     engine/model/workers/rtSourceLoc/rtsourcedataworker.cpp \
     engine/model/workers/rtSourceLoc/rtsourcedatacontroller.cpp \
@@ -175,7 +174,6 @@ HEADERS += \
     engine/model/items/common/abstractmeshtreeitem.h \
     engine/model/items/common/types.h \
     engine/model/items/common/gpuinterpolationitem.h \
-    engine/model/items/common/cpuinterpolationitem.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     engine/model/workers/rtSourceLoc/rtsourcedataworker.h \
     engine/model/workers/rtSourceLoc/rtsourcedatacontroller.h \
