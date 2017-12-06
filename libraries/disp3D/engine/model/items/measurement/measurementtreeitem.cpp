@@ -387,27 +387,33 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet,
 DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigitizer,
                                                    Qt3DCore::QEntity *p3DEntityParent)
 {
-    //Find the digitizer kind
-    QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
-    DigitizerSetTreeItem* pReturnItem = Q_NULLPTR;
+    if(tDigitizer.size() > 0) {
+        //Find the digitizer kind
+        QList<QStandardItem*> itemDigitizerList = this->findChildren(Data3DTreeModelItemTypes::DigitizerSetItem);
+        DigitizerSetTreeItem* pReturnItem = Q_NULLPTR;
 
-    //If digitizer does not exist, create a new one
-    if(itemDigitizerList.size() == 0) {
-        DigitizerSetTreeItem* digitizerSetItem = new DigitizerSetTreeItem(Data3DTreeModelItemTypes::DigitizerSetItem,"Digitizer");
-        itemDigitizerList << digitizerSetItem;
-        itemDigitizerList << new QStandardItem(digitizerSetItem->toolTip());
-        this->appendRow(itemDigitizerList);
-    }
-
-    // Add Data to the first Digitizer Set Item
-    //Check if it is really a digitizer tree item
-    if(itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem) {
-        if(pReturnItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
-            pReturnItem->addData(tDigitizer, p3DEntityParent);
+        //If digitizer does not exist, create a new one
+        if(itemDigitizerList.size() == 0) {
+            pReturnItem = new DigitizerSetTreeItem(Data3DTreeModelItemTypes::DigitizerSetItem,"Digitizer");
+            itemDigitizerList << pReturnItem;
+            itemDigitizerList << new QStandardItem(pReturnItem->toolTip());
+            this->appendRow(itemDigitizerList);
         }
+
+        // Add Data to the first Digitizer Set Item
+        //Check if it is really a digitizer tree item
+        if(itemDigitizerList.at(0)->type() == Data3DTreeModelItemTypes::DigitizerSetItem) {
+            if(pReturnItem = dynamic_cast<DigitizerSetTreeItem*>(itemDigitizerList.at(0))) {
+                pReturnItem->addData(tDigitizer, p3DEntityParent);
+            }
+        }
+
+        return pReturnItem;
+    } else {
+        qDebug() << "MeasurementTreeItem::addData - digitizer set is empty";
     }
 
-    return pReturnItem;
+    return Q_NULLPTR;
 }
 
 
