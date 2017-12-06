@@ -118,6 +118,8 @@ SOURCES += \
     engine/model/items/common/abstract3Dtreeitem.cpp \
     engine/model/items/common/metatreeitem.cpp \
     engine/model/items/common/abstractmeshtreeitem.cpp \
+    engine/model/items/common/gpuinterpolationitem.cpp \
+    engine/model/items/common/cpuinterpolationitem.cpp \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
     engine/model/workers/rtSourceLoc/rtsourcedataworker.cpp \
     engine/model/workers/rtSourceLoc/rtsourcedatacontroller.cpp \
@@ -144,8 +146,6 @@ SOURCES += \
     engine/view/customframegraph.cpp \
     engine/model/items/sensordata/cpusensordatatreeitem.cpp \
     engine/model/items/sensordata/gpusensordatatreeitem.cpp \
-    engine/model/items/sensordata/gpuinterpolationitem.cpp \
-    engine/model/items/sensordata/cpuinterpolationitem.cpp \
     engine/model/materials/gpuinterpolationmaterial.cpp
 
 HEADERS += \
@@ -174,6 +174,8 @@ HEADERS += \
     engine/model/items/common/metatreeitem.h \
     engine/model/items/common/abstractmeshtreeitem.h \
     engine/model/items/common/types.h \
+    engine/model/items/common/gpuinterpolationitem.h \
+    engine/model/items/common/cpuinterpolationitem.h \
     engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
     engine/model/workers/rtSourceLoc/rtsourcedataworker.h \
     engine/model/workers/rtSourceLoc/rtsourcedatacontroller.h \
@@ -202,8 +204,6 @@ HEADERS += \
     engine/view/customframegraph.h \
     engine/model/items/sensordata/cpusensordatatreeitem.h \
     engine/model/items/sensordata/gpusensordatatreeitem.h \
-    engine/model/items/sensordata/gpuinterpolationitem.h \
-    engine/model/items/sensordata/cpuinterpolationitem.h \
     engine/model/materials/gpuinterpolationmaterial.h
 
 FORMS += \

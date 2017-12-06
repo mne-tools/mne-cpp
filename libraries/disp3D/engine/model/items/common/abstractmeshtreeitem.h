@@ -144,6 +144,17 @@ public:
     */
     virtual void setVertColor(const QVariant &vertColor);
 
+    //=========================================================================================================
+    /**
+    * Creates a QByteArray of colors for given color for the input vertices.
+    *
+    * @param[in] numVert        The number of vertices.
+    * @param[in] color          The vertex color information.
+    *
+    * @return The colors per vertex
+    */
+    static MatrixX3f createVertColor(int numVert, const QColor& color = QColor(100,100,100));
+
 protected:
     //=========================================================================================================
     /**
@@ -190,17 +201,6 @@ protected:
     * @param[in] material        The new surface material.
     */
     virtual void onSurfaceMaterialChanged(const QVariant& sMaterial);
-
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given color for the input vertices.
-    *
-    * @param[in] numVert        The number of vertices.
-    * @param[in] color          The vertex color information.
-    *
-    * @return The colors per vertex
-    */
-    virtual MatrixX3f createVertColor(int numVert, const QColor& color = QColor(100,100,100)) const;
 
     QPointer<Qt3DRender::QMaterial>     m_pMaterial;                        /**< The material. Ownership belongs to RenderableEntity. */
     QPointer<CustomMesh>                m_pCustomMesh;                      /**< The actual mesh information (vertices, normals, colors). */

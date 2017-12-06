@@ -96,6 +96,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class RtSourceDataController;
+class AbstractMeshTreeItem;
 
 
 //=============================================================================================================
@@ -330,6 +331,9 @@ protected:
     bool                                m_bIsDataInit;                      /**< The init flag. */
 
     QPointer<RtSourceDataController>    m_pRtSourceDataController;          /**< The source data worker. This worker streams the rt data to this item.*/
+
+    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemLeft;           /**< This item manages all 3d rendering and calculations for the left hemisphere. */
+    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemRight;          /**< This item manages all 3d rendering and calculations for the right hemisphere. */
 
 signals:
 

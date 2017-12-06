@@ -225,7 +225,6 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 
                     //Set renderable 3D entity mesh and color data
                     data.setValue(matNewVertColor);
-                    this->setData(data, Data3DTreeModelItemRoles::SurfaceAnnotationColorVert);
                     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
                     //Emit the new colors which are to be used during rt source loc plotting

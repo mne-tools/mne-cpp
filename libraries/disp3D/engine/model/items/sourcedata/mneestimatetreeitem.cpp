@@ -41,6 +41,8 @@
 #include "mneestimatetreeitem.h"
 #include "../../workers/rtSourceLoc/rtsourcedatacontroller.h"
 #include "../common/metatreeitem.h"
+#include "../common/abstractmeshtreeitem.h"
+#include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
@@ -248,6 +250,78 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     this->appendRow(list);
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
+
+    //Process annotation data
+//    MatrixX3f matAnnotColors(tAnnotation.getVertices().rows(), 3);
+
+//    QList<FSLIB::Label> qListLabels;
+//    QList<RowVector4i> qListLabelRGBAs;
+
+//    tAnnotation.toLabels(tSurface, qListLabels, qListLabelRGBAs);
+
+//    for(int i = 0; i < qListLabels.size(); ++i) {
+//        FSLIB::Label label = qListLabels.at(i);
+//        for(int j = 0; j<label.vertices.rows(); j++) {
+//            QColor patchColor;
+//            patchColor.setRed(qListLabelRGBAs.at(i)(0));
+//            patchColor.setGreen(qListLabelRGBAs.at(i)(1));
+//            patchColor.setBlue(qListLabelRGBAs.at(i)(2));
+
+//            patchColor = patchColor.darker(200);
+
+//            if(label.vertices(j) < matAnnotColors.rows()) {
+//                matAnnotColors(label.vertices(j),0) = patchColor.redF();
+//                matAnnotColors(label.vertices(j),1) = patchColor.greenF();
+//                matAnnotColors(label.vertices(j),2) = patchColor.blueF();
+//            }
+//        }
+//    }
+//    vecLabelIdsLeftHemi = tAnnotation.getLabelIds();
+//    vecLabelIdsRightHemi = tAnnotation.getLabelIds();
+
+    //Create CpuInterpolationItems
+    if(!m_pInterpolationItemLeft)
+    {
+        m_pInterpolationItemLeft = new AbstractMeshTreeItem(p3DEntityParent,
+                                                        Data3DTreeModelItemTypes::AbstractMeshItem,
+                                                        QStringLiteral("3D Plot - Left"));
+
+        //Create color from curvature information with default gyri and sulcus colors
+        MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[0].rr().rows());
+
+        m_pInterpolationItemLeft->getCustomMesh()->setMeshData(tSurfSet[0].rr(),
+                                                               tSurfSet[0].nn(),
+                                                               tSurfSet[0].tris(),
+                                                               matVertColor,
+                                                               Qt3DRender::QGeometryRenderer::Triangles);
+
+        QList<QStandardItem*> list;
+        list << m_pInterpolationItemLeft;
+        list << new QStandardItem(m_pInterpolationItemLeft->toolTip());
+        this->appendRow(list);
+    }
+
+    if(!m_pInterpolationItemRight)
+    {
+        m_pInterpolationItemRight = new AbstractMeshTreeItem(p3DEntityParent,
+                                                        Data3DTreeModelItemTypes::AbstractMeshItem,
+                                                        QStringLiteral("3D Plot - Right"));
+
+        //Create color from curvature information with default gyri and sulcus colors
+        MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[1].rr().rows());
+
+        m_pInterpolationItemRight->getCustomMesh()->setMeshData(tSurfSet[1].rr(),
+                                                                tSurfSet[1].nn(),
+                                                                tSurfSet[1].tris(),
+                                                                matVertColor,
+                                                                Qt3DRender::QGeometryRenderer::Triangles);
+
+        QList<QStandardItem*> list;
+        list << m_pInterpolationItemRight;
+        list << new QStandardItem(m_pInterpolationItemRight->toolTip());
+        this->appendRow(list);
+    }
+
 
     //set rt data corresponding to the hemisphere
     if(!m_pRtSourceDataController) {
@@ -478,7 +552,19 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
                                                        const Eigen::MatrixX3f &matColorMatrixRightHemi)
 {    
+    QVariant data;
 
+    if(m_pInterpolationItemLeft)
+    {
+        data.setValue(matColorMatrixLeftHemi);
+        m_pInterpolationItemLeft->setVertColor(data);
+    }
+
+    if(m_pInterpolationItemRight)
+    {
+        data.setValue(matColorMatrixRightHemi);
+        m_pInterpolationItemRight->setVertColor(data);
+    }
 }
 
 

@@ -112,13 +112,6 @@ public:
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
     * @param[in] tBem               The BEM data.

@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "gpusensordatatreeitem.h"
-#include "gpuinterpolationitem.h"
+#include "../common/gpuinterpolationitem.h"
 #include "../../workers/rtSensorData/rtsensordatacontroller.h"
 #include <mne/mne_bem.h>
 
