@@ -222,6 +222,8 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
             return m_pMneEstimateTreeItem;
         }
     }
+
+    return Q_NULLPTR;
 }
 
 

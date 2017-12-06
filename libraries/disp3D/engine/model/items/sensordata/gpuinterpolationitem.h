@@ -68,10 +68,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB{
-    class MNEBemSurface;
-}
-
 namespace Qt3DRender {
     class QComputeCommand;
     class QBuffer;
@@ -132,25 +128,29 @@ public:
 
     //=========================================================================================================
     /**
-     * Initialize interpolation data of this item.
-     *
-     * @param tMneBemSurface        The bem surface data.
-     */
-    virtual void initData(const MNELIB::MNEBemSurface &tMneBemSurface);
+    * Initialize interpolation data of this item.
+    *
+    * @param[in] matVertices       The surface vertices.
+    * @param[in] matNormals        The surface normals.
+    * @param[in] matTriangles      The surface triangles.
+    */
+    virtual void initData(const Eigen::MatrixX3f &matVertices,
+                          const Eigen::MatrixX3f &matNormals,
+                          const Eigen::MatrixX3i &matTriangles);
 
     //=========================================================================================================
     /**
-     * Set the new Interpolation matrix for the interpolation.
-     *
-     * @param matInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
-     */
+    * Set the new Interpolation matrix for the interpolation.
+    *
+    * @param[in] matInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
+    */
     virtual void setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
     //=========================================================================================================
     /**
     * Add a new vector with signal data form the sensors.
     *
-    * @param tSignalVec              Vector with one float value for each sensor.
+    * @param[in] tSignalVec              Vector with one float value for each sensor.
     */
     virtual void addNewRtData(const VectorXf &tSignalVec);
 
@@ -164,31 +164,31 @@ public:
 
     //=========================================================================================================
     /**
-     * This function sets the colormap type
-     *
-     * @param tColormapType           The new colormap name.
-     */
+    * This function sets the colormap type
+    *
+    * @param[in] tColormapType           The new colormap name.
+    */
     virtual void setColormapType(const QString& tColormapType);
 
 protected:
     //=========================================================================================================
     /**
-     * Build the content of the Interpolation matrix buffer.
-     *
-     * @param matInterpolationMatrix    The Interpolation matrix.
-     *
-     * @return                          Interpolation matrix is byte array form.
-     */
+    * Build the content of the Interpolation matrix buffer.
+    *
+    * @param[in] matInterpolationMatrix    The Interpolation matrix.
+    *
+    * @return                          Interpolation matrix is byte array form.
+    */
     virtual QByteArray buildInterpolationMatrixBuffer(Eigen::SparseMatrix<float> matInterpolationMatrix);
 
     //=========================================================================================================
     /**
-     * Build buffer filled with 0.0f.
-     *
-     * @param tSize         Number of zeros.
-     *
-     * @return              Buffer content.
-     */
+    * Build buffer filled with 0.0f.
+    *
+    * @param[in] tSize         Number of zeros.
+    *
+    * @return              Buffer content.
+    */
     virtual QByteArray buildZeroBuffer(const uint tSize);
 
     bool                                    m_bIsDataInit;                  /**< The data initialization flag. */

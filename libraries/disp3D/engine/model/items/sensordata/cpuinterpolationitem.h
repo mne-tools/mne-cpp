@@ -67,10 +67,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB{
-    class MNEBemSurface;
-}
-
 namespace Qt3DRender {
     class QComputeCommand;
 }
@@ -122,11 +118,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Init the item's data.
+    * Initialize interpolation data of this item.
     *
-    * @param[in] tBemSurface        The bem data.
+    * @param[in] matVertices       The surface vertices.
+    * @param[in] matNormals        The surface normals.
+    * @param[in] matTriangles      The surface triangles.
     */
-    void initData(const MNELIB::MNEBemSurface &tBemSurface);
+    virtual void initData(const Eigen::MatrixX3f &matVertices,
+                          const Eigen::MatrixX3f &matNormals,
+                          const Eigen::MatrixX3i &matTriangles);
 
 protected:
     //=========================================================================================================

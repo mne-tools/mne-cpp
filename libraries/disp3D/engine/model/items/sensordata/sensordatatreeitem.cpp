@@ -152,7 +152,9 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
                                                         fiffInfo,
                                                         sensorTypeFiffConstant);
 
-    this->initInterpolationItem(bemSurface,
+    this->initInterpolationItem(bemSurface.rr,
+                                bemSurface.nn,
+                                bemSurface.tris,
                                 p3DEntityParent);
 
     //Init complete

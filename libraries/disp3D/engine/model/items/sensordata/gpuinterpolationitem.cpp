@@ -42,7 +42,6 @@
 #include "gpuinterpolationitem.h"
 #include "../../materials/gpuinterpolationmaterial.h"
 #include "../../3dhelpers/custommesh.h"
-#include <mne/mne_bem_surface.h>
 
 
 //*************************************************************************************************************
@@ -108,7 +107,9 @@ GpuInterpolationItem::~GpuInterpolationItem()
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
+void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
+                                    const MatrixX3f &matNormals,
+                                    const MatrixX3i &matTriangles)
 {
     if(m_bIsDataInit == true)
     {
@@ -142,7 +143,7 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
     QPointer<Qt3DRender::QComputeCommand> pComputeCommand = new QComputeCommand();
     this->addComponent(pComputeCommand);
 
-    const uint iInterpolationMatRows = tMneBemSurface.rr.rows();
+    const uint iInterpolationMatRows = matVertices.rows();
     const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iInterpolationMatRows)));
     pComputeCommand->setWorkGroupX(iWorkGroupsSize);
     pComputeCommand->setWorkGroupY(iWorkGroupsSize);
@@ -150,12 +151,12 @@ void GpuInterpolationItem::initData(const MNELIB::MNEBemSurface &tMneBemSurface)
 
     //Set custom mesh data
     //generate mesh base color
-    MatrixX3f matVertColor = createVertColor(tMneBemSurface.rr.rows(), QColor(0,0,0));
+    MatrixX3f matVertColor = createVertColor(matVertices.rows(), QColor(0,0,0));
 
     //Set renderable 3D entity mesh and color data
-    m_pCustomMesh->setMeshData(tMneBemSurface.rr,
-                               tMneBemSurface.nn,
-                               tMneBemSurface.tris,
+    m_pCustomMesh->setMeshData(matVertices,
+                               matNormals,
+                               matTriangles,
                                matVertColor,
                                Qt3DRender::QGeometryRenderer::Triangles);
 
