@@ -41,7 +41,6 @@
 
 #include "cpuinterpolationitem.h"
 #include "../../3dhelpers/custommesh.h"
-#include <mne/mne_bem_surface.h>
 
 
 //*************************************************************************************************************
@@ -62,7 +61,6 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -96,24 +94,17 @@ void CpuInterpolationItem::initItem()
 
 //*************************************************************************************************************
 
-void CpuInterpolationItem::initData(const MNEBemSurface& tBemSurface)
+void CpuInterpolationItem::initData(const MatrixX3f &matVertices,
+                                    const MatrixX3f &matNormals,
+                                    const MatrixX3i &matTriangles)
 {
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tBemSurface.rr.rows());
+    MatrixX3f matVertColor = createVertColor(matVertices.rows());
 
     //Set renderable 3D entity mesh and color data
-    m_pCustomMesh->setMeshData(tBemSurface.rr,
-                                tBemSurface.nn,
-                                tBemSurface.tris,
-                                matVertColor,
-                                Qt3DRender::QGeometryRenderer::Triangles);
-
-    //Find out BEM layer type and change items name
-    this->setText(MNEBemSurface::id_name(tBemSurface.id));
-
-    //Add data which is held by this BemSurfaceTreeItem
-    QVariant data;
-
-    data.setValue(tBemSurface.rr.rows());
-    this->setData(data, Data3DTreeModelItemRoles::NumberVertices);
+    m_pCustomMesh->setMeshData(matVertices,
+                               matNormals,
+                               matTriangles,
+                               matVertColor,
+                               Qt3DRender::QGeometryRenderer::Triangles);
 }

@@ -95,7 +95,9 @@ GpuSensorDataTreeItem::GpuSensorDataTreeItem(int iType, const QString &text)
 
 //*************************************************************************************************************
 
-void GpuSensorDataTreeItem::initInterpolationItem(const MNEBemSurface &bemSurface,
+void GpuSensorDataTreeItem::initInterpolationItem(const MatrixX3f &matVertices,
+                                                  const MatrixX3f &matNormals,
+                                                  const MatrixX3i &matTriangles,
                                                   Qt3DCore::QEntity *p3DEntityParent)
 {
     //create new Tree Item
@@ -104,7 +106,9 @@ void GpuSensorDataTreeItem::initInterpolationItem(const MNEBemSurface &bemSurfac
         m_pInterpolationItem = new GpuInterpolationItem(p3DEntityParent,
                                                         Data3DTreeModelItemTypes::GpuInterpolationItem,
                                                         QStringLiteral("3D Plot"));
-        m_pInterpolationItem->initData(bemSurface);
+        m_pInterpolationItem->initData(matVertices,
+                                       matNormals,
+                                       matTriangles);
 
         QList<QStandardItem*> list;
         list << m_pInterpolationItem;

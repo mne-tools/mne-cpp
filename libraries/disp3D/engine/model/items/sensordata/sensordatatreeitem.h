@@ -129,9 +129,9 @@ public:
     * @param[in] p3DEntityParent           The Qt3D entity parent of the new item.
      */
     virtual void initData(const MNELIB::MNEBemSurface& tBemSurface,
-                  const FIFFLIB::FiffInfo &tFiffInfo,
-                  const QString& sSensorType,
-                  Qt3DCore::QEntity *p3DEntityParent);
+                          const FIFFLIB::FiffInfo &tFiffInfo,
+                          const QString& sSensorType,
+                          Qt3DCore::QEntity *p3DEntityParent);
 
     //=========================================================================================================
     /**
@@ -243,10 +243,14 @@ protected:
     /**
     * Init the interpolation items. This cannot be done here because they might differ from GPU to CPU version.
     *
-    * @param[in] bemSurface                 MNEBemSurface that holds the mesh that should be visualized.
-    * @param[in] p3DEntityParent            The Qt3D entity parent of the new item.
+    * @param[in] matVertices       The surface vertices.
+    * @param[in] matNormals        The surface normals.
+    * @param[in] matTriangles      The surface triangles.
+    * @param[in] p3DEntityParent   The Qt3D entity parent of the new item.
     */
-    virtual void initInterpolationItem(const MNELIB::MNEBemSurface &bemSurface,
+    virtual void initInterpolationItem(const Eigen::MatrixX3f &matVertices,
+                                       const Eigen::MatrixX3f &matNormals,
+                                       const Eigen::MatrixX3i &matTriangles,
                                        Qt3DCore::QEntity* p3DEntityParent) = 0;
 
     //=========================================================================================================
