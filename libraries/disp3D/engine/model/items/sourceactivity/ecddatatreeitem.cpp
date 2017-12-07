@@ -188,7 +188,7 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
     dipoleEntity->addComponent(pDipolMesh);
 
     //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
     pMaterial->setAmbient(QColor(0,0,0));
     pMaterial->setAlpha(1.0f);
     dipoleEntity->addComponent(pMaterial);
