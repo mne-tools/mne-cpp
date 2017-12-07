@@ -94,7 +94,7 @@ void FsSurfaceTreeItem::initItem()
 
     //Use SortPolicy in frame graph
     this->removeComponent(m_pMaterial);
-    m_pMaterial = new PerVertexPhongAlphaMaterial(true, true);
+    m_pMaterial = new PerVertexPhongAlphaMaterial(true);
     this->addComponent(m_pMaterial);
 
     //Add surface meta information as item children
