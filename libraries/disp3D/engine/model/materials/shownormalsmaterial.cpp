@@ -53,10 +53,6 @@
 #include <Qt3DRender/qparameter.h>
 #include <Qt3DRender/qrenderpass.h>
 #include <QFilterKey>
-#include <Qt3DRender/qdepthtest.h>
-#include <Qt3DRender/qblendequation.h>
-#include <Qt3DRender/qblendequationarguments.h>
-#include <Qt3DRender/qnodepthmask.h>
 #include <Qt3DRender/qgraphicsapifilter.h>
 
 #include <QUrl>
@@ -85,9 +81,6 @@ ShowNormalsMaterial::ShowNormalsMaterial(QNode *parent)
 , m_pVertexGL3RenderPass(new QRenderPass())
 , m_pVertexGL3Shader(new QShaderProgram())
 , m_pFilterKey(new QFilterKey)
-, m_pNoDepthMask(new QNoDepthMask())
-, m_pBlendState(new QBlendEquationArguments())
-, m_pBlendEquation(new QBlendEquation())
 {
     this->init();
 }
@@ -110,15 +103,6 @@ void ShowNormalsMaterial::init()
     m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl3/shownormals.frag"))));
     m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
 
-    //Setup transparency
-    m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-    m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-    m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
-
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-    m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-    m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
-
     //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using geometry shaders
     m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
@@ -126,7 +110,7 @@ void ShowNormalsMaterial::init()
     m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
     m_pFilterKey->setName(QStringLiteral("renderingStyle"));
-    m_pFilterKey->setValue(QStringLiteral("forward"));
+    m_pFilterKey->setValue(QStringLiteral("forwardTransparent"));
     m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
 
     m_pVertexGL3Technique->addRenderPass(m_pVertexGL3RenderPass);
