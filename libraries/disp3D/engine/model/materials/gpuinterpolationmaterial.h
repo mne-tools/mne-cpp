@@ -84,10 +84,6 @@ namespace Qt3DRender {
         class QFilterKey;
         class QTechnique;
         class QBuffer;
-        class QCullFace;
-        class QNoDepthMask;
-        class QBlendEquationArguments;
-        class QBlendEquation;
 }
 
 
@@ -124,10 +120,9 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] bUseAlpha      Whether to use alpha/transparency.
     * @param[in] parent         The parent of this class.
     */
-    explicit GpuInterpolationMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+    explicit GpuInterpolationMaterial(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
@@ -200,6 +195,15 @@ private:
 
     //=========================================================================================================
     /**
+    * This function gets called whenever the alpha value is changed.
+    * It handles the change between opaque and transparent depending on the new alpha.
+    *
+    * @param[in] fAlpha         The new alpha value.
+    */
+    void onAlphaChanged(const QVariant &fAlpha);
+
+    //=========================================================================================================
+    /**
      * Build the content of the weight matrix buffer.
      *
      * @param tInterpolationMatrix      The weight matrix.
@@ -258,13 +262,6 @@ private:
 
     //Colormap type
     QPointer<Qt3DRender::QParameter>                    m_pColormapParameter;       /**< This parameter stores the colormap type. */
-
-    QPointer<Qt3DRender::QCullFace>                     m_pCullFace;                /**< This render state activates face culling. */
-
-    //Alpha states
-    QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;             /**< This render state disables depth write. */
-    QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;              /**< This render state specifes how blend values are handled. */
-    QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;           /**< This render state specifies the blend equation. */
 };
 
 
