@@ -331,7 +331,7 @@ void GpuInterpolationMaterial::onAlphaChanged(const QVariant &fAlpha)
         {
             m_pDrawFilterKey->setValue(QStringLiteral("forward"));
         }
-        else if(tempAlpha < 1.0f)
+        else
         {
             m_pDrawFilterKey->setValue(QStringLiteral("forwardTransparent"));
         }

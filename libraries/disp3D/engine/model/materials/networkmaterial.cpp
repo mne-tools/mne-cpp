@@ -173,7 +173,7 @@ void NetworkMaterial::onAlphaChanged(const QVariant &fAlpha)
         {
             m_pFilterKey->setValue(QStringLiteral("forward"));
         }
-        else if(tempAlpha < 1.0f)
+        else
         {
             m_pFilterKey->setValue(QStringLiteral("forwardTransparent"));
         }
