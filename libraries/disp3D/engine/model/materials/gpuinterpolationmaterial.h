@@ -220,8 +220,6 @@ private:
      */
     QByteArray buildZeroBuffer(const uint tSize);
 
-    bool                                                m_bUseAlpha;                /**< Declares if the rendered object is transparent. */
-
     QPointer<Qt3DRender::QEffect>                       m_pEffect;                  /**< The effect of this material. */
 
     //Phongalpha parameter

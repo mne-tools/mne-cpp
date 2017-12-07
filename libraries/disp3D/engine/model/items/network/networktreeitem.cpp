@@ -225,7 +225,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         pSourceSphereEntity->addComponent(pSphereMesh);
 
         //Add material
-        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
         pMaterial->setAmbient(Qt::blue);
         pMaterial->setAlpha(1.0f);
         pSourceSphereEntity->addComponent(pMaterial);

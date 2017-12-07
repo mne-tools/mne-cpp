@@ -55,10 +55,6 @@
 #include <Qt3DRender/qparameter.h>
 #include <Qt3DRender/qrenderpass.h>
 #include <QFilterKey>
-#include <Qt3DRender/qdepthtest.h>
-#include <Qt3DRender/qblendequation.h>
-#include <Qt3DRender/qblendequationarguments.h>
-#include <Qt3DRender/qnodepthmask.h>
 #include <Qt3DRender/qgraphicsapifilter.h>
 
 
@@ -88,7 +84,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-GeometryMultiplierMaterial::GeometryMultiplierMaterial(bool bUseAlpha, Qt3DCore::QNode *parent)
+GeometryMultiplierMaterial::GeometryMultiplierMaterial(Qt3DCore::QNode *parent)
     : QMaterial(parent)
     , m_pVertexEffect(new QEffect())
     , m_pAmbientColor(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.2f, 0.2f, 0.2f, 1.0f)))
@@ -105,10 +101,6 @@ GeometryMultiplierMaterial::GeometryMultiplierMaterial(bool bUseAlpha, Qt3DCore:
     , m_pVertexES2RenderPass(new QRenderPass())
     , m_pVertexES2Shader(new QShaderProgram())
     , m_pFilterKey(new QFilterKey)
-    , m_pNoDepthMask(new QNoDepthMask())
-    , m_pBlendState(new QBlendEquationArguments())
-    , m_pBlendEquation(new QBlendEquation())
-    , m_bUseAlpha(bUseAlpha)
 {
     this->init();
 }
@@ -177,28 +169,6 @@ void GeometryMultiplierMaterial::init()
     m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
-    //If wanted setup transparency - TODO: Fix transparency problem and remove this
-    if(m_bUseAlpha) {
-        m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-        m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-        m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
-
-        m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-        m_pVertexGL2RenderPass->addRenderState(m_pBlendEquation);
-        m_pVertexES2RenderPass->addRenderState(m_pBlendEquation);
-
-        m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-        m_pVertexGL2RenderPass->addRenderState(m_pNoDepthMask);
-        m_pVertexES2RenderPass->addRenderState(m_pNoDepthMask);
-
-        m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
-        m_pVertexGL2RenderPass->addRenderState(m_pBlendState);
-        m_pVertexES2RenderPass->addRenderState(m_pBlendState);
-    }
-
-    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
-    m_pFilterKey->setValue(QStringLiteral("forward"));
-
     m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
     m_pVertexGL2Technique->addFilterKey(m_pFilterKey);
     m_pVertexES2Technique->addFilterKey(m_pFilterKey);
@@ -218,6 +188,30 @@ void GeometryMultiplierMaterial::init()
     m_pVertexEffect->addParameter(m_pAmbientColor);
 
     this->setEffect(m_pVertexEffect);
+
+    connect(m_pAlphaParameter, &QParameter::valueChanged,
+            this, &GeometryMultiplierMaterial::onAlphaChanged);
+
+    //Init filter keys
+    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
+    onAlphaChanged(m_pAlphaParameter->value());
+}
+
+void GeometryMultiplierMaterial::onAlphaChanged(const QVariant &fAlpha)
+{
+    if(fAlpha.canConvert<float>())
+    {
+        float tempAlpha = fAlpha.toFloat();
+
+        if(tempAlpha == 1.0f)
+        {
+            m_pFilterKey->setValue(QStringLiteral("forward"));
+        }
+        else
+        {
+            m_pFilterKey->setValue(QStringLiteral("forwardTransparent"));
+        }
+    }
 }
 
 //*************************************************************************************************************
