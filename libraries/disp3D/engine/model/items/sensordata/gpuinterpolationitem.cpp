@@ -87,7 +87,7 @@ using namespace Qt3DCore;
 GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
     : Abstract3DTreeItem(p3DEntityParent, iType, text)
     , m_bIsDataInit(false)
-    , m_pMaterial(new GpuInterpolationMaterial(true))
+    , m_pMaterial(new GpuInterpolationMaterial)
 {
     initItem();
 }
