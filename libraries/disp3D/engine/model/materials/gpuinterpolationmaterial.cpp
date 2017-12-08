@@ -310,7 +310,7 @@ void GpuInterpolationMaterial::init()
     //Add to material
     this->setEffect(m_pEffect);
 
-    connect(m_pAlphaParameter, &QParameter::valueChanged,
+    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
             this, &GpuInterpolationMaterial::onAlphaChanged);
 
     //Init draw filter key

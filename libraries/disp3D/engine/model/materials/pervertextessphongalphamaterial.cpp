@@ -140,7 +140,7 @@ void PerVertexTessPhongAlphaMaterial::init()
 
     this->setEffect(m_pVertexEffect);
 
-    connect(m_pAlphaParameter, &QParameter::valueChanged,
+    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
             this, &PerVertexTessPhongAlphaMaterial::onAlphaChanged);
 
     //Init draw filter key
