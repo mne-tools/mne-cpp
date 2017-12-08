@@ -153,7 +153,7 @@ void PerVertexPhongAlphaMaterial::init()
 
     this->setEffect(m_pVertexEffect);
 
-    connect(m_pAlphaParameter, &QParameter::valueChanged,
+    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
             this, &PerVertexPhongAlphaMaterial::onAlphaChanged);
 
     //Init filter keys
