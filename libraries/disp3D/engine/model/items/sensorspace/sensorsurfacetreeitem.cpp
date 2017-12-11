@@ -95,7 +95,7 @@ void SensorSurfaceTreeItem::initItem()
     this->removeComponent(m_pTessMaterial);
     this->removeComponent(m_pNormalMaterial);
 
-    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial();
     this->addComponent(pBemMaterial);
 }
 

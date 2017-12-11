@@ -180,7 +180,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
     pSourceSphereEntity->addComponent(pSphereMesh);
 
     //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
     QColor defaultColor(255,0,0);
     pMaterial->setAmbient(defaultColor);
 

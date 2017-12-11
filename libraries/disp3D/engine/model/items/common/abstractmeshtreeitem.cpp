@@ -76,8 +76,8 @@ using namespace Eigen;
 
 AbstractMeshTreeItem::AbstractMeshTreeItem(QEntity* p3DEntityParent, int iType, const QString& text)
 : Abstract3DTreeItem(p3DEntityParent, iType, text)
-, m_pMaterial(new PerVertexPhongAlphaMaterial(true))
-, m_pTessMaterial(new PerVertexTessPhongAlphaMaterial(true))
+, m_pMaterial(new PerVertexPhongAlphaMaterial)
+, m_pTessMaterial(new PerVertexTessPhongAlphaMaterial)
 , m_pNormalMaterial(new ShowNormalsMaterial())
 , m_pCustomMesh(new CustomMesh())
 {
