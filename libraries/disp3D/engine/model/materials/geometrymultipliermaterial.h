@@ -72,9 +72,6 @@ namespace Qt3DRender {
     class QFilterKey;
     class QTechnique;
     class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
 }
 
 namespace Qtcore {
@@ -112,10 +109,9 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] bUseAlpha      Whether to use alpha/transparency.
     * @param[in] parent         The parent of this class.
     */
-    explicit GeometryMultiplierMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+    explicit GeometryMultiplierMaterial(Qt3DCore::QNode *parent = 0);
 
 
     //=========================================================================================================
@@ -167,6 +163,15 @@ private:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the alpha value is changed.
+    * It handles the change between opaque and transparent depending on the new alpha.
+    *
+    * @param[in] fAlpha         The new alpha value.
+    */
+    void onAlphaChanged(const QVariant &fAlpha);
+
     QPointer<Qt3DRender::QEffect>           m_pVertexEffect;
 
     QPointer<Qt3DRender::QParameter>        m_pAmbientColor;
@@ -187,13 +192,6 @@ private:
     QPointer<Qt3DRender::QTechnique>        m_pVertexES2Technique;
     QPointer<Qt3DRender::QRenderPass>       m_pVertexES2RenderPass;
     QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;
-
-    QPointer<Qt3DRender::QNoDepthMask>                  m_pNoDepthMask;
-    QPointer<Qt3DRender::QBlendEquationArguments>       m_pBlendState;
-    QPointer<Qt3DRender::QBlendEquation>                m_pBlendEquation;
-
-    bool        m_bUseAlpha;
-
 };
 
 

@@ -116,7 +116,7 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
         pSourceSphereEntity->addComponent(pTransform);
 
         //Add material
-        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
         pMaterial->setAmbient(tSphereColor);
         pSourceSphereEntity->addComponent(pMaterial);
     }

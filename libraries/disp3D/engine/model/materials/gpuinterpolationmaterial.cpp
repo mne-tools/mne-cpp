@@ -55,10 +55,6 @@
 #include <Qt3DRender/QTechnique>
 #include <Qt3DRender/QShaderProgram>
 #include <Qt3DRender/QGraphicsApiFilter>
-#include <Qt3DRender/QCullFace>
-#include <Qt3DRender/QBlendEquation>
-#include <Qt3DRender/QBlendEquationArguments>
-#include <Qt3DRender/QNoDepthMask>
 #include <QUrl>
 #include <QColor>
 
@@ -90,34 +86,29 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-GpuInterpolationMaterial::GpuInterpolationMaterial(bool bUseAlpha, Qt3DCore::QNode *parent)
-: QMaterial(parent)
-, m_bUseAlpha(bUseAlpha)
-, m_pEffect(new QEffect)
-, m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
-, m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
-, m_pAlphaParameter(new QParameter(QStringLiteral("alpha"), 0.5f))
-, m_pComputeShader(new QShaderProgram)
-, m_pComputeRenderPass(new QRenderPass)
-, m_pComputeFilterKey(new QFilterKey)
-, m_pComputeTechnique(new QTechnique)
-, m_pDrawShader(new QShaderProgram)
-, m_pDrawRenderPass(new QRenderPass)
-, m_pDrawFilterKey(new QFilterKey)
-, m_pDrawTechnique(new QTechnique)
-, m_pSignalDataParameter(new QParameter)
-, m_pColsParameter(new QParameter)
-, m_pRowsParameter(new QParameter)
-, m_pInterpolationMatParameter(new QParameter)
-, m_pOutputColorParameter(new QParameter)
-, m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
-, m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
-, m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
-, m_pCullFace(new QCullFace)
-, m_pNoDepthMask(new QNoDepthMask())
-, m_pBlendState(new QBlendEquationArguments())
-, m_pBlendEquation(new QBlendEquation())
+GpuInterpolationMaterial::GpuInterpolationMaterial(Qt3DCore::QNode *parent)
+    : QMaterial(parent)
+    , m_pEffect(new QEffect)
+    , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
+    , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
+    , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
+    , m_pAlphaParameter(new QParameter(QStringLiteral("alpha"), 0.5f))
+    , m_pComputeShader(new QShaderProgram)
+    , m_pComputeRenderPass(new QRenderPass)
+    , m_pComputeFilterKey(new QFilterKey)
+    , m_pComputeTechnique(new QTechnique)
+    , m_pDrawShader(new QShaderProgram)
+    , m_pDrawRenderPass(new QRenderPass)
+    , m_pDrawFilterKey(new QFilterKey)
+    , m_pDrawTechnique(new QTechnique)
+    , m_pSignalDataParameter(new QParameter)
+    , m_pColsParameter(new QParameter)
+    , m_pRowsParameter(new QParameter)
+    , m_pInterpolationMatParameter(new QParameter)
+    , m_pOutputColorParameter(new QParameter)
+    , m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
+    , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
+    , m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
 {
     init();
 }
@@ -187,32 +178,11 @@ void GpuInterpolationMaterial::init()
     m_pDrawRenderPass->addParameter(m_pShininessParameter);
     m_pDrawRenderPass->addParameter(m_pAlphaParameter);
 
-    if(m_bUseAlpha)
-    {
-        m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-        m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-        m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
-
-        m_pDrawRenderPass->addRenderState(m_pBlendEquation);
-
-        m_pDrawRenderPass->addRenderState(m_pNoDepthMask);
-
-        m_pDrawRenderPass->addRenderState(m_pBlendState);
-    }
-
-    //Add Face Culling
-    m_pCullFace->setMode(QCullFace::Back);
-    m_pDrawRenderPass->addRenderState(m_pCullFace);
-
     //Set OpenGL version
     m_pDrawTechnique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pDrawTechnique->graphicsApiFilter()->setMajorVersion(4);
     m_pDrawTechnique->graphicsApiFilter()->setMinorVersion(3);
     m_pDrawTechnique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
-
-    //Set filter Keys
-    m_pDrawFilterKey->setName(QStringLiteral("renderingStyle"));
-    m_pDrawFilterKey->setValue(QStringLiteral("forward"));
 
     //Add to technique
     m_pDrawTechnique->addFilterKey(m_pDrawFilterKey);
@@ -225,5 +195,31 @@ void GpuInterpolationMaterial::init()
 
     //Add to material
     this->setEffect(m_pEffect);
+
+    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
+            this, &GpuInterpolationMaterial::onAlphaChanged);
+
+    //Init draw filter key
+    m_pDrawFilterKey->setName(QStringLiteral("renderingStyle"));
+    onAlphaChanged(m_pAlphaParameter->value());
 }
 
+
+//*************************************************************************************************************
+
+void GpuInterpolationMaterial::onAlphaChanged(const QVariant &fAlpha)
+{
+    if(fAlpha.canConvert<float>())
+    {
+        float tempAlpha = fAlpha.toFloat();
+
+        if(tempAlpha == 1.0f)
+        {
+            m_pDrawFilterKey->setValue(QStringLiteral("forward"));
+        }
+        else
+        {
+            m_pDrawFilterKey->setValue(QStringLiteral("forwardTransparent"));
+        }
+    }
+}

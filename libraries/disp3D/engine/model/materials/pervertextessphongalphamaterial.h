@@ -73,9 +73,6 @@ namespace Qt3DRender {
     class QFilterKey;
     class QTechnique;
     class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
     class QGraphicsApiFilter;
 }
 
@@ -110,10 +107,9 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] bUseAlpha      Whether to use alpha/transparency.
     * @param[in] parent         The parent of this class.
     */
-    explicit PerVertexTessPhongAlphaMaterial(bool bUseAlpha = false, Qt3DCore::QNode *parent = 0);
+    explicit PerVertexTessPhongAlphaMaterial(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
@@ -144,6 +140,15 @@ private:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the alpha value is changed.
+    * It handles the change between opaque and transparent depending on the new alpha.
+    *
+    * @param[in] fAlpha         The new alpha value.
+    */
+    void onAlphaChanged(const QVariant &fAlpha);
+
     QPointer<Qt3DRender::QEffect>                   m_pVertexEffect;
 
     QPointer<Qt3DRender::QParameter>                m_pDiffuseParameter;
@@ -159,12 +164,6 @@ private:
     QPointer<Qt3DRender::QTechnique>                m_pVertexGL4Technique;
     QPointer<Qt3DRender::QRenderPass>               m_pVertexGL4RenderPass;
     QPointer<Qt3DRender::QShaderProgram>            m_pVertexGL4Shader;
-
-    QPointer<Qt3DRender::QNoDepthMask>              m_pNoDepthMask;
-    QPointer<Qt3DRender::QBlendEquationArguments>   m_pBlendState;
-    QPointer<Qt3DRender::QBlendEquation>            m_pBlendEquation;
-
-    bool        m_bUseAlpha;
 };
 
 } // namespace DISP3DLIB
