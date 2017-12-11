@@ -181,7 +181,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
     pSensorEntity->addComponent(pMesh);
 
     //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
 
     QColor colDefault(100,100,100);
     pMaterial->setAmbient(colDefault);

@@ -117,7 +117,16 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
         return;
     }
 
-    m_pTransformBuffer->setData(buildTransformBuffer(tInstanceTansform));
+    //Update buffer content
+    const QByteArray &transformBufferData = buildTransformBuffer(tInstanceTansform);
+    if(transformBufferData.size() != m_pTransformBuffer->data().size())
+    {
+        m_pTransformBuffer->setData(transformBufferData);
+    }
+    else
+    {
+        m_pTransformBuffer->updateData(0, transformBufferData);
+    }
     m_pTransformAttribute->setBuffer(m_pTransformBuffer);
 
     updateInstanceCount(tInstanceTansform.size());
@@ -134,8 +143,26 @@ void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
         return;
     }
 
-    m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
-    m_pColorAttribute->setBuffer(m_pColorBuffer);
+    //Update buffer content
+    const QByteArray &colorBufferData = buildColorBuffer(tInstanceColors);
+    if(colorBufferData.size() != m_pColorBuffer->data().size())
+    {
+        m_pColorBuffer->setData(colorBufferData);
+    }
+    else
+    {
+        m_pColorBuffer->updateData(0, colorBufferData);
+    }
+
+    if(tInstanceColors.size() > 1)
+    {
+        m_pColorAttribute->setDivisor(1);
+    }
+    else
+    {
+        //enable 1 color for x transforms
+        m_pColorAttribute->setDivisor(0);
+    }
 
     updateInstanceCount(tInstanceColors.size());
 }
@@ -152,14 +179,16 @@ void GeometryMultiplier::init()
     m_pTransformAttribute->setVertexSize(16);
     m_pTransformAttribute->setDivisor(1);
     m_pTransformAttribute->setByteOffset(0);
-
+    m_pTransformAttribute->setBuffer(m_pTransformBuffer);
     //Set color attribute parameters
     m_pColorAttribute->setName(QStringLiteral("instanceColor"));
     m_pColorAttribute->setAttributeType(QAttribute::VertexAttribute);
     m_pColorAttribute->setVertexBaseType(QAttribute::Float);
     m_pColorAttribute->setVertexSize(3);
-    m_pColorAttribute->setDivisor(1);
+    //Set divisor 0 to enable empty color buffer
+    m_pColorAttribute->setDivisor(0);
     m_pColorAttribute->setByteOffset(0);
+    m_pColorAttribute->setBuffer(m_pColorBuffer);
 
     //Set default instance color
     QVector<QColor> tempColors;
