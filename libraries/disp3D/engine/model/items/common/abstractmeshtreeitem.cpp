@@ -77,6 +77,7 @@ using namespace Eigen;
 
 AbstractMeshTreeItem::AbstractMeshTreeItem(QEntity* p3DEntityParent, int iType, const QString& text)
 : Abstract3DTreeItem(p3DEntityParent, iType, text)
+, m_pMaterial(new PerVertexPhongAlphaMaterial)
 , m_pCustomMesh(new CustomMesh())
 {
     initItem();
@@ -272,12 +273,12 @@ void AbstractMeshTreeItem::onSurfaceMaterialChanged(const QVariant& sMaterial)
     QPointer<Qt3DRender::QMaterial> pMaterial;
 
     if(sMaterial.toString() == "Phong Alpha") {
-        pMaterial = new PerVertexPhongAlphaMaterial(true);
+        pMaterial = new PerVertexPhongAlphaMaterial();
         if(m_pCustomMesh) {
             m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
         }
     } else if(sMaterial.toString() == "Phong Alpha Tesselation") {
-        pMaterial = new PerVertexTessPhongAlphaMaterial(true);
+        pMaterial = new PerVertexTessPhongAlphaMaterial();
         if(m_pCustomMesh) {
             m_pCustomMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Patches);
         }

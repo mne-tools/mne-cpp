@@ -87,7 +87,7 @@ using namespace Qt3DCore;
 GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
 : AbstractMeshTreeItem(p3DEntityParent, iType, text)
 , m_bIsDataInit(false)
-, m_pGPUMaterial(new GpuInterpolationMaterial(true))
+, m_pGPUMaterial(new GpuInterpolationMaterial())
 , m_pInterpolationMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
 , m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
 , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))

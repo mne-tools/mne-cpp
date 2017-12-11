@@ -93,7 +93,6 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCameraEntity(this->camera())
-, m_pFrameGraph(new CustomFrameGraph)
 , m_bRotationMode(false)
 , m_bCameraTransMode(false)
 , m_bModelRotationMode(false)
@@ -103,6 +102,8 @@ View3D::View3D()
 , m_vecViewRotationOld(QVector3D(-90.0,130.0,0.0))
 , m_pCameraTransform(new Qt3DCore::QTransform())
 {
+    m_pFrameGraph = new CustomFrameGraph(this->format());
+
     init();
 }
 

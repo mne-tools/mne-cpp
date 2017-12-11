@@ -91,7 +91,7 @@ void SensorSurfaceTreeItem::initItem()
     this->setToolTip("Sensor surface item");
 
     //Set materials
-    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial();
     this->setMaterial(pBemMaterial);
 }
 

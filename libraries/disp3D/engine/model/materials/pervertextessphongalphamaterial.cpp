@@ -78,7 +78,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(bool bUseAlpha, QNode *parent)
+PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
@@ -92,10 +92,6 @@ PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(bool bUseAlpha,
 , m_pVertexGL4RenderPass(new QRenderPass())
 , m_pVertexGL4Shader(new QShaderProgram())
 , m_pFilterKey(new QFilterKey)
-, m_pNoDepthMask(new QNoDepthMask())
-, m_pBlendState(new QBlendEquationArguments())
-, m_pBlendEquation(new QBlendEquation())
-, m_bUseAlpha(bUseAlpha)
 {
     this->init();
 }
@@ -128,19 +124,6 @@ void PerVertexTessPhongAlphaMaterial::init()
     m_pVertexGL4Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexGL4Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
-    //If wanted setup transparency
-    if(m_bUseAlpha) {
-        m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-        m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-        m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
-
-        m_pVertexGL4RenderPass->addRenderState(m_pBlendEquation);
-        m_pVertexGL4RenderPass->addRenderState(m_pNoDepthMask);
-        m_pVertexGL4RenderPass->addRenderState(m_pBlendState);
-    }
-
-    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
-    m_pFilterKey->setValue(QStringLiteral("forward"));
     m_pVertexGL4Technique->addFilterKey(m_pFilterKey);
 
     m_pVertexGL4Technique->addRenderPass(m_pVertexGL4RenderPass);
@@ -156,6 +139,33 @@ void PerVertexTessPhongAlphaMaterial::init()
     m_pVertexEffect->addParameter(m_pTriangleScaleParameter);
 
     this->setEffect(m_pVertexEffect);
+
+    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
+            this, &PerVertexTessPhongAlphaMaterial::onAlphaChanged);
+
+    //Init draw filter key
+    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
+    onAlphaChanged(m_pAlphaParameter->value());
+}
+
+
+//*************************************************************************************************************
+
+void PerVertexTessPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
+{
+    if(fAlpha.canConvert<float>())
+    {
+        float tempAlpha = fAlpha.toFloat();
+
+        if(tempAlpha == 1.0f)
+        {
+            m_pFilterKey->setValue(QStringLiteral("forward"));
+        }
+        else
+        {
+            m_pFilterKey->setValue(QStringLiteral("forwardTransparent"));
+        }
+    }
 }
 
 
