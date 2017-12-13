@@ -204,7 +204,7 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
         pReturnItem = pMriItem->addData(surface, annotation, m_pModelEntity);
     } else {
         MriTreeItem* pMriItem = new MriTreeItem(Data3DTreeModelItemTypes::MriItem, sMriSetName);
-        addItemWithDescription(pSubjectItem, pMriItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMriItem);
         pReturnItem = pMriItem->addData(surface, annotation, m_pModelEntity);
     }
 
@@ -231,7 +231,7 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject,
         pReturnItem = pMeasurementItem->addData(sourceSpace, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(sourceSpace, m_pModelEntity);
     }
 
@@ -291,7 +291,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(tSourceEstimate,
                                                 tForwardSolution,
                                                 tSurfSet,
@@ -325,7 +325,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sSet);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(ecdSet, m_pModelEntity);
     }
 
@@ -353,7 +353,7 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(networkData, m_pModelEntity);
     }
 
@@ -380,7 +380,7 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
         pReturnItem->addData(bem, m_pModelEntity);
     } else {
         pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, sBemSetName);
-        addItemWithDescription(pSubjectItem, pReturnItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(bem, m_pModelEntity);
     }
 
@@ -408,7 +408,7 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
         pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
     } else {
         pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
-        addItemWithDescription(pSubjectItem, pReturnItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
     }
 
@@ -437,7 +437,7 @@ SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
         pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
     } else {
         pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
-        addItemWithDescription(pSubjectItem, pReturnItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
     }
 
@@ -464,7 +464,7 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& sSubject,
         pReturnItem = pMeasurementItem->addData(digitizer, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(digitizer, m_pModelEntity);
     }
 
@@ -514,7 +514,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(matSensorData,
                                                 tBemSurface,
                                                 fiffInfo,
@@ -555,20 +555,6 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
     }
 
     return pReturnItem;
-}
-
-
-//*************************************************************************************************************
-
-void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent,
-                                             QStandardItem* pItemAdd)
-{
-    if(pItemParent && pItemAdd) {
-        QList<QStandardItem*> list;
-        list << pItemAdd;
-        list << new QStandardItem(pItemAdd->toolTip());
-        pItemParent->appendRow(list);
-    }
 }
 
 

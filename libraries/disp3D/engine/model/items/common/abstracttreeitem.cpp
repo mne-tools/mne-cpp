@@ -110,6 +110,20 @@ int AbstractTreeItem::type() const
 
 //*************************************************************************************************************
 
+void AbstractTreeItem::addItemWithDescription(QStandardItem* pItemParent,
+                                              QStandardItem* pItemAdd)
+{
+    if(pItemParent && pItemAdd) {
+        QList<QStandardItem*> list;
+        list << pItemAdd;
+        list << new QStandardItem(pItemAdd->toolTip());
+        pItemParent->appendRow(list);
+    }
+}
+
+
+//*************************************************************************************************************
+
 QList<QStandardItem*> AbstractTreeItem::findChildren(int type)
 {
     QList<QStandardItem*> itemList;

@@ -50,12 +50,11 @@
 #include "../digitizer/digitizertreeitem.h"
 #include "../mri/mritreeitem.h"
 #include "../subject/subjecttreeitem.h"
-#include "../sensordata/cpusensordatatreeitem.h"
-#include "../sensordata/gpusensordatatreeitem.h"
 #include "../bem/bemtreeitem.h"
 #include "../bem/bemsurfacetreeitem.h"
 #include "../sensorspace/sensorsettreeitem.h"
 #include "../sensorspace/sensorsurfacetreeitem.h"
+#include "../sensordata/sensordatatreeitem.h"
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -214,108 +213,59 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
 {
     if(!tSensorData.size() == 0) {
         if(sSensorType == "EEG") {
-            if(bUseGPU) {
-                //GPU for EEG data
-                if(m_pGpuEEGSensorDataTreeItem) {
-                    m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
-                } else {
-                    //Add sensor data as child
-                    //If item does not exists yet, create it here!
-                    m_pGpuEEGSensorDataTreeItem = new GpuSensorDataTreeItem();
-                    m_pGpuEEGSensorDataTreeItem->setText("EEG Data");
-
-                    QList<QStandardItem*> list;
-                    list << m_pGpuEEGSensorDataTreeItem;
-                    list << new QStandardItem(m_pGpuEEGSensorDataTreeItem->toolTip());
-                    this->appendRow(list);
-
-                    m_pGpuEEGSensorDataTreeItem->initData(bemSurface,
-                                                      fiffInfo,
-                                                      sSensorType,
-                                                      p3DEntityParent);
-
-                    m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
-                }
-
-                return dynamic_cast<SensorDataTreeItem*>(m_pGpuEEGSensorDataTreeItem.data());
+            //GPU for EEG data
+            if(m_pEEGSensorDataTreeItem) {
+                m_pEEGSensorDataTreeItem->addData(tSensorData);
             } else {
-                //CPU for EEG data
-                if(m_pCpuEEGSensorDataTreeItem) {
-                    m_pCpuEEGSensorDataTreeItem->addData(tSensorData);
-                } else {
-                    //Add sensor data as child
-                    //If item does not exists yet, create it here!
-                    m_pCpuEEGSensorDataTreeItem = new CpuSensorDataTreeItem();
-                    m_pCpuEEGSensorDataTreeItem->setText("EEG Data");
+                //Add sensor data as child
+                //If item does not exists yet, create it here!
+                m_pEEGSensorDataTreeItem = new SensorDataTreeItem(Data3DTreeModelItemTypes::SensorDataItem,
+                                                                  "Sensor Data",
+                                                                  bUseGPU);
+                m_pEEGSensorDataTreeItem->setText("EEG Data");
 
-                    QList<QStandardItem*> list;
-                    list << m_pCpuEEGSensorDataTreeItem;
-                    list << new QStandardItem(m_pCpuEEGSensorDataTreeItem->toolTip());
-                    this->appendRow(list);
+                QList<QStandardItem*> list;
+                list << m_pEEGSensorDataTreeItem;
+                list << new QStandardItem(m_pEEGSensorDataTreeItem->toolTip());
+                this->appendRow(list);
 
-                    m_pCpuEEGSensorDataTreeItem->initData(bemSurface,
-                                                      fiffInfo,
-                                                      sSensorType,
-                                                      p3DEntityParent);
+                m_pEEGSensorDataTreeItem->initData(bemSurface,
+                                                   fiffInfo,
+                                                   sSensorType,
+                                                   p3DEntityParent);
 
-                    m_pCpuEEGSensorDataTreeItem->addData(tSensorData);
-                }
-
-                return dynamic_cast<SensorDataTreeItem*>(m_pCpuEEGSensorDataTreeItem.data());
+                m_pEEGSensorDataTreeItem->addData(tSensorData);
             }
+
+            return m_pEEGSensorDataTreeItem;
         }
 
         if(sSensorType == "MEG") {
-            if(bUseGPU) {
-                //GPU for MEG data
-                if(m_pGpuMEGSensorDataTreeItem) {
-                    m_pGpuMEGSensorDataTreeItem->addData(tSensorData);
-                } else {
-                    //Add sensor data as child
-                    //If item does not exists yet, create it here!
-                    m_pGpuMEGSensorDataTreeItem = new GpuSensorDataTreeItem();
-                    m_pGpuMEGSensorDataTreeItem->setText("MEG Data");
-
-                    QList<QStandardItem*> list;
-                    list << m_pGpuMEGSensorDataTreeItem;
-                    list << new QStandardItem(m_pGpuMEGSensorDataTreeItem->toolTip());
-                    this->appendRow(list);
-
-                    m_pGpuMEGSensorDataTreeItem->initData(bemSurface,
-                                                      fiffInfo,
-                                                      sSensorType,
-                                                      p3DEntityParent);
-
-                    m_pGpuMEGSensorDataTreeItem->addData(tSensorData);
-                }
-
-                return dynamic_cast<SensorDataTreeItem*>(m_pGpuMEGSensorDataTreeItem.data());
+            //GPU for EEG data
+            if(m_pMEGSensorDataTreeItem) {
+                m_pMEGSensorDataTreeItem->addData(tSensorData);
             } else {
-                //CPU for MEG data
-                if(m_pCpuMEGSensorDataTreeItem) {
-                    m_pCpuMEGSensorDataTreeItem->addData(tSensorData);
-                } else {
-                    //Add sensor data as child
-                    //If item does not exists yet, create it here!
-                    m_pCpuMEGSensorDataTreeItem = new CpuSensorDataTreeItem();
-                    m_pCpuMEGSensorDataTreeItem->setText("MEG Data");
+                //Add sensor data as child
+                //If item does not exists yet, create it here!
+                m_pMEGSensorDataTreeItem = new SensorDataTreeItem(Data3DTreeModelItemTypes::SensorDataItem,
+                                                                  "Sensor Data",
+                                                                  bUseGPU);
+                m_pMEGSensorDataTreeItem->setText("MEG Data");
 
-                    QList<QStandardItem*> list;
-                    list << m_pCpuMEGSensorDataTreeItem;
-                    list << new QStandardItem(m_pCpuMEGSensorDataTreeItem->toolTip());
-                    this->appendRow(list);
+                QList<QStandardItem*> list;
+                list << m_pMEGSensorDataTreeItem;
+                list << new QStandardItem(m_pMEGSensorDataTreeItem->toolTip());
+                this->appendRow(list);
 
-                    m_pCpuMEGSensorDataTreeItem->initData(bemSurface,
-                                                      fiffInfo,
-                                                      sSensorType,
-                                                      p3DEntityParent);
+                m_pMEGSensorDataTreeItem->initData(bemSurface,
+                                                   fiffInfo,
+                                                   sSensorType,
+                                                   p3DEntityParent);
 
-                    m_pCpuMEGSensorDataTreeItem->addData(tSensorData);
-                }
-
-                return dynamic_cast<SensorDataTreeItem*>(m_pCpuMEGSensorDataTreeItem.data());
-
+                m_pMEGSensorDataTreeItem->addData(tSensorData);
             }
+
+            return m_pMEGSensorDataTreeItem;
         }
     }
 
