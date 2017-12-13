@@ -83,7 +83,9 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text, bool bUseGPU)
+MneEstimateTreeItem::MneEstimateTreeItem(int iType,
+                                         const QString &text,
+                                         bool bUseGPU)
 : AbstractTreeItem(iType, text)
 , m_bIsDataInit(false)
 , m_bUseGPU(bUseGPU)

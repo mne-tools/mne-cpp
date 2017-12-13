@@ -87,6 +87,7 @@ namespace DISP3DLIB {
 
 class RtSensorDataController;
 class GpuInterpolationItem;
+class AbstractMeshTreeItem;
 
 
 //=============================================================================================================
@@ -108,9 +109,14 @@ public:
     //=========================================================================================================
     /**
     * Constructs a sensordatatreeitem object, calls initItem
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
     */
-    explicit SensorDataTreeItem(int iType ,
-                                const QString& text);
+    explicit SensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem,
+                                const QString& text = "Sensor Data",
+                                bool bUseGPU = false);
 
     //=========================================================================================================
     /**
@@ -241,17 +247,27 @@ protected:
 
     //=========================================================================================================
     /**
-    * Init the interpolation items. This cannot be done here because they might differ from GPU to CPU version.
+    * Set the new interpolation matrix.
     *
-    * @param[in] matVertices       The surface vertices.
-    * @param[in] matNormals        The surface normals.
-    * @param[in] matTriangles      The surface triangles.
-    * @param[in] p3DEntityParent   The Qt3D entity parent of the new item.
+    * @param[in] matInterpolationMatrix                 The new interpolation matrix.
     */
-    virtual void initInterpolationItem(const Eigen::MatrixX3f &matVertices,
-                                       const Eigen::MatrixX3f &matNormals,
-                                       const Eigen::MatrixX3i &matTriangles,
-                                       Qt3DCore::QEntity* p3DEntityParent) = 0;
+    virtual void onNewInterpolationMatrixAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever this item receives sensor values for each estimated source.
+    *
+    * @param[in] vecDataVector         The streamed raw data.
+    */
+    void virtual onNewRtRawDataAvailable(const VectorXd &vecDataVector);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever this item receives new color values for each estimated source.
+    *
+    * @param[in] sourceColorSamples         The color values for the streamed data.
+    */
+    virtual void onNewRtSmoothedDataAvailable(const MatrixX3f &matColorMatrix);
 
     //=========================================================================================================
     /**
@@ -318,11 +334,14 @@ protected:
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
 
     bool                                m_bIsDataInit;                     /**< The init flag. */
+    bool                                m_bUseGPU;                         /**< The use GPU flag. */
 
     QVector<int>                        m_iUsedSensors;                    /**< Stores the indices of channels inside the passed fiff evoked that are used for interpolation. */
     QVector<int>                        m_iSensorsBad;                     /**< Store bad channel indexes.*/
 
     QPointer<RtSensorDataController>    m_pSensorRtDataWorkController;     /**< The source data worker. This worker streams the rt data to this item.*/
+    QPointer<GpuInterpolationItem>      m_pInterpolationItemGPU;           /**< This item manages all 3d rendering and calculations. */
+    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemCPU;           /**< This item manages all 3d rendering and calculations. */
 };
 
 

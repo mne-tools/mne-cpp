@@ -109,6 +109,15 @@ public :
 
     //=========================================================================================================
     /**
+    * Adds an item with its toolTip as second coulm item as description to the model.
+    *
+    * @param[in] pItemParent         The parent item.
+    * @param[in] pItemAdd            The item which is added as a row to the parent item.
+    */
+    static void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
+
+    //=========================================================================================================
+    /**
     * Returns all children of this item based on their type.
     *
     * @param[in] type    The type of the child items which should be looked for.

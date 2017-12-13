@@ -143,8 +143,6 @@ SOURCES += \
     engine/model/3dhelpers/geometrymultiplier.cpp \
     engine/model/materials/geometrymultipliermaterial.cpp \
     engine/view/customframegraph.cpp \
-    engine/model/items/sensordata/cpusensordatatreeitem.cpp \
-    engine/model/items/sensordata/gpusensordatatreeitem.cpp \
     engine/model/materials/gpuinterpolationmaterial.cpp
 
 HEADERS += \
@@ -200,8 +198,6 @@ HEADERS += \
     engine/model/3dhelpers/geometrymultiplier.h \
     engine/model/materials/geometrymultipliermaterial.h \
     engine/view/customframegraph.h \
-    engine/model/items/sensordata/cpusensordatatreeitem.h \
-    engine/model/items/sensordata/gpusensordatatreeitem.h \
     engine/model/materials/gpuinterpolationmaterial.h
 
 FORMS += \

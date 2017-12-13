@@ -372,15 +372,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Adds an item with its toolTip as second coulm item as description to the model.
-    *
-    * @param[in] pItemParent         The parent item.
-    * @param[in] pItemAdd            The item which is added as a row to the parent item.
-    */
-    void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
-
-    //=========================================================================================================
-    /**
     * Adds live sensor data for interpolation with the cpu.
     *
     * @param[in] sSubject               The name of the subject.

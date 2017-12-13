@@ -41,9 +41,12 @@
 
 #include "sensordatatreeitem.h"
 #include "../common/metatreeitem.h"
-#include <fiff/fiff_evoked.h>
-#include <mne/mne_bem.h>
 #include "../../workers/rtSensorData/rtsensordatacontroller.h"
+#include "../common/gpuinterpolationitem.h"
+#include "../common/abstractmeshtreeitem.h"
+#include "../../3dhelpers/custommesh.h"
+
+#include <mne/mne_bem.h>
 
 
 //*************************************************************************************************************
@@ -52,6 +55,7 @@
 //=============================================================================================================
 
 #include <QVector3D>
+#include <QGeometryRenderer>
 
 
 //*************************************************************************************************************
@@ -84,9 +88,12 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorDataTreeItem::SensorDataTreeItem(int iType, const QString &text)
+SensorDataTreeItem::SensorDataTreeItem(int iType,
+                                       const QString &text,
+                                       bool bUseGPU)
 : AbstractTreeItem(iType,text)
 , m_bIsDataInit(false)
+, m_bUseGPU(bUseGPU)
 , m_pSensorRtDataWorkController(new RtSensorDataController())
 {
     initItem();
@@ -146,16 +153,63 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
         m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
     }
 
+    //Setup worker
     m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface.rr,
                                                         bemSurface.neighbor_vert,
                                                         vecSensorPos,
                                                         fiffInfo,
                                                         sensorTypeFiffConstant);
 
-    this->initInterpolationItem(bemSurface.rr,
-                                bemSurface.nn,
-                                bemSurface.tris,
-                                p3DEntityParent);
+    //Create InterpolationItems for CPU or GPU usage
+    if(m_bUseGPU) {
+        if(!m_pInterpolationItemGPU)
+        {
+            m_pInterpolationItemGPU = new GpuInterpolationItem(p3DEntityParent,
+                                                               Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                                               QStringLiteral("3D Plot"));
+
+            m_pInterpolationItemGPU->initData(bemSurface.rr,
+                                              bemSurface.nn,
+                                              bemSurface.tris);
+
+            QList<QStandardItem*> list;
+            list << m_pInterpolationItemGPU;
+            list << new QStandardItem(m_pInterpolationItemGPU->toolTip());
+            this->appendRow(list);
+        }
+
+        m_pSensorRtDataWorkController->setStreamSmoothedData(false);
+
+        connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newInterpolationMatrixAvailable,
+                        this, &SensorDataTreeItem::onNewInterpolationMatrixAvailable);
+
+        connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newRtRawDataAvailable,
+                this, &SensorDataTreeItem::onNewRtRawDataAvailable);
+    } else {
+        if(!m_pInterpolationItemCPU)
+        {
+            m_pInterpolationItemCPU = new AbstractMeshTreeItem(p3DEntityParent,
+                                                            Data3DTreeModelItemTypes::AbstractMeshItem,
+                                                            QStringLiteral("3D Plot - Left"));
+
+            //Create color from curvature information with default gyri and sulcus colors
+            MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(bemSurface.rr.rows());
+
+            m_pInterpolationItemCPU->getCustomMesh()->setMeshData(bemSurface.rr,
+                                                                  bemSurface.nn,
+                                                                  bemSurface.tris,
+                                                                  matVertColor,
+                                                                  Qt3DRender::QGeometryRenderer::Triangles);
+
+            QList<QStandardItem*> list;
+            list << m_pInterpolationItemCPU;
+            list << new QStandardItem(m_pInterpolationItemCPU->toolTip());
+            this->appendRow(list);
+        }
+
+        connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newRtSmoothedDataAvailable,
+                this, &SensorDataTreeItem::onNewRtSmoothedDataAvailable);
+    }
 
     //Init complete
     m_bIsDataInit = true;
@@ -478,6 +532,41 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
+void SensorDataTreeItem::onNewInterpolationMatrixAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrix)
+{
+    if(m_pInterpolationItemGPU)
+    {
+        m_pInterpolationItemGPU->setInterpolationMatrix(matInterpolationMatrix);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorDataTreeItem::onNewRtRawDataAvailable(const VectorXd &vecDataVector)
+{
+    if(m_pInterpolationItemGPU)
+    {
+        m_pInterpolationItemGPU->addNewRtData(vecDataVector.cast<float>());
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorDataTreeItem::onNewRtSmoothedDataAvailable(const MatrixX3f &matColorMatrix)
+{
+    if(m_pInterpolationItemCPU)
+    {
+        QVariant data;
+        data.setValue(matColorMatrix);
+        m_pInterpolationItemCPU->setVertColor(data);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void SensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState &checkState)
 {
     if(m_pSensorRtDataWorkController) {
@@ -494,11 +583,15 @@ void SensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState &checkStat
 
 void SensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
 {
-    if(sColormapType.canConvert<QString>())
-    {
-        if(m_pSensorRtDataWorkController)
-        {
-            m_pSensorRtDataWorkController->setColormapType(sColormapType.toString());
+    if(sColormapType.canConvert<QString>()) {
+        if(m_bUseGPU) {
+            if(m_pInterpolationItemGPU) {
+                m_pInterpolationItemGPU->setColormapType(sColormapType.toString());
+            }
+        } else {
+            if(m_pSensorRtDataWorkController) {
+                m_pSensorRtDataWorkController->setColormapType(sColormapType.toString());
+            }
         }
     }
 }
@@ -520,11 +613,15 @@ void SensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
 
 void SensorDataTreeItem::onDataThresholdChanged(const QVariant &vecThresholds)
 {
-    if(vecThresholds.canConvert<QVector3D>())
-    {
-        if(m_pSensorRtDataWorkController)
-        {
-            m_pSensorRtDataWorkController->setThresholds(vecThresholds.value<QVector3D>());
+    if(vecThresholds.canConvert<QVector3D>()) {
+        if(m_bUseGPU) {
+            if(m_pInterpolationItemGPU) {
+                m_pInterpolationItemGPU->setThresholds(vecThresholds.value<QVector3D>());
+            }
+        } else {
+            if(m_pSensorRtDataWorkController) {
+                m_pSensorRtDataWorkController->setThresholds(vecThresholds.value<QVector3D>());
+            }
         }
     }
 }
