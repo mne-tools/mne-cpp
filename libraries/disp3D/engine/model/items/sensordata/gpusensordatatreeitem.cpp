@@ -42,7 +42,6 @@
 #include "gpusensordatatreeitem.h"
 #include "../common/gpuinterpolationitem.h"
 #include "../../workers/rtSensorData/rtsensordatacontroller.h"
-#include <mne/mne_bem.h>
 
 
 //*************************************************************************************************************
@@ -66,7 +65,6 @@
 
 using namespace DISP3DLIB;
 using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -162,7 +160,7 @@ void GpuSensorDataTreeItem::onDataThresholdChanged(const QVariant &vecThresholds
     {
         if(m_pInterpolationItem)
         {
-            m_pInterpolationItem->setNormalization(vecThresholds.value<QVector3D>());
+            m_pInterpolationItem->setThresholds(vecThresholds.value<QVector3D>());
         }
     }
 }

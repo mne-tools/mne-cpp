@@ -245,16 +245,16 @@ void RtSourceDataWorker::streamData()
                 emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.cols()), m_lVisualizationInfoLeft),
                                        generateColorsFromSensorValues(m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.cols(), m_lVisualizationInfoRight.matInterpolationMatrix.cols()), m_lVisualizationInfoRight));
             } else {
-                emit newRtRawData(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.rows()),
-                                  m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.rows(), m_lVisualizationInfoRight.matInterpolationMatrix.rows()));
+                emit newRtRawData(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.cols()),
+                                  m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.cols(), m_lVisualizationInfoRight.matInterpolationMatrix.cols()));
             }
             m_vecAverage.setZero(m_vecAverage.rows());
 
             //reset sample counter
             m_iSampleCtr = 0;
         }
+
         //qDebug()<<"RtSourceDataWorker::streamData - this->thread() "<< this->thread();
-        //qDebug()<<"RtSourceDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
     }
 }
 
