@@ -47,8 +47,7 @@
 //=============================================================================================================
 
 #include <QSet>
-#include <QtDebug>
-
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -86,7 +85,8 @@ using namespace Eigen;
 SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
                                                           const MatrixXd &matDistanceTable,
                                                           double (*interpolationFunction) (double),
-                                                          const double dCancelDist)
+                                                          const double dCancelDist,
+                                                          const QVector<qint32> &vecExcludeIndex)
 {
 
     if(matDistanceTable.rows() == 0 && matDistanceTable.cols() == 0) {
@@ -102,9 +102,20 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
     const qint32 iRows = matInterpolationMatrix.rows();
     const qint32 iCols = matInterpolationMatrix.cols();
 
+    // insert all sensor nodes into set for faster lookup during later computation. Also consider bad channels here.
+    QSet<qint32> sensorLookup;
+    int idx = 0;
+
+    for(const qint32& s : vecProjectedSensors){
+        if(!vecExcludeIndex.contains(idx)){
+            sensorLookup.insert(s);
+        }
+        idx++;
+    }
+
     // main loop: go through all rows of distance table and calculate weights
     for (qint32 r = 0; r < iRows; ++r) {
-        if (vecProjectedSensors.contains(r) == false) {
+        if (sensorLookup.contains(r) == false) {
             // "normal" node, i.e. one which was not assigned a sensor
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
             QVector<QPair<qint32, float> > vecBelowThresh;
@@ -125,7 +136,8 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
                 vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, qp.first, qp.second / dWeightsSum));
             }
         } else {
-            // a sensor has been assigned to this node, we do not need to interpolate anything (final vertex signal is equal to sensor input signal, thus factor 1)
+            // a sensor has been assigned to this node, we do not need to interpolate anything
+            //(final vertex signal is equal to sensor input signal, thus factor 1)
             const int iIndexInSubset = vecProjectedSensors.indexOf(r);
 
             vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, iIndexInSubset, 1));

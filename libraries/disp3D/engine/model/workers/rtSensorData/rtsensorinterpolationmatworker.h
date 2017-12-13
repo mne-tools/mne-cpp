@@ -166,6 +166,7 @@ protected:
         Eigen::MatrixX3f                                matVertices;                    /**< Holds all vertex information. */
 
         QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QVector<qint32>                                 vecExcludeIndex;                /**< The indices to be excluded from vecProjectedSensors, e.g., bad channels. */
         QVector<QVector<int> >                          vecNeighborVertices;            /**< The neighbor vertex information. */
 
         FIFFLIB::FiffInfo                               fiffInfo;                       /**< Contains all information about the sensors. */

@@ -321,18 +321,6 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
 
 //*************************************************************************************************************
 
-void GeometryInfo::matrixDump(const Eigen::MatrixXd &matrix,
-                              std::string sFilename) {
-    qDebug() << "Start writing matrix to file: " << sFilename.c_str();
-    std::ofstream oFileStream;
-    oFileStream.open(sFilename.c_str());
-    oFileStream << matrix;
-    qDebug() << "Finished writing !";
-}
-
-
-//*************************************************************************************************************
-
 QVector<qint32> GeometryInfo::filterBadChannels(MatrixXd &matDistanceTable,
                                                 const FIFFLIB::FiffInfo& fiffInfo,
                                                 qint32 iSensorType) {
