@@ -150,16 +150,6 @@ public:
 
     //=========================================================================================================
     /**
-    * @brief matrixDump                 Creates a file named 'filename' and writes the contents of ptr into it
-    *
-    * @param[in] matrix                The matrix to be written.
-    * @param[in] sFilename             The file to be written to.
-    */
-    static void matrixDump(const Eigen::MatrixXd &matrix,
-                           std::string sFilename);
-
-    //=========================================================================================================
-    /**
     * @brief filterBadChannels          Filters bad channels from distance table
     *
     * @param[out] matDistanceTable     Result of SCDC.

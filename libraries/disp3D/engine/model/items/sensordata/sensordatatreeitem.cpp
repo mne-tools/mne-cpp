@@ -115,8 +115,7 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
                                   const QString &sSensorType,
                                   Qt3DCore::QEntity* p3DEntityParent)
 {
-    if(m_bIsDataInit == true)
-    {
+    if(m_bIsDataInit == true) {
         qDebug("SensorDataTreeItem::initData - Item is already initialized");
     }
 
@@ -133,13 +132,14 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
         return;
     }
 
-    //fill QVector with the right sensor positions
+    //Fill QVector with the right sensor positions, exclude bad channels
+    //Only take EEG with V as unit or MEG magnetometers with T as unit
     QVector<Vector3f> vecSensorPos;
     m_iUsedSensors.clear();
     int iCounter = 0;
     for(const FiffChInfo &info : fiffInfo.chs) {
-        //Only take EEG with V as unit or MEG magnetometers with T as unit
-        if(info.kind == sensorTypeFiffConstant && (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
+        if(info.kind == sensorTypeFiffConstant &&
+                (info.unit == FIFF_UNIT_T || info.unit == FIFF_UNIT_V)) {
             vecSensorPos.push_back(info.chpos.r0);
 
             //save the number of the sensor
@@ -153,17 +153,9 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
         m_iSensorsBad.push_back(fiffInfo.ch_names.indexOf(bad));
     }
 
-    //Setup worker
-    m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface.rr,
-                                                        bemSurface.neighbor_vert,
-                                                        vecSensorPos,
-                                                        fiffInfo,
-                                                        sensorTypeFiffConstant);
-
     //Create InterpolationItems for CPU or GPU usage
     if(m_bUseGPU) {
-        if(!m_pInterpolationItemGPU)
-        {
+        if(!m_pInterpolationItemGPU) {
             m_pInterpolationItemGPU = new GpuInterpolationItem(p3DEntityParent,
                                                                Data3DTreeModelItemTypes::GpuInterpolationItem,
                                                                QStringLiteral("3D Plot"));
@@ -186,8 +178,7 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
         connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newRtRawDataAvailable,
                 this, &SensorDataTreeItem::onNewRtRawDataAvailable);
     } else {
-        if(!m_pInterpolationItemCPU)
-        {
+        if(!m_pInterpolationItemCPU) {
             m_pInterpolationItemCPU = new AbstractMeshTreeItem(p3DEntityParent,
                                                             Data3DTreeModelItemTypes::AbstractMeshItem,
                                                             QStringLiteral("3D Plot - Left"));
@@ -211,6 +202,13 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
                 this, &SensorDataTreeItem::onNewRtSmoothedDataAvailable);
     }
 
+    //Setup worker
+    m_pSensorRtDataWorkController->setInterpolationInfo(bemSurface.rr,
+                                                        bemSurface.neighbor_vert,
+                                                        vecSensorPos,
+                                                        fiffInfo,
+                                                        sensorTypeFiffConstant);
+
     //Init complete
     m_bIsDataInit = true;
 }
@@ -221,7 +219,7 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
 void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
 {
     if(!m_bIsDataInit) {
-        qDebug() << "GpuSensorDataTreeItem::addData - sensor data item has not been initialized yet!";
+        qDebug() << "SensorDataTreeItem::addData - item has not been initialized yet!";
         return;
     }
 
@@ -232,7 +230,7 @@ void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
         MatrixXd dSmallSensorData(iSensorSize, tSensorData.cols());
         for(int i = 0 ; i < iSensorSize; ++i)
         {
-            //Set bad channels to zero
+            //Set bad channels to zero so that the data does not corrupt while the bad channels vertex is weighted by surrounding sensors
             if(m_iSensorsBad.contains(m_iUsedSensors[i])) {
                 dSmallSensorData.row(i).setZero();
             } else {
@@ -417,6 +415,7 @@ void SensorDataTreeItem::setSFreq(const double dSFreq)
     }
 }
 
+
 //*************************************************************************************************************
 
 void SensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
@@ -428,7 +427,7 @@ void SensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
             m_iSensorsBad.push_back(info.ch_names.indexOf(bad));
         }
 
-        //qDebug() << "CpuSensorDataTreeItem::updateBadChannels - m_iSensorsBad" << m_iSensorsBad;
+        //qDebug() << "SensorDataTreeItem::setBadChannels - m_iSensorsBad" << m_iSensorsBad;
         m_pSensorRtDataWorkController->setBadChannels(info);
     }
 }
@@ -439,7 +438,7 @@ void SensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
 void SensorDataTreeItem::initItem()
 {
     this->setEditable(false);
-    this->setToolTip("SensorData item");
+    this->setToolTip("Sensor Data item");
 
     //Add items
     QList<QStandardItem*> list;

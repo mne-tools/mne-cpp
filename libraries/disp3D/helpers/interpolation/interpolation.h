@@ -124,13 +124,15 @@ public:
     * @param[in] matDistanceTable              atrix that contains all needed distances
     * @param[in] interpolationFunction         Function that computes interpolation coefficients using the distance values
     * @param[in] dCancelDist                   Distances higher than this are ignored, i.e. the respective coefficients are set to zero
+    * @param[in] vecExcludeIndex               The indices to be excluded from vecProjectedSensors, e.g., bad channels (empty by default)
     *
     * @return                                  The distance matrix created
     */
     static Eigen::SparseMatrix<float> createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
                                                              const Eigen::MatrixXd &matDistanceTable,
                                                              double (*interpolationFunction) (double),
-                                                             const double dCancelDist = FLOAT_INFINITY);
+                                                             const double dCancelDist = FLOAT_INFINITY,
+                                                             const QVector<qint32> &vecExcludeIndex = QVector<qint32>());
 
     //=========================================================================================================
     /**

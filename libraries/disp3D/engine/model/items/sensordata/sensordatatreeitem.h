@@ -41,7 +41,6 @@
 #include "../../../../disp3D_global.h"
 #include "../common/abstracttreeitem.h"
 #include "../measurement/measurementtreeitem.h"
-#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -63,8 +62,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
+namespace FIFFLIB {
     class FiffEvoked;
+    class FiffInfo;
 }
 
 namespace MNELIB{
