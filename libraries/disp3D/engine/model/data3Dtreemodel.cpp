@@ -271,8 +271,6 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
         qDebug("Using compute shader version of SensorDataTreeItem.");
     }
 
-    bUseGPU = false;
-
     MneEstimateTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item

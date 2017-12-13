@@ -97,6 +97,7 @@ namespace DISP3DLIB
 
 class RtSourceDataController;
 class AbstractMeshTreeItem;
+class GpuInterpolationItem;
 
 
 //=============================================================================================================
@@ -119,8 +120,11 @@ public:
     *
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
     */
-    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem, const QString& text = "MNE data");
+    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem,
+                                 const QString& text = "MNE data",
+                                 bool bUseGPU = false);
 
     //=========================================================================================================
     /**
@@ -256,6 +260,32 @@ protected:
 
     //=========================================================================================================
     /**
+    * Set the new interpolation matrix.
+    *
+    * @param[in] matInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
+    */
+    virtual void onNewInterpolationMatrixLeftAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeftHemi);
+
+    //=========================================================================================================
+    /**
+    * Set the new interpolation matrix.
+    *
+    * @param[in] matInterpolationMatrixRightHemi          The new interpolation matrix for the right hemisphere.
+    */
+    virtual void onNewInterpolationMatrixRightAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixRightHemi);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever this item receives sensor values for each estimated source.
+    *
+    * @param[in] vecDataVectorLeftHemi          The new streamed raw data for the left hemispehre.
+    * @param[in] vecDataVectorRightHemi         The new streamed raw data for the right hemispehre.
+    */
+    void virtual onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
+                                const Eigen::VectorXd &vecDataVectorRightHemi);
+
+    //=========================================================================================================
+    /**
     * This function gets called whenever this item receives new color values for each estimated source.
     *
     * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
@@ -329,11 +359,14 @@ protected:
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
 
     bool                                m_bIsDataInit;                      /**< The init flag. */
+    bool                                m_bUseGPU;                          /**< The use GPU flag. */
 
     QPointer<RtSourceDataController>    m_pRtSourceDataController;          /**< The source data worker. This worker streams the rt data to this item.*/
 
-    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemLeft;           /**< This item manages all 3d rendering and calculations for the left hemisphere. */
-    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemRight;          /**< This item manages all 3d rendering and calculations for the right hemisphere. */
+    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemLeftCPU;        /**< This item manages all 3d rendering and calculations for the left hemisphere. */
+    QPointer<GpuInterpolationItem>      m_pInterpolationItemLeftGPU;        /**< This item manages all 3d rendering and calculations for the left hemisphere. */
+    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemRightCPU;       /**< This item manages all 3d rendering and calculations for the right hemisphere. */
+    QPointer<GpuInterpolationItem>      m_pInterpolationItemRightGPU;       /**< This item manages all 3d rendering and calculations for the right hemisphere. */
 
 signals:
 

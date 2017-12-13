@@ -42,6 +42,7 @@
 #include "../../workers/rtSourceLoc/rtsourcedatacontroller.h"
 #include "../common/metatreeitem.h"
 #include "../common/abstractmeshtreeitem.h"
+#include "../common/gpuinterpolationitem.h"
 #include "../../3dhelpers/custommesh.h"
 
 #include <mne/mne_sourceestimate.h>
@@ -82,9 +83,10 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text)
+MneEstimateTreeItem::MneEstimateTreeItem(int iType, const QString &text, bool bUseGPU)
 : AbstractTreeItem(iType, text)
 , m_bIsDataInit(false)
+, m_bUseGPU(bUseGPU)
 {
     initItem();
 }
@@ -251,7 +253,7 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
-    //Process annotation data
+//    //Process annotation data for patch based visualization
 //    MatrixX3f matAnnotColors(tAnnotation.getVertices().rows(), 3);
 
 //    QList<FSLIB::Label> qListLabels;
@@ -279,57 +281,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
 //    vecLabelIdsLeftHemi = tAnnotation.getLabelIds();
 //    vecLabelIdsRightHemi = tAnnotation.getLabelIds();
 
-    //Create CpuInterpolationItems
-    if(!m_pInterpolationItemLeft)
-    {
-        m_pInterpolationItemLeft = new AbstractMeshTreeItem(p3DEntityParent,
-                                                        Data3DTreeModelItemTypes::AbstractMeshItem,
-                                                        QStringLiteral("3D Plot - Left"));
-
-        //Create color from curvature information with default gyri and sulcus colors
-        MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[0].rr().rows());
-
-        m_pInterpolationItemLeft->getCustomMesh()->setMeshData(tSurfSet[0].rr(),
-                                                               tSurfSet[0].nn(),
-                                                               tSurfSet[0].tris(),
-                                                               matVertColor,
-                                                               Qt3DRender::QGeometryRenderer::Triangles);
-
-        QList<QStandardItem*> list;
-        list << m_pInterpolationItemLeft;
-        list << new QStandardItem(m_pInterpolationItemLeft->toolTip());
-        this->appendRow(list);
-    }
-
-    if(!m_pInterpolationItemRight)
-    {
-        m_pInterpolationItemRight = new AbstractMeshTreeItem(p3DEntityParent,
-                                                        Data3DTreeModelItemTypes::AbstractMeshItem,
-                                                        QStringLiteral("3D Plot - Right"));
-
-        //Create color from curvature information with default gyri and sulcus colors
-        MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[1].rr().rows());
-
-        m_pInterpolationItemRight->getCustomMesh()->setMeshData(tSurfSet[1].rr(),
-                                                                tSurfSet[1].nn(),
-                                                                tSurfSet[1].tris(),
-                                                                matVertColor,
-                                                                Qt3DRender::QGeometryRenderer::Triangles);
-
-        QList<QStandardItem*> list;
-        list << m_pInterpolationItemRight;
-        list << new QStandardItem(m_pInterpolationItemRight->toolTip());
-        this->appendRow(list);
-    }
-
-
     //set rt data corresponding to the hemisphere
     if(!m_pRtSourceDataController) {
         m_pRtSourceDataController = new RtSourceDataController();
     }
-
-    connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtSmoothedDataAvailable,
-            this, &MneEstimateTreeItem::onNewRtSmoothedDataAvailable);
 
     m_pRtSourceDataController->setInterpolationInfo(tForwardSolution.src[0].rr,
                                                     tForwardSolution.src[1].rr,
@@ -342,6 +297,98 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
 //                                                vecLabelIdsRightHemi,
 //                                                lLabelsLeftHemi,
 //                                                lLabelsRightHemi);
+
+
+    //Create InterpolationItems for CPU or GPU usage
+    if(m_bUseGPU) {
+        if(!m_pInterpolationItemLeftGPU)
+        {
+            m_pInterpolationItemLeftGPU = new GpuInterpolationItem(p3DEntityParent,
+                                                                   Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                                                   QStringLiteral("3D Plot - Left"));
+
+            m_pInterpolationItemLeftGPU->initData(tSurfSet[0].rr(),
+                                                  tSurfSet[0].nn(),
+                                                  tSurfSet[0].tris());
+
+            QList<QStandardItem*> list;
+            list << m_pInterpolationItemLeftGPU;
+            list << new QStandardItem(m_pInterpolationItemLeftGPU->toolTip());
+            this->appendRow(list);
+        }
+
+        if(!m_pInterpolationItemRightGPU)
+        {
+            m_pInterpolationItemRightGPU = new GpuInterpolationItem(p3DEntityParent,
+                                                                    Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                                                    QStringLiteral("3D Plot - Right"));
+
+            m_pInterpolationItemRightGPU->initData(tSurfSet[1].rr(),
+                                                   tSurfSet[1].nn(),
+                                                   tSurfSet[1].tris());
+
+            QList<QStandardItem*> list;
+            list << m_pInterpolationItemRightGPU;
+            list << new QStandardItem(m_pInterpolationItemRightGPU->toolTip());
+            this->appendRow(list);
+        }
+
+        m_pRtSourceDataController->setStreamSmoothedData(false);
+
+        connect(m_pRtSourceDataController.data(), &RtSourceDataController::newInterpolationMatrixLeftAvailable,
+                        this, &MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable);
+
+        connect(m_pRtSourceDataController.data(), &RtSourceDataController::newInterpolationMatrixRightAvailable,
+                        this, &MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable);
+
+        connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtRawDataAvailable,
+                this, &MneEstimateTreeItem::onNewRtRawData);
+    } else {
+        if(!m_pInterpolationItemLeftCPU)
+        {
+            m_pInterpolationItemLeftCPU = new AbstractMeshTreeItem(p3DEntityParent,
+                                                            Data3DTreeModelItemTypes::AbstractMeshItem,
+                                                            QStringLiteral("3D Plot - Left"));
+
+            //Create color from curvature information with default gyri and sulcus colors
+            MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[0].rr().rows());
+
+            m_pInterpolationItemLeftCPU->getCustomMesh()->setMeshData(tSurfSet[0].rr(),
+                                                                      tSurfSet[0].nn(),
+                                                                      tSurfSet[0].tris(),
+                                                                      matVertColor,
+                                                                      Qt3DRender::QGeometryRenderer::Triangles);
+
+            QList<QStandardItem*> list;
+            list << m_pInterpolationItemLeftCPU;
+            list << new QStandardItem(m_pInterpolationItemLeftCPU->toolTip());
+            this->appendRow(list);
+        }
+
+        if(!m_pInterpolationItemRightCPU)
+        {
+            m_pInterpolationItemRightCPU = new AbstractMeshTreeItem(p3DEntityParent,
+                                                            Data3DTreeModelItemTypes::AbstractMeshItem,
+                                                            QStringLiteral("3D Plot - Right"));
+
+            //Create color from curvature information with default gyri and sulcus colors
+            MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[1].rr().rows());
+
+            m_pInterpolationItemRightCPU->getCustomMesh()->setMeshData(tSurfSet[1].rr(),
+                                                                    tSurfSet[1].nn(),
+                                                                    tSurfSet[1].tris(),
+                                                                    matVertColor,
+                                                                    Qt3DRender::QGeometryRenderer::Triangles);
+
+            QList<QStandardItem*> list;
+            list << m_pInterpolationItemRightCPU;
+            list << new QStandardItem(m_pInterpolationItemRightCPU->toolTip());
+            this->appendRow(list);
+        }
+
+        connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtSmoothedDataAvailable,
+                this, &MneEstimateTreeItem::onNewRtSmoothedDataAvailable);
+    }
 
     m_bIsDataInit = true;
 }
@@ -554,16 +601,49 @@ void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &m
 {    
     QVariant data;
 
-    if(m_pInterpolationItemLeft)
-    {
+    if(m_pInterpolationItemLeftCPU) {
         data.setValue(matColorMatrixLeftHemi);
-        m_pInterpolationItemLeft->setVertColor(data);
+        m_pInterpolationItemLeftCPU->setVertColor(data);
     }
 
-    if(m_pInterpolationItemRight)
-    {
+    if(m_pInterpolationItemRightCPU) {
         data.setValue(matColorMatrixRightHemi);
-        m_pInterpolationItemRight->setVertColor(data);
+        m_pInterpolationItemRightCPU->setVertColor(data);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeftHemi)
+{
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->setInterpolationMatrix(matInterpolationMatrixLeftHemi);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixRightHemi)
+{
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->setInterpolationMatrix(matInterpolationMatrixRightHemi);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
+                                         const Eigen::VectorXd &vecDataVectorRightHemi)
+{
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->addNewRtData(vecDataVectorLeftHemi.cast<float>());
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->addNewRtData(vecDataVectorRightHemi.cast<float>());
     }
 }
 
@@ -573,8 +653,18 @@ void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &m
 void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
-        if(m_pRtSourceDataController) {
-            m_pRtSourceDataController->setColormapType(sColormapType.toString());
+        if(m_bUseGPU) {
+            if(m_pInterpolationItemLeftGPU) {
+                m_pInterpolationItemLeftGPU->setColormapType(sColormapType.toString());
+            }
+
+            if(m_pInterpolationItemRightGPU) {
+                m_pInterpolationItemRightGPU->setColormapType(sColormapType.toString());
+            }
+        } else {
+            if(m_pRtSourceDataController) {
+                m_pRtSourceDataController->setColormapType(sColormapType.toString());
+            }
         }
     }
 }
@@ -597,8 +687,18 @@ void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 void MneEstimateTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
-        if(m_pRtSourceDataController) {
-            m_pRtSourceDataController->setThresholds(vecThresholds.value<QVector3D>());
+        if(m_bUseGPU) {
+            if(m_pInterpolationItemLeftGPU) {
+                m_pInterpolationItemLeftGPU->setThresholds(vecThresholds.value<QVector3D>());
+            }
+
+            if(m_pInterpolationItemRightGPU) {
+                m_pInterpolationItemRightGPU->setThresholds(vecThresholds.value<QVector3D>());
+            }
+        } else {
+            if(m_pRtSourceDataController) {
+                m_pRtSourceDataController->setThresholds(vecThresholds.value<QVector3D>());
+            }
         }
     }
 }
@@ -669,8 +769,7 @@ void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 
 void MneEstimateTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
-    if(sInterpolationFunction.canConvert<QString>())
-    {
+    if(sInterpolationFunction.canConvert<QString>()) {
         if(m_pRtSourceDataController) {
             m_pRtSourceDataController->setInterpolationFunction(sInterpolationFunction.toString());
         }

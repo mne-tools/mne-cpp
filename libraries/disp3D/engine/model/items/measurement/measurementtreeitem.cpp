@@ -172,55 +172,31 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
                                                   Qt3DCore::QEntity* p3DEntityParent,
                                                   bool bUseGPU)
 {
-    if(!tSourceEstimate.isEmpty()) {
-        if(bUseGPU) {
-//            //GPU for EEG data
-//            if(m_pGpuEEGSensorDataTreeItem) {
-//                m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
-//            } else {
-//                //Add sensor data as child
-//                //If item does not exists yet, create it here!
-//                m_pGpuEEGSensorDataTreeItem = new GpuSensorDataTreeItem();
-//                m_pGpuEEGSensorDataTreeItem->setText("EEG Data");
-
-//                QList<QStandardItem*> list;
-//                list << m_pGpuEEGSensorDataTreeItem;
-//                list << new QStandardItem(m_pGpuEEGSensorDataTreeItem->toolTip());
-//                this->appendRow(list);
-
-//                m_pGpuEEGSensorDataTreeItem->initData(bemSurface,
-//                                                  fiffInfo,
-//                                                  sSensorType,
-//                                                  pParent);
-
-//                m_pGpuEEGSensorDataTreeItem->addData(tSensorData);
-//            }
-
-//            return dynamic_cast<SensorDataTreeItem*>(m_pGpuEEGSensorDataTreeItem.data());
+    if(!tSourceEstimate.isEmpty()) {        
+        //CPU for source data
+        if(m_pMneEstimateTreeItem) {
+            m_pMneEstimateTreeItem->addData(tSourceEstimate);
         } else {
-            //CPU for source data
-            if(m_pMneEstimateTreeItem) {
-                m_pMneEstimateTreeItem->addData(tSourceEstimate);
-            } else {
-                //Add sensor data as child
-                //If item does not exists yet, create it here!
-                m_pMneEstimateTreeItem = new MneEstimateTreeItem();
+            //Add sensor data as child
+            //If item does not exists yet, create it here!
+            m_pMneEstimateTreeItem = new MneEstimateTreeItem(Data3DTreeModelItemTypes::MNEEstimateItem,
+                                                             "MNE data",
+                                                             bUseGPU);
 
-                QList<QStandardItem*> list;
-                list << m_pMneEstimateTreeItem;
-                list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
-                this->appendRow(list);
+            QList<QStandardItem*> list;
+            list << m_pMneEstimateTreeItem;
+            list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
+            this->appendRow(list);
 
-                m_pMneEstimateTreeItem->initData(tForwardSolution,
-                                                 tSurfSet,
-                                                 tAnnotSet,
-                                                 p3DEntityParent);
+            m_pMneEstimateTreeItem->initData(tForwardSolution,
+                                             tSurfSet,
+                                             tAnnotSet,
+                                             p3DEntityParent);
 
-                m_pMneEstimateTreeItem->addData(tSourceEstimate);
-            }
-
-            return m_pMneEstimateTreeItem;
+            m_pMneEstimateTreeItem->addData(tSourceEstimate);
         }
+
+        return m_pMneEstimateTreeItem;
     }
 
     return Q_NULLPTR;
