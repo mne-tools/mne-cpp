@@ -44,6 +44,8 @@
 
 #include "../../../../disp3D_global.h"
 
+#include <fs/label.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,6 +54,7 @@
 
 #include <QSharedPointer>
 #include <QVector>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -66,6 +69,10 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace FSLIB {
+    class Label;
+}
 
 
 //*************************************************************************************************************
@@ -114,6 +121,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the visualization type.
+    *
+    * @param[in] iVisType               The new visualization type.
+    */
+    void setVisualizationType(int iVisType);
+
+    //=========================================================================================================
+    /**
     * This function sets the cancel distance used in distance calculations for the interpolation.
     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
     * Warning: Using this function can take some seconds because recalculation are required.
@@ -137,6 +152,18 @@ public:
                               const QVector<QVector<int> > &vecNeighborVertices,
                               const QVector<qint32> &vecMappedSubset);
 
+    //=========================================================================================================
+    /**
+    * Set annotation data.
+    *
+    * @param[in] vecLabelIds       The labels ids for each of the right hemipshere surface vertex idx.
+    * @param[in] lLabels           The label information for the right hemipshere.
+    * @param[in] vecVert             The vertNos for the right hemisphere.
+    */
+    void setAnnotationInfo(const Eigen::VectorXi &vecLabelIds,
+                           const QList<FSLIB::Label> &lLabels,
+                           const Eigen::VectorXi &vecVert);
+
 protected:    
     //=========================================================================================================
     /**
@@ -149,18 +176,24 @@ protected:
     * The struct specifing all data that is used in the interpolation process
     */
     struct InterpolationData {
-        double                                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
+        double                      dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
-        Eigen::MatrixXd                                 matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
-        Eigen::MatrixX3f                                matVertices;                    /**< Holds all vertex information. */
+        Eigen::MatrixXd             matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+        Eigen::MatrixX3f            matVertices;                    /**< Holds all vertex information. */
 
-        QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
-        QVector<QVector<int> >                          vecNeighborVertices;            /**< The neighbor vertex information. */
+        QList<FSLIB::Label>         lLabels;                        /**< The annotation labels. */
+        QMap<qint32, qint32>        mapLabelIdSources;              /**< The mapped label ID to sources. */
+
+        QVector<qint32>             vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QVector<QVector<int> >      vecNeighborVertices;            /**< The neighbor vertex information. */
 
         double (*interpolationFunction) (double);                                       /**< Function that computes interpolation coefficients using the distance values. */
     }       m_lInterpolationData;           /**< Container for the interpolation data. */
 
     bool    m_bInterpolationInfoIsInit;     /**< Flag if this thread's interpoaltion data was initialized. */
+    bool    m_bAnnotationInfoIsInit;        /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+
+    int     m_iVisualizationType;           /**< The visualization type (smoothing or annotation based). */
 
 signals:
     //=========================================================================================================

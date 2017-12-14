@@ -150,8 +150,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
 
         case MetaTreeItemTypes::VisualizationType: {
             QComboBox* pComboBox = new QComboBox(parent);
-            pComboBox->addItem("Vertex based");
-            pComboBox->addItem("Smoothing based");
+            pComboBox->addItem("Interpolation based");
             pComboBox->addItem("Annotation based");
             return pComboBox;
         }

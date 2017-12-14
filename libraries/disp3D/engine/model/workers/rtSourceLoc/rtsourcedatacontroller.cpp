@@ -42,6 +42,8 @@
 #include "rtsourceinterpolationmatworker.h"
 #include "rtsourcedataworker.h"
 
+#include <fs/label.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -143,6 +145,12 @@ RtSourceDataController::RtSourceDataController()
        connect(this, &RtSourceDataController::interpolationInfoLeftChanged,
                m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setInterpolationInfo);
 
+       connect(this, &RtSourceDataController::annotationInfoLeftChanged,
+               m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setAnnotationInfo);
+
+       connect(this, &RtSourceDataController::visualizationTypeChanged,
+               m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType);
+
        m_rtInterpolationLeftWorkerThread.start();
 
        //Calculate interpolation matrix right hemisphere
@@ -163,6 +171,12 @@ RtSourceDataController::RtSourceDataController()
 
        connect(this, &RtSourceDataController::interpolationInfoRightChanged,
                m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setInterpolationInfo);
+
+       connect(this, &RtSourceDataController::annotationInfoRightChanged,
+               m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setAnnotationInfo);
+
+       connect(this, &RtSourceDataController::visualizationTypeChanged,
+               m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType);
 
        m_rtInterpolationRightWorkerThread.start();
 }
@@ -265,9 +279,35 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
 
 //*************************************************************************************************************
 
+void RtSourceDataController::setAnnotationInfo(const VectorXi &vecLabelIdsLeftHemi,
+                                               const VectorXi &vecLabelIdsRightHemi,
+                                               const  QList<FSLIB::Label> &lLabels,
+                                               const VectorXi &vecVertNoLeft,
+                                               const VectorXi &vecVertNoRight)
+{
+    emit annotationInfoLeftChanged(vecLabelIdsLeftHemi,
+                                   lLabels,
+                                   vecVertNoLeft);
+
+    emit annotationInfoRightChanged(vecLabelIdsRightHemi,
+                                    lLabels,
+                                    vecVertNoRight);
+}
+
+
+//*************************************************************************************************************
+
 void RtSourceDataController::setThresholds(const QVector3D &vecThresholds)
 {
     emit thresholdsChanged(vecThresholds);
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceDataController::setVisualizationType(int iVisType)
+{
+    emit visualizationTypeChanged(iVisType);
 }
 
 

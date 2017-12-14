@@ -255,33 +255,19 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
-//    //Process annotation data for patch based visualization
-//    MatrixX3f matAnnotColors(tAnnotation.getVertices().rows(), 3);
+    //Process annotation data for patch based visualization
+    QList<FSLIB::Label> qListLabels;
+    QList<RowVector4i> qListLabelRGBAs;
 
-//    QList<FSLIB::Label> qListLabels;
-//    QList<RowVector4i> qListLabelRGBAs;
+    tAnnotSet.toLabels(tSurfSet, qListLabels, qListLabelRGBAs);
 
-//    tAnnotation.toLabels(tSurface, qListLabels, qListLabelRGBAs);
+    VectorXi vecLabelIdsLeftHemi;
+    VectorXi vecLabelIdsRightHemi;
 
-//    for(int i = 0; i < qListLabels.size(); ++i) {
-//        FSLIB::Label label = qListLabels.at(i);
-//        for(int j = 0; j<label.vertices.rows(); j++) {
-//            QColor patchColor;
-//            patchColor.setRed(qListLabelRGBAs.at(i)(0));
-//            patchColor.setGreen(qListLabelRGBAs.at(i)(1));
-//            patchColor.setBlue(qListLabelRGBAs.at(i)(2));
-
-//            patchColor = patchColor.darker(200);
-
-//            if(label.vertices(j) < matAnnotColors.rows()) {
-//                matAnnotColors(label.vertices(j),0) = patchColor.redF();
-//                matAnnotColors(label.vertices(j),1) = patchColor.greenF();
-//                matAnnotColors(label.vertices(j),2) = patchColor.blueF();
-//            }
-//        }
-//    }
-//    vecLabelIdsLeftHemi = tAnnotation.getLabelIds();
-//    vecLabelIdsRightHemi = tAnnotation.getLabelIds();
+    if(tAnnotSet.size() <= 2) {
+        vecLabelIdsLeftHemi = tAnnotSet[0].getLabelIds();
+        vecLabelIdsRightHemi = tAnnotSet[1].getLabelIds();
+    }
 
     //set rt data corresponding to the hemisphere
     if(!m_pRtSourceDataController) {
@@ -295,10 +281,11 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                     clustVertNoLeft,
                                                     clustVertNoRight);
 
-//    m_pRtSourceDataController->setAnnotationData(vecLabelIdsLeftHemi,
-//                                                vecLabelIdsRightHemi,
-//                                                lLabelsLeftHemi,
-//                                                lLabelsRightHemi);
+    m_pRtSourceDataController->setAnnotationInfo(vecLabelIdsLeftHemi,
+                                                 vecLabelIdsRightHemi,
+                                                 qListLabels,
+                                                 clustVertNoLeft,
+                                                 clustVertNoRight);
 
 
     //Create InterpolationItems for CPU or GPU usage
@@ -711,18 +698,14 @@ void MneEstimateTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
 void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
 {
     if(sVisType.canConvert<QString>()) {
-        int iVisType = Data3DTreeModelItemRoles::VertexBased;
+        int iVisType = Data3DTreeModelItemRoles::InterpolationBased;
 
         if(sVisType.toString() == "Annotation based") {
             iVisType = Data3DTreeModelItemRoles::AnnotationBased;
         }
 
-        if(sVisType.toString() == "Smoothing based") {
-            iVisType = Data3DTreeModelItemRoles::SmoothingBased;
-        }
-
         if(m_pRtSourceDataController) {
-            //m_pRtSourceDataController->setVisualizationType(iVisType);
+            m_pRtSourceDataController->setVisualizationType(iVisType);
         }
     }
 }
