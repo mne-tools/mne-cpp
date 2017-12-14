@@ -108,12 +108,12 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
 
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
-        SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+        m_matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
                                                                                         m_lInterpolationData.matDistanceMatrix,
                                                                                         m_lInterpolationData.interpolationFunction,
                                                                                         m_lInterpolationData.dCancelDistance);
 
-        emit newInterpolationMatrixCalculated(matInterpolationMat);
+        emit newInterpolationMatrixCalculated(m_matInterpolationMat);
     }
 }
 
@@ -121,7 +121,27 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
 
 void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
 {
-    m_iVisualizationType = iVisType;
+    switch (iVisType) {
+        case Data3DTreeModelItemRoles::InterpolationBased: {
+            if(m_matInterpolationMat.size() == 0) {
+                calculateInterpolationOperator();
+            }
+
+            emit newInterpolationMatrixCalculated(m_matInterpolationMat);
+            break;
+        }
+
+        case Data3DTreeModelItemRoles::AnnotationBased: {
+            if(m_matAnnotationMat.size() == 0) {
+                qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType size == 0 Calculating";
+                calculateAnnotationOperator();
+            }
+            qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType emitting annot matrix " << m_matAnnotationMat.rows() << " " << m_matAnnotationMat.cols();
+
+            emit newInterpolationMatrixCalculated(m_matAnnotationMat);
+            break;
+        }
+    }
 }
 
 
@@ -138,6 +158,8 @@ void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 
     //recalculate everything because parameters changed
     calculateInterpolationOperator();
+
+    emit newInterpolationMatrixCalculated(m_matInterpolationMat);
 }
 
 
@@ -160,6 +182,8 @@ void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
     m_bInterpolationInfoIsInit = true;
 
     calculateInterpolationOperator();
+
+    emit newInterpolationMatrixCalculated(m_matInterpolationMat);
 }
 
 
@@ -167,7 +191,7 @@ void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
 
 void RtSourceInterpolationMatWorker::setAnnotationInfo(const Eigen::VectorXi &vecLabelIds,
                                                        const QList<FSLIB::Label> &lLabels,
-                                                       const Eigen::VectorXi &vecVert)
+                                                       const Eigen::VectorXi &vecVertNo)
 {
     if(vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
         qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfo - Annotation data is empty. Returning ...";
@@ -178,11 +202,13 @@ void RtSourceInterpolationMatWorker::setAnnotationInfo(const Eigen::VectorXi &ve
     m_lInterpolationData.mapLabelIdSources.clear();
 
     //Generate fast lookup map for each source and corresponding label
-    for(qint32 i = 0; i < vecVert.rows(); ++i) {
-        m_lInterpolationData.mapLabelIdSources.insert(vecVert(i), vecLabelIds(vecVert(i)));
+    for(qint32 i = 0; i < vecVertNo.rows(); ++i) {
+        m_lInterpolationData.mapLabelIdSources.insert(vecVertNo(i), vecLabelIds(vecVertNo(i)));
     }
 
     m_bAnnotationInfoIsInit = true;
+
+    calculateAnnotationOperator();
 }
 
 
@@ -190,48 +216,56 @@ void RtSourceInterpolationMatWorker::setAnnotationInfo(const Eigen::VectorXi &ve
 
 void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
 {
-    switch (m_iVisualizationType) {
-        case Data3DTreeModelItemRoles::InterpolationBased: {
-            if(!m_bInterpolationInfoIsInit) {
-                qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
-                return;
-            }
-
-            //SCDC with cancel distance
-            m_lInterpolationData.matDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.matVertices,
-                                                                        m_lInterpolationData.vecNeighborVertices,
-                                                                        m_lInterpolationData.vecMappedSubset,
-                                                                        m_lInterpolationData.dCancelDistance);
-
-            //create Interpolation matrix
-            SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                            m_lInterpolationData.matDistanceMatrix,
-                                                                                            m_lInterpolationData.interpolationFunction,
-                                                                                            m_lInterpolationData.dCancelDistance);
-
-            emit newInterpolationMatrixCalculated(matInterpolationMat);
-
-            break;
-        }
-
-        case Data3DTreeModelItemRoles::AnnotationBased: {
-            if(!m_bAnnotationInfoIsInit) {
-                qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set annotation info first.";
-                return;
-            }
-
-            if(!m_bInterpolationInfoIsInit) {
-                qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
-                return;
-            }
-
-            //create Interpolation matrix for annotation based visualization
-            SparseMatrix<float> matInterpolationMat;
-
-            emit newInterpolationMatrixCalculated(matInterpolationMat);
-
-            break;
-        }
+    if(!m_bInterpolationInfoIsInit) {
+        qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
+        return;
     }
 
+    //SCDC with cancel distance
+    m_lInterpolationData.matDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.matVertices,
+                                                                m_lInterpolationData.vecNeighborVertices,
+                                                                m_lInterpolationData.vecMappedSubset,
+                                                                m_lInterpolationData.dCancelDistance);
+
+    //create Interpolation matrix
+    m_matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                    m_lInterpolationData.matDistanceMatrix,
+                                                                                    m_lInterpolationData.interpolationFunction,
+                                                                                    m_lInterpolationData.dCancelDistance);
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceInterpolationMatWorker::calculateAnnotationOperator()
+{
+    if(!m_bAnnotationInfoIsInit) {
+        qDebug() << "RtSourceInterpolationMatWorker::calculateAnnotationOperator - Set annotation info first.";
+        return;
+    }
+
+    int iNumVert = 0;
+    for(int i = 0; i < m_lInterpolationData.lLabels.size(); ++i) {
+        iNumVert += m_lInterpolationData.lLabels.at(i).vertices.rows();
+    }
+
+    qDebug() << "iNumVert" << iNumVert;
+    qDebug() << "m_lInterpolationData.matVertices" << m_lInterpolationData.matVertices.rows();
+
+    m_matAnnotationMat = SparseMatrix<float>(iNumVert, m_lInterpolationData.vecMappedSubset.size());
+
+    //Color all labels respectivley to their activation
+    QList<qint32> listSourcesVertNoAll = m_lInterpolationData.mapLabelIdSources.keys();
+
+    for(int i = 0; i < m_lInterpolationData.lLabels.size(); ++i) {
+        FSLIB::Label label = m_lInterpolationData.lLabels.at(i);
+        QList<qint32> listSourcesVertNoLabel = m_lInterpolationData.mapLabelIdSources.keys(label.label_id);
+
+        for(int j = 0; j < label.vertices.rows(); ++j) {
+            for(int k = 0; k < listSourcesVertNoLabel.size(); ++k) {
+                int colIdx = listSourcesVertNoAll.indexOf(listSourcesVertNoLabel.at(k));
+                m_matAnnotationMat.coeffRef(label.vertices(j),colIdx) = 1.0f/listSourcesVertNoLabel.size();
+            }
+        }
+    }
 }

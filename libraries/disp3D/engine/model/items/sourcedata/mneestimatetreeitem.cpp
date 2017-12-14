@@ -256,10 +256,9 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::SourceSpaceType);
 
     //Process annotation data for patch based visualization
-    QList<FSLIB::Label> qListLabels;
+    QList<FSLIB::Label> qListLabelsLeft, qListLabelsRight;
     QList<RowVector4i> qListLabelRGBAs;
 
-    tAnnotSet.toLabels(tSurfSet, qListLabels, qListLabelRGBAs);
 
     VectorXi vecLabelIdsLeftHemi;
     VectorXi vecLabelIdsRightHemi;
@@ -267,6 +266,8 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     if(tAnnotSet.size() <= 2) {
         vecLabelIdsLeftHemi = tAnnotSet[0].getLabelIds();
         vecLabelIdsRightHemi = tAnnotSet[1].getLabelIds();
+        tAnnotSet[0].toLabels(tSurfSet[0], qListLabelsLeft, qListLabelRGBAs);
+        tAnnotSet[1].toLabels(tSurfSet[1], qListLabelsRight, qListLabelRGBAs);
     }
 
     //set rt data corresponding to the hemisphere
@@ -283,7 +284,8 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
 
     m_pRtSourceDataController->setAnnotationInfo(vecLabelIdsLeftHemi,
                                                  vecLabelIdsRightHemi,
-                                                 qListLabels,
+                                                 qListLabelsLeft,
+                                                 qListLabelsRight,
                                                  clustVertNoLeft,
                                                  clustVertNoRight);
 
@@ -300,6 +302,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                   tSurfSet[0].nn(),
                                                   tSurfSet[0].tris());
 
+            m_pInterpolationItemLeftGPU->setPosition(QVector3D(-tSurfSet[0].offset()(0),
+                                                               -tSurfSet[0].offset()(1),
+                                                               -tSurfSet[0].offset()(2)));
+
             QList<QStandardItem*> list;
             list << m_pInterpolationItemLeftGPU;
             list << new QStandardItem(m_pInterpolationItemLeftGPU->toolTip());
@@ -315,6 +321,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             m_pInterpolationItemRightGPU->initData(tSurfSet[1].rr(),
                                                    tSurfSet[1].nn(),
                                                    tSurfSet[1].tris());
+
+            m_pInterpolationItemRightGPU->setPosition(QVector3D(-tSurfSet[1].offset()(0),
+                                                               -tSurfSet[1].offset()(1),
+                                                               -tSurfSet[1].offset()(2)));
 
             QList<QStandardItem*> list;
             list << m_pInterpolationItemRightGPU;
@@ -348,6 +358,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                                       matVertColor,
                                                                       Qt3DRender::QGeometryRenderer::Triangles);
 
+            m_pInterpolationItemLeftCPU->setPosition(QVector3D(-tSurfSet[0].offset()(0),
+                                                               -tSurfSet[0].offset()(1),
+                                                               -tSurfSet[0].offset()(2)));
+
             QList<QStandardItem*> list;
             list << m_pInterpolationItemLeftCPU;
             list << new QStandardItem(m_pInterpolationItemLeftCPU->toolTip());
@@ -368,6 +382,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                                     tSurfSet[1].tris(),
                                                                     matVertColor,
                                                                     Qt3DRender::QGeometryRenderer::Triangles);
+
+            m_pInterpolationItemRightCPU->setPosition(QVector3D(-tSurfSet[1].offset()(0),
+                                                               -tSurfSet[1].offset()(1),
+                                                               -tSurfSet[1].offset()(2)));
 
             QList<QStandardItem*> list;
             list << m_pInterpolationItemRightCPU;

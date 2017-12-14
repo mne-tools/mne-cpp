@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
         pRTDataItem->setNumberAverages(1);
         pRTDataItem->setStreamingState(true);
         pRTDataItem->setThresholds(QVector3D(0.0,0.5,10.0));
-        pRTDataItem->setVisualizationType("Smoothing based");
+        pRTDataItem->setVisualizationType("Interpolation based");
         pRTDataItem->setColormapType("Hot");
     }
 
