@@ -68,6 +68,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FSLIB {
+    class Label;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -158,7 +162,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the members InterpolationData.bemSurface, InterpolationData.vecSensorPos and m_numSensors.
+    * Sets the interpoaltion inforamtion about the surfaces etc.
     * Warning: Using this function can take some seconds because recalculation are required.
     *
     * @param[in] matVerticesLeft                 The surface vertices in 3D space for the left hemisphere.
@@ -179,11 +183,35 @@ public:
 
     //=========================================================================================================
     /**
+    * Set annotation info.
+    *
+    * @param[in] vecLabelIdsLeftHemi        The labels ids for each of the left hemipshere surface vertex idx.
+    * @param[in] vecLabelIdsRightHemi       The labels ids for each of the right hemipshere surface vertex idx.
+    * @param[in] lLabels                    The label information.
+    * @param[in] vecVertNoLeft              The vertNos for the left hemisphere.
+    * @param[in] vecVertNoRight             The vertNos for the right hemisphere.
+    */
+    void setAnnotationInfo(const Eigen::VectorXi &vecLabelIdsLeftHemi,
+                           const Eigen::VectorXi &vecLabelIdsRightHemi,
+                           const QList<FSLIB::Label> &lLabels,
+                           const Eigen::VectorXi &vecVertNoLeft,
+                           const Eigen::VectorXi &vecVertNoRight);
+
+    //=========================================================================================================
+    /**
     * Set the normalization value.
     *
     * @param[in] vecThresholds          The new threshold values used for normalizing the data.
     */
     void setThresholds(const QVector3D &vecThresholds);
+
+    //=========================================================================================================
+    /**
+    * Set the visualization type.
+    *
+    * @param[in] iVisType               The new visualization type.
+    */
+    void setVisualizationType(int iVisType);
 
     //=========================================================================================================
     /**
@@ -301,6 +329,30 @@ signals:
 
     //=========================================================================================================
     /**
+    * Emit this signal whenever the interpolation info for the left hemisphere changed.
+    *
+    * @param[in] vecLabelIdsLeftHemi        The labels ids for each of the left hemipshere surface vertex idx.
+    * @param[in] lLabels                    The label information.
+    * @param[in] vecVertNoLeft              The vertNos for the left hemisphere.
+    */
+    void annotationInfoLeftChanged(const Eigen::VectorXi &vecLabelIdsLeftHemi,
+                                   const  QList<FSLIB::Label> &lLabels,
+                                   const Eigen::VectorXi &vecVertNoLeft);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the interpolation info for the right hemisphere changed.
+    *
+    * @param[in] vecLabelIdsRightHemi       The labels ids for each of the right hemipshere surface vertex idx.
+    * @param[in] lLabels                    The label information.
+    * @param[in] vecVertNoRight             The vertNos for the right hemisphere.
+    */
+    void annotationInfoRightChanged(const Eigen::VectorXi &vecLabelIdsRightHemi,
+                                    const  QList<FSLIB::Label> &lLabels,
+                                    const Eigen::VectorXi &vecVertNoRight);
+
+    //=========================================================================================================
+    /**
     * Emit this signal whenever the number of vertices changed.
     *
     * @param[in] iNumberVertsLeft      The number of vertices for the left hemisphere.
@@ -340,6 +392,14 @@ signals:
     * @param[in] vecThresholds          The new threshold values used for normalizing the data.
     */
     void thresholdsChanged(const QVector3D &vecThresholds);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the visualization type changed.
+    *
+    * @param[in] iVisType          The new visualization type.
+    */
+    void visualizationTypeChanged(int iVisType);
 
     //=========================================================================================================
     /**

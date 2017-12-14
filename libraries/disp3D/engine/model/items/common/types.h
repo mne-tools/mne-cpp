@@ -153,7 +153,7 @@ namespace Data3DTreeModelItemRoles
                     FilePath = Qt::UserRole + 107,
                     Data = Qt::UserRole + 108,
                     VertexBased = Qt::UserRole + 109,
-                    SmoothingBased = Qt::UserRole + 110,
+                    InterpolationBased = Qt::UserRole + 110,
                     AnnotationBased = Qt::UserRole + 111};
 }
 

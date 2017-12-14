@@ -118,7 +118,7 @@ public:
     * Clear this worker, empties the m_lData field that holds the current block of sensor activity
     */
     void clear();
-    
+
     //=========================================================================================================
     /**
     * Set number of vertices.

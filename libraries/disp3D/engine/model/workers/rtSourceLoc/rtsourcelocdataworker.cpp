@@ -764,7 +764,7 @@ QPair<MatrixX3f, MatrixX3f> RtSourceLocDataWorker::performVisualizationTypeCalcu
             break;
         }
 
-        case Data3DTreeModelItemRoles::SmoothingBased: {
+        case Data3DTreeModelItemRoles::InterpolationBased: {
             QFuture<void> future = QtConcurrent::map(m_lVisualizationInfo, generateSmoothedColors);
             future.waitForFinished();
 

@@ -40,8 +40,10 @@
 //=============================================================================================================
 
 #include "rtsourceinterpolationmatworker.h"
+
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
+#include "../../items/common/types.h"
 
 
 //*************************************************************************************************************
@@ -64,6 +66,7 @@
 using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace Eigen;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -73,6 +76,8 @@ using namespace Eigen;
 
 RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false)
+, m_iVisualizationType(Data3DTreeModelItemRoles::InterpolationBased)
+, m_bAnnotationInfoIsInit(false)
 {
     m_lInterpolationData.dCancelDistance = 0.05;
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
@@ -83,7 +88,10 @@ RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 
 void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sInterpolationFunction)
 {
-    qDebug()<<"RtSourceInterpolationMatWorker::setInterpolationFunction";
+    //Only supported in interpolation mode
+    if(m_iVisualizationType != Data3DTreeModelItemRoles::InterpolationBased) {
+        return;
+    }
 
     if(sInterpolationFunction == "Linear") {
         m_lInterpolationData.interpolationFunction = Interpolation::linear;
@@ -109,11 +117,23 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
     }
 }
 
+//*************************************************************************************************************
+
+void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
+{
+    m_iVisualizationType = iVisType;
+}
+
 
 //*************************************************************************************************************
 
 void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 {
+    //Only supported in interpolation mode
+    if(m_iVisualizationType != Data3DTreeModelItemRoles::InterpolationBased) {
+        return;
+    }
+
     m_lInterpolationData.dCancelDistance = dCancelDist;
 
     //recalculate everything because parameters changed
@@ -128,7 +148,7 @@ void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
                                                           const QVector<qint32> &vecMappedSubset)
 {
     if(matVertices.rows() == 0) {
-        qDebug() << "RtSourceInterpolationMatWorker::calculateSurfaceData - Surface data is empty. Returning ...";
+        qDebug() << "RtSourceInterpolationMatWorker::setInterpolationInfo - Surface data is empty. Returning ...";
         return;
     }
 
@@ -145,24 +165,73 @@ void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
 
 //*************************************************************************************************************
 
-void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
+void RtSourceInterpolationMatWorker::setAnnotationInfo(const Eigen::VectorXi &vecLabelIds,
+                                                       const QList<FSLIB::Label> &lLabels,
+                                                       const Eigen::VectorXi &vecVert)
 {
-    if(!m_bInterpolationInfoIsInit) {
-        qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
+    if(vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
+        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfo - Annotation data is empty. Returning ...";
         return;
     }
 
-    //SCDC with cancel distance
-    m_lInterpolationData.matDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.matVertices,
-                                                                m_lInterpolationData.vecNeighborVertices,
-                                                                m_lInterpolationData.vecMappedSubset,
-                                                                m_lInterpolationData.dCancelDistance);
+    m_lInterpolationData.lLabels = lLabels;
+    m_lInterpolationData.mapLabelIdSources.clear();
 
-    //create Interpolation matrix
-    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                    m_lInterpolationData.matDistanceMatrix,
-                                                                                    m_lInterpolationData.interpolationFunction,
-                                                                                    m_lInterpolationData.dCancelDistance);
+    //Generate fast lookup map for each source and corresponding label
+    for(qint32 i = 0; i < vecVert.rows(); ++i) {
+        m_lInterpolationData.mapLabelIdSources.insert(vecVert(i), vecLabelIds(vecVert(i)));
+    }
 
-    emit newInterpolationMatrixCalculated(matInterpolationMat);
+    m_bAnnotationInfoIsInit = true;
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
+{
+    switch (m_iVisualizationType) {
+        case Data3DTreeModelItemRoles::InterpolationBased: {
+            if(!m_bInterpolationInfoIsInit) {
+                qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
+                return;
+            }
+
+            //SCDC with cancel distance
+            m_lInterpolationData.matDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.matVertices,
+                                                                        m_lInterpolationData.vecNeighborVertices,
+                                                                        m_lInterpolationData.vecMappedSubset,
+                                                                        m_lInterpolationData.dCancelDistance);
+
+            //create Interpolation matrix
+            SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                            m_lInterpolationData.matDistanceMatrix,
+                                                                                            m_lInterpolationData.interpolationFunction,
+                                                                                            m_lInterpolationData.dCancelDistance);
+
+            emit newInterpolationMatrixCalculated(matInterpolationMat);
+
+            break;
+        }
+
+        case Data3DTreeModelItemRoles::AnnotationBased: {
+            if(!m_bAnnotationInfoIsInit) {
+                qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set annotation info first.";
+                return;
+            }
+
+            if(!m_bInterpolationInfoIsInit) {
+                qDebug() << "RtSourceInterpolationMatWorker::calculateInterpolationOperator - Set interpolation info first.";
+                return;
+            }
+
+            //create Interpolation matrix for annotation based visualization
+            SparseMatrix<float> matInterpolationMat;
+
+            emit newInterpolationMatrixCalculated(matInterpolationMat);
+
+            break;
+        }
+    }
+
 }
