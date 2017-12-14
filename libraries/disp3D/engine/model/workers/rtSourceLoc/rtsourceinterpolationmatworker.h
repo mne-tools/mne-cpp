@@ -188,6 +188,7 @@ protected:
         Eigen::MatrixX3f            matVertices;                    /**< Holds all vertex information. */
 
         QList<FSLIB::Label>         lLabels;                        /**< The annotation labels. */
+        QList<int>                  vertNos;
         QMap<qint32, qint32>        mapLabelIdSources;              /**< The mapped label ID to sources. */
 
         QVector<qint32>             vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
