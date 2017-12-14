@@ -68,6 +68,7 @@
 
 using namespace DISP3DLIB;
 using namespace Eigen;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -281,16 +282,17 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
 
 void RtSourceDataController::setAnnotationInfo(const VectorXi &vecLabelIdsLeftHemi,
                                                const VectorXi &vecLabelIdsRightHemi,
-                                               const  QList<FSLIB::Label> &lLabels,
+                                               const QList<Label> &lLabelsLeftHemi,
+                                               const QList<Label> &lLabelsRightHemi,
                                                const VectorXi &vecVertNoLeft,
                                                const VectorXi &vecVertNoRight)
 {
     emit annotationInfoLeftChanged(vecLabelIdsLeftHemi,
-                                   lLabels,
+                                   lLabelsLeftHemi,
                                    vecVertNoLeft);
 
     emit annotationInfoRightChanged(vecLabelIdsRightHemi,
-                                    lLabels,
+                                    lLabelsRightHemi,
                                     vecVertNoRight);
 }
 

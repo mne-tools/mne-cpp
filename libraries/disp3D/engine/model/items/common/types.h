@@ -257,4 +257,9 @@ Q_DECLARE_METATYPE(QVector<qint32>);
 Q_DECLARE_METATYPE(Eigen::SparseMatrix<float>);
 #endif
 
+#ifndef DISP3DLIB_metatype_listlabel
+#define DISP3DLIB_metatype_listlabel
+Q_DECLARE_METATYPE(QList<FSLIB::Label>);
+#endif
+
 #endif // DISP3DLIB_TYPES_H

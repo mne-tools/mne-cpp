@@ -158,11 +158,11 @@ public:
     *
     * @param[in] vecLabelIds       The labels ids for each of the right hemipshere surface vertex idx.
     * @param[in] lLabels           The label information for the right hemipshere.
-    * @param[in] vecVert             The vertNos for the right hemisphere.
+    * @param[in] vecVertNo         The vertNos for the right hemisphere.
     */
     void setAnnotationInfo(const Eigen::VectorXi &vecLabelIds,
                            const QList<FSLIB::Label> &lLabels,
-                           const Eigen::VectorXi &vecVert);
+                           const Eigen::VectorXi &vecVertNo);
 
 protected:    
     //=========================================================================================================
@@ -170,6 +170,12 @@ protected:
     * Calculate the interpolation operator based on the set interpolation info.
     */
     void calculateInterpolationOperator();
+
+    //=========================================================================================================
+    /**
+    * Calculate the annotation operator based on the set annotation info.
+    */
+    void calculateAnnotationOperator();
 
     //=============================================================================================================
     /**
@@ -190,10 +196,13 @@ protected:
         double (*interpolationFunction) (double);                                       /**< Function that computes interpolation coefficients using the distance values. */
     }       m_lInterpolationData;           /**< Container for the interpolation data. */
 
-    bool    m_bInterpolationInfoIsInit;     /**< Flag if this thread's interpoaltion data was initialized. */
-    bool    m_bAnnotationInfoIsInit;        /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                        m_bInterpolationInfoIsInit;     /**< Flag if this thread's interpoaltion data was initialized. */
+    bool                        m_bAnnotationInfoIsInit;        /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    int     m_iVisualizationType;           /**< The visualization type (smoothing or annotation based). */
+    int                         m_iVisualizationType;           /**< The visualization type (smoothing or annotation based). */
+
+    Eigen::SparseMatrix<float>  m_matInterpolationMat;          /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
+    Eigen::SparseMatrix<float>  m_matAnnotationMat;             /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
 
 signals:
     //=========================================================================================================

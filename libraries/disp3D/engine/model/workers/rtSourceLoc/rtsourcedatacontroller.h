@@ -187,13 +187,15 @@ public:
     *
     * @param[in] vecLabelIdsLeftHemi        The labels ids for each of the left hemipshere surface vertex idx.
     * @param[in] vecLabelIdsRightHemi       The labels ids for each of the right hemipshere surface vertex idx.
-    * @param[in] lLabels                    The label information.
+    * @param[in] lLabelsLeftHemi            The label information for the left hemisphere.
+    * @param[in] lLabelsRightHemi           The label information for the right hemisphere.
     * @param[in] vecVertNoLeft              The vertNos for the left hemisphere.
     * @param[in] vecVertNoRight             The vertNos for the right hemisphere.
     */
     void setAnnotationInfo(const Eigen::VectorXi &vecLabelIdsLeftHemi,
                            const Eigen::VectorXi &vecLabelIdsRightHemi,
-                           const QList<FSLIB::Label> &lLabels,
+                           const QList<FSLIB::Label> &lLabelsLeftHemi,
+                           const QList<FSLIB::Label> &lLabelsRightHemi,
                            const Eigen::VectorXi &vecVertNoLeft,
                            const Eigen::VectorXi &vecVertNoRight);
 
