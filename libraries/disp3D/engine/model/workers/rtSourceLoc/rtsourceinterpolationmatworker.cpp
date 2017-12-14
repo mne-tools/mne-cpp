@@ -204,6 +204,7 @@ void RtSourceInterpolationMatWorker::setAnnotationInfo(const Eigen::VectorXi &ve
     //Generate fast lookup map for each source and corresponding label
     for(qint32 i = 0; i < vecVertNo.rows(); ++i) {
         m_lInterpolationData.mapLabelIdSources.insert(vecVertNo(i), vecLabelIds(vecVertNo(i)));
+        m_lInterpolationData.vertNos.append(vecVertNo(i));
     }
 
     m_bAnnotationInfoIsInit = true;
@@ -249,21 +250,16 @@ void RtSourceInterpolationMatWorker::calculateAnnotationOperator()
         iNumVert += m_lInterpolationData.lLabels.at(i).vertices.rows();
     }
 
-    qDebug() << "iNumVert" << iNumVert;
-    qDebug() << "m_lInterpolationData.matVertices" << m_lInterpolationData.matVertices.rows();
-
     m_matAnnotationMat = SparseMatrix<float>(iNumVert, m_lInterpolationData.vecMappedSubset.size());
 
     //Color all labels respectivley to their activation
-    QList<qint32> listSourcesVertNoAll = m_lInterpolationData.mapLabelIdSources.keys();
-
     for(int i = 0; i < m_lInterpolationData.lLabels.size(); ++i) {
         FSLIB::Label label = m_lInterpolationData.lLabels.at(i);
         QList<qint32> listSourcesVertNoLabel = m_lInterpolationData.mapLabelIdSources.keys(label.label_id);
 
         for(int j = 0; j < label.vertices.rows(); ++j) {
             for(int k = 0; k < listSourcesVertNoLabel.size(); ++k) {
-                int colIdx = listSourcesVertNoAll.indexOf(listSourcesVertNoLabel.at(k));
+                int colIdx = m_lInterpolationData.vertNos.indexOf(listSourcesVertNoLabel.at(k));
                 m_matAnnotationMat.coeffRef(label.vertices(j),colIdx) = 1.0f/listSourcesVertNoLabel.size();
             }
         }
