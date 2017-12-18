@@ -510,6 +510,13 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
 
 void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 {
+    //Create material
+    Qt3DExtras::QPhongMaterial *pCoordSysMaterial = new Qt3DExtras::QPhongMaterial;
+    pCoordSysMaterial->setDiffuse(QColor(255, 0, 0));
+    pCoordSysMaterial->setAmbient(Qt::gray);
+    pCoordSysMaterial->setSpecular(Qt::white);
+    pCoordSysMaterial->setShininess(50.0f);
+
     // Y - red
     Qt3DExtras::QCylinderMesh *YAxis = new Qt3DExtras::QCylinderMesh();
     YAxis->setRadius(0.001f);
@@ -519,13 +526,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 
     m_YAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_YAxisEntity->addComponent(YAxis); //will take ownership of YAxis if no parent was declared!
-
-    Qt3DExtras::QPhongMaterial *phongMaterialY = new Qt3DExtras::QPhongMaterial();
-    phongMaterialY->setDiffuse(QColor(255, 0, 0));
-    phongMaterialY->setAmbient(Qt::gray);
-    phongMaterialY->setSpecular(Qt::white);
-    phongMaterialY->setShininess(50.0f);
-    m_YAxisEntity->addComponent(phongMaterialY);
+    m_YAxisEntity->addComponent(pCoordSysMaterial);
 
     // Z - blue
     Qt3DExtras::QCylinderMesh *ZAxis = new Qt3DExtras::QCylinderMesh();
@@ -540,13 +541,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_ZAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_ZAxisEntity->addComponent(ZAxis);
     m_ZAxisEntity->addComponent(transformZ);
-
-    Qt3DExtras::QPhongMaterial *phongMaterialZ = new Qt3DExtras::QPhongMaterial();
-    phongMaterialZ->setDiffuse(QColor(0, 0, 255));
-    phongMaterialZ->setAmbient(Qt::gray);
-    phongMaterialZ->setSpecular(Qt::white);
-    phongMaterialZ->setShininess(50.0f);
-    m_ZAxisEntity->addComponent(phongMaterialZ);
+    m_ZAxisEntity->addComponent(pCoordSysMaterial);
 
     // X - green
     Qt3DExtras::QCylinderMesh *XAxis = new Qt3DExtras::QCylinderMesh();
@@ -561,11 +556,5 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_XAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_XAxisEntity->addComponent(XAxis);
     m_XAxisEntity->addComponent(transformX);
-
-    Qt3DExtras::QPhongMaterial *phongMaterialX = new Qt3DExtras::QPhongMaterial();
-    phongMaterialX->setDiffuse(QColor(0, 255, 0));
-    phongMaterialX->setAmbient(Qt::gray);
-    phongMaterialX->setSpecular(Qt::white);
-    phongMaterialX->setShininess(50.0f);
-    m_XAxisEntity->addComponent(phongMaterialX);
+    m_XAxisEntity->addComponent(pCoordSysMaterial);
 }
