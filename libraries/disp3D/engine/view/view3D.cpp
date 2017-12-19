@@ -127,9 +127,6 @@ void View3D::init()
     m_pCameraEntity->setUpVector(QVector3D(0, 1, 0));
     m_pCameraEntity->setViewCenter(QVector3D(0, 0, 0));
 
-    Qt3DExtras::QFirstPersonCameraController *camController = new Qt3DExtras::QFirstPersonCameraController(m_pRootEntity);
-    camController->setCamera(m_pCameraEntity);
-
     //FrameGraph
     m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
     m_pFrameGraph->setCamera(m_pCameraEntity);
@@ -325,70 +322,64 @@ void View3D::keyPressEvent(QKeyEvent* e)
             break;
 
         case Qt::Key_Left:
-                m_vecViewRotation.setY(-0.75 + m_vecViewRotationOld.y());
-
-                //Rotate all entities
-                if(!m_bModelRotationMode) {
+                if(!m_bModelRotationMode)
+                {
+                    qDebug("Camera Left pressed");
                     //Rotate camera
+                    m_vecViewRotation.setY(-0.75 + m_vecViewRotationOld.y());
                     m_pCameraTransform->setRotationY(m_vecViewRotation.y());
-                } else {
-                    //Rotate all objects
-                    for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-                        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_p3DObjectsEntity->children().at(i))) {
-                            pItem->setRotY(m_vecViewRotation.y());
-                        }
-                    }
+                }
+                else
+                {
+                    //Rotate all surface objects
+                    qDebug("Object Left pressed");
+                    m_vecModelRotation.setY(-0.75 + m_vecModelRotationOld.y());
+                    setRotationRecursive(m_p3DObjectsEntity);
                 }
             break;
 
         case Qt::Key_Right:
-                m_vecViewRotation.setY(0.75 + m_vecViewRotationOld.y());
-
-                //Rotate all surface objects
-                if(!m_bModelRotationMode) {
+                if(!m_bModelRotationMode)
+                {
                     //Rotate camera
+                    m_vecViewRotation.setY(0.75 + m_vecViewRotationOld.y());
                     m_pCameraTransform->setRotationY(m_vecViewRotation.y());
-                } else {
+                }
+                else
+                {
                     //Rotate all surface objects
-                    for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-                        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_p3DObjectsEntity->children().at(i))) {
-                            pItem->setRotY(m_vecViewRotation.y());
-                        }
-                    }
+                    m_vecModelRotation.setY(0.75 + m_vecModelRotationOld.y());
+                    setRotationRecursive(m_p3DObjectsEntity);
                 }
             break;
 
         case Qt::Key_Up:
-                m_vecViewRotation.setX(0.75 + m_vecViewRotationOld.x());
-
-                //Rotate all surface objects
-                if(!m_bModelRotationMode) {
+                if(!m_bModelRotationMode)
+                {
                     //Rotate camera
+                    m_vecViewRotation.setX(0.75 + m_vecViewRotationOld.x());
                     m_pCameraTransform->setRotationX(m_vecViewRotation.x());
-                } else {
+                }
+                else
+                {
                     //Rotate all surface objects
-                    for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-                        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_p3DObjectsEntity->children().at(i))) {
-                            pItem->setRotX(m_vecViewRotation.x());
-                        }
-                    }
+                    m_vecModelRotation.setX(0.75 + m_vecModelRotationOld.x());
+                    setRotationRecursive(m_p3DObjectsEntity);
                 }
             break;
 
         case Qt::Key_Down:
-                m_vecViewRotation.setX(-0.75 + m_vecViewRotationOld.x());
-
-                //Rotate all surface objects
-                if(!m_bModelRotationMode) {
+                if(!m_bModelRotationMode)
+                {
                     //Rotate camera
+                    m_vecViewRotation.setX(-0.75 + m_vecViewRotationOld.x());
                     m_pCameraTransform->setRotationX(m_vecViewRotation.x());
-                } else {
+                }
+                else
+                {
                     //Rotate all surface objects
-                    for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-                        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_p3DObjectsEntity->children().at(i))) {
-                            pItem->setRotX(m_vecViewRotation.x());
-                        }
-                    }
+                    m_vecModelRotation.setX(-0.75 + m_vecModelRotationOld.x());
+                    setRotationRecursive(m_p3DObjectsEntity);
                 }
             break;
 
@@ -402,26 +393,17 @@ void View3D::keyPressEvent(QKeyEvent* e)
 
 void View3D::keyReleaseEvent(QKeyEvent* e)
 {
-    switch ( e->key() )
+    if(e->key() == Qt::Key_Left
+            || e->key() == Qt::Key_Right
+            || e->key() == Qt::Key_Up
+            || e->key() == Qt::Key_Down)
     {
-        case Qt::Key_Left:
-            m_vecViewRotationOld = m_vecViewRotation;
-            break;
-
-        case Qt::Key_Right:
-            m_vecViewRotationOld = m_vecViewRotation;
-            break;
-
-        case Qt::Key_Up:
-            m_vecViewRotationOld = m_vecViewRotation;
-            break;
-
-        case Qt::Key_Down:
-            m_vecViewRotationOld = m_vecViewRotation;
-            break;
-
-        default:
-            Qt3DWindow::keyPressEvent(e);
+        m_vecViewRotationOld = m_vecViewRotation;
+        m_vecModelRotationOld = m_vecModelRotation;
+    }
+    else
+    {
+        Qt3DWindow::keyPressEvent(e);
     }
 }
 
@@ -470,6 +452,7 @@ void View3D::wheelEvent(QWheelEvent* e)
 
 void View3D::mouseReleaseEvent(QMouseEvent* e)
 {
+    qDebug("mouse released");
     m_bRotationMode = false;
     m_bCameraTransMode = false;
     m_vecViewTransOld = m_vecViewTrans;
@@ -502,6 +485,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     if(m_bRotationMode) {
         //Rotate
         if(!m_bModelRotationMode) {
+            qDebug("Mouse roation camera");
             //Rotate camera
             m_vecViewRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecViewRotationOld.x());
             m_vecViewRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecViewRotationOld.y());
@@ -509,6 +493,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
             m_pCameraTransform->setRotationX(m_vecViewRotation.x());
             m_pCameraTransform->setRotationY(m_vecViewRotation.y());
         } else {
+            qDebug("Mouse roation object");
             //Rotate objects
             m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
             m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
@@ -518,6 +503,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     }
 
     if(m_bCameraTransMode) {
+        qDebug("Mouse translate camera");
         m_vecViewTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.0001f) + m_vecViewTransOld.x());
         m_vecViewTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.0001f) + m_vecViewTransOld.y());
 
