@@ -44,6 +44,8 @@
 #include "../model/items/common/types.h"
 #include "../model/data3Dtreemodel.h"
 #include "customframegraph.h"
+#include "../model/3dhelpers/geometrymultiplier.h"
+#include "../model/materials/geometrymultipliermaterial.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -66,7 +68,7 @@
 #include <Qt3DExtras/QFirstPersonCameraController>
 #include <Qt3DRender/QPointLight>
 #include <Qt3DRender/QPointLight>
-#include <Qt3DExtras/QCylinderMesh>
+#include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
 
@@ -272,9 +274,7 @@ void View3D::startStopModelRotation(bool checked)
 
 void View3D::toggleCoordAxis(bool checked)
 {
-    m_XAxisEntity->setEnabled(checked);
-    m_YAxisEntity->setEnabled(checked);
-    m_ZAxisEntity->setEnabled(checked);
+    m_pCoordSysEntity->setEnabled(checked);
 }
 
 
@@ -523,51 +523,48 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
 
 void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 {
-    //Create material
-    Qt3DExtras::QPhongMaterial *pCoordSysMaterial = new Qt3DExtras::QPhongMaterial;
-    pCoordSysMaterial->setDiffuse(QColor(255, 0, 0));
-    pCoordSysMaterial->setAmbient(Qt::gray);
-    pCoordSysMaterial->setSpecular(Qt::white);
-    pCoordSysMaterial->setShininess(50.0f);
+    m_pCoordSysEntity = QSharedPointer<Qt3DCore::QEntity>::create(parent);
+
+    //create geometry
+    QSharedPointer<Qt3DExtras::QCylinderGeometry> pAxis =  QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
+    pAxis->setRadius(0.001f);
+    pAxis->setLength(30);
+    pAxis->setRings(100);
+    pAxis->setSlices(20);
+
+    //create mesh
+    GeometryMultiplier *pCoordSysMesh = new GeometryMultiplier(pAxis);
+    QVector<QColor> vColors;
+    vColors.reserve(3);
+    QVector<QMatrix4x4> vTransforms;
+    vTransforms.reserve(3);
+    QMatrix4x4 transformMat;
 
     // Y - red
-    Qt3DExtras::QCylinderMesh *YAxis = new Qt3DExtras::QCylinderMesh();
-    YAxis->setRadius(0.001f);
-    YAxis->setLength(30);
-    YAxis->setRings(100);
-    YAxis->setSlices(20);
-
-    m_YAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
-    m_YAxisEntity->addComponent(YAxis); //will take ownership of YAxis if no parent was declared!
-    m_YAxisEntity->addComponent(pCoordSysMaterial);
+    transformMat.setToIdentity();
+    vTransforms.push_back(transformMat);
+    vColors.push_back(QColor(255, 0, 0));
 
     // Z - blue
-    Qt3DExtras::QCylinderMesh *ZAxis = new Qt3DExtras::QCylinderMesh();
-    ZAxis->setRadius(0.001f);
-    ZAxis->setLength(30);
-    ZAxis->setRings(100);
-    ZAxis->setSlices(20);
-
-    Qt3DCore::QTransform *transformZ = new Qt3DCore::QTransform();
-    transformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 90));
-
-    m_ZAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
-    m_ZAxisEntity->addComponent(ZAxis);
-    m_ZAxisEntity->addComponent(transformZ);
-    m_ZAxisEntity->addComponent(pCoordSysMaterial);
+    transformMat.setToIdentity();
+    transformMat.rotate(90.0f, QVector3D(0,0,1));
+    vTransforms.push_back(transformMat);
+    vColors.push_back(QColor(0, 0, 255));
 
     // X - green
-    Qt3DExtras::QCylinderMesh *XAxis = new Qt3DExtras::QCylinderMesh();
-    XAxis->setRadius(0.001f);
-    XAxis->setLength(30);
-    XAxis->setRings(100);
-    XAxis->setSlices(20);
+    transformMat.setToIdentity();
+    transformMat.rotate(90.0f, QVector3D(1,0,0));
+    vTransforms.push_back(transformMat);
+    vColors.push_back(QColor(0, 255, 0));
 
-    Qt3DCore::QTransform *transformX = new Qt3DCore::QTransform();
-    transformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), 90));
+    //Set transforms and colors
+    pCoordSysMesh->setTransforms(vTransforms);
+    pCoordSysMesh->setColors(vColors);
 
-    m_XAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
-    m_XAxisEntity->addComponent(XAxis);
-    m_XAxisEntity->addComponent(transformX);
-    m_XAxisEntity->addComponent(pCoordSysMaterial);
+    m_pCoordSysEntity->addComponent(pCoordSysMesh);
+    //Add material
+    GeometryMultiplierMaterial* pCoordSysMaterial = new GeometryMultiplierMaterial;
+    pCoordSysMaterial->setAmbient(QColor(0,0,0));
+    pCoordSysMaterial->setAlpha(1.0f);
+    m_pCoordSysEntity->addComponent(pCoordSysMaterial);
 }
