@@ -141,8 +141,6 @@ public:
     */
     void setSceneColor(const QColor& colSceneColor);
 
-    void startModelRotationRecursive(QObject* pObject);
-
     //=========================================================================================================
     /**
     * Starts or stops to rotate all loaded 3D models.
@@ -213,6 +211,14 @@ protected:
 
     //=========================================================================================================
     /**
+    * Starts the automated rotation animation for all 3D models being childern.
+    *
+    * @param[in] pObject         The parent of the children to be rotated.
+    */
+    void startModelRotationRecursive(QObject* pObject);
+
+    //=========================================================================================================
+    /**
     * Sets the rotation for all 3D models being children.
     *
     * @param[in] obj         The parent of the children to be rotated.
@@ -225,9 +231,10 @@ protected:
     QPointer<Qt3DRender::QCamera>       m_pCameraEntity;                /**< The camera entity. */
     QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
 
-    QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
-    QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
-    QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
+    QSharedPointer<Qt3DCore::QEntity>   m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
+//    QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
+//    QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
+//    QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
 
     QPointer<Qt3DCore::QTransform>      m_pCameraTransform;             /**< The main camera transform. */
 
