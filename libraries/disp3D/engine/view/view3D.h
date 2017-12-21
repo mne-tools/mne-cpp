@@ -232,9 +232,6 @@ protected:
     QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
 
     QSharedPointer<Qt3DCore::QEntity>   m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
-//    QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
-//    QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
-//    QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
 
     QPointer<Qt3DCore::QTransform>      m_pCameraTransform;             /**< The main camera transform. */
 

@@ -469,7 +469,7 @@ void View3D::setRotationRecursive(QObject* obj)
 {
     for(int i = 0; i < obj->children().size(); ++i) {
         if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(obj->children().at(i))) {
-            pItem->setRotZ(m_vecModelRotation.y());
+            pItem->setRotY(m_vecModelRotation.y());
             pItem->setRotX(m_vecModelRotation.x());
         }
 
@@ -541,13 +541,13 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     vTransforms.push_back(transformMat);
     vColors.push_back(QColor(255, 0, 0));
 
-    // Z - blue
+    // X - blue
     transformMat.setToIdentity();
     transformMat.rotate(90.0f, QVector3D(0,0,1));
     vTransforms.push_back(transformMat);
     vColors.push_back(QColor(0, 0, 255));
 
-    // X - green
+    // Z - green
     transformMat.setToIdentity();
     transformMat.rotate(90.0f, QVector3D(1,0,0));
     vTransforms.push_back(transformMat);
