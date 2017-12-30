@@ -196,7 +196,9 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
     //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
     if(!m_bNodesPlotted) {
 
-        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
+        //use QEntity instead of Renderable3DEntity to avoid a double transformation of digitizers
+        //from Abstract3DMeshTree and the child Renderable3DEntity
+        QEntity* pSourceSphereEntity = new QEntity(this);
         //create geometry
         QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
         pSourceSphereGeometry->setRadius(0.001f);
