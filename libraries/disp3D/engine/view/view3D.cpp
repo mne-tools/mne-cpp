@@ -235,7 +235,7 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 void View3D::startModelRotationRecursive(QObject* pObject)
 {
     //TODO this won't work with QEntities
-    if(Abstract3DTreeItem* pItem = dynamic_cast<Abstract3DTreeItem*>(pObject)) {
+    if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
         QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
         anim->setDuration(30000);
         anim->setStartValue(QVariant::fromValue(pItem->rotZ()));

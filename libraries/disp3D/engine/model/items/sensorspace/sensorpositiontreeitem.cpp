@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lroenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -109,8 +109,7 @@ void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, 
 
 void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
 {
-    //Create digitizers
-    Renderable3DEntity* pSensorEntity = new Renderable3DEntity(this);
+    //Create digitizer
 
     GeometryMultiplier *pMesh;
 
@@ -178,7 +177,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         pMesh->setTransforms(vTransforms);
     }
 
-    pSensorEntity->addComponent(pMesh);
+    this->addComponent(pMesh);
 
     //Add material
     GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
@@ -186,7 +185,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
     QColor colDefault(100,100,100);
     pMaterial->setAmbient(colDefault);
     pMaterial->setAlpha(1.0f);
-    pSensorEntity->addComponent(pMaterial);
+    this->addComponent(pMaterial);
 
 
     //Update colors in color item
