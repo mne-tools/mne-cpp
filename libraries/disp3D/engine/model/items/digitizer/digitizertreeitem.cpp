@@ -101,24 +101,18 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     //create instanced renderer if there is none
     if(!m_pSphereMesh && !tDigitizer.isEmpty())
     {
-        Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
-
         QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
         pSourceSphereGeometry->setRadius(tSphereRadius);
 
         m_pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
 
         //Set sphere positions
-        pSourceSphereEntity->addComponent(m_pSphereMesh);
-
-        //add transform
-        Qt3DCore::QTransform *pTransform = new Qt3DCore::QTransform;
-        pSourceSphereEntity->addComponent(pTransform);
+        this->addComponent(m_pSphereMesh);
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
         pMaterial->setAmbient(tSphereColor);
-        pSourceSphereEntity->addComponent(pMaterial);
+        this->addComponent(pMaterial);
     }
 
     //Set transforms
@@ -146,7 +140,6 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
     //Update alpha
     float alpha = 1.0;
-    this->setMaterialParameter(QVariant(alpha), "alpha");
 
     QList<QStandardItem*> items = m_pItemAppearanceOptions->findChildren(MetaTreeItemTypes::AlphaValue);
 
