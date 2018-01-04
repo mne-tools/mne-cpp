@@ -53,10 +53,6 @@
 #include <Qt3DRender/qparameter.h>
 #include <Qt3DRender/qrenderpass.h>
 #include <QFilterKey>
-#include <Qt3DRender/qdepthtest.h>
-#include <Qt3DRender/qblendequation.h>
-#include <Qt3DRender/qblendequationarguments.h>
-#include <Qt3DRender/qnodepthmask.h>
 #include <Qt3DRender/qgraphicsapifilter.h>
 
 #include <QUrl>
@@ -78,7 +74,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseAlpha, QNode *parent)
+PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseSortPolicy, QNode *parent)
 : QMaterial(parent)
 , m_pVertexEffect(new QEffect())
 , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
@@ -94,10 +90,7 @@ PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseAlpha, QNode *
 , m_pVertexES2RenderPass(new QRenderPass())
 , m_pVertexES2Shader(new QShaderProgram())
 , m_pFilterKey(new QFilterKey)
-, m_pNoDepthMask(new QNoDepthMask())
-, m_pBlendState(new QBlendEquationArguments())
-, m_pBlendEquation(new QBlendEquation())
-, m_bUseAlpha(bUseAlpha)
+, m_bUseSortPolicy(bUseSortPolicy)
 {
     this->init();
 }
@@ -141,28 +134,6 @@ void PerVertexPhongAlphaMaterial::init()
     m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
     m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
 
-    //If wanted setup transparency - TODO: Fix transparency problem and remove this
-    if(m_bUseAlpha) {
-        m_pBlendState->setSourceRgb(QBlendEquationArguments::SourceAlpha);
-        m_pBlendState->setDestinationRgb(QBlendEquationArguments::OneMinusSourceAlpha);
-        m_pBlendEquation->setBlendFunction(QBlendEquation::Add);
-
-        m_pVertexGL3RenderPass->addRenderState(m_pBlendEquation);
-        m_pVertexGL2RenderPass->addRenderState(m_pBlendEquation);
-        m_pVertexES2RenderPass->addRenderState(m_pBlendEquation);
-
-        m_pVertexGL3RenderPass->addRenderState(m_pNoDepthMask);
-        m_pVertexGL2RenderPass->addRenderState(m_pNoDepthMask);
-        m_pVertexES2RenderPass->addRenderState(m_pNoDepthMask);
-
-        m_pVertexGL3RenderPass->addRenderState(m_pBlendState);
-        m_pVertexGL2RenderPass->addRenderState(m_pBlendState);
-        m_pVertexES2RenderPass->addRenderState(m_pBlendState);
-    }
-
-    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
-    m_pFilterKey->setValue(QStringLiteral("forward"));
-
     m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
     m_pVertexGL2Technique->addFilterKey(m_pFilterKey);
     m_pVertexES2Technique->addFilterKey(m_pFilterKey);
@@ -181,6 +152,13 @@ void PerVertexPhongAlphaMaterial::init()
     m_pVertexEffect->addParameter(m_pAlphaParameter);
 
     this->setEffect(m_pVertexEffect);
+
+    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
+            this, &PerVertexPhongAlphaMaterial::onAlphaChanged);
+
+    //Init filter keys
+    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
+    onAlphaChanged(m_pAlphaParameter->value());
 }
 
 
@@ -199,3 +177,32 @@ void PerVertexPhongAlphaMaterial::setAlpha(float alpha)
     m_pAlphaParameter->setValue(alpha);
 }
 
+
+//*************************************************************************************************************
+
+void PerVertexPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
+{
+    if(fAlpha.canConvert<float>())
+    {
+        float tempAlpha = fAlpha.toFloat();
+
+        if(tempAlpha == 1.0f)
+        {
+            m_pFilterKey->setValue(QStringLiteral("forward"));
+        }
+        else if(tempAlpha < 1.0f)
+        {
+            if(m_bUseSortPolicy)
+            {
+                m_pFilterKey->setValue(QStringLiteral("forwardSorted"));
+            }
+            else
+            {
+                m_pFilterKey->setValue(QStringLiteral("forwardTransparent"));
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************

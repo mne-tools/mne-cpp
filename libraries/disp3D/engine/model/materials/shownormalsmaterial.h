@@ -73,9 +73,6 @@ namespace Qt3DRender {
     class QFilterKey;
     class QTechnique;
     class QRenderPass;
-    class QNoDepthMask;
-    class QBlendEquationArguments;
-    class QBlendEquation;
     class QGraphicsApiFilter;
 }
 
@@ -134,10 +131,6 @@ private:
     QPointer<Qt3DRender::QTechnique>                m_pVertexGL3Technique;
     QPointer<Qt3DRender::QRenderPass>               m_pVertexGL3RenderPass;
     QPointer<Qt3DRender::QShaderProgram>            m_pVertexGL3Shader;
-
-    QPointer<Qt3DRender::QNoDepthMask>              m_pNoDepthMask;
-    QPointer<Qt3DRender::QBlendEquationArguments>   m_pBlendState;
-    QPointer<Qt3DRender::QBlendEquation>            m_pBlendEquation;
 };
 
 } // namespace DISP3DLIB

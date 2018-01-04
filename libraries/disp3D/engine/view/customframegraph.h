@@ -77,7 +77,16 @@ namespace Qt3DRender {
         class QFilterKey;
         class QMemoryBarrier;
         class QCamera;
+        class QSortPolicy;
+        class QRenderStateSet;
+        class QDepthTest;
+        class QNoDepthMask;
+        class QBlendEquationArguments;
+        class QBlendEquation;
+        class QCullFace;
 }
+
+class QSurfaceFormat;
 
 
 //*************************************************************************************************************
@@ -111,8 +120,11 @@ public:
     //=========================================================================================================
     /**
     * Constructs a CustomFrameGraph object.
+    *
+    * @param[in] tSurfaceFormat         Surface format for OpenGL version detection.
+    * @param[in] parent                 Pointer to parent node.
     */
-    explicit CustomFrameGraph(Qt3DCore::QNode *parent = 0);
+    explicit CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
@@ -156,27 +168,52 @@ private:
      */
     void init();
 
-    QPointer<Qt3DRender::QRenderSurfaceSelector> m_pSurfaceSelector;    /**< Frame graph node that declares the render surface. */
+    QPointer<Qt3DRender::QRenderSurfaceSelector>    m_pSurfaceSelector;     /**< Frame graph node that declares the render surface. */
 
-    QPointer<Qt3DRender::QClearBuffers> m_pClearBuffers;                /**< Frame graph node that clears buffers in the branch. */
+    QPointer<Qt3DRender::QClearBuffers>             m_pClearBuffers;        /**< Frame graph node that clears buffers in the branch. */
 
-    QPointer<Qt3DRender::QNoDraw> m_pNoDraw;                            /**< Frame graph node that prevents rendering in the branch. */
+    QPointer<Qt3DRender::QNoDraw>                   m_pNoDraw;              /**< Frame graph node that prevents rendering in the branch. */
 
-    QPointer<Qt3DRender::QDispatchCompute> m_pDispatchCompute;          /**< Frame graph node that issues work to the compute shader. */
+    QPointer<Qt3DRender::QDispatchCompute>          m_pDispatchCompute;     /**< Frame graph node that issues work to the compute shader. */
 
-    QPointer<Qt3DRender::QTechniqueFilter> m_pComputeFilter;            /**< Frame graph node selects the compute technique. */
+    QPointer<Qt3DRender::QTechniqueFilter>          m_pComputeFilter;       /**< Frame graph node selects the compute technique. */
 
-    QPointer<Qt3DRender::QCameraSelector> m_pCameraSelector;            /**< Frame graph node that selects the camera. */
+    QPointer<Qt3DRender::QCameraSelector>           m_pCameraSelector;      /**< Frame graph node that selects the camera. */
 
-    QPointer<Qt3DRender::QTechniqueFilter> m_pForwardFilter;            /**< Frame graph node that selects the forward rendering technique. */
+    QPointer<Qt3DRender::QMemoryBarrier>            m_pMemoryBarrier;       /**< Frame graph node that emplaces a memory barrier to synchronize computing and rendering. */
 
-    QPointer<Qt3DRender::QMemoryBarrier> m_pMemoryBarrier;              /**< Frame graph node that emplaces a memory barrier to synchronize computing and rendering. */
+    QPointer<Qt3DRender::QRenderStateSet>           m_pForwardState;        /**< Frame graph node that holds the depth test render state. */
 
-    QPointer<Qt3DRender::QFilterKey> m_pForwardKey;                     /**< Filter key for the compute filter. */
+    QPointer<Qt3DRender::QTechniqueFilter>          m_pForwardTranspFilter; /**< Frame graph node that selects the forward rendering technique for transparent objects. */
 
-    QPointer<Qt3DRender::QFilterKey> m_pComputeKey;                     /**< Filter key for the forward rendering filter. */
+    QPointer<Qt3DRender::QRenderStateSet>           m_pTransparentState;    /**< Frame graph node that holds the render states for transparency. */
+
+    QPointer<Qt3DRender::QTechniqueFilter>          m_pForwardFilter;       /**< Frame graph node that selects the forward rendering technique for opaque objects. */
+
+    QPointer<Qt3DRender::QTechniqueFilter>          m_pForwardSortedFilter; /**< Frame graph node that selects the forward sorted rendering technique. */
+
+    QPointer<Qt3DRender::QSortPolicy>               m_pSortPolicy;          /**< Frame graph node that defines the drawing order. */
+
+    QPointer<Qt3DRender::QFilterKey>                m_pForwardTranspKey;    /**< Filter key for the transparent forward filter. */
+
+    QPointer<Qt3DRender::QFilterKey>                m_pForwardKey;          /**< Filter key for the forward filter. */
+
+    QPointer<Qt3DRender::QFilterKey>                m_pForwardSortedKey;    /**< Filter key for the sorted forward filter. */
+
+    QPointer<Qt3DRender::QFilterKey>                m_pComputeKey;          /**< Filter key for the compute filter. */
+
+    QPointer<Qt3DRender::QDepthTest>                m_pDepthTest;           /**< Depth test render state. */
+
+    QPointer<Qt3DRender::QCullFace>                 m_pCullFace;            /**< Render state for face culling. */
+
+    QPointer<Qt3DRender::QBlendEquation>            m_pBlendEquation;       /**< Blend equation render state. */
+
+    QPointer<Qt3DRender::QBlendEquationArguments>   m_pBlendArguments;      /**< Blend equation arguments render state. */
+
+    QPointer<Qt3DRender::QNoDepthMask>              m_pNoDepthMask;         /**< Render state for disableling writing to depth buffer. */
+
+    bool                                            m_bUseOpenGl4_3;        /**< OpenGL version 4.3 status flag. */
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
