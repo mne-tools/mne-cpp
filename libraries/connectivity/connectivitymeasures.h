@@ -135,7 +135,7 @@ public:
         *
         * @return               The connectivity information in form of a network structure.
         */
-        static Network phaseLagIndex(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    static Network phaseLagIndex(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
@@ -169,7 +169,7 @@ protected:
         *
         * @return               The Pearson's correlation coefficient.
         */
-        static double calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+    static double calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 };
 
 

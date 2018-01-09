@@ -110,7 +110,10 @@ Network Connectivity::calculateConnectivity() const
         return ConnectivityMeasures::pearsonsCorrelationCoeff(matData, matNodePos);
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
         return ConnectivityMeasures::crossCorrelation(matData, matNodePos);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
+        return ConnectivityMeasures::phaseLagIndex(matData, matNodePos);
     }
+
 
     return Network();
 }
