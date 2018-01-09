@@ -342,16 +342,16 @@ double ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, cons
 
     //Main Phase Lag Index calculation
 
-    double ansvec;
+    double ansvec = 0;
     for (int i = 0; i < phasediff.cols(); i++) {
         //signum
-
-        if (phasediff[i] > 0) return  phasediff[i] = 1;
-        if (phasediff[i] = 0) return phasediff[i] = 0;
-        else return phasediff[i] = -1;
-
-        //sum
-        ansvec += (phasediff[i]);
+        if (phasediff[i] > 0) {
+            ansvec += 1.0;
+        } else if (phasediff[i] == 0) {
+            ansvec += 0.0;
+        } else {
+            ansvec += -1.0;
+        }
     }
 
     //average

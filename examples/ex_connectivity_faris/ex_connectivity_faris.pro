@@ -1,16 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     examples.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+# @file     ex_connectivity.pro
+# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2010
+# @date     July, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2010, Christoph Dinh, Lorenz Esch, Florian Schlembach and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -31,58 +29,57 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all examples of the mne-cpp project.
+# @brief    Builds an example on connectivity estimation
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    ex_cancel_noise \
-    ex_evoked_grad_amp \
-    ex_fiff_io \
-    ex_find_evoked \
-    ex_inverse_mne \
-    ex_make_inverse_operator \
-    ex_make_layout \
-    ex_read_bem \
-    ex_read_epochs \
-    ex_read_evoked \
-    ex_read_fwd \
-    ex_read_raw \
-    ex_read_write_raw
+VERSION = $${MNE_CPP_VERSION}
 
-!contains(MNECPP_CONFIG, minimalVersion) {
-    qtHaveModule(charts) {
-        SUBDIRS += \
-            ex_clustered_inverse_mne \
-            ex_clustered_inverse_mne_raw \
-            ex_clustered_inverse_pwl_rap_music_raw \
-            ex_clustered_inverse_rap_music_raw \
-            ex_connectivity \
-            ex_disp \
-            ex_disp_3D \
-            ex_fs_surface \
-            ex_histogram \
-            ex_inverse_mne_raw \
-            ex_inverse_pwl_rap_music \
-            ex_inverse_rap_music \
-            ex_read_fwd_disp_3D \
-            ex_roi_clustered_inverse_pwl_rap_music \
-            ex_st_clustered_inverse_pwl_rap_music \
-            ex_interpolation \
-            ex_connectivity_faris \
+QT += widgets 3dextras
 
-        !isEmpty( CNTK_INCLUDE_DIR ) {
-            SUBDIRS += \
-                ex_deep \
-                ex_deep_eval \
-                ex_deep_model_viewer
-        }
-    }
-    else {
-        message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
-    }
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = ex_connectivity_faris
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+        main.cpp \
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
