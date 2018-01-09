@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
 
     //Do connectivity estimation and visualize results
     ConnectivitySettings settings(QApplication::arguments());
+    settings.m_sConnectivityMethod = "PLI";
 
     Connectivity tConnectivity(settings);
     Network tNetwork = tConnectivity.calculateConnectivity();
