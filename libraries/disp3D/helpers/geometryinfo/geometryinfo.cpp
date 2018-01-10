@@ -107,7 +107,8 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
     }
 
     // convention: first dimension in distance table is "from", second dimension "to"
-    QSharedPointer<MatrixXd> returnMat = QSharedPointer<MatrixXd>::create(matVertices.rows(), iCols);
+    //QSharedPointer<MatrixXd> returnMat = QSharedPointer<MatrixXd>::create(matVertices.rows(), iCols);
+    MatrixXd returnMat(matVertices.rows(), iCols);
 
     // distribute calculation on cores
     int iCores = QThread::idealThreadCount();
@@ -115,24 +116,36 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
         // assume that we have at least two available cores
         iCores = 2;
     }
+    iCores = 2;
 
     // start threads with their respective parts of the final subset
     qint32 iSubArraySize = ceil(vecVertSubset.size() / iCores);
     QVector<QFuture<void> > vecThreads(iCores - 1);
     qint32 iBegin = 0;
     qint32 iEnd = iSubArraySize;
-    for (int i = 0; i < vecThreads.size(); ++i) {
-        vecThreads[i] = QtConcurrent::run(std::bind(iterativeDijkstra,
-                                                    returnMat,
-                                                    std::cref(matVertices),
-                                                    std::cref(vecNeighborVertices),
-                                                    std::cref(vecVertSubset),
-                                                    iBegin,
-                                                    iEnd,
-                                                    dCancelDist));
-        iBegin += iSubArraySize;
-        iEnd += iSubArraySize;
-    }
+
+    iterativeDijkstra(returnMat,
+                                        matVertices,
+                                        vecNeighborVertices,
+                                        vecVertSubset,
+                                        iBegin,
+                                        iEnd,
+                                        dCancelDist);
+    iBegin += iSubArraySize;
+    iEnd += iSubArraySize;
+
+//    for (int i = 0; i < vecThreads.size(); ++i) {
+//        vecThreads[i] = QtConcurrent::run(std::bind(iterativeDijkstra,
+//                                                    returnMat,
+//                                                    std::cref(matVertices),
+//                                                    std::cref(vecNeighborVertices),
+//                                                    std::cref(vecVertSubset),
+//                                                    iBegin,
+//                                                    iEnd,
+//                                                    dCancelDist));
+//        iBegin += iSubArraySize;
+//        iEnd += iSubArraySize;
+//    }
 
     // use main thread to calculate last part of the final subset
     iterativeDijkstra(returnMat,
@@ -148,8 +161,8 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
         f.waitForFinished();
     }
 
-    MatrixXd rereferenceReturnMat = *returnMat;
-    return rereferenceReturnMat;
+    //MatrixXd rereferenceReturnMat = *returnMat;
+    return returnMat;
 }
 
 
@@ -256,7 +269,7 @@ QVector<qint32> GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
 
 //*************************************************************************************************************
 
-void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatrix,
+void GeometryInfo::iterativeDijkstra(MatrixXd &matOutputDistMatrix,
                                      const MatrixX3f &matVertices,
                                      const QVector<QVector<int> > &vecNeighborVertices,
                                      const QVector<qint32> &vecVertSubset,
@@ -313,7 +326,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
 
         // save results for current root in matrix
         for (qint32 m = 0; m < vecMinDists.size(); ++m) {
-            (*matOutputDistMatrix)(m , i) = vecMinDists[m];
+            matOutputDistMatrix(m , i) = vecMinDists[m];
         }
     }
 }

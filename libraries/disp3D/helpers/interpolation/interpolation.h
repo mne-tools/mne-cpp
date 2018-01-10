@@ -121,7 +121,7 @@ public:
     *    -# if not: the values are calculated to give a total of 1 (a lot of values will stay 0, because they are too far away to influence) by using the above mentioned formula
     *
     * @param[in] vecProjectedSensors           Vector of IDs of sensor vertices
-    * @param[in] matDistanceTable              atrix that contains all needed distances
+    * @param[in] matDistanceTable              Matrix that contains all needed distances
     * @param[in] interpolationFunction         Function that computes interpolation coefficients using the distance values
     * @param[in] dCancelDist                   Distances higher than this are ignored, i.e. the respective coefficients are set to zero
     * @param[in] vecExcludeIndex               The indices to be excluded from vecProjectedSensors, e.g., bad channels (empty by default)

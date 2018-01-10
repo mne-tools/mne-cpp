@@ -152,9 +152,9 @@ protected:
     *
     * @return The final colors per vertex (RGB).
     */
-    MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
-                                       const QColor& colSulci = QColor(50,50,50),
-                                       const QColor& colGyri = QColor(125,125,125)) const;
+    Eigen::MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
+                                              const QColor& colSulci = QColor(50,50,50),
+                                              const QColor& colGyri = QColor(125,125,125)) const;
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
 

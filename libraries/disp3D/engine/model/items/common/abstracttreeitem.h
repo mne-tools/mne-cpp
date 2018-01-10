@@ -109,7 +109,7 @@ public :
 
     //=========================================================================================================
     /**
-    * Adds an item with its toolTip as second coulm item as description to the model.
+    * Adds an item with its toolTip as second column item as description to the model.
     *
     * @param[in] pItemParent         The parent item.
     * @param[in] pItemAdd            The item which is added as a row to the parent item.

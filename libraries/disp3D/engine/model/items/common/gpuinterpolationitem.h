@@ -151,7 +151,7 @@ public:
     *
     * @param[in] tSignalVec              Vector with one float value for each sensor.
     */
-    virtual void addNewRtData(const VectorXf &tSignalVec);
+    virtual void addNewRtData(const Eigen::VectorXf &tSignalVec);
 
     //=========================================================================================================
     /**
@@ -178,7 +178,7 @@ protected:
     *
     * @return                          Interpolation matrix is byte array form.
     */
-    virtual QByteArray buildInterpolationMatrixBuffer(Eigen::SparseMatrix<float> matInterpolationMatrix);
+    virtual QByteArray buildInterpolationMatrixBuffer(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
 
     //=========================================================================================================
     /**

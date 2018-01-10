@@ -146,7 +146,7 @@ public:
     *
     * @param[in] tSensorData                The matrix that holds rt measurement data.
     */
-    virtual void addData(const MatrixXd& tSensorData);
+    virtual void addData(const Eigen::MatrixXd& tSensorData);
 
     //=========================================================================================================
     /**      
@@ -259,7 +259,7 @@ protected:
     *
     * @param[in] vecDataVector         The streamed raw data.
     */
-    void virtual onNewRtRawDataAvailable(const VectorXd &vecDataVector);
+    void virtual onNewRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
 
     //=========================================================================================================
     /**
@@ -267,7 +267,7 @@ protected:
     *
     * @param[in] sourceColorSamples         The color values for the streamed data.
     */
-    virtual void onNewRtSmoothedDataAvailable(const MatrixX3f &matColorMatrix);
+    virtual void onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
 
     //=========================================================================================================
     /**

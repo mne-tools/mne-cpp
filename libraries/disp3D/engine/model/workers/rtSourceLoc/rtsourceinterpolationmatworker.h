@@ -194,16 +194,16 @@ protected:
         QVector<qint32>             vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
         QVector<QVector<int> >      vecNeighborVertices;            /**< The neighbor vertex information. */
 
-        double (*interpolationFunction) (double);                                       /**< Function that computes interpolation coefficients using the distance values. */
-    }       m_lInterpolationData;           /**< Container for the interpolation data. */
+        double (*interpolationFunction) (double);                   /**< Function that computes interpolation coefficients using the distance values. */
+    }                           m_lInterpolationData;               /**< Container for the interpolation data. */
 
-    bool                        m_bInterpolationInfoIsInit;     /**< Flag if this thread's interpoaltion data was initialized. */
-    bool                        m_bAnnotationInfoIsInit;        /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                        m_bInterpolationInfoIsInit;         /**< Flag if this thread's interpoaltion data was initialized. */
+    bool                        m_bAnnotationInfoIsInit;            /**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    int                         m_iVisualizationType;           /**< The visualization type (smoothing or annotation based). */
+    int                         m_iVisualizationType;               /**< The visualization type (smoothing or annotation based). */
 
-    Eigen::SparseMatrix<float>  m_matInterpolationMat;          /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
-    Eigen::SparseMatrix<float>  m_matAnnotationMat;             /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
+    Eigen::SparseMatrix<float>  m_matInterpolationMat;              /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
+    Eigen::SparseMatrix<float>  m_matAnnotationMat;                 /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
 
 signals:
     //=========================================================================================================

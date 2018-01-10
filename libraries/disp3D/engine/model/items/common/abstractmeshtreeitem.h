@@ -146,14 +146,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates a QByteArray of colors for given color for the input vertices.
+    * Creates colors for given color for a number of input vertices.
     *
     * @param[in] numVert        The number of vertices.
     * @param[in] color          The vertex color information.
     *
     * @return The colors per vertex
     */
-    static MatrixX3f createVertColor(int numVert, const QColor& color = QColor(100,100,100));
+    static Eigen::MatrixX3f createVertColor(int numVert, const QColor& color = QColor(100,100,100));
 
 protected:
     //=========================================================================================================

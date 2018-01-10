@@ -234,10 +234,10 @@ protected:
 
     //=========================================================================================================
     /**
-    * @brief generateColorsFromSensorValues        Produces the final color matrix that is to be emitted
+    * @brief generateColorsFromSensorValues     Produces the final color matrix that is to be emitted
     *
-    * @param[in] vecSensorValues                   A vector of sensor signals
-    * @param[in/out] visualizationInfoHemi             The needed visualization info
+    * @param[in] vecSensorValues                A vector of sensor signals
+    * @param[in/out] visualizationInfoHemi      The needed visualization info
     *
     * @return The final color values for the underlying mesh surface
     */
