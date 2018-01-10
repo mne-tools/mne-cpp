@@ -365,7 +365,7 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the state to whether stream smoothed/interpolated or raw data changed.
+    * Emit this signal whenever the fiff info changed.
     *
     * @param[in] info                 The fiff info including the new bad channels.
     */

@@ -266,8 +266,7 @@ MatrixX3f RtSourceDataWorker::generateColorsFromSensorValues(const VectorXd &vec
 {
     if(vecSensorValues.rows() != visualizationInfoHemi.matInterpolationMatrix.cols()) {
         qDebug() << "RtSourceDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << visualizationInfoHemi.matInterpolationMatrix.cols() << "). Returning...";
-        MatrixX3f matColor = visualizationInfoHemi.matOriginalVertColor;
-        return matColor;
+        return visualizationInfoHemi.matOriginalVertColor;
     }
 
     // interpolate sensor signals

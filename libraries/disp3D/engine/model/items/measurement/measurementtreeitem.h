@@ -184,7 +184,7 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
     */
-    SensorDataTreeItem *addData(const MatrixXd& tSensorData,
+    SensorDataTreeItem *addData(const Eigen::MatrixXd& tSensorData,
                                 const MNELIB::MNEBemSurface &bemSurface,
                                 const FIFFLIB::FiffInfo &fiffInfo,
                                 const QString &sSensorType,

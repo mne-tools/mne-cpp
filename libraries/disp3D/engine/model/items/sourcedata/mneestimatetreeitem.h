@@ -139,7 +139,7 @@ public:
     * @param[in] tForwardSolution       The MNEForwardSolution.
     * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
     * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
-    * @param[in] p3DEntityParent    Pointer to the QEntity parent.
+    * @param[in] p3DEntityParent        Pointer to the QEntity parent.
     */
     void initData(const MNELIB::MNEForwardSolution& tForwardSolution,
                   const FSLIB::SurfaceSet& tSurfSet,

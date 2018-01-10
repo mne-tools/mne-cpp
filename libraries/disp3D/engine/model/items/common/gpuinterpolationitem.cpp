@@ -71,6 +71,7 @@
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
 using namespace Qt3DCore;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -174,6 +175,8 @@ void GpuInterpolationItem::setInterpolationMatrix(const Eigen::SparseMatrix<floa
         return;
     }
 
+    qDebug("GpuInterpolationItem::setInterpolationMatrix - buildInterpolationMatrixBuffer");
+
     //Init and set interpolation buffer
     QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(matInterpolationMatrix);
 
@@ -188,9 +191,10 @@ void GpuInterpolationItem::setInterpolationMatrix(const Eigen::SparseMatrix<floa
         m_pOutputColorBuffer->setData(buildZeroBuffer(4 * matInterpolationMatrix.rows()));
         this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), "OutputColor");
     } else {
-        m_pInterpolationMatBuffer->updateData(0, interpolationBufferData);
+        m_pInterpolationMatBuffer->setData(interpolationBufferData);
     }
 
+    qDebug("GpuInterpolationItem::setInterpolationMatrix - finished");
 }
 
 
@@ -206,8 +210,7 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 
     const uint iBufferSize = tSignalVec.rows();
 
-    QByteArray bufferData;
-    bufferData.resize(iBufferSize * (int)sizeof(float));
+    QByteArray bufferData (iBufferSize, '0');
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
     for(uint i = 0; i < iBufferSize; ++i)
@@ -255,26 +258,32 @@ void GpuInterpolationItem::setColormapType(const QString &tColormapType)
 
 //*************************************************************************************************************
 
-QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(SparseMatrix<float> matInterpolationMatrix)
+QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(const SparseMatrix<float> &matInterpolationMatrix)
 {
-    QByteArray bufferData;
-
     const uint iRows = matInterpolationMatrix.rows();
     const uint iCols = matInterpolationMatrix.cols();
 
-    //bufferData.resize(iRows * iCols * (int)sizeof(float));
-    bufferData = buildZeroBuffer(iRows * iCols);
+    qDebug() << "(int)sizeof(float)" << (int)sizeof(float);
+    qDebug() << "GpuInterpolationItem::buildInterpolationMatrixBuffer - iRows" << iRows ;
+    qDebug() << "GpuInterpolationItem::buildInterpolationMatrixBuffer - iCols" << iCols;
+    qDebug() << "GpuInterpolationItem::buildInterpolationMatrixBuffer - iRows * iCols " << iRows * iCols;
+    qDebug() << "GpuInterpolationItem::buildInterpolationMatrixBuffer - iRows * iCols * (int)sizeof(float) " << iRows * iCols * (int)sizeof(float);
 
+    QByteArray bufferData (iRows * iCols * (int)sizeof(float), '0');
+
+    // We do not need to use the buildZeroBuffer because we need to go through the non-zero entries again
+    qDebug() << "GpuInterpolationItem::buildInterpolationMatrixBuffer - Fill Byte Array";
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
-    //Iterate over non zero entries only and transform from col major to row major (shader works with row major)
-    for (int k=0; k<matInterpolationMatrix.outerSize(); ++k) {
-        for (SparseMatrix<float>::InnerIterator it(matInterpolationMatrix,k); it; ++it)
-        {
-            //rawVertexArray[(it.col()*iRows)+it.row()] = static_cast<float>(it.value()); //Col major as result
-            rawVertexArray[(it.row()*iCols)+it.col()] = static_cast<float>(it.value()); //Row major as result
+    unsigned int iCtr = 0;
+    for(uint i = 0; i < iRows; ++i) {
+        for(uint j = 0; j < iCols; ++j) {
+            rawVertexArray[iCtr] = static_cast<float>(matInterpolationMatrix.coeff(i, j));
+            iCtr++;
         }
     }
+
+    qDebug() << "GpuInterpolationItem::buildInterpolationMatrixBuffer - Finished";
 
     return bufferData;
 }
@@ -284,15 +293,18 @@ QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(SparseMatrix<flo
 
 QByteArray GpuInterpolationItem::buildZeroBuffer(const uint tSize)
 {
-    QByteArray bufferData;
-    bufferData.resize(tSize * (int)sizeof(float));
+    qDebug() << "GpuInterpolationItem::buildZeroBuffer 0 "<<tSize;
+    QByteArray bufferData (tSize * (int)sizeof(float), '0');
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
+
+    qDebug() << "GpuInterpolationItem::buildZeroBuffer 1 ";
 
     //Set default values
     for(uint i = 0; i < tSize; ++i)
     {
         rawVertexArray[i] = static_cast<float>(0.0);
     }
+    qDebug() << "GpuInterpolationItem::buildZeroBuffer 2 ";
 
     return bufferData;
 }

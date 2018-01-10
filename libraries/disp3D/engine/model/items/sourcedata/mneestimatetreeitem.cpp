@@ -214,7 +214,8 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                    const AnnotationSet& tAnnotSet,
                                    Qt3DCore::QEntity* p3DEntityParent)
 {   
-    if(tForwardSolution.src.size() < 2) {
+    if(tForwardSolution.src.size() < 2 || tAnnotSet.size() < 2 || tSurfSet.size() < 2) {
+        qDebug() << "MneEstimateTreeItem::initData - Two hemisphere were not found. Check input.";
         return;
     }
 
@@ -259,16 +260,13 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     QList<FSLIB::Label> qListLabelsLeft, qListLabelsRight;
     QList<RowVector4i> qListLabelRGBAs;
 
-
     VectorXi vecLabelIdsLeftHemi;
     VectorXi vecLabelIdsRightHemi;
 
-    if(tAnnotSet.size() <= 2) {
-        vecLabelIdsLeftHemi = tAnnotSet[0].getLabelIds();
-        vecLabelIdsRightHemi = tAnnotSet[1].getLabelIds();
-        tAnnotSet[0].toLabels(tSurfSet[0], qListLabelsLeft, qListLabelRGBAs);
-        tAnnotSet[1].toLabels(tSurfSet[1], qListLabelsRight, qListLabelRGBAs);
-    }
+    vecLabelIdsLeftHemi = tAnnotSet[0].getLabelIds();
+    vecLabelIdsRightHemi = tAnnotSet[1].getLabelIds();
+    tAnnotSet[0].toLabels(tSurfSet[0], qListLabelsLeft, qListLabelRGBAs);
+    tAnnotSet[1].toLabels(tSurfSet[1], qListLabelsRight, qListLabelRGBAs);
 
     //set rt data corresponding to the hemisphere
     if(!m_pRtSourceDataController) {
@@ -624,6 +622,7 @@ void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &m
 
 void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeftHemi)
 {
+    qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable";
     if(m_pInterpolationItemLeftGPU) {
         m_pInterpolationItemLeftGPU->setInterpolationMatrix(matInterpolationMatrixLeftHemi);
     }
@@ -634,6 +633,7 @@ void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(const Eigen::Spa
 
 void MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixRightHemi)
 {
+    qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable";
     if(m_pInterpolationItemRightGPU) {
         m_pInterpolationItemRightGPU->setInterpolationMatrix(matInterpolationMatrixRightHemi);
     }

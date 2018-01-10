@@ -109,9 +109,9 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
         m_matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                        m_lInterpolationData.matDistanceMatrix,
-                                                                                        m_lInterpolationData.interpolationFunction,
-                                                                                        m_lInterpolationData.dCancelDistance);
+                                                                      m_lInterpolationData.matDistanceMatrix,
+                                                                      m_lInterpolationData.interpolationFunction,
+                                                                      m_lInterpolationData.dCancelDistance);
 
         emit newInterpolationMatrixCalculated(m_matInterpolationMat);
     }
