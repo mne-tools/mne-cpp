@@ -344,7 +344,7 @@ double ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, cons
 
     double ansvec = 0;
     for (int i = 0; i < phasediff.cols(); i++) {
-        //signum
+        //signum and addition of all values
         if (phasediff[i] > 0) {
             ansvec += 1.0;
         } else if (phasediff[i] == 0) {
@@ -356,6 +356,9 @@ double ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, cons
 
     //average
     ansvec /= phasediff.cols();
+
+    //absolute value
+    ansvec = abs(ansvec);
 
     return ansvec;
 }
