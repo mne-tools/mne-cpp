@@ -86,9 +86,10 @@ using namespace Eigen;
 //=============================================================================================================
 
 GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
-: AbstractMeshTreeItem(p3DEntityParent, iType, text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 , m_bIsDataInit(false)
 , m_pGPUMaterial(new GpuInterpolationMaterial())
+, m_pCustomMesh(new CustomMesh)
 , m_pInterpolationMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
 , m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
 , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
@@ -131,7 +132,9 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
     m_pCustomMesh->addAttribute(pInterpolatedSignalAttrib);
 
     //Create material, init and connect all necessary buffers
-    this->setMaterial(m_pGPUMaterial);
+    this->addComponent(m_pGPUMaterial);
+    this->addComponent(m_pCustomMesh);
+
 
     m_pInterpolationMatBuffer->setData(buildZeroBuffer(1));
     this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), QStringLiteral("InterpolationMat"));
