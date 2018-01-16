@@ -115,10 +115,8 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
 void RtSourceDataWorker::setNumberVertices(int iNumberVertsLeft,
                                            int iNumberVertsRight)
 {
-    m_lVisualizationInfoLeft.matOriginalVertColor.resize(iNumberVertsLeft,3);
-    m_lVisualizationInfoLeft.matOriginalVertColor.setZero();
-    m_lVisualizationInfoRight.matOriginalVertColor.resize(iNumberVertsRight,3);
-    m_lVisualizationInfoRight.matOriginalVertColor.setZero();
+    m_lVisualizationInfoLeft.matOriginalVertColor.setZero(iNumberVertsLeft,3);
+    m_lVisualizationInfoRight.matOriginalVertColor.setZero(iNumberVertsRight,3);
 }
 
 
@@ -143,16 +141,16 @@ void RtSourceDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 void RtSourceDataWorker::setColormapType(const QString& sColormapType)
 {
     //Create function handler to corresponding color map function
-    if(sColormapType == "Hot Negative 1") {
+    if(sColormapType == QStringLiteral("Hot Negative 1")) {
         m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHotNegative1;
         m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHotNegative1;
-    } else if(sColormapType == "Hot") {
+    } else if(sColormapType == QStringLiteral("Hot")) {
         m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHot;
         m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHot;
-    } else if(sColormapType == "Hot Negative 2") {
+    } else if(sColormapType == QStringLiteral("Hot Negative 2")) {
         m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHotNegative2;
         m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHotNegative2;
-    } else if(sColormapType == "Jet") {
+    } else if(sColormapType == QStringLiteral("Jet")) {
         m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToJet;
         m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToJet;
     }
