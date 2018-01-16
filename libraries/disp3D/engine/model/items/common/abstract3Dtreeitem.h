@@ -149,6 +149,17 @@ public :
     */
     Abstract3DTreeItem &operator<<(Abstract3DTreeItem& newItem);
 
+    //=========================================================================================================
+    /**
+    * Creates colors for given color for a number of input vertices.
+    *
+    * @param[in] numVert        The number of vertices.
+    * @param[in] color          The vertex color information.
+    *
+    * @return The colors per vertex
+    */
+    static Eigen::MatrixX3f createVertColor(int numVert, const QColor& color = QColor(100,100,100));
+
 protected:
     //=========================================================================================================
     /**

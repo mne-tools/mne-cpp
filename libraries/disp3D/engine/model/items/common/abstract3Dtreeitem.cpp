@@ -260,6 +260,22 @@ Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem& newItem)
 
 //*************************************************************************************************************
 
+Eigen::MatrixX3f Abstract3DTreeItem::createVertColor(int numVert, const QColor& color)
+{
+    Eigen::MatrixX3f matColor(numVert,3);
+
+    for(int i = 0; i < numVert; ++i) {
+        matColor(i,0) = color.redF();
+        matColor(i,1) = color.greenF();
+        matColor(i,2) = color.blueF();
+    }
+
+    return matColor;
+}
+
+
+//*************************************************************************************************************
+
 void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i<this->rowCount(); i++) {
