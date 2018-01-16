@@ -238,8 +238,8 @@ public:
     * @param[in] data             The value to be set.
     * @param[in] sParameterName   The parameters name.
     */
-    virtual void setMaterialParameter(QVariant data,
-                                      QString sParameterName);
+    virtual void setMaterialParameter(const QVariant &data,
+                                      const QString &sParameterName);
 
     //=========================================================================================================
     /**
@@ -249,7 +249,7 @@ public:
     *
     * @return   The data of the parameter.
     */
-    virtual QVariant getMaterialParameter(QString sParameterName);
+    virtual QVariant getMaterialParameter(const QString &sParameterName);
 
 protected: 
     //=========================================================================================================
@@ -261,8 +261,8 @@ protected:
     * @param[in] sParameterName     The parameters name.
     */
     virtual void setMaterialParameterRecursive(QObject * pObject,
-                                               QVariant data,
-                                               QString sParameterName);
+                                               const QVariant &data,
+                                               const QString &sParameterName);
 
     //=========================================================================================================
     /**
@@ -274,7 +274,7 @@ protected:
     * @return   The data of the parameter.
     */
     virtual QPair<bool, QVariant> getMaterialParameterRecursive(QObject * pObject,
-                                                                QString sParameterName);
+                                                                const QString &sParameterName);
 
     //=========================================================================================================
     /**
