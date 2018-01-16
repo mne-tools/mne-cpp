@@ -86,9 +86,10 @@ using namespace Eigen;
 //=============================================================================================================
 
 GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
-: AbstractMeshTreeItem(p3DEntityParent, iType, text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 , m_bIsDataInit(false)
 , m_pGPUMaterial(new GpuInterpolationMaterial())
+, m_pCustomMesh(new CustomMesh)
 , m_pInterpolationMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
 , m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
 , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
@@ -131,14 +132,16 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
     m_pCustomMesh->addAttribute(pInterpolatedSignalAttrib);
 
     //Create material, init and connect all necessary buffers
-    this->setMaterial(m_pGPUMaterial);
+    this->addComponent(m_pGPUMaterial);
+    this->addComponent(m_pCustomMesh);
+
 
     m_pInterpolationMatBuffer->setData(buildZeroBuffer(1));
-    this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), "InterpolationMat");
+    this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), QStringLiteral("InterpolationMat"));
     m_pOutputColorBuffer->setData(buildZeroBuffer(4));
-    this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), "OutputColor");
+    this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), QStringLiteral("OutputColor"));
     m_pSignalDataBuffer->setData(buildZeroBuffer(1));
-    this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), "InputVec");
+    this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), QStringLiteral("InputVec"));
 
     //Create and add compute shader
     QPointer<Qt3DRender::QComputeCommand> pComputeCommand = new QComputeCommand();
@@ -182,14 +185,14 @@ void GpuInterpolationItem::setInterpolationMatrix(const Eigen::SparseMatrix<floa
 
     if(m_pInterpolationMatBuffer->data().size() != interpolationBufferData.size()) {
         //Set Rows and Cols
-        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.cols()), "cols");
-        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.rows()), "rows");
+        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.cols()), QStringLiteral("cols"));
+        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.rows()), QStringLiteral("rows"));
 
         m_pInterpolationMatBuffer->setData(interpolationBufferData);
-        this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), "InterpolationMat");
+        this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), QStringLiteral("InterpolationMat"));
 
         m_pOutputColorBuffer->setData(buildZeroBuffer(4 * matInterpolationMatrix.rows()));
-        this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), "OutputColor");
+        this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), QStringLiteral("OutputColor"));
     } else {
         m_pInterpolationMatBuffer->setData(interpolationBufferData);
     }
@@ -208,12 +211,12 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
         return;
     }
 
-    const uint iBufferSize = tSignalVec.rows();
+    const uint iSignalSize = tSignalVec.rows();
 
-    QByteArray bufferData (iBufferSize, '0');
+    QByteArray bufferData (iSignalSize * (int)sizeof(float), '0');
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
-    for(uint i = 0; i < iBufferSize; ++i)
+    for(uint i = 0; i < iSignalSize; ++i)
     {
         rawVertexArray[i] = static_cast<float>(tSignalVec[i]);
     }
@@ -221,7 +224,7 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
     //Init and set signal data buffer
     if(m_pSignalDataBuffer->data().size() != bufferData.size()) {
         m_pSignalDataBuffer->setData(bufferData);
-        this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), "InputVec");
+        this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), QStringLiteral("InputVec"));
     } else {
         m_pSignalDataBuffer->updateData(0, bufferData);
     }
@@ -232,8 +235,8 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 
 void GpuInterpolationItem::setThresholds(const QVector3D &tVecThresholds)
 {   
-    this->setMaterialParameter(QVariant::fromValue(tVecThresholds.x()), "fThresholdX");
-    this->setMaterialParameter(QVariant::fromValue(tVecThresholds.z()), "fThresholdZ");
+    this->setMaterialParameter(QVariant::fromValue(tVecThresholds.x()), QStringLiteral("fThresholdX"));
+    this->setMaterialParameter(QVariant::fromValue(tVecThresholds.z()), QStringLiteral("fThresholdZ"));
 }
 
 
@@ -241,18 +244,18 @@ void GpuInterpolationItem::setThresholds(const QVector3D &tVecThresholds)
 
 void GpuInterpolationItem::setColormapType(const QString &tColormapType)
 {
-    int colorMapId = 0;
-    if(tColormapType == "Hot") {
+    uint colorMapId = 0;
+    if(tColormapType == QStringLiteral("Hot")) {
         colorMapId = 0;
-    } else if(tColormapType == "Hot Negative 1") {
+    } else if(tColormapType == QStringLiteral("Hot Negative 1")) {
         colorMapId = 1;
-    } else if(tColormapType == "Hot Negative 2") {
+    } else if(tColormapType == QStringLiteral("Hot Negative 2")) {
         colorMapId = 2;
-    } else if(tColormapType == "Jet") {
+    } else if(tColormapType == QStringLiteral("Jet")) {
         colorMapId = 3;
     }
 
-    this->setMaterialParameter(QVariant::fromValue(colorMapId), "ColormapType");
+    this->setMaterialParameter(QVariant::fromValue(colorMapId), QStringLiteral("ColormapType"));
 }
 
 
@@ -302,7 +305,7 @@ QByteArray GpuInterpolationItem::buildZeroBuffer(const uint tSize)
     //Set default values
     for(uint i = 0; i < tSize; ++i)
     {
-        rawVertexArray[i] = static_cast<float>(0.0);
+        rawVertexArray[i] = 0.0f;
     }
     qDebug() << "GpuInterpolationItem::buildZeroBuffer 2 ";
 

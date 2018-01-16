@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
-#include "../common/abstractmeshtreeitem.h"
+#include "../common/abstract3Dtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -99,7 +99,7 @@ class GpuInterpolationMaterial;
 * @brief This item is used for signal interpolation with GPU support.
 */
 
-class DISP3DSHARED_EXPORT GpuInterpolationItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT GpuInterpolationItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
@@ -193,6 +193,8 @@ protected:
     bool                                    m_bIsDataInit;                  /**< The data initialization flag. */
 
     QPointer<GpuInterpolationMaterial>      m_pGPUMaterial;                 /**< Compute material used for the process. */
+
+    QPointer<CustomMesh>                    m_pCustomMesh;                  /**< The actual mesh information (vertices, normals, colors). */
 
     QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
     QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;           /**< The QBuffer/GLBuffer holding the output color (interpolated) data. */

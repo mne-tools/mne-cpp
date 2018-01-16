@@ -93,16 +93,16 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
         return;
     }
 
-    if(sInterpolationFunction == "Linear") {
+    if(sInterpolationFunction == QStringLiteral("Linear")) {
         m_lInterpolationData.interpolationFunction = Interpolation::linear;
     }
-    else if(sInterpolationFunction == "Square") {
+    else if(sInterpolationFunction == QStringLiteral("Square")) {
         m_lInterpolationData.interpolationFunction = Interpolation::square;
     }
-    else if(sInterpolationFunction == "Cubic") {
+    else if(sInterpolationFunction == QStringLiteral("Cubic")) {
         m_lInterpolationData.interpolationFunction = Interpolation::cubic;
     }
-    else if(sInterpolationFunction == "Gaussian") {
+    else if(sInterpolationFunction == QStringLiteral("Gaussian")) {
         m_lInterpolationData.interpolationFunction = Interpolation::gaussian;
     }
 

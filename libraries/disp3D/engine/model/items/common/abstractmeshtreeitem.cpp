@@ -102,22 +102,6 @@ void AbstractMeshTreeItem::setVertColor(const QVariant& vertColor)
 
 //*************************************************************************************************************
 
-MatrixX3f AbstractMeshTreeItem::createVertColor(int numVert, const QColor& color)
-{
-    MatrixX3f matColor(numVert,3);
-
-    for(int i = 0; i < numVert; ++i) {
-        matColor(i,0) = color.redF();
-        matColor(i,1) = color.greenF();
-        matColor(i,2) = color.blueF();
-    }
-
-    return matColor;
-}
-
-
-//*************************************************************************************************************
-
 void AbstractMeshTreeItem::initItem()
 {
     this->setEditable(false);

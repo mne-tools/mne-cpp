@@ -275,8 +275,8 @@ void Renderable3DEntity::setScale(float scale)
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setMaterialParameter(QVariant data,
-                                              QString sParameterName)
+void Renderable3DEntity::setMaterialParameter(const QVariant &data,
+                                              const QString &sParameterName)
 {
     setMaterialParameterRecursive(this, data, sParameterName);
 }
@@ -284,7 +284,7 @@ void Renderable3DEntity::setMaterialParameter(QVariant data,
 
 //*************************************************************************************************************
 
-QVariant Renderable3DEntity::getMaterialParameter(QString sParameterName)
+QVariant Renderable3DEntity::getMaterialParameter(const QString &sParameterName)
 {
     QPair<bool, QVariant> resultPair = getMaterialParameterRecursive(this, sParameterName);
 
@@ -295,8 +295,8 @@ QVariant Renderable3DEntity::getMaterialParameter(QString sParameterName)
 //*************************************************************************************************************
 
 void Renderable3DEntity::setMaterialParameterRecursive(QObject * pObject,
-                                                       QVariant data,
-                                                       QString sParameterName)
+                                                       const QVariant &data,
+                                                       const QString &sParameterName)
 {
     if(QParameter* pParameter = dynamic_cast<QParameter*>(pObject)) {
         if(pParameter->name() == sParameterName) {
@@ -313,7 +313,7 @@ void Renderable3DEntity::setMaterialParameterRecursive(QObject * pObject,
 //*************************************************************************************************************
 
 QPair<bool, QVariant> Renderable3DEntity::getMaterialParameterRecursive(QObject * pObject,
-                                                           QString sParameterName)
+                                                           const QString &sParameterName)
 {
     if(QParameter* pParameter = dynamic_cast<QParameter*>(pObject)) {
         if(pParameter->name() == sParameterName) {
