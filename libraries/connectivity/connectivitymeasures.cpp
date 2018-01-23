@@ -280,7 +280,7 @@ Network ConnectivityMeasures::phaseLagIndex(const MatrixXd& matData, const Matri
 
 double ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
 {
-    //making Hilbert function (still need verification)
+    //Hilbert function
 
     Eigen::FFT<double> fft;
 
@@ -330,13 +330,14 @@ double ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, cons
 
     phase =  (invfreq.cwiseQuotient(pLagInputVecFirst));
     phase2 = (invfreq2.cwiseQuotient(pLagInputVecSecond));
-    phasediff = phase - phase2;
 
-    /*RowVectorXd phaset;
-    RowVectorXd phaset2;
-    phaset = atan (phase);
-    phaset2 = atan (phase2);
-    phasediff = phaset - phaset2;*/
+    for(int i = 0; i<phase.cols(); ++i) {
+        phase[i] = atan(phase[i]);
+    }
+    for(int i = 0; i<phase2.cols(); ++i) {
+        phase2[i] = atan(phase2[i]);
+    }
+    phasediff = phase - phase2;
 
     //std::cout << phasediff << std::endl;
 
