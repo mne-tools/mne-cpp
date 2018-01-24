@@ -129,7 +129,7 @@ protected:
     /**
     * Generate the sensor level data based on the current settings.
     *
-    * @param [out] epochDataList    The sensor level as epocs.
+    * @param [out] epochDataList    The sensor level data in form of epochs.
     * @param [out] matNodePos       The nodes position in 3D space.
     */
     void generateSensorLevelData(MNELIB::MNEEpochDataList& epochDataList, Eigen::MatrixX3f& matNodePos) const;

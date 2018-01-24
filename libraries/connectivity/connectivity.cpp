@@ -99,20 +99,19 @@ Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
 
 Network Connectivity::calculateConnectivity() const
 {
-    MatrixXd matData;
     MNEEpochDataList epochDataList;
     MatrixX3f matNodePos;
 
     if(m_pConnectivitySettings->m_bDoSourceLoc) {
-        generateSourceLevelData(matData, matNodePos);
+        //generateSourceLevelData(matData, matNodePos);
     } else {
         generateSensorLevelData(epochDataList, matNodePos);
     }
 
     if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
-        return ConnectivityMeasures::pearsonsCorrelationCoeff(matData, matNodePos);
+        return ConnectivityMeasures::pearsonsCorrelationCoeff(epochDataList, matNodePos);
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
-        return ConnectivityMeasures::crossCorrelation(matData, matNodePos);
+        return ConnectivityMeasures::crossCorrelation(epochDataList, matNodePos);
     }
 
     return Network();
@@ -128,14 +127,13 @@ void Connectivity::generateSensorLevelData(MNEEpochDataList& epochDataList, Matr
 
     // Load data
     QFile t_fileRaw(m_pConnectivitySettings->m_sRaw);
-
     qint32 event = m_pConnectivitySettings->m_iAveIdx;
-    QString t_sEventName = m_pConnectivitySettings->m_sAve;
+    QString t_sEventName = m_pConnectivitySettings->m_sEve;
     float tmin = m_pConnectivitySettings->m_dTMin;
     float tmax = m_pConnectivitySettings->m_dTMax;
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
-    bool pick_all = true;
+    bool pick_all = false;
     qint32 k, p;
 
     // Setup for reading the raw data
@@ -151,39 +149,19 @@ void Connectivity::generateSensorLevelData(MNEEpochDataList& epochDataList, Matr
         }
     } else {
         QStringList include;
-        include << "STI 014";
-        bool want_meg   = true;
-        bool want_eeg   = false;
-        bool want_stim  = false;
+        bool want_meg, want_eeg, want_stim;
 
-        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
-
-        // If meg was selected also seperate between gradiometeres and magnetometers
         if(m_pConnectivitySettings->m_sChType == "meg") {
-            RowVectorXi picksNew;
-            bool bPick = false;
-            qint32 unit = 0;
-
-            for(k = 0; k < picks.cols (); ++k) {
-                bPick = false;
-                unit = raw.info.chs.at(picks(k)).unit;
-
-                if(unit == FIFF_UNIT_T_M &&
-                    m_pConnectivitySettings->m_sCoilType == "grad") {
-                    bPick = true;
-                } else if (unit == FIFF_UNIT_T &&
-                    m_pConnectivitySettings->m_sCoilType == "mag") {
-                    bPick = true;
-                }
-
-                if(bPick) {
-                    picksNew.resize(picksNew.cols()+1);
-                    picksNew(picksNew.cols()-1) = picks(k);
-                }
-            }
-
-            picks = picksNew;
+            want_meg = true;
+            want_eeg = false;
+            want_stim = false;
+        } else if (m_pConnectivitySettings->m_sChType == "eeg") {
+            want_meg = false;
+            want_eeg = true;
+            want_stim = false;
         }
+
+        picks = raw.info.pick_types(m_pConnectivitySettings->m_sCoilType, want_eeg, want_stim, include, raw.info.bads);
     }
 
     QStringList pickedChNames;
@@ -321,7 +299,7 @@ void Connectivity::generateSensorLevelData(MNEEpochDataList& epochDataList, Matr
 
     for(int i = 0; i < raw.info.chs.size(); ++i) {
         if (pickedChNames.contains(raw.info.chs.at(i).ch_name)) {
-            //Get the 3D positions
+            // Get the 3D positions
             matNodePos.conservativeResize(matNodePos.rows()+1, 3);
             matNodePos(counter,0) = raw.info.chs.at(i).chpos.r0(0);
             matNodePos(counter,1) = raw.info.chs.at(i).chpos.r0(1);
