@@ -103,6 +103,10 @@ void ConnectivitySettings::parseArguments(const QStringList& arguments)
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis.fif");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.3");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.6");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -118,6 +122,10 @@ void ConnectivitySettings::parseArguments(const QStringList& arguments)
     parser.addOption(evokedIndexOption);
     parser.addOption(coilTypeOption);
     parser.addOption(chTypeOption);
+    parser.addOption(eventsFileOption);
+    parser.addOption(rawFileOption);
+    parser.addOption(tMinOption);
+    parser.addOption(tMaxOption);
 
     parser.process(arguments);
 
@@ -129,9 +137,13 @@ void ConnectivitySettings::parseArguments(const QStringList& arguments)
     m_sFwd = parser.value(fwdOption);
     m_sCov = parser.value(covFileOption);
     m_sSourceLocMethod = parser.value(sourceLocMethodOption);
-    m_sMeas = parser.value(evokedFileOption);
+    m_sAve = parser.value(evokedFileOption);
     m_sCoilType = parser.value(coilTypeOption);
     m_sChType = parser.value(chTypeOption);
+    m_sEve = parser.value(eventsFileOption);
+    m_sRaw = parser.value(rawFileOption);
+    m_dTMin = parser.value(tMinOption).toDouble();
+    m_dTMax = parser.value(tMaxOption).toDouble();
 
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
         m_bDoSourceLoc =false;

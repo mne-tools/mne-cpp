@@ -66,6 +66,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB {
+    class MNEEpochDataList;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -125,10 +129,10 @@ protected:
     /**
     * Generate the sensor level data based on the current settings.
     *
-    * @param [out] matData      The source level data.
-    * @param [out] matNodePos   The nodes position in 3D space.
+    * @param [out] epochDataList    The sensor level as epocs.
+    * @param [out] matNodePos       The nodes position in 3D space.
     */
-    void generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
+    void generateSensorLevelData(MNELIB::MNEEpochDataList& epochDataList, Eigen::MatrixX3f& matNodePos) const;
 
     QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
 };

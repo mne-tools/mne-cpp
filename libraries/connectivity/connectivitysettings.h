@@ -107,14 +107,18 @@ public:
     QString m_sFwd;                         /**< The path to the forward solution. */
     QString m_sCov;                         /**< The path to the covariance matrix. */
     QString m_sSourceLocMethod;             /**< The source localization method. */
-    QString m_sMeas;                        /**< The path to the averaged data. */
+    QString m_sAve;                         /**< The path to the averaged data. */
     QString m_sCoilType;                    /**< The coil type. Only used if channel type is set to meg. */
     QString m_sChType;                      /**< The channel type. */
+    QString m_sEve;                         /**< The path to the event file. */
+    QString m_sRaw;                         /**< The path to the raw file. */
 
     bool m_bDoSourceLoc;                    /**< Whether to perform source localization before the connectivity estimation. */
     bool m_bDoClust;                        /**< Whether to cluster the source space for source localization. */
 
     double m_dSnr;                          /**< The SNR value. */
+    double m_dTMin;                         /**< The tmin value for averaging.*/
+    double m_dTMax;                         /**< The tmax value for averaging.*/
     int m_iAveIdx;                          /**< The The average index to take from the input data. */
 
 protected:
