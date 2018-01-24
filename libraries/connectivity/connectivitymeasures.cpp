@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -196,6 +197,63 @@ Network ConnectivityMeasures::crossCorrelation(const MNEEpochDataList& epochData
 }
 
 
+//*******************************************************************************************************
+
+Network ConnectivityMeasures::phaseLagIndex(const MNEEpochDataList& epochDataList, const MatrixX3f& matVert)
+{
+    Network finalNetwork("Phase Lag Index");
+
+    if(epochDataList.empty()) {
+        qDebug() << "ConnectivityMeasures::phaseLagIndex - Input data is empty";
+        return finalNetwork;
+    }
+
+    //Create nodes
+    for(int i = 0; i < matVert.rows(); ++i) {
+        RowVectorXf rowVert = RowVectorXf::Zero(3);
+
+        if(matVert.rows() != 0 && i < matVert.rows()) {
+            rowVert(0) = matVert.row(i)(0);
+            rowVert(1) = matVert.row(i)(1);
+            rowVert(2) = matVert.row(i)(2);
+        }
+
+        finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
+    }
+
+    //Create edges
+    int rows = epochDataList.first()->epoch.rows();
+
+    MatrixXd matSignValues(rows,rows);
+    matSignValues.setZero();
+    MatrixXd matData;
+
+    for(int k = 0; k < epochDataList.size(); ++k) {
+        matData = epochDataList.at(k)->epoch;
+
+        for(int i = 0; i < rows; ++i) {
+            for(int j = i; j < rows; ++j) {
+                matSignValues(i,j) += calcPhaseLagIndex(matData.row(i), matData.row(j));
+            }
+        }
+    }
+
+    matSignValues /= epochDataList.size();
+    matSignValues.array().abs();
+
+    for(int i = 0; i < rows; ++i) {
+        for(int j = i; j < rows; ++j) {
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matSignValues(i,j)));
+
+            *finalNetwork.getNodeAt(i) << pEdge;
+            finalNetwork << pEdge;
+        }
+    }
+
+    return finalNetwork;
+}
+
+
 //*************************************************************************************************************
 
 double ConnectivityMeasures::calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond)
@@ -271,48 +329,13 @@ QPair<int,double> ConnectivityMeasures::calcCrossCorrelation(const RowVectorXd& 
     return QPair<int,double>(resultIndex, maxValue);
 }
 
-//*******************************************************************************************************
-
-Network ConnectivityMeasures::phaseLagIndex(const MatrixXd& matData, const MatrixX3f& matVert)
-{
-    Network finalNetwork("Phase Lag Index");
-
-    //Create nodes
-    for(int i = 0; i < matData.rows(); ++i) {
-        RowVectorXf rowVert = RowVectorXf::Zero(3);
-
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
-        }
-
-        finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
-    }
-
-    //Create edges
-    double phaseLag;
-
-    for(int i = 0; i < matData.rows(); ++i) {
-        for(int j = i; j < matData.rows(); ++j) {
-            phaseLag = calcPhaseLagIndex(matData.row(i), matData.row(j));
-
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], phaseLag));
-
-            *finalNetwork.getNodeAt(i) << pEdge;
-            finalNetwork << pEdge;
-        }
-    }
-
-    return finalNetwork;
-}
 
 //*************************************************************************************************************
 
-double ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
+int ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
 {
-    //Hilbert function
-
+    QElapsedTimer elapsedTimer;
+    elapsedTimer.start();
     Eigen::FFT<double> fft;
 
     int N = std::max(vecFirst.cols(), vecSecond.cols());
@@ -322,75 +345,116 @@ double ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, cons
     int fftsize = pow(2,b);
 
     //Zero Padd
-    RowVectorXd pLagInputVecFirst = RowVectorXd::Zero(fftsize);
-    pLagInputVecFirst.head(vecFirst.cols()) = vecFirst;
+    RowVectorXd xCorrInputVecFirst = RowVectorXd::Zero(fftsize);
+    xCorrInputVecFirst.head(vecFirst.cols()) = vecFirst;
 
-    RowVectorXd pLagInputVecSecond = RowVectorXd::Zero(fftsize);
-    pLagInputVecSecond.head(vecSecond.cols()) = vecSecond;
+    RowVectorXd xCorrInputVecSecond = RowVectorXd::Zero(fftsize);
+    xCorrInputVecSecond.head(vecSecond.cols()) = vecSecond;
 
     //FFT for freq domain to both vectors
     RowVectorXcd freqvec;
     RowVectorXcd freqvec2;
 
-    fft.fwd(freqvec, pLagInputVecFirst);
-    fft.fwd(freqvec2, pLagInputVecSecond);
+    fft.fwd(freqvec, xCorrInputVecFirst);
+    fft.fwd(freqvec2, xCorrInputVecSecond);
 
-    //removing the negative frequencies
+    //Create conjugate complex
+    freqvec2.conjugate();
 
+    //Main step of cross corr
+    freqvec = freqvec.array() * freqvec2.array();
+    qDebug() << "0 elapsedTimer.elapsed()" << elapsedTimer.elapsed();
 
-    RowVectorXcd freqpos;
-    RowVectorXcd freqpos2;
+    std::complex<double> cdCSD = freqvec.mean();
 
-    freqpos = freqvec ;
-    freqpos2 = freqvec2 ;
-
-    //inverse FFT of the results
-
-    RowVectorXd invfreq;
-    RowVectorXd invfreq2;
-
-    fft.inv(invfreq, freqpos);
-    fft.inv(invfreq2, freqpos2);
-
-    //Hilbert function end
-    //Phase calculation
-
-    RowVectorXd phase;
-    RowVectorXd phase2;
-    RowVectorXd phasediff;
-
-    phase =  (invfreq.cwiseQuotient(pLagInputVecFirst));
-    phase2 = (invfreq2.cwiseQuotient(pLagInputVecSecond));
-
-    for(int i = 0; i<phase.cols(); ++i) {
-        phase[i] = atan(phase[i]);
-    }
-    for(int i = 0; i<phase2.cols(); ++i) {
-        phase2[i] = atan(phase2[i]);
-    }
-    phasediff = phase - phase2;
-
-    //std::cout << phasediff << std::endl;
-
-    //Main Phase Lag Index calculation
-
-    double ansvec = 0;
-    for (int i = 0; i < phasediff.cols(); i++) {
+    int iSignResult = 0.0;
+    for (int i = 0; i < freqvec.cols(); i++) {
         //signum and addition of all values
-        if (phasediff[i] > 0) {
-            ansvec += 1.0;
-        } else if (phasediff[i] == 0) {
-            ansvec += 0.0;
+        if (cdCSD.imag() > 0.0) {
+            iSignResult = 1.0;
+        } else if (cdCSD.imag() == 0.0) {
+            iSignResult = 0.0;
         } else {
-            ansvec += -1.0;
+            iSignResult = -1.0;
         }
     }
 
-    //average
-    ansvec /= phasediff.cols();
+    qDebug() << "1 elapsedTimer.elapsed()" << elapsedTimer.elapsed();
+    return iSignResult;
 
-    //absolute value
-    ansvec = abs(ansvec);
 
-    return ansvec;
+
+
+//    //Hilbert function
+//    Eigen::FFT<double> fft;
+
+//    int N = std::max(vecFirst.cols(), vecSecond.cols());
+
+//    //Compute the FFT size as the "next power of 2" of the input vector's length (max)
+//    int b = ceil(log2(2.0 * N - 1));
+//    int fftsize = pow(2,b);
+
+//    //Zero Padd
+//    RowVectorXd pLagInputVecFirst = RowVectorXd::Zero(fftsize);
+//    pLagInputVecFirst.head(vecFirst.cols()) = vecFirst;
+
+//    RowVectorXd pLagInputVecSecond = RowVectorXd::Zero(fftsize);
+//    pLagInputVecSecond.head(vecSecond.cols()) = vecSecond;
+
+//    //FFT for freq domain to both vectors
+//    RowVectorXcd freqvec;
+//    RowVectorXcd freqvec2;
+
+//    fft.fwd(freqvec, pLagInputVecFirst);
+//    fft.fwd(freqvec2, pLagInputVecSecond);
+
+//    //removing the negative frequencies
+//    RowVectorXcd freqpos;
+//    RowVectorXcd freqpos2;
+
+//    freqpos = freqvec;
+//    freqpos2 = freqvec2;
+
+//    //inverse FFT of the results
+//    RowVectorXd invfreq;
+//    RowVectorXd invfreq2;
+
+//    fft.inv(invfreq, freqpos);
+//    fft.inv(invfreq2, freqpos2);
+
+//    //Hilbert function end
+//    //Phase calculation
+//    RowVectorXd phase;
+//    RowVectorXd phase2;
+//    RowVectorXd phasediff;
+
+//    phase =  (invfreq.cwiseQuotient(pLagInputVecFirst));
+//    phase2 = (invfreq2.cwiseQuotient(pLagInputVecSecond));
+
+//    for(int i = 0; i<phase.cols(); ++i) {
+//        phase[i] = atan(phase[i]);
+//    }
+
+//    for(int i = 0; i<phase2.cols(); ++i) {
+//        phase2[i] = atan(phase2[i]);
+//    }
+//    phasediff = phase - phase2;
+
+//    //std::cout << phasediff << std::endl;
+
+//    //Main Phase Lag Index calculation
+//    RowVectorXd signResult(phasediff.cols());
+
+//    for (int i = 0; i < phasediff.cols(); i++) {
+//        //signum and addition of all values
+//        if (phasediff[i] > 0) {
+//            signResult[i] = 1.0;
+//        } else if (phasediff[i] == 0) {
+//            signResult[i] = 0.0;
+//        } else {
+//            signResult[i] = -1.0;
+//        }
+//    }
+
+//    return signResult;
 }

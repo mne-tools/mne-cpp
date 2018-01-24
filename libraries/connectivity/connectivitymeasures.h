@@ -132,14 +132,14 @@ public:
 
     //=========================================================================================================
     /**
-        * Calculates the Phase Lag Index between the rows of the data matrix.
-        *
-        * @param[in] matData    The input data for whicht the phase lag index is to be calculated.
-        * @param[in] matVert    The vertices of each network node.
-        *
-        * @return               The connectivity information in form of a network structure.
-        */
-    static Network phaseLagIndex(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    * Calculates the Phase Lag Index between the rows of the data matrix.
+    *
+    * @param[in] epochDataList  The input data for whicht the phase lag index is to be calculated.
+    * @param[in] matVert        The vertices of each network node.
+    *
+    * @return                   The connectivity information in form of a network structure.
+    */
+    static Network phaseLagIndex(const MNELIB::MNEEpochDataList &epochDataList, const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
@@ -166,14 +166,14 @@ protected:
 
     //==========================================================================================================
     /**
-        * Calculates the actual Phase Lag Index between two data vectors.
-        *
-        * @param[in] vecFirst    The first input data row.
-        * @param[in] vecSecond   The second input data row.
-        *
-        * @return               The Pearson's correlation coefficient.
-        */
-    static double calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+    * Calculates the actual Phase Lag Index between two data vectors.
+    *
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
+    *
+    * @return                The PLI value.
+    */
+    static int calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 };
 
 
