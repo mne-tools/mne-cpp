@@ -113,7 +113,7 @@ Network Connectivity::calculateConnectivity() const
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
         return ConnectivityMeasures::crossCorrelation(epochDataList, matNodePos);
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
-        return ConnectivityMeasures::phaseLagIndex(matData, matNodePos);
+        return ConnectivityMeasures::phaseLagIndex(epochDataList, matNodePos);
     }
 
 
@@ -158,13 +158,15 @@ void Connectivity::generateSensorLevelData(MNEEpochDataList& epochDataList, Matr
             want_meg = true;
             want_eeg = false;
             want_stim = false;
+
+            picks = raw.info.pick_types(m_pConnectivitySettings->m_sCoilType, want_eeg, want_stim, include, raw.info.bads);
         } else if (m_pConnectivitySettings->m_sChType == "eeg") {
             want_meg = false;
             want_eeg = true;
             want_stim = false;
-        }
 
-        picks = raw.info.pick_types(m_pConnectivitySettings->m_sCoilType, want_eeg, want_stim, include, raw.info.bads);
+            picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+        }
     }
 
     QStringList pickedChNames;

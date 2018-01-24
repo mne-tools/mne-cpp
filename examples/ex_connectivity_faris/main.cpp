@@ -47,7 +47,10 @@
 #include <connectivity/connectivitymeasures.h>
 #include <connectivity/network/network.h>
 
-#include <fiff/fiff_evoked.h>
+#include <mne/mne_epoch_data_list.h>
+#include <mne/mne.h>
+
+#include <fiff/fiff_raw_data.h>
 
 
 //*************************************************************************************************************
@@ -80,6 +83,7 @@ using namespace INVERSELIB;
 using namespace Eigen;
 using namespace CONNECTIVITYLIB;
 using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -103,66 +107,202 @@ int main(int argc, char *argv[])
 
     //Do connectivity estimation and visualize results
     ConnectivitySettings settings(QApplication::arguments());
-    settings.m_sConnectivityMethod = "COR";
-    settings.m_sChType = "meg";
-    settings.m_sCoilType = "mag";
+    settings.m_sConnectivityMethod = "PLI";
+    settings.m_sChType = "eeg";
+    settings.m_sCoilType = "grad";
 
-    // Load the data
-    MatrixXd matData;
+
+    // Load data
+    MNEEpochDataList epochDataList;
     MatrixX3f matNodePos;
-    matData.resize(0,0);
-    matData.resize(0,0);
 
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    QFile t_fileEvoked(settings.m_sMeas);
-    FiffEvoked evoked(t_fileEvoked, settings.m_iAveIdx, baseline);
+    QFile t_fileRaw(settings.m_sRaw);
+    qint32 event = settings.m_iAveIdx;
+    QString t_sEventName = settings.m_sEve;
+    float tmin = settings.m_dTMin;
+    float tmax = settings.m_dTMax;
+    bool keep_comp = false;
+    fiff_int_t dest_comp = 0;
+    bool pick_all = false;
+    qint32 k, p;
 
-    bool bPick = false;
-    qint32 unit;
-    int counter = 0;
+    // Setup for reading the raw data
+    FiffRawData raw(t_fileRaw);
 
-    for(int i = 0; i < evoked.info.chs.size(); ++i) {
-        unit = evoked.info.chs.at(i).unit;
+    RowVectorXi picks;
+    if (pick_all) {
+        // Pick all
+        picks.resize(raw.info.nchan);
 
-        if(unit == FIFF_UNIT_T_M &&
-            settings.m_sChType == "meg" &&
-            settings.m_sCoilType == "grad") {
-            bPick = true;
-        } else if(unit == FIFF_UNIT_T &&
-                    settings.m_sChType == "meg" &&
-                    settings.m_sCoilType == "mag") {
-            bPick = true;
-        } else if (unit == FIFF_UNIT_V &&
-                    settings.m_sChType == "eeg") {
-            bPick = true;
+        for(k = 0; k < raw.info.nchan; ++k) {
+            picks(k) = k;
+        }
+    } else {
+        QStringList include;
+        bool want_meg, want_eeg, want_stim;
+
+        if(settings.m_sChType == "meg") {
+            want_meg = true;
+            want_eeg = false;
+            want_stim = false;
+        } else if (settings.m_sChType == "eeg") {
+            want_meg = false;
+            want_eeg = true;
+            want_stim = false;
         }
 
-        if(bPick) {
-            //Get the data
-            matData.conservativeResize(matData.rows()+1, evoked.data.cols());
-            matData.row(counter) = evoked.data.row(i);
+        picks = raw.info.pick_types(settings.m_sCoilType, want_eeg, want_stim, include, raw.info.bads);
+    }
 
-            //Get the positions
+    QStringList pickedChNames;
+    for(k = 0; k < picks.cols(); ++k) {
+        pickedChNames << raw.info.ch_names[picks(0,k)];
+    }
+
+    // Set up projection
+    if (raw.info.projs.size() == 0) {
+        printf("No projector specified for these data\n");
+    } else {
+        // Activate the projection items
+        for (k = 0; k < raw.info.projs.size(); ++k) {
+            raw.info.projs[k].active = true;
+        }
+
+        // Create the projector
+        fiff_int_t nproj = raw.info.make_projector(raw.proj);
+
+        if (nproj == 0) {
+            printf("The projection vectors do not apply to these channels\n");
+        } else {
+            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+        }
+    }
+
+    // Set up the CTF compensator
+    qint32 current_comp = raw.info.get_current_comp();
+    if(current_comp > 0) {
+        printf("Current compensation grade : %d\n",current_comp);
+    }
+
+    if(keep_comp) {
+        dest_comp = current_comp;
+    }
+
+    if (current_comp != dest_comp) {
+        qDebug() << "This part needs to be debugged";
+        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
+            raw.info.set_current_comp(dest_comp);
+            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+        } else {
+            printf("Could not make the compensator\n");
+        }
+    }
+
+    // Read the events
+    QFile t_EventFile;
+    MatrixXi events;
+
+    if (t_sEventName.size() == 0) {
+        p = t_fileRaw.fileName().indexOf(".fif");
+
+        if (p > 0) {
+            t_sEventName = t_fileRaw.fileName().replace(p, 4, "-eve.fif");
+        } else {
+            printf("Raw file name does not end properly\n");
+        }
+
+        t_EventFile.setFileName(t_sEventName);
+        MNE::read_events(t_EventFile, events);
+        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
+    } else {
+        // Binary file
+        p = t_fileRaw.fileName().indexOf(".fif");
+        if (p > 0)
+        {
+            t_EventFile.setFileName(t_sEventName);
+            if(!MNE::read_events(t_EventFile, events))
+            {
+                printf("Error while read events.\n");
+            }
+            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
+        } else {
+            // Text file
+            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
+        }
+    }
+
+    // Select the desired events
+    qint32 count = 0;
+    MatrixXi selected = MatrixXi::Zero(1, events.rows());
+    for (p = 0; p < events.rows(); ++p) {
+        if (events(p,1) == 0 && events(p,2) == event) {
+            selected(0,count) = p;
+            ++count;
+        }
+    }
+
+    selected.conservativeResize(1, count);
+    if (count > 0) {
+        printf("%d matching events found\n",count);
+    } else {
+        printf("No desired events found.\n");
+    }
+
+    fiff_int_t event_samp, from, to;
+    MatrixXd timesDummy;
+
+    MNEEpochData::SPtr pEpoch;
+    MatrixXd times;
+
+    for (p = 0; p < count; ++p) {
+        // Read a data segment
+        event_samp = events(selected(p),0);
+        from = event_samp + tmin*raw.info.sfreq;
+        to = event_samp + floor(tmax*raw.info.sfreq + 0.5);
+
+        pEpoch = MNEEpochData::SPtr(new MNEEpochData());
+
+        if(raw.read_raw_segment(pEpoch->epoch, timesDummy, from, to, picks)) {
+            if (p == 0) {
+                times.resize(1, to-from+1);
+                for (qint32 i = 0; i < times.cols(); ++i)
+                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
+            }
+
+            pEpoch->event = event;
+            pEpoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
+            pEpoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
+
+            epochDataList.append(pEpoch);
+        } else  {
+            printf("Can't read the event data segments");
+        }
+    }
+
+    // Generate 3D node for 3D network visualization
+    int counter = 0;
+
+    for(int i = 0; i < raw.info.chs.size(); ++i) {
+        if (pickedChNames.contains(raw.info.chs.at(i).ch_name)) {
+            // Get the 3D positions
             matNodePos.conservativeResize(matNodePos.rows()+1, 3);
-            matNodePos(counter,0) = evoked.info.chs.at(i).chpos.r0(0);
-            matNodePos(counter,1) = evoked.info.chs.at(i).chpos.r0(1);
-            matNodePos(counter,2) = evoked.info.chs.at(i).chpos.r0(2);
+            matNodePos(counter,0) = raw.info.chs.at(i).chpos.r0(0);
+            matNodePos(counter,1) = raw.info.chs.at(i).chpos.r0(1);
+            matNodePos(counter,2) = raw.info.chs.at(i).chpos.r0(2);
 
             counter++;
         }
-
-        bPick = false;
     }
 
     // Choose the connectivity measure and perform the actual computation
     Network finalNetwork;
 
     if(settings.m_sConnectivityMethod == "COR") {
-        finalNetwork = ConnectivityMeasures::pearsonsCorrelationCoeff(matData, matNodePos);
+        finalNetwork = ConnectivityMeasures::pearsonsCorrelationCoeff(epochDataList, matNodePos);
     } else if(settings.m_sConnectivityMethod == "XCOR") {
-        finalNetwork = ConnectivityMeasures::crossCorrelation(matData, matNodePos);
+        finalNetwork = ConnectivityMeasures::crossCorrelation(epochDataList, matNodePos);
     } else if(settings.m_sConnectivityMethod == "PLI") {
-        finalNetwork = ConnectivityMeasures::phaseLagIndex(matData, matNodePos);
+        finalNetwork = ConnectivityMeasures::phaseLagIndex(epochDataList, matNodePos);
     }
 
     // Visualize the network
