@@ -228,14 +228,18 @@ Network ConnectivityMeasures::phaseLagIndex(const MNEEpochDataList& epochDataLis
     matSignValues.setZero();
     MatrixXd matData;
 
-    for(int k = 0; k < epochDataList.size(); ++k) {
+    for(int k = 0; k < 3; ++k) {
         matData = epochDataList.at(k)->epoch;
+        QElapsedTimer elapsedTimer;
+        elapsedTimer.start();
 
         for(int i = 0; i < rows; ++i) {
             for(int j = i; j < rows; ++j) {
                 matSignValues(i,j) += calcPhaseLagIndex(matData.row(i), matData.row(j));
             }
         }
+
+        qDebug() << "One epoch takes" << elapsedTimer.elapsed() <<" msec";
     }
 
     matSignValues /= epochDataList.size();
@@ -334,8 +338,6 @@ QPair<int,double> ConnectivityMeasures::calcCrossCorrelation(const RowVectorXd& 
 
 int ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
 {
-    QElapsedTimer elapsedTimer;
-    elapsedTimer.start();
     Eigen::FFT<double> fft;
 
     int N = std::max(vecFirst.cols(), vecSecond.cols());
@@ -363,7 +365,6 @@ int ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, const R
 
     //Main step of cross corr
     freqvec = freqvec.array() * freqvec2.array();
-    qDebug() << "0 elapsedTimer.elapsed()" << elapsedTimer.elapsed();
 
     std::complex<double> cdCSD = freqvec.mean();
 
@@ -378,8 +379,6 @@ int ConnectivityMeasures::calcPhaseLagIndex(const RowVectorXd& vecFirst, const R
             iSignResult = -1.0;
         }
     }
-
-    qDebug() << "1 elapsedTimer.elapsed()" << elapsedTimer.elapsed();
     return iSignResult;
 
 
