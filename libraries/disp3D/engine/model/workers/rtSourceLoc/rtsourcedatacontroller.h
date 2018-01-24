@@ -280,17 +280,17 @@ protected:
     /**
     * Call this function whenever a new interpolation matrix for the left hemisphere is available to be dispatched.
     *
-    * @param[in] matInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
+    * @param[in] pMatInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
     */
-    void onNewInterpolationMatrixLeftCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeftHemi);
+    void onNewInterpolationMatrixLeftCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi);
 
     //=========================================================================================================
     /**
     * Call this function whenever a new interpolation matrix for the right hemisphere is available to be dispatched.
     *
-    * @param[in] matInterpolationMatrixRightHemi         The new interpolation matrix for the right hemisphere.
+    * @param[in] pMatInterpolationMatrixRightHemi         The new interpolation matrix for the right hemisphere.
     */
-    void onNewInterpolationMatrixRightCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrixRightHemi);
+    void onNewInterpolationMatrixRightCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi);
 
     QTimer                                      m_timer;                                /**< The timer to control the streaming speed. */
 
@@ -447,17 +447,17 @@ signals:
     /**
     * Emit this signal whenever a new interpolation matrix for the left hemisphere is available.
     *
-    * @param[in] matInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
+    * @param[in] pMatInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
     */
-    void newInterpolationMatrixLeftAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeftHemi);
+    void newInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi);
 
     //=========================================================================================================
     /**
     * Emit this signal whenever a new interpolation matrix for the right hemisphere is available.
     *
-    * @param[in] matInterpolationMatrixRightHemi         The new interpolation matrix for the right hemisphere.
+    * @param[in] pMatInterpolationMatrixRightHemi         The new interpolation matrix for the right hemisphere.
     */
-    void newInterpolationMatrixRightAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixRightHemi);
+    void newInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi);
 
     //=========================================================================================================
     /**

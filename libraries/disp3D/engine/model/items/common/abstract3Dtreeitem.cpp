@@ -276,6 +276,17 @@ Eigen::MatrixX3f Abstract3DTreeItem::createVertColor(int numVert, const QColor& 
 
 //*************************************************************************************************************
 
+void Abstract3DTreeItem::setAlpha(float fAlpha)
+{
+    QVariant data;
+    data.setValue(fAlpha);
+
+    onAlphaChanged(data);
+}
+
+
+//*************************************************************************************************************
+
 void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     for(int i = 0; i<this->rowCount(); i++) {

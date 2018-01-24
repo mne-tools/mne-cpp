@@ -76,7 +76,7 @@ using namespace FSLIB;
 
 RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false)
-, m_iVisualizationType(Data3DTreeModelItemRoles::InterpolationBased)
+, m_iVisualizationType(Data3DTreeModelItemRoles::AnnotationBased)
 , m_bAnnotationInfoIsInit(false)
 {
     m_lInterpolationData.dCancelDistance = 0.05;
@@ -108,39 +108,24 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
 
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
-        m_matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                      m_lInterpolationData.matDistanceMatrix,
-                                                                      m_lInterpolationData.interpolationFunction,
-                                                                      m_lInterpolationData.dCancelDistance);
+        m_pMatInterpolationMat = QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                                                                                  m_lInterpolationData.matDistanceMatrix,
+                                                                                                                                                  m_lInterpolationData.interpolationFunction,
+                                                                                                                                                  m_lInterpolationData.dCancelDistance)));
 
-        emit newInterpolationMatrixCalculated(m_matInterpolationMat);
+        emitMatrix();
     }
 }
+
 
 //*************************************************************************************************************
 
 void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
 {
-    switch (iVisType) {
-        case Data3DTreeModelItemRoles::InterpolationBased: {
-            if(m_matInterpolationMat.size() == 0) {
-                calculateInterpolationOperator();
-            }
+    if(m_iVisualizationType != iVisType) {
+        m_iVisualizationType = iVisType;
 
-            emit newInterpolationMatrixCalculated(m_matInterpolationMat);
-            break;
-        }
-
-        case Data3DTreeModelItemRoles::AnnotationBased: {
-            if(m_matAnnotationMat.size() == 0) {
-                qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType size == 0 Calculating";
-                calculateAnnotationOperator();
-            }
-            qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType emitting annot matrix " << m_matAnnotationMat.rows() << " " << m_matAnnotationMat.cols();
-
-            emit newInterpolationMatrixCalculated(m_matAnnotationMat);
-            break;
-        }
+        emitMatrix();
     }
 }
 
@@ -159,7 +144,7 @@ void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
     //recalculate everything because parameters changed
     calculateInterpolationOperator();
 
-    emit newInterpolationMatrixCalculated(m_matInterpolationMat);
+    emitMatrix();
 }
 
 
@@ -183,7 +168,9 @@ void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
 
     calculateInterpolationOperator();
 
-    emit newInterpolationMatrixCalculated(m_matInterpolationMat);
+    if(m_iVisualizationType == Data3DTreeModelItemRoles::InterpolationBased) {
+        emit newInterpolationMatrixCalculated(m_pMatInterpolationMat);
+    }
 }
 
 
@@ -210,6 +197,10 @@ void RtSourceInterpolationMatWorker::setAnnotationInfo(const Eigen::VectorXi &ve
     m_bAnnotationInfoIsInit = true;
 
     calculateAnnotationOperator();
+
+    if(m_iVisualizationType == Data3DTreeModelItemRoles::AnnotationBased) {
+        emit newInterpolationMatrixCalculated(m_pMatAnnotationMat);
+    }
 }
 
 
@@ -229,10 +220,10 @@ void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
                                                                 m_lInterpolationData.dCancelDistance);
 
     //create Interpolation matrix
-    m_matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                    m_lInterpolationData.matDistanceMatrix,
-                                                                                    m_lInterpolationData.interpolationFunction,
-                                                                                    m_lInterpolationData.dCancelDistance);
+    m_pMatInterpolationMat = QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                                                                              m_lInterpolationData.matDistanceMatrix,
+                                                                                                                                              m_lInterpolationData.interpolationFunction,
+                                                                                                                                              m_lInterpolationData.dCancelDistance)));
 }
 
 
@@ -250,7 +241,7 @@ void RtSourceInterpolationMatWorker::calculateAnnotationOperator()
         iNumVert += m_lInterpolationData.lLabels.at(i).vertices.rows();
     }
 
-    m_matAnnotationMat = SparseMatrix<float>(iNumVert, m_lInterpolationData.vecMappedSubset.size());
+    m_pMatAnnotationMat = QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(iNumVert, m_lInterpolationData.vecMappedSubset.size()));
 
     //Color all labels respectivley to their activation
     for(int i = 0; i < m_lInterpolationData.lLabels.size(); ++i) {
@@ -260,8 +251,42 @@ void RtSourceInterpolationMatWorker::calculateAnnotationOperator()
         for(int j = 0; j < label.vertices.rows(); ++j) {
             for(int k = 0; k < listSourcesVertNoLabel.size(); ++k) {
                 int colIdx = m_lInterpolationData.vertNos.indexOf(listSourcesVertNoLabel.at(k));
-                m_matAnnotationMat.coeffRef(label.vertices(j),colIdx) = 1.0f/listSourcesVertNoLabel.size();
+                m_pMatAnnotationMat->coeffRef(label.vertices(j),colIdx) = 1.0f/listSourcesVertNoLabel.size();
             }
         }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceInterpolationMatWorker::emitMatrix()
+{
+    switch (m_iVisualizationType) {
+        case Data3DTreeModelItemRoles::InterpolationBased:
+            if(!m_pMatInterpolationMat) {
+                return;
+            }
+
+            if(m_pMatInterpolationMat->size() == 0) {
+                calculateInterpolationOperator();
+            }
+
+            emit newInterpolationMatrixCalculated(m_pMatInterpolationMat);
+            break;
+
+        case Data3DTreeModelItemRoles::AnnotationBased:
+            if(!m_pMatAnnotationMat) {
+                return;
+            }
+
+            if(m_pMatAnnotationMat->size() == 0) {
+                qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType size == 0 Calculating";
+                calculateAnnotationOperator();
+            }
+            qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType emitting annot matrix " << m_pMatAnnotationMat->rows() << " " << m_pMatAnnotationMat->cols();
+
+            emit newInterpolationMatrixCalculated(m_pMatAnnotationMat);
+            break;
     }
 }

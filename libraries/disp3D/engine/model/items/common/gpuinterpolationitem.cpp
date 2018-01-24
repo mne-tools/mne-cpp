@@ -90,9 +90,9 @@ GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 , m_bIsDataInit(false)
 , m_pGPUMaterial(new GpuInterpolationMaterial())
 , m_pCustomMesh(new CustomMesh)
-, m_pInterpolationMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
-, m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-, m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
+, m_pInterpolationMatBuffer(new Qt3DRender::QBuffer())
+, m_pOutputColorBuffer(new Qt3DRender::QBuffer())
+, m_pSignalDataBuffer(new Qt3DRender::QBuffer())
 {
 }
 
@@ -101,9 +101,9 @@ GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 
 GpuInterpolationItem::~GpuInterpolationItem()
 {
-    m_pInterpolationMatBuffer->deleteLater();
-    m_pOutputColorBuffer->deleteLater();
-    m_pSignalDataBuffer->deleteLater();
+    delete m_pInterpolationMatBuffer;
+    delete m_pOutputColorBuffer;
+    delete m_pSignalDataBuffer;
 }
 
 
@@ -134,7 +134,6 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
     //Create material, init and connect all necessary buffers
     this->addComponent(m_pGPUMaterial);
     this->addComponent(m_pCustomMesh);
-
 
     m_pInterpolationMatBuffer->setData(buildZeroBuffer(1));
     this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), QStringLiteral("InterpolationMat"));
@@ -170,7 +169,7 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
 
 //*************************************************************************************************************
 
-void GpuInterpolationItem::setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix)
+void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix)
 {
     if(m_bIsDataInit == false)
     {
@@ -178,23 +177,43 @@ void GpuInterpolationItem::setInterpolationMatrix(const Eigen::SparseMatrix<floa
         return;
     }
 
-    qDebug("GpuInterpolationItem::setInterpolationMatrix - buildInterpolationMatrixBuffer");
-
     //Init and set interpolation buffer
-    QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(matInterpolationMatrix);
+    if(m_pInterpolationMatBuffer->data().size() != pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()*sizeof(float)) {
+        qDebug("GpuInterpolationItem::setInterpolationMatrix - buildInterpolationMatrixBuffer");
+        QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(pMatInterpolationMatrix);
 
-    if(m_pInterpolationMatBuffer->data().size() != interpolationBufferData.size()) {
         //Set Rows and Cols
-        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.cols()), QStringLiteral("cols"));
-        this->setMaterialParameter(QVariant::fromValue(matInterpolationMatrix.rows()), QStringLiteral("rows"));
+        this->setMaterialParameter(QVariant::fromValue(pMatInterpolationMatrix->cols()), QStringLiteral("cols"));
+        this->setMaterialParameter(QVariant::fromValue(pMatInterpolationMatrix->rows()), QStringLiteral("rows"));
 
         m_pInterpolationMatBuffer->setData(interpolationBufferData);
         this->setMaterialParameter(QVariant::fromValue(m_pInterpolationMatBuffer.data()), QStringLiteral("InterpolationMat"));
-
-        m_pOutputColorBuffer->setData(buildZeroBuffer(4 * matInterpolationMatrix.rows()));
+        m_pOutputColorBuffer->setData(buildZeroBuffer(4 * pMatInterpolationMatrix->rows()));
         this->setMaterialParameter(QVariant::fromValue(m_pOutputColorBuffer.data()), QStringLiteral("OutputColor"));
+
+        qDebug() << "4 * pMatInterpolationMatrix->rows()"<<4 * pMatInterpolationMatrix->rows();
+        qDebug() << "pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()"<<pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols();
     } else {
-        m_pInterpolationMatBuffer->setData(interpolationBufferData);
+        //m_pInterpolationMatBuffer->updateData(0, interpolationBufferData);
+        QByteArray updateData;
+        updateData.resize(pMatInterpolationMatrix->cols() * sizeof(float));
+        float *rawVertexArray = reinterpret_cast<float *>(updateData.data());
+
+        int pos = 0; //matrix element offset
+
+        for(uint i = 0; i < pMatInterpolationMatrix->rows()-60000; ++i) {
+            //qDebug()<<"row "<<i;
+
+            //Extract row
+            int itr = 0;
+            for(uint j = 0; j < pMatInterpolationMatrix->cols(); ++j) {
+                rawVertexArray[itr] = pMatInterpolationMatrix->coeff(i,j);
+                itr++;
+            }
+
+            m_pInterpolationMatBuffer->updateData(pos, updateData);
+            pos += pMatInterpolationMatrix->cols() * sizeof(float); //stride
+        }
     }
 
     qDebug("GpuInterpolationItem::setInterpolationMatrix - finished");
@@ -226,7 +245,7 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
         m_pSignalDataBuffer->setData(bufferData);
         this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), QStringLiteral("InputVec"));
     } else {
-        m_pSignalDataBuffer->updateData(0, bufferData);
+        m_pSignalDataBuffer->setData(bufferData);
     }
 }
 
@@ -261,10 +280,10 @@ void GpuInterpolationItem::setColormapType(const QString &tColormapType)
 
 //*************************************************************************************************************
 
-QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(const SparseMatrix<float> &matInterpolationMatrix)
+QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix)
 {
-    const uint iRows = matInterpolationMatrix.rows();
-    const uint iCols = matInterpolationMatrix.cols();
+    const uint iRows = pMatInterpolationMatrix->rows();
+    const uint iCols = pMatInterpolationMatrix->cols();
 
     qDebug() << "(int)sizeof(float)" << (int)sizeof(float);
     qDebug() << "GpuInterpolationItem::buildInterpolationMatrixBuffer - iRows" << iRows ;
@@ -281,7 +300,7 @@ QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(const SparseMatr
     unsigned int iCtr = 0;
     for(uint i = 0; i < iRows; ++i) {
         for(uint j = 0; j < iCols; ++j) {
-            rawVertexArray[iCtr] = static_cast<float>(matInterpolationMatrix.coeff(i, j));
+            rawVertexArray[iCtr] = pMatInterpolationMatrix->coeff(i, j);
             iCtr++;
         }
     }

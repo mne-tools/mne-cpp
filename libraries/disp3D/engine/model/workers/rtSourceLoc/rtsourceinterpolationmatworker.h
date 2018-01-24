@@ -177,6 +177,12 @@ protected:
     */
     void calculateAnnotationOperator();
 
+    //=========================================================================================================
+    /**
+    * Emit the interpolation matrix.
+    */
+    void emitMatrix();
+
     //=============================================================================================================
     /**
     * The struct specifing all data that is used in the interpolation process
@@ -202,17 +208,17 @@ protected:
 
     int                         m_iVisualizationType;               /**< The visualization type (smoothing or annotation based). */
 
-    Eigen::SparseMatrix<float>  m_matInterpolationMat;              /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
-    Eigen::SparseMatrix<float>  m_matAnnotationMat;                 /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
+    QSharedPointer<Eigen::SparseMatrix<float> >  m_pMatInterpolationMat;              /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
+    QSharedPointer<Eigen::SparseMatrix<float> >  m_pMatAnnotationMat;                 /**< The current itnerpolation matrix (keep this as member so we can easily switch between interpolation and annotation based visualization). */
 
 signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever a new interpolation matrix was calcualted.
     *
-    * @param[in] matInterpolationMatrix     The new interpolation matrix.
+    * @param[in] pMatInterpolationMatrix     The new interpolation matrix.
     */
-    void newInterpolationMatrixCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 };
 
 } // NAMESPACE

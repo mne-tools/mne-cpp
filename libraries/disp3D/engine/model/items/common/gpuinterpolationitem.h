@@ -141,9 +141,9 @@ public:
     /**
     * Set the new Interpolation matrix for the interpolation.
     *
-    * @param[in] matInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
+    * @param[in] pMatInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
     */
-    virtual void setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    virtual void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -174,11 +174,11 @@ protected:
     /**
     * Build the content of the Interpolation matrix buffer.
     *
-    * @param[in] matInterpolationMatrix    The Interpolation matrix.
+    * @param[in] pMatInterpolationMatrix    The Interpolation matrix.
     *
     * @return                          Interpolation matrix is byte array form.
     */
-    virtual QByteArray buildInterpolationMatrixBuffer(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    virtual QByteArray buildInterpolationMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**

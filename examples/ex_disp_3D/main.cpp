@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "pial");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
@@ -244,11 +244,11 @@ int main(int argc, char *argv[])
     AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
-    //Add fressurfer surface set including both hemispheres
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption),
-                                "MRI",
-                                tSurfSet,
-                                tAnnotSet);
+//    //Add fressurfer surface set including both hemispheres
+//    p3DDataModel->addSurfaceSet(parser.value(subjectOption),
+//                                "MRI",
+//                                tSurfSet,
+//                                tAnnotSet);
 
 //    //Read and show BEM
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"); //sample-5120-5120-5120-bem
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
-            pRTDataItem->setVisualizationType("Interpolation based");
+            //pRTDataItem->setVisualizationType("Annotation based");
             pRTDataItem->setColormapType("Jet");
         }
     }

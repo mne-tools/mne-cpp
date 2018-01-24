@@ -602,4 +602,7 @@ void Data3DTreeModel::initMetatypes()
 
     qRegisterMetaType<Eigen::SparseMatrix<float> >();
     qRegisterMetaType<SparseMatrix<float> >();
+
+    qRegisterMetaType<QSharedPointer<Eigen::SparseMatrix<float> > >();
+    qRegisterMetaType<QSharedPointer<SparseMatrix<float> > >();
 }

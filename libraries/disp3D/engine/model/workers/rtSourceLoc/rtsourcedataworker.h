@@ -181,17 +181,17 @@ public:
     /**
     * Set the interpolation matrix for the left hemisphere.
     *
-    * @param[in] matInterpolationMatrixLeft                 The new interpolation matrix.
+    * @param[in] pMatInterpolationMatrixLeft                 The new interpolation matrix.
     */
-    void setInterpolationMatrixLeft(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeft);
+    void setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeft);
 
     //=========================================================================================================
     /**
     * Set the interpolation matrix for the right hemisphere.
     *
-    * @param[in] matInterpolationMatrixRight                 The new interpolation matrix.
+    * @param[in] pMatInterpolationMatrixRight                 The new interpolation matrix.
     */
-    void setInterpolationMatrixRight(const Eigen::SparseMatrix<float> &matInterpolationMatrixRight);
+    void setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRight);
 
     //=========================================================================================================
     /**
@@ -211,7 +211,7 @@ protected:
         Eigen::MatrixX3f            matOriginalVertColor;
         Eigen::MatrixX3f            matFinalVertColor;
 
-        Eigen::SparseMatrix<float>  matInterpolationMatrix;         /**< The interpolation matrix. */
+        QSharedPointer<Eigen::SparseMatrix<float> >  pMatInterpolationMatrix;         /**< The interpolation matrix. */
 
         QRgb (*functionHandlerColorMap)(double v);
     } m_lVisualizationInfoLeft, m_lVisualizationInfoRight;          /**< Container for the visualization info. */

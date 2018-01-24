@@ -163,7 +163,7 @@ void View3D::initLight()
     QColor lightColor(255,255,255);
     float lightIntensity = 0.2f;
 
-    lLightPositions << QVector3D(-0.5,0,0);// << QVector3D(0,0,-0.5) << QVector3D(0.5,0,0) << QVector3D(-0.5,0,0) << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0);
+    lLightPositions << QVector3D(-0.5,0,0) << QVector3D(0,0,-0.5) << QVector3D(0.5,0,0) << QVector3D(-0.5,0,0) << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0);
     lLightDirections << QVector3D(0.5,0,0) << QVector3D(0,0,0.5) << QVector3D(-0.5,0,0) << QVector3D(0.5,0,0) << QVector3D(0,-0.5,0) << QVector3D(0,0.5,0);
     lLightIntensities << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity;
     lLightColor << lightColor << lightColor << lightColor << lightColor << lightColor << lightColor;
