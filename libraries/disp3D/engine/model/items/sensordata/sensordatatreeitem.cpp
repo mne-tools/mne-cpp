@@ -535,7 +535,7 @@ void SensorDataTreeItem::onNewInterpolationMatrixAvailable(const Eigen::SparseMa
 {
     if(m_pInterpolationItemGPU)
     {
-        m_pInterpolationItemGPU->setInterpolationMatrix(matInterpolationMatrix);
+        //m_pInterpolationItemGPU->setInterpolationMatrix(matInterpolationMatrix);
     }
 }
 

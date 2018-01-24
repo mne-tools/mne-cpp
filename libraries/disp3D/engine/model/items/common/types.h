@@ -53,6 +53,7 @@
 
 #include <QStandardItem>
 #include <QByteArray>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -139,22 +140,6 @@ namespace MetaTreeItemTypes
 }
 
 // Model item roles
-namespace Data3DTreeModelItemRoles
-{
-    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
-                    NumberVertices = Qt::UserRole + 101,
-                    SurfaceCurv = Qt::UserRole + 102,
-                    NetworkDataMatrix = Qt::UserRole + 103,
-                    SurfaceHemi = Qt::UserRole + 104,
-                    AnnotColors = Qt::UserRole + 105,
-                    FileName = Qt::UserRole + 106,
-                    FilePath = Qt::UserRole + 107,
-                    Data = Qt::UserRole + 108,
-                    VertexBased = Qt::UserRole + 109,
-                    InterpolationBased = Qt::UserRole + 110,
-                    AnnotationBased = Qt::UserRole + 111};
-}
-
 namespace MetaTreeItemRoles
 {
     enum ItemRole{SurfaceFileName = Qt::UserRole,
@@ -184,6 +169,22 @@ namespace MetaTreeItemRoles
                     SurfaceMaterial = Qt::UserRole + 24,
                     Scale = Qt::UserRole + 25,
                     CancelDistance = Qt::UserRole + 26};
+}
+
+namespace Data3DTreeModelItemRoles
+{
+    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
+                    NumberVertices = Qt::UserRole + 101,
+                    SurfaceCurv = Qt::UserRole + 102,
+                    NetworkDataMatrix = Qt::UserRole + 103,
+                    SurfaceHemi = Qt::UserRole + 104,
+                    AnnotColors = Qt::UserRole + 105,
+                    FileName = Qt::UserRole + 106,
+                    FilePath = Qt::UserRole + 107,
+                    Data = Qt::UserRole + 108,
+                    VertexBased = Qt::UserRole + 109,
+                    InterpolationBased = Qt::UserRole + 110,
+                    AnnotationBased = Qt::UserRole + 111};
 }
 
 } //NAMESPACE DISP3DLIB
@@ -253,6 +254,11 @@ Q_DECLARE_METATYPE(QVector<qint32>);
 #ifndef DISP3DLIB_metatype_sparsematf
 #define DISP3DLIB_metatype_sparsematf
 Q_DECLARE_METATYPE(Eigen::SparseMatrix<float>);
+#endif
+
+#ifndef DISP3DLIB_metatype_sharedptrsparsematf
+#define DISP3DLIB_metatype_sharedptrsparsematf
+Q_DECLARE_METATYPE(QSharedPointer<Eigen::SparseMatrix<float> >);
 #endif
 
 #ifndef DISP3DLIB_metatype_listlabel

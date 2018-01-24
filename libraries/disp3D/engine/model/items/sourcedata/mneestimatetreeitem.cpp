@@ -125,14 +125,15 @@ void MneEstimateTreeItem::initItem()
     data.setValue(false);
     pItemStreamStatus->setData(data, MetaTreeItemRoles::StreamStatus);
 
-    MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::VisualizationType, "Vertex based");
+    QString defaultVisualizationType = "Interpolation based";
+    MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::VisualizationType, defaultVisualizationType);
     connect(pItemVisuaizationType, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onVisualizationTypeChanged);
     list.clear();
     list << pItemVisuaizationType;
     list << new QStandardItem(pItemVisuaizationType->toolTip());
     this->appendRow(list);
-    data.setValue(QString("Vertex based"));
+    data.setValue(defaultVisualizationType);
     pItemVisuaizationType->setData(data, MetaTreeItemRoles::VisualizationType);
 
     MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot");
@@ -196,14 +197,14 @@ void MneEstimateTreeItem::initItem()
 //            this, &MneEstimateTreeItem::onCancelDistanceChanged);
 
     MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Cubic");
+    connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
+            this, &MneEstimateTreeItem::onInterpolationFunctionChanged);
     list.clear();
     list << pInterpolationFunction;
     list << new QStandardItem(pInterpolationFunction->toolTip());
     this->appendRow(list);
     data.setValue(QString("Cubic"));
     pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
-    connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onInterpolationFunctionChanged);
 }
 
 
@@ -273,21 +274,6 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
         m_pRtSourceDataController = new RtSourceDataController();
     }
 
-    m_pRtSourceDataController->setInterpolationInfo(tForwardSolution.src[0].rr,
-                                                    tForwardSolution.src[1].rr,
-                                                    tForwardSolution.src[0].neighbor_vert,
-                                                    tForwardSolution.src[1].neighbor_vert,
-                                                    clustVertNoLeft,
-                                                    clustVertNoRight);
-
-    m_pRtSourceDataController->setAnnotationInfo(vecLabelIdsLeftHemi,
-                                                 vecLabelIdsRightHemi,
-                                                 qListLabelsLeft,
-                                                 qListLabelsRight,
-                                                 clustVertNoLeft,
-                                                 clustVertNoRight);
-
-
     //Create InterpolationItems for CPU or GPU usage
     if(m_bUseGPU) {
         if(!m_pInterpolationItemLeftGPU)
@@ -308,6 +294,8 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             list << m_pInterpolationItemLeftGPU;
             list << new QStandardItem(m_pInterpolationItemLeftGPU->toolTip());
             this->appendRow(list);
+
+            m_pInterpolationItemLeftGPU->setAlpha(1.0f);
         }
 
         if(!m_pInterpolationItemRightGPU)
@@ -328,6 +316,8 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             list << m_pInterpolationItemRightGPU;
             list << new QStandardItem(m_pInterpolationItemRightGPU->toolTip());
             this->appendRow(list);
+
+            m_pInterpolationItemRightGPU->setAlpha(1.0f);
         }
 
         m_pRtSourceDataController->setStreamSmoothedData(false);
@@ -364,6 +354,8 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             list << m_pInterpolationItemLeftCPU;
             list << new QStandardItem(m_pInterpolationItemLeftCPU->toolTip());
             this->appendRow(list);
+
+            m_pInterpolationItemLeftCPU->setAlpha(1.0f);
         }
 
         if(!m_pInterpolationItemRightCPU)
@@ -389,11 +381,27 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             list << m_pInterpolationItemRightCPU;
             list << new QStandardItem(m_pInterpolationItemRightCPU->toolTip());
             this->appendRow(list);
+
+            m_pInterpolationItemRightCPU->setAlpha(1.0f);
         }
 
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtSmoothedDataAvailable,
                 this, &MneEstimateTreeItem::onNewRtSmoothedDataAvailable);
     }
+
+    m_pRtSourceDataController->setInterpolationInfo(tForwardSolution.src[0].rr,
+                                                    tForwardSolution.src[1].rr,
+                                                    tForwardSolution.src[0].neighbor_vert,
+                                                    tForwardSolution.src[1].neighbor_vert,
+                                                    clustVertNoLeft,
+                                                    clustVertNoRight);
+
+    m_pRtSourceDataController->setAnnotationInfo(vecLabelIdsLeftHemi,
+                                                 vecLabelIdsRightHemi,
+                                                 qListLabelsLeft,
+                                                 qListLabelsRight,
+                                                 clustVertNoLeft,
+                                                 clustVertNoRight);
 
     m_bIsDataInit = true;
 }
@@ -620,22 +628,22 @@ void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &m
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeftHemi)
+void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
 {
     qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable";
     if(m_pInterpolationItemLeftGPU) {
-        m_pInterpolationItemLeftGPU->setInterpolationMatrix(matInterpolationMatrixLeftHemi);
+        m_pInterpolationItemLeftGPU->setInterpolationMatrix(pMatInterpolationMatrixLeftHemi);
     }
 }
 
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixRightHemi)
+void MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi)
 {
     qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable";
     if(m_pInterpolationItemRightGPU) {
-        m_pInterpolationItemRightGPU->setInterpolationMatrix(matInterpolationMatrixRightHemi);
+        m_pInterpolationItemRightGPU->setInterpolationMatrix(pMatInterpolationMatrixRightHemi);
     }
 }
 

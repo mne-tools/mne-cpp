@@ -262,17 +262,17 @@ protected:
     /**
     * Set the new interpolation matrix.
     *
-    * @param[in] matInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
+    * @param[in] pMatInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
     */
-    virtual void onNewInterpolationMatrixLeftAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeftHemi);
+    virtual void onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi);
 
     //=========================================================================================================
     /**
     * Set the new interpolation matrix.
     *
-    * @param[in] matInterpolationMatrixRightHemi          The new interpolation matrix for the right hemisphere.
+    * @param[in] pMatInterpolationMatrixRightHemi          The new interpolation matrix for the right hemisphere.
     */
-    virtual void onNewInterpolationMatrixRightAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrixRightHemi);
+    virtual void onNewInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi);
 
     //=========================================================================================================
     /**

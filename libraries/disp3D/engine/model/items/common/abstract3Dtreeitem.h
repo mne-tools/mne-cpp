@@ -160,6 +160,14 @@ public :
     */
     static Eigen::MatrixX3f createVertColor(int numVert, const QColor& color = QColor(100,100,100));
 
+    //=========================================================================================================
+    /**
+    * Set the alpha value.
+    *
+    * @param[in] fAlpha    The new alpha value.
+    */
+    void setAlpha(float fAlpha);
+
 protected:
     //=========================================================================================================
     /**

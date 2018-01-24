@@ -186,17 +186,17 @@ void RtSourceDataWorker::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-void RtSourceDataWorker::setInterpolationMatrixLeft(const Eigen::SparseMatrix<float> &matInterpolationMatrixLeft)
+void RtSourceDataWorker::setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeft)
 {
-    m_lVisualizationInfoLeft.matInterpolationMatrix = matInterpolationMatrixLeft;
+    m_lVisualizationInfoLeft.pMatInterpolationMatrix = pMatInterpolationMatrixLeft;
 }
 
 
 //*************************************************************************************************************
 
-void RtSourceDataWorker::setInterpolationMatrixRight(const Eigen::SparseMatrix<float> &matInterpolationMatrixRight)
+void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRight)
 {
-    m_lVisualizationInfoRight.matInterpolationMatrix = matInterpolationMatrixRight;
+    m_lVisualizationInfoRight.pMatInterpolationMatrix = pMatInterpolationMatrixRight;
 
 }
 
@@ -240,11 +240,11 @@ void RtSourceDataWorker::streamData()
             //Perform the actual interpolation and send signal
             m_vecAverage /= (double)m_iAverageSamples;
             if(m_bStreamSmoothedData) {
-                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.cols()), m_lVisualizationInfoLeft),
-                                       generateColorsFromSensorValues(m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.cols(), m_lVisualizationInfoRight.matInterpolationMatrix.cols()), m_lVisualizationInfoRight));
+                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage.segment(0, m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols()), m_lVisualizationInfoLeft),
+                                       generateColorsFromSensorValues(m_vecAverage.segment(m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols(), m_lVisualizationInfoRight.pMatInterpolationMatrix->cols()), m_lVisualizationInfoRight));
             } else {
-                emit newRtRawData(m_vecAverage.segment(0, m_lVisualizationInfoLeft.matInterpolationMatrix.cols()),
-                                  m_vecAverage.segment(m_lVisualizationInfoLeft.matInterpolationMatrix.cols(), m_lVisualizationInfoRight.matInterpolationMatrix.cols()));
+                emit newRtRawData(m_vecAverage.segment(0, m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols()),
+                                  m_vecAverage.segment(m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols(), m_lVisualizationInfoRight.pMatInterpolationMatrix->cols()));
             }
             m_vecAverage.setZero(m_vecAverage.rows());
 
@@ -262,13 +262,13 @@ void RtSourceDataWorker::streamData()
 MatrixX3f RtSourceDataWorker::generateColorsFromSensorValues(const VectorXd &vecSensorValues,
                                                              VisualizationInfo &visualizationInfoHemi)
 {
-    if(vecSensorValues.rows() != visualizationInfoHemi.matInterpolationMatrix.cols()) {
-        qDebug() << "RtSourceDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << visualizationInfoHemi.matInterpolationMatrix.cols() << "). Returning...";
+    if(vecSensorValues.rows() != visualizationInfoHemi.pMatInterpolationMatrix->cols()) {
+        qDebug() << "RtSourceDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << visualizationInfoHemi.pMatInterpolationMatrix->cols() << "). Returning...";
         return visualizationInfoHemi.matOriginalVertColor;
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(visualizationInfoHemi.matInterpolationMatrix, vecSensorValues);
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(*visualizationInfoHemi.pMatInterpolationMatrix, vecSensorValues);
 
     // Reset to original color as default
     visualizationInfoHemi.matFinalVertColor = visualizationInfoHemi.matOriginalVertColor;
