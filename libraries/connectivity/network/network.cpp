@@ -43,6 +43,7 @@
 
 #include "networkedge.h"
 #include "networknode.h"
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -64,7 +65,7 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
-
+using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -191,6 +192,7 @@ MatrixXd Network::generateConnectMat() const
         }
     }
 
+    IOUtils::write_eigen_matrix(matDist,"eigen.txt");
     return matDist;
 }
 
