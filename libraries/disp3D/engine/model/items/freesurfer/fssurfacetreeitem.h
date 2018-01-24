@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef FSSURFACETREEITEM_H
-#define FSSURFACETREEITEM_H
+#ifndef DISP3DLIB_FSSURFACETREEITEM_H
+#define DISP3DLIB_FSSURFACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,7 +81,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MetaTreeItem;
@@ -152,9 +152,9 @@ protected:
     *
     * @return The final colors per vertex (RGB).
     */
-    MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
-                                       const QColor& colSulci = QColor(50,50,50),
-                                       const QColor& colGyri = QColor(125,125,125)) const;
+    Eigen::MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
+                                              const QColor& colSulci = QColor(50,50,50),
+                                              const QColor& colGyri = QColor(125,125,125)) const;
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
 
@@ -162,13 +162,8 @@ protected:
     QPointer<MetaTreeItem>          m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
-    */
-    void colorOriginChanged();
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // FSSURFACETREEITEM_H
+#endif // DISP3DLIB_FSSURFACETREEITEM_H

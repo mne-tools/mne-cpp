@@ -249,7 +249,7 @@ QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstance
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
     //copy colors into buffer
-    for(uint i = 0; i < tInstanceColor.size(); i++)
+    for(int i = 0; i < tInstanceColor.size(); i++)
     {
         rawVertexArray[iVertSize * i] = tInstanceColor[i].redF();
         rawVertexArray[iVertSize * i + 1] = tInstanceColor[i].greenF();

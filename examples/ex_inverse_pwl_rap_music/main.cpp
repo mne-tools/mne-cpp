@@ -52,10 +52,10 @@
 
 #include <inverse/rapMusic/pwlrapmusic.h>
 
+#include <disp3D/adapters/abstractview.h>
 #include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -69,6 +69,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -177,7 +178,7 @@ int main(int argc, char *argv[])
 
     int iWinSize = 200;
     if(doMovie) {
-        t_pwlRapMusic.setStcAttr(iWinSize, 0.6);
+        t_pwlRapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
@@ -198,28 +199,29 @@ int main(int argc, char *argv[])
     if(sourceEstimate.isEmpty())
         return 1;
 
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-    testWindow->setModel(p3DDataModel);
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, t_surfSet, t_annotationSet);
 
     //Add rt source loc data and init some visualization values
-    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+                                                                      evoked.comment,
+                                                                      sourceEstimate,
+                                                                      t_clusteredFwd,
+                                                                      t_surfSet,
+                                                                      t_annotationSet,
+                                                                      p3DAbstractView->getView()->format())) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);
-        pRTDataItem->setStreamingActive(true);
-        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setStreamingState(true);
+        pRTDataItem->setThresholds(QVector3D(0.01f,0.5f,1.0f));
         pRTDataItem->setVisualizationType("Annotation based");
-        pRTDataItem->setColortable("Hot");
+        pRTDataItem->setColormapType("Hot");
     }
 
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
+    p3DAbstractView->show();
 
     if(!t_sFileNameStc.isEmpty())
     {

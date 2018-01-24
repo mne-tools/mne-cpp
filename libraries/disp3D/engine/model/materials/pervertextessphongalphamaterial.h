@@ -32,8 +32,8 @@
 * @brief    PerVertexTessPhongAlphaMaterial class declaration
 */
 
-#ifndef PERVERTEXTESSPHONGALPHAMATERIAL_H
-#define PERVERTEXTESSPHONGALPHAMATERIAL_H
+#ifndef DISP3DLIB_PERVERTEXTESSPHONGALPHAMATERIAL_H
+#define DISP3DLIB_PERVERTEXTESSPHONGALPHAMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -88,7 +88,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -168,4 +168,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // PERVERTEXTESSPHONGALPHAMATERIAL_H
+#endif // DISP3DLIB_PERVERTEXTESSPHONGALPHAMATERIAL_H

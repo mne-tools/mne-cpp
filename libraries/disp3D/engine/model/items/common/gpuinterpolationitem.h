@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     rtgpusensordataworker.h
+* @file     gpuinterpolationitem.h
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2017
+* @date     October, 2017
 *
 * @section  LICENSE
 *
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtGpuSensorDataWorker class declaration.
+* @brief     GpuInterpolationItem class declaration.
 *
 */
 
-#ifndef DISP3DLIB_RTGPUSENSORDATAWORKER_H
-#define DISP3DLIB_RTGPUSENSORDATAWORKER_H
+#ifndef DISP3DLIB_GPUINTERPOLATIONITEM_H
+#define DISP3DLIB_GPUINTERPOLATIONITEM_H
 
 
 //*************************************************************************************************************
@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "../../../../disp3D_global.h"
+#include "../common/abstract3Dtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -51,9 +52,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QThread>
-#include <QMutex>
-#include <QLinkedList>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -61,13 +60,19 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace Qt3DRender {
+    class QComputeCommand;
+    class QBuffer;
+    class QAttribute;
+}
 
 
 //*************************************************************************************************************
@@ -83,126 +88,117 @@ namespace DISP3DLIB {
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class CustomMesh;
+class GpuInterpolationMaterial;
+
 
 //=============================================================================================================
 /**
-* Worker which schedules data with the right timing.
+* This item is used for signal interpolation with GPU support.
 *
-* @brief Data scheduler.
+* @brief This item is used for signal interpolation with GPU support.
 */
 
-class DISP3DSHARED_EXPORT RtGpuSensorDataWorker : public QThread
+class DISP3DSHARED_EXPORT GpuInterpolationItem : public Abstract3DTreeItem
 {
     Q_OBJECT
+
 public:
-    typedef QSharedPointer<RtGpuSensorDataWorker> SPtr;            /**< Shared pointer type for RtGpuSensorDataWorker. */
-    typedef QSharedPointer<const RtGpuSensorDataWorker> ConstSPtr; /**< Const shared pointer type for RtGpuSensorDataWorker. */
+    typedef QSharedPointer<GpuInterpolationItem> SPtr;            /**< Shared pointer type for GpuInterpolationItem. */
+    typedef QSharedPointer<const GpuInterpolationItem> ConstSPtr; /**< Const shared pointer type for GpuInterpolationItem. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     *
-    * @param[in] parent      The parent of the QObject.
+    * @param[in] p3DEntityParent    The parent 3D entity.
+    * @param[in] iType              The type of the item. See types.h for declaration and definition.
+    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit RtGpuSensorDataWorker(QObject* parent = 0);
+    explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
+                                  int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
+                                  const QString& text = "3D Plot");
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~RtGpuSensorDataWorker();
+    ~GpuInterpolationItem();
 
     //=========================================================================================================
     /**
-    * Add data which is to be streamed.
+    * Initialize interpolation data of this item.
     *
-    * @param[in] tData         The new data.
+    * @param[in] matVertices       The surface vertices.
+    * @param[in] matNormals        The surface normals.
+    * @param[in] matTriangles      The surface triangles.
     */
-    void addData(const Eigen::MatrixXf& tData);
+    virtual void initData(const Eigen::MatrixX3f &matVertices,
+                          const Eigen::MatrixX3f &matNormals,
+                          const Eigen::MatrixX3i &matTriangles);
 
     //=========================================================================================================
     /**
-    * Clear this worker, empties the m_lData field that holds the current block of sensor activity
-    */
-    void clear();
-
-    //=========================================================================================================
-    /**
-    * Set the number of average to take after emitting the data to the listening threads.
+    * Set the new Interpolation matrix for the interpolation.
     *
-    * @param[in] tNumAvr                The new number of averages.
+    * @param[in] pMatInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
     */
-    void setNumberAverages(const uint tNumAvr);
+    virtual void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**
-    * Set the length in milli Seconds to wait inbetween data samples.
+    * Add a new vector with signal data form the sensors.
     *
-    * @param[in] tMSec                  The new length in milli Seconds to wait inbetween data samples.
+    * @param[in] tSignalVec              Vector with one float value for each sensor.
     */
-    void setInterval(const uint tMSec);
+    virtual void addNewRtData(const Eigen::VectorXf &tSignalVec);
 
     //=========================================================================================================
     /**
-    * Set the loop functionality on or off.
+    * This function set the normalization value.
     *
-    * @param[in] tLooping                The new looping state.
+    * @param[in] vecThresholds       The new threshold values used for normalizing the data.
     */
-    void setLoop(const bool tLooping);
+    virtual void setThresholds(const QVector3D& tVecThresholds);
 
     //=========================================================================================================
     /**
-    * Set the sampling frequency.
+    * This function sets the colormap type
     *
-    * @param[in] tSFreq                 The new sampling frequency.
+    * @param[in] tColormapType           The new colormap name.
     */
-    void setSFreq(const double tSFreq);
-
-    //=========================================================================================================
-    /**
-    * Sets the running flag to false and waits for the worker to stop.
-    */
-    void stop();
-
-    //=========================================================================================================
-    /**
-    * Resets the index of the current sample and starts the worker.
-    */
-    void start();
+    virtual void setColormapType(const QString& tColormapType);
 
 protected:
-
     //=========================================================================================================
     /**
-    * Main method of this worker: Checks whether it is time for the worker to output new data for visualization.
-    * If so, it averages the specified amount of data samples and calculates the output.
-    */
-    virtual void run() override;
-
-private:
-
-    //=========================================================================================================
-    QMutex                                          m_qMutex;                           /**< The thread's mutex. */
-
-    QLinkedList<Eigen::VectorXf>                    m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    QLinkedList<Eigen::VectorXf>::const_iterator    m_itCurrentSample;                  /**< Iterator to the current sample in the linked list. */
-
-    bool                                            m_bIsRunning;                       /**< Flag if this thread is running. */
-    bool                                            m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
-
-    uint                                            m_iAverageSamples;                  /**< Number of average to compute. */
-    uint                                            m_iMSecIntervall;                   /**< Length in milli Seconds to wait inbetween data samples. */
-
-    double                                          m_dSFreq;                           /**< The current sampling frequency. */
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever this item should send new signal data to its listeners.
+    * Build the content of the Interpolation matrix buffer.
     *
-    * @param[in] tDataVector     The signal data from each sensor.
+    * @param[in] pMatInterpolationMatrix    The Interpolation matrix.
+    *
+    * @return                          Interpolation matrix is byte array form.
     */
-    void newRtData(const Eigen::VectorXf &tDataVector);
+    virtual QByteArray buildInterpolationMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
+
+    //=========================================================================================================
+    /**
+    * Build buffer filled with 0.0f.
+    *
+    * @param[in] tSize         Number of zeros.
+    *
+    * @return              Buffer content.
+    */
+    virtual QByteArray buildZeroBuffer(const uint tSize);
+
+    bool                                    m_bIsDataInit;                  /**< The data initialization flag. */
+
+    QPointer<GpuInterpolationMaterial>      m_pGPUMaterial;                 /**< Compute material used for the process. */
+
+    QPointer<CustomMesh>                    m_pCustomMesh;                  /**< The actual mesh information (vertices, normals, colors). */
+
+    QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
+    QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;           /**< The QBuffer/GLBuffer holding the output color (interpolated) data. */
+    QPointer<Qt3DRender::QBuffer>           m_pSignalDataBuffer;            /**< The QBuffer/GLBuffer holding the signal data. */
 };
 
 
@@ -214,4 +210,4 @@ signals:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_RTGPUSENSORDATAWORKER_H
+#endif // DISP3DLIB_GPUINTERPOLATIONITEM_H
