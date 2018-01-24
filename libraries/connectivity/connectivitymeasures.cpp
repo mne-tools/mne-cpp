@@ -44,6 +44,8 @@
 #include "network/networkedge.h"
 #include "network/network.h"
 
+#include <mne/mne_epoch_data_list.h>
+
 #include <iostream>
 
 
@@ -70,6 +72,7 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -90,9 +93,23 @@ ConnectivityMeasures::ConnectivityMeasures()
 
 //*************************************************************************************************************
 
-Network ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, const MatrixX3f& matVert)
+Network ConnectivityMeasures::pearsonsCorrelationCoeff(const MNEEpochDataList& epochDataList, const MatrixX3f& matVert)
 {
     Network finalNetwork("Pearson's Correlation Coefficient");
+
+    if(epochDataList.empty()) {
+        qDebug() << "ConnectivityMeasures::pearsonsCorrelationCoeff - Input data is empty";
+        return finalNetwork;
+    }
+
+    // Average data
+    MatrixXd matData(epochDataList.first()->epoch.rows(), epochDataList.first()->epoch.cols());
+    for(int i = 0; i < epochDataList.size(); ++i) {
+        matData += epochDataList.at(i)->epoch;
+    }
+
+    matData = matData/epochDataList.size();
+
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {
@@ -127,9 +144,22 @@ Network ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, 
 
 //*************************************************************************************************************
 
-Network ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
+Network ConnectivityMeasures::crossCorrelation(const MNEEpochDataList& epochDataList, const MatrixX3f& matVert)
 {
     Network finalNetwork("Cross Correlation");
+
+    if(epochDataList.empty()) {
+        qDebug() << "ConnectivityMeasures::crossCorrelation - Input data is empty";
+        return finalNetwork;
+    }
+
+    // Average data
+    MatrixXd matData(epochDataList.first()->epoch.rows(), epochDataList.first()->epoch.cols());
+    for(int i = 0; i < epochDataList.size(); ++i) {
+        matData += epochDataList.at(i)->epoch;
+    }
+
+    matData = matData/epochDataList.size();
 
     //Create nodes
     for(int i = 0; i < matData.rows(); ++i) {

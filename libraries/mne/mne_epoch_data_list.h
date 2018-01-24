@@ -108,10 +108,14 @@ public:
     * @param[in] info     measurement info
     * @param[in] first    First time sample
     * @param[in] last     Last time sample
-    * @param[in] sel        Which epochs should be averaged (optional)
-    * @param[in] proj       Apply SSP projection vectors (optional, default = false)
+    * @param[in] sel      Which epochs should be averaged (optional)
+    * @param[in] proj     Apply SSP projection vectors (optional, default = false)
     */
-    FIFFLIB::FiffEvoked average(FIFFLIB::FiffInfo& p_info, FIFFLIB::fiff_int_t first, FIFFLIB::fiff_int_t last, VectorXi sel = FIFFLIB::defaultVectorXi, bool proj = false);
+    FIFFLIB::FiffEvoked average(FIFFLIB::FiffInfo& p_info,
+                                FIFFLIB::fiff_int_t first,
+                                FIFFLIB::fiff_int_t last,
+                                VectorXi sel = FIFFLIB::defaultVectorXi,
+                                bool proj = false);
 };
 
 } // NAMESPACE
