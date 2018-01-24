@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef HEMISPHERETREEITEM_H
-#define HEMISPHERETREEITEM_H
+#ifndef DISP3DLIB_HEMISPHERETREEITEM_H
+#define DISP3DLIB_HEMISPHERETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,7 +91,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FsSurfaceTreeItem;
@@ -120,7 +120,8 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
+    explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem,
+                                const QString& text = "Unknown");
 
     //=========================================================================================================
     /**
@@ -132,7 +133,9 @@ public:
     *
     * @return                       Returns a pointer to the added tree item.
     */
-    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface,
+                               const FSLIB::Annotation& tAnnotation,
+                               Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -143,23 +146,8 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
-
-    //=========================================================================================================
-    /**
-    * Returns the surface tree item.
-    *
-    * @return The current surface tree item.
-    */
-    FsSurfaceTreeItem* getSurfaceItem();
-
-    //=========================================================================================================
-    /**
-    * Returns the annotation tree item.
-    *
-    * @return The current annotation tree item.
-    */
-    FsAnnotationTreeItem* getAnnotItem();
+    SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere,
+                                 Qt3DCore::QEntity* p3DEntityParent = 0);
 
 protected:
     //=========================================================================================================
@@ -167,11 +155,8 @@ protected:
     * AbstractTreeItem functions
     */
     void initItem();
-
-    QPointer<FsSurfaceTreeItem>           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    QPointer<FsAnnotationTreeItem>        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // HEMISPHERETREEITEM_H
+#endif // DISP3DLIB_HEMISPHERETREEITEM_H

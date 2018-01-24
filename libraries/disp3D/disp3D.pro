@@ -103,8 +103,8 @@ SOURCES += \
     engine/model/items/freesurfer/fsannotationtreeitem.cpp \
     engine/model/items/hemisphere/hemispheretreeitem.cpp \
     engine/model/items/sourcespace/sourcespacetreeitem.cpp \
-    engine/model/items/sourceactivity/mneestimatetreeitem.cpp \
-    engine/model/items/sourceactivity/ecddatatreeitem.cpp \
+    engine/model/items/sourcedata/mneestimatetreeitem.cpp \
+    engine/model/items/sourcedata/ecddatatreeitem.cpp \
     engine/model/items/network/networktreeitem.cpp \
     engine/model/items/bem/bemtreeitem.cpp \
     engine/model/items/bem/bemsurfacetreeitem.cpp \
@@ -118,8 +118,13 @@ SOURCES += \
     engine/model/items/common/abstract3Dtreeitem.cpp \
     engine/model/items/common/metatreeitem.cpp \
     engine/model/items/common/abstractmeshtreeitem.cpp \
-    engine/model/workers/rtSourceLoc/rtsourcelocdataworker.cpp \
+    engine/model/items/common/gpuinterpolationitem.cpp \
+    engine/model/workers/rtSourceLoc/rtsourcedataworker.cpp \
+    engine/model/workers/rtSourceLoc/rtsourcedatacontroller.cpp \
+    engine/model/workers/rtSourceLoc/rtsourceinterpolationmatworker.cpp \
     engine/model/workers/rtSensorData/rtsensordataworker.cpp \
+    engine/model/workers/rtSensorData/rtsensordatacontroller.cpp \
+    engine/model/workers/rtSensorData/rtsensorinterpolationmatworker.cpp \
     engine/model/3dhelpers/renderable3Dentity.cpp \
     engine/model/3dhelpers/custommesh.cpp \
     engine/model/materials/pervertexphongalphamaterial.cpp \
@@ -137,10 +142,6 @@ SOURCES += \
     engine/model/3dhelpers/geometrymultiplier.cpp \
     engine/model/materials/geometrymultipliermaterial.cpp \
     engine/view/customframegraph.cpp \
-    engine/model/items/sensordata/cpusensordatatreeitem.cpp \
-    engine/model/items/sensordata/gpusensordatatreeitem.cpp \
-    engine/model/items/sensordata/gpuinterpolationitem.cpp \
-    engine/model/workers/rtSensorData/rtgpusensordataworker.cpp \
     engine/model/materials/gpuinterpolationmaterial.cpp
 
 HEADERS += \
@@ -153,8 +154,8 @@ HEADERS += \
     engine/model/items/freesurfer/fsannotationtreeitem.h \
     engine/model/items/hemisphere/hemispheretreeitem.h \
     engine/model/items/sourcespace/sourcespacetreeitem.h \
-    engine/model/items/sourceactivity/mneestimatetreeitem.h \
-    engine/model/items/sourceactivity/ecddatatreeitem.h \
+    engine/model/items/sourcedata/mneestimatetreeitem.h \
+    engine/model/items/sourcedata/ecddatatreeitem.h \
     engine/model/items/network/networktreeitem.h \
     engine/model/items/bem/bemtreeitem.h \
     engine/model/items/bem/bemsurfacetreeitem.h \
@@ -169,8 +170,13 @@ HEADERS += \
     engine/model/items/common/metatreeitem.h \
     engine/model/items/common/abstractmeshtreeitem.h \
     engine/model/items/common/types.h \
-    engine/model/workers/rtSourceLoc/rtsourcelocdataworker.h \
+    engine/model/items/common/gpuinterpolationitem.h \
+    engine/model/workers/rtSourceLoc/rtsourcedataworker.h \
+    engine/model/workers/rtSourceLoc/rtsourcedatacontroller.h \
+    engine/model/workers/rtSourceLoc/rtsourceinterpolationmatworker.h \
     engine/model/workers/rtSensorData/rtsensordataworker.h \
+    engine/model/workers/rtSensorData/rtsensordatacontroller.h \
+    engine/model/workers/rtSensorData/rtsensorinterpolationmatworker.h \
     engine/model/3dhelpers/renderable3Dentity.h \
     engine/model/3dhelpers/custommesh.h \
     engine/model/items/common/types.h \
@@ -190,10 +196,6 @@ HEADERS += \
     engine/model/3dhelpers/geometrymultiplier.h \
     engine/model/materials/geometrymultipliermaterial.h \
     engine/view/customframegraph.h \
-    engine/model/items/sensordata/cpusensordatatreeitem.h \
-    engine/model/items/sensordata/gpusensordatatreeitem.h \
-    engine/model/items/sensordata/gpuinterpolationitem.h \
-    engine/model/workers/rtSensorData/rtgpusensordataworker.h \
     engine/model/materials/gpuinterpolationmaterial.h
 
 FORMS += \

@@ -32,8 +32,8 @@
 * @brief    ShaderMaterial class declaration
 */
 
-#ifndef SHADERMATERIAL_H
-#define SHADERMATERIAL_H
+#ifndef DISP3DLIB_SHADERMATERIAL_H
+#define DISP3DLIB_SHADERMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -91,7 +91,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -170,4 +170,4 @@ private:
 
 } // namespace DISP3DLIB
 
-#endif // ShaderMaterial_H
+#endif // DISP3DLIB_ShaderMaterial_H

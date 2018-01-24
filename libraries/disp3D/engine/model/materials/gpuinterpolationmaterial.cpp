@@ -53,12 +53,10 @@
 #include <Qt3DRender/QRenderPass>
 #include <Qt3DRender/QFilterKey>
 #include <Qt3DRender/QTechnique>
-#include <Qt3DRender/QBuffer>
 #include <Qt3DRender/QShaderProgram>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <QUrl>
 #include <QColor>
-#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -74,6 +72,7 @@
 
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -102,122 +101,16 @@ GpuInterpolationMaterial::GpuInterpolationMaterial(Qt3DCore::QNode *parent)
     , m_pDrawRenderPass(new QRenderPass)
     , m_pDrawFilterKey(new QFilterKey)
     , m_pDrawTechnique(new QTechnique)
-    , m_pSignalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
     , m_pSignalDataParameter(new QParameter)
     , m_pColsParameter(new QParameter)
     , m_pRowsParameter(new QParameter)
-    , m_pWeightMatParameter(new QParameter)
-    , m_pWeightMatBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::ShaderStorageBuffer))
+    , m_pInterpolationMatParameter(new QParameter)
     , m_pOutputColorParameter(new QParameter)
-    , m_pOutputColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
     , m_pThresholdXParameter(new QParameter(QStringLiteral("fThresholdX"), 1e-10f))
     , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
     , m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
 {
     init();
-}
-
-
-//*************************************************************************************************************
-
-GpuInterpolationMaterial::~GpuInterpolationMaterial()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void GpuInterpolationMaterial::setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
-{
-    //Set Rows and Cols
-    m_pColsParameter->setValue(static_cast<uint>(tInterpolationMatrix->cols()));
-    m_pRowsParameter->setValue(static_cast<uint>(tInterpolationMatrix->rows()));
-
-    //Set buffer
-    m_pWeightMatBuffer->setData(buildWeightMatrixBuffer(tInterpolationMatrix));
-    //Set weight matrix parameter
-    m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
-
-    //Set output buffer
-    m_pOutputColorBuffer->setData(buildZeroBuffer(4 * tInterpolationMatrix->rows()));
-    m_pOutputColorParameter->setValue(QVariant::fromValue(m_pOutputColorBuffer.data()));
-}
-
-
-//*************************************************************************************************************
-
-void GpuInterpolationMaterial::addSignalData(const Eigen::VectorXf &tSignalVec)
-{
-    const uint iBufferSize = tSignalVec.rows();
-
-    if(iBufferSize != m_pColsParameter->value())
-    {
-        qDebug("GpuInterpolationMaterial::addSignalData input vector dimension mismatch!");
-        return;
-    }
-
-    QByteArray bufferData;
-    bufferData.resize(iBufferSize * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    for(uint i = 0; i < iBufferSize; ++i)
-    {
-        rawVertexArray[i] = tSignalVec[i];
-    }
-
-    //Set buffer and parameter
-    m_pSignalDataBuffer->setData(bufferData);
-    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
-}
-
-
-//*************************************************************************************************************
-
-float GpuInterpolationMaterial::alpha()
-{
-    return m_pAlphaParameter->value().toFloat();
-}
-
-
-//*************************************************************************************************************
-
-void GpuInterpolationMaterial::setAlpha(const float tAlpha)
-{
-    m_pAlphaParameter->setValue(tAlpha);
-}
-
-
-//*************************************************************************************************************
-
-void GpuInterpolationMaterial::setNormalization(const QVector3D &tVecThresholds)
-{
-    m_pThresholdXParameter->setValue(QVariant::fromValue(tVecThresholds.x()));
-    m_pThresholdZParameter->setValue(QVariant::fromValue(tVecThresholds.z()));
-}
-
-
-//*************************************************************************************************************
-
-void GpuInterpolationMaterial::setColormapType(const QString &tColormapType)
-{
-    if(tColormapType == "Hot") {
-        m_pColormapParameter->setValue(0);
-    } else if(tColormapType == "Hot Negative 1") {
-        m_pColormapParameter->setValue(1);
-    } else if(tColormapType == "Hot Negative 2") {
-        m_pColormapParameter->setValue(2);
-    } else if(tColormapType == "Jet") {
-        m_pColormapParameter->setValue(3);
-    }
-}
-
-
-//*************************************************************************************************************
-
-Qt3DRender::QBuffer * GpuInterpolationMaterial::getOutputColorBuffer()
-{
-    return m_pOutputColorBuffer.data();
 }
 
 
@@ -245,31 +138,24 @@ void GpuInterpolationMaterial::init()
     m_pComputeTechnique->addFilterKey(m_pComputeFilterKey);
     m_pComputeTechnique->addRenderPass(m_pComputeRenderPass);
 
-    //Set default weight matrix parameters
+    //Set default Interpolation matrix parameters
     m_pColsParameter->setName(QStringLiteral("cols"));
     m_pColsParameter->setValue(1);
     m_pRowsParameter->setName(QStringLiteral("rows"));
     m_pRowsParameter->setValue(1);
-
-    m_pWeightMatBuffer->setData(buildZeroBuffer(1));
-    m_pWeightMatParameter->setName(QStringLiteral("WeightMat"));
-    m_pWeightMatParameter->setValue(QVariant::fromValue(m_pWeightMatBuffer.data()));
+    m_pInterpolationMatParameter->setName(QStringLiteral("InterpolationMat"));
 
     //Set default output
-    m_pOutputColorBuffer->setData(buildZeroBuffer(4));
     m_pOutputColorParameter->setName(QStringLiteral("OutputColor"));
-    m_pOutputColorParameter->setValue(QVariant::fromValue(m_pOutputColorBuffer.data()));
 
     //Set default input
-    m_pSignalDataBuffer->setData(buildZeroBuffer(1));
     m_pSignalDataParameter->setName(QStringLiteral("InputVec"));
-    m_pSignalDataParameter->setValue(QVariant::fromValue(m_pSignalDataBuffer.data()));
 
     //Add compute Parameter
     m_pComputeRenderPass->addParameter(m_pColsParameter);
     m_pComputeRenderPass->addParameter(m_pRowsParameter);
     m_pComputeRenderPass->addParameter(m_pOutputColorParameter);
-    m_pComputeRenderPass->addParameter(m_pWeightMatParameter);
+    m_pComputeRenderPass->addParameter(m_pInterpolationMatParameter);
     m_pComputeRenderPass->addParameter(m_pSignalDataParameter);
 
     //Add Threshold parameter
@@ -337,50 +223,3 @@ void GpuInterpolationMaterial::onAlphaChanged(const QVariant &fAlpha)
         }
     }
 }
-
-
-//*************************************************************************************************************
-
-QByteArray GpuInterpolationMaterial::buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double> > tInterpolationMatrix)
-{
-    QByteArray bufferData;
-
-    const uint iRows = tInterpolationMatrix->rows();
-    const uint iCols = tInterpolationMatrix->cols();
-
-    bufferData.resize(iRows * iCols * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    unsigned int iCtr = 0;
-    for(uint i = 0; i < iRows; ++i)
-    {
-        for(uint j = 0; j < iCols; ++j)
-        {
-            //@TODO this is probably not the best way to extract the weight matrix components
-            rawVertexArray[iCtr] = static_cast<float>(tInterpolationMatrix->coeff(i, j));
-            iCtr++;
-        }
-    }
-
-    return bufferData;
-}
-
-
-//*************************************************************************************************************
-
-QByteArray GpuInterpolationMaterial::buildZeroBuffer(const uint tSize)
-{
-    QByteArray bufferData;
-    bufferData.resize(tSize * (int)sizeof(float));
-    float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
-
-    //Set default values
-    for(uint i = 0; i < tSize; ++i)
-    {
-        rawVertexArray[i] = 0.0f;
-    }
-    return bufferData;
-}
-
-
-//*************************************************************************************************************

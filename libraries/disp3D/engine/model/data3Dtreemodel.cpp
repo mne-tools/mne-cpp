@@ -106,15 +106,8 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent)
 
 //*************************************************************************************************************
 
-Data3DTreeModel::~Data3DTreeModel()
-{
-    //delete m_pRootItem;
-}
-
-
-//*************************************************************************************************************
-
-QVariant Data3DTreeModel::data(const QModelIndex& index, int role) const
+QVariant Data3DTreeModel::data(const QModelIndex& index,
+                               int role) const
 {
 //    qDebug() << "Data3DTreeModel::data - index.column(): " << index.column();
 
@@ -139,7 +132,8 @@ int Data3DTreeModel::columnCount(const QModelIndex &parent) const
 
 //*************************************************************************************************************
 
-QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation,
+                                     int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         QVariant data;
@@ -171,7 +165,10 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject, const QString& sMriSetName, const SurfaceSet& surfaceSet, const AnnotationSet& annotationSet)
+QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject,
+                                                         const QString& sMriSetName,
+                                                         const SurfaceSet& surfaceSet,
+                                                         const AnnotationSet& annotationSet)
 {
     QList<FsSurfaceTreeItem*> returnItemList;
 
@@ -189,7 +186,10 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject
 
 //*************************************************************************************************************
 
-FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QString& sMriSetName, const Surface& surface, const Annotation &annotation)
+FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
+                                               const QString& sMriSetName,
+                                               const Surface& surface,
+                                               const Annotation &annotation)
 {
     FsSurfaceTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -204,7 +204,7 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QSt
         pReturnItem = pMriItem->addData(surface, annotation, m_pModelEntity);
     } else {
         MriTreeItem* pMriItem = new MriTreeItem(Data3DTreeModelItemTypes::MriItem, sMriSetName);
-        addItemWithDescription(pSubjectItem, pMriItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMriItem);
         pReturnItem = pMriItem->addData(surface, annotation, m_pModelEntity);
     }
 
@@ -214,7 +214,9 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject, const QSt
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject, const QString& sMeasurementSetName, const MNESourceSpace& sourceSpace)
+SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject,
+                                                     const QString& sMeasurementSetName,
+                                                     const MNESourceSpace& sourceSpace)
 {
     SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -229,7 +231,7 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject, co
         pReturnItem = pMeasurementItem->addData(sourceSpace, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(sourceSpace, m_pModelEntity);
     }
 
@@ -239,7 +241,9 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject, co
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject, const QString& sMeasurementSetName, const MNEForwardSolution& forwardSolution)
+SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject,
+                                                         const QString& sMeasurementSetName,
+                                                         const MNEForwardSolution& forwardSolution)
 {
     return this->addSourceSpace(sSubject, sMeasurementSetName, forwardSolution.src);
 }
@@ -247,8 +251,26 @@ SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, const QString& sMeasurementSetName, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
+                                                    const QString& sMeasurementSetName,
+                                                    const MNESourceEstimate& tSourceEstimate,
+                                                    const MNELIB::MNEForwardSolution& tForwardSolution,
+                                                    const FSLIB::SurfaceSet& tSurfSet,
+                                                    const FSLIB::AnnotationSet& tAnnotSet,
+                                                    const QSurfaceFormat &tSurfaceFormat)
 {
+    bool bUseGPU = false;
+
+    //Test for OpenGL version 4.3
+    if((tSurfaceFormat.majorVersion() == 4
+            && tSurfaceFormat.minorVersion() >= 3
+            || tSurfaceFormat.majorVersion() > 4))
+    {
+        //use compute shader version
+        bUseGPU = true;
+        qDebug("Using compute shader version for 3D visualization.");
+    }
+
     MneEstimateTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
@@ -257,22 +279,25 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, con
     //Find already existing surface items and add the new data to the first search result
     QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
 
-    //Find the "set" items and add the dipole fits as items
+    //Find the "set" items and add the sensor data as items
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {            
-            //If measurement data has already been created but in conjunction with a different data type (i.e. connectivity, dipole fitting, etc.), do the connects here
-            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::MNEEstimateItem).isEmpty()) {
-                pSubjectItem->connectMeasurementToMriItems(pMeasurementItem);
-            }
-
-            pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
+        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
+            pReturnItem = pMeasurementItem->addData(tSourceEstimate,
+                                                    tForwardSolution,
+                                                    tSurfSet,
+                                                    tAnnotSet,
+                                                    m_pModelEntity,
+                                                    bUseGPU);
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(tSourceEstimate, tForwardSolution);
-
-        pSubjectItem->connectMeasurementToMriItems(pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
+        pReturnItem = pMeasurementItem->addData(tSourceEstimate,
+                                                tForwardSolution,
+                                                tSurfSet,
+                                                tAnnotSet,
+                                                m_pModelEntity,
+                                                bUseGPU);
     }
 
     return pReturnItem;
@@ -281,7 +306,9 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject, con
 
 //*************************************************************************************************************
 
-EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject, const QString& sSet, const INVERSELIB::ECDSet& ecdSet)
+EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
+                                                   const QString& sSet,
+                                                   const INVERSELIB::ECDSet& ecdSet)
 {
     EcdDataTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -298,7 +325,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject, cons
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sSet);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(ecdSet, m_pModelEntity);
     }
 
@@ -308,7 +335,9 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject, cons
 
 //*************************************************************************************************************
 
-NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject, const QString& sMeasurementSetName, const Network& networkData)
+NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
+                                                      const QString& sMeasurementSetName,
+                                                      const Network& networkData)
 {
     NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -324,7 +353,7 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject, c
         }
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(networkData, m_pModelEntity);
     }
 
@@ -334,7 +363,9 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject, c
 
 //*************************************************************************************************************
 
-BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString& sBemSetName, const MNELIB::MNEBem& bem)
+BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
+                                         const QString& sBemSetName,
+                                         const MNELIB::MNEBem& bem)
 {
     BemTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -349,7 +380,7 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString&
         pReturnItem->addData(bem, m_pModelEntity);
     } else {
         pReturnItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, sBemSetName);
-        addItemWithDescription(pSubjectItem, pReturnItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(bem, m_pModelEntity);
     }
 
@@ -360,9 +391,9 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject, const QString&
 //*************************************************************************************************************
 
 SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
-                                                       const QString& sSensorSetName,
-                                                        const QList<FIFFLIB::FiffChInfo>& lChInfo,
-                                                       const MNELIB::MNEBem& sensor)
+                                                     const QString& sSensorSetName,
+                                                     const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                                     const MNELIB::MNEBem& sensor)
 {
     SensorSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -377,7 +408,7 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
         pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
     } else {
         pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
-        addItemWithDescription(pSubjectItem, pReturnItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
     }
 
@@ -388,8 +419,8 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 //*************************************************************************************************************
 
 SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
-                                                       const QString& sSensorSetName,
-                                                       const QList<FIFFLIB::FiffChInfo>& lChInfo)
+                                                     const QString& sSensorSetName,
+                                                     const QList<FIFFLIB::FiffChInfo>& lChInfo)
 {
     SensorSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -406,7 +437,7 @@ SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
         pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
     } else {
         pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
-        addItemWithDescription(pSubjectItem, pReturnItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
         pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
     }
 
@@ -433,8 +464,63 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& sSubject,
         pReturnItem = pMeasurementItem->addData(digitizer, m_pModelEntity);
     } else {
         MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
         pReturnItem = pMeasurementItem->addData(digitizer, m_pModelEntity);
+    }
+
+    return pReturnItem;
+}
+
+
+//*************************************************************************************************************
+
+SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
+                                                   const QString& sMeasurementSetName,
+                                                   const MatrixXd& matSensorData,
+                                                   const MNEBemSurface& tBemSurface,
+                                                   const FiffInfo& fiffInfo,
+                                                   const QString& sDataType,
+                                                   const QSurfaceFormat &tSurfaceFormat)
+{
+    bool bUseGPU = false;
+
+    //Test for OpenGL version 4.3
+    if((tSurfaceFormat.majorVersion() == 4
+            && tSurfaceFormat.minorVersion() >= 3
+            || tSurfaceFormat.majorVersion() > 4))
+    {
+        //use compute shader version
+        bUseGPU = true;
+        qDebug("Using compute shader version of SensorDataTreeItem.");
+    }
+
+    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
+
+    //Handle subject item
+    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
+
+    //Find already existing surface items and add the new data to the first search result
+    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
+
+    //Find the "set" items and add the sensor data as items
+    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
+        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
+            pReturnItem = pMeasurementItem->addData(matSensorData,
+                                                    tBemSurface,
+                                                    fiffInfo,
+                                                    sDataType,
+                                                    m_pModelEntity,
+                                                    bUseGPU);
+        }
+    } else {
+        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
+        AbstractTreeItem::addItemWithDescription(pSubjectItem, pMeasurementItem);
+        pReturnItem = pMeasurementItem->addData(matSensorData,
+                                                tBemSurface,
+                                                fiffInfo,
+                                                sDataType,
+                                                m_pModelEntity,
+                                                bUseGPU);
     }
 
     return pReturnItem;
@@ -446,33 +532,6 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& sSubject,
 QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
 {
     return m_pModelEntity;
-}
-
-
-//*************************************************************************************************************
-
-void Data3DTreeModel::initMetatypes()
-{
-    //Init metatypes
-    qRegisterMetaType<QPair<MatrixX3f, MatrixX3f> >("QPair<MatrixX3f, MatrixX3f>");
-
-    qRegisterMetaType<Eigen::MatrixX3i>();
-    qRegisterMetaType<Eigen::MatrixXd>();
-    qRegisterMetaType<Eigen::MatrixX3f>();
-    qRegisterMetaType<Eigen::VectorXf>();
-    qRegisterMetaType<Eigen::VectorXi>();
-    qRegisterMetaType<Eigen::VectorXd>();
-    qRegisterMetaType<Eigen::RowVectorXf>();
-    qRegisterMetaType<Eigen::Vector3f>();
-
-    qRegisterMetaType<MatrixX3i>();
-    qRegisterMetaType<MatrixXd>();
-    qRegisterMetaType<MatrixX3f>();
-    qRegisterMetaType<VectorXf>();
-    qRegisterMetaType<VectorXi>();
-    qRegisterMetaType<VectorXd>();
-    qRegisterMetaType<RowVectorXf>();
-    qRegisterMetaType<Vector3f>();
 }
 
 
@@ -501,139 +560,49 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 
 //*************************************************************************************************************
 
-void Data3DTreeModel::addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd)
+void Data3DTreeModel::initMetatypes()
 {
-    if(pItemParent && pItemAdd) {
-        QList<QStandardItem*> list;
-        list << pItemAdd;
-        list << new QStandardItem(pItemAdd->toolTip());
-        pItemParent->appendRow(list);
-    }
+    //Init metatypes
+    qRegisterMetaType<QVector<QVector<int> > >();
+
+    qRegisterMetaType<QVector<Vector3f> >();
+    qRegisterMetaType<QVector<Eigen::Vector3f> >();
+
+    qRegisterMetaType<QVector<qint32> >();
+
+    qRegisterMetaType<QList<FSLIB::Label> >();
+    qRegisterMetaType<QList<Label> >();
+
+    qRegisterMetaType<FIFFLIB::FiffInfo>();
+    qRegisterMetaType<FiffInfo>();
+
+    qRegisterMetaType<Eigen::MatrixX3i>();
+    qRegisterMetaType<MatrixX3i>();
+
+    qRegisterMetaType<Eigen::MatrixXd>();
+    qRegisterMetaType<MatrixXd>();
+
+    qRegisterMetaType<Eigen::MatrixX3f>();
+    qRegisterMetaType<MatrixX3f>();
+
+    qRegisterMetaType<Eigen::VectorXf>();
+    qRegisterMetaType<VectorXf>();
+
+    qRegisterMetaType<Eigen::VectorXi>();
+    qRegisterMetaType<VectorXi>();
+
+    qRegisterMetaType<Eigen::VectorXd>();
+    qRegisterMetaType<VectorXd>();
+
+    qRegisterMetaType<Eigen::RowVectorXf>();
+    qRegisterMetaType<RowVectorXf>();
+
+    qRegisterMetaType<Eigen::Vector3f>();
+    qRegisterMetaType<Vector3f>();
+
+    qRegisterMetaType<Eigen::SparseMatrix<float> >();
+    qRegisterMetaType<SparseMatrix<float> >();
+
+    qRegisterMetaType<QSharedPointer<Eigen::SparseMatrix<float> > >();
+    qRegisterMetaType<QSharedPointer<SparseMatrix<float> > >();
 }
-
-
-//*************************************************************************************************************
-
-SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
-                                        const QString& sMeasurementSetName,
-                                        const MatrixXd& matSensorData,
-                                        const MNEBemSurface& tBemSurface,
-                                        const FiffInfo& fiffInfo,
-                                        const QString& sDataType,
-                                        const double dCancelDist,
-                                        const QString& sInterpolationFunction,
-                                        const QSurfaceFormat &tSurfaceFormat)
-{
-    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
-
-    //Test for OpenGL version 4.3
-    if((tSurfaceFormat.majorVersion() == 4
-            && tSurfaceFormat.minorVersion() >= 3
-            || tSurfaceFormat.majorVersion() > 4))
-    {
-        //use compute shader version
-        pReturnItem = addCshSensorData(sSubject,
-                         sMeasurementSetName,
-                         matSensorData,
-                         tBemSurface,
-                         fiffInfo,
-                         sDataType,
-                         dCancelDist,
-                         sInterpolationFunction);
-        qDebug("Using compute shader version of SensorDataTreeItem.");
-    }
-    else
-    {
-        //use cpu version
-        pReturnItem = addCpuSensorData(sSubject,
-                         sMeasurementSetName,
-                         matSensorData,
-                         tBemSurface,
-                         fiffInfo,
-                         sDataType,
-                         dCancelDist,
-                         sInterpolationFunction);
-    }
-
-    return pReturnItem;
-}
-
-
-//*************************************************************************************************************
-
-SensorDataTreeItem *Data3DTreeModel::addCpuSensorData(const QString &sSubject, const QString &sMeasurementSetName, const MatrixXd &matSensorData, const MNEBemSurface &tBemSurface, const FiffInfo &fiffInfo, const QString &sDataType, const double dCancelDist, const QString &sInterpolationFunction)
-{
-    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
-
-    //Handle subject item
-    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
-
-    //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
-
-    //Find the "set" items and add the sensor data as items
-    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            //If measurement data has already been created but in conjunction with a different data type
-            //(i.e. connectivity, dipole fitting, etc.), do the connects here
-            if(pMeasurementItem->findChildren(Data3DTreeModelItemTypes::SensorDataItem).size() < 2) { // <2 because we can store MEG and EEG
-                if(sDataType == "EEG") {
-                    pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-                } else if (sDataType == "MEG") {
-                    pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-                }
-            }
-
-            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction);
-        }
-    } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction);
-
-        if(sDataType == "EEG") {
-            pSubjectItem->connectEEGMeasurementToBemHeadItems(pMeasurementItem);
-        } else if (sDataType == "MEG") {
-            pSubjectItem->connectMEGMeasurementToSensorItems(pMeasurementItem, m_pRootItem);
-        }
-    }
-
-    return pReturnItem;
-}
-
-
-//*************************************************************************************************************
-
-SensorDataTreeItem *Data3DTreeModel::addCshSensorData(const QString &sSubject,
-                                                         const QString &sMeasurementSetName,
-                                                         const MatrixXd &matSensorData,
-                                                         const MNEBemSurface &tBemSurface,
-                                                         const FiffInfo &fiffInfo,
-                                                         const QString &sDataType,
-                                                         const double dCancelDist,
-                                                         const QString &sInterpolationFunction)
-{
-    SensorDataTreeItem* pReturnItem = Q_NULLPTR;
-
-    //Handle subject item
-    SubjectTreeItem* pSubjectItem = addSubject(sSubject);
-
-    //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = pSubjectItem->findChildren(sMeasurementSetName);
-
-    //Find the "set" items and add the sensor data as items
-    if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::MeasurementItem)) {
-        if(MeasurementTreeItem* pMeasurementItem = dynamic_cast<MeasurementTreeItem*>(itemList.first())) {
-            pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
-        }
-    } else {
-        MeasurementTreeItem* pMeasurementItem = new MeasurementTreeItem(Data3DTreeModelItemTypes::MeasurementItem, sMeasurementSetName);
-        addItemWithDescription(pSubjectItem, pMeasurementItem);
-        pReturnItem = pMeasurementItem->addData(matSensorData, tBemSurface, fiffInfo, sDataType, dCancelDist, sInterpolationFunction, m_pModelEntity);
-    }
-
-    return pReturnItem;
-}
-
-
-//*************************************************************************************************************

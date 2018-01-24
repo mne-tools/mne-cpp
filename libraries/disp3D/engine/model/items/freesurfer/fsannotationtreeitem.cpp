@@ -126,12 +126,6 @@ void FsAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tA
         data.setValue(matAnnotColors);
         this->setData(data, Data3DTreeModelItemRoles::AnnotColors);
 
-        data.setValue(qListLabels);
-        this->setData(data, Data3DTreeModelItemRoles::LabeList);
-
-        data.setValue(tAnnotation.getLabelIds());
-        this->setData(data, Data3DTreeModelItemRoles::LabeIds);
-
         //Add annotation meta information as item children
         QList<QStandardItem*> list;
 

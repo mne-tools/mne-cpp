@@ -32,8 +32,9 @@
 * @brief    Contains general application specific types
 *
 */
-#ifndef TYPES_H
-#define TYPES_H
+
+#ifndef DISP3DLIB_TYPES_H
+#define DISP3DLIB_TYPES_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +43,7 @@
 
 #include <fs/label.h>
 #include <inverse/dipoleFit/ecd_set.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +53,7 @@
 
 #include <QStandardItem>
 #include <QByteArray>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -59,14 +62,13 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Sparse>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -101,7 +103,6 @@ namespace Data3DTreeModelItemTypes
                     SensorPositionItem = QStandardItem::UserType + 17,
                     AbstractMeshItem = QStandardItem::UserType + 18,
                     SensorDataItem = QStandardItem::UserType + 19,
-                    CshSensorDataItem = QStandardItem::UserType + 20,
                     GpuInterpolationItem = QStandardItem::UserType + 21};
 }
 
@@ -109,147 +110,160 @@ namespace MetaTreeItemTypes
 {
     enum ItemType{FileName = QStandardItem::UserType + 100,
                     FilePath = QStandardItem::UserType + 101,
-                    SurfaceColorGyri = QStandardItem::UserType + 103,
-                    SurfaceColorSulci = QStandardItem::UserType + 104,
-                    SurfaceColorVert = QStandardItem::UserType + 105,
-                    AlphaValue = QStandardItem::UserType + 106,
-                    StreamStatus = QStandardItem::UserType + 107,
-                    SourceSpaceType = QStandardItem::UserType + 108,
-                    ColormapType = QStandardItem::UserType + 109,
-                    StreamingTimeInterval = QStandardItem::UserType + 110,
-                    LoopedStreaming = QStandardItem::UserType + 111,
-                    NumberAverages = QStandardItem::UserType + 112,
-                    DistributedSourceLocThreshold = QStandardItem::UserType + 113,
-                    VisualizationType = QStandardItem::UserType + 114,
-                    Color = QStandardItem::UserType + 115,
-                    UnknownItem = QStandardItem::UserType + 116,
-                    TranslateX = QStandardItem::UserType + 117,
-                    TranslateY = QStandardItem::UserType + 118,
-                    TranslateZ = QStandardItem::UserType + 119,
-                    NetworkThreshold = QStandardItem::UserType + 120,
-                    NetworkMatrix = QStandardItem::UserType + 121,
-                    SurfaceTessInner = QStandardItem::UserType + 122,
-                    SurfaceTessOuter = QStandardItem::UserType + 123,
-                    SurfaceTriangleScale = QStandardItem::UserType + 124,
-                    NumberDipoles = QStandardItem::UserType + 125,
-                    MaterialType = QStandardItem::UserType + 126,
-                    ShowNormals = QStandardItem::UserType + 127,
-                    Scale = QStandardItem::UserType + 128,
-                    CancelDistance = QStandardItem::UserType + 129,
-                    InterpolationFunction = QStandardItem::UserType + 130};
+                    SurfaceColorGyri = QStandardItem::UserType + 102,
+                    SurfaceColorSulci = QStandardItem::UserType + 103,
+                    SurfaceColorVert = QStandardItem::UserType + 104,
+                    AlphaValue = QStandardItem::UserType + 105,
+                    StreamStatus = QStandardItem::UserType + 106,
+                    SourceSpaceType = QStandardItem::UserType + 107,
+                    ColormapType = QStandardItem::UserType + 108,
+                    StreamingTimeInterval = QStandardItem::UserType + 109,
+                    LoopedStreaming = QStandardItem::UserType + 110,
+                    NumberAverages = QStandardItem::UserType + 111,
+                    DataThreshold = QStandardItem::UserType + 112,
+                    VisualizationType = QStandardItem::UserType + 113,
+                    Color = QStandardItem::UserType + 114,
+                    UnknownItem = QStandardItem::UserType + 115,
+                    TranslateX = QStandardItem::UserType + 116,
+                    TranslateY = QStandardItem::UserType + 117,
+                    TranslateZ = QStandardItem::UserType + 118,
+                    InterpolationFunction = QStandardItem::UserType + 119,
+                    NetworkMatrix = QStandardItem::UserType + 120,
+                    SurfaceTessInner = QStandardItem::UserType + 121,
+                    SurfaceTessOuter = QStandardItem::UserType + 122,
+                    SurfaceTriangleScale = QStandardItem::UserType + 123,
+                    NumberDipoles = QStandardItem::UserType + 124,
+                    MaterialType = QStandardItem::UserType + 125,
+                    ShowNormals = QStandardItem::UserType + 126,
+                    Scale = QStandardItem::UserType + 127,
+                    CancelDistance = QStandardItem::UserType + 128};
 }
 
 // Model item roles
-namespace Data3DTreeModelItemRoles
-{
-    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
-                    SurfaceVert = Qt::UserRole + 101,
-                    SurfaceTris = Qt::UserRole + 102,
-                    SurfaceNorm = Qt::UserRole + 103,
-                    SurfaceCurv = Qt::UserRole + 104,
-                    SurfaceOffset = Qt::UserRole + 105,
-                    SurfaceCurvatureColorVert = Qt::UserRole + 107,
-                    NetworkDataMatrix = Qt::UserRole + 108,
-                    SurfaceAnnotationColorVert = Qt::UserRole + 109,
-                    SurfaceSetName = Qt::UserRole + 111,
-                    SurfaceHemi = Qt::UserRole + 112,
-                    AnnotColors = Qt::UserRole + 113,
-                    FileName = Qt::UserRole + 114,
-                    FilePath = Qt::UserRole + 115,
-                    LabeList = Qt::UserRole + 116,
-                    LabeIds = Qt::UserRole + 117,
-                    RTData = Qt::UserRole + 118,
-                    RTVertNoLeftHemi = Qt::UserRole + 119,
-                    RTTimes = Qt::UserRole + 120,
-                    RTHemi = Qt::UserRole + 121,
-                    RTStartIdxLeftHemi = Qt::UserRole + 122,
-                    RTEndIdxLeftHemi = Qt::UserRole + 123,
-                    VertexBased = Qt::UserRole + 124,
-                    SmoothingBased = Qt::UserRole + 125,
-                    AnnotationBased = Qt::UserRole + 126,
-                    BemName = Qt::UserRole + 127,
-                    RTStartIdxRightHemi = Qt::UserRole + 128,
-                    RTEndIdxRightHemi = Qt::UserRole + 129,
-                    RTVertNoRightHemi = Qt::UserRole + 130,
-                    SourceVertices = Qt::UserRole + 131,
-                    NetworkData = Qt::UserRole + 132,
-                    ECDSetData = Qt::UserRole + 133};
-}
-
 namespace MetaTreeItemRoles
 {
     enum ItemRole{SurfaceFileName = Qt::UserRole,
                     SurfaceType = Qt::UserRole + 1,
-                    SurfaceColorSulci = Qt::UserRole + 3,
-                    SurfaceColorGyri = Qt::UserRole + 4,
-                    SurfaceFilePath = Qt::UserRole + 5,
-                    AnnotName = Qt::UserRole + 6,
-                    AnnotFilePath = Qt::UserRole + 7,
-                    AlphaValue = Qt::UserRole + 8,
-                    StreamStatus = Qt::UserRole + 9,
-                    SourceSpaceType = Qt::UserRole + 10,
-                    ColormapType = Qt::UserRole + 11,
-                    StreamingTimeInterval = Qt::UserRole + 12,
-                    LoopedStreaming = Qt::UserRole + 13,
-                    NumberAverages = Qt::UserRole + 14,
-                    DistributedSourceLocThreshold = Qt::UserRole + 15,
-                    VisualizationType = Qt::UserRole + 16,
-                    Color = Qt::UserRole + 17,
-                    TranslateX = Qt::UserRole + 18,
-                    TranslateY = Qt::UserRole + 19,
-                    TranslateZ = Qt::UserRole + 20,
-                    NetworkThreshold = Qt::UserRole + 22,
-                    SurfaceTessInner = Qt::UserRole + 23,
-                    SurfaceTessOuter = Qt::UserRole + 24,
-                    SurfaceTriangleScale = Qt::UserRole + 25,
-                    SurfaceMaterial = Qt::UserRole + 26,
-                    Scale = Qt::UserRole + 27,
-                    CancelDistance = Qt::UserRole + 28,
-                    InterpolationFunction = Qt::UserRole + 29};
+                    SurfaceColorSulci = Qt::UserRole + 2,
+                    SurfaceColorGyri = Qt::UserRole + 3,
+                    SurfaceFilePath = Qt::UserRole + 4,
+                    AnnotName = Qt::UserRole + 5,
+                    AnnotFilePath = Qt::UserRole + 6,
+                    AlphaValue = Qt::UserRole + 7,
+                    StreamStatus = Qt::UserRole + 8,
+                    SourceSpaceType = Qt::UserRole + 9,
+                    ColormapType = Qt::UserRole + 10,
+                    StreamingTimeInterval = Qt::UserRole + 11,
+                    LoopedStreaming = Qt::UserRole + 12,
+                    NumberAverages = Qt::UserRole + 13,
+                    DataThreshold = Qt::UserRole + 14,
+                    VisualizationType = Qt::UserRole + 15,
+                    Color = Qt::UserRole + 16,
+                    TranslateX = Qt::UserRole + 17,
+                    TranslateY = Qt::UserRole + 18,
+                    TranslateZ = Qt::UserRole + 19,
+                    InterpolationFunction = Qt::UserRole + 20,
+                    SurfaceTessInner = Qt::UserRole + 21,
+                    SurfaceTessOuter = Qt::UserRole + 22,
+                    SurfaceTriangleScale = Qt::UserRole + 23,
+                    SurfaceMaterial = Qt::UserRole + 24,
+                    Scale = Qt::UserRole + 25,
+                    CancelDistance = Qt::UserRole + 26};
+}
+
+namespace Data3DTreeModelItemRoles
+{
+    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
+                    NumberVertices = Qt::UserRole + 101,
+                    SurfaceCurv = Qt::UserRole + 102,
+                    NetworkDataMatrix = Qt::UserRole + 103,
+                    SurfaceHemi = Qt::UserRole + 104,
+                    AnnotColors = Qt::UserRole + 105,
+                    FileName = Qt::UserRole + 106,
+                    FilePath = Qt::UserRole + 107,
+                    Data = Qt::UserRole + 108,
+                    VertexBased = Qt::UserRole + 109,
+                    InterpolationBased = Qt::UserRole + 110,
+                    AnnotationBased = Qt::UserRole + 111};
 }
 
 } //NAMESPACE DISP3DLIB
 
 // Metatype declaration for correct QVariant usage
-// DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE VIEW3D initMetatypes())
-#ifndef metatype_matrixx3i
-#define metatype_matrixx3i
+// DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE Data3DTreeModel initMetatypes())
+#ifndef DISP3DLIB_metatype_matrixx3i
+#define DISP3DLIB_metatype_matrixx3i
 Q_DECLARE_METATYPE(Eigen::MatrixX3i);
 #endif
 
-#ifndef metatype_matrixXd
-#define metatype_matrixXd
+#ifndef DISP3DLIB_metatype_matrixXd
+#define DISP3DLIB_metatype_matrixXd
 Q_DECLARE_METATYPE(Eigen::MatrixXd);
 #endif
 
-#ifndef metatype_matrixx3f
-#define metatype_matrixx3f
+#ifndef DISP3DLIB_metatype_matrixx3f
+#define DISP3DLIB_metatype_matrixx3f
 Q_DECLARE_METATYPE(Eigen::MatrixX3f);
 #endif
 
-#ifndef metatype_vectorxf
-#define metatype_vectorxf
+#ifndef DISP3DLIB_metatype_vectorxf
+#define DISP3DLIB_metatype_vectorxf
 Q_DECLARE_METATYPE(Eigen::VectorXf);
 #endif
 
-#ifndef metatype_vectorxi
-#define metatype_vectorxi
+#ifndef DISP3DLIB_metatype_vectorxi
+#define DISP3DLIB_metatype_vectorxi
 Q_DECLARE_METATYPE(Eigen::VectorXi);
 #endif
 
-#ifndef metatype_vectorxd
-#define metatype_vectorxd
+#ifndef DISP3DLIB_metatype_vectorxd
+#define DISP3DLIB_metatype_vectorxd
 Q_DECLARE_METATYPE(Eigen::VectorXd);
 #endif
 
-#ifndef metatype_rowvectorxf
-#define metatype_rowvectorxf
+#ifndef DISP3DLIB_metatype_rowvectorxf
+#define DISP3DLIB_metatype_rowvectorxf
 Q_DECLARE_METATYPE(Eigen::RowVectorXf);
 #endif
 
-#ifndef metatype_vector3f
-#define metatype_vector3f
+#ifndef DISP3DLIB_metatype_vector3f
+#define DISP3DLIB_metatype_vector3f
 Q_DECLARE_METATYPE(Eigen::Vector3f);
 #endif
 
-#endif // TYPES_H
+#ifndef DISP3DLIB_metatype_fiffinfo
+#define DISP3DLIB_metatype_fiffinfo
+Q_DECLARE_METATYPE(FIFFLIB::FiffInfo);
+#endif
+
+#ifndef DISP3DLIB_metatype_qvectorvector3f
+#define DISP3DLIB_metatype_qvectorvector3f
+Q_DECLARE_METATYPE(QVector<Eigen::Vector3f>);
+#endif
+
+#ifndef DISP3DLIB_metatype_qvectorvectorint
+#define DISP3DLIB_metatype_qvectorvectorint
+Q_DECLARE_METATYPE(QVector<QVector<int> >);
+#endif
+
+#ifndef DISP3DLIB_metatype_qvectorint32
+#define DISP3DLIB_metatype_qvectorint32
+Q_DECLARE_METATYPE(QVector<qint32>);
+#endif
+
+#ifndef DISP3DLIB_metatype_sparsematf
+#define DISP3DLIB_metatype_sparsematf
+Q_DECLARE_METATYPE(Eigen::SparseMatrix<float>);
+#endif
+
+#ifndef DISP3DLIB_metatype_sharedptrsparsematf
+#define DISP3DLIB_metatype_sharedptrsparsematf
+Q_DECLARE_METATYPE(QSharedPointer<Eigen::SparseMatrix<float> >);
+#endif
+
+#ifndef DISP3DLIB_metatype_listlabel
+#define DISP3DLIB_metatype_listlabel
+Q_DECLARE_METATYPE(QList<FSLIB::Label>);
+#endif
+
+#endif // DISP3DLIB_TYPES_H

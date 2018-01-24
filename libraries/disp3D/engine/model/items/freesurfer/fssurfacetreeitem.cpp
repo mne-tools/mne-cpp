@@ -151,13 +151,12 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface)
 
     data.setValue(matCurvatureColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
 
     data.setValue(tSurface.curv());
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
 
-    data.setValue(tSurface.rr());
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+    data.setValue(tSurface.rr().rows());
+    this->setData(data, Data3DTreeModelItemRoles::NumberVertices);
 
      //Add data which is held by this FsSurfaceTreeItem
     QList<QStandardItem*> list;
@@ -212,11 +211,7 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             matNewVertColor = createCurvatureVertColor(this->data(Data3DTreeModelItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
 
             data.setValue(matNewVertColor);
-            this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
             this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-
-            //Emit the new colors which are to be used during rt source loc plotting
-            emit colorOriginChanged();
 
             //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
             return;
@@ -230,11 +225,7 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 
                     //Set renderable 3D entity mesh and color data
                     data.setValue(matNewVertColor);
-                    this->setData(data, Data3DTreeModelItemRoles::SurfaceAnnotationColorVert);
                     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
-
-                    //Emit the new colors which are to be used during rt source loc plotting
-                    emit colorOriginChanged();
 
                     //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
                     return;

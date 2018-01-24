@@ -49,6 +49,8 @@
 
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
+#include <mne/mne_epoch_data_list.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,6 +61,7 @@ using namespace NEURONALCONNECTIVITYPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
+using namespace MNELIB;
 using namespace CONNECTIVITYLIB;
 
 
@@ -350,7 +353,12 @@ void NeuronalConnectivity::run()
             QElapsedTimer time;
             time.start();
 
-            Network tNetwork = ConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
+            MNEEpochDataList epochDataList;
+            MNEEpochData::SPtr pEpoch = MNEEpochData::SPtr(new MNEEpochData());
+            pEpoch->epoch = t_mat;
+            epochDataList.append(pEpoch);
+
+            Network tNetwork = ConnectivityMeasures::crossCorrelation(epochDataList, m_matNodeVertComb);
             qDebug()<<"----------------------------------------";
             qDebug()<<"----------------------------------------";
             qDebug()<<"NeuronalConnectivity::run() - time.elapsed()" << time.elapsed();

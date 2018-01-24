@@ -85,18 +85,9 @@ BemSurfaceTreeItem::BemSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int i
 
 void BemSurfaceTreeItem::initItem()
 {
-    this->setEditable(false);
-    this->setCheckable(true);
-    this->setCheckState(Qt::Checked);
-    this->setToolTip("BEM surface item");
-
-//    //Set shaders
-//    this->removeComponent(m_pMaterial);
-//    this->removeComponent(m_pTessMaterial);
-//    this->removeComponent(m_pNormalMaterial);
-
-//    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
-//    this->addComponent(pBemMaterial);
+//    //Set material
+//    QPointer<PerVertexPhongAlphaMaterial> pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+//    this->setMaterial(pBemMaterial);
 }
 
 
@@ -104,8 +95,8 @@ void BemSurfaceTreeItem::initItem()
 
 void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface)
 {
-    //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tBemSurface.rr);
+    //Create default color
+    MatrixX3f matVertColor = createVertColor(tBemSurface.rr.rows());
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tBemSurface.rr,
@@ -120,6 +111,6 @@ void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface)
     //Add data which is held by this BemSurfaceTreeItem
     QVariant data;
 
-    data.setValue(tBemSurface.rr);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
+    data.setValue(tBemSurface.rr.rows());
+    this->setData(data, Data3DTreeModelItemRoles::NumberVertices);
 }

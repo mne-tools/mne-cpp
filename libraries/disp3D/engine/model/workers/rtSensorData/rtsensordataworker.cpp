@@ -2,13 +2,14 @@
 /**
 * @file     rtsensordataworker.cpp
 * @author   Lars Debor <lars.debor@tu-ilmenau.de>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lars Debor and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lars Debor, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -39,16 +40,8 @@
 //=============================================================================================================
 
 #include "rtsensordataworker.h"
-#include "../../items/common/types.h"
-
 #include <disp/helpers/colormap.h>
-#include <utils/ioutils.h>
 #include "../../../../helpers/interpolation/interpolation.h"
-#include "../../../../helpers/geometryinfo/geometryinfo.h"
-#include <mne/mne_bem_surface.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -56,10 +49,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QTime>
+#include <QVector3D>
 #include <QDebug>
-#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -78,9 +69,7 @@
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace DISPLIB;
-using namespace MNELIB;
 using namespace FIFFLIB;
-using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -88,33 +77,15 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
-: QThread(parent)
-, m_bIsRunning(false)
-, m_bIsLooping(true)
+RtSensorDataWorker::RtSensorDataWorker()
+: m_bIsLooping(true)
 , m_iAverageSamples(1)
-, m_iMSecIntervall(17)
-, m_bSurfaceDataIsInit(false)
-, m_iNumSensors(0)
 , m_dSFreq(1000.0)
+, m_bStreamSmoothedData(true)
+, m_itCurrentSample(0)
+, m_iSampleCtr(0)
 {
-    m_lVisualizationInfo = VisualizationInfo();
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
-
-    m_lInterpolationData = InterpolationData();
-    //5cm cancel distance
-    m_lInterpolationData.dCancelDistance = 0.05;
-    m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
-}
-
-
-//*************************************************************************************************************
-
-RtSensorDataWorker::~RtSensorDataWorker()
-{
-    if(this->isRunning()) {
-        stop();
-    }
 }
 
 
@@ -122,7 +93,6 @@ RtSensorDataWorker::~RtSensorDataWorker()
 
 void RtSensorDataWorker::addData(const MatrixXd& data)
 {
-    QMutexLocker locker(&m_qMutex);
     if(data.rows() == 0) {
         return;
     }
@@ -141,76 +111,10 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::clear()
+void RtSensorDataWorker::setNumberVertices(int iNumberVerts)
 {
-    QMutexLocker locker(&m_qMutex);
-    m_lDataQ.clear();
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::calculateSurfaceData()
-{
-    //SCDC with cancel distance 
-    m_lInterpolationData.pDistanceMatrix = GeometryInfo::scdc(m_lInterpolationData.bemSurface,
-                                                              m_lInterpolationData.pVecMappedSubset,
-                                                              m_lInterpolationData.dCancelDistance);
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
-                                    m_lInterpolationData.fiffInfo,
-                                    m_lInterpolationData.iSensorType);
-
-    //create weight matrix
-    m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                               m_lInterpolationData.pDistanceMatrix,
-                                                                               m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance,
-                                                                               m_lInterpolationData.fiffInfo,
-                                                                               m_lInterpolationData.iSensorType);
-}
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::calculateSurfaceData(const MNEBemSurface &bemSurface,
-                                              const QVector<Vector3f> &vecSensorPos,
-                                              const FIFFLIB::FiffInfo &fiffInfo,
-                                              int iSensorType)
-{
-    QMutexLocker locker(&m_qMutex);
-
-    if(bemSurface.rr.rows() == 0) {
-        qDebug() << "RtSensorDataWorker::calculateSurfaceData - Surface data is empty. Returning ...";
-        return;
-    }
-
-    //set members
-    m_iNumSensors = vecSensorPos.size();
-    m_lInterpolationData.bemSurface = bemSurface;
-    m_lInterpolationData.fiffInfo = fiffInfo;
-    m_lInterpolationData.iSensorType = iSensorType;
-    
-    //sensor projecting: One time operation because surface and sensors can not change 
-    m_lInterpolationData.pVecMappedSubset = GeometryInfo::projectSensors(m_lInterpolationData.bemSurface, vecSensorPos);
-    
-    calculateSurfaceData();
-
-    m_bSurfaceDataIsInit = true;
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::setSurfaceColor(const MatrixX3f& matSurfaceVertColor)
-{
-    QMutexLocker locker(&m_qMutex);
-    if(matSurfaceVertColor.size() == 0) {
-        qDebug() << "RtSensorDataWorker::setSurfaceColor - Surface color data is empty. Returning ...";
-        return;
-    }
-
-    m_lVisualizationInfo.matOriginalVertColor = matSurfaceVertColor;
+    m_lVisualizationInfo.matOriginalVertColor.resize(iNumberVerts,3);
+    m_lVisualizationInfo.matOriginalVertColor.setZero();
 }
 
 
@@ -218,17 +122,15 @@ void RtSensorDataWorker::setSurfaceColor(const MatrixX3f& matSurfaceVertColor)
 
 void RtSensorDataWorker::setNumberAverages(int iNumAvr)
 {
-    QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = iNumAvr;
 }
 
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setInterval(int iMSec)
+void RtSensorDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 {
-    QMutexLocker locker(&m_qMutex);
-    m_iMSecIntervall = iMSec;
+    m_bStreamSmoothedData = bStreamSmoothedData;
 }
 
 
@@ -236,8 +138,6 @@ void RtSensorDataWorker::setInterval(int iMSec)
 
 void RtSensorDataWorker::setColormapType(const QString& sColormapType)
 {
-    QMutexLocker locker(&m_qMutex);
-
     //Create function handler to corresponding color map function
     if(sColormapType == "Hot Negative 1") {
         m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHotNegative1;
@@ -253,10 +153,8 @@ void RtSensorDataWorker::setColormapType(const QString& sColormapType)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
+void RtSensorDataWorker::setThresholds(const QVector3D& vecThresholds)
 {
-    QMutexLocker locker(&m_qMutex);
-
     m_lVisualizationInfo.dThresholdX = vecThresholds.x();
     m_lVisualizationInfo.dThresholdZ = vecThresholds.z();
 }
@@ -264,49 +162,9 @@ void RtSensorDataWorker::setNormalization(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setCancelDistance(double dCancelDist)
+void RtSensorDataWorker::setLoopState(bool bLoopState)
 {
-    QMutexLocker locker(&m_qMutex);
-    m_lInterpolationData.dCancelDistance = dCancelDist;
-
-    if(m_bSurfaceDataIsInit == true){
-        //recalculate because parameters changed
-        calculateSurfaceData();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::setInterpolationFunction(const QString &sInterpolationFunction)
-{
-    QMutexLocker locker(&m_qMutex);
-    if(sInterpolationFunction == "Linear") {
-        m_lInterpolationData.interpolationFunction = Interpolation::linear;
-    }
-    else if(sInterpolationFunction == "Square") {
-        m_lInterpolationData.interpolationFunction = Interpolation::square;
-    }
-    else if(sInterpolationFunction == "Cubic") {
-        m_lInterpolationData.interpolationFunction = Interpolation::cubic;
-    }
-    else if(sInterpolationFunction == "Gaussian") {
-        m_lInterpolationData.interpolationFunction = Interpolation::gaussian;
-    }
-
-    if(m_bSurfaceDataIsInit == true){
-        //recalculate because parameters changed
-        calculateSurfaceData();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::setLoop(bool bLooping)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_bIsLooping = bLooping;
+    m_bIsLooping = bLoopState;
 }
 
 
@@ -314,152 +172,67 @@ void RtSensorDataWorker::setLoop(bool bLooping)
 
 void RtSensorDataWorker::setSFreq(const double dSFreq)
 {
-    QMutexLocker locker(&m_qMutex);
-
     m_dSFreq = dSFreq;
 }
 
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::updateBadChannels(const FiffInfo& info)
-{
-    qDebug()<<"RtSensorDataWorker::updateBadChannels";
-    QMutexLocker locker(&m_qMutex);
-
-    if(!m_bSurfaceDataIsInit) {
-        return;
-    }
-
-    m_lInterpolationData.fiffInfo = info;
-
-    //filtering of bad channels out of the distance table
-    GeometryInfo::filterBadChannels(m_lInterpolationData.pDistanceMatrix,
-                                    m_lInterpolationData.fiffInfo,
-                                    m_lInterpolationData.iSensorType);
-
-    //create weight matrix
-    m_lInterpolationData.pWeightMatrix = Interpolation::createInterpolationMat(m_lInterpolationData.pVecMappedSubset,
-                                                                               m_lInterpolationData.pDistanceMatrix,
-                                                                               m_lInterpolationData.interpolationFunction,
-                                                                               m_lInterpolationData.dCancelDistance,
-                                                                               m_lInterpolationData.fiffInfo,
-                                                                               m_lInterpolationData.iSensorType);
+void RtSensorDataWorker::setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix) {
+    m_matInterpolationMatrix = matInterpolationMatrix;
 }
 
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::start()
+void RtSensorDataWorker::streamData()
 {
-    m_qMutex.lock();
-    m_itCurrentSample = m_lDataQ.cbegin();
-    m_qMutex.unlock();
-
-    QThread::start();
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::stop()
-{
-    m_qMutex.lock();
-    m_bIsRunning = false;
-    m_qMutex.unlock();
-
-    QThread::wait();
-}
-
-
-//*************************************************************************************************************
-
-void RtSensorDataWorker::run()
-{
-    VectorXd t_vecAverage;
-
-    uint iSampleCtr = 0;
-    m_bIsRunning = true;
-    QTime timer;
-
-    while(true) {
-        timer.start();
-
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(!m_bIsRunning)
-                break;
+    if(m_lDataQ.size() > 0) {
+        if(m_itCurrentSample == 0) {
+            m_itCurrentSample = m_lDataQ.cbegin();
         }
 
-        bool doProcessing = false;
-
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(m_lDataQ.size() > 0)
-                doProcessing = true;
-        }
-
-        if(doProcessing) {
-            if(m_bIsLooping) {
-                m_qMutex.lock();
-
-                //Down sampling in loop mode
-                if(t_vecAverage.rows() != m_lDataQ.front().rows()) {
-                    t_vecAverage = *m_itCurrentSample;
-                } else {
-                    t_vecAverage += *m_itCurrentSample;
-                }
-
-                m_qMutex.unlock();
+        if(m_bIsLooping) {
+            //Down sampling in loop mode
+            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+                m_vecAverage = *m_itCurrentSample;
             } else {
-                m_qMutex.lock();
-
-                //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_lDataQ.front().rows()) {
-                    t_vecAverage = m_lDataQ.front();
-                } else {
-                    t_vecAverage += m_lDataQ.front();
-                }
-
-                m_lDataQ.pop_front();
-
-                m_qMutex.unlock();
+                m_vecAverage += *m_itCurrentSample;
+            }
+        } else {
+            //Down sampling in stream mode
+            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+                m_vecAverage = m_lDataQ.front();
+            } else {
+                m_vecAverage += m_lDataQ.front();
             }
 
-            m_qMutex.lock();
-
-            m_itCurrentSample++;
-            iSampleCtr++;
-
-            //Set iterator back to the front if needed
-            if(m_itCurrentSample == m_lDataQ.cend())
-            {
-                m_itCurrentSample = m_lDataQ.cbegin();
-            }
-
-            if(iSampleCtr % m_iAverageSamples == 0) {
-                //Perform the actual interpolation and send signal
-                t_vecAverage /= (double)m_iAverageSamples;
-                emit newRtData(generateColorsFromSensorValues(t_vecAverage));
-                t_vecAverage.setZero(t_vecAverage.rows());                
-
-                //Sleep specified amount of time
-                const int timerelap = timer.elapsed();
-                const int iTimeLeft = m_iMSecIntervall - timerelap;
-
-                //reset sample counter
-                iSampleCtr = 0;
-
-                //qDebug()<<"elapsed"<<timerelap<<"diff"<<iTimeLeft;
-                if(iTimeLeft > 0) {
-                    QThread::msleep(iTimeLeft);
-                }
-            }
-
-            m_qMutex.unlock();
+            m_lDataQ.pop_front();
         }
 
-        //qDebug()<<"m_lData.size()"<<m_lData.size();
+        m_itCurrentSample++;
+        m_iSampleCtr++;
+
+        //Set iterator back to the front if needed
+        if(m_itCurrentSample == m_lDataQ.cend()) {
+            m_itCurrentSample = m_lDataQ.cbegin();
+        }
+
+        if(m_iSampleCtr % m_iAverageSamples == 0) {
+            //Perform the actual interpolation and send signal
+            m_vecAverage /= (double)m_iAverageSamples;
+            if(m_bStreamSmoothedData) {
+                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage));
+            } else {
+                emit newRtRawData(m_vecAverage);
+            }
+            m_vecAverage.setZero(m_vecAverage.rows());
+
+            //reset sample counter
+            m_iSampleCtr = 0;
+        }
+        //qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
+        //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
     }
 }
 
@@ -468,26 +241,14 @@ void RtSensorDataWorker::run()
 
 MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vecSensorValues)
 {
-    // NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
-    if(vecSensorValues.rows() != m_iNumSensors) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of vertices (" << m_iNumSensors << "). Returning...";
+    if(vecSensorValues.rows() != m_matInterpolationMatrix.cols()) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << m_matInterpolationMatrix.cols() << "). Returning...";
         MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
         return matColor;
-    }
-
-    if(!m_bSurfaceDataIsInit) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Surface data was not initialized. Returning ...";
-        MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
-        return matColor;
-    }
-
-
-    if(!m_lInterpolationData.pWeightMatrix) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - weight matrix is no initialized. Returning ...";
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = *Interpolation::interpolateSignal(m_lInterpolationData.pWeightMatrix, vecSensorValues);
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(m_matInterpolationMatrix, vecSensorValues);
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
@@ -511,11 +272,9 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                                                       double dThreholdZ,
                                                       QRgb (*functionHandlerColorMap)(double v))
 {
-    //Note: This function needs to be implemented extremly efficient. That is why we have three if clauses.
-    //      Otherwise we would have to check which color map to take for each vertex.
-
+    //Note: This function needs to be implemented extremly efficient.
     if(vecData.rows() != matFinalVertColor.rows()) {
-        qDebug() << "RtSensorDataWorker::transformDataToColor - Sizes of input data (" << vecData.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
+        qDebug() << "RtSensorDataWorker::normalizeAndTransformToColor - Sizes of input data (" << vecData.rows() <<") do not match output data ("<< matFinalVertColor.rows() <<"). Returning ...";
         return;
     }
 

@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef ABSTRACTVIEW_H
-#define ABSTRACTVIEW_H
+#ifndef DISP3DLIB_ABSTRACTVIEW_H
+#define DISP3DLIB_ABSTRACTVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,7 +70,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class View3D;
@@ -95,7 +95,6 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
-    *
     */
     explicit AbstractView(QWidget *parent = 0);
 
@@ -104,6 +103,30 @@ public:
     * Default destructor.
     */
     ~AbstractView();
+
+    //=========================================================================================================
+    /**
+    * Returns the View3D.
+    *
+    * @return The currently set View3D.
+    */
+    QSharedPointer<DISP3DLIB::View3D> getView();
+
+    //=========================================================================================================
+    /**
+    * Returns the Control3D.
+    *
+    * @return The currently set Control3D.
+    */
+    QSharedPointer<DISP3DLIB::Control3DWidget> getControlView();
+
+    //=========================================================================================================
+    /**
+    * Returns the Data3DTreeModel.
+    *
+    * @return The currently set Data3DTreeModel.
+    */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel> getTreeModel();
 
 protected:
     //=========================================================================================================
@@ -119,4 +142,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // ABSTRACTVIEW_H
+#endif // DISP3DLIB_ABSTRACTVIEW_H

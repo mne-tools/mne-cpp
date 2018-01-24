@@ -68,6 +68,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB {
+    class MNEEpochDataList;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -108,23 +112,23 @@ public:
     /**
     * Calculates the Pearson's correlation coefficient between the rows of the data matrix.
     *
-    * @param[in] matData    The input data for whicht the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
+    * @param[in] epochDataList  The data in form of epochs.
+    * @param[in] matVert        The vertices of each network node.
     *
-    * @return               The connectivity information in form of a network structure.
+    * @return                   The connectivity information in form of a network structure.
     */
-    static Network pearsonsCorrelationCoeff(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    static Network pearsonsCorrelationCoeff(const MNELIB::MNEEpochDataList& epochDataList, const Eigen::MatrixX3f& matVert);
 
     //=========================================================================================================
     /**
     * Calculates the cross correlation between the rows of the data matrix.
     *
-    * @param[in] matData    The input data for which the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
+    * @param[in] epochDataList  The data in form of epochs.
+    * @param[in] matVert        The vertices of each network node.
     *
-    * @return               The connectivity information in form of a network structure.
+    * @return                   The connectivity information in form of a network structure.
     */
-    static Network crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    static Network crossCorrelation(const MNELIB::MNEEpochDataList &epochDataList, const Eigen::MatrixX3f& matVert);
 
     //=========================================================================================================
     /**

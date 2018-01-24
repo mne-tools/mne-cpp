@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef SOURCESPACETREEITEM_H
-#define SOURCESPACETREEITEM_H
+#ifndef DISP3DLIB_SOURCESPACETREEITEM_H
+#define DISP3DLIB_SOURCESPACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,7 +84,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Renderable3DEntity;
@@ -140,4 +140,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // SOURCESPACETREEITEM_H
+#endif // DISP3DLIB_SOURCESPACETREEITEM_H

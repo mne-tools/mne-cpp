@@ -107,7 +107,7 @@ class CovarianceSettingsWidget;
 class COVARIANCESHARED_EXPORT Covariance : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "covariance.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "covariance.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
