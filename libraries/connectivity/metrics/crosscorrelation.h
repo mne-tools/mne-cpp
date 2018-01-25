@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivitymeasures.h
+* @file     crosscorrelation.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ConnectivityMeasures class declaration.
+* @brief     CrossCorrelation class declaration.
 *
 */
 
-#ifndef CONNECTIVITYMEASURES_H
-#define CONNECTIVITYMEASURES_H
+#ifndef CROSSCORRELATION_H
+#define CROSSCORRELATION_H
 
 
 //*************************************************************************************************************
@@ -44,6 +44,8 @@
 
 #include "connectivity_global.h"
 
+#include "abstractmetric.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,8 +53,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QPair>
-#include <QString>
 
 
 //*************************************************************************************************************
@@ -91,33 +91,22 @@ class Network;
 
 //=============================================================================================================
 /**
-* This class computes basic (functional) connectivity measures.
+* This class computes the cross correlation connectivity metric.
 *
-* @brief This class computes basic (functional) connectivity measures.
+* @brief This class computes the cross correlation connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
+class CONNECTIVITYSHARED_EXPORT CrossCorrelation : public AbstractMetric
 {    
 
 public:
-    typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
-    typedef QSharedPointer<const ConnectivityMeasures> ConstSPtr; /**< Const shared pointer type for ConnectivityMeasures. */
+    typedef QSharedPointer<CrossCorrelation> SPtr;            /**< Shared pointer type for CrossCorrelation. */
+    typedef QSharedPointer<const CrossCorrelation> ConstSPtr; /**< Const shared pointer type for CrossCorrelation. */
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectivityMeasures object.
+    * Constructs a CrossCorrelation object.
     */
-    explicit ConnectivityMeasures();
-
-    //=========================================================================================================
-    /**
-    * Calculates the Pearson's correlation coefficient between the rows of the data matrix.
-    *
-    * @param[in] epochDataList  The data in form of epochs.
-    * @param[in] matVert        The vertices of each network node.
-    *
-    * @return                   The connectivity information in form of a network structure.
-    */
-    static Network pearsonsCorrelationCoeff(const MNELIB::MNEEpochDataList& epochDataList, const Eigen::MatrixX3f& matVert);
+    explicit CrossCorrelation();
 
     //=========================================================================================================
     /**
@@ -130,29 +119,7 @@ public:
     */
     static Network crossCorrelation(const MNELIB::MNEEpochDataList &epochDataList, const Eigen::MatrixX3f& matVert);
 
-    //=========================================================================================================
-    /**
-    * Calculates the Phase Lag Index between the rows of the data matrix.
-    *
-    * @param[in] epochDataList  The input data for whicht the phase lag index is to be calculated.
-    * @param[in] matVert        The vertices of each network node.
-    *
-    * @return                   The connectivity information in form of a network structure.
-    */
-    static Network phaseLagIndex(const MNELIB::MNEEpochDataList &epochDataList, const Eigen::MatrixX3f& matVert);
-
 protected:
-    //=========================================================================================================
-    /**
-    * Calculates the actual Pearson's correlation coefficient between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return               The Pearson's correlation coefficient.
-    */
-    static double calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
-
     //=========================================================================================================
     /**
     * Calculates the actual cross correlation between two data vectors.
@@ -164,16 +131,6 @@ protected:
     */
     static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 
-    //==========================================================================================================
-    /**
-    * Calculates the actual Phase Lag Index between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return                The PLI value.
-    */
-    static int calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 };
 
 
@@ -185,4 +142,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITYMEASURES_H
+#endif // CROSSCORRELATION_H

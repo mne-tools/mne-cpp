@@ -43,7 +43,9 @@
 
 #include "connectivitysettings.h"
 #include "network/network.h"
-#include "connectivitymeasures.h"
+#include "metrics/correlation.h"
+#include "metrics/crosscorrelation.h"
+#include "metrics/phaselagindex.h""
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
@@ -109,11 +111,11 @@ Network Connectivity::calculateConnectivity() const
     }
 
     if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
-        return ConnectivityMeasures::pearsonsCorrelationCoeff(epochDataList, matNodePos);
+        return Correlation::correlationCoeff(epochDataList, matNodePos);
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
-        return ConnectivityMeasures::crossCorrelation(epochDataList, matNodePos);
+        return CrossCorrelation::crossCorrelation(epochDataList, matNodePos);
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
-        return ConnectivityMeasures::phaseLagIndex(epochDataList, matNodePos);
+        return PhaseLagIndex::phaseLagIndex(epochDataList, matNodePos);
     }
 
     return Network();
