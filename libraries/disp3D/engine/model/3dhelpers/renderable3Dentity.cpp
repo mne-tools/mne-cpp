@@ -154,47 +154,6 @@ void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setMaterialParameter(QVariant data, QString sParameterName)
-{
-    //Look for all materials and set the corresponding parameters
-    QComponentVector vComponents;
-
-    //Search in this item's components
-    if(QEntity* pEntity = dynamic_cast<QEntity*>(this)) {
-        vComponents = pEntity->components();
-
-        for(int j = 0; j < vComponents.size(); ++j) {
-            if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
-                for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
-                    if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
-                        pMaterial->effect()->parameters().at(i)->setValue(data);
-                    }
-                }
-            }
-        }
-    }
-
-    //Search in all child item components
-    for(int k = 0; k < this->childNodes().size(); ++k) {
-        if(QEntity* pEntity = dynamic_cast<QEntity*>(this->childNodes().at(k))) {
-            vComponents = pEntity->components();
-
-            for(int j = 0; j < vComponents.size(); ++j) {
-                if(QMaterial* pMaterial = dynamic_cast<QMaterial*>(vComponents.at(j))) {
-                    for(int i = 0; i < pMaterial->effect()->parameters().size(); ++i) {
-                        if(pMaterial->effect()->parameters().at(i)->name() == sParameterName) {
-                            pMaterial->effect()->parameters().at(i)->setValue(data);
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
 float Renderable3DEntity::scaleValue() const
 {
     return m_fScale;
@@ -311,6 +270,66 @@ void Renderable3DEntity::setScale(float scale)
     m_fScale = scale;
     emit scaleChanged(scale);
     updateTransform();
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setMaterialParameter(const QVariant &data,
+                                              const QString &sParameterName)
+{
+    setMaterialParameterRecursive(this, data, sParameterName);
+}
+
+
+//*************************************************************************************************************
+
+QVariant Renderable3DEntity::getMaterialParameter(const QString &sParameterName)
+{
+    QPair<bool, QVariant> resultPair = getMaterialParameterRecursive(this, sParameterName);
+
+    return resultPair.second;
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setMaterialParameterRecursive(QObject * pObject,
+                                                       const QVariant &data,
+                                                       const QString &sParameterName)
+{
+    if(QParameter* pParameter = dynamic_cast<QParameter*>(pObject)) {
+        if(pParameter->name() == sParameterName) {
+            pParameter->setValue(data);
+        }
+    }
+
+    for(int i = 0; i < pObject->children().size(); ++i) {
+        setMaterialParameterRecursive(pObject->children().at(i), data, sParameterName);
+    }
+}
+
+
+//*************************************************************************************************************
+
+QPair<bool, QVariant> Renderable3DEntity::getMaterialParameterRecursive(QObject * pObject,
+                                                           const QString &sParameterName)
+{
+    if(QParameter* pParameter = dynamic_cast<QParameter*>(pObject)) {
+        if(pParameter->name() == sParameterName) {
+            return QPair<bool, QVariant>(true, pParameter->value());
+        }
+    }
+
+    for(int i = 0; i < pObject->children().size(); ++i) {
+        QPair<bool, QVariant> pair = getMaterialParameterRecursive(pObject->children().at(i), sParameterName);
+
+        if(pair.first) {
+            return pair;
+        }
+    }
+
+    return QPair<bool, QVariant>(false, QVariant());
 }
 
 

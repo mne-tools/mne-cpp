@@ -44,7 +44,7 @@
 
 #include <scMeas/realtimesourceestimate.h>
 
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
@@ -165,15 +165,20 @@ void RealTimeSourceEstimateWidget::getData()
         //
         if(!m_pRtItem) {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+            m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data",
+                                                      *m_pRTSE->getValue(),
+                                                      *m_pRTSE->getFwdSolution(),
+                                                      m_surfSet,
+                                                      m_annotationSet,
+                                                      m_p3DView->format());
 
             m_pRtItem->setLoopState(false);
             m_pRtItem->setTimeInterval(17);
-            m_pRtItem->setNormalization(QVector3D(0.0,5,10));
-            m_pRtItem->setColortable("Hot");
+            m_pRtItem->setThresholds(QVector3D(0.0,5,10));
+            m_pRtItem->setColormapType("Hot");
             m_pRtItem->setVisualizationType("Annotation based");
             m_pRtItem->setNumberAverages(1);
-            m_pRtItem->setStreamingActive(true);
+            m_pRtItem->setStreamingState(true);
             m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
         } else {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";

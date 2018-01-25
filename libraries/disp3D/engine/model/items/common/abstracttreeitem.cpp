@@ -79,9 +79,9 @@ void AbstractTreeItem::initItem()
 {
     this->setToolTip("Abstract Tree Item");
 
-     //Do the connects
-     connect(this, &AbstractTreeItem::checkStateChanged,
-             this, &AbstractTreeItem::onCheckStateChanged);
+    //Do the connects
+    connect(this, &AbstractTreeItem::checkStateChanged,
+         this, &AbstractTreeItem::onCheckStateChanged);
 }
 
 
@@ -105,6 +105,20 @@ void AbstractTreeItem::setData(const QVariant& value, int role)
 int AbstractTreeItem::type() const
 {
     return m_iType;
+}
+
+
+//*************************************************************************************************************
+
+void AbstractTreeItem::addItemWithDescription(QStandardItem* pItemParent,
+                                              QStandardItem* pItemAdd)
+{
+    if(pItemParent && pItemAdd) {
+        QList<QStandardItem*> list;
+        list << pItemAdd;
+        list << new QStandardItem(pItemAdd->toolTip());
+        pItemParent->appendRow(list);
+    }
 }
 
 

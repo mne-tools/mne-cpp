@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef CUSTOMMESH_H
-#define CUSTOMMESH_H
+#ifndef DISP3DLIB_CUSTOMMESH_H
+#define DISP3DLIB_CUSTOMMESH_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,7 +82,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -199,7 +199,7 @@ protected:
     QPointer<Qt3DRender::QGeometry>     m_pCustomGeometry;         /**< The custom geometry. */
 
     QPointer<Qt3DRender::QAttribute>    m_pIndexAttribute;         /**< The index attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;      /**< The position attribute. */
+    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;        /**< The position attribute. */
     QPointer<Qt3DRender::QAttribute>    m_pNormalAttribute;        /**< The normal attribute. */
     QPointer<Qt3DRender::QAttribute>    m_pColorAttribute;         /**< The color attribute. */
 
@@ -208,4 +208,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // CUSTOMMESH_H
+#endif // DISP3DLIB_CUSTOMMESH_H

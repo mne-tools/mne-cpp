@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef ECDVIEW_H
-#define ECDVIEW_H
+#ifndef DISP3DLIB_ECDVIEW_H
+#define DISP3DLIB_ECDVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,7 +75,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -96,9 +96,10 @@ public:
     //=========================================================================================================
     /**
     * Default constructor
-    *
     */
-    explicit ECDView(const INVERSELIB::DipoleFitSettings& dipFitSettings, const INVERSELIB::ECDSet& ecdSet, QWidget *parent = 0);
+    explicit ECDView(const INVERSELIB::DipoleFitSettings& dipFitSettings,
+                     const INVERSELIB::ECDSet& ecdSet,
+                     QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -111,4 +112,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // ECDVIEW_H
+#endif // DISP3DLIB_ECDVIEW_H

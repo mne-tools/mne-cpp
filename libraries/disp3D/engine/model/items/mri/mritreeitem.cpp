@@ -151,58 +151,8 @@ FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotatio
         list << pHemiItem;
         list << new QStandardItem(pHemiItem->toolTip());
         this->appendRow(list);
-
-        connect(pHemiItem->getSurfaceItem(), &FsSurfaceTreeItem::colorOriginChanged,
-            this, &MriTreeItem::onColorOriginChanged);
     }
 
     return pReturnItem;
 }
 
-
-//*************************************************************************************************************
-
-void MriTreeItem::setRtVertColor(const QVariant& sourceColorSamples)
-{
-    QVariant data;
-    QPair<MatrixX3f, MatrixX3f> colorsPerHemi = sourceColorSamples.value<QPair<MatrixX3f, MatrixX3f> >();
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                data.setValue(colorsPerHemi.first);
-                pHemiItem->getSurfaceItem()->setVertColor(data);
-            } else if (pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                data.setValue(colorsPerHemi.second);
-                pHemiItem->getSurfaceItem()->setVertColor(data);
-            }
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void MriTreeItem::onColorOriginChanged()
-{
-    QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
-
-    FsSurfaceTreeItem* pSurfaceTreeItemLeft = Q_NULLPTR;
-    FsSurfaceTreeItem* pSurfaceTreeItemRight = Q_NULLPTR;
-
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
-            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 0) {
-                pSurfaceTreeItemLeft = pHemiItem->getSurfaceItem();
-            } else if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == 1) {
-                pSurfaceTreeItemRight = pHemiItem->getSurfaceItem();
-            }
-        }
-    }
-
-    if(pSurfaceTreeItemLeft && pSurfaceTreeItemRight) {
-        emit colorOriginChanged(pSurfaceTreeItemLeft->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>(),
-                              pSurfaceTreeItemRight->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<MatrixX3f>());
-    }
-}

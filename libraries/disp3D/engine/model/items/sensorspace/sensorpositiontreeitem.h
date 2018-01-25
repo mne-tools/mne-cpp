@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef SENSORPOSITIONTREEITEM_H
-#define SENSORPOSITIONTREEITEM_H
+#ifndef DISP3DLIB_SENSORPOSITIONTREEITEM_H
+#define DISP3DLIB_SENSORPOSITIONTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,7 +83,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -141,4 +141,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // SENSORPOSITIONTREEITEM_H
+#endif // DISP3DLIB_SENSORPOSITIONTREEITEM_H

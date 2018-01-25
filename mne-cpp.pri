@@ -40,7 +40,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2016 Authors of mne-cpp. All rights reser
 ## To set CodeCov coverage compiler flag run: qmake MNECPP_CONFIG+=withCodeCov
 ## To disable tests run: qmake MNECPP_CONFIG+=noTests
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
-## To build basic MNE-X version run: qmake MNECPP_CONFIG+=BuildBasicMNESCANVersion
+## To build basic MNE Scan version run: qmake MNECPP_CONFIG+=BuildBasicMNESCANVersion
 #MNECPP_CONFIG += BuildBasicMNESCANVersion
 
 ## Build MNE-CPP libraries as static libs

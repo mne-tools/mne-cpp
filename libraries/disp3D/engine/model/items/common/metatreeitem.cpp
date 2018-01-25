@@ -114,8 +114,8 @@ void MetaTreeItem::initItem()
         case MetaTreeItemTypes::NumberAverages:
             sToolTip = "The number of samples averaged together (downsampling)";
             break;
-        case MetaTreeItemTypes::DistributedSourceLocThreshold:
-            sToolTip = "The value to normalize the distributed source localization result";
+        case MetaTreeItemTypes::DataThreshold:
+            sToolTip = "The threshold used to scale the data";
             break;
         case MetaTreeItemTypes::VisualizationType:
             sToolTip = "The visualization type";
@@ -143,9 +143,6 @@ void MetaTreeItem::initItem()
             break;
         case MetaTreeItemTypes::TranslateZ:
             sToolTip = "z translation value";
-            break;
-        case MetaTreeItemTypes::NetworkThreshold:
-            sToolTip = "The threshold used to scale the network";
             break;
         case MetaTreeItemTypes::NetworkMatrix:
             sToolTip = "The network distance matrix";
@@ -179,6 +176,8 @@ void MetaTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
-    emit dataChanged(value);
+    if(role >= Qt::UserRole) {
+        emit dataChanged(value);
+    }
 }
 

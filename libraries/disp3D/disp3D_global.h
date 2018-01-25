@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef DISP3DNEW_GLOBAL_H
-#define DISP3DNEW_GLOBAL_H
+#ifndef DISP3DLIB_DISP3D_GLOBAL_H
+#define DISP3DLIB_DISP3D_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,4 +57,4 @@
 #  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // DISP3DNEW_GLOBAL_H
+#endif // DISP3DLIB_GLOBAL_H

@@ -99,6 +99,30 @@ AbstractView::~AbstractView()
 
 //*************************************************************************************************************
 
+QSharedPointer<DISP3DLIB::View3D> AbstractView::getView()
+{
+    return m_p3DView;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<DISP3DLIB::Control3DWidget> AbstractView::getControlView()
+{
+    return m_pControl3DView;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<DISP3DLIB::Data3DTreeModel> AbstractView::getTreeModel()
+{
+    return m_pData3DModel;
+}
+
+
+//*************************************************************************************************************
+
 void AbstractView::createGUI()
 {
     //Create widget GUI

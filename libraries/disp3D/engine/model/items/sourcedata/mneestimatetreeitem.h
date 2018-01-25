@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef MNEESTIMATETREEITEM_H
-#define MNEESTIMATETREEITEM_H
+#ifndef DISP3DLIB_MNEESTIMATETREEITEM_H
+#define DISP3DLIB_MNEESTIMATETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,6 +71,15 @@ namespace MNELIB {
     class MNESourceEstimate;
 }
 
+namespace FSLIB {
+    class SurfaceSet;
+    class AnnotationSet;
+}
+
+namespace Qt3DCore {
+    class QEntity;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,10 +92,12 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RtSourceLocDataWorker;
+class RtSourceDataController;
+class AbstractMeshTreeItem;
+class GpuInterpolationItem;
 
 
 //=============================================================================================================
@@ -109,8 +120,11 @@ public:
     *
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
     */
-    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem, const QString& text = "MNE data");
+    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem,
+                                 const QString& text = "MNE data",
+                                 bool bUseGPU = false);
 
     //=========================================================================================================
     /**
@@ -122,21 +136,15 @@ public:
     /**
     * Initializes the rt data item with neccessary information for visualization computations.
     *
-    * @param[in] tForwardSolution                   The MNEForwardSolution.
-    * @param[in] matSurfaceVertColorLeftHemi        The vertex colors for the left hemisphere surface where the data is to be plotted on.
-    * @param[in] matSurfaceVertColorRightHemi       The vertex colors for the right hemisphere surface where the data is to be plotted on.
-    * @param[in] vecLabelIdsLeftHemi                The label ids for each left hemisphere surface vertex index.
-    * @param[in] vecLabelIdsRightHemi               The label ids for each right hemispheresurface vertex index.
-    * @param[in] lLabelsLeftHemi                    The label list for the left hemisphere.
-    * @param[in] lLabelsRightHemi                   The label list for the right hemisphere.
+    * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
+    * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
+    * @param[in] p3DEntityParent        Pointer to the QEntity parent.
     */
-    void init(const MNELIB::MNEForwardSolution& tForwardSolution,
-            const MatrixX3f &matSurfaceVertColorLeftHemi,
-            const MatrixX3f &matSurfaceVertColorRightHemi,
-            const Eigen::VectorXi& vecLabelIdsLeftHemi = FIFFLIB::defaultVectorXi,
-            const Eigen::VectorXi &vecLabelIdsRightHemi = FIFFLIB::defaultVectorXi,
-            const QList<FSLIB::Label> &lLabelsRightHemi = QList<FSLIB::Label>(),
-            const QList<FSLIB::Label>& lLabelsLeftHemi = QList<FSLIB::Label>());
+    void initData(const MNELIB::MNEForwardSolution& tForwardSolution,
+                  const FSLIB::SurfaceSet& tSurfSet,
+                  const FSLIB::AnnotationSet& tAnnotSet,
+                  Qt3DCore::QEntity* p3DEntityParent);
 
     //=========================================================================================================
     /**
@@ -168,7 +176,7 @@ public:
     *
     * @param[in] state     Whether to stream the data to the display or not.
     */
-    void setStreamingActive(bool state);
+    void setStreamingState(bool state);
 
     //=========================================================================================================
     /**
@@ -188,11 +196,11 @@ public:
 
     //=========================================================================================================
     /**
-    * This function sets the colortable type.
+    * This function sets the color map type.
     *
     * @param[in] sColortable     The new colortable ("Hot Negative 1" etc.).
     */
-    void setColortable(const QString& sColortable);
+    void setColormapType(const QString& sColormap);
 
     //=========================================================================================================
     /**
@@ -204,20 +212,28 @@ public:
 
     //=========================================================================================================
     /**
-    * This function set the normalization value.
+    * This function set the threshold values.
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void setNormalization(const QVector3D& vecThresholds);
+    void setThresholds(const QVector3D& vecThresholds);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the origin of the surface vertex color changed.
-    *
-    * @param[in] matVertColorLeftHemisphere       The new vertex colors for the left hemisphere.
-    * @param[in] matVertColorRightHemisphere      The new vertex colors for the right hemisphere.
-    */
-    void setColorOrigin(const MatrixX3f& matVertColorLeftHemisphere, const MatrixX3f& matVertColorRightHemisphere);
+     * This function sets the cancel distance used in distance calculations for the interpolation.
+     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     *
+     * @param[in] dCancelDist               The new cancel distance value in meters.
+     */
+    //virtual void setCancelDistance(double dCancelDist);
+
+    //=========================================================================================================
+    /**
+     * This function sets the function that is used in the interpolation process.
+     *
+     * @param sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
+     */
+    virtual void setInterpolationFunction(const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -244,11 +260,39 @@ protected:
 
     //=========================================================================================================
     /**
+    * Set the new interpolation matrix.
+    *
+    * @param[in] pMatInterpolationMatrixLeftHemi          The new interpolation matrix for the left hemisphere.
+    */
+    virtual void onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi);
+
+    //=========================================================================================================
+    /**
+    * Set the new interpolation matrix.
+    *
+    * @param[in] pMatInterpolationMatrixRightHemi          The new interpolation matrix for the right hemisphere.
+    */
+    virtual void onNewInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever this item receives sensor values for each estimated source.
+    *
+    * @param[in] vecDataVectorLeftHemi          The new streamed raw data for the left hemispehre.
+    * @param[in] vecDataVectorRightHemi         The new streamed raw data for the right hemispehre.
+    */
+    void virtual onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
+                                const Eigen::VectorXd &vecDataVectorRightHemi);
+
+    //=========================================================================================================
+    /**
     * This function gets called whenever this item receives new color values for each estimated source.
     *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
+    * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
+    * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
     */
-    void onNewRtData(const QPair<MatrixX3f, MatrixX3f> &sourceColorSamples);
+    void onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
+                                      const Eigen::MatrixX3f &matColorMatrixRightHemi);
 
     //=========================================================================================================
     /**
@@ -272,7 +316,7 @@ protected:
     *
     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
     */
-    void onDataNormalizationValueChanged(const QVariant &vecThresholds);
+    void onDataThresholdChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
@@ -298,18 +342,34 @@ protected:
     */
     void onNumberAveragesChanged(const QVariant& iNumAvr);
 
-    bool                                m_bIsDataInit;                      /**< The init flag. */
-
-    QPointer<RtSourceLocDataWorker>     m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
-
-signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
+    * This function gets called whenever the cancel distance of the interpolation changed.
     *
-    * @param[in] sourceColors     The color values for each estimated source for left and right hemisphere.
+    * @param[in] dCancelDist     The new cancel distance.
     */
-    void sourceVertColorChanged(const QVariant& sourceColors);
+    //virtual void onCancelDistanceChanged(const QVariant& dCancelDist);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the function of the interpolation changed.
+    *
+    * @param[in] sInterpolationFunction     The new function name.
+    */
+    virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
+
+    bool                                m_bIsDataInit;                      /**< The init flag. */
+    bool                                m_bUseGPU;                          /**< The use GPU flag. */
+
+    QPointer<RtSourceDataController>    m_pRtSourceDataController;          /**< The source data worker. This worker streams the rt data to this item.*/
+
+    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemLeftCPU;        /**< This item manages all 3d rendering and calculations for the left hemisphere. */
+    QPointer<GpuInterpolationItem>      m_pInterpolationItemLeftGPU;        /**< This item manages all 3d rendering and calculations for the left hemisphere. */
+    QPointer<AbstractMeshTreeItem>      m_pInterpolationItemRightCPU;       /**< This item manages all 3d rendering and calculations for the right hemisphere. */
+    QPointer<GpuInterpolationItem>      m_pInterpolationItemRightGPU;       /**< This item manages all 3d rendering and calculations for the right hemisphere. */
+
+signals:
+
 };
 
 //*************************************************************************************************************
@@ -324,4 +384,4 @@ inline bool MneEstimateTreeItem::isDataInit() const
 
 } //NAMESPACE DISP3DLIB
 
-#endif // MneEstimateTreeItem_H
+#endif // DISP3DLIB_MNEESTIMATTREEITEM_H
