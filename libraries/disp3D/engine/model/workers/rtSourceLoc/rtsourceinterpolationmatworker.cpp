@@ -76,7 +76,7 @@ using namespace FSLIB;
 
 RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false)
-, m_iVisualizationType(Data3DTreeModelItemRoles::AnnotationBased)
+, m_iVisualizationType(Data3DTreeModelItemRoles::InterpolationBased)
 , m_bAnnotationInfoIsInit(false)
 , m_pMatInterpolationMat(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 , m_pMatAnnotationMat(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
@@ -286,7 +286,6 @@ void RtSourceInterpolationMatWorker::emitMatrix()
                 qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType size == 0 Calculating";
                 calculateAnnotationOperator();
             }
-            qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType emitting annot matrix " << m_pMatAnnotationMat->rows() << " " << m_pMatAnnotationMat->cols();
 
             emit newInterpolationMatrixCalculated(m_pMatAnnotationMat);
             break;
