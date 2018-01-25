@@ -118,12 +118,6 @@ void EcdDataTreeItem::addData(const ECDSet& pECDSet)
     list << new QStandardItem(pItemNumDipoles->toolTip());
     this->appendRow(list);
 
-    //Add data which is held by this NetworkTreeItem
-    QVariant data;
-
-    data.setValue(pECDSet);
-    this->setData(data, Data3DTreeModelItemRoles::ECDSetData);
-
     //Plot dipole moment
     plotDipoles(pECDSet);
 }

@@ -197,14 +197,14 @@ public:
     //QGeometryData* getGeometryData(float p_fScaling = 1.0f);
 
 public:
-    fiff_int_t type;            /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used jet. */
+    fiff_int_t type;            /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used yet. */
     fiff_int_t id;              /**< Id information */
     fiff_int_t np;              /**< Number of vertices of the whole/original surface used to create the source locations. */
     fiff_int_t ntri;            /**< Number of available triangles */
     fiff_int_t coord_frame;     /**< Coil coordinate system definition */
-    MatrixX3f rr;               /**< Source locations of available dipoles. */
-    MatrixX3f nn;               /**< Source normals of available dipoles. */
-    MatrixX3i tris;             /**< Triangles */
+    MatrixX3f rr;               /**< Vertices of the source space mesh/surface. */
+    MatrixX3f nn;               /**< Normals of the source space mesh/surface. */
+    MatrixX3i tris;             /**< Triangles of the source space mesh/surface. */
     fiff_int_t nuse;            /**< Number of used dipoles. */
     VectorXi inuse;             /**< Used source points indicated by 1, 0 otherwise */
     VectorXi vertno;            /**< Zero based (different to MATLAB) indices of the used vertices/If label based clustered gain matrix vertno contains label IDs*/

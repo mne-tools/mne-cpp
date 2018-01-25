@@ -59,8 +59,6 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
 
 
 //*************************************************************************************************************
@@ -91,7 +89,6 @@ using namespace std;
 using namespace DISPLIB;
 using namespace FSLIB;
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 
@@ -231,16 +228,14 @@ int main(int argc, char *argv[])
     std::cout << "resultFrequency = " << resultFrequency << std::endl;
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
 
-    int precision = 2;             //format for the amount digits of coefficient shown in the Bar Histogram (does not affect Spline)
-
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
     Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
     //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
     QTime myTimerHistogram;
     myTimerHistogram.start();
-    displayObj->setData(resultClassLimit, resultFrequency, precision);
-    QVector3D thresholdLines1(2.1e-10, 5.0e-8, 6.0e-7);
+    displayObj->setData(resultClassLimit, resultFrequency);
+    QVector3D thresholdLines1(2.1e-10f, 5.0e-8f, 6.0e-7f);
     displayObj->setThreshold(thresholdLines1);
 
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();

@@ -39,11 +39,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/adapters/abstractview.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/view/view3D.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -66,6 +66,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
+    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "pial");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
@@ -240,10 +241,14 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     //Create 3D data model
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     //Add fressurfer surface set including both hemispheres
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", tSurfSet, tAnnotSet);
+    p3DDataModel->addSurfaceSet(parser.value(subjectOption),
+                                "MRI",
+                                tSurfSet,
+                                tAnnotSet);
 
     //Read and show BEM
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
@@ -278,10 +283,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    //Create the 3D view
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-
-
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment,
@@ -289,15 +290,13 @@ int main(int argc, char *argv[])
                                                                              t_sensorSurfaceVV[0],
                                                                              evoked.info,
                                                                              "MEG",
-                                                                             0.10,
-                                                                             "Cubic",
-                                                                             testWindow->format())) {
+                                                                             p3DAbstractView->getView()->format())) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
-        pMegSensorTreeItem->setStreamingActive(false);
-        pMegSensorTreeItem->setNormalization(QVector3D(0.0, 3e-12/2, 3e-12));
-        pMegSensorTreeItem->setColortable("Jet");
+        pMegSensorTreeItem->setStreamingState(false);
+        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 3e-12f*0.5f, 3e-12f));
+        pMegSensorTreeItem->setColormapType("Jet");
         pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
@@ -308,38 +307,36 @@ int main(int argc, char *argv[])
                                                                              t_Bem[0],
                                                                              evoked.info,
                                                                              "EEG",
-                                                                             0.2,
-                                                                             "Cubic",
-                                                                             testWindow->format())) {
+                                                                             p3DAbstractView->getView()->format())) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
-        pEegSensorTreeItem->setStreamingActive(false);
-        pEegSensorTreeItem->setNormalization(QVector3D(0.0, 6e-6/2, 6e-6));
-        pEegSensorTreeItem->setColortable("Jet");
+        pEegSensorTreeItem->setStreamingState(false);
+        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 6.0e-6f*0.5f, 6.0e-6f));
+        pEegSensorTreeItem->setColormapType("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
     }
 
     if(bAddRtSourceLoc) {
         //Add rt source loc data and init some visualization values
-        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+                                                                          evoked.comment,
+                                                                          sourceEstimate,
+                                                                          t_clusteredFwd,
+                                                                          tSurfSet,
+                                                                          tAnnotSet,
+                                                                          p3DAbstractView->getView()->format())) {
             pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(0);
+            pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingActive(false);
-            pRTDataItem->setNormalization(QVector3D(0.0,0.5,10.0));
-            pRTDataItem->setVisualizationType("Smoothing based");
-            pRTDataItem->setColortable("Jet");
+            pRTDataItem->setStreamingState(false);
+            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
+            pRTDataItem->setVisualizationType("Annotation based");
+            pRTDataItem->setColormapType("Jet");
         }
     }
 
-    //Setup window
-    testWindow->setModel(p3DDataModel);
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
+    p3DAbstractView->show();
 
     return a.exec();
 }

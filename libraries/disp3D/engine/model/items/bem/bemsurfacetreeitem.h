@@ -33,8 +33,9 @@
 *
 */
 
-#ifndef BEMSURFACETREEITEM_H
-#define BEMSURFACETREEITEM_H
+#ifndef DISP3DLIB_BEMSURFACETREEITEM_H
+#define DISP3DLIB_BEMSURFACETREEITEM_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,7 +89,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Renderable3DEntity;
@@ -118,7 +119,7 @@ public:
     */
     explicit BemSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
                                 int iType = Data3DTreeModelItemTypes::BemSurfaceItem,
-                                const QString& text = "BEM Surface");
+                                const QString& text = "BEM Surface Item");
 
     //=========================================================================================================
     /**
@@ -133,16 +134,9 @@ protected:
     /**
     * AbstractTreeItem functions
     */
-    void initItem();
-
-    //=========================================================================================================
-    /**
-    * Call this function whenever the color info changed. This needs to be done here since handling BEM color
-    * changes need to handled different to other AbstractMeshTreeItem objects.
-    */
-    void onColorOriginChanged();
+    virtual void initItem() override;
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BEMSURFACETREEITEM_H
+#endif // DISP3DLIB_BEMSURFACETREEITEM_H

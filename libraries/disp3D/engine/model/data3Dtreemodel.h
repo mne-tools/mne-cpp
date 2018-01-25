@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef DATA3DTREEMODEL_H
-#define DATA3DTREEMODEL_H
+#ifndef DISP3DLIB_DATA3DTREEMODEL_H
+#define DISP3DLIB_DATA3DTREEMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,7 +111,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MneEstimateTreeItem;
@@ -148,12 +148,6 @@ public:
     * @param[in] parent         The parent of this class.
     */
     explicit Data3DTreeModel(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~Data3DTreeModel();
 
     //=========================================================================================================
     /**
@@ -232,15 +226,21 @@ public:
     *
     * @param[in] sSubject               The name of the subject.
     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] sourceEstimate         The MNESourceEstimate.
-    * @param[in] forwardSolution        The MNEForwardSolution.
+    * @param[in] tSourceEstimate        The MNESourceEstimate.
+    * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
+    * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
+    * @param[in] tSurfaceFormat         Surface format form View3D. It is used to determine the OpenGL version.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     MneEstimateTreeItem* addSourceData(const QString& sSubject,
                                        const QString& sMeasurementSetName,
-                                       const MNELIB::MNESourceEstimate& sourceEstimate,
-                                       const MNELIB::MNEForwardSolution& forwardSolution = MNELIB::MNEForwardSolution());
+                                       const MNELIB::MNESourceEstimate& tSourceEstimate,
+                                       const MNELIB::MNEForwardSolution& tForwardSolution,
+                                       const FSLIB::SurfaceSet& tSurfSet,
+                                       const FSLIB::AnnotationSet& tAnnotSet,
+                                       const QSurfaceFormat &tSurfaceFormat);
 
     //=========================================================================================================
     /**
@@ -339,8 +339,6 @@ public:
     * @param[in] tBemSurface            The Bem Surface data.
     * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
     * @param[in] sDataType              The data type ("MEG" or "EEG").
-    * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
-    * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
     * @param[in] tSurfaceFormat         Surface format form View3D. It is used to determine the OpenGL version.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
@@ -351,8 +349,6 @@ public:
                                       const MNELIB::MNEBemSurface& tBemSurface,
                                       const FIFFLIB::FiffInfo &fiffInfo,
                                       const QString &sDataType,
-                                      const double dCancelDist,
-                                      const QString &sInterpolationFunction,
                                       const QSurfaceFormat &tSurfaceFormat);
 
     //=========================================================================================================
@@ -366,12 +362,6 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Init the meta types
-    */
-    void initMetatypes();
-
-    //=========================================================================================================
-    /**
     * Create a subject tree item if the item was not found. This is a convenience function.
     *
     * @param[in] sSubject           The name of the subject.
@@ -379,15 +369,6 @@ protected:
     * @return                       Returns a pointer to the first found or created subject tree item. Default is a NULL pointer if no item was found.
     */
     SubjectTreeItem* addSubject(const QString& sSubject);
-
-    //=========================================================================================================
-    /**
-    * Adds an item with its toolTip as second coulm item as description to the model.
-    *
-    * @param[in] pItemParent         The parent item.
-    * @param[in] pItemAdd            The item which is added as a row to the parent item.
-    */
-    void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
 
     //=========================================================================================================
     /**
@@ -428,7 +409,7 @@ protected:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SensorDataTreeItem *addCshSensorData(const QString& sSubject,
+    SensorDataTreeItem *addGpuSensorData(const QString& sSubject,
                                             const QString& sMeasurementSetName,
                                             const Eigen::MatrixXd& matSensorData,
                                             const MNELIB::MNEBemSurface& tBemSurface,
@@ -437,10 +418,16 @@ protected:
                                             const double dCancelDist,
                                             const QString &sInterpolationFunction);
 
+    //=========================================================================================================
+    /**
+    * Init the meta types
+    */
+    void initMetatypes();
+
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
 };
 
 } // NAMESPACE
 
-#endif // DATA3DTREEMODEL_H
+#endif // DISP3DLIB_DATA3DTREEMODEL_H

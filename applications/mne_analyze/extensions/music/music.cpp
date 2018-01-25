@@ -58,7 +58,7 @@
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -226,7 +226,7 @@ void Music::calculate()
 
     int iWinSize = 200;
     if(doMovie) {
-        t_rapMusic.setStcAttr(iWinSize, 0.6);
+        t_rapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
@@ -267,7 +267,7 @@ void Music::calculate()
 //        pRTDataItem->setLoopState(true);
 //        pRTDataItem->setTimeInterval(17);
 //        pRTDataItem->setNumberAverages(1);
-//        pRTDataItem->setStreamingActive(true);
+//        pRTDataItem->setStreamingState(true);
 //        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
 //        pRTDataItem->setVisualizationType("Annotation based");
 //        pRTDataItem->setColortable("Hot");

@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef BEMTREEITEM_H
-#define BEMTREEITEM_H
+#ifndef DISP3DLIB_BEMTREEITEM_H
+#define DISP3DLIB_BEMTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,7 +83,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -112,13 +112,6 @@ public:
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
     * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
     * @param[in] tBem               The BEM data.
@@ -137,4 +130,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BEMTREEITEM_H
+#endif // DISP3DLIB_BEMTREEITEM_H

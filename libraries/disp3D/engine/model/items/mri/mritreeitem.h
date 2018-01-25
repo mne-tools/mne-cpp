@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef MRITREEITEM_H
-#define MRITREEITEM_H
+#ifndef DISP3DLIB_MRITREEITEM_H
+#define DISP3DLIB_MRITREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,7 +89,7 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FsSurfaceTreeItem;
@@ -146,14 +146,6 @@ public:
     */
     FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-    //=========================================================================================================
-    /**
-    * Call this function whenever new colors for the activation data plotting are available.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source for left and right hemisphere.
-    */
-    void setRtVertColor(const QVariant& sourceColorSamples);
-
 protected:
     //=========================================================================================================
     /**
@@ -161,23 +153,9 @@ protected:
     */
     void initItem();
 
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the origin of the vertex color changed to curvature or annotation mode.
-    */
-    void onColorOriginChanged();
-
 signals:
-    //=========================================================================================================
-    /**
-    * emit this signal whenver the color info of the underlying hemisphere surfaces changed.
-    *
-    * @param[in] leftHemiColor        Color of the left hemisphere.
-    * @param[in] rightHemiColor       Color of the right hemisphere.
-    */
-    void colorOriginChanged(const MatrixX3f& leftHemiColor, const MatrixX3f& rightHemiColor);
 };
 
 } //NAMESPACE DISP3DLIB
 
-#endif // MRITREEITEM_H
+#endif // DISP3DLIB_MRITREEITEM_H

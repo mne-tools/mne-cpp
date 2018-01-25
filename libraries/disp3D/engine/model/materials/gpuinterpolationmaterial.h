@@ -83,7 +83,6 @@ namespace Qt3DRender {
         class QRenderPass;
         class QFilterKey;
         class QTechnique;
-        class QBuffer;
 }
 
 
@@ -124,69 +123,7 @@ public:
     */
     explicit GpuInterpolationMaterial(Qt3DCore::QNode *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~GpuInterpolationMaterial();
-
-    //=========================================================================================================
-    /**
-     * Set the new interpolation matrix for interpolation.
-     *
-     * @param pInterpolationMatrix      The weight matrix.
-     */
-    void setWeightMatrix(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
-
-    //=========================================================================================================
-    /**
-    * Add a new vector with signal data form the sensors and push them into m_pSignalDataBuffer.
-    *
-    * @param tSignalVec                Vector with one float value for each sensor.
-    */
-    void addSignalData(const Eigen::VectorXf &tSignalVec);
-
-    //=========================================================================================================
-    /**
-    * Get the current alpha value.
-    *
-    * @return The current alpha value.
-    */
-    float alpha();
-
-    //=========================================================================================================
-    /**
-    * Set the current alpha value.
-    *
-    * @param[in] alpha  The new alpha value.
-    */
-    void setAlpha(const float tAlpha);
-
-    //=========================================================================================================
-    /**
-    * This function set the normalization value.
-    *
-    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
-    */
-    void setNormalization(const QVector3D& tVecThresholds);
-
-    //=========================================================================================================
-    /**
-     * This function sets the colormap type
-     *
-     * @param tColormapType                     The new colormap name.
-     */
-    void setColormapType(const QString& tColormapType);
-
-    //=========================================================================================================
-    /**
-     * This function returns a pointer to the output color buffer.
-     */
-    Qt3DRender::QBuffer *getOutputColorBuffer();
-
 protected:
-
-private:
     //=========================================================================================================
     /**
      * Init GpuInterpolationMaterial class.
@@ -241,18 +178,15 @@ private:
     QPointer<Qt3DRender::QTechnique>                    m_pDrawTechnique;           /**< The technique of the draw shader. This should match with the frame graph. */
 
     //Measurement signal
-    QPointer<Qt3DRender::QBuffer>                       m_pSignalDataBuffer;        /**< This buffer stores signal input data. */
     QPointer<Qt3DRender::QParameter>                    m_pSignalDataParameter;     /**< This parameter holds the signal data buffer. */
 
-    //Weight matrix parameter
-    QPointer<Qt3DRender::QParameter>                    m_pColsParameter;           /**< This parameter holds the number of columns in the weight matrix. */
-    QPointer<Qt3DRender::QParameter>                    m_pRowsParameter;           /**< This parameter holds the number of rows in the weight matrix. */
-    QPointer<Qt3DRender::QParameter>                    m_pWeightMatParameter;      /**< This parameter holds the weight matrix buffer. */
-    QPointer<Qt3DRender::QBuffer>                       m_pWeightMatBuffer;         /**< This buffer the interpolation matrix. */
+    //Interpolation matrix parameter
+    QPointer<Qt3DRender::QParameter>                    m_pColsParameter;           /**< This parameter holds the number of columns in the Interpolation matrix. */
+    QPointer<Qt3DRender::QParameter>                    m_pRowsParameter;           /**< This parameter holds the number of rows in the Interpolation matrix. */
+    QPointer<Qt3DRender::QParameter>                    m_pInterpolationMatParameter;/**< This parameter holds the Interpolation matrix buffer. */
 
     //Output parameter
     QPointer<Qt3DRender::QParameter>                    m_pOutputColorParameter;    /**< This parameter holds the output color buffer. */
-    QPointer<Qt3DRender::QBuffer>                       m_pOutputColorBuffer;       /**< This buffer the color output from the compute shader. */
 
     //Lower and upper normalization threshold parameter
     QPointer<Qt3DRender::QParameter>                    m_pThresholdXParameter;     /**< This parameter holds the lower threshold value. */

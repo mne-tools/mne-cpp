@@ -25,7 +25,7 @@ layout (std430, binding = 0) buffer OutputColor
 };
 
 //Weight matrix buffer
-layout (std430, binding = 1) buffer WeightMat
+layout (std430, binding = 1) buffer InterpolationMat
 {
     float weights[];
 };
