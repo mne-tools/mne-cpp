@@ -44,10 +44,6 @@
 #include "network/networkedge.h"
 #include "network/network.h"
 
-#include <mne/mne_epoch_data_list.h>
-
-#include <utils/ioutils.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,6 +52,7 @@
 
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -73,7 +70,6 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -94,19 +90,20 @@ PhaseLagIndex::PhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::phaseLagIndex(const MNEEpochDataList& epochDataList, const MatrixX3f& matVert)
+Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
 {
     Network finalNetwork("Phase Lag Index");
 
-    if(epochDataList.empty()) {
+    if(matDataList.empty()) {
         qDebug() << "PhaseLagIndex::phaseLagIndex - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    for(int i = 0; i < matVert.rows(); ++i) {
-        RowVectorXf rowVert = RowVectorXf::Zero(3);
+    int rows = matDataList.first().rows();
+    RowVectorXf rowVert = RowVectorXf::Zero(3);
 
+    for(int i = 0; i < rows; ++i) {
         if(matVert.rows() != 0 && i < matVert.rows()) {
             rowVert(0) = matVert.row(i)(0);
             rowVert(1) = matVert.row(i)(1);
@@ -116,33 +113,17 @@ Network PhaseLagIndex::phaseLagIndex(const MNEEpochDataList& epochDataList, cons
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    //Create edges
-    int rows = epochDataList.first()->epoch.rows();
+    //Calculate connectivity matrix over epochs and average afterwards
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
+    resultMat.waitForFinished();
 
-    MatrixXd matSignValues(rows,rows);
-    matSignValues.setZero();
-    MatrixXd matData;
+    MatrixXd matDist = resultMat.result();
+    matDist /= matDataList.size();
 
-    for(int k = 0; k < 3; ++k) {
-        matData = epochDataList.at(k)->epoch;
-        QElapsedTimer elapsedTimer;
-        elapsedTimer.start();
-
-        for(int i = 0; i < rows; ++i) {
-            for(int j = i; j < rows; ++j) {
-                matSignValues(i,j) += calcPhaseLagIndex(matData.row(i), matData.row(j));
-            }
-        }
-
-        qDebug() << "One epoch takes" << elapsedTimer.elapsed() <<" msec";
-    }
-
-    matSignValues /= epochDataList.size();
-    matSignValues.array().abs();
-
-    for(int i = 0; i < rows; ++i) {
-        for(int j = i; j < rows; ++j) {
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matSignValues(i,j)));
+    //Add edges to network
+    for(int i = 0; i < matDist.rows(); ++i) {
+        for(int j = i; j < matDist.cols(); ++j) {
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], abs(matDist(i,j))));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.append(pEdge);
@@ -276,3 +257,35 @@ int PhaseLagIndex::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVecto
 
 //    return signResult;
 }
+
+
+//*************************************************************************************************************
+
+MatrixXd PhaseLagIndex::calculate(const MatrixXd &data)
+{
+    MatrixXd matDist(data.rows(), data.rows());
+    matDist.setZero();
+
+    for(int i = 0; i < data.rows(); ++i) {
+        for(int j = i; j < data.rows(); ++j) {
+            matDist(i,j) += calcPhaseLagIndex(data.row(i), data.row(j));
+        }
+    }
+
+    return matDist;
+}
+
+
+//*************************************************************************************************************
+
+void PhaseLagIndex::sum(MatrixXd &resultData, const MatrixXd &data)
+{
+    if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
+        resultData.resize(data.rows(), data.cols());
+        resultData.setZero();
+    }
+
+    resultData += data;
+}
+
+

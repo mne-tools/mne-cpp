@@ -139,7 +139,7 @@ protected:
 
     //=========================================================================================================
     /**
-    * Sums up (reduces) the in parallel processed conenctivity matrix.
+    * Sums up (reduces) the in parallel processed connectivity matrix.
     *
     * @param[out] resultData    The result data.
     * @param[in]  data          The incoming and temporary result data.

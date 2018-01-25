@@ -101,10 +101,9 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const 
 
     //Create nodes
     int rows = matDataList.first().rows();
+    RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        RowVectorXf rowVert = RowVectorXf::Zero(3);
-
         if(matVert.rows() != 0 && i < matVert.rows()) {
             rowVert(0) = matVert.row(i)(0);
             rowVert(1) = matVert.row(i)(1);

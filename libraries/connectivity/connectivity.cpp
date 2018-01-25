@@ -66,8 +66,6 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
-using namespace MNELIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,7 +93,7 @@ Network Connectivity::calculateConnectivity() const
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
         return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
     } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
-        //return PhaseLagIndex::phaseLagIndex(epochDataList, matNodePos);
+        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
     }
 
     return Network();
