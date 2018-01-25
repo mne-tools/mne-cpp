@@ -116,7 +116,6 @@ Network Connectivity::calculateConnectivity() const
         return ConnectivityMeasures::phaseLagIndex(epochDataList, matNodePos);
     }
 
-
     return Network();
 }
 
