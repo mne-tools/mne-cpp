@@ -213,11 +213,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Overloaded stream operator to add a network edge to this network node.
+    * Appends a network edge to this network node. Automatically decides whether to add to the in or out edges.
     *
-    * @param[in] newEdge    The new edge item as a reference.
+    * @param[in] newEdge    The new edge item.
     */
-    NetworkNode &operator<<(QSharedPointer<NetworkEdge> newEdge);
+    void append(QSharedPointer<NetworkEdge> newEdge);
 
 protected:
     bool                                    m_bIsHub;       /**< Whether this node is a hub.*/

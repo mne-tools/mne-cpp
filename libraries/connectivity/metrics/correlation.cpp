@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     network.cpp
+* @file     correlation.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Network class definition.
+* @brief    Correlation class definition.
 *
 */
 
@@ -39,11 +39,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "network.h"
+#include "correlation.h"
+#include "network/networknode.h"
+#include "network/networkedge.h"
+#include "network/network.h"
 
-#include "networkedge.h"
-#include "networknode.h"
-#include <utils/ioutils.h>
+#include <mne/mne_epoch_data_list.h>
 
 
 //*************************************************************************************************************
@@ -51,11 +52,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -65,7 +70,8 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
-using namespace UTILSLIB;
+using namespace MNELIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,121 +84,68 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Network::Network(const QString& sConnectivityMethod)
-: m_sConnectivityMethod(sConnectivityMethod)
+Correlation::Correlation()
 {
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd Network::getConnectivityMatrix() const
+Network Correlation::correlationCoeff(const MNEEpochDataList& epochDataList, const MatrixX3f& matVert)
 {
-    return generateConnectMat();
-}
+    Network finalNetwork("Correlation");
 
-
-//*************************************************************************************************************
-
-const QList<NetworkEdge::SPtr>& Network::getEdges() const
-{
-    return m_lEdges;
-}
-
-
-//*************************************************************************************************************
-
-const QList<NetworkNode::SPtr>& Network::getNodes() const
-{
-    return m_lNodes;
-}
-
-
-//*************************************************************************************************************
-
-NetworkEdge::SPtr Network::getEdgeAt(int i)
-{
-    return m_lEdges.at(i);
-}
-
-
-//*************************************************************************************************************
-
-NetworkNode::SPtr Network::getNodeAt(int i)
-{
-    return m_lNodes.at(i);
-}
-
-
-//*************************************************************************************************************
-
-qint16 Network::getDistribution() const
-{
-    qint16 distribution = 0;
-
-    for(NetworkNode::SPtr node : m_lNodes) {
-        distribution += node->getDegree();
+    if(epochDataList.empty()) {
+        qDebug() << "Correlation::CorrelationCoeff - Input data is empty";
+        return finalNetwork;
     }
 
-    return distribution;
-}
+    // Average data
+    MatrixXd matData(epochDataList.first()->epoch.rows(), epochDataList.first()->epoch.cols());
+    for(int i = 0; i < epochDataList.size(); ++i) {
+        matData += epochDataList.at(i)->epoch;
+    }
 
+    matData = matData/epochDataList.size();
 
-//*************************************************************************************************************
+    //Create nodes
+    for(int i = 0; i < matData.rows(); ++i) {
+        RowVectorXf rowVert = RowVectorXf::Zero(3);
 
-void Network::setConnectivityMethod(const QString& sConnectivityMethod)
-{
-    m_sConnectivityMethod = sConnectivityMethod;
-}
+        if(matVert.rows() != 0 && i < matVert.rows()) {
+            rowVert(0) = matVert.row(i)(0);
+            rowVert(1) = matVert.row(i)(1);
+            rowVert(2) = matVert.row(i)(2);
+        }
 
+        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
+    }
 
-//*************************************************************************************************************
+    //Create edges
+    double correlationCoeff;
 
-QString Network::getConnectivityMethod() const
-{
-    return m_sConnectivityMethod;
-}
+    for(int i = 0; i < matData.rows(); ++i) {
+        for(int j = i; j < matData.rows(); ++j) {
+            correlationCoeff = calcCorrelationCoeff(matData.row(i), matData.row(j));
 
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], correlationCoeff));
 
-//*************************************************************************************************************
-
-void Network::append(NetworkEdge::SPtr newEdge)
-{
-    m_lEdges << newEdge;
-}
-
-
-//*************************************************************************************************************
-
-void Network::append(NetworkNode::SPtr newNode)
-{
-    m_lNodes << newNode;
-}
-
-
-//*************************************************************************************************************
-
-MatrixXd Network::generateConnectMat() const
-{
-    MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setZero();
-
-    for(int i = 0; i < m_lEdges.size(); ++i)
-    {
-        int row = m_lEdges.at(i)->getStartNode()->getId();
-        int col = m_lEdges.at(i)->getEndNode()->getId();
-
-        if(row < matDist.rows() && col < matDist.cols())
-        {
-            matDist(row,col) = m_lEdges.at(i)->getWeight();
+            finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.append(pEdge);
         }
     }
 
-    IOUtils::write_eigen_matrix(matDist,"eigen.txt");
-    return matDist;
+    return finalNetwork;
 }
 
 
+//*************************************************************************************************************
 
+double Correlation::calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond)
+{
+    if(vecFirst.cols() != vecSecond.cols()) {
+        qDebug() << "Correlation::calcCorrelationCoeff - Vectors length do not match!";
+    }
 
-
+    return (vecFirst.dot(vecSecond))/vecFirst.cols();
+}

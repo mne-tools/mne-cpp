@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     network.cpp
+* @file     abstractmetric.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Network class definition.
+* @brief     AbstractMetric class declaration.
 *
 */
+
+#ifndef ABSTRACTMETRIC_H
+#define ABSTRACTMETRIC_H
 
 
 //*************************************************************************************************************
@@ -39,11 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "network.h"
-
-#include "networkedge.h"
-#include "networknode.h"
-#include <utils/ioutils.h>
+#include "connectivity_global.h"
 
 
 //*************************************************************************************************************
@@ -51,148 +50,67 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace CONNECTIVITYLIB;
-using namespace Eigen;
-using namespace UTILSLIB;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-Network::Network(const QString& sConnectivityMethod)
-: m_sConnectivityMethod(sConnectivityMethod)
-{
-}
+namespace CONNECTIVITYLIB {
 
 
 //*************************************************************************************************************
-
-MatrixXd Network::getConnectivityMatrix() const
-{
-    return generateConnectMat();
-}
+//=============================================================================================================
+// CONNECTIVITYLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
 
-//*************************************************************************************************************
+//=============================================================================================================
+/**
+* This class provides basic functionalities for all implemented metrics.
+*
+* @brief This class provides basic functionalities for all implemented metrics.
+*/
+class CONNECTIVITYSHARED_EXPORT AbstractMetric
+{    
 
-const QList<NetworkEdge::SPtr>& Network::getEdges() const
-{
-    return m_lEdges;
-}
+public:
+    typedef QSharedPointer<AbstractMetric> SPtr;            /**< Shared pointer type for AbstractMetric. */
+    typedef QSharedPointer<const AbstractMetric> ConstSPtr; /**< Const shared pointer type for AbstractMetric. */
 
+    //=========================================================================================================
+    /**
+    * Constructs a AbstractMetric object.
+    */
+    explicit AbstractMetric();
 
-//*************************************************************************************************************
+protected:
 
-const QList<NetworkNode::SPtr>& Network::getNodes() const
-{
-    return m_lNodes;
-}
-
-
-//*************************************************************************************************************
-
-NetworkEdge::SPtr Network::getEdgeAt(int i)
-{
-    return m_lEdges.at(i);
-}
+};
 
 
 //*************************************************************************************************************
-
-NetworkNode::SPtr Network::getNodeAt(int i)
-{
-    return m_lNodes.at(i);
-}
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
 
-//*************************************************************************************************************
+} // namespace CONNECTIVITYLIB
 
-qint16 Network::getDistribution() const
-{
-    qint16 distribution = 0;
-
-    for(NetworkNode::SPtr node : m_lNodes) {
-        distribution += node->getDegree();
-    }
-
-    return distribution;
-}
-
-
-//*************************************************************************************************************
-
-void Network::setConnectivityMethod(const QString& sConnectivityMethod)
-{
-    m_sConnectivityMethod = sConnectivityMethod;
-}
-
-
-//*************************************************************************************************************
-
-QString Network::getConnectivityMethod() const
-{
-    return m_sConnectivityMethod;
-}
-
-
-//*************************************************************************************************************
-
-void Network::append(NetworkEdge::SPtr newEdge)
-{
-    m_lEdges << newEdge;
-}
-
-
-//*************************************************************************************************************
-
-void Network::append(NetworkNode::SPtr newNode)
-{
-    m_lNodes << newNode;
-}
-
-
-//*************************************************************************************************************
-
-MatrixXd Network::generateConnectMat() const
-{
-    MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setZero();
-
-    for(int i = 0; i < m_lEdges.size(); ++i)
-    {
-        int row = m_lEdges.at(i)->getStartNode()->getId();
-        int col = m_lEdges.at(i)->getEndNode()->getId();
-
-        if(row < matDist.rows() && col < matDist.cols())
-        {
-            matDist(row,col) = m_lEdges.at(i)->getWeight();
-        }
-    }
-
-    IOUtils::write_eigen_matrix(matDist,"eigen.txt");
-    return matDist;
-}
-
-
-
-
-
+#endif // ABSTRACTMETRIC_H

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     networknode.cpp
+* @file     phaselagindex.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    NetworkNode class definition.
+* @brief     PhaseLagIndex class declaration.
 *
 */
+
+#ifndef PHASELAGINDEX_H
+#define PHASELAGINDEX_H
 
 
 //*************************************************************************************************************
@@ -39,9 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "networknode.h"
-
-#include "networkedge.h"
+#include "connectivity_global.h"
 
 
 //*************************************************************************************************************
@@ -49,179 +50,95 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
+#include <QPair>
+#include <QString>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace CONNECTIVITYLIB;
-using namespace Eigen;
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace MNELIB {
+    class MNEEpochDataList;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE CONNECTIVITYLIB
+//=============================================================================================================
+
+namespace CONNECTIVITYLIB {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// CONNECTIVITYLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+class Network;
+
+
+//=============================================================================================================
+/**
+* This class computes the phase lag index connectivity metric.
+*
+* @brief This class computes the phase lag index connectivity metric.
+*/
+class CONNECTIVITYSHARED_EXPORT PhaseLagIndex
+{    
+
+public:
+    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
+    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a PhaseLagIndex object.
+    */
+    explicit PhaseLagIndex();
+
+    //=========================================================================================================
+    /**
+    * Calculates the phase lag index between the rows of the data matrix.
+    *
+    * @param[in] epochDataList  The input data for whicht the phase lag index is to be calculated.
+    * @param[in] matVert        The vertices of each network node.
+    *
+    * @return                   The connectivity information in form of a network structure.
+    */
+    static Network phaseLagIndex(const MNELIB::MNEEpochDataList &epochDataList, const Eigen::MatrixX3f& matVert);
+
+protected:
+    //==========================================================================================================
+    /**
+    * Calculates the actual phase lag index between two data vectors.
+    *
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
+    *
+    * @return                The PLI value.
+    */
+    static int calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
+} // namespace CONNECTIVITYLIB
 
-NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert)
-: m_bIsHub(false)
-, m_iId(iId)
-, m_vecVert(vecVert)
-{
-}
-
-
-//*************************************************************************************************************
-
-const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesIn() const
-{
-    return m_lEdgesIn;
-}
-
-
-//*************************************************************************************************************
-
-const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesOut() const
-{
-    return m_lEdgesOut;
-}
-
-
-//*************************************************************************************************************
-
-int NetworkNode::getNumberEdges() const
-{
-    return m_lEdgesIn.size() + m_lEdgesOut.size();
-}
-
-
-//*************************************************************************************************************
-
-const RowVectorXf& NetworkNode::getVert() const
-{
-    return m_vecVert;
-}
-
-
-//*************************************************************************************************************
-
-qint16 NetworkNode::getId() const
-{
-    return m_iId;
-}
-
-
-//*************************************************************************************************************
-
-qint16 NetworkNode::getDegree() const
-{
-    return m_lEdgesIn.size() + m_lEdgesOut.size();
-}
-
-
-//*************************************************************************************************************
-
-qint16 NetworkNode::getIndegree() const
-{
-    return m_lEdgesIn.size();
-}
-
-
-//*************************************************************************************************************
-
-qint16 NetworkNode::getOutdegree() const
-{
-    return m_lEdgesOut.size();
-}
-
-
-//*************************************************************************************************************
-
-double NetworkNode::getStrength() const
-{
-    double strength = 0;
-
-    for(NetworkEdge::SPtr node : m_lEdgesIn) {
-        strength += node->getWeight();
-    }
-
-    for(NetworkEdge::SPtr node : m_lEdgesOut) {
-        strength += node->getWeight();
-    }
-
-    return strength;
-}
-
-
-//*************************************************************************************************************
-
-double NetworkNode::getInstrength() const
-{
-    double strength = 0;
-
-    for(NetworkEdge::SPtr node : m_lEdgesIn) {
-        strength += node->getWeight();
-    }
-
-    return strength;
-}
-
-
-//*************************************************************************************************************
-
-double NetworkNode::getOutstrength() const
-{
-    double strength = 0;
-
-    for(NetworkEdge::SPtr node : m_lEdgesOut) {
-        strength += node->getWeight();
-    }
-
-    return strength;
-}
-
-
-//*************************************************************************************************************
-
-void NetworkNode::setHubStatus(bool bIsHub)
-{
-    m_bIsHub = bIsHub;
-}
-
-
-//*************************************************************************************************************
-
-bool NetworkNode::getHubStatus() const
-{
-    return m_bIsHub;
-}
-
-
-//*************************************************************************************************************
-
-void NetworkNode::append(QSharedPointer<NetworkEdge> newEdge)
-{
-    if(newEdge->getEndNode()->getId() == this->getId()) {
-        m_lEdgesIn << newEdge;
-    }
-
-    if(newEdge->getStartNode()->getId() == this->getId()) {
-        m_lEdgesOut << newEdge;
-    }
-}
-
-
-
+#endif // PHASELAGINDEX_H

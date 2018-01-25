@@ -88,7 +88,10 @@ else {
 }
 
 SOURCES += \
-    connectivitymeasures.cpp \
+    metrics/abstractmetric.cpp \
+    metrics/correlation.cpp \
+    metrics/crosscorrelation.cpp \
+    metrics/phaselagindex.cpp \
     network/network.cpp \
     network/networknode.cpp \
     network/networkedge.cpp \
@@ -97,7 +100,10 @@ SOURCES += \
 
 HEADERS += \
     connectivity_global.h \
-    connectivitymeasures.h \
+    metrics/abstractmetric.h \
+    metrics/correlation.h \
+    metrics/crosscorrelation.h \
+    metrics/phaselagindex.h \
     network/network.h \
     network/networknode.h \
     network/networkedge.h \

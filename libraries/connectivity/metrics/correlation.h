@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     network.h
+* @file     correlation.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Network class declaration.
+* @brief     Correlation class declaration.
 *
 */
 
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef CORRELATION_H
+#define CORRELATION_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../connectivity_global.h"
+#include "connectivity_global.h"
+
+#include "abstractmetric.h"
 
 
 //*************************************************************************************************************
@@ -66,6 +68,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB {
+    class MNEEpochDataList;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,132 +86,50 @@ namespace CONNECTIVITYLIB {
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class NetworkEdge;
-class NetworkNode;
+class Network;
 
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class computes the correlation metric.
 *
-* @brief Brief description of this class.
+* @brief This class computes the correlation metric.
 */
-
-class CONNECTIVITYSHARED_EXPORT Network
-{
+class CONNECTIVITYSHARED_EXPORT Correlation : public AbstractMetric
+{    
 
 public:
-    typedef QSharedPointer<Network> SPtr;            /**< Shared pointer type for Network. */
-    typedef QSharedPointer<const Network> ConstSPtr; /**< Const shared pointer type for Network. */
+    typedef QSharedPointer<Correlation> SPtr;            /**< Shared pointer type for Correlation. */
+    typedef QSharedPointer<const Correlation> ConstSPtr; /**< Const shared pointer type for Correlation. */
 
     //=========================================================================================================
     /**
-    * Constructs a Network object.
-    *
-    * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
+    * Constructs a Correlation object.
     */
-    explicit Network(const QString& sConnectivityMethod = "Unknown");
+    explicit Correlation();
 
     //=========================================================================================================
     /**
-    * Returns the connectivity matrix for this network structure.
+    * Calculates the correlation coefficient between the rows of the data matrix.
     *
-    * @return    The connectivity matrix generated from the current network information.
+    * @param[in] epochDataList  The data in form of epochs.
+    * @param[in] matVert        The vertices of each network node.
+    *
+    * @return                   The connectivity information in form of a network structure.
     */
-    Eigen::MatrixXd getConnectivityMatrix() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the edges.
-    *
-    * @return Returns the network edges.
-    */
-    const QList<QSharedPointer<NetworkEdge> >& getEdges() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the nodes.
-    *
-    * @return Returns the network nodes.
-    */
-    const QList<QSharedPointer<NetworkNode> >& getNodes() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the edge at a specific position.
-    *
-    * @param[in] i      The index to look up the edge. i must be a valid index position in the network list (i.e., 0 <= i < size()).
-    *
-    * @return Returns the network edge.
-    */
-    QSharedPointer<NetworkEdge> getEdgeAt(int i);
-
-    //=========================================================================================================
-    /**
-    * Returns the node at a specific position.
-    *
-    * @param[in] i      The index to look up the node. i must be a valid index position in the network list (i.e., 0 <= i < size()).
-    *
-    * @return Returns the network node.
-    */
-    QSharedPointer<NetworkNode> getNodeAt(int i);
-
-    //=========================================================================================================
-    /**
-    * Returns network distribution, also known as network degree.
-    *
-    * @return   The network distribution calculated as degrees of all nodes together.
-    */
-    qint16 getDistribution() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the connectivity measure method used to create the data of this network structure.
-    *
-    * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
-    */
-    void setConnectivityMethod(const QString& sConnectivityMethod);
-
-    //=========================================================================================================
-    /**
-    * Returns the connectivity measure method used to create the data of this network structure.
-    *
-    * @return   The connectivity measure method used to create the data of this network structure.
-    */
-    QString getConnectivityMethod() const;
-
-    //=========================================================================================================
-    /**
-    * Appends a network edge to this network node.
-    *
-    * @param[in] newEdge    The new edge item.
-    */
-    void append(QSharedPointer<NetworkEdge> newEdge);
-
-    //=========================================================================================================
-    /**
-    * Appends a network edge to this network node.
-    *
-    * @param[in] newNode    The new node item as a reference.
-    */
-    void append(QSharedPointer<NetworkNode> newNode);
+    static Network correlationCoeff(const MNELIB::MNEEpochDataList& epochDataList, const Eigen::MatrixX3f& matVert);
 
 protected:
-    QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/
-    QList<QSharedPointer<NetworkNode> >     m_lNodes;                   /**< List with all nodes of the network.*/
-
-    Eigen::MatrixXd                         m_matDistMatrix;            /**< The distance matrix.*/
-
-    QString                                 m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
-
     //=========================================================================================================
     /**
-    * Returns the connectivity matrix for this network structure.
+    * Calculates the actual correlation coefficient between two data vectors.
     *
-    * @return    The connectivity matrix generated from the current network information.
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
+    *
+    * @return               The correlation coefficient.
     */
-    Eigen::MatrixXd generateConnectMat() const;
-
+    static double calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 };
 
 
@@ -217,9 +141,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#ifndef metatype_networks
-#define metatype_networks
-Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network);
-#endif
-
-#endif // NETWORK_H
+#endif // CORRELATION_H
