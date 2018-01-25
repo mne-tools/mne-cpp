@@ -51,7 +51,6 @@
 //=============================================================================================================
 
 #include <QDebug>
-#include <QElapsedTimer>
 #include <QtConcurrent>
 
 
@@ -179,10 +178,8 @@ int PhaseLagIndex::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVecto
             iSignResult = -1.0;
         }
     }
+
     return iSignResult;
-
-
-
 
 //    //Hilbert function
 //    Eigen::FFT<double> fft;
@@ -287,5 +284,3 @@ void PhaseLagIndex::sum(MatrixXd &resultData, const MatrixXd &data)
 
     resultData += data;
 }
-
-
