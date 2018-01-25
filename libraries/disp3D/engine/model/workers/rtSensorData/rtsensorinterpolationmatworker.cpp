@@ -76,6 +76,7 @@ RtSensorInterpolationMatWorker::RtSensorInterpolationMatWorker()
 {
     m_lInterpolationData.dCancelDistance = 0.05;
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
+    m_lInterpolationData.matDistanceMatrix = QSharedPointer<MatrixXd>(new MatrixXd());
 }
 
 
@@ -218,9 +219,9 @@ void RtSensorInterpolationMatWorker::calculateInterpolationOperator()
 void RtSensorInterpolationMatWorker::emitMatrix()
 {
     //create Interpolation matrix
-    emit newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                                                                                           m_lInterpolationData.matDistanceMatrix,
-                                                                                                                                                           m_lInterpolationData.interpolationFunction,
-                                                                                                                                                           m_lInterpolationData.dCancelDistance,
-                                                                                                                                                           m_lInterpolationData.vecExcludeIndex))));
+    emit newInterpolationMatrixCalculated(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                m_lInterpolationData.matDistanceMatrix,
+                                                                                m_lInterpolationData.interpolationFunction,
+                                                                                m_lInterpolationData.dCancelDistance,
+                                                                                m_lInterpolationData.vecExcludeIndex));
 }

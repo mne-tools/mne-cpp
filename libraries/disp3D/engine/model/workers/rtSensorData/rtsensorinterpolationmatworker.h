@@ -168,7 +168,7 @@ protected:
         int                                             iSensorType;                    /**< Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH. */
         double                                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
-        Eigen::MatrixXd                                 matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+        QSharedPointer<Eigen::MatrixXd>                 matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
         Eigen::MatrixX3f                                matVertices;                    /**< Holds all vertex information. */
 
         QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */

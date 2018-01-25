@@ -131,10 +131,10 @@ public:
     *
     * @return                               A double matrix. One column represents the distances for one vertex inside of the passed subset
     */
-    static Eigen::MatrixXd scdc(const Eigen::MatrixX3f &matVertices,
-                                const QVector<QVector<int> > &vecNeighborVertices,
-                                QVector<qint32> &pVecVertSubset,
-                                double dCancelDist = FLOAT_INFINITY);
+    static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f &matVertices,
+                                                const QVector<QVector<int> > &vecNeighborVertices,
+                                                QVector<qint32> &pVecVertSubset,
+                                                double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
     /**
@@ -158,21 +158,11 @@ public:
     *
     * @return Vector of bad channel indices.
     */
-    static QVector<qint32> filterBadChannels(Eigen::MatrixXd &matDistanceTable,
+    static QVector<qint32> filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
                                              const FIFFLIB::FiffInfo& fiffInfo,
                                              qint32 iSensorType);
 
 protected:
-    struct IterativeDijkstraData {
-        QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix;
-        const Eigen::MatrixX3f &matVertices;
-        const QVector<QVector<int> > &vecNeighborVertices;
-        const QVector<qint32> &vecVertSubset;
-        qint32 iBegin;
-        qint32 iEnd;
-        double dCancelDistance;
-    };
-
     //=========================================================================================================
     /**
     * @brief squared        Implemented for better readability only
@@ -209,7 +199,7 @@ protected:
     * @param[in] iEnd                  End index of distance calculation, exclusive
     * @param[in] dCancelDistance       Distance threshold: all vertices that have a higher distance to the respective root vertex are set to infinity
     */
-    static void iterativeDijkstra(Eigen::MatrixXd & matOutputDistMatrix,
+    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix,
                                   const Eigen::MatrixX3f &matVertices,
                                   const QVector<QVector<int> > &vecNeighborVertices,
                                   const QVector<qint32> &vecVertSubset,
