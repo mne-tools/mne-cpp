@@ -51,8 +51,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QPair>
-#include <QString>
 
 
 //*************************************************************************************************************
@@ -67,10 +65,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace MNELIB {
-    class MNEEpochDataList;
-}
 
 
 //*************************************************************************************************************
@@ -112,12 +106,12 @@ public:
     /**
     * Calculates the phase lag index between the rows of the data matrix.
     *
-    * @param[in] epochDataList  The input data for whicht the phase lag index is to be calculated.
+    * @param[in] matDataList    The input data.
     * @param[in] matVert        The vertices of each network node.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network phaseLagIndex(const MNELIB::MNEEpochDataList &epochDataList, const Eigen::MatrixX3f& matVert);
+    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
 
 protected:
     //==========================================================================================================
@@ -130,6 +124,25 @@ protected:
     * @return                The PLI value.
     */
     static int calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+
+    //=========================================================================================================
+    /**
+    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
+    *
+    * @param[in] data       The input data.
+    *
+    * @return               The connectivity matrix.
+    */
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed connectivity matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming, temporary result data.
+    */
+    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
 };
 
 
