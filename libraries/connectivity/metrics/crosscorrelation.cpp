@@ -44,8 +44,6 @@
 #include "network/networkedge.h"
 #include "network/network.h"
 
-#include <mne/mne_epoch_data_list.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -53,6 +51,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -70,7 +69,6 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -91,25 +89,19 @@ CrossCorrelation::CrossCorrelation()
 
 //*************************************************************************************************************
 
-Network CrossCorrelation::crossCorrelation(const MNEEpochDataList& epochDataList, const MatrixX3f& matVert)
+Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
 {
     Network finalNetwork("Cross Correlation");
 
-    if(epochDataList.empty()) {
+    if(matDataList.empty()) {
         qDebug() << "CrossCorrelation::crossCorrelation - Input data is empty";
         return finalNetwork;
     }
 
-    // Average data
-    MatrixXd matData(epochDataList.first()->epoch.rows(), epochDataList.first()->epoch.cols());
-    for(int i = 0; i < epochDataList.size(); ++i) {
-        matData += epochDataList.at(i)->epoch;
-    }
-
-    matData = matData/epochDataList.size();
-
     //Create nodes
-    for(int i = 0; i < matData.rows(); ++i) {
+    int rows = matDataList.first().rows();
+
+    for(int i = 0; i < rows; ++i) {
         RowVectorXf rowVert = RowVectorXf::Zero(3);
 
         if(matVert.rows() != 0 && i < matVert.rows()) {
@@ -121,22 +113,22 @@ Network CrossCorrelation::crossCorrelation(const MNEEpochDataList& epochDataList
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    //Create edges
-    QPair<int,double> crossCorrPair;
+    //Calculate connectivity matrix over epochs and average afterwards
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
+    resultMat.waitForFinished();
 
-    for(int i = 0; i < matData.rows(); ++i) {
-        for(int j = i; j < matData.rows(); ++j) {
-            crossCorrPair = calcCrossCorrelation(matData.row(i), matData.row(j));
+    MatrixXd matDist = resultMat.result();
+    matDist /= matDataList.size();
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], crossCorrPair.second));
+    //Add edges to network
+    for(int i = 0; i < matDist.rows(); ++i) {
+        for(int j = i; j < matDist.cols(); ++j) {
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matDist(i,j)));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.append(pEdge);
         }
     }
-
-//    finalNetwork.scale();
-//    matDist /= matDist.maxCoeff();
 
     return finalNetwork;
 }
@@ -144,7 +136,7 @@ Network CrossCorrelation::crossCorrelation(const MNEEpochDataList& epochDataList
 
 //*************************************************************************************************************
 
-QPair<int,double> CrossCorrelation::calcCrossCorrelation(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
+QPair<int,double> CrossCorrelation::calcCrossCorrelation(const RowVectorXd &vecFirst, const RowVectorXd &vecSecond)
 {
     Eigen::FFT<double> fft;
 
@@ -203,4 +195,34 @@ QPair<int,double> CrossCorrelation::calcCrossCorrelation(const RowVectorXd& vecF
     double maxValue = result2(resultIndex);
 
     return QPair<int,double>(resultIndex, maxValue);
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd CrossCorrelation::calculate(const MatrixXd &data)
+{
+    MatrixXd matDist(data.rows(), data.rows());
+    matDist.setZero();
+
+    for(int i = 0; i < data.rows(); ++i) {
+        for(int j = i; j < data.rows(); ++j) {
+            matDist(i,j) += calcCrossCorrelation(data.row(i), data.row(j)).second;
+        }
+    }
+
+    return matDist;
+}
+
+
+//*************************************************************************************************************
+
+void CrossCorrelation::sum(MatrixXd &resultData, const MatrixXd &data)
+{
+    if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
+        resultData.resize(data.rows(), data.cols());
+        resultData.setZero();
+    }
+
+    resultData += data;
 }

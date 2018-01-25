@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "../connectivity_global.h"
 
 #include "abstractmetric.h"
 
@@ -67,10 +67,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace MNELIB {
-    class MNEEpochDataList;
-}
 
 
 //*************************************************************************************************************
@@ -112,24 +108,43 @@ public:
     /**
     * Calculates the cross correlation between the rows of the data matrix.
     *
-    * @param[in] epochDataList  The data in form of epochs.
+    * @param[in] matDataList    The input data.
     * @param[in] matVert        The vertices of each network node.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network crossCorrelation(const MNELIB::MNEEpochDataList &epochDataList, const Eigen::MatrixX3f& matVert);
+    static Network crossCorrelation(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
     /**
-    * Calculates the actual cross correlation between two data vectors.
+    * Calculates the actual correlation coefficient between two data vectors.
     *
     * @param[in] vecFirst    The first input data row.
     * @param[in] vecSecond   The second input data row.
     *
-    * @return               The result in form of a QPair. First element represents the index of the maximum. Second element represents the actual correlation value.
+    * @return                The cross position where the maximum correlation was computed.
     */
     static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+
+    //=========================================================================================================
+    /**
+    * Calculates the connectivity matrix for a given input data matrix based on the cross correlation coefficient.
+    *
+    * @param[in] data       The input data.
+    *
+    * @return               The connectivity matrix.
+    */
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed conenctivity matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming and temporary result data.
+    */
+    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
 
 };
 
