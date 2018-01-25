@@ -249,9 +249,9 @@ protected:
     /**
     * Set the new interpolation matrix.
     *
-    * @param[in] matInterpolationMatrix                 The new interpolation matrix.
+    * @param[in] pMatInterpolationMatrixLeftHemi                 The new interpolation matrix.
     */
-    virtual void onNewInterpolationMatrixAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    virtual void onNewInterpolationMatrixAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi);
 
     //=========================================================================================================
     /**

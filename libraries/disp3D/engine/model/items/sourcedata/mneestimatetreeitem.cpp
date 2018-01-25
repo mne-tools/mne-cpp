@@ -630,7 +630,7 @@ void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &m
 
 void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
 {
-    qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable";
+    //qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable";
     if(m_pInterpolationItemLeftGPU) {
         m_pInterpolationItemLeftGPU->setInterpolationMatrix(pMatInterpolationMatrixLeftHemi);
     }
@@ -641,7 +641,7 @@ void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<E
 
 void MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi)
 {
-    qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable";
+    //qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable";
     if(m_pInterpolationItemRightGPU) {
         m_pInterpolationItemRightGPU->setInterpolationMatrix(pMatInterpolationMatrixRightHemi);
     }

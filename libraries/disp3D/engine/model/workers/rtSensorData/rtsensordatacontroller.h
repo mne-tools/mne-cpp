@@ -257,9 +257,9 @@ protected:
     /**
     * Call this function whenever a new interpolation matrix is available to be dispatched.
     *
-    * @param[in] matInterpolationMatrix         The new interpolation matrix data.
+    * @param[in] pMatInterpolationMatrix         The new interpolation matrix data.
     */
-    void onNewInterpolationMatrixCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    void onNewInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     QTimer                                  m_timer;                            /**< The timer to control the streaming speed. */
 
@@ -387,9 +387,9 @@ signals:
     /**
     * Emit this signal whenever a new interpolation matrix is available.
     *
-    * @param[in] matInterpolationMatrix          The new interpolation matrix.
+    * @param[in] pMatInterpolationMatrix          The new interpolation matrix.
     */
-    void newInterpolationMatrixAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    void newInterpolationMatrixAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**

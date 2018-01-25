@@ -87,6 +87,8 @@ RtSourceDataWorker::RtSourceDataWorker()
 {
     m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHot;
     m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHot;
+    m_lVisualizationInfoLeft.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
+    m_lVisualizationInfoRight.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
 }
 
 
@@ -268,7 +270,7 @@ MatrixX3f RtSourceDataWorker::generateColorsFromSensorValues(const VectorXd &vec
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(*visualizationInfoHemi.pMatInterpolationMatrix, vecSensorValues);
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(visualizationInfoHemi.pMatInterpolationMatrix, vecSensorValues);
 
     // Reset to original color as default
     visualizationInfoHemi.matFinalVertColor = visualizationInfoHemi.matOriginalVertColor;
