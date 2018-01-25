@@ -353,10 +353,8 @@ void NeuronalConnectivity::run()
             QElapsedTimer time;
             time.start();
 
-            MNEEpochDataList epochDataList;
-            MNEEpochData::SPtr pEpoch = MNEEpochData::SPtr(new MNEEpochData());
-            pEpoch->epoch = t_mat;
-            epochDataList.append(pEpoch);
+            QList<MatrixXd> epochDataList;
+            epochDataList.append(t_mat);
 
             Network tNetwork = CrossCorrelation::crossCorrelation(epochDataList, m_matNodeVertComb);
             qDebug()<<"----------------------------------------";
