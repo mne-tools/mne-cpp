@@ -128,11 +128,11 @@ public:
     *
     * @return                                  The distance matrix created
     */
-    static Eigen::SparseMatrix<float> createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
-                                                             const Eigen::MatrixXd &matDistanceTable,
-                                                             double (*interpolationFunction) (double),
-                                                             const double dCancelDist = FLOAT_INFINITY,
-                                                             const QVector<qint32> &vecExcludeIndex = QVector<qint32>());
+    static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
+                                                                              const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+                                                                              double (*interpolationFunction) (double),
+                                                                              const double dCancelDist = FLOAT_INFINITY,
+                                                                              const QVector<qint32> &vecExcludeIndex = QVector<qint32>());
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ public:
     *
     * @return                              Interpolated values for all vertices of the mesh
     */
-    static Eigen::VectorXf interpolateSignal(const Eigen::SparseMatrix<float> &matInterpolationMatrix,
+    static Eigen::VectorXf interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix,
                                              const Eigen::VectorXd &vecMeasurementData);
 
     //=========================================================================================================

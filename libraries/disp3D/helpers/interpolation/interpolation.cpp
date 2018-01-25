@@ -82,25 +82,25 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
-                                                          const MatrixXd &matDistanceTable,
-                                                          double (*interpolationFunction) (double),
-                                                          const double dCancelDist,
-                                                          const QVector<qint32> &vecExcludeIndex)
+QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
+                                                                           const QSharedPointer<MatrixXd> matDistanceTable,
+                                                                           double (*interpolationFunction) (double),
+                                                                           const double dCancelDist,
+                                                                           const QVector<qint32> &vecExcludeIndex)
 {
 
-    if(matDistanceTable.rows() == 0 && matDistanceTable.cols() == 0) {
+    if(matDistanceTable->rows() == 0 && matDistanceTable->cols() == 0) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table.";
-        return SparseMatrix<float>();
+        return QSharedPointer<SparseMatrix<float> >::create();
     }
 
     // initialization
-    SparseMatrix<float> matInterpolationMatrix(matDistanceTable.rows(), vecProjectedSensors.size());
+    QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix = QSharedPointer<SparseMatrix<float> >::create(matDistanceTable->rows(), vecProjectedSensors.size());
 
     // temporary helper structure for filling sparse matrix
     QVector<Triplet<float> > vecNonZeroEntries;
-    const qint32 iRows = matInterpolationMatrix.rows();
-    const qint32 iCols = matInterpolationMatrix.cols();
+    const qint32 iRows = matInterpolationMatrix->rows();
+    const qint32 iCols = matInterpolationMatrix->cols();
 
     // insert all sensor nodes into set for faster lookup during later computation. Also consider bad channels here.
     QSet<qint32> sensorLookup;
@@ -120,7 +120,7 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
             // bLoThreshold: stores the indizes that point to distances which are below the passed distance threshold (dCancelDist)
             QVector<QPair<qint32, float> > vecBelowThresh;
             float dWeightsSum = 0.0;
-            const RowVectorXd& rowVec = matDistanceTable.row(r);
+            const RowVectorXd& rowVec = matDistanceTable->row(r);
 
             for (qint32 c = 0; c < iCols; ++c) {
                 const float dDist = rowVec[c];
@@ -144,7 +144,7 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
         }
     }
 
-    matInterpolationMatrix.setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
+    matInterpolationMatrix->setFromTriplets(vecNonZeroEntries.begin(), vecNonZeroEntries.end());
 
     return matInterpolationMatrix;
 }
@@ -152,15 +152,15 @@ SparseMatrix<float> Interpolation::createInterpolationMat(const QVector<qint32> 
 
 //*************************************************************************************************************
 
-VectorXf Interpolation::interpolateSignal(const Eigen::SparseMatrix<float> &matInterpolationMatrix,
+VectorXf Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float> > matInterpolationMatrix,
                                           const VectorXd &vecMeasurementData)
 {
-    if (matInterpolationMatrix.cols() != vecMeasurementData.rows()) {
+    if (matInterpolationMatrix->cols() != vecMeasurementData.rows()) {
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
         return VectorXf();
     }
 
-    VectorXf pOutVec = matInterpolationMatrix * vecMeasurementData.cast<float>();
+    VectorXf pOutVec = *matInterpolationMatrix * vecMeasurementData.cast<float>();
 
     return pOutVec;
 }

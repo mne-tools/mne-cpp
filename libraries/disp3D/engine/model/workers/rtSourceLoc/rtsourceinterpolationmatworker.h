@@ -188,17 +188,17 @@ protected:
     * The struct specifing all data that is used in the interpolation process
     */
     struct InterpolationData {
-        double                      dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
+        double                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
-        Eigen::MatrixXd             matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
-        Eigen::MatrixX3f            matVertices;                    /**< Holds all vertex information. */
+        QSharedPointer<Eigen::MatrixXd> matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
+        Eigen::MatrixX3f                matVertices;                    /**< Holds all vertex information. */
 
-        QList<FSLIB::Label>         lLabels;                        /**< The annotation labels. */
-        QList<int>                  vertNos;
-        QMap<qint32, qint32>        mapLabelIdSources;              /**< The mapped label ID to sources. */
+        QList<FSLIB::Label>             lLabels;                        /**< The annotation labels. */
+        QList<int>                      vertNos;
+        QMap<qint32, qint32>            mapLabelIdSources;              /**< The mapped label ID to sources. */
 
-        QVector<qint32>             vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
-        QVector<QVector<int> >      vecNeighborVertices;            /**< The neighbor vertex information. */
+        QVector<qint32>                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QVector<QVector<int> >          vecNeighborVertices;            /**< The neighbor vertex information. */
 
         double (*interpolationFunction) (double);                   /**< Function that computes interpolation coefficients using the distance values. */
     }                           m_lInterpolationData;               /**< Container for the interpolation data. */

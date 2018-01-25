@@ -83,6 +83,7 @@ RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 {
     m_lInterpolationData.dCancelDistance = 0.05;
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
+    m_lInterpolationData.matDistanceMatrix = QSharedPointer<MatrixXd>(new MatrixXd());
 }
 
 
@@ -110,10 +111,10 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
 
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
-        m_pMatInterpolationMat = QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                                                                                  m_lInterpolationData.matDistanceMatrix,
-                                                                                                                                                  m_lInterpolationData.interpolationFunction,
-                                                                                                                                                  m_lInterpolationData.dCancelDistance)));
+        m_pMatInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                       m_lInterpolationData.matDistanceMatrix,
+                                                                       m_lInterpolationData.interpolationFunction,
+                                                                       m_lInterpolationData.dCancelDistance);
 
         emitMatrix();
     }
@@ -222,11 +223,11 @@ void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
                                                                 m_lInterpolationData.dCancelDistance);
 
     //create Interpolation matrix
-    m_pMatInterpolationMat = QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                                                                              m_lInterpolationData.matDistanceMatrix,
-                                                                                                                                              m_lInterpolationData.interpolationFunction,
-                                                                                                                                              m_lInterpolationData.dCancelDistance)));
-}
+    m_pMatInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                   m_lInterpolationData.matDistanceMatrix,
+                                                                   m_lInterpolationData.interpolationFunction,
+                                                                   m_lInterpolationData.dCancelDistance);
+    }
 
 
 //*************************************************************************************************************

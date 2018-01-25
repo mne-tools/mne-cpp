@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
                                 tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"); //sample-5120-5120-5120-bem
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
