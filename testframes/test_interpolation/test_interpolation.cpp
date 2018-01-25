@@ -158,18 +158,18 @@ void TestInterpolation::initTestCase()
 void TestInterpolation::testDimensionsForInterpolation()
 {
     // create weight matrix from distance table
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
-    SparseMatrix<float> testWeightMatrix = Interpolation::createInterpolationMat(smallSubset,
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
+    QSharedPointer<SparseMatrix<float> > testWeightMatrix = Interpolation::createInterpolationMat(smallSubset,
                                                                                  distTable,
                                                                                  Interpolation::linear);
 
-    QVERIFY(testWeightMatrix.rows() == distTable.rows());
-    QVERIFY(testWeightMatrix.cols() == distTable.cols());
+    QVERIFY(testWeightMatrix->rows() == distTable->rows());
+    QVERIFY(testWeightMatrix->cols() == distTable->cols());
 
     // random data set
     VectorXd testSignal = VectorXd::Random(smallSubset.size());
 
-    QVERIFY(testWeightMatrix.cols() == testSignal.rows());
+    QVERIFY(testWeightMatrix->cols() == testSignal.rows());
 
     // interpolate with random data set
     VectorXf testInterpolatedSignal = Interpolation::interpolateSignal(testWeightMatrix, testSignal);
@@ -188,7 +188,7 @@ void TestInterpolation::testSumOfRow()
                                                                 megSensors);
 
     // SCDC with cancel distance 0.20 m:
-    MatrixXd distanceMatrix = GeometryInfo::scdc(realSurface.rr,
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface.rr,
                                                  realSurface.neighbor_vert,
                                                  mappedSubSet,
                                                  0.20);
@@ -199,13 +199,13 @@ void TestInterpolation::testSumOfRow()
                                     FIFFV_MEG_CH);
 
     // weight matrix creation
-    SparseMatrix<float> w = Interpolation::createInterpolationMat(mappedSubSet,
+    QSharedPointer<SparseMatrix<float> > w = Interpolation::createInterpolationMat(mappedSubSet,
                                                                   distanceMatrix,
                                                                   Interpolation::linear,
                                                                   0.20);
 
-    qint32 n = w.rows();
-    qint32 m = w.cols();
+    qint32 n = w->rows();
+    qint32 m = w->cols();
 
     const float LOWER_TRESH = 0.99999f;
     const float UPPER_TRESH = 1.00001f;
@@ -213,7 +213,7 @@ void TestInterpolation::testSumOfRow()
     for (int r = 0; r < n; ++r) {
         float rowSum = 0.0f;
         for (int c = 0; c < m; ++c) {
-            rowSum += w.coeff(r, c);
+            rowSum += w->coeff(r, c);
         }
         // either 1.0 (within range of some sensors) or 0.0 (out of range for all sensors)
         QVERIFY((rowSum >= LOWER_TRESH && rowSum <= UPPER_TRESH) || rowSum == 0.0);
@@ -225,23 +225,23 @@ void TestInterpolation::testSumOfRow()
 void TestInterpolation::testEmptyInputsForWeightMatrix()
 {
     // SCDC with cancel distance 0.03:
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset, 0.03);
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset, 0.03);
 
     // ---------- empty sensor indices ----------
     QVector<qint32> emptySensors;
     QVERIFY(Interpolation::createInterpolationMat(emptySensors,
                                                   distTable,
                                                   Interpolation::linear,
-                                                  0.03).size() == 0);
+                                                  0.03)->size() == 0);
 
     // ---------- empty distance table ----------
-    MatrixXd emptyDistTable;
-    SparseMatrix<float> resultMat = Interpolation::createInterpolationMat(smallSubset,
+    QSharedPointer<MatrixXd> emptyDistTable = QSharedPointer<MatrixXd>::create();
+    QSharedPointer<SparseMatrix<float> > resultMat = Interpolation::createInterpolationMat(smallSubset,
                                                                           emptyDistTable,
                                                                           Interpolation::linear,
                                                                           0.03);
 
-    QVERIFY((resultMat.rows() == 0) && (resultMat.cols() == 0));
+    QVERIFY((resultMat->rows() == 0) && (resultMat->cols() == 0));
 }
 
 //*************************************************************************************************************

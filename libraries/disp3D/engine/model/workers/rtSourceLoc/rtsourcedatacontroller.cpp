@@ -129,7 +129,7 @@ RtSourceDataController::RtSourceDataController()
 
        //Calculate interpolation matrix left hemisphere
        m_pRtInterpolationLeftWorker = new RtSourceInterpolationMatWorker();
-       //m_pRtInterpolationLeftWorker->moveToThread(&m_rtInterpolationLeftWorkerThread);
+       m_pRtInterpolationLeftWorker->moveToThread(&m_rtInterpolationLeftWorkerThread);
 
        connect(this, &RtSourceDataController::interpolationFunctionChanged,
                m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setInterpolationFunction);
@@ -156,7 +156,7 @@ RtSourceDataController::RtSourceDataController()
 
        //Calculate interpolation matrix right hemisphere
        m_pRtInterpolationRightWorker = new RtSourceInterpolationMatWorker();
-       //m_pRtInterpolationRightWorker->moveToThread(&m_rtInterpolationRightWorkerThread);
+       m_pRtInterpolationRightWorker->moveToThread(&m_rtInterpolationRightWorkerThread);
 
        connect(this, &RtSourceDataController::interpolationFunctionChanged,
                m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setInterpolationFunction);

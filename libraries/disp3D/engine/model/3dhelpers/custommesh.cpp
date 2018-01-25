@@ -190,7 +190,7 @@ void CustomMesh::setColor(const Eigen::MatrixX3f& tMatColors)
     //Update color
     m_pColorDataBuffer->setData(colorBufferData);
 
-    m_pColorAttribute->setBuffer(m_pColorDataBuffer);
+    //m_pColorAttribute->setBuffer(m_pColorDataBuffer);
     m_pColorAttribute->setCount(tMatColors.rows());
 }
 
@@ -213,7 +213,7 @@ void CustomMesh::setNormals(const Eigen::MatrixX3f& tMatNorm)
 
     m_pNormalDataBuffer->setData(normalBufferData);
 
-    m_pNormalAttribute->setBuffer(m_pNormalDataBuffer);
+    //m_pNormalAttribute->setBuffer(m_pNormalDataBuffer);
     m_pNormalAttribute->setCount(tMatNorm.rows());
 }
 
@@ -235,7 +235,7 @@ void CustomMesh::setVertex(const Eigen::MatrixX3f& tMatVert)
 
     m_pVertexDataBuffer->setData(vertexBufferData);
 
-    m_pVertexAttribute->setBuffer(m_pVertexDataBuffer);
+    //m_pVertexAttribute->setBuffer(m_pVertexDataBuffer);
     m_pVertexAttribute->setCount(tMatVert.rows());
 }
 
@@ -258,7 +258,7 @@ void CustomMesh::setIndex(const Eigen::MatrixXi& tMatTris)
 
     m_pIndexDataBuffer->setData(indexBufferData);
 
-    m_pIndexAttribute->setBuffer(m_pIndexDataBuffer);
+    //m_pIndexAttribute->setBuffer(m_pIndexDataBuffer);
     m_pIndexAttribute->setByteStride(tMatTris.cols() * sizeof(uint));
     m_pIndexAttribute->setCount(tMatTris.rows());
     m_pIndexAttribute->setDataSize(tMatTris.cols());

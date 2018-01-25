@@ -89,10 +89,10 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
-                            const QVector<QVector<int> > &vecNeighborVertices,
-                            QVector<qint32> &vecVertSubset,
-                            double dCancelDist)
+QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
+                                            const QVector<QVector<int> > &vecNeighborVertices,
+                                            QVector<qint32> &vecVertSubset,
+                                            double dCancelDist)
 {
     // create matrix and check for empty subset:
     qint32 iCols = vecVertSubset.size();
@@ -107,8 +107,7 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
     }
 
     // convention: first dimension in distance table is "from", second dimension "to"
-    //QSharedPointer<MatrixXd> returnMat = QSharedPointer<MatrixXd>::create(matVertices.rows(), iCols);
-    MatrixXd returnMat(matVertices.rows(), iCols);
+    QSharedPointer<MatrixXd> returnMat = QSharedPointer<MatrixXd>::create(matVertices.rows(), iCols);
 
     // distribute calculation on cores
     int iCores = QThread::idealThreadCount();
@@ -116,7 +115,6 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
         // assume that we have at least two available cores
         iCores = 2;
     }
-    iCores = 2;
 
     // start threads with their respective parts of the final subset
     qint32 iSubArraySize = ceil(vecVertSubset.size() / iCores);
@@ -124,28 +122,18 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
     qint32 iBegin = 0;
     qint32 iEnd = iSubArraySize;
 
-    iterativeDijkstra(returnMat,
-                                        matVertices,
-                                        vecNeighborVertices,
-                                        vecVertSubset,
-                                        iBegin,
-                                        iEnd,
-                                        dCancelDist);
-    iBegin += iSubArraySize;
-    iEnd += iSubArraySize;
-
-//    for (int i = 0; i < vecThreads.size(); ++i) {
-//        vecThreads[i] = QtConcurrent::run(std::bind(iterativeDijkstra,
-//                                                    returnMat,
-//                                                    std::cref(matVertices),
-//                                                    std::cref(vecNeighborVertices),
-//                                                    std::cref(vecVertSubset),
-//                                                    iBegin,
-//                                                    iEnd,
-//                                                    dCancelDist));
-//        iBegin += iSubArraySize;
-//        iEnd += iSubArraySize;
-//    }
+    for (int i = 0; i < vecThreads.size(); ++i) {
+        vecThreads[i] = QtConcurrent::run(std::bind(iterativeDijkstra,
+                                                    returnMat,
+                                                    std::cref(matVertices),
+                                                    std::cref(vecNeighborVertices),
+                                                    std::cref(vecVertSubset),
+                                                    iBegin,
+                                                    iEnd,
+                                                    dCancelDist));
+        iBegin += iSubArraySize;
+        iEnd += iSubArraySize;
+    }
 
     // use main thread to calculate last part of the final subset
     iterativeDijkstra(returnMat,
@@ -161,7 +149,6 @@ MatrixXd GeometryInfo::scdc(const MatrixX3f &matVertices,
         f.waitForFinished();
     }
 
-    //MatrixXd rereferenceReturnMat = *returnMat;
     return returnMat;
 }
 
@@ -269,7 +256,7 @@ QVector<qint32> GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
 
 //*************************************************************************************************************
 
-void GeometryInfo::iterativeDijkstra(MatrixXd &matOutputDistMatrix,
+void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatrix,
                                      const MatrixX3f &matVertices,
                                      const QVector<QVector<int> > &vecNeighborVertices,
                                      const QVector<qint32> &vecVertSubset,
@@ -326,7 +313,7 @@ void GeometryInfo::iterativeDijkstra(MatrixXd &matOutputDistMatrix,
 
         // save results for current root in matrix
         for (qint32 m = 0; m < vecMinDists.size(); ++m) {
-            matOutputDistMatrix(m , i) = vecMinDists[m];
+            matOutputDistMatrix->coeffRef(m , i) = vecMinDists[m];
         }
     }
 }
@@ -334,7 +321,7 @@ void GeometryInfo::iterativeDijkstra(MatrixXd &matOutputDistMatrix,
 
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::filterBadChannels(MatrixXd &matDistanceTable,
+QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
                                                 const FIFFLIB::FiffInfo& fiffInfo,
                                                 qint32 iSensorType) {
     // use pointer to avoid copying of FiffChInfo objects
@@ -353,8 +340,8 @@ QVector<qint32> GeometryInfo::filterBadChannels(MatrixXd &matDistanceTable,
             if(vecSensors[col]->ch_name == b){
                 // found index of our bad channel, set whole column to infinity
                 vecBadColumns.push_back(col);
-                for(int row = 0; row < matDistanceTable.rows(); ++row){
-                    matDistanceTable(row, col) = FLOAT_INFINITY;
+                for(int row = 0; row < matDistanceTable->rows(); ++row){
+                    matDistanceTable->coeffRef(row, col) = FLOAT_INFINITY;
                 }
                 break;
             }

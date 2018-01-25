@@ -299,7 +299,7 @@ void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMat
 
 //*************************************************************************************************************
 
-void RtSensorDataController::onNewInterpolationMatrixCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrix)
+void RtSensorDataController::onNewInterpolationMatrixCalculated(QSharedPointer<SparseMatrix<float> > pMatInterpolationMatrix)
 {
-    emit newInterpolationMatrixAvailable(matInterpolationMatrix);
+    emit newInterpolationMatrixAvailable(pMatInterpolationMatrix);
 }

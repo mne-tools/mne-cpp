@@ -76,11 +76,14 @@ using namespace FSLIB;
 
 RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false)
-, m_iVisualizationType(Data3DTreeModelItemRoles::AnnotationBased)
+, m_iVisualizationType(Data3DTreeModelItemRoles::InterpolationBased)
 , m_bAnnotationInfoIsInit(false)
+, m_pMatInterpolationMat(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
+, m_pMatAnnotationMat(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 {
     m_lInterpolationData.dCancelDistance = 0.05;
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
+    m_lInterpolationData.matDistanceMatrix = QSharedPointer<MatrixXd>(new MatrixXd());
 }
 
 
@@ -108,10 +111,10 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
 
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
-        m_pMatInterpolationMat = QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                                                                                  m_lInterpolationData.matDistanceMatrix,
-                                                                                                                                                  m_lInterpolationData.interpolationFunction,
-                                                                                                                                                  m_lInterpolationData.dCancelDistance)));
+        m_pMatInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                       m_lInterpolationData.matDistanceMatrix,
+                                                                       m_lInterpolationData.interpolationFunction,
+                                                                       m_lInterpolationData.dCancelDistance);
 
         emitMatrix();
     }
@@ -220,11 +223,11 @@ void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
                                                                 m_lInterpolationData.dCancelDistance);
 
     //create Interpolation matrix
-    m_pMatInterpolationMat = QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                                                                              m_lInterpolationData.matDistanceMatrix,
-                                                                                                                                              m_lInterpolationData.interpolationFunction,
-                                                                                                                                              m_lInterpolationData.dCancelDistance)));
-}
+    m_pMatInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                   m_lInterpolationData.matDistanceMatrix,
+                                                                   m_lInterpolationData.interpolationFunction,
+                                                                   m_lInterpolationData.dCancelDistance);
+    }
 
 
 //*************************************************************************************************************
@@ -284,7 +287,6 @@ void RtSourceInterpolationMatWorker::emitMatrix()
                 qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType size == 0 Calculating";
                 calculateAnnotationOperator();
             }
-            qDebug() << "RtSourceInterpolationMatWorker::setVisualizationType emitting annot matrix " << m_pMatAnnotationMat->rows() << " " << m_pMatAnnotationMat->cols();
 
             emit newInterpolationMatrixCalculated(m_pMatAnnotationMat);
             break;

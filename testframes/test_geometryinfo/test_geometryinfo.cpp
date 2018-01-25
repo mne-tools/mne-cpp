@@ -87,11 +87,13 @@ private:
     QVector<qint32> smallSubset;
 };
 
+
 //*************************************************************************************************************
 
 TestGeometryInfo::TestGeometryInfo() {
 
 }
+
 
 //*************************************************************************************************************
 void TestGeometryInfo::initTestCase() {
@@ -131,6 +133,7 @@ void TestGeometryInfo::initTestCase() {
     }
 }
 
+
 //*************************************************************************************************************
 
 void TestGeometryInfo::testBadChannelFiltering() {
@@ -153,20 +156,21 @@ void TestGeometryInfo::testBadChannelFiltering() {
     // projecting with MEG:
     QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr, megSensors);
     // SCDC with cancel distance 0.03:
-    MatrixXd distanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
     // filter for bad MEG channels:
     QVector<qint32> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
 
     for (qint32 col : erasedColums) {
         qint64 notInfCount = 0;
-        for (qint32 row = 0; row < distanceMatrix.rows(); ++row) {
-            if (distanceMatrix(row, col) != FLOAT_INFINITY) {
+        for (qint32 row = 0; row < distanceMatrix->rows(); ++row) {
+            if (distanceMatrix->coeff(row, col) != FLOAT_INFINITY) {
                 notInfCount++;
             }
         }
         QVERIFY(notInfCount == 0);
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -177,21 +181,24 @@ void TestGeometryInfo::testEmptyInputsForProjecting() {
     QVERIFY(emptyMapping.size() == 0);
 }
 
+
 //*************************************************************************************************************
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
     QVector<qint32> vecVertSubset;
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vecVertSubset);
-    QVERIFY(distTable.rows() == distTable.cols());
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vecVertSubset);
+    QVERIFY(distTable->rows() == distTable->cols());
 }
+
 
 //*************************************************************************************************************
 
 void TestGeometryInfo::testDimensionsForSCDC() {
-    MatrixXd distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
-    QVERIFY(distTable.rows() == smallSurface.rr.rows());
-    QVERIFY(distTable.cols() == smallSubset.size());
+    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
+    QVERIFY(distTable->rows() == smallSurface.rr.rows());
+    QVERIFY(distTable->cols() == smallSubset.size());
 }
+
 
 //*************************************************************************************************************
 
