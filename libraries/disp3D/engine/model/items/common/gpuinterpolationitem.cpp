@@ -314,7 +314,7 @@ QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(QSharedPointer<E
 
 QByteArray GpuInterpolationItem::buildZeroBuffer(const uint tSize)
 {
-    qDebug() << "GpuInterpolationItem::buildZeroBuffer 0 "<<tSize;
+    //qDebug() << "GpuInterpolationItem::buildZeroBuffer 0 "<<tSize;
     QByteArray bufferData (tSize * (int)sizeof(float), '0');
     float *rawVertexArray = reinterpret_cast<float *>(bufferData.data());
 
