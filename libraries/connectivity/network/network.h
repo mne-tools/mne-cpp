@@ -86,9 +86,9 @@ class NetworkNode;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class holds information (nodes and connecting edges) about a network, can compute a distance table and provide network metrics.
 *
-* @brief Brief description of this class.
+* @brief This class holds information about a network, can compute a distance table and provide network metrics.
 */
 
 class CONNECTIVITYSHARED_EXPORT Network

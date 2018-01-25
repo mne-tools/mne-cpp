@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "../connectivity_global.h"
 
 #include "abstractmetric.h"
 
@@ -67,10 +67,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace MNELIB {
-    class MNEEpochDataList;
-}
 
 
 //*************************************************************************************************************
@@ -112,12 +108,12 @@ public:
     /**
     * Calculates the correlation coefficient between the rows of the data matrix.
     *
-    * @param[in] epochDataList  The data in form of epochs.
+    * @param[in] matDataList    The input data.
     * @param[in] matVert        The vertices of each network node.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network correlationCoeff(const MNELIB::MNEEpochDataList& epochDataList, const Eigen::MatrixX3f& matVert);
+    static Network correlationCoeff(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
@@ -130,6 +126,25 @@ protected:
     * @return               The correlation coefficient.
     */
     static double calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+
+    //=========================================================================================================
+    /**
+    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
+    *
+    * @param[in] data       The input data.
+    *
+    * @return               The connectivity matrix.
+    */
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed conenctivity matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming, temporary result data.
+    */
+    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
 };
 
 

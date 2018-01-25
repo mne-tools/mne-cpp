@@ -44,8 +44,6 @@
 #include "network/networkedge.h"
 #include "network/network.h"
 
-#include <mne/mne_epoch_data_list.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -53,6 +51,8 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QElapsedTimer>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -70,7 +70,6 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -91,25 +90,19 @@ Correlation::Correlation()
 
 //*************************************************************************************************************
 
-Network Correlation::correlationCoeff(const MNEEpochDataList& epochDataList, const MatrixX3f& matVert)
+Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
 {
     Network finalNetwork("Correlation");
 
-    if(epochDataList.empty()) {
-        qDebug() << "Correlation::CorrelationCoeff - Input data is empty";
+    if(matDataList.empty()) {
+        qDebug() << "Correlation::correlationCoeff - Input data is empty";
         return finalNetwork;
-    }
-
-    // Average data
-    MatrixXd matData(epochDataList.first()->epoch.rows(), epochDataList.first()->epoch.cols());
-    for(int i = 0; i < epochDataList.size(); ++i) {
-        matData += epochDataList.at(i)->epoch;
-    }
-
-    matData = matData/epochDataList.size();
+    }   
 
     //Create nodes
-    for(int i = 0; i < matData.rows(); ++i) {
+    int rows = matDataList.first().rows();
+
+    for(int i = 0; i < rows; ++i) {
         RowVectorXf rowVert = RowVectorXf::Zero(3);
 
         if(matVert.rows() != 0 && i < matVert.rows()) {
@@ -121,14 +114,17 @@ Network Correlation::correlationCoeff(const MNEEpochDataList& epochDataList, con
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    //Create edges
-    double correlationCoeff;
+    //Calculate connectivity matrix over epochs and average afterwards
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
+    resultMat.waitForFinished();
 
-    for(int i = 0; i < matData.rows(); ++i) {
-        for(int j = i; j < matData.rows(); ++j) {
-            correlationCoeff = calcCorrelationCoeff(matData.row(i), matData.row(j));
+    MatrixXd matDist = resultMat.result();
+    matDist /= matDataList.size();
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], correlationCoeff));
+    //Add edges to network
+    for(int i = 0; i < matDist.rows(); ++i) {
+        for(int j = i; j < matDist.cols(); ++j) {
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matDist(i,j)));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.append(pEdge);
@@ -141,7 +137,7 @@ Network Correlation::correlationCoeff(const MNEEpochDataList& epochDataList, con
 
 //*************************************************************************************************************
 
-double Correlation::calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond)
+double Correlation::calcCorrelationCoeff(const RowVectorXd &vecFirst, const RowVectorXd &vecSecond)
 {
     if(vecFirst.cols() != vecSecond.cols()) {
         qDebug() << "Correlation::calcCorrelationCoeff - Vectors length do not match!";
@@ -149,3 +145,34 @@ double Correlation::calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, con
 
     return (vecFirst.dot(vecSecond))/vecFirst.cols();
 }
+
+
+//*************************************************************************************************************
+
+MatrixXd Correlation::calculate(const MatrixXd &data)
+{
+    MatrixXd matDist(data.rows(), data.rows());
+    matDist.setZero();
+
+    for(int i = 0; i < data.rows(); ++i) {
+        for(int j = i; j < data.rows(); ++j) {
+            matDist(i,j) += calcCorrelationCoeff(data.row(i), data.row(j));
+        }
+    }
+
+    return matDist;
+}
+
+
+//*************************************************************************************************************
+
+void Correlation::sum(MatrixXd &resultData, const MatrixXd &data)
+{
+    if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
+        resultData.resize(data.rows(), data.cols());
+        resultData.setZero();
+    }
+
+    resultData += data;
+}
+
