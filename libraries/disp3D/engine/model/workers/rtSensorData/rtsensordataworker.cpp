@@ -84,6 +84,7 @@ RtSensorDataWorker::RtSensorDataWorker()
 , m_bStreamSmoothedData(true)
 , m_itCurrentSample(0)
 , m_iSampleCtr(0)
+, m_pMatInterpolationMatrix(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 {
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
 }
@@ -178,8 +179,8 @@ void RtSensorDataWorker::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-void RtSensorDataWorker::setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix) {
-    m_matInterpolationMatrix = matInterpolationMatrix;
+void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<float> > pMatInterpolationMatrix) {
+    m_pMatInterpolationMatrix = pMatInterpolationMatrix;
 }
 
 
@@ -241,14 +242,14 @@ void RtSensorDataWorker::streamData()
 
 MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vecSensorValues)
 {
-    if(vecSensorValues.rows() != m_matInterpolationMatrix.cols()) {
-        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << m_matInterpolationMatrix.cols() << "). Returning...";
+    if(vecSensorValues.rows() != m_pMatInterpolationMatrix->cols()) {
+        qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << m_pMatInterpolationMatrix->cols() << "). Returning...";
         MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
         return matColor;
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(m_matInterpolationMatrix, vecSensorValues);
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(*m_pMatInterpolationMatrix, vecSensorValues);
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;

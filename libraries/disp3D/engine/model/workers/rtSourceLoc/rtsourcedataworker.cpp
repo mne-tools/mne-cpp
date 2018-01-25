@@ -87,6 +87,8 @@ RtSourceDataWorker::RtSourceDataWorker()
 {
     m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHot;
     m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHot;
+    m_lVisualizationInfoLeft.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
+    m_lVisualizationInfoRight.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
 }
 
 

@@ -531,11 +531,11 @@ void SensorDataTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorDataTreeItem::onNewInterpolationMatrixAvailable(const Eigen::SparseMatrix<float> &matInterpolationMatrix)
+void SensorDataTreeItem::onNewInterpolationMatrixAvailable(QSharedPointer<SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
 {
     if(m_pInterpolationItemGPU)
     {
-        //m_pInterpolationItemGPU->setInterpolationMatrix(matInterpolationMatrix);
+        m_pInterpolationItemGPU->setInterpolationMatrix(pMatInterpolationMatrixLeftHemi);
     }
 }
 

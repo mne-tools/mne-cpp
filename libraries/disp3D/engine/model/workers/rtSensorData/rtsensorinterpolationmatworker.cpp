@@ -98,13 +98,7 @@ void RtSensorInterpolationMatWorker::setInterpolationFunction(const QString &sIn
 
     if(m_bInterpolationInfoIsInit == true){
         //recalculate Interpolation matrix parameters changed
-        SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                        m_lInterpolationData.matDistanceMatrix,
-                                                                                        m_lInterpolationData.interpolationFunction,
-                                                                                        m_lInterpolationData.dCancelDistance,
-                                                                                        m_lInterpolationData.vecExcludeIndex);
-
-        emit newInterpolationMatrixCalculated(matInterpolationMat);
+        emitMatrix();
     }
 }
 
@@ -191,14 +185,7 @@ void RtSensorInterpolationMatWorker::setBadChannels(const FiffInfo& info)
         }
     }
 
-    //create Interpolation matrix
-    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                    m_lInterpolationData.matDistanceMatrix,
-                                                                                    m_lInterpolationData.interpolationFunction,
-                                                                                    m_lInterpolationData.dCancelDistance,
-                                                                                    m_lInterpolationData.vecExcludeIndex);
-
-    emit newInterpolationMatrixCalculated(matInterpolationMat);
+    emitMatrix();
 }
 
 
@@ -222,12 +209,18 @@ void RtSensorInterpolationMatWorker::calculateInterpolationOperator()
                                     m_lInterpolationData.fiffInfo,
                                     m_lInterpolationData.iSensorType);
 
-    //create Interpolation matrix
-    SparseMatrix<float> matInterpolationMat = Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
-                                                                                    m_lInterpolationData.matDistanceMatrix,
-                                                                                    m_lInterpolationData.interpolationFunction,
-                                                                                    m_lInterpolationData.dCancelDistance,
-                                                                                    m_lInterpolationData.vecExcludeIndex);
+    emitMatrix();
+}
 
-    emit newInterpolationMatrixCalculated(matInterpolationMat);
+
+//*************************************************************************************************************
+
+void RtSensorInterpolationMatWorker::emitMatrix()
+{
+    //create Interpolation matrix
+    emit newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> >(new Eigen::SparseMatrix<float>(Interpolation::createInterpolationMat(m_lInterpolationData.vecMappedSubset,
+                                                                                                                                                           m_lInterpolationData.matDistanceMatrix,
+                                                                                                                                                           m_lInterpolationData.interpolationFunction,
+                                                                                                                                                           m_lInterpolationData.dCancelDistance,
+                                                                                                                                                           m_lInterpolationData.vecExcludeIndex))));
 }

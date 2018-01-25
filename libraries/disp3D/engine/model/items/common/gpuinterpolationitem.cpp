@@ -177,10 +177,11 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
         return;
     }
 
+    qDebug("GpuInterpolationItem::setInterpolationMatrix - buildInterpolationMatrixBuffer");
+    QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(pMatInterpolationMatrix);
+
     //Init and set interpolation buffer
     if(m_pInterpolationMatBuffer->data().size() != pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()*sizeof(float)) {
-        qDebug("GpuInterpolationItem::setInterpolationMatrix - buildInterpolationMatrixBuffer");
-        QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(pMatInterpolationMatrix);
 
         //Set Rows and Cols
         this->setMaterialParameter(QVariant::fromValue(pMatInterpolationMatrix->cols()), QStringLiteral("cols"));
@@ -194,26 +195,26 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
         qDebug() << "4 * pMatInterpolationMatrix->rows()"<<4 * pMatInterpolationMatrix->rows();
         qDebug() << "pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()"<<pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols();
     } else {
-        //m_pInterpolationMatBuffer->updateData(0, interpolationBufferData);
-        QByteArray updateData;
-        updateData.resize(pMatInterpolationMatrix->cols() * sizeof(float));
-        float *rawVertexArray = reinterpret_cast<float *>(updateData.data());
+        m_pInterpolationMatBuffer->updateData(0, interpolationBufferData);
+//        QByteArray updateData;
+//        updateData.resize(pMatInterpolationMatrix->cols() * sizeof(float));
+//        float *rawVertexArray = reinterpret_cast<float *>(updateData.data());
 
-        int pos = 0; //matrix element offset
+//        int pos = 0; //matrix element offset
 
-        for(uint i = 0; i < pMatInterpolationMatrix->rows()-60000; ++i) {
-            //qDebug()<<"row "<<i;
+//        for(uint i = 0; i < pMatInterpolationMatrix->rows(); ++i) {
+//            //qDebug()<<"row "<<i;
 
-            //Extract row
-            int itr = 0;
-            for(uint j = 0; j < pMatInterpolationMatrix->cols(); ++j) {
-                rawVertexArray[itr] = pMatInterpolationMatrix->coeff(i,j);
-                itr++;
-            }
+//            //Extract row
+//            int itr = 0;
+//            for(uint j = 0; j < pMatInterpolationMatrix->cols(); ++j) {
+//                rawVertexArray[itr] = pMatInterpolationMatrix->coeff(i,j);
+//                itr++;
+//            }
 
-            m_pInterpolationMatBuffer->updateData(pos, updateData);
-            pos += pMatInterpolationMatrix->cols() * sizeof(float); //stride
-        }
+//            m_pInterpolationMatBuffer->updateData(pos, updateData);
+//            pos += pMatInterpolationMatrix->cols() * sizeof(float); //stride
+//        }
     }
 
     qDebug("GpuInterpolationItem::setInterpolationMatrix - finished");
