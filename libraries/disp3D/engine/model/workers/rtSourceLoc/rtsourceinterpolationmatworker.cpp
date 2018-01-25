@@ -78,6 +78,8 @@ RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 : m_bInterpolationInfoIsInit(false)
 , m_iVisualizationType(Data3DTreeModelItemRoles::AnnotationBased)
 , m_bAnnotationInfoIsInit(false)
+, m_pMatInterpolationMat(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
+, m_pMatAnnotationMat(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 {
     m_lInterpolationData.dCancelDistance = 0.05;
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;

@@ -179,9 +179,9 @@ public:
     /**
     * Set the interpolation matrix.
     *
-    * @param[in] matInterpolationMatrix                 The new interpolation matrix.
+    * @param[in] pMatInterpolationMatrix                 The new interpolation matrix.
     */
-    void setInterpolationMatrix(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**
@@ -219,7 +219,7 @@ protected:
     QLinkedList<Eigen::VectorXd>                        m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     QLinkedList<Eigen::VectorXd>::const_iterator        m_itCurrentSample;                  /**< Iterator to current sample which is/was streamed. */
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */
-    Eigen::SparseMatrix<float>                          m_matInterpolationMatrix;           /**< The interpolation matrix. */
+    QSharedPointer<Eigen::SparseMatrix<float> >         m_pMatInterpolationMatrix;          /**< The interpolation matrix. */
 
     bool                                                m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                                                m_bStreamSmoothedData;              /**< Flag if this thread's streams the raw or already smoothed data. Latter are produced by multiplying the smoothing operator here in this thread. */

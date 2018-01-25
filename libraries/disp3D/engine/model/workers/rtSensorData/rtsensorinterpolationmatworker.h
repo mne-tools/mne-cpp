@@ -154,6 +154,12 @@ protected:
     */
     void calculateInterpolationOperator();
 
+    //=========================================================================================================
+    /**
+    * Emit the interpolation matrix.
+    */
+    void emitMatrix();
+
     //=============================================================================================================
     /**
     * The struct specifing all data that is used in the interpolation process
@@ -181,9 +187,9 @@ signals:
     /**
     * Emit this signal whenever a new interpolation matrix was calcualted.
     *
-    * @param[in] matInterpolationMatrix     The new interpolation matrix.
+    * @param[in] pMatInterpolationMatrix     The new interpolation matrix.
     */
-    void newInterpolationMatrixCalculated(const Eigen::SparseMatrix<float> &matInterpolationMatrix);
+    void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 };
 
 } // NAMESPACE
