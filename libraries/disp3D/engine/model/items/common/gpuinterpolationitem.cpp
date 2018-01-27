@@ -179,6 +179,7 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
 
         m_pInterpolationMatBuffer->setData(interpolationBufferData);
         m_pOutputColorBuffer->setData(buildZeroBuffer(4 * pMatInterpolationMatrix->rows()));
+        m_pSignalDataBuffer->setData(buildZeroBuffer(pMatInterpolationMatrix->cols()));
 
         //Set work group size
         if(!m_pComputeCommand) {
@@ -239,13 +240,7 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
         rawVertexArray[i] = static_cast<float>(tSignalVec[i]);
     }
 
-    //Init and set signal data buffer
-    if(m_pSignalDataBuffer->data().size() != bufferData.size()) {
-        m_pSignalDataBuffer->setData(bufferData);
-        this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), QStringLiteral("InputVec"));
-    } else {
-        m_pSignalDataBuffer->updateData(0, bufferData);
-    }
+    m_pSignalDataBuffer->setData(bufferData);
 }
 
 
@@ -299,7 +294,7 @@ QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(QSharedPointer<E
     unsigned int iCtr = 0;
     for(uint i = 0; i < iRows; ++i) {
         for(uint j = 0; j < iCols; ++j) {
-            rawVertexArray[iCtr] = pMatInterpolationMatrix->coeff(i, j);
+            rawVertexArray[iCtr] = static_cast<float>(pMatInterpolationMatrix->coeff(i, j));
             iCtr++;
         }
     }
