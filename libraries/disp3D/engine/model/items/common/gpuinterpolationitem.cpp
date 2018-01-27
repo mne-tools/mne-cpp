@@ -142,16 +142,6 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
     m_pSignalDataBuffer->setData(buildZeroBuffer(1));
     this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), QStringLiteral("InputVec"));
 
-    //Create and add compute shader
-    QPointer<Qt3DRender::QComputeCommand> pComputeCommand = new QComputeCommand();
-    this->addComponent(pComputeCommand);
-
-    const uint iInterpolationMatRows = matVertices.rows();
-    const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iInterpolationMatRows)));
-    pComputeCommand->setWorkGroupX(iWorkGroupsSize);
-    pComputeCommand->setWorkGroupY(iWorkGroupsSize);
-    pComputeCommand->setWorkGroupZ(1);
-
     //Set custom mesh data
     //generate mesh base color
     MatrixX3f matVertColor = createVertColor(matVertices.rows(), QColor(0,0,0));
@@ -189,6 +179,16 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
 
         m_pInterpolationMatBuffer->setData(interpolationBufferData);
         m_pOutputColorBuffer->setData(buildZeroBuffer(4 * pMatInterpolationMatrix->rows()));
+
+        //Set work group size
+        if(!m_pComputeCommand) {
+            m_pComputeCommand = new QComputeCommand();
+            this->addComponent(m_pComputeCommand);
+        }
+        const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(pMatInterpolationMatrix->rows())));
+        m_pComputeCommand->setWorkGroupX(iWorkGroupsSize);
+        m_pComputeCommand->setWorkGroupY(iWorkGroupsSize);
+        m_pComputeCommand->setWorkGroupZ(1);
 
         //qDebug() << "4 * pMatInterpolationMatrix->rows()"<<4 * pMatInterpolationMatrix->rows();
         //qDebug() << "pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()"<<pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols();
