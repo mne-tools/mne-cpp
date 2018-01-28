@@ -67,7 +67,6 @@
 #include <Qt3DExtras/QPerVertexColorMaterial>
 #include <Qt3DExtras/QFirstPersonCameraController>
 #include <Qt3DRender/QPointLight>
-#include <Qt3DRender/QPointLight>
 #include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
@@ -155,47 +154,36 @@ void View3D::initLight()
 {
     //Setup light positions, intensities and color
     QList<QVector3D> lLightPositions;
-    QList<QVector3D> lLightDirections;
-    QList<float> lLightIntensities;
-    QList<QColor> lLightColor;
+    const QColor lightColor(255,255,255);
+    const float lightIntensity = 0.2f;
 
-    QColor lightColor(255,255,255);
-    float lightIntensity = 0.2f;
-
-    lLightPositions << QVector3D(-0.5,0,0) << QVector3D(0,0,-0.5) << QVector3D(0.5,0,0) << QVector3D(-0.5,0,0) << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0);
-    lLightDirections << QVector3D(0.5,0,0) << QVector3D(0,0,0.5) << QVector3D(-0.5,0,0) << QVector3D(0.5,0,0) << QVector3D(0,-0.5,0) << QVector3D(0,0.5,0);
-    lLightIntensities << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity << lightIntensity;
-    lLightColor << lightColor << lightColor << lightColor << lightColor << lightColor << lightColor;
+    lLightPositions << QVector3D(-0.5,0,0) << QVector3D(0,0,-0.5)
+                    << QVector3D(0.5,0,0) << QVector3D(0,0,0.5)
+                    << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0);
 
     //Create all the lights - make it shine
     for(int i = 0; i < lLightPositions.size(); ++i) {
         //Light source
-        Qt3DCore::QEntity* entityLight = new Qt3DCore::QEntity(m_pLightEntity);
-        Qt3DCore::QTransform* transform = new Qt3DCore::QTransform();
-        QMatrix4x4 m;
-        m.translate(lLightPositions.at(i));
-        transform->setMatrix(m);
+        Qt3DCore::QEntity* pLightEntity = new Qt3DCore::QEntity(m_pLightEntity);
 
-        entityLight->addComponent(transform);
+        Qt3DCore::QTransform* pTransform = new Qt3DCore::QTransform();
+        pTransform->setTranslation(lLightPositions.at(i));
+        pLightEntity->addComponent(pTransform);
 
-        Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight(entityLight);
-        light1->setColor(lLightColor.at(i));
-        //light1->setWorldDirection(lLightDirections.at(i));
-        light1->setIntensity(lLightIntensities.at(i));
-        entityLight->addComponent(light1);
+        Qt3DRender::QPointLight *pPointLight = new Qt3DRender::QPointLight(pLightEntity);
+        pPointLight->setColor(lightColor);
+        pPointLight->setIntensity(lightIntensity);
+        pLightEntity->addComponent(pPointLight);
 
-//        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(entityLight);
+        m_lLightSources.append(pPointLight);
+
+        //Uncomment the following to visualize the light sources for debugging:
+//        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(pLightEntity);
 //        lightSphere->setRadius(0.1f);
-//        enitityLight->addComponent(lightSphere);
-
-        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(entityLight);
-        material->setAmbient(lLightColor.at(i));
-        entityLight->addComponent(material);
-
-        QPair<Qt3DRender::QPointLight*, Qt3DExtras::QPhongMaterial*> pair;
-        pair.first = light1;
-        pair.second = material;
-        m_lLightSources.append(pair);
+//        pLightEntity->addComponent(lightSphere);
+//        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(pLightEntity);
+//        material->setAmbient(lightColor);
+//        pLightEntity->addComponent(material);
     }
 }
 
@@ -262,7 +250,8 @@ void View3D::startStopModelRotation(bool checked)
         for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
             startModelRotationRecursive(m_p3DObjectsEntity->children().at(i));
         }
-    } else {
+    }
+    else {
         for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
             m_lPropertyAnimations.at(i)->stop();
         }
@@ -284,7 +273,8 @@ void View3D::showFullScreen(bool checked)
 {
     if(checked) {
         this->Qt3DWindow::showFullScreen();
-    } else {
+    }
+    else {
         this->showNormal();
     }
 }
@@ -292,11 +282,10 @@ void View3D::showFullScreen(bool checked)
 
 //*************************************************************************************************************
 
-void View3D::setLightColor(QColor color)
+void View3D::setLightColor(const QColor &color)
 {
     for(int i = 0; i < m_lLightSources.size(); ++i) {
-        m_lLightSources.at(i).first->setColor(color);
-        m_lLightSources.at(i).second->setAmbient(color);
+        m_lLightSources.at(i)->setColor(color);
     }
 }
 
@@ -306,7 +295,7 @@ void View3D::setLightColor(QColor color)
 void View3D::setLightIntensity(double value)
 {
     for(int i = 0; i < m_lLightSources.size(); ++i) {
-        m_lLightSources.at(i).first->setIntensity(value);
+        m_lLightSources.at(i)->setIntensity(value);
     }
 }
 
@@ -326,15 +315,13 @@ void View3D::keyPressEvent(QKeyEvent* e)
             break;
 
         case Qt::Key_Left:
-                if(!m_bModelRotationMode)
-                {
+                if(!m_bModelRotationMode) {
                     qDebug("Camera Left pressed");
                     //Rotate camera
                     m_vecViewRotation.setY(-0.75 + m_vecViewRotationOld.y());
                     m_pCameraTransform->setRotationY(m_vecViewRotation.y());
                 }
-                else
-                {
+                else {
                     //Rotate all surface objects
                     qDebug("Object Left pressed");
                     m_vecModelRotation.setY(-0.75 + m_vecModelRotationOld.y());
@@ -343,14 +330,12 @@ void View3D::keyPressEvent(QKeyEvent* e)
             break;
 
         case Qt::Key_Right:
-                if(!m_bModelRotationMode)
-                {
+                if(!m_bModelRotationMode) {
                     //Rotate camera
                     m_vecViewRotation.setY(0.75 + m_vecViewRotationOld.y());
                     m_pCameraTransform->setRotationY(m_vecViewRotation.y());
                 }
-                else
-                {
+                else {
                     //Rotate all surface objects
                     m_vecModelRotation.setY(0.75 + m_vecModelRotationOld.y());
                     setRotationRecursive(m_p3DObjectsEntity);
@@ -358,14 +343,12 @@ void View3D::keyPressEvent(QKeyEvent* e)
             break;
 
         case Qt::Key_Up:
-                if(!m_bModelRotationMode)
-                {
+                if(!m_bModelRotationMode) {
                     //Rotate camera
                     m_vecViewRotation.setX(0.75 + m_vecViewRotationOld.x());
                     m_pCameraTransform->setRotationX(m_vecViewRotation.x());
                 }
-                else
-                {
+                else {
                     //Rotate all surface objects
                     m_vecModelRotation.setX(0.75 + m_vecModelRotationOld.x());
                     setRotationRecursive(m_p3DObjectsEntity);
@@ -373,14 +356,12 @@ void View3D::keyPressEvent(QKeyEvent* e)
             break;
 
         case Qt::Key_Down:
-                if(!m_bModelRotationMode)
-                {
+                if(!m_bModelRotationMode) {
                     //Rotate camera
                     m_vecViewRotation.setX(-0.75 + m_vecViewRotationOld.x());
                     m_pCameraTransform->setRotationX(m_vecViewRotation.x());
                 }
-                else
-                {
+                else {
                     //Rotate all surface objects
                     m_vecModelRotation.setX(-0.75 + m_vecModelRotationOld.x());
                     setRotationRecursive(m_p3DObjectsEntity);
@@ -400,13 +381,11 @@ void View3D::keyReleaseEvent(QKeyEvent* e)
     if(e->key() == Qt::Key_Left
             || e->key() == Qt::Key_Right
             || e->key() == Qt::Key_Up
-            || e->key() == Qt::Key_Down)
-    {
+            || e->key() == Qt::Key_Down) {
         m_vecViewRotationOld = m_vecViewRotation;
         m_vecModelRotationOld = m_vecModelRotation;
     }
-    else
-    {
+    else {
         Qt3DWindow::keyPressEvent(e);
     }
 }
@@ -441,7 +420,8 @@ void View3D::wheelEvent(QWheelEvent* e)
 {
     if(e->angleDelta().y() > 0) {
         m_vecViewTrans.setZ(m_vecViewTrans.z() + 0.005f);
-    } else {
+    }
+    else {
         m_vecViewTrans.setZ(m_vecViewTrans.z() - 0.005f);
     }
 
@@ -496,7 +476,8 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
 
             m_pCameraTransform->setRotationX(m_vecViewRotation.x());
             m_pCameraTransform->setRotationY(m_vecViewRotation.y());
-        } else {
+        }
+        else {
             qDebug("Mouse roation object");
             //Rotate objects
             m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
@@ -561,10 +542,11 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     pCoordSysMesh->setTransforms(vTransforms);
     pCoordSysMesh->setColors(vColors);
 
-    m_pCoordSysEntity->addComponent(pCoordSysMesh);
     //Add material
     GeometryMultiplierMaterial* pCoordSysMaterial = new GeometryMultiplierMaterial;
     pCoordSysMaterial->setAmbient(QColor(0,0,0));
     pCoordSysMaterial->setAlpha(1.0f);
+
+    m_pCoordSysEntity->addComponent(pCoordSysMesh);
     m_pCoordSysEntity->addComponent(pCoordSysMaterial);
 }

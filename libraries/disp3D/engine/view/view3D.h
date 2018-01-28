@@ -163,7 +163,7 @@ public:
     /**
     * Change light color.
     */
-    void setLightColor(QColor color);
+    void setLightColor(const QColor &color);
 
     //=========================================================================================================
     /**
@@ -248,8 +248,8 @@ protected:
     QVector3D                           m_vecModelRotation;             /**< The model rotation vector. */
     QVector3D                           m_vecModelRotationOld;          /**< The model old rotation vector. */
 
-    QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;        /**< The animations for each 3D object. */
-    QList<QPair<QPointer<Qt3DRender::QPointLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */
+    QList<QPointer<QPropertyAnimation>>  m_lPropertyAnimations;         /**< The animations for each 3D object. */
+    QList<QPointer<Qt3DRender::QPointLight>>  m_lLightSources;          /**< The light sources. */
 };
 
 } // NAMESPACE
