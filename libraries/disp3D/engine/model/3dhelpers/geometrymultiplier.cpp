@@ -118,16 +118,7 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
     }
 
     //Update buffer content
-    const QByteArray &transformBufferData = buildTransformBuffer(tInstanceTansform);
-    if(transformBufferData.size() != m_pTransformBuffer->data().size())
-    {
-        m_pTransformBuffer->setData(transformBufferData);
-    }
-    else
-    {
-        m_pTransformBuffer->updateData(0, transformBufferData);
-    }
-    m_pTransformAttribute->setBuffer(m_pTransformBuffer);
+    m_pTransformBuffer->setData(buildTransformBuffer(tInstanceTansform));
 
     updateInstanceCount(tInstanceTansform.size());
 }
@@ -144,15 +135,7 @@ void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
     }
 
     //Update buffer content
-    const QByteArray &colorBufferData = buildColorBuffer(tInstanceColors);
-    if(colorBufferData.size() != m_pColorBuffer->data().size())
-    {
-        m_pColorBuffer->setData(colorBufferData);
-    }
-    else
-    {
-        m_pColorBuffer->updateData(0, colorBufferData);
-    }
+    m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
 
     if(tInstanceColors.size() > 1)
     {

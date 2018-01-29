@@ -171,13 +171,12 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
     QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(pMatInterpolationMatrix);
 
     //Init and set interpolation buffer
-    if(m_pInterpolationMatBuffer->data().size() != pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()*sizeof(float)) {
+    if(m_pInterpolationMatBuffer->data().size() != interpolationBufferData.size()) {
 
         //Set Rows and Cols
         this->setMaterialParameter(QVariant::fromValue(pMatInterpolationMatrix->cols()), QStringLiteral("cols"));
         this->setMaterialParameter(QVariant::fromValue(pMatInterpolationMatrix->rows()), QStringLiteral("rows"));
 
-        m_pInterpolationMatBuffer->setData(interpolationBufferData);
         m_pOutputColorBuffer->setData(buildZeroBuffer(4 * pMatInterpolationMatrix->rows()));
         m_pSignalDataBuffer->setData(buildZeroBuffer(pMatInterpolationMatrix->cols()));
 
@@ -193,8 +192,10 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
 
         //qDebug() << "4 * pMatInterpolationMatrix->rows()"<<4 * pMatInterpolationMatrix->rows();
         //qDebug() << "pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()"<<pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols();
-    } else {
-        m_pInterpolationMatBuffer->updateData(0, interpolationBufferData);
+    }
+
+    m_pInterpolationMatBuffer->setData(interpolationBufferData);
+
 //        QByteArray updateData;
 //        updateData.resize(pMatInterpolationMatrix->cols() * sizeof(float));
 //        float *rawVertexArray = reinterpret_cast<float *>(updateData.data());
@@ -214,7 +215,6 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
 //            m_pInterpolationMatBuffer->updateData(pos, updateData);
 //            pos += pMatInterpolationMatrix->cols() * sizeof(float); //stride
 //        }
-    }
 
     qDebug("GpuInterpolationItem::setInterpolationMatrix - finished");
 }
