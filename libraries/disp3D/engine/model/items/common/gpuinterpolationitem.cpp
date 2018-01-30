@@ -142,16 +142,6 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
     m_pSignalDataBuffer->setData(buildZeroBuffer(1));
     this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), QStringLiteral("InputVec"));
 
-    //Create and add compute shader
-    QPointer<Qt3DRender::QComputeCommand> pComputeCommand = new QComputeCommand();
-    this->addComponent(pComputeCommand);
-
-    const uint iInterpolationMatRows = matVertices.rows();
-    const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(iInterpolationMatRows)));
-    pComputeCommand->setWorkGroupX(iWorkGroupsSize);
-    pComputeCommand->setWorkGroupY(iWorkGroupsSize);
-    pComputeCommand->setWorkGroupZ(1);
-
     //Set custom mesh data
     //generate mesh base color
     MatrixX3f matVertColor = createVertColor(matVertices.rows(), QColor(0,0,0));
@@ -181,19 +171,31 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
     QByteArray interpolationBufferData = buildInterpolationMatrixBuffer(pMatInterpolationMatrix);
 
     //Init and set interpolation buffer
-    if(m_pInterpolationMatBuffer->data().size() != pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()*sizeof(float)) {
+    if(m_pInterpolationMatBuffer->data().size() != interpolationBufferData.size()) {
 
         //Set Rows and Cols
         this->setMaterialParameter(QVariant::fromValue(pMatInterpolationMatrix->cols()), QStringLiteral("cols"));
         this->setMaterialParameter(QVariant::fromValue(pMatInterpolationMatrix->rows()), QStringLiteral("rows"));
 
-        m_pInterpolationMatBuffer->setData(interpolationBufferData);
         m_pOutputColorBuffer->setData(buildZeroBuffer(4 * pMatInterpolationMatrix->rows()));
+        m_pSignalDataBuffer->setData(buildZeroBuffer(pMatInterpolationMatrix->cols()));
+
+        //Set work group size
+        if(!m_pComputeCommand) {
+            m_pComputeCommand = new QComputeCommand();
+            this->addComponent(m_pComputeCommand);
+        }
+        const uint iWorkGroupsSize = static_cast<uint>(std::ceil(std::sqrt(pMatInterpolationMatrix->rows())));
+        m_pComputeCommand->setWorkGroupX(iWorkGroupsSize);
+        m_pComputeCommand->setWorkGroupY(iWorkGroupsSize);
+        m_pComputeCommand->setWorkGroupZ(1);
 
         //qDebug() << "4 * pMatInterpolationMatrix->rows()"<<4 * pMatInterpolationMatrix->rows();
         //qDebug() << "pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols()"<<pMatInterpolationMatrix->rows()*pMatInterpolationMatrix->cols();
-    } else {
-        m_pInterpolationMatBuffer->updateData(0, interpolationBufferData);
+    }
+
+    m_pInterpolationMatBuffer->setData(interpolationBufferData);
+
 //        QByteArray updateData;
 //        updateData.resize(pMatInterpolationMatrix->cols() * sizeof(float));
 //        float *rawVertexArray = reinterpret_cast<float *>(updateData.data());
@@ -213,7 +215,6 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
 //            m_pInterpolationMatBuffer->updateData(pos, updateData);
 //            pos += pMatInterpolationMatrix->cols() * sizeof(float); //stride
 //        }
-    }
 
     qDebug("GpuInterpolationItem::setInterpolationMatrix - finished");
 }
@@ -239,13 +240,7 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
         rawVertexArray[i] = static_cast<float>(tSignalVec[i]);
     }
 
-    //Init and set signal data buffer
-    if(m_pSignalDataBuffer->data().size() != bufferData.size()) {
-        m_pSignalDataBuffer->setData(bufferData);
-        this->setMaterialParameter(QVariant::fromValue(m_pSignalDataBuffer.data()), QStringLiteral("InputVec"));
-    } else {
-        m_pSignalDataBuffer->updateData(0, bufferData);
-    }
+    m_pSignalDataBuffer->setData(bufferData);
 }
 
 
@@ -299,7 +294,7 @@ QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(QSharedPointer<E
     unsigned int iCtr = 0;
     for(uint i = 0; i < iRows; ++i) {
         for(uint j = 0; j < iCols; ++j) {
-            rawVertexArray[iCtr] = pMatInterpolationMatrix->coeff(i, j);
+            rawVertexArray[iCtr] = static_cast<float>(pMatInterpolationMatrix->coeff(i, j));
             iCtr++;
         }
     }
