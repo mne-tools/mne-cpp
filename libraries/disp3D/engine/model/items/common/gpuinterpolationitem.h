@@ -195,6 +195,7 @@ protected:
     QPointer<GpuInterpolationMaterial>      m_pGPUMaterial;                 /**< Compute material used for the process. */
 
     QPointer<CustomMesh>                    m_pCustomMesh;                  /**< The actual mesh information (vertices, normals, colors). */
+    QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;              /**< The compute command defines the work group size for the compute shader code execution . */
 
     QPointer<Qt3DRender::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
     QPointer<Qt3DRender::QBuffer>           m_pOutputColorBuffer;           /**< The QBuffer/GLBuffer holding the output color (interpolated) data. */
