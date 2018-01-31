@@ -112,7 +112,6 @@ SOURCES += \
     imagesc.cpp \
     plot.cpp \
     graph.cpp \
-    rtplot.cpp \
     tfplot.cpp \
     filterwindow.cpp \
     helpers/layoutscene.cpp \
@@ -134,7 +133,6 @@ HEADERS += \
     imagesc.h \
     plot.h \
     graph.h \
-    rtplot.h \
     tfplot.h \
     filterwindow.h \
     selectionmanagerwindow.h \
