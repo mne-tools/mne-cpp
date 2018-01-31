@@ -1,12 +1,12 @@
 {
     "version": 1,
     "supportedProjectTypes": [ ],
-    "id": "A.MNECPPClass",
+    "id": "A.MNECPPStaticClass",
     "category": "O.MNECPP",
-    "trDescription": "Creates a MNE-CPP header and a source file for a new class.",
-    "trDisplayName": "MNE-CPP Class",
+    "trDescription": "Creates a MNE-CPP header and source file for a new static class.",
+    "trDisplayName": "MNE-CPP Static Class",
     "trDisplayCategory": "MNE-CPP",
-    "icon": "../../global/genericfilewizard.png",
+    "iconText": "h/cpp",
     "enabled": "%{JS: [ %{Plugins} ].indexOf('CppEditor') >= 0}",
 
     "options":
@@ -34,14 +34,31 @@
                     "mandatory": true,
                     "type": "LineEdit",
                     "data": {}
-                },  				
+                }, 
+
 				{
                     "name": "eMail",
                     "trDisplayName": "Your E-Mail address:",
                     "mandatory": true,
                     "type": "LineEdit",
                     "data": {}
-                },        
+                },   
+
+                {
+                    "name": "Month",
+                    "trDisplayName": "Current Month:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": {}
+                },   
+                
+                {
+                    "name": "Year",
+                    "trDisplayName": "Current Year:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": {}
+                },    
 				
 				{
                     "name": "Sp1",
@@ -156,7 +173,7 @@
             "data":
             [
                 {
-                    "source": "../mne_templates/templateclass.h",
+                    "source": "templateclassstatic.h",
                     "target": "%{HdrPath}",
                     "openInEditor": true,
                     "options": [
@@ -165,7 +182,7 @@
                     ]
                 },
                 {
-                    "source": "../mne_templates/templateclass.cpp",
+                    "source": "templateclassstatic.cpp",
                     "target": "%{SrcPath}",
                     "openInEditor": true,
                     "options": [
