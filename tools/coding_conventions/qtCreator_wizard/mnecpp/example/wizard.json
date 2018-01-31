@@ -1,0 +1,134 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ "Qt4ProjectManager.Qt4Project" ],
+    "id": "R.MNE-CPP Example",
+    "category": "I.MNE-CPP",
+    "trDescription": "Creates a plain MNE-CPP Example.",
+    "trDisplayName": "MNE-CPP Example",
+    "trDisplayCategory": "MNE-CPP",
+    "icon": "../../global/consoleapplication.png",
+    "enabled": "%{JS: [ %{Plugins} ].indexOf('QmakeProjectManager') >= 0 }",
+
+    "options":
+    [
+        { "key": "ProjectFile", "value": "%{JS: '%{ProFile}'}" },
+        { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectDirectory}/%{ProjectName}', 'pro')}" },
+        { "key": "CppFileName", "value": "%{JS: 'main.' + Util.preferredSuffix('text/x-c++src')}" }
+    ],
+
+    "pages":
+    [
+        {
+            "trDisplayName": "Example Location",
+            "trShortTitle": "Location",
+            "typeId": "Project"
+        },
+        {
+            "trDisplayName": "Example Details",
+            "trShortTitle": "Details",
+            "typeId": "Fields",
+            "data" :
+            [
+				{
+                    "name": "author",
+                    "trDisplayName": "Your full name:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": {}
+                }, 
+
+				{
+                    "name": "eMail",
+                    "trDisplayName": "Your E-Mail address:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": {}
+                },   
+
+                {
+                    "name": "Month",
+                    "trDisplayName": "Current Month:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": {}
+                },   
+                
+                {
+                    "name": "Year",
+                    "trDisplayName": "Current Year:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": {}
+                },
+                
+                {
+                    "name": "exDescription",
+                    "trDisplayName": "Brief description:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": {}
+                }		
+
+                
+            ]
+        },
+        {
+            "trDisplayName": "Define Build System",
+            "trShortTitle": "Build System",
+            "typeId": "Fields",
+            "enabled": "%{JS: ! %{IsSubproject}}",
+            "data":
+            [
+                {
+                    "name": "BuildSystem",
+                    "trDisplayName": "Build system:",
+                    "type": "ComboBox",
+                    "data":
+                    {
+                        "index": 0,
+                        "items":
+                        [
+                            {
+                                "trKey": "qmake",
+                                "value": "qmake",
+                                "condition": "%{JS: [ %{Plugins} ].indexOf('QmakeProjectManager') >= 0}"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "trDisplayName": "Kit Selection",
+            "trShortTitle": "Kits",
+            "typeId": "Kits",
+            "enabled": "%{JS: ! %{IsSubproject}}",
+            "data": { "projectFilePath": "%{ProjectFile}" }
+        },
+        {
+            "trDisplayName": "Example Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators":
+    [
+        {
+            "typeId": "File",
+            "data":
+            [
+                {
+                    "source": "file.pro",
+                    "target": "%{ProFile}",
+                    "openAsProject": true,
+                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                },
+                {
+                    "source": "main.cpp",
+                    "target": "%{CppFileName}",
+                    "openInEditor": true
+                }
+            ]
+        }
+    ]
+}
