@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     %{SrcFileName}
+* @file     %{HdrFileName}
 * @author   %{author} <%{eMail}>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Month, Year
+* @date     %{Month}, %{Year}
 *
 * @section  LICENSE
 *
-* Copyright (C) Year, %{author} and Matti Hamalainen. All rights reserved.
+* Copyright (C) %{Year}, %{author} and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,17 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    %{CN} class definition.
+* @brief     %{CN} class declaration.
 *
 */
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "%{HdrFileName}"
+#ifndef %{GUARD}
+#define %{GUARD}
 
 
 //*************************************************************************************************************
@@ -53,6 +48,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
+%{JS: QtSupport.qtIncludes([ 'QtCore/QSharedPointer' ,
+						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
+                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
+                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : '' ],
+						   [ 'QtCore/QSharedPointer',
+						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
+                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
+                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : ''])}\
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,34 +66,69 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace %{JS: Cpp.namespaces('%{Class}')[0]};
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE %{JS: Cpp.namespaces('%{Class}')[0]}
+//=============================================================================================================
+%{JS: Cpp.openNamespaces('%{Class}')}
+
+//*************************************************************************************************************
+//=============================================================================================================
+// %{JS: Cpp.namespaces('%{Class}')[0]} FORWARD DECLARATIONS
 //=============================================================================================================
 
-@if '%{Base}' === 'QObject'
-%{CN}::%{CN}(QObject *parent)
-: QObject(parent)
-@elsif '%{Base}' === 'QWidget' || '%{Base}' === 'QMainWindow'
-%{CN}::%{CN}(QWidget *parent) 
-: %{Base}(parent)
+
+//=============================================================================================================
+/**
+* Description of what this class is intended to do (in detail).
+*
+* @brief Brief description of this class.
+*/
+@if '%{Base}'
+class %{CN} : public %{Base}
 @else
-%{CN}::%{CN}()
+class %{CN}
 @endif
 {
-}
+@if %{isQObject}
+     Q_OBJECT
+@endif
+
+public:
+    typedef QSharedPointer<%{CN}> SPtr;            /**< Shared pointer type for %{CN}. */
+    typedef QSharedPointer<const %{CN}> ConstSPtr; /**< Const shared pointer type for %{CN}. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a %{CN} object.
+    */
+@if '%{Base}' === 'QObject'
+    explicit %{CN}(QObject *parent = 0);
+@elsif '%{Base}' === 'QWidget' || '%{Base}' === 'QMainWindow'
+    explicit %{CN}(QWidget *parent = 0);
+@else
+    %{CN}();
+@endif
+
+protected:
+	
+private:
+	
+@if %{isQObject}
+signals:
+@endif
+
+};
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+%{JS: Cpp.closeNamespaces('%{Class}')}
+#endif // %{GUARD}
