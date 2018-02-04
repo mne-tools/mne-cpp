@@ -90,34 +90,30 @@ AbstractPhongAlphaMaterial::AbstractPhongAlphaMaterial(bool bUseSortPolicy, QNod
     , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
     , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
     , m_pAlphaParameter(new QParameter("alpha", 0.5f))
-//    , m_pVertexGL3Technique(new QTechnique())
-//    , m_pVertexGL3RenderPass(new QRenderPass())
-//    , m_pVertexGL3Shader(new QShaderProgram())
-//    , m_pVertexGL2Technique(new QTechnique())
-//    , m_pVertexGL2RenderPass(new QRenderPass())
-//    , m_pVertexES2Technique(new QTechnique())
-//    , m_pVertexES2RenderPass(new QRenderPass())
-//    , m_pVertexES2Shader(new QShaderProgram())
     , m_pDrawFilterKey(new QFilterKey)
     , m_bUseSortPolicy(bUseSortPolicy)
 {
 
 }
 
-AbstractPhongAlphaMaterial::~AbstractPhongAlphaMaterial()
-{
 
-}
+//*************************************************************************************************************
 
 float AbstractPhongAlphaMaterial::alpha() const
 {
     return m_pAlphaParameter->value().toFloat();
 }
 
+//*************************************************************************************************************
+
+
 void AbstractPhongAlphaMaterial::setAlpha(float fAlpha)
 {
     m_pAlphaParameter->setValue(fAlpha);
 }
+
+//*************************************************************************************************************
+
 
 void AbstractPhongAlphaMaterial::initData()
 {
@@ -178,6 +174,21 @@ void AbstractPhongAlphaMaterial::initData()
 }
 
 
+//*************************************************************************************************************
+
+void AbstractPhongAlphaMaterial::addShaderToRenderPass(const QString &sObjectName, QShaderProgram *pShaderProgramm)
+{
+    if(QRenderPass *pRenderPass = this->findChild<QRenderPass*>(sObjectName)) {
+        pRenderPass->setShaderProgram(pShaderProgramm);
+    }
+    else {
+        qDebug() << "AbstractPhongAlphaMaterial::addShaderToRenderPass: Renderpass " << sObjectName <<  " not found!";
+    }
+}
+
+
+//*************************************************************************************************************
+
 void AbstractPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
 {
     if(fAlpha.canConvert<float>())
@@ -197,8 +208,6 @@ void AbstractPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
         }
     }
 }
-
-
 
 
 //*************************************************************************************************************

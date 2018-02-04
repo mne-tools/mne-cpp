@@ -65,19 +65,10 @@
 //=============================================================================================================
 
 namespace Qt3DRender {
-    class QMaterial;
     class QEffect;
     class QParameter;
-    class QShaderProgram;
-    class QMaterial;
     class QFilterKey;
-    class QTechnique;
-    class QRenderPass;
-    class QGraphicsApiFilter;
-}
-
-namespace Qtcore {
-    class QColor;
+    class QShaderProgram;
 }
 
 
@@ -97,9 +88,9 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This abstract class is used as a base class for all materials that use the phong alpha lightining model in their shaders.
 *
-* @brief Brief description of this class.
+* @brief This abstract class is used as a base class for all materials that use the phong alpha lightining model in their shaders.
 */
 
 class AbstractPhongAlphaMaterial : public Qt3DRender::QMaterial
@@ -111,18 +102,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a AbstractPhongAlphaMaterial object.
+    * Default constructs a AbstractPhongAlphaMaterial object.
+    *
+    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+    * @param[in] parent             The parent of this object.
     */
-    AbstractPhongAlphaMaterial(bool bUseSortPolicy = false, QNode *parent = nullptr);
+    AbstractPhongAlphaMaterial(bool bUseSortPolicy, QNode *parent);
 
-    virtual ~AbstractPhongAlphaMaterial();
-
+    //=========================================================================================================
+    /**
+    * The virtual default destructor.
+    */
+    virtual ~AbstractPhongAlphaMaterial() = default;
 
     //=========================================================================================================
     /**
     * Get the current alpha value.
     *
-    * @return The current alpha value.
+    * @return   The current alpha value.
     */
     virtual float alpha() const;
 
@@ -136,9 +133,28 @@ public:
 
 protected:
 
+    //=========================================================================================================
+    /**
+    * Inits the OpenGL 3.3, 2.0, ES2.0 techniques and add phong alpha parameters.
+    */
     virtual void initData();
 
+    //=========================================================================================================
+    /**
+    * This abstract function should be used by the derived class to set the needed shader code.
+    * The implemented function has to be called by the derived class.
+    */
     virtual void setShaderCode() = 0;
+
+    //=========================================================================================================
+    /**
+    * This function searches the children of this item for a QRenderPass with matching name
+    * and sets the given shader program.
+    *
+    * @param[in] sObjectName         The object name of the render pass.
+    * @param[in] pShaderProgramm     The shader programm. Passing a nullptr is not allowed.
+    */
+    virtual void addShaderToRenderPass(const QString &sObjectName, Qt3DRender::QShaderProgram *pShaderProgramm);
 
     //=========================================================================================================
     /**
@@ -149,27 +165,16 @@ protected:
     */
     virtual void onAlphaChanged(const QVariant &fAlpha);
 
-    QPointer<Qt3DRender::QEffect>           m_pEffect;
+    QPointer<Qt3DRender::QEffect>           m_pEffect;                  /**< Material Effect. */
 
     QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;        /**< Parameter that determines the diffuse value. */
     QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;       /**< Parameter that determines the specular value. */
     QPointer<Qt3DRender::QParameter>        m_pShininessParameter;      /**< Parameter that determines the shininess value. */
     QPointer<Qt3DRender::QParameter>        m_pAlphaParameter;          /**< Parameter that determines the alpha value. */
 
-    QPointer<Qt3DRender::QFilterKey>        m_pDrawFilterKey;
+    QPointer<Qt3DRender::QFilterKey>        m_pDrawFilterKey;           /**< Filter key for navigating in the frame graph. */
 
-//    QPointer<Qt3DRender::QTechnique>        m_pVertexGL3Technique;
-//    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
-//    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;
-
-//    QPointer<Qt3DRender::QTechnique>        m_pVertexGL2Technique;
-//    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL2RenderPass;
-
-//    QPointer<Qt3DRender::QTechnique>        m_pVertexES2Technique;
-//    QPointer<Qt3DRender::QRenderPass>       m_pVertexES2RenderPass;
-//    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;
-
-    bool                                    m_bUseSortPolicy;
+    bool                                    m_bUseSortPolicy;           /**< Flag that indicated hether to use the sort policy in the frame graph. */
 };
 
 
