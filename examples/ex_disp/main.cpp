@@ -40,7 +40,6 @@
 
 #include <disp/imagesc.h>
 #include <disp/plot.h>
-#include <disp/rtplot.h>
 #include <disp/tfplot.h>
 
 #include <fiff/fiff.h>
@@ -245,14 +244,6 @@ int main(int argc, char *argv[])
     plot.setYLabel("Y Axes");
     plot.setWindowTitle("Corresponding function to MATLABs plot");
     plot.show();
-
-    //Rt plot example
-    RtPlot rtplot(dataCol);
-    rtplot.setTitle("Data Row 0 RtPlot");
-    rtplot.setXLabel("X Axes");
-    rtplot.setYLabel("Y Axes");
-    rtplot.setWindowTitle("Rt Plot");
-    rtplot.show();
 
 //    //ToDo: Debug tfplot
 //    //tf plot example
