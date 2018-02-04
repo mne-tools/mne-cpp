@@ -44,6 +44,7 @@
 
 
 #include "../../../disp3D_global.h"
+#include "abstractphongalphamaterial.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -99,7 +100,7 @@ namespace DISP3DLIB {
 * @brief Custom phong alpha material for instanced rendering.
 */
 
-class DISP3DSHARED_EXPORT GeometryMultiplierMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT GeometryMultiplierMaterial : public AbstractPhongAlphaMaterial
 {
     Q_OBJECT
 
@@ -109,89 +110,37 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] parent         The parent of this class.
+    * @param[in] parent             The parent of this object.
+    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
     */
-    explicit GeometryMultiplierMaterial(Qt3DCore::QNode *parent = 0);
-
+    explicit GeometryMultiplierMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
-    * Copy constructor disabled.
+    * Default destructor.
     */
-    GeometryMultiplierMaterial(const GeometryMultiplierMaterial &other) = delete;
+    virtual ~GeometryMultiplierMaterial() = default;
 
     //=========================================================================================================
     /**
-    * Copy operator disabled.
-    */
-    GeometryMultiplierMaterial& operator =(const GeometryMultiplierMaterial &other) = delete;
-
-    //=========================================================================================================
-    /**
-    * default destructor.
-    */
-    ~GeometryMultiplierMaterial();
-
-    //=========================================================================================================
-    /**
-     * Sets ambient Color for the mesh.
-     * @param tColor            New color.
-     */
-    void setAmbient(const QColor &tColor);
-
-    //=========================================================================================================
-    /**
-    * Get the current alpha value.
+    * Sets the color for the ambient color parameter.
     *
-    * @return The current alpha value.
+    * @param[in]        The new ambient color.
     */
-    float alpha();
+    void setAmbient(const QColor &ambientColor);
+
+protected:
 
     //=========================================================================================================
     /**
-    * Set the current alpha value.
-    *
-    * @param[in] alpha  The new alpha value.
+    * Adds the shader code to the material.
     */
-    void setAlpha(float alpha);
+    virtual void setShaderCode() override;
 
-private:
+    QPointer<Qt3DRender::QParameter>        m_pAmbientColor;            /**< Parameter that determines the ambient value. */
 
-    //=========================================================================================================
-    /**
-    * Init the GeometryMultiplierMaterial class.
-    */
-    void init();
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the alpha value is changed.
-    * It handles the change between opaque and transparent depending on the new alpha.
-    *
-    * @param[in] fAlpha         The new alpha value.
-    */
-    void onAlphaChanged(const QVariant &fAlpha);
-
-    QPointer<Qt3DRender::QEffect>           m_pVertexEffect;
-
-    QPointer<Qt3DRender::QParameter>        m_pAmbientColor;
-
-    QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;
-    QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;
-    QPointer<Qt3DRender::QParameter>        m_pShininessParameter;
-    QPointer<Qt3DRender::QParameter>        m_pAlphaParameter;
-    QPointer<Qt3DRender::QFilterKey>        m_pFilterKey;
-
-    QPointer<Qt3DRender::QTechnique>        m_pVertexGL3Technique;
-    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
-    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;
-
-    QPointer<Qt3DRender::QTechnique>        m_pVertexGL2Technique;
-    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL2RenderPass;
-
-    QPointer<Qt3DRender::QTechnique>        m_pVertexES2Technique;
-    QPointer<Qt3DRender::QRenderPass>       m_pVertexES2RenderPass;
-    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;         /**< Shader program for OpenGL version ES2.0. */
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;         /**< Shader program for OpenGL version 3. */
 };
 
 
