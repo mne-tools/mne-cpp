@@ -129,7 +129,6 @@ SOURCES += \
     engine/model/3dhelpers/custommesh.cpp \
     engine/model/materials/pervertexphongalphamaterial.cpp \
     engine/model/materials/pervertextessphongalphamaterial.cpp \
-    engine/model/materials/shadermaterial.cpp \
     engine/model/materials/shownormalsmaterial.cpp \
     engine/model/materials/networkmaterial.cpp \
     engine/control/control3dwidget.cpp \
