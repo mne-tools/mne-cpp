@@ -47,7 +47,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DCore/QNode>
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QParameter>
 #include <Qt3DRender/QRenderPass>
@@ -56,7 +55,6 @@
 #include <Qt3DRender/QShaderProgram>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <QUrl>
-#include <QColor>
 
 
 //*************************************************************************************************************
@@ -72,7 +70,6 @@
 
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -86,20 +83,14 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-GpuInterpolationMaterial::GpuInterpolationMaterial(Qt3DCore::QNode *parent)
-    : QMaterial(parent)
-    , m_pEffect(new QEffect)
-    , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
-    , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-    , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
-    , m_pAlphaParameter(new QParameter(QStringLiteral("alpha"), 0.5f))
+GpuInterpolationMaterial::GpuInterpolationMaterial(bool bUseSortPolicy, Qt3DCore::QNode *parent)
+    : AbstractPhongAlphaMaterial(bUseSortPolicy, parent)
     , m_pComputeShader(new QShaderProgram)
     , m_pComputeRenderPass(new QRenderPass)
     , m_pComputeFilterKey(new QFilterKey)
     , m_pComputeTechnique(new QTechnique)
     , m_pDrawShader(new QShaderProgram)
     , m_pDrawRenderPass(new QRenderPass)
-    , m_pDrawFilterKey(new QFilterKey)
     , m_pDrawTechnique(new QTechnique)
     , m_pSignalDataParameter(new QParameter)
     , m_pColsParameter(new QParameter)
@@ -110,20 +101,15 @@ GpuInterpolationMaterial::GpuInterpolationMaterial(Qt3DCore::QNode *parent)
     , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
     , m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
 {
-    init();
+    initData();
+    setShaderCode();
 }
-
 
 //*************************************************************************************************************
 
-void GpuInterpolationMaterial::init()
+void GpuInterpolationMaterial::initData()
 {
     //Compute part
-    //Set shader
-    m_pComputeShader->setComputeShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.csh"))));
-
-    m_pComputeRenderPass->setShaderProgram(m_pComputeShader);
-
     //Set OpenGL version
     m_pComputeTechnique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_pComputeTechnique->graphicsApiFilter()->setMajorVersion(4);
@@ -166,12 +152,6 @@ void GpuInterpolationMaterial::init()
     m_pComputeRenderPass->addParameter(m_pColormapParameter);
 
     //Draw part
-    //Set shader
-    m_pDrawShader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.vert"))));
-    m_pDrawShader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.frag"))));
-
-    m_pDrawRenderPass->setShaderProgram(m_pDrawShader);
-
     //Add Phongalpha parameter
     m_pDrawRenderPass->addParameter(m_pDiffuseParameter);
     m_pDrawRenderPass->addParameter(m_pSpecularParameter);
@@ -195,31 +175,21 @@ void GpuInterpolationMaterial::init()
 
     //Add to material
     this->setEffect(m_pEffect);
-
-    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
-            this, &GpuInterpolationMaterial::onAlphaChanged);
-
-    //Init draw filter key
-    m_pDrawFilterKey->setName(QStringLiteral("renderingStyle"));
-    onAlphaChanged(m_pAlphaParameter->value());
 }
 
 
 //*************************************************************************************************************
 
-void GpuInterpolationMaterial::onAlphaChanged(const QVariant &fAlpha)
+void GpuInterpolationMaterial::setShaderCode()
 {
-    if(fAlpha.canConvert<float>())
-    {
-        float tempAlpha = fAlpha.toFloat();
+    m_pComputeShader->setComputeShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.csh"))));
+    m_pComputeRenderPass->setShaderProgram(m_pComputeShader);
 
-        if(tempAlpha == 1.0f)
-        {
-            m_pDrawFilterKey->setValue(QStringLiteral("forward"));
-        }
-        else
-        {
-            m_pDrawFilterKey->setValue(QStringLiteral("forwardTransparent"));
-        }
-    }
+    m_pDrawShader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.vert"))));
+    m_pDrawShader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/compute/interpolation.frag"))));
+    m_pDrawRenderPass->setShaderProgram(m_pDrawShader);
 }
+
+
+//*************************************************************************************************************
+
