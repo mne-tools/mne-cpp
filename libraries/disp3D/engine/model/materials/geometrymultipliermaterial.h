@@ -110,10 +110,10 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] parent             The parent of this object.
     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+    * @param[in] parent             The parent of this object.
     */
-    explicit GeometryMultiplierMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = 0);
+    explicit GeometryMultiplierMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -129,7 +129,7 @@ public:
     */
     void setAmbient(const QColor &ambientColor);
 
-protected:
+private:
 
     //=========================================================================================================
     /**
