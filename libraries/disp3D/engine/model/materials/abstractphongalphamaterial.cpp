@@ -93,7 +93,12 @@ AbstractPhongAlphaMaterial::AbstractPhongAlphaMaterial(bool bUseSortPolicy, QNod
     , m_pDrawFilterKey(new QFilterKey)
     , m_bUseSortPolicy(bUseSortPolicy)
 {
+    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
+            this, & AbstractPhongAlphaMaterial::onAlphaChanged);
 
+    //Init filter keys
+    m_pDrawFilterKey->setName(QStringLiteral("renderingStyle"));
+    onAlphaChanged(m_pAlphaParameter->value());
 }
 
 
@@ -164,13 +169,6 @@ void AbstractPhongAlphaMaterial::initData()
     m_pEffect->addParameter(m_pAlphaParameter);
 
     this->setEffect(m_pEffect);
-
-    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
-            this, & AbstractPhongAlphaMaterial::onAlphaChanged);
-
-    //Init filter keys
-    m_pDrawFilterKey->setName(QStringLiteral("renderingStyle"));
-    onAlphaChanged(m_pAlphaParameter->value());
 }
 
 

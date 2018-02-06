@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include <disp3D_global.h>
+#include "abstractphongalphamaterial.h"
 
 
 //*************************************************************************************************************
@@ -52,16 +53,12 @@
 
 #include <QSharedPointer>
 #include <QPointer>
-#include <Qt3DRender/QMaterial>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -72,12 +69,8 @@
 namespace QtCore {
         class QVector3D;
 }
-namespace Qt3DCore {
-        class QNode;
-}
 
 namespace Qt3DRender {
-        class QEffect;
         class QParameter;
         class QShaderProgram;
         class QRenderPass;
@@ -107,7 +100,7 @@ namespace DISP3DLIB {
 * @brief Compute shader interpolation material.
 */
 
-class DISP3DSHARED_EXPORT GpuInterpolationMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT GpuInterpolationMaterial : public AbstractPhongAlphaMaterial
 {
     Q_OBJECT
 
@@ -121,49 +114,26 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    explicit GpuInterpolationMaterial(Qt3DCore::QNode *parent = 0);
+    explicit GpuInterpolationMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
+
+    //=========================================================================================================
+    /**
+    * Default destructor.
+    */
+    virtual ~GpuInterpolationMaterial() = default;
 
 protected:
     //=========================================================================================================
     /**
      * Init GpuInterpolationMaterial class.
      */
-    void init();
+    void initData() override;
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the alpha value is changed.
-    * It handles the change between opaque and transparent depending on the new alpha.
-    *
-    * @param[in] fAlpha         The new alpha value.
+    * Add the shader code to the material.
     */
-    void onAlphaChanged(const QVariant &fAlpha);
-
-    //=========================================================================================================
-    /**
-     * Build the content of the weight matrix buffer.
-     *
-     * @param tInterpolationMatrix      The weight matrix.
-     * @return                          Weight matrix is byte array form.
-     */
-    QByteArray buildWeightMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<double>> tInterpolationMatrix);
-
-    //=========================================================================================================
-    /**
-     * Build buffer filled with 0.0f.
-     *
-     * @param tSize         Number of zeros.
-     * @return              Buffer content.
-     */
-    QByteArray buildZeroBuffer(const uint tSize);
-
-    QPointer<Qt3DRender::QEffect>                       m_pEffect;                  /**< The effect of this material. */
-
-    //Phongalpha parameter
-    QPointer<Qt3DRender::QParameter>                    m_pDiffuseParameter;        /**< Parameter that determines the diffuse value. */
-    QPointer<Qt3DRender::QParameter>                    m_pSpecularParameter;       /**< Parameter that determines the specular value. */
-    QPointer<Qt3DRender::QParameter>                    m_pShininessParameter;      /**< Parameter that determines the shininess value. */
-    QPointer<Qt3DRender::QParameter>                    m_pAlphaParameter;          /**< Parameter that determines the alpha value. */
+    void setShaderCode() override;
 
     //Compute Part
     QPointer<Qt3DRender::QShaderProgram>                m_pComputeShader;           /**< Stores the shader program of the compute shader. */
@@ -174,7 +144,6 @@ protected:
     //Draw Part
     QPointer<Qt3DRender::QShaderProgram>                m_pDrawShader;              /**< Stores the shader program of the draw shader. */
     QPointer<Qt3DRender::QRenderPass>                   m_pDrawRenderPass;          /**< The render pass for the draw run. */
-    QPointer<Qt3DRender::QFilterKey>                    m_pDrawFilterKey;           /**< The draw filter key. */
     QPointer<Qt3DRender::QTechnique>                    m_pDrawTechnique;           /**< The technique of the draw shader. This should match with the frame graph. */
 
     //Measurement signal
