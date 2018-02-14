@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -176,6 +177,8 @@ void RtCov::run()
 
             if(n_samples > m_iMaxSamples)
             {
+                QElapsedTimer time;
+                time.start();
                 mu /= (float)n_samples;
                 cov->data.array() -= n_samples * (mu * mu.transpose()).array();
                 cov->data.array() /= (n_samples - 1);
@@ -197,6 +200,8 @@ void RtCov::run()
 
                 cov = FiffCov::SPtr(new FiffCov());
                 n_samples = 0;
+
+                qInfo()<<time.elapsed()<<"Covariance Processed";
             }
 
 

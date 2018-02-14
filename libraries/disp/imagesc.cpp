@@ -49,6 +49,8 @@
 //=============================================================================================================
 
 #include <QPainter>
+#include <QDebug>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -283,6 +285,9 @@ void ImageSc::paintEvent(QPaintEvent *)
     QPainter painter(this);
     if (m_pPixmapData)
     {
+        QElapsedTimer time;
+        time.start();
+
         QPoint t_qPointTopLeft(0,0);
 
         // -- Data --
@@ -372,5 +377,7 @@ void ImageSc::paintEvent(QPaintEvent *)
 
         //Draw title & axes
         Graph::drawLabels(t_qPixmapScaledData.width(), t_qPixmapScaledData.height());
+
+        qInfo()<<time.elapsed()<<"Covariance Plot";
     }
 }

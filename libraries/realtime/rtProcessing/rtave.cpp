@@ -331,8 +331,8 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
 
     //Detect trigger
 
-    //QElapsedTimer time;
-    //time.start();
+    QElapsedTimer time;
+    time.start();
 
     QList<QPair<int,double> > lDetectedTriggers = DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
 
@@ -450,7 +450,7 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
         }
     }
 
-    //qDebug()<<"RtAve::doAveraging() - time for procesing"<<time.elapsed();
+    qInfo()<<time.elapsed()<<"Averaging Processed";
 }
 
 

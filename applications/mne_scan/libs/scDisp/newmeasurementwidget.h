@@ -157,6 +157,7 @@ protected:
     */
     inline void addDisplayWidget(QWidget* pWidget);
 
+    int m_iBlockNumber = 0;
 private:
     QList< QAction* >   m_qListDisplayActions;      /**< List of display actions */
     QList< QWidget* >   m_qListDisplayWidgets;       /**< List of display widgets to attach to the toolbar */

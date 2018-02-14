@@ -257,6 +257,8 @@ private:
     QPen        m_penNormalSelected;    /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected.  */
     QPen        m_penNormalBad;         /**< Pen for drawing the data when bad data is plotted normally without freeze on.  */
     QPen        m_penNormalSelectedBad; /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected.  */
+
+    int m_iBlockNumber = 0;
 };
 
 } // NAMESPACE
