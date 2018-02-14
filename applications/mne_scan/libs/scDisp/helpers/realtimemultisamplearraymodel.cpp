@@ -562,6 +562,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     QModelIndex topLeft = this->index(0,1);
     QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
+
     emit dataChanged(topLeft, bottomRight, roles);
 }
 

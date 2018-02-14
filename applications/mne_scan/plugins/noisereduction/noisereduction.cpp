@@ -248,6 +248,7 @@ void NoiseReduction::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
     m_pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
     if(m_pRTMSA) {
+        qInfo() << m_iBlockNumber++ << "NoiseReduction Received";
         //Check if buffer initialized
         if(!m_pNoiseReductionBuffer) {
             m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, m_pRTMSA->getNumChannels(), m_pRTMSA->getMultiSampleArray()[0].cols()));
@@ -737,6 +738,9 @@ void NoiseReduction::run()
 
         m_mutex.lock();
 
+        QElapsedTimer timer;
+        timer.start();
+
         //Do SSP's and compensators here
         if(m_bCompActivated) {
             if(m_bProjActivated) {
@@ -773,6 +777,7 @@ void NoiseReduction::run()
 
             t_mat = m_matSparseSpharaMult * t_mat;
         }
+        qInfo()<<timer.elapsed()<<"NoiseReduction Processed";
 
 //        //Common average
 //        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());

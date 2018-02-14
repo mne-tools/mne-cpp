@@ -84,6 +84,9 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
     if(m_bIsInit)
     {
+        QElapsedTimer time;
+        time.start();
+
         //Draw baseline correction area
         if(m_pRealTimeEvokedModel->getBaselineInfo().first.toString() != "None" &&
                 m_pRealTimeEvokedModel->getBaselineInfo().second.toString() != "None") {
@@ -239,7 +242,9 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
                 painter.restore();
             }
-        }
+        }        
+
+        qInfo()<<time.elapsed()<<"Averaging Plot";
     }
 
     return QWidget::paintEvent(paintEvent);

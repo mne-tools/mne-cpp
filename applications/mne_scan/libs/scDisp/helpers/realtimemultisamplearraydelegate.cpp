@@ -303,6 +303,9 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
             if(data.second > 0)
             {
+                QElapsedTimer time;
+                time.start();
+
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -421,6 +424,11 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->setPen(m_penMarker);
                 painter->drawPath(path);
                 painter->restore();
+
+
+                //qInfo() << m_iBlockNumber++ << "RTMSA Done";
+
+                qInfo()<<time.elapsed()<<"FiffSimulator Plot";
             }
             break;
         }

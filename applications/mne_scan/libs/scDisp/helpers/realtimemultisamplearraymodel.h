@@ -608,6 +608,7 @@ private:
     QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
 
+    int m_iBlockNumber= 0;
 signals:
     //=========================================================================================================
     /**
