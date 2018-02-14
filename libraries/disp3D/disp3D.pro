@@ -182,7 +182,6 @@ HEADERS += \
     engine/model/items/common/types.h \
     engine/model/materials/pervertexphongalphamaterial.h \
     engine/model/materials/pervertextessphongalphamaterial.h \
-    engine/model/materials/shadermaterial.h \
     engine/model/materials/shownormalsmaterial.h \
     engine/model/materials/networkmaterial.h \
     engine/control/control3dwidget.h \
