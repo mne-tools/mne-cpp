@@ -79,14 +79,14 @@ PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(bool bUseSortPo
 , m_pVertexGL4RenderPass(new QRenderPass())
 , m_pVertexGL4Shader(new QShaderProgram())
 {
-    initData();
+    init();
     setShaderCode();
 }
 
 
 //*************************************************************************************************************
 
-void PerVertexTessPhongAlphaMaterial::initData()
+void PerVertexTessPhongAlphaMaterial::init()
 {
     //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using tesselation
     m_pVertexGL4Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);

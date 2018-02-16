@@ -101,13 +101,14 @@ GpuInterpolationMaterial::GpuInterpolationMaterial(bool bUseSortPolicy, Qt3DCore
     , m_pThresholdZParameter(new QParameter(QStringLiteral("fThresholdZ"), 6e-6f))
     , m_pColormapParameter(new QParameter(QStringLiteral("ColormapType"), 3))
 {
-    initData();
+    init();
     setShaderCode();
 }
 
+
 //*************************************************************************************************************
 
-void GpuInterpolationMaterial::initData()
+void GpuInterpolationMaterial::init()
 {
     //Compute part
     //Set OpenGL version

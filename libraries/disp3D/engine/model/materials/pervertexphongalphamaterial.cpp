@@ -69,7 +69,7 @@ PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseSortPolicy, QN
 , m_pVertexGL3Shader(new QShaderProgram())
 , m_pVertexES2Shader(new QShaderProgram())
 {
-    initData();
+    init();
     setShaderCode();
 }
 

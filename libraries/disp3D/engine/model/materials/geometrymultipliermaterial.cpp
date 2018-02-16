@@ -87,7 +87,7 @@ GeometryMultiplierMaterial::GeometryMultiplierMaterial(bool bUseSortPolicy, Qt3D
     , m_pVertexGL3Shader(new QShaderProgram())
     , m_pVertexES2Shader(new QShaderProgram())
 {
-    initData();
+    init();
     setShaderCode();
     m_pEffect->addParameter(m_pAmbientColor);
 }
