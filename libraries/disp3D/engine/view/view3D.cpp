@@ -39,16 +39,12 @@
 //=============================================================================================================
 
 #include "view3D.h"
-#include "../model/3dhelpers/renderable3Dentity.h"
-#include "../model/items/common/abstract3Dtreeitem.h"
 #include "../model/items/common/types.h"
 #include "../model/data3Dtreemodel.h"
+#include "../model/3dhelpers/renderable3Dentity.h"
 #include "customframegraph.h"
 #include "../model/3dhelpers/geometrymultiplier.h"
 #include "../model/materials/geometrymultipliermaterial.h"
-
-#include <mne/mne_sourceestimate.h>
-#include <fiff/fiff_dig_point_set.h>
 
 
 //*************************************************************************************************************
@@ -64,8 +60,6 @@
 #include <Qt3DRender/QCamera>
 #include <Qt3DCore/QTransform>
 #include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DExtras/QPerVertexColorMaterial>
-#include <Qt3DExtras/QFirstPersonCameraController>
 #include <Qt3DRender/QPointLight>
 #include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DExtras/QSphereMesh>
@@ -311,7 +305,8 @@ void View3D::keyPressEvent(QKeyEvent* e)
             break;
 
         case Qt::Key_Space:
-            m_bModelRotationMode = !m_bModelRotationMode;
+            //Uncomment the following to enable object rotation mode
+            //m_bModelRotationMode = !m_bModelRotationMode;
             break;
 
         case Qt::Key_Left:
