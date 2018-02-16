@@ -43,11 +43,6 @@
 
 #include "../../disp3D_global.h"
 
-#include <fs/annotationset.h>
-#include <fs/annotation.h>
-#include <mne/mne_forwardsolution.h>
-#include <connectivity/network/network.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,12 +66,7 @@ namespace Qt3DCore {
 }
 
 namespace Qt3DRender {
-    class QDirectionalLight;
     class QPointLight;
-}
-
-namespace Qt3DExtras {
-    class QPhongMaterial;
 }
 
 
