@@ -52,7 +52,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QPropertyAnimation>
 #include <QKeyEvent>
 
@@ -311,14 +310,12 @@ void View3D::keyPressEvent(QKeyEvent* e)
 
         case Qt::Key_Left:
                 if(!m_bModelRotationMode) {
-                    qDebug("Camera Left pressed");
                     //Rotate camera
                     m_vecViewRotation.setY(-0.75 + m_vecViewRotationOld.y());
                     m_pCameraTransform->setRotationY(m_vecViewRotation.y());
                 }
                 else {
                     //Rotate all surface objects
-                    qDebug("Object Left pressed");
                     m_vecModelRotation.setY(-0.75 + m_vecModelRotationOld.y());
                     setRotationRecursive(m_p3DObjectsEntity);
                 }
@@ -431,7 +428,6 @@ void View3D::wheelEvent(QWheelEvent* e)
 
 void View3D::mouseReleaseEvent(QMouseEvent* e)
 {
-    qDebug("mouse released");
     m_bRotationMode = false;
     m_bCameraTransMode = false;
     m_vecViewTransOld = m_vecViewTrans;
@@ -464,7 +460,6 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     if(m_bRotationMode) {
         //Rotate
         if(!m_bModelRotationMode) {
-            qDebug("Mouse roation camera");
             //Rotate camera
             m_vecViewRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecViewRotationOld.x());
             m_vecViewRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecViewRotationOld.y());
@@ -473,7 +468,6 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
             m_pCameraTransform->setRotationY(m_vecViewRotation.y());
         }
         else {
-            qDebug("Mouse roation object");
             //Rotate objects
             m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
             m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
@@ -483,7 +477,6 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     }
 
     if(m_bCameraTransMode) {
-        qDebug("Mouse translate camera");
         m_vecViewTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.0001f) + m_vecViewTransOld.x());
         m_vecViewTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.0001f) + m_vecViewTransOld.y());
 
