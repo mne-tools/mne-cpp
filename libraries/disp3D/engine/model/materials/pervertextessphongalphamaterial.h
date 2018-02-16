@@ -120,7 +120,7 @@ private:
     /**
     * Init the PerVertexTessPhongAlphaMaterial class.
     */
-    void initData() override;
+    void init() override;
 
     //=========================================================================================================
     /**

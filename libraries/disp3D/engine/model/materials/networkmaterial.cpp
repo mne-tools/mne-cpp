@@ -73,7 +73,7 @@ NetworkMaterial::NetworkMaterial(bool bUseSortPolicy, QNode *parent)
 , m_pVertexGL3Shader(new QShaderProgram())
 , m_pVertexES2Shader(new QShaderProgram())
 {
-    initData();
+    init();
     setShaderCode();
 }
 
@@ -94,3 +94,4 @@ void NetworkMaterial::setShaderCode()
 }
 
 
+//*************************************************************************************************************

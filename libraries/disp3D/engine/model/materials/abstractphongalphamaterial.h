@@ -88,13 +88,14 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* This abstract class is used as a base class for all materials that use the phong alpha lightining model in their shaders.
+* This abstract class is used as a base class for all materials that are using the phong alpha lightining model in their shaders.
 *
-* @brief This abstract class is used as a base class for all materials that use the phong alpha lightining model in their shaders.
+* @brief This abstract class is used as a base class for all materials that are using the phong alpha lightining model in their shaders.
 */
 
 class AbstractPhongAlphaMaterial : public Qt3DRender::QMaterial
 {
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<AbstractPhongAlphaMaterial> SPtr;            /**< Shared pointer type for AbstractPhongAlphaMaterial. */
@@ -136,12 +137,13 @@ protected:
     //=========================================================================================================
     /**
     * Inits the OpenGL 3.3, 2.0, ES2.0 techniques and add phong alpha parameters.
+    * This functions needs to be overridden for other techniques.
     */
-    virtual void initData();
+    virtual void init();
 
     //=========================================================================================================
     /**
-    * This abstract function should be used by the derived class to set the needed shader code.
+    * This abstract function should be used by the derived class to set the appropriate shader code.
     * The implemented function has to be called by the derived class.
     */
     virtual void setShaderCode() = 0;

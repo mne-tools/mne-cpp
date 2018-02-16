@@ -128,7 +128,7 @@ protected:
     /**
      * Init GpuInterpolationMaterial class.
      */
-    void initData() override;
+    void init() override;
 
     //=========================================================================================================
     /**

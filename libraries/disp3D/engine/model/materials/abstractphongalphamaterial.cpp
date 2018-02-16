@@ -109,18 +109,18 @@ float AbstractPhongAlphaMaterial::alpha() const
     return m_pAlphaParameter->value().toFloat();
 }
 
-//*************************************************************************************************************
 
+//*************************************************************************************************************
 
 void AbstractPhongAlphaMaterial::setAlpha(float fAlpha)
 {
     m_pAlphaParameter->setValue(fAlpha);
 }
 
+
 //*************************************************************************************************************
 
-
-void AbstractPhongAlphaMaterial::initData()
+void AbstractPhongAlphaMaterial::init()
 {
     //Set OpenGL version
     QTechnique *pVertexGL3Technique = new QTechnique;
