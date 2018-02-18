@@ -129,7 +129,6 @@ SOURCES += \
     engine/model/3dhelpers/custommesh.cpp \
     engine/model/materials/pervertexphongalphamaterial.cpp \
     engine/model/materials/pervertextessphongalphamaterial.cpp \
-    engine/model/materials/shadermaterial.cpp \
     engine/model/materials/shownormalsmaterial.cpp \
     engine/model/materials/networkmaterial.cpp \
     engine/control/control3dwidget.cpp \
@@ -142,7 +141,8 @@ SOURCES += \
     engine/model/3dhelpers/geometrymultiplier.cpp \
     engine/model/materials/geometrymultipliermaterial.cpp \
     engine/view/customframegraph.cpp \
-    engine/model/materials/gpuinterpolationmaterial.cpp
+    engine/model/materials/gpuinterpolationmaterial.cpp \
+    engine/model/materials/abstractphongalphamaterial.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -182,7 +182,6 @@ HEADERS += \
     engine/model/items/common/types.h \
     engine/model/materials/pervertexphongalphamaterial.h \
     engine/model/materials/pervertextessphongalphamaterial.h \
-    engine/model/materials/shadermaterial.h \
     engine/model/materials/shownormalsmaterial.h \
     engine/model/materials/networkmaterial.h \
     engine/control/control3dwidget.h \
@@ -196,7 +195,8 @@ HEADERS += \
     engine/model/3dhelpers/geometrymultiplier.h \
     engine/model/materials/geometrymultipliermaterial.h \
     engine/view/customframegraph.h \
-    engine/model/materials/gpuinterpolationmaterial.h
+    engine/model/materials/gpuinterpolationmaterial.h \
+    engine/model/materials/abstractphongalphamaterial.h
 
 FORMS += \
     engine/control/control3dwidget.ui \
