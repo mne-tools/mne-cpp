@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef DISP3DLIB_ABSTRACT_PHONG_ALPHA_MATERIAL_H
-#define DISP3DLIB_ABSTRACT_PHONG_ALPHA_MATERIAL_H
+#ifndef DISP3DLIB_ABSTRACTPHONGALPHAMATERIAL_H
+#define DISP3DLIB_ABSTRACTPHONGALPHAMATERIAL_H
 
 
 //*************************************************************************************************************
@@ -188,4 +188,4 @@ protected:
 
 } // namespace DISP3DLIB
 
-#endif // DISP3DLIB_ABSTRACT_PHONG_ALPHA_MATERIAL_H
+#endif // DISP3DLIB_ABSTRACTPHONGALPHAMATERIAL_H
