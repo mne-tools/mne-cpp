@@ -46,22 +46,14 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QColor>
 #include <Qt3DRender/qeffect.h>
 #include <Qt3DRender/qtechnique.h>
 #include <Qt3DRender/qshaderprogram.h>
 #include <Qt3DRender/qparameter.h>
 #include <Qt3DRender/qrenderpass.h>
-#include <QFilterKey>
-#include <Qt3DRender/qdepthtest.h>
-#include <Qt3DRender/qblendequation.h>
-#include <Qt3DRender/qblendequationarguments.h>
-#include <Qt3DRender/qnodepthmask.h>
 #include <Qt3DRender/qgraphicsapifilter.h>
 
 #include <QUrl>
-#include <QVector3D>
-#include <QVector4D>
 
 
 //*************************************************************************************************************
@@ -78,29 +70,17 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(QNode *parent)
-: QMaterial(parent)
-, m_pVertexEffect(new QEffect())
-, m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
-, m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 15.0f))
+PerVertexTessPhongAlphaMaterial::PerVertexTessPhongAlphaMaterial(bool bUseSortPolicy, QNode *parent)
+: AbstractPhongAlphaMaterial(bUseSortPolicy, parent)
 , m_pInnerTessParameter(new QParameter("innerTess", 1.0f))
 , m_pOuterTessParameter(new QParameter("outerTess", 1.0f))
 , m_pTriangleScaleParameter(new QParameter("triangleScale", 1.0f))
-, m_pAlphaParameter(new QParameter("alpha", 0.5f))
 , m_pVertexGL4Technique(new QTechnique())
 , m_pVertexGL4RenderPass(new QRenderPass())
 , m_pVertexGL4Shader(new QShaderProgram())
-, m_pFilterKey(new QFilterKey)
 {
-    this->init();
-}
-
-
-//*************************************************************************************************************
-
-PerVertexTessPhongAlphaMaterial::~PerVertexTessPhongAlphaMaterial()
-{
+    init();
+    setShaderCode();
 }
 
 
@@ -108,7 +88,34 @@ PerVertexTessPhongAlphaMaterial::~PerVertexTessPhongAlphaMaterial()
 
 void PerVertexTessPhongAlphaMaterial::init()
 {
-    //Set shader
+    //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using tesselation
+    m_pVertexGL4Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
+    m_pVertexGL4Technique->graphicsApiFilter()->setMajorVersion(4);
+    m_pVertexGL4Technique->graphicsApiFilter()->setMinorVersion(0);
+    m_pVertexGL4Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
+
+    m_pVertexGL4Technique->addFilterKey(m_pDrawFilterKey);
+
+    m_pVertexGL4Technique->addRenderPass(m_pVertexGL4RenderPass);
+
+    m_pEffect->addTechnique(m_pVertexGL4Technique);
+
+    m_pEffect->addParameter(m_pDiffuseParameter);
+    m_pEffect->addParameter(m_pSpecularParameter);
+    m_pEffect->addParameter(m_pShininessParameter);
+    m_pEffect->addParameter(m_pAlphaParameter);
+    m_pEffect->addParameter(m_pInnerTessParameter);
+    m_pEffect->addParameter(m_pOuterTessParameter);
+    m_pEffect->addParameter(m_pTriangleScaleParameter);
+
+    this->setEffect(m_pEffect);
+}
+
+
+//*************************************************************************************************************
+
+void PerVertexTessPhongAlphaMaterial::setShaderCode()
+{
     m_pVertexGL4Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl4/pervertextessphongalpha.vert"))));
     m_pVertexGL4Shader->setTessellationControlShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl4/pervertextessphongalpha.tcs"))));
     //m_pVertexGL4Shader->setTessellationEvaluationShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl4/pervertextessphongalpha_simple.tes"))));
@@ -117,69 +124,7 @@ void PerVertexTessPhongAlphaMaterial::init()
     m_pVertexGL4Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl4/pervertextessphongalpha.frag"))));
 
     m_pVertexGL4RenderPass->setShaderProgram(m_pVertexGL4Shader);
-
-    //Set OpenGL version - This material can only be used with opengl 4.0 or higher since it is using tesselation
-    m_pVertexGL4Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL4Technique->graphicsApiFilter()->setMajorVersion(4);
-    m_pVertexGL4Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_pVertexGL4Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
-
-    m_pVertexGL4Technique->addFilterKey(m_pFilterKey);
-
-    m_pVertexGL4Technique->addRenderPass(m_pVertexGL4RenderPass);
-
-    m_pVertexEffect->addTechnique(m_pVertexGL4Technique);
-
-    m_pVertexEffect->addParameter(m_pDiffuseParameter);
-    m_pVertexEffect->addParameter(m_pSpecularParameter);
-    m_pVertexEffect->addParameter(m_pShininessParameter);
-    m_pVertexEffect->addParameter(m_pAlphaParameter);
-    m_pVertexEffect->addParameter(m_pInnerTessParameter);
-    m_pVertexEffect->addParameter(m_pOuterTessParameter);
-    m_pVertexEffect->addParameter(m_pTriangleScaleParameter);
-
-    this->setEffect(m_pVertexEffect);
-
-    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
-            this, &PerVertexTessPhongAlphaMaterial::onAlphaChanged);
-
-    //Init draw filter key
-    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
-    onAlphaChanged(m_pAlphaParameter->value());
 }
 
 
 //*************************************************************************************************************
-
-void PerVertexTessPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
-{
-    if(fAlpha.canConvert<float>())
-    {
-        float tempAlpha = fAlpha.toFloat();
-
-        if(tempAlpha == 1.0f)
-        {
-            m_pFilterKey->setValue(QStringLiteral("forward"));
-        }
-        else
-        {
-            m_pFilterKey->setValue(QStringLiteral("forwardTransparent"));
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-float PerVertexTessPhongAlphaMaterial::alpha()
-{
-    return m_pAlphaParameter->value().toFloat();
-}
-
-
-//*************************************************************************************************************
-
-void PerVertexTessPhongAlphaMaterial::setAlpha(float alpha)
-{
-    m_pAlphaParameter->setValue(alpha);
-}

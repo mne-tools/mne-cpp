@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rtplot.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     %{HdrFileName}
+* @author   %{author} <%{eMail}>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2013
+* @date     %{Month}, %{Year}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) %{Year}, %{author} and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RtPlot class declaration
+* @brief     %{CN} class declaration.
 *
 */
-#ifndef RTPLOT_H
-#define RTPLOT_H
+
+#ifndef %{GUARD}
+#define %{GUARD}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "disp_global.h"
-#include "graph.h"
 
 
 //*************************************************************************************************************
@@ -49,36 +48,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QString>
-#include <QList>
-#include <QVector>
-#include <QPointF>
-#include <QSharedPointer>
+%{JS: QtSupport.qtIncludes([ 'QtCore/QSharedPointer' ,
+						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
+                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
+                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : '' ],
+						   [ 'QtCore/QSharedPointer',
+						     ( '%{IncludeQObject}' )          ? 'QtCore/%{IncludeQObject}'     : '',
+                             ( '%{IncludeQWidget}' )          ? 'QtGui/%{IncludeQWidget}'      : '',
+                             ( '%{IncludeQMainWindow}' )      ? 'QtGui/%{IncludeQMainWindow}'  : ''])}\
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
-
-namespace DISPLIB
-{
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -87,75 +70,77 @@ using namespace Eigen;
 //=============================================================================================================
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE %{JS: Cpp.namespaces('%{Class}')[0]}
+//=============================================================================================================
+%{JS: Cpp.openNamespaces('%{Class}')}
+
+//*************************************************************************************************************
+//=============================================================================================================
+// %{JS: Cpp.namespaces('%{Class}')[0]} FORWARD DECLARATIONS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* Real-time plot
+* Description of what this class is intended to do (in detail).
 *
-* @brief Real-time plot
+* @brief Brief description of this class.
 */
-class DISPSHARED_EXPORT RtPlot : public Graph
+
+@if '%{Base}'
+class %{CN} : public %{Base}
+@else
+class %{CN}
+@endif
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<RtPlot> SPtr;            /**< Shared pointer type for MatrixView class. */
-    typedef QSharedPointer<const RtPlot> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
+@if %{isQObject}
+     Q_OBJECT
+@endif
+
+public:  
+@if '%{Base}' === 'QObject'
+    typedef QSharedPointer<%{CN}> SPtr;            /**< Shared pointer type for %{CN}. */
+    typedef QSharedPointer<const %{CN}> ConstSPtr; /**< Const shared pointer type for %{CN}. */
 
     //=========================================================================================================
     /**
-    * Creates the RtPlot.
-    *
-    * @param[in] parent     Parent QObject (optional)
+    * Constructs a %{CN} object.
     */
-    explicit RtPlot(QWidget *parent = 0);
+    explicit %{CN}(QObject *parent = 0);
+@elsif '%{Base}' === 'QWidget' || '%{Base}' === 'QMainWindow'
+    typedef QSharedPointer<%{CN}> SPtr;            /**< Shared pointer type for %{CN}. */
+    typedef QSharedPointer<const %{CN}> ConstSPtr; /**< Const shared pointer type for %{CN}. */
 
     //=========================================================================================================
     /**
-    * Creates the real-time plot using a given double vector.
-    *
-    * @param[in] p_dVec     The double data vector
-    * @param[in] parent     Parent QObject (optional)
+    * Constructs a %{CN} object.
     */
-    explicit RtPlot(VectorXd &p_dVec, QWidget *parent = 0);
-
+    explicit %{CN}(QWidget *parent = 0);
+@else
     //=========================================================================================================
     /**
-    * Destructs the RtPlot object
+    * Delete constructor since this is a static class.
     */
-    ~RtPlot();
-
-    //=========================================================================================================
-    /**
-    * Initializes the Plot object
-    */
-    void init();
-
-    //=========================================================================================================
-    /**
-    * Updates the plot using a given double vector without given X data.
-    *
-    * @param[in] p_dVec     The double data vector
-    */
-    void updateData(VectorXd &p_dVec);
+    %{CN}() = delete;
+@endif
 
 protected:
-    void paintEvent(QPaintEvent*);
+	
+private:
+	
+@if %{isQObject}
+signals:
+@endif
 
-    bool m_bHoldOn;             /**< If multiple plots */
-
-    QList<QVector<QPointF> > m_qListVecPointFPaths;
-
-    double m_dMinX;             /**< Minimal X value */
-    double m_dMaxX;             /**< Maximal X value */
-    double m_dMinY;             /**< Minimal Y value */
-    double m_dMaxY;             /**< Maximal Y value */
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE
-
-#endif // RTPLOT_H
+%{JS: Cpp.closeNamespaces('%{Class}')}
+#endif // %{GUARD}

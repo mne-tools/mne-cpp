@@ -88,13 +88,6 @@ ShowNormalsMaterial::ShowNormalsMaterial(QNode *parent)
 
 //*************************************************************************************************************
 
-ShowNormalsMaterial::~ShowNormalsMaterial()
-{
-}
-
-
-//*************************************************************************************************************
-
 void ShowNormalsMaterial::init()
 {
     //Set shader

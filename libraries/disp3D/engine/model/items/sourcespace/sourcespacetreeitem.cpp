@@ -126,7 +126,9 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
 
 void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 {
-    Renderable3DEntity* pSourceSphereEntity = new Renderable3DEntity(this);
+    //use QEntity instead of Renderable3DEntity to avoid a double transformation of digitizers
+    //from Abstract3DMeshTree and the child Renderable3DEntity
+    QEntity* pSourceSphereEntity = new QEntity(this);
 
     //create geometry
     QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
