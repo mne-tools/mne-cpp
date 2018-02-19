@@ -95,7 +95,6 @@ namespace DISP3DLIB
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Renderable3DEntity;
 class MetaTreeItem;
 
 

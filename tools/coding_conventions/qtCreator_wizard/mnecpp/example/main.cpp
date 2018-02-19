@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     bemsurfacetreeitem.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     %{CppFileName}
+* @author   %{author} <%{eMail}>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     %{Month}, %{Year}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) %{Year}, %{author} and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,23 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BemSurfaceTreeItem class declaration.
+* @brief     %{exDescription}.
 *
 */
-
-#ifndef DISP3DLIB_BEMSURFACETREEITEM_H
-#define DISP3DLIB_BEMSURFACETREEITEM_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../../../disp3D_global.h"
 
-#include "../common/abstractmeshtreeitem.h"
-#include "../common/types.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -53,88 +50,46 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QPointer>
+#include <QApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// MAIN
 //=============================================================================================================
-
-namespace MNELIB {
-    class MNEBemSurface;
-}
-
-namespace Qt3DCore {
-    class QEntity;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
-
-namespace DISP3DLIB
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DISP3DLIB FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 //=============================================================================================================
 /**
-* BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
 *
-* @brief BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-class DISP3DSHARED_EXPORT BemSurfaceTreeItem : public AbstractMeshTreeItem
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
+    QApplication a(argc, argv);
 
-public:
-    typedef QSharedPointer<BemSurfaceTreeItem> SPtr;             /**< Shared pointer type for BemSurfaceTreeItem class. */
-    typedef QSharedPointer<const BemSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BemSurfaceTreeItem class. */
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Example name");
+    parser.addHelpOption();
 
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    */
-    explicit BemSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
-                                int iType = Data3DTreeModelItemTypes::BemSurfaceItem,
-                                const QString& text = "BEM Surface Item");
+    QCommandLineOption parameterOption("parameter", "The first parameter description.");
 
-    //=========================================================================================================
-    /**
-    * Adds BEM model data.
-    *
-    * @param[in] tBemSurface        The bem data.
-    */
-    void addData(const MNELIB::MNEBemSurface &tBemSurface);
+    parser.addOption(parameterOption);
 
-protected:
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    virtual void initItem() override;
-};
+    parser.process(a);
 
-} //NAMESPACE DISP3DLIB
+    // Add exampel code here
 
-#endif // DISP3DLIB_BEMSURFACETREEITEM_H
+    return a.exec();
+}
