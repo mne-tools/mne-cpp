@@ -53,6 +53,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QDebug>
+#include <QStringList>
 
 
 //*************************************************************************************************************
