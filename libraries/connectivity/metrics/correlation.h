@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.cpp
+* @file     correlation.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Connectivity class definition.
+* @brief     Correlation class declaration.
 *
 */
+
+#ifndef CORRELATION_H
+#define CORRELATION_H
 
 
 //*************************************************************************************************************
@@ -39,13 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity.h"
+#include "../connectivity_global.h"
 
-#include "connectivitysettings.h"
-#include "network/network.h"
-#include "metrics/correlation.h"
-#include "metrics/crosscorrelation.h"
-#include "metrics/phaselagindex.h"
+#include "abstractmetric.h"
 
 
 //*************************************************************************************************************
@@ -53,48 +52,108 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace CONNECTIVITYLIB;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
-: m_pConnectivitySettings(ConnectivitySettings::SPtr(new ConnectivitySettings(connectivitySettings)))
-{
-}
+namespace CONNECTIVITYLIB {
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// CONNECTIVITYLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
-Network Connectivity::calculateConnectivity() const
-{
-    if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
-        return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
-        return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
-        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    }
+class Network;
 
-    return Network();
-}
+
+//=============================================================================================================
+/**
+* This class computes the correlation metric.
+*
+* @brief This class computes the correlation metric.
+*/
+class CONNECTIVITYSHARED_EXPORT Correlation : public AbstractMetric
+{    
+
+public:
+    typedef QSharedPointer<Correlation> SPtr;            /**< Shared pointer type for Correlation. */
+    typedef QSharedPointer<const Correlation> ConstSPtr; /**< Const shared pointer type for Correlation. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a Correlation object.
+    */
+    explicit Correlation();
+
+    //=========================================================================================================
+    /**
+    * Calculates the correlation coefficient between the rows of the data matrix.
+    *
+    * @param[in] matDataList    The input data.
+    * @param[in] matVert        The vertices of each network node.
+    *
+    * @return                   The connectivity information in form of a network structure.
+    */
+    static Network correlationCoeff(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Calculates the actual correlation coefficient between two data vectors.
+    *
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
+    *
+    * @return               The correlation coefficient.
+    */
+    static double calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+
+    //=========================================================================================================
+    /**
+    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
+    *
+    * @param[in] data       The input data.
+    *
+    * @return               The connectivity matrix.
+    */
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed connectivity matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming, temporary result data.
+    */
+    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace CONNECTIVITYLIB
+
+#endif // CORRELATION_H

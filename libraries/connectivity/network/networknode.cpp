@@ -212,7 +212,7 @@ bool NetworkNode::getHubStatus() const
 
 //*************************************************************************************************************
 
-NetworkNode& NetworkNode::operator<<(QSharedPointer<NetworkEdge> newEdge)
+void NetworkNode::append(QSharedPointer<NetworkEdge> newEdge)
 {
     if(newEdge->getEndNode()->getId() == this->getId()) {
         m_lEdgesIn << newEdge;
@@ -221,8 +221,6 @@ NetworkNode& NetworkNode::operator<<(QSharedPointer<NetworkEdge> newEdge)
     if(newEdge->getStartNode()->getId() == this->getId()) {
         m_lEdgesOut << newEdge;
     }
-
-    return *this;
 }
 
 

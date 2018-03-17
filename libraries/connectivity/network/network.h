@@ -86,9 +86,9 @@ class NetworkNode;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class holds information (nodes and connecting edges) about a network, can compute a distance table and provide network metrics.
 *
-* @brief Brief description of this class.
+* @brief This class holds information about a network, can compute a distance table and provide network metrics.
 */
 
 class CONNECTIVITYSHARED_EXPORT Network
@@ -176,19 +176,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Overloaded stream operator to add a network edge to this network.
+    * Appends a network edge to this network node.
     *
-    * @param[in] newEdge    The new edge item as a reference.
+    * @param[in] newEdge    The new edge item.
     */
-    Network &operator<<(QSharedPointer<NetworkEdge> newEdge);
+    void append(QSharedPointer<NetworkEdge> newEdge);
 
     //=========================================================================================================
     /**
-    * Overloaded stream operator to add a network node to this network.
+    * Appends a network edge to this network node.
     *
     * @param[in] newNode    The new node item as a reference.
     */
-    Network &operator<<(QSharedPointer<NetworkNode> newNode);
+    void append(QSharedPointer<NetworkNode> newNode);
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/

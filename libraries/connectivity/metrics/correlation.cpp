@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.cpp
+* @file     correlation.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Connectivity class definition.
+* @brief    Correlation class definition.
 *
 */
 
@@ -39,13 +39,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity.h"
-
-#include "connectivitysettings.h"
+#include "correlation.h"
+#include "network/networknode.h"
+#include "network/networkedge.h"
 #include "network/network.h"
-#include "metrics/correlation.h"
-#include "metrics/crosscorrelation.h"
-#include "metrics/phaselagindex.h"
 
 
 //*************************************************************************************************************
@@ -53,11 +50,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+#include <QElapsedTimer>
+#include <QtConcurrent>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -66,6 +69,8 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,23 +83,95 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
-: m_pConnectivitySettings(ConnectivitySettings::SPtr(new ConnectivitySettings(connectivitySettings)))
+Correlation::Correlation()
 {
 }
 
 
 //*************************************************************************************************************
 
-Network Connectivity::calculateConnectivity() const
+Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
 {
-    if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
-        return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
-        return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
-        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
+    Network finalNetwork("Correlation");
+
+    if(matDataList.empty()) {
+        qDebug() << "Correlation::correlationCoeff - Input data is empty";
+        return finalNetwork;
+    }   
+
+    //Create nodes
+    int rows = matDataList.first().rows();
+    RowVectorXf rowVert = RowVectorXf::Zero(3);
+
+    for(int i = 0; i < rows; ++i) {
+        if(matVert.rows() != 0 && i < matVert.rows()) {
+            rowVert(0) = matVert.row(i)(0);
+            rowVert(1) = matVert.row(i)(1);
+            rowVert(2) = matVert.row(i)(2);
+        }
+
+        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    return Network();
+    //Calculate connectivity matrix over epochs and average afterwards
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
+    resultMat.waitForFinished();
+
+    MatrixXd matDist = resultMat.result();
+    matDist /= matDataList.size();
+
+    //Add edges to network
+    for(int i = 0; i < matDist.rows(); ++i) {
+        for(int j = i; j < matDist.cols(); ++j) {
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matDist(i,j)));
+
+            finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.append(pEdge);
+        }
+    }
+
+    return finalNetwork;
 }
+
+
+//*************************************************************************************************************
+
+double Correlation::calcCorrelationCoeff(const RowVectorXd &vecFirst, const RowVectorXd &vecSecond)
+{
+    if(vecFirst.cols() != vecSecond.cols()) {
+        qDebug() << "Correlation::calcCorrelationCoeff - Vectors length do not match!";
+    }
+
+    return (vecFirst.dot(vecSecond))/vecFirst.cols();
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd Correlation::calculate(const MatrixXd &data)
+{
+    MatrixXd matDist(data.rows(), data.rows());
+    matDist.setZero();
+
+    for(int i = 0; i < data.rows(); ++i) {
+        for(int j = i; j < data.rows(); ++j) {
+            matDist(i,j) += calcCorrelationCoeff(data.row(i), data.row(j));
+        }
+    }
+
+    return matDist;
+}
+
+
+//*************************************************************************************************************
+
+void Correlation::sum(MatrixXd &resultData, const MatrixXd &data)
+{
+    if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
+        resultData.resize(data.rows(), data.cols());
+        resultData.setZero();
+    }
+
+    resultData += data;
+}
+

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.cpp
+* @file     abstractmetric.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Connectivity class definition.
+* @brief     AbstractMetric class declaration.
 *
 */
+
+#ifndef ABSTRACTMETRIC_H
+#define ABSTRACTMETRIC_H
 
 
 //*************************************************************************************************************
@@ -39,13 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity.h"
-
-#include "connectivitysettings.h"
-#include "network/network.h"
-#include "metrics/correlation.h"
-#include "metrics/crosscorrelation.h"
-#include "metrics/phaselagindex.h"
+#include "../connectivity_global.h"
 
 
 //*************************************************************************************************************
@@ -53,48 +50,67 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace CONNECTIVITYLIB;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
-: m_pConnectivitySettings(ConnectivitySettings::SPtr(new ConnectivitySettings(connectivitySettings)))
-{
-}
+namespace CONNECTIVITYLIB {
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// CONNECTIVITYLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
-Network Connectivity::calculateConnectivity() const
-{
-    if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
-        return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
-        return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
-        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    }
 
-    return Network();
-}
+//=============================================================================================================
+/**
+* This class provides basic functionalities for all implemented metrics.
+*
+* @brief This class provides basic functionalities for all implemented metrics.
+*/
+class CONNECTIVITYSHARED_EXPORT AbstractMetric
+{    
+
+public:
+    typedef QSharedPointer<AbstractMetric> SPtr;            /**< Shared pointer type for AbstractMetric. */
+    typedef QSharedPointer<const AbstractMetric> ConstSPtr; /**< Const shared pointer type for AbstractMetric. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a AbstractMetric object.
+    */
+    explicit AbstractMetric();
+
+protected:
+
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace CONNECTIVITYLIB
+
+#endif // ABSTRACTMETRIC_H

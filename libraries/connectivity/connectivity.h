@@ -112,24 +112,6 @@ public:
     Network calculateConnectivity() const;
 
 protected:
-    //=========================================================================================================
-    /**
-    * Generate the source level data based on the current settings.
-    *
-    * @param [out] matData      The source level data.
-    * @param [out] matNodePos   The nodes position in 3D space.
-    */
-    void generateSourceLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
-
-    //=========================================================================================================
-    /**
-    * Generate the sensor level data based on the current settings.
-    *
-    * @param [out] matData      The source level data.
-    * @param [out] matNodePos   The nodes position in 3D space.
-    */
-    void generateSensorLevelData(Eigen::MatrixXd& matData, Eigen::MatrixX3f& matNodePos) const;
-
     QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
 };
 

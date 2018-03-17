@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.cpp
+* @file     abstractmetric.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Connectivity class definition.
+* @brief    AbstractMetric class definition.
 *
 */
 
@@ -39,13 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity.h"
-
-#include "connectivitysettings.h"
-#include "network/network.h"
-#include "metrics/correlation.h"
-#include "metrics/crosscorrelation.h"
-#include "metrics/phaselagindex.h"
+#include "abstractmetric.h"
 
 
 //*************************************************************************************************************
@@ -67,6 +61,7 @@
 
 using namespace CONNECTIVITYLIB;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -78,23 +73,7 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
-: m_pConnectivitySettings(ConnectivitySettings::SPtr(new ConnectivitySettings(connectivitySettings)))
+AbstractMetric::AbstractMetric()
 {
 }
 
-
-//*************************************************************************************************************
-
-Network Connectivity::calculateConnectivity() const
-{
-    if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
-        return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
-        return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
-        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    }
-
-    return Network();
-}

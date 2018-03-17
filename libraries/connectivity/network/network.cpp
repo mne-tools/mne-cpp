@@ -43,6 +43,7 @@
 
 #include "networkedge.h"
 #include "networknode.h"
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -64,7 +65,7 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
-
+using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -155,21 +156,17 @@ QString Network::getConnectivityMethod() const
 
 //*************************************************************************************************************
 
-Network& Network::operator<<(NetworkEdge::SPtr newEdge)
+void Network::append(NetworkEdge::SPtr newEdge)
 {
     m_lEdges << newEdge;
-
-    return *this;
 }
 
 
 //*************************************************************************************************************
 
-Network& Network::operator<<(NetworkNode::SPtr newNode)
+void Network::append(NetworkNode::SPtr newNode)
 {
     m_lNodes << newNode;
-
-    return *this;
 }
 
 
@@ -191,6 +188,7 @@ MatrixXd Network::generateConnectMat() const
         }
     }
 
+    //IOUtils::write_eigen_matrix(matDist,"eigen.txt");
     return matDist;
 }
 
