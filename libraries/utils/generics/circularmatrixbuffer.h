@@ -253,7 +253,7 @@ inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>*
         }
 
         else {
-            printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
+            qDebug()<<"Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions";
         }
     }
 }
