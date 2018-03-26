@@ -76,7 +76,6 @@ using namespace CONNECTIVITYLIB;
 //=============================================================================================================
 
 ConnectivitySettings::ConnectivitySettings()
-: m_sConnectivityMethod("COR")
 {
 }
 

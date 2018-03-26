@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
 
     //Do connectivity estimation and visualize results
     ConnectivitySettings settings;
-    settings.m_sConnectivityMethod = sConnectivityMethod;
+    settings.m_sConnectivityMethods << sConnectivityMethod;
     settings.m_matDataList = matDataList;
     settings.m_matNodePositions = matNodePositions;
 

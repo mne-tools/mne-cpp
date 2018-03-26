@@ -88,11 +88,11 @@ Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
 
 Network Connectivity::calculateConnectivity() const
 {
-    if(m_pConnectivitySettings->m_sConnectivityMethod == "COR") {
+    if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COR")) {
         return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "XCOR") {
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("XCOR")) {
         return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethod == "PLI") {
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLI")) {
         return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
     }
 
