@@ -172,7 +172,7 @@ void Network::append(NetworkNode::SPtr newNode)
 
 //*************************************************************************************************************
 
-MatrixXd Network::generateConnectMat(int row, int col) const
+MatrixXd Network::generateConnectMat(int idxRow, int idxCol) const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();
@@ -184,7 +184,7 @@ MatrixXd Network::generateConnectMat(int row, int col) const
 
         if(row < matDist.rows() && col < matDist.cols())
         {
-            matDist(row,col) = m_lEdges.at(i)->getWeight()(row,col);
+            matDist(row,col) = m_lEdges.at(i)->getWeight()(idxRow, idxCol);
         }
     }
 
