@@ -70,7 +70,7 @@
 #include <QPair>
 #include <QSemaphore>
 #include <QSharedPointer>
-#include <QDebug>
+#include <stdio.h>
 
 
 //*************************************************************************************************************
@@ -254,7 +254,7 @@ inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>*
         }
 
         else {
-            qDebug()<<"Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions";
+            printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
         }
     }
 }
