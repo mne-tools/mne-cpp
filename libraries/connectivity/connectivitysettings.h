@@ -100,7 +100,7 @@ public:
     */
     explicit ConnectivitySettings();
 
-    QString                     m_sConnectivityMethod;          /**< The connectivity method. */
+    QStringList                 m_sConnectivityMethods;         /**< The connectivity methods. */
 
     QList<Eigen::MatrixXd>      m_matDataList;                  /**< The input data. */
     Eigen::MatrixX3f            m_matNodePositions;             /**< The node position in 3D space. */
