@@ -150,47 +150,63 @@ qint16 NetworkNode::getOutdegree() const
 
 //*************************************************************************************************************
 
-double NetworkNode::getStrength() const
+MatrixXd NetworkNode::getStrength() const
 {
-    double strength = 0;
+    MatrixXd matStrength;
 
     for(NetworkEdge::SPtr node : m_lEdgesIn) {
-        strength += node->getWeight();
+        if(matStrength.size() == 0) {
+            matStrength = node->getWeight().setZero();
+        }
+
+        matStrength += node->getWeight();
     }
 
     for(NetworkEdge::SPtr node : m_lEdgesOut) {
-        strength += node->getWeight();
+        if(matStrength.size() == 0) {
+            matStrength = node->getWeight().setZero();
+        }
+
+        matStrength += node->getWeight();
     }
 
-    return strength;
+    return matStrength;
 }
 
 
 //*************************************************************************************************************
 
-double NetworkNode::getInstrength() const
+MatrixXd NetworkNode::getInstrength() const
 {
-    double strength = 0;
+    MatrixXd matStrength;
 
     for(NetworkEdge::SPtr node : m_lEdgesIn) {
-        strength += node->getWeight();
+        if(matStrength.size() == 0) {
+            matStrength = node->getWeight().setZero();
+        }
+
+        matStrength += node->getWeight();
     }
 
-    return strength;
+    return matStrength;
 }
 
 
 //*************************************************************************************************************
 
-double NetworkNode::getOutstrength() const
+MatrixXd NetworkNode::getOutstrength() const
 {
-    double strength = 0;
+    MatrixXd matStrength;
 
     for(NetworkEdge::SPtr node : m_lEdgesOut) {
-        strength += node->getWeight();
+        if(matStrength.size() == 0) {
+            matStrength = node->getWeight().setZero();
+        }
+
+        matStrength += node->getWeight();
     }
 
-    return strength;
+    return matStrength;
 }
 
 

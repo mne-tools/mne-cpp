@@ -202,9 +202,12 @@ protected:
     /**
     * Returns the connectivity matrix for this network structure.
     *
+    * @param[in] row    The row for which the connection matrix is to be produced. E.g. for the first frequency bin/band. Default is 0.
+    * @param[in] col    The column for which the connection matrix is to be produced. E.g. for the first instance in time. Default is 0.
+    *
     * @return    The connectivity matrix generated from the current network information.
     */
-    Eigen::MatrixXd generateConnectMat() const;
+    Eigen::MatrixXd generateConnectMat(int row = 0, int col = 0) const;
 
 };
 

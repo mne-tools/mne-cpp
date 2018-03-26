@@ -177,7 +177,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all edges of a node.
     */
-    double getStrength() const;
+    Eigen::MatrixXd getStrength() const;
 
     //=========================================================================================================
     /**
@@ -185,7 +185,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
     */
-    double getInstrength() const;
+    Eigen::MatrixXd getInstrength() const;
 
     //=========================================================================================================
     /**
@@ -193,7 +193,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
     */
-    double getOutstrength() const;
+    Eigen::MatrixXd getOutstrength() const;
 
     //=========================================================================================================
     /**

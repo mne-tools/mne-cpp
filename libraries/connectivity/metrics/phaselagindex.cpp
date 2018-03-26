@@ -121,8 +121,11 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
 
     //Add edges to network
     for(int i = 0; i < matDist.rows(); ++i) {
-        for(int j = i; j < matDist.cols(); ++j) {
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], abs(matDist(i,j))));
+        for(int j = i; j < matDist.cols(); ++j) {            
+            MatrixXd matWeight(1,1);
+            matWeight << abs(matDist(i,j));
+
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.append(pEdge);
