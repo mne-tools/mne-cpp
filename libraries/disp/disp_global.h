@@ -49,7 +49,7 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
+#if defined(BUILD_STATIC_LIBRARIES)
 #  define DISPSHARED_EXPORT
 #elif defined(DISP_LIBRARY)
 #  define DISPSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

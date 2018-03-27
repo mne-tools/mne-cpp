@@ -39,7 +39,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = lib
 
 QT -= gui
-QT += xml core widgets
+QT += xml core
 QT += network concurrent # Check with HP-UX
 
 DEFINES += UTILS_LIBRARY
@@ -52,9 +52,9 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+contains(MNECPP_CONFIG, buildStaticLibraries) {
     CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
+    DEFINES += BUILD_STATIC_LIBRARIES
 }
 else {
     CONFIG += dll

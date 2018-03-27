@@ -37,6 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
+QT -= gui
+
 VERSION = $${MNE_CPP_VERSION}
 
 CONFIG   += console
