@@ -2,7 +2,7 @@
 
 #include "compute_fwd_settings.h"
 
-
+#include <stdio.h>
 
 
 using namespace Eigen;
