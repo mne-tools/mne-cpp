@@ -160,7 +160,6 @@ public:
     */
     static void get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig, MatrixXd& eigvec);
 
-
     //=========================================================================================================
     /**
     * Find the intersection of two vectors

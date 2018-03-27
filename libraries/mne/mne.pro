@@ -62,9 +62,9 @@ else {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+contains(MNECPP_CONFIG, buildStaticLibraries) {
     CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
+    DEFINES += BUILD_STATIC_LIBRARIES
 }
 else {
     CONFIG += dll
