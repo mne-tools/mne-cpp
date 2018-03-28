@@ -40,7 +40,7 @@
 
 #include "neuronalconnectivity.h"
 
-#include <connectivity/connectivitymeasures.h>
+#include <connectivity/metrics/crosscorrelation.h>
 #include <connectivity/network/network.h>
 
 #include <scMeas/realtimesourceestimate.h>
@@ -48,6 +48,8 @@
 #include <scMeas/newrealtimemultisamplearray.h>
 
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
+
+#include <mne/mne_epoch_data_list.h>
 
 
 //*************************************************************************************************************
@@ -59,6 +61,7 @@ using namespace NEURONALCONNECTIVITYPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
+using namespace MNELIB;
 using namespace CONNECTIVITYLIB;
 
 
@@ -350,7 +353,10 @@ void NeuronalConnectivity::run()
             QElapsedTimer time;
             time.start();
 
-            Network tNetwork = ConnectivityMeasures::crossCorrelation(t_mat, m_matNodeVertComb);
+            QList<MatrixXd> epochDataList;
+            epochDataList.append(t_mat);
+
+            Network tNetwork = CrossCorrelation::crossCorrelation(epochDataList, m_matNodeVertComb);
             qDebug()<<"----------------------------------------";
             qDebug()<<"----------------------------------------";
             qDebug()<<"NeuronalConnectivity::run() - time.elapsed()" << time.elapsed();

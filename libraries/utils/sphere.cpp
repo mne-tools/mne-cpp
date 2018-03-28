@@ -72,7 +72,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Sphere::Sphere( const Vector3f& center, float radius )
+Sphere::Sphere(const Vector3f& center, float radius)
 : m_center(center)
 , m_r(radius)
 {
@@ -134,7 +134,7 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 
 //*************************************************************************************************************
 
-bool Sphere::fit_sphere_to_points ( float **rr, int np, float simplex_size, float *r0, float *R )
+bool Sphere::fit_sphere_to_points(float **rr, int np, float simplex_size, float *r0, float *R)
 {
     MatrixXf rr_eigen(np,3);
     VectorXf r0_eigen(3);
@@ -167,7 +167,7 @@ bool Sphere::fit_sphere_to_points ( float **rr, int np, float simplex_size, floa
 
 //*************************************************************************************************************
 
-bool Sphere::fit_sphere_to_points ( const MatrixXf &rr, float simplex_size, VectorXf &r0, float &R )
+bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, VectorXf &r0, float &R)
 {
 //    int   np = rr.rows();
 
@@ -235,7 +235,7 @@ bool Sphere::report_func(int loop, const VectorXf &fitpar, double fval)
 
 //*************************************************************************************************************
 
-void Sphere::calculate_cm_ave_dist (const MatrixXf &rr, VectorXf &cm, float &avep)
+void Sphere::calculate_cm_ave_dist(const MatrixXf &rr, VectorXf &cm, float &avep)
 {
     cm = rr.colwise().mean();
     MatrixXf diff = rr.rowwise() - cm.transpose();
@@ -245,7 +245,7 @@ void Sphere::calculate_cm_ave_dist (const MatrixXf &rr, VectorXf &cm, float &ave
 
 //*************************************************************************************************************
 
-MatrixXf Sphere::make_initial_simplex( const VectorXf &pars, float size )
+MatrixXf Sphere::make_initial_simplex(const VectorXf &pars, float size)
 {
     /*
     * Make the initial tetrahedron
@@ -266,7 +266,7 @@ MatrixXf Sphere::make_initial_simplex( const VectorXf &pars, float size )
 
 //*************************************************************************************************************
 
-float Sphere::fit_eval ( const VectorXf &fitpar, const void  *user_data)
+float Sphere::fit_eval(const VectorXf &fitpar, const void  *user_data)
 {
     /*
     * Calculate the cost function value

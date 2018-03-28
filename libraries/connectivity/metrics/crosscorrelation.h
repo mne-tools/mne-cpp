@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.h
+* @file     crosscorrelation.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Connectivity class declaration.
+* @brief     CrossCorrelation class declaration.
 *
 */
 
-#ifndef CONNECTIVITY_H
-#define CONNECTIVITY_H
+#ifndef CROSSCORRELATION_H
+#define CROSSCORRELATION_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "../connectivity_global.h"
+
+#include "abstractmetric.h"
 
 
 //*************************************************************************************************************
@@ -80,39 +82,70 @@ namespace CONNECTIVITYLIB {
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ConnectivitySettings;
 class Network;
 
 
 //=============================================================================================================
 /**
-* This class handles the incoming settings and computes the actual connectivity estimation.
+* This class computes the cross correlation connectivity metric.
 *
-* @brief This class is a container for connectivity settings.
+* @brief This class computes the cross correlation connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT Connectivity
-{
+class CONNECTIVITYSHARED_EXPORT CrossCorrelation : public AbstractMetric
+{    
 
 public:
-    typedef QSharedPointer<Connectivity> SPtr;            /**< Shared pointer type for Connectivity. */
-    typedef QSharedPointer<const Connectivity> ConstSPtr; /**< Const shared pointer type for Connectivity. */
+    typedef QSharedPointer<CrossCorrelation> SPtr;            /**< Shared pointer type for CrossCorrelation. */
+    typedef QSharedPointer<const CrossCorrelation> ConstSPtr; /**< Const shared pointer type for CrossCorrelation. */
 
     //=========================================================================================================
     /**
-    * Constructs a Connectivity object.
+    * Constructs a CrossCorrelation object.
     */
-    explicit Connectivity(const ConnectivitySettings& connectivitySettings);
+    explicit CrossCorrelation();
 
     //=========================================================================================================
     /**
-    * Computes the network based on the current settings.
+    * Calculates the cross correlation between the rows of the data matrix.
     *
-    * @return Returns the network.
+    * @param[in] matDataList    The input data.
+    * @param[in] matVert        The vertices of each network node.
+    *
+    * @return                   The connectivity information in form of a network structure.
     */
-    Network calculateConnectivity() const;
+    static Network crossCorrelation(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
 
 protected:
-    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
+    //=========================================================================================================
+    /**
+    * Calculates the actual correlation coefficient between two data vectors.
+    *
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
+    *
+    * @return                The cross position where the maximum correlation was computed.
+    */
+    static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+
+    //=========================================================================================================
+    /**
+    * Calculates the connectivity matrix for a given input data matrix based on the cross correlation coefficient.
+    *
+    * @param[in] data       The input data.
+    *
+    * @return               The connectivity matrix.
+    */
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed connectivity matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming and temporary result data.
+    */
+    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
+
 };
 
 
@@ -124,4 +157,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITY_H
+#endif // CROSSCORRELATION_H

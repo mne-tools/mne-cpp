@@ -76,7 +76,8 @@ VectorXd Spectrogram::gauss_window (qint32 sample_count, qreal scale, quint32 tr
     return gauss;
 }
 
-//-----------------------------------------------------------------------------------------------------------------
+
+//*************************************************************************************************************
 
 MatrixXd Spectrogram::make_spectrogram(VectorXd signal, qint32 window_size = 0)
 {
