@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivitymeasures.h
+* @file     phaselagindex.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     ConnectivityMeasures class declaration.
+* @brief     PhaseLagIndex class declaration.
 *
 */
 
-#ifndef CONNECTIVITYMEASURES_H
-#define CONNECTIVITYMEASURES_H
+#ifndef PHASELAGINDEX_H
+#define PHASELAGINDEX_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "../connectivity_global.h"
 
 
 //*************************************************************************************************************
@@ -51,8 +51,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QPair>
-#include <QString>
 
 
 //*************************************************************************************************************
@@ -87,68 +85,64 @@ class Network;
 
 //=============================================================================================================
 /**
-* This class computes basic (functional) connectivity measures.
+* This class computes the phase lag index connectivity metric.
 *
-* @brief This class computes basic (functional) connectivity measures.
+* @brief This class computes the phase lag index connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT ConnectivityMeasures
+class CONNECTIVITYSHARED_EXPORT PhaseLagIndex
 {    
 
 public:
-    typedef QSharedPointer<ConnectivityMeasures> SPtr;            /**< Shared pointer type for ConnectivityMeasures. */
-    typedef QSharedPointer<const ConnectivityMeasures> ConstSPtr; /**< Const shared pointer type for ConnectivityMeasures. */
+    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
+    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectivityMeasures object.
+    * Constructs a PhaseLagIndex object.
     */
-    explicit ConnectivityMeasures();
+    explicit PhaseLagIndex();
 
     //=========================================================================================================
     /**
-    * Calculates the Pearson's correlation coefficient between the rows of the data matrix.
+    * Calculates the phase lag index between the rows of the data matrix.
     *
-    * @param[in] matData    The input data for whicht the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
+    * @param[in] matDataList    The input data.
+    * @param[in] matVert        The vertices of each network node.
     *
-    * @return               The connectivity information in form of a network structure.
+    * @return                   The connectivity information in form of a network structure.
     */
-    static Network pearsonsCorrelationCoeff(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
-
-    //=========================================================================================================
-    /**
-    * Calculates the cross correlation between the rows of the data matrix.
-    *
-    * @param[in] matData    The input data for which the cross correlation is to be calculated.
-    * @param[in] matVert    The vertices of each network node.
-    *
-    * @return               The connectivity information in form of a network structure.
-    */
-    static Network crossCorrelation(const Eigen::MatrixXd& matData, const Eigen::MatrixX3f& matVert);
+    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
 
 protected:
-    //=========================================================================================================
+    //==========================================================================================================
     /**
-    * Calculates the actual Pearson's correlation coefficient between two data vectors.
+    * Calculates the actual phase lag index between two data vectors.
     *
     * @param[in] vecFirst    The first input data row.
     * @param[in] vecSecond   The second input data row.
     *
-    * @return               The Pearson's correlation coefficient.
+    * @return                The PLI value.
     */
-    static double calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+    static int calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 
     //=========================================================================================================
     /**
-    * Calculates the actual cross correlation between two data vectors.
+    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
     *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
+    * @param[in] data       The input data.
     *
-    * @return               The result in form of a QPair. First element represents the index of the maximum. Second element represents the actual correlation value.
+    * @return               The connectivity matrix.
     */
-    static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
 
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed connectivity matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming, temporary result data.
+    */
+    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
 };
 
 
@@ -160,4 +154,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITYMEASURES_H
+#endif // PHASELAGINDEX_H

@@ -1,14 +1,14 @@
- //=============================================================================================================
+//=============================================================================================================
 /**
-* @file     connectivitymeasures.cpp
+* @file     phaselagindex.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2016
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ConnectivityMeasures class definition.
+* @brief    PhaseLagIndex class definition.
 *
 */
 
@@ -39,12 +39,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivitymeasures.h"
+#include "phaselagindex.h"
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-
-#include <iostream>
 
 
 //*************************************************************************************************************
@@ -53,6 +51,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -83,41 +82,53 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ConnectivityMeasures::ConnectivityMeasures()
+PhaseLagIndex::PhaseLagIndex()
 {
 }
 
 
-//*************************************************************************************************************
+//*******************************************************************************************************
 
-Network ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, const MatrixX3f& matVert)
+Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
 {
-    Network finalNetwork("Pearson's Correlation Coefficient");
+    Network finalNetwork("Phase Lag Index");
+
+    if(matDataList.empty()) {
+        qDebug() << "PhaseLagIndex::phaseLagIndex - Input data is empty";
+        return finalNetwork;
+    }
 
     //Create nodes
-    for(int i = 0; i < matData.rows(); ++i) {
-        RowVectorXf rowVert = RowVectorXf::Zero(3);
+    int rows = matDataList.first().rows();
+    RowVectorXf rowVert = RowVectorXf::Zero(3);
 
+    for(int i = 0; i < rows; ++i) {
         if(matVert.rows() != 0 && i < matVert.rows()) {
             rowVert(0) = matVert.row(i)(0);
             rowVert(1) = matVert.row(i)(1);
             rowVert(2) = matVert.row(i)(2);
         }
 
-        finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
+        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    //Create edges
-    double pearsonsCoeff;
+    //Calculate connectivity matrix over epochs and average afterwards
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
+    resultMat.waitForFinished();
 
-    for(int i = 0; i < matData.rows(); ++i) {
-        for(int j = i; j < matData.rows(); ++j) {
-            pearsonsCoeff = calcPearsonsCorrelationCoeff(matData.row(i), matData.row(j));
+    MatrixXd matDist = resultMat.result();
+    matDist /= matDataList.size();
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], pearsonsCoeff));
+    //Add edges to network
+    for(int i = 0; i < matDist.rows(); ++i) {
+        for(int j = i; j < matDist.cols(); ++j) {            
+            MatrixXd matWeight(1,1);
+            matWeight << abs(matDist(i,j));
 
-            *finalNetwork.getNodeAt(i) << pEdge;
-            finalNetwork << pEdge;
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
+
+            finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.append(pEdge);
         }
     }
 
@@ -127,59 +138,7 @@ Network ConnectivityMeasures::pearsonsCorrelationCoeff(const MatrixXd& matData, 
 
 //*************************************************************************************************************
 
-Network ConnectivityMeasures::crossCorrelation(const MatrixXd& matData, const MatrixX3f& matVert)
-{
-    Network finalNetwork("Cross Correlation");
-
-    //Create nodes
-    for(int i = 0; i < matData.rows(); ++i) {
-        RowVectorXf rowVert = RowVectorXf::Zero(3);
-
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
-        }
-
-        finalNetwork << NetworkNode::SPtr(new NetworkNode(i, rowVert));
-    }
-
-    //Create edges
-    QPair<int,double> crossCorrPair;
-
-    for(int i = 0; i < matData.rows(); ++i) {
-        for(int j = i; j < matData.rows(); ++j) {
-            crossCorrPair = calcCrossCorrelation(matData.row(i), matData.row(j));
-
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], crossCorrPair.second));
-
-            *finalNetwork.getNodeAt(i) << pEdge;
-            finalNetwork << pEdge;
-        }
-    }
-
-//    finalNetwork.scale();
-//    matDist /= matDist.maxCoeff();
-
-    return finalNetwork;
-}
-
-
-//*************************************************************************************************************
-
-double ConnectivityMeasures::calcPearsonsCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond)
-{
-    if(vecFirst.cols() != vecSecond.cols()) {
-        qDebug() << "ConnectivityMeasures::calcPearsonsCorrelationCoeff - Vectors length do not match!";
-    }
-
-    return (vecFirst.dot(vecSecond))/vecFirst.cols();
-}
-
-
-//*************************************************************************************************************
-
-QPair<int,double> ConnectivityMeasures::calcCrossCorrelation(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
+int PhaseLagIndex::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
 {
     Eigen::FFT<double> fft;
 
@@ -188,8 +147,6 @@ QPair<int,double> ConnectivityMeasures::calcCrossCorrelation(const RowVectorXd& 
     //Compute the FFT size as the "next power of 2" of the input vector's length (max)
     int b = ceil(log2(2.0 * N - 1));
     int fftsize = pow(2,b);
-//    int end = fftsize - 1;
-//    int maxlag = N - 1;
 
     //Zero Padd
     RowVectorXd xCorrInputVecFirst = RowVectorXd::Zero(fftsize);
@@ -209,33 +166,124 @@ QPair<int,double> ConnectivityMeasures::calcCrossCorrelation(const RowVectorXd& 
     freqvec2.conjugate();
 
     //Main step of cross corr
-    for (int i = 0; i < fftsize; i++) {
-        freqvec[i] = freqvec[i] * freqvec2[i];
+    freqvec = freqvec.array() * freqvec2.array();
+
+    std::complex<double> cdCSD = freqvec.mean();
+
+    int iSignResult = 0.0;
+    for (int i = 0; i < freqvec.cols(); i++) {
+        //signum and addition of all values
+        if (cdCSD.imag() > 0.0) {
+            iSignResult = 1.0;
+        } else if (cdCSD.imag() == 0.0) {
+            iSignResult = 0.0;
+        } else {
+            iSignResult = -1.0;
+        }
     }
 
-    RowVectorXd result;
-    fft.inv(result, freqvec);
+    return iSignResult;
 
-    //Will get rid of extra zero padding
-    RowVectorXd result2 = result;//.segment(maxlag, N);
+//    //Hilbert function
+//    Eigen::FFT<double> fft;
 
-    QPair<int,int> minMaxRange;
-    int idx = 0;
-    result2.minCoeff(&idx);
-    minMaxRange.first = idx;
-    result2.maxCoeff(&idx);
-    minMaxRange.second = idx;
+//    int N = std::max(vecFirst.cols(), vecSecond.cols());
 
-//    std::cout<<"result2(minMaxRange.first)"<<result2(minMaxRange.first)<<std::endl;
-//    std::cout<<"result2(minMaxRange.second)"<<result2(minMaxRange.second)<<std::endl;
-//    std::cout<<"b"<<b<<std::endl;
-//    std::cout<<"fftsize"<<fftsize<<std::endl;
-//    std::cout<<"end"<<end<<std::endl;
-//    std::cout<<"maxlag"<<maxlag<<std::endl;
+//    //Compute the FFT size as the "next power of 2" of the input vector's length (max)
+//    int b = ceil(log2(2.0 * N - 1));
+//    int fftsize = pow(2,b);
 
-    //Return val
-    int resultIndex = minMaxRange.second;
-    double maxValue = result2(resultIndex);
+//    //Zero Padd
+//    RowVectorXd pLagInputVecFirst = RowVectorXd::Zero(fftsize);
+//    pLagInputVecFirst.head(vecFirst.cols()) = vecFirst;
 
-    return QPair<int,double>(resultIndex, maxValue);
+//    RowVectorXd pLagInputVecSecond = RowVectorXd::Zero(fftsize);
+//    pLagInputVecSecond.head(vecSecond.cols()) = vecSecond;
+
+//    //FFT for freq domain to both vectors
+//    RowVectorXcd freqvec;
+//    RowVectorXcd freqvec2;
+
+//    fft.fwd(freqvec, pLagInputVecFirst);
+//    fft.fwd(freqvec2, pLagInputVecSecond);
+
+//    //removing the negative frequencies
+//    RowVectorXcd freqpos;
+//    RowVectorXcd freqpos2;
+
+//    freqpos = freqvec;
+//    freqpos2 = freqvec2;
+
+//    //inverse FFT of the results
+//    RowVectorXd invfreq;
+//    RowVectorXd invfreq2;
+
+//    fft.inv(invfreq, freqpos);
+//    fft.inv(invfreq2, freqpos2);
+
+//    //Hilbert function end
+//    //Phase calculation
+//    RowVectorXd phase;
+//    RowVectorXd phase2;
+//    RowVectorXd phasediff;
+
+//    phase =  (invfreq.cwiseQuotient(pLagInputVecFirst));
+//    phase2 = (invfreq2.cwiseQuotient(pLagInputVecSecond));
+
+//    for(int i = 0; i<phase.cols(); ++i) {
+//        phase[i] = atan(phase[i]);
+//    }
+
+//    for(int i = 0; i<phase2.cols(); ++i) {
+//        phase2[i] = atan(phase2[i]);
+//    }
+//    phasediff = phase - phase2;
+
+//    //std::cout << phasediff << std::endl;
+
+//    //Main Phase Lag Index calculation
+//    RowVectorXd signResult(phasediff.cols());
+
+//    for (int i = 0; i < phasediff.cols(); i++) {
+//        //signum and addition of all values
+//        if (phasediff[i] > 0) {
+//            signResult[i] = 1.0;
+//        } else if (phasediff[i] == 0) {
+//            signResult[i] = 0.0;
+//        } else {
+//            signResult[i] = -1.0;
+//        }
+//    }
+
+//    return signResult;
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd PhaseLagIndex::calculate(const MatrixXd &data)
+{
+    MatrixXd matDist(data.rows(), data.rows());
+    matDist.setZero();
+
+    for(int i = 0; i < data.rows(); ++i) {
+        for(int j = i; j < data.rows(); ++j) {
+            matDist(i,j) += calcPhaseLagIndex(data.row(i), data.row(j));
+        }
+    }
+
+    return matDist;
+}
+
+
+//*************************************************************************************************************
+
+void PhaseLagIndex::sum(MatrixXd &resultData, const MatrixXd &data)
+{
+    if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
+        resultData.resize(data.rows(), data.cols());
+        resultData.setZero();
+    }
+
+    resultData += data;
 }
