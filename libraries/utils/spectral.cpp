@@ -102,6 +102,36 @@ MatrixXcd Spectral::computeTaperedSpectra(const VectorXd &vecData,
 
 //*************************************************************************************************************
 
+RowVectorXd Spectral::psdFromTaperedSpectra(const MatrixXcd &matTapSpectrum,
+                                            const VectorXd &vecTapWeights,
+                                            int iNfft,
+                                            double dSampFreq)
+{
+    //Check inputs
+    if (matTapSpectrum.rows() != vecTapWeights.rows()) {
+        return RowVectorXd();
+    }
+
+    //Compute PSD (average over tapers if necessary)
+    double denom = vecTapWeights.cwiseAbs2().sum();  //We use fix weights (adaptive weights not yet supported)
+    RowVectorXd vecPsd = (vecTapWeights.asDiagonal() * matTapSpectrum).cwiseAbs2().colwise().sum() / denom;
+
+    //multiply by 2 due to half spectrum
+    vecPsd *= 2.0;
+    vecPsd(0) /= 2.0;
+    if (iNfft % 2 == 0){
+        vecPsd.tail(1) /= 2.0;
+    }
+
+    //Normalization
+    vecPsd /= (double(iNfft) * dSampFreq);
+
+    return vecPsd;
+}
+
+
+//*************************************************************************************************************
+
 VectorXd Spectral::calculateFFTFreqs(int iNfft, double dSampFreq)
 {
     //Compute FFT frequencies

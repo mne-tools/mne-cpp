@@ -103,6 +103,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Calculates the power spectral density of given tapered spectrum
+    *
+    * @param[in] vecTapSpectrum    tapered spectrum, for which the PSD is calculated
+    * @param[in] vecTapWeights     taper weights
+    * @param[in] iNfft             FFT length
+    * @param[in] dSampFreq         sampling frequency of the input data
+    *
+    * @return power spectral density of a given tapered spectrum
+    */
+    static Eigen::RowVectorXd psdFromTaperedSpectra(const Eigen::MatrixXcd &matTapSpectrum,
+                                                    const Eigen::VectorXd &vecTapWeights,
+                                                    int iNfft,
+                                                    double dSampFreq=1.0);
+
+    //=========================================================================================================
+    /**
     * Calculates the FFT frequencies
     *
     * @param[in] iNfft            FFT length
