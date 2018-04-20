@@ -94,7 +94,8 @@ SOURCES += \
     generics/buffer.cpp \
     generics/circularbuffer.cpp \
     generics/circularmatrixbuffer.cpp \
-    generics/observerpattern.cpp
+    generics/observerpattern.cpp \
+    spectral.cpp
 
 
 HEADERS += \
@@ -126,7 +127,8 @@ HEADERS += \
     generics/circularmultichannelbuffer_old.h \
     generics/commandpattern.h \
     generics/observerpattern.h \
-    generics/typename_old.h
+    generics/typename_old.h \
+    spectral.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
