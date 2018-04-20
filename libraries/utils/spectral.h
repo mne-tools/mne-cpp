@@ -119,6 +119,24 @@ public:
 
     //=========================================================================================================
     /**
+    * Calculates the cross-spectral density of the tapered spectra of seed and target
+    *
+    * @param[in] vecTapSpectrumSeed      tapered spectrum of the seed
+    * @param[in] vecTapSpectrumTarget    tapered spectrum of the target
+    * @param[in] vecTapWeights           taper weights
+    * @param[in] iNfft                   FFT length
+    * @param[in] dSampFreq               sampling frequency of the input data
+    *
+    * @return cross-spectral density of the tapered spectra of seed and target
+    */
+    static Eigen::RowVectorXcd csdFromTaperedSpectra(const Eigen::MatrixXcd &vecTapSpectrumSeed,
+                                                     const Eigen::MatrixXcd &vecTapSpectrumTarget,
+                                                     const Eigen::VectorXd &vecTapWeights,
+                                                     int iNfft,
+                                                     double dSampFreq=1.0);
+
+    //=========================================================================================================
+    /**
     * Calculates the FFT frequencies
     *
     * @param[in] iNfft            FFT length
