@@ -97,7 +97,7 @@ public:
     *
     * @return tapered spectra of the input data
     */
-    static Eigen::MatrixXcd computeTaperedSpectra(const Eigen::VectorXd &vecData,
+    static Eigen::MatrixXcd computeTaperedSpectra(const Eigen::RowVectorXd &vecData,
                                                   const Eigen::MatrixXd &matTaper,
                                                   int iNfft);
 

@@ -75,7 +75,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXcd Spectral::computeTaperedSpectra(const VectorXd &vecData,
+MatrixXcd Spectral::computeTaperedSpectra(const RowVectorXd &vecData,
                                           const MatrixXd &matTaper,
                                           int iNfft)
 {
