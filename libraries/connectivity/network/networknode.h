@@ -177,7 +177,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all edges of a node.
     */
-    double getStrength() const;
+    Eigen::MatrixXd getStrength() const;
 
     //=========================================================================================================
     /**
@@ -185,7 +185,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
     */
-    double getInstrength() const;
+    Eigen::MatrixXd getInstrength() const;
 
     //=========================================================================================================
     /**
@@ -193,7 +193,7 @@ public:
     *
     * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
     */
-    double getOutstrength() const;
+    Eigen::MatrixXd getOutstrength() const;
 
     //=========================================================================================================
     /**
@@ -213,11 +213,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Overloaded stream operator to add a network edge to this network node.
+    * Appends a network edge to this network node. Automatically decides whether to add to the in or out edges.
     *
-    * @param[in] newEdge    The new edge item as a reference.
+    * @param[in] newEdge    The new edge item.
     */
-    NetworkNode &operator<<(QSharedPointer<NetworkEdge> newEdge);
+    void append(QSharedPointer<NetworkEdge> newEdge);
 
 protected:
     bool                                    m_bIsHub;       /**< Whether this node is a hub.*/

@@ -178,7 +178,7 @@
         <item row="0" column="0" colspan="2">
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>4</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="View">
            <attribute name="title">
@@ -271,7 +271,7 @@
                <number>1</number>
               </property>
               <property name="maximum">
-               <number>10</number>
+               <number>30</number>
               </property>
               <property name="value">
                <number>1</number>

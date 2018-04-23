@@ -58,6 +58,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include<Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -101,9 +103,11 @@ public:
     *
     * @param[in]  pStartNode        The start node of the edge.
     * @param[in]  pEndNode          The end node of the edge.
-    * @param[in]  dWeight           The edge weight.
+    * @param[in]  matWeight         The edge weight.
     */
-    explicit NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight);
+    explicit NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
+                         QSharedPointer<NetworkNode> pEndNode,
+                         Eigen::MatrixXd& matWeight);
 
     //=========================================================================================================
     /**
@@ -125,13 +129,13 @@ public:
     /**
     * Returns the edge weight.
     */
-    double getWeight() const;
+    Eigen::MatrixXd getWeight() const;
 
 protected:
     QSharedPointer<NetworkNode>     m_pStartNode;       /**< The start node of the edge.*/
     QSharedPointer<NetworkNode>     m_pEndNode;         /**< The end node of the edge.*/
 
-    double                          m_dWeight;          /**< The weight of the edge.*/
+    Eigen::MatrixXd                 m_matWeight;        /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
 
 };
 

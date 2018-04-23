@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.h
+* @file     abstractmetric.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Connectivity class declaration.
+* @brief    AbstractMetric class definition.
 *
 */
-
-#ifndef CONNECTIVITY_H
-#define CONNECTIVITY_H
 
 
 //*************************************************************************************************************
@@ -42,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "abstractmetric.h"
 
 
 //*************************************************************************************************************
@@ -50,78 +47,33 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE GLOBAL METHODS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-class ConnectivitySettings;
-class Network;
-
-
-//=============================================================================================================
-/**
-* This class handles the incoming settings and computes the actual connectivity estimation.
-*
-* @brief This class is a container for connectivity settings.
-*/
-class CONNECTIVITYSHARED_EXPORT Connectivity
+AbstractMetric::AbstractMetric()
 {
+}
 
-public:
-    typedef QSharedPointer<Connectivity> SPtr;            /**< Shared pointer type for Connectivity. */
-    typedef QSharedPointer<const Connectivity> ConstSPtr; /**< Const shared pointer type for Connectivity. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a Connectivity object.
-    */
-    explicit Connectivity(const ConnectivitySettings& connectivitySettings);
-
-    //=========================================================================================================
-    /**
-    * Computes the network based on the current settings.
-    *
-    * @return Returns the network.
-    */
-    Network calculateConnectivity() const;
-
-protected:
-    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
-};
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-} // namespace CONNECTIVITYLIB
-
-#endif // CONNECTIVITY_H
