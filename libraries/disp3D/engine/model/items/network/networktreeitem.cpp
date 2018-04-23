@@ -241,7 +241,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
             start = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
             end = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
 
-            if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()) >= vecThreshold.x() &&
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()(0,0)) >= vecThreshold.x() &&
                     start != end) {
                 tMatLines.conservativeResize(count+1,2);
                 tMatLines(count,0) = start;
@@ -255,7 +255,7 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
             start = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
             end = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
 
-            if(std::fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()) >= vecThreshold.x() &&
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0)) >= vecThreshold.x() &&
                     start != end) {
                 tMatLines.conservativeResize(count+1,2);
                 tMatLines(count,0) = start;

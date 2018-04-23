@@ -190,7 +190,7 @@ INSTALLS += header_files
 
 OTHER_FILES +=
 
-contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
+contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
     DEFINES += BUILD_BASIC_MNESCAN_VERSION
 }
 
