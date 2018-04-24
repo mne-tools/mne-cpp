@@ -44,6 +44,8 @@
 
 #include "../connectivity_global.h"
 
+#include "abstractmetric.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,7 +91,7 @@ class Network;
 *
 * @brief This class computes the phase lag index connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex
+class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
 {    
 
 public:
