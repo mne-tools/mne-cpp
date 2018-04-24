@@ -92,24 +92,26 @@ SOURCES += \
     metrics/abstractmetric.cpp \
     metrics/correlation.cpp \
     metrics/crosscorrelation.cpp \
+    metrics/coherency.cpp \
     metrics/phaselagindex.cpp \
     network/network.cpp \
     network/networknode.cpp \
     network/networkedge.cpp \
     connectivitysettings.cpp \
-    connectivity.cpp \
+    connectivity.cpp
 
 HEADERS += \
     connectivity_global.h \
     metrics/abstractmetric.h \
     metrics/correlation.h \
     metrics/crosscorrelation.h \
+    metrics/coherency.h
     metrics/phaselagindex.h \
     network/network.h \
     network/networknode.h \
     network/networkedge.h \
     connectivitysettings.h \
-    connectivity.h \
+    connectivity.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
