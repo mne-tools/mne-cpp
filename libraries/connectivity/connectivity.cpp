@@ -46,6 +46,7 @@
 #include "metrics/correlation.h"
 #include "metrics/crosscorrelation.h"
 #include "metrics/phaselagindex.h"
+#include "metrics/coherency.h"
 
 
 //*************************************************************************************************************
@@ -94,6 +95,9 @@ Network Connectivity::calculateConnectivity() const
         return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLI")) {
         return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COHY")) {
+        return Coherency::coherency(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
+                                    m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
     }
 
     return Network();
