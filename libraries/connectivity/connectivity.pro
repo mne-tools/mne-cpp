@@ -105,7 +105,7 @@ HEADERS += \
     metrics/abstractmetric.h \
     metrics/correlation.h \
     metrics/crosscorrelation.h \
-    metrics/coherency.h
+    metrics/coherency.h \
     metrics/phaselagindex.h \
     network/network.h \
     network/networknode.h \
