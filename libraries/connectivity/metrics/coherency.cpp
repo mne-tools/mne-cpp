@@ -92,51 +92,6 @@ Coherency::Coherency()
 }
 
 
-//*******************************************************************************************************
-
-//Network Coherency::coherency(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert, int iNfft,
-//                             const QString &sWindowType)
-//{
-//    Network finalNetwork("Coherency");
-
-//    if(matDataList.empty()) {
-//        qDebug() << "Coherency::coherency - Input data is empty";
-//        return finalNetwork;
-//    }
-
-//    //Create nodes
-//    int rows = matDataList.first().rows();
-//    RowVectorXf rowVert = RowVectorXf::Zero(3);
-
-//    for(int i = 0; i < rows; ++i) {
-//        if(matVert.rows() != 0 && i < matVert.rows()) {
-//            rowVert(0) = matVert.row(i)(0);
-//            rowVert(1) = matVert.row(i)(1);
-//            rowVert(2) = matVert.row(i)(2);
-//        }
-
-//        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
-//    }
-
-//    //Calculate all-to-all coherency matrix over epochs
-//    QVector<MatrixXcd> vecCoh = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
-
-//    //Add edges to network
-//    for(int i = 0; i < vecCoh.length(); ++i) {
-//        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
-//            MatrixXcd matWeight = vecCoh.at(i).row(j);
-
-//            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
-
-//            finalNetwork.getNodeAt(i)->append(pEdge);
-//            finalNetwork.append(pEdge);
-//        }
-//    }
-
-//    return finalNetwork;
-//}
-
-
 //*************************************************************************************************************
 
 QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataList,

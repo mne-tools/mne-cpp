@@ -107,18 +107,6 @@ public:
     */
     explicit Coherency();
 
-//    //=========================================================================================================
-//    /**
-//    * Calculates the coherency between the rows of the data matrix.
-//    *
-//    * @param[in] matDataList    The input data.
-//    * @param[in] matVert        The vertices of each network node.
-//    *
-//    * @return                   The connectivity information in form of a network structure.
-//    */
-//    static Network coherency(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-//                             int iNfft, const QString &sWindowType);
-
     //=========================================================================================================
     /**
     * Calculates the coherency of the rows of the data matrix.
