@@ -43,22 +43,8 @@
 //=============================================================================================================
 
 #include "scdisp_global.h"
-
 #include "newmeasurementwidget.h"
-
-#include <scMeas/newrealtimemultisamplearray.h>
-
 //#include "annotationwindow.h"
-
-#include "helpers/realtimemultisamplearraymodel.h"
-#include "helpers/realtimemultisamplearraydelegate.h"
-#include "disp/selectionmanagerwindow.h"
-#include "disp/helpers/chinfomodel.h"
-#include "helpers/quickcontrolwidget.h"
-
-#include "disp/filterwindow.h"
-
-#include <math.h>
 
 
 //*************************************************************************************************************
@@ -75,26 +61,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
 #include <QMap>
-#include <QTableView>
-#include <QAction>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QTimer>
-#include <QTime>
-#include <QVBoxLayout>
-#include <QHeaderView>
-#include <QMenu>
-#include <QMessageBox>
-#include <QSettings>
-#include <QScroller>
-#include <QScrollBar>
-#include <QDebug>
-#include <QColor>
-#include <QToolBox>
 
 
 //*************************************************************************************************************
@@ -103,6 +70,8 @@
 //=============================================================================================================
 
 class QTime;
+class QTableView;
+class QToolBox;
 
 namespace DISP3DLIB {
     class SensorDataTreeItem;
@@ -111,11 +80,24 @@ namespace DISP3DLIB {
     class Data3DTreeModel;
 }
 
+namespace DISPLIB {
+    class SelectionManagerWindow;
+    class FilterWindow;
+    class ChInfoModel;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
 namespace MNELIB {
     class MNEBem;
 }
 
-namespace SCMEASLIB{class NewRealTimeMultiSampleArray;}
+namespace SCMEASLIB{
+    class NewRealTimeMultiSampleArray;
+    class RealTimeSampleArrayChInfo;
+}
 
 
 //*************************************************************************************************************
@@ -129,27 +111,20 @@ namespace SCDISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace SCMEASLIB;
-using namespace DISPLIB;
+class RealTimeMultiSampleArrayModel;
+class RealTimeMultiSampleArrayDelegate;
+class QuickControlWidget;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// ENUMERATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
+using namespace SCMEASLIB;
 
 
 //=============================================================================================================
@@ -290,7 +265,7 @@ signals:
     *
     * @param FiffInfo the current loaded fiffinfo
     */
-    void fiffFileUpdated(const FiffInfo&);
+    void fiffFileUpdated(const FIFFLIB::FiffInfo&);
 
     //=========================================================================================================
     /**
@@ -415,14 +390,13 @@ private slots:
     void onMakeScreenshot(const QString& imageType);
 
 private:
-
-    RealTimeMultiSampleArrayModel::SPtr         m_pRTMSAModel;                  /**< RTMSA data model */
-    RealTimeMultiSampleArrayDelegate::SPtr      m_pRTMSADelegate;               /**< RTMSA data delegate */
-    QuickControlWidget::SPtr                    m_pQuickControlWidget;          /**< quick control widget. */
-    ChInfoModel::SPtr                           m_pChInfoModel;                 /**< channel info model. */
-    NewRealTimeMultiSampleArray::SPtr           m_pRTMSA;                       /**< The real-time sample array measurement. */
-    SelectionManagerWindow::SPtr                m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
-    FilterWindow::SPtr                          m_pFilterWindow;                /**< Filter window. */
+    QSharedPointer<RealTimeMultiSampleArrayModel>       m_pRTMSAModel;                  /**< RTMSA data model */
+    QSharedPointer<RealTimeMultiSampleArrayDelegate>    m_pRTMSADelegate;               /**< RTMSA data delegate */
+    QSharedPointer<QuickControlWidget>                  m_pQuickControlWidget;          /**< quick control widget. */
+    QSharedPointer<DISPLIB::ChInfoModel>                m_pChInfoModel;                 /**< channel info model. */
+    QSharedPointer<NewRealTimeMultiSampleArray>         m_pRTMSA;                       /**< The real-time sample array measurement. */
+    QSharedPointer<DISPLIB::SelectionManagerWindow>     m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
+    QSharedPointer<DISPLIB::FilterWindow>               m_pFilterWindow;                /**< Filter window. */
 
     bool                                        m_bInitialized;                 /**< Is Initialized */
     bool                                        m_bHideBadChannels;             /**< hide bad channels flag. */
@@ -437,16 +411,13 @@ private:
     QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
     QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda  */
     QList<qint32>                               m_qListBadChannels;             /**< Current list of bad channels  */
-    QList<RealTimeSampleArrayChInfo>            m_qListChInfo;                  /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
+    QList<SCMEASLIB::RealTimeSampleArrayChInfo> m_qListChInfo;                  /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
     QMap<qint32,float>                          m_qMapChScaling;                /**< Channel scaling values. */
 
-    FiffInfo::SPtr                              m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QDoubleSpinBox*                             m_pDoubleSpinBoxZoom;           /**< Adjust Zoom Factor */
-    QSpinBox*                                   m_pSpinBoxTimeScale;            /**< Time scale spin box */
-    QSpinBox*                                   m_pSpinBoxDSFactor;             /**< downsampling factor */
     QTableView*                                 m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt. */
-    QToolBox*                                   m_pToolBox;                     /**< The toolbox which holds the table view and real-time interpolation plot. */
+    QSharedPointer<QToolBox>                    m_pToolBox;                     /**< The toolbox which holds the table view and real-time interpolation plot. */
 
     QSharedPointer<DISP3DLIB::View3D>           m_p3DView;                      /**< The Disp3D view. */
     QSharedPointer<DISP3DLIB::Control3DWidget>  m_pControl3DView;               /**< The Disp3D control. */
