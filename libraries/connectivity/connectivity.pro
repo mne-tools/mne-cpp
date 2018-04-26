@@ -94,6 +94,13 @@ SOURCES += \
     metrics/crosscorrelation.cpp \
     metrics/coherency.cpp \
     metrics/phaselagindex.cpp \
+    metrics/coherence.cpp \
+    metrics/imagcoherence.cpp \
+    metrics/phaselagindexnew.cpp \
+    metrics/unbiasedsquaredphaselagindex.cpp \
+    metrics/phaselockingvalue.cpp \
+    metrics/weightedphaselagindex.cpp \
+    metrics/debiasedsquaredweightedphaselagindex.cpp \
     network/network.cpp \
     network/networknode.cpp \
     network/networkedge.cpp \
@@ -107,6 +114,13 @@ HEADERS += \
     metrics/crosscorrelation.h \
     metrics/coherency.h \
     metrics/phaselagindex.h \
+    metrics/coherence.h \
+    metrics/imagcoherence.h \
+    metrics/phaselagindexnew.h \
+    metrics/unbiasedsquaredphaselagindex.h \
+    metrics/phaselockingvalue.h \
+    metrics/weightedphaselagindex.h \
+    metrics/debiasedsquaredweightedphaselagindex.h \
     network/network.h \
     network/networknode.h \
     network/networkedge.h \
