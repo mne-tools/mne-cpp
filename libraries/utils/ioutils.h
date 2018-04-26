@@ -354,7 +354,6 @@ bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path)
 template<typename T>
 bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path)
 {
-    qDebug() << "Matrix!";
     QFile file(path);
 
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {

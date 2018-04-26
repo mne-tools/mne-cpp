@@ -133,7 +133,11 @@ public:
     * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] parent            The parent of widget.
     */
-    QuickControlWidget(const QMap<qint32, float>& qMapChScaling, const FiffInfo::SPtr pFiffInfo, const QString& name = "", const QStringList& slFlags = QStringList("Scaling"), QWidget *parent = Q_NULLPTR);
+    QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
+                       const FiffInfo::SPtr pFiffInfo,
+                       const QString& name = "",
+                       const QStringList& slFlags = QStringList("Scaling"),
+                       QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**

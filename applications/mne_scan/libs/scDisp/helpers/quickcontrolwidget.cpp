@@ -62,7 +62,12 @@ using namespace SCDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling, const FiffInfo::SPtr pFiffInfo, const QString& name, const QStringList& slFlags, QWidget *parent)
+QuickControlWidget::QuickControlWidget(const QMap<qint32,
+                                       float>& qMapChScaling,
+                                       const FiffInfo::SPtr pFiffInfo,
+                                       const QString& name,
+                                       const QStringList& slFlags,
+                                       QWidget *parent)
 : RoundedEdgesWidget(parent, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)

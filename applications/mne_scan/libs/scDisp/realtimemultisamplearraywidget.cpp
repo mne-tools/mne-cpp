@@ -47,7 +47,31 @@
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
+#include "helpers/realtimemultisamplearraymodel.h"
+#include "helpers/realtimemultisamplearraydelegate.h"
+#include "helpers/quickcontrolwidget.h"
+
+#include <disp/filterwindow.h>
+#include <disp/selectionmanagerwindow.h>
+#include <disp/helpers/chinfomodel.h>
+
+#include <scMeas/newrealtimemultisamplearray.h>
+
 #include <mne/mne_bem.h>
+
+#include <math.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QSvgGenerator>
+#include <QTableView>
+#include <QToolBox>
+#include <QMenu>
+#include <QAction>
 
 
 //*************************************************************************************************************
@@ -58,18 +82,8 @@
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 using namespace MNELIB;
-
-
-//=============================================================================================================
-/**
-* Tool enumeration.
-*/
-enum Tool
-{
-    Freeze     = 0,     /**< Freezing tool. */
-    Annotation = 1      /**< Annotation tool. */
-};
 
 
 //*************************************************************************************************************
@@ -77,11 +91,10 @@ enum Tool
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA, QSharedPointer<QTime> &pTime, QWidget* parent)
+RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA,
+                                                               QSharedPointer<QTime> &pTime,
+                                                               QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTMSAModel(NULL)
-, m_pRTMSADelegate(NULL)
-, m_pTableView(NULL)
 , m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_pRTMSA(pRTMSA)
@@ -90,10 +103,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_fSamplingRate(1024)
 , m_bHideBadChannels(false)
 , m_iMaxFilterTapSize(0)
-, m_pQuickControlWidget(Q_NULLPTR)
-, m_pChInfoModel(Q_NULLPTR)
-, m_pSelectionManagerWindow(Q_NULLPTR)
-, m_pFilterWindow(Q_NULLPTR)
 , m_pRtEEGSensorDataItem(Q_NULLPTR)
 , m_pRtMEGSensorDataItem(Q_NULLPTR)
 , m_bVisualize3DSensorData(false)
@@ -123,13 +132,11 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pActionQuickControl->setVisible(true);
 
     //Create toolboxes with table view and real-time interpolation plot
-    m_pToolBox = new QToolBox(this);
+    m_pToolBox = QSharedPointer<QToolBox>::create(this);
     m_pToolBox->hide();
 
     //Table view
-    if(m_pTableView)
-        delete m_pTableView;
-    m_pTableView = new QTableView;
+    m_pTableView = new QTableView();
 
     //Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);
@@ -168,7 +175,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     //set layout
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
-    rtmsaLayout->addWidget(m_pToolBox);
+    rtmsaLayout->addWidget(m_pToolBox.data());
     this->setLayout(rtmsaLayout);
 
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
@@ -209,7 +216,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
             settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_MISC_CH]);
 
         //Store filter
-        if(m_pFilterWindow != 0) {
+        if(m_pFilterWindow) {
             FilterData filter = m_pFilterWindow->getUserDesignedFilter();
 
             settings.setValue(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), filter.m_dHighpassFreq);
@@ -225,22 +232,25 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         //Store view
         settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_fZoomFactor);
         settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_iT);
-        if(m_pQuickControlWidget != 0)
+        if(m_pQuickControlWidget) {
             settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlWidget->getOpacityValue());
+        }
 
         //Store show/hide bad channel flag
         settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_bHideBadChannels);
 
         //Store selected layout file
-        if(m_pSelectionManagerWindow != 0)
+        if(m_pSelectionManagerWindow) {
             settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+        }
 
         //Store show/hide bad channel flag
-        if(m_pQuickControlWidget != 0)
+        if(m_pQuickControlWidget) {
             settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlWidget->getDistanceTimeSpacerIndex());
+        }
 
         //Store signal and background colors
-        if(m_pQuickControlWidget != 0) {
+        if(m_pQuickControlWidget) {
             settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getSignalColor());
             settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getBackgroundColor());
         }
@@ -448,8 +458,8 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
-                this,SLOT(channelContextMenu(QPoint)));
+        connect(m_pTableView, SIGNAL(customContextMenuRequested(QPoint)),
+                this, SLOT(channelContextMenu(QPoint)));
 
         //
         //-------- Init scaling --------
@@ -516,10 +526,10 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_qListBadChannels << i;
 
         //-------- Init filter window --------
-        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this, Qt::Window/* | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
+        m_pFilterWindow = FilterWindow::SPtr::create(this, Qt::Window/* | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/);
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-        m_pFilterWindow->setFiffInfo(m_pFiffInfo);
+        m_pFilterWindow->init(m_pFiffInfo->sfreq);
         m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
@@ -578,7 +588,7 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #endif
 
-        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags));
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags, this));
 
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
@@ -986,15 +996,17 @@ void RealTimeMultiSampleArrayWidget::hideBadChannels()
 
 void RealTimeMultiSampleArrayWidget::showFilterWidget(bool state)
 {
-    if(state) {
-        if(m_pFilterWindow->isActiveWindow())
+    if(m_pFilterWindow) {
+        if(state) {
+            if(m_pFilterWindow->isActiveWindow())
+                m_pFilterWindow->hide();
+            else {
+                m_pFilterWindow->activateWindow();
+                m_pFilterWindow->show();
+            }
+        } else {
             m_pFilterWindow->hide();
-        else {
-            m_pFilterWindow->activateWindow();
-            m_pFilterWindow->show();
         }
-    } else {
-        m_pFilterWindow->hide();
     }
 }
 

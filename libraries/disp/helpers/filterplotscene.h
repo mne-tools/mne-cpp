@@ -83,6 +83,9 @@ class DISPSHARED_EXPORT FilterPlotScene : public LayoutScene
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<FilterPlotScene> SPtr;            /**< Shared pointer type for FilterPlotScene class. */
+    typedef QSharedPointer<const FilterPlotScene> ConstSPtr; /**< Const shared pointer type for FilterPlotScene class. */
+
     //=========================================================================================================
     /**
     * Constructs a FilterPlotScene dialog which is a child of parent.
