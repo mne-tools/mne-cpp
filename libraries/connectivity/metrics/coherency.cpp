@@ -28,7 +28,7 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
-* Notes:
+* @note Notes:
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
 * @brief     Coherency class declaration.
@@ -94,69 +94,114 @@ Coherency::Coherency()
 
 //*******************************************************************************************************
 
-Network Coherency::coherency(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
-{
-    Network finalNetwork("Coherency");
+//Network Coherency::coherency(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert, int iNfft,
+//                             const QString &sWindowType)
+//{
+//    Network finalNetwork("Coherency");
 
-    if(matDataList.empty()) {
-        qDebug() << "Coherency::coherency - Input data is empty";
-        return finalNetwork;
+//    if(matDataList.empty()) {
+//        qDebug() << "Coherency::coherency - Input data is empty";
+//        return finalNetwork;
+//    }
+
+//    //Create nodes
+//    int rows = matDataList.first().rows();
+//    RowVectorXf rowVert = RowVectorXf::Zero(3);
+
+//    for(int i = 0; i < rows; ++i) {
+//        if(matVert.rows() != 0 && i < matVert.rows()) {
+//            rowVert(0) = matVert.row(i)(0);
+//            rowVert(1) = matVert.row(i)(1);
+//            rowVert(2) = matVert.row(i)(2);
+//        }
+
+//        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
+//    }
+
+//    //Calculate all-to-all coherency matrix over epochs
+//    QVector<MatrixXcd> vecCoh = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
+
+//    //Add edges to network
+//    for(int i = 0; i < vecCoh.length(); ++i) {
+//        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+//            MatrixXcd matWeight = vecCoh.at(i).row(j);
+
+//            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
+
+//            finalNetwork.getNodeAt(i)->append(pEdge);
+//            finalNetwork.append(pEdge);
+//        }
+//    }
+
+//    return finalNetwork;
+//}
+
+
+//*************************************************************************************************************
+
+QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataList,
+                                               int iNfft, const QString &sWindowType)
+{
+    // Check that iNfft >= signal length
+    int iSignalLength = matDataList.at(0).cols();
+    if (iNfft < iSignalLength) {
+        iNfft = iSignalLength;
     }
 
-    //Create nodes
-    int rows = matDataList.first().rows();
-    RowVectorXf rowVert = RowVectorXf::Zero(3);
+    // Generate tapers
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
 
-    for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+    // Initialize vecPsdAvg and vecCsdAvg
+    int iNRows = matDataList.at(0).rows();
+    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+    MatrixXd matPsdAvg = MatrixXd::Zero(iNRows, iNFreqs);
+    QVector<MatrixXcd> vecCsdAvg;
+    for (int j = 0; j < iNRows; ++j) {
+        vecCsdAvg.append(MatrixXcd::Zero(iNRows, iNFreqs));
+    }
+
+    // Generate tapered spectra, PSD, and CSD and sum over epoch
+    // This part could be parallelized with QtConcurrent::mappedReduced
+    for (int i = 0; i < matDataList.length(); ++i) {
+        //Remove mean
+        MatrixXd matInputData = matDataList.at(i);
+        for (int i = 0; i < matInputData.rows(); ++i) {
+            matInputData.row(i).array() -= matInputData.row(i).mean();
         }
 
-        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
-    }
+        // This part could be parallelized with QtConcurrent::mapped
+        QVector<MatrixXcd> vecTapSpectra;
+        for (int j = 0; j < iNRows; ++j) {
+            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
+            vecTapSpectra.append(matTmpSpectra);
+        }
 
-    //Calculate connectivity matrix over epochs and average afterwards
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
-    resultMat.waitForFinished();
+        // This part could be parallelized with QtConcurrent::mappedReduced
+        for (int j = 0; j < iNRows; ++j) {
+            RowVectorXd vecTmpPsd = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j), tapers.second,
+                                                                    iNfft, 1.0);
+            matPsdAvg.row(j) += vecTmpPsd;
+        }
 
-    MatrixXd matDist = resultMat.result();
-    matDist /= matDataList.size();
-
-    //Add edges to network
-    for(int i = 0; i < matDist.rows(); ++i) {
-        for(int j = i; j < matDist.cols(); ++j) {            
-            MatrixXd matWeight(1,1);
-            matWeight << abs(matDist(i,j));
-
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
-
-            finalNetwork.getNodeAt(i)->append(pEdge);
-            finalNetwork.append(pEdge);
+        // This part could be parallelized with QtConcurrent::mappedReduced
+        for (int j = 0; j < iNRows; ++j) {
+            MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+            for (int k = 0; k < iNRows; ++k) {
+                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
+                                                                tapers.second, iNfft, 1.0);
+            }
+            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd);
         }
     }
+    matPsdAvg = matPsdAvg.cwiseSqrt();
 
-    return finalNetwork;
-}
-
-
-//*************************************************************************************************************
-
-int Coherency::calcCoherency(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
-{
-}
-
-
-//*************************************************************************************************************
-
-MatrixXd Coherency::calculate(const MatrixXd &data)
-{
-}
-
-
-//*************************************************************************************************************
-
-void Coherency::sum(MatrixXd &resultData, const MatrixXd &data)
-{
+    QVector<MatrixXcd> vecCoherency;
+    for (int i = 0; i < iNRows; ++i) {
+        MatrixXd matPSDtmp = MatrixXd::Zero(iNRows, iNFreqs);
+        for(int j = 0; j < iNRows; ++j){
+            matPSDtmp.row(j) = matPsdAvg.row(i).cwiseProduct(matPsdAvg.row(j));
+        }
+        vecCoherency.append(vecCsdAvg.at(i).cwiseQuotient(matPSDtmp));
+    }
+    return vecCoherency;
 }
