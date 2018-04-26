@@ -28,8 +28,9 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
-* Notes:
+* @note Notes:
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
+* - QtConcurrent can be used to speed up computation.
 *
 * @brief     Coherency class declaration.
 *
@@ -106,47 +107,31 @@ public:
     */
     explicit Coherency();
 
+//    //=========================================================================================================
+//    /**
+//    * Calculates the coherency between the rows of the data matrix.
+//    *
+//    * @param[in] matDataList    The input data.
+//    * @param[in] matVert        The vertices of each network node.
+//    *
+//    * @return                   The connectivity information in form of a network structure.
+//    */
+//    static Network coherency(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
+//                             int iNfft, const QString &sWindowType);
+
     //=========================================================================================================
     /**
-    * Calculates the coherency between the rows of the data matrix.
+    * Calculates the coherency of the rows of the data matrix.
     *
     * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
+    * @param[in] iNfft          FFT length
+    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
     *
-    * @return                   The connectivity information in form of a network structure.
+    * @return                   The connectivity information in form of a QVector of matrices.
     */
-    static Network coherency(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
-
-protected:
-    //==========================================================================================================
-    /**
-    * Calculates the actual coherency between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return                The coherency.
-    */
-    static int calcCoherency(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
-
-    //=========================================================================================================
-    /**
-    * Calculates the connectivity matrix for a given input data matrix based on the coherency.
-    *
-    * @param[in] data       The input data.
-    *
-    * @return               The connectivity matrix.
-    */
-    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
-
-    //=========================================================================================================
-    /**
-    * Sums up (reduces) the in parallel processed connectivity matrix.
-    *
-    * @param[out] resultData    The result data.
-    * @param[in]  data          The incoming, temporary result data.
-    */
-    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
+    static QVector<Eigen::MatrixXcd> computeCoherency(const QList<Eigen::MatrixXd> &matDataList,
+                                                      int iNfft=-1,
+                                                      const QString &sWindowType="hanning");
 };
 
 
