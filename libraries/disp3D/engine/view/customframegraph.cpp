@@ -192,6 +192,9 @@ void CustomFrameGraph::init()
     {
         m_pMemoryBarrier = new QMemoryBarrier(m_pCameraSelector);
         m_pForwardState = new QRenderStateSet(m_pMemoryBarrier);
+
+        //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
+        m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
     }
     else
     {
@@ -251,9 +254,6 @@ void CustomFrameGraph::init()
     //Set draw policy
     QVector<QSortPolicy::SortType> sortTypes = {QSortPolicy::StateChangeCost, QSortPolicy::BackToFront};
     m_pSortPolicy->setSortTypes(sortTypes);
-
-    //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
-    m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
 }
 
 
