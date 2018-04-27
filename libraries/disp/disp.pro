@@ -125,7 +125,7 @@ SOURCES += \
     selectionmanagerwindow.cpp \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
-    helpers/roundededgeswidget.cpp \
+    helpers/draggableframelesswidget.cpp \
 
 HEADERS += \
     disp_global.h \
@@ -146,7 +146,7 @@ HEADERS += \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
-    helpers/roundededgeswidget.h \
+    helpers/draggableframelesswidget.h \
 
 qtHaveModule(charts) {
     SOURCES += \

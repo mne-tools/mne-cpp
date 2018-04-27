@@ -2,6 +2,7 @@
 /**
 * @file     realtimesamplearraywidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -72,6 +73,7 @@
 #include <QToolBox>
 #include <QMenu>
 #include <QAction>
+#include <QHeaderView>
 
 
 //*************************************************************************************************************
@@ -526,8 +528,7 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_qListBadChannels << i;
 
         //-------- Init filter window --------
-        m_pFilterWindow = FilterWindow::SPtr::create(this, Qt::Window/* | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/);
-        //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+        m_pFilterWindow = FilterWindow::SPtr::create(this, Qt::Window);
 
         m_pFilterWindow->init(m_pFiffInfo->sfreq);
         m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
@@ -558,7 +559,6 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
 
         m_pSelectionManagerWindow = SelectionManagerWindow::SPtr(new SelectionManagerWindow(this, m_pChInfoModel));
-        //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
                 this, &RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly);
@@ -575,7 +575,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
-        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
+        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName),
+                                                                       "babymeg-mag-inner-layer.lout").toString());
 
         //
         //-------- Init quick control widget --------
@@ -589,8 +590,6 @@ void RealTimeMultiSampleArrayWidget::init()
         #endif
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags, this));
-
-        m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         //Handle scaling
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
