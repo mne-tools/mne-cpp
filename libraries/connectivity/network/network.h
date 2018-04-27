@@ -86,9 +86,9 @@ class NetworkNode;
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class holds information (nodes and connecting edges) about a network, can compute a distance table and provide network metrics.
 *
-* @brief Brief description of this class.
+* @brief This class holds information about a network, can compute a distance table and provide network metrics.
 */
 
 class CONNECTIVITYSHARED_EXPORT Network
@@ -176,19 +176,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Overloaded stream operator to add a network edge to this network.
+    * Appends a network edge to this network node.
     *
-    * @param[in] newEdge    The new edge item as a reference.
+    * @param[in] newEdge    The new edge item.
     */
-    Network &operator<<(QSharedPointer<NetworkEdge> newEdge);
+    void append(QSharedPointer<NetworkEdge> newEdge);
 
     //=========================================================================================================
     /**
-    * Overloaded stream operator to add a network node to this network.
+    * Appends a network edge to this network node.
     *
     * @param[in] newNode    The new node item as a reference.
     */
-    Network &operator<<(QSharedPointer<NetworkNode> newNode);
+    void append(QSharedPointer<NetworkNode> newNode);
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/
@@ -202,9 +202,12 @@ protected:
     /**
     * Returns the connectivity matrix for this network structure.
     *
+    * @param[in] idxRow    The row for which the connection matrix is to be produced. E.g. for the first frequency bin/band. Default is 0.
+    * @param[in] idxCol    The column for which the connection matrix is to be produced. E.g. for the first instance in time. Default is 0.
+    *
     * @return    The connectivity matrix generated from the current network information.
     */
-    Eigen::MatrixXd generateConnectMat() const;
+    Eigen::MatrixXd generateConnectMat(int idxRow = 0, int idxCol = 0) const;
 
 };
 

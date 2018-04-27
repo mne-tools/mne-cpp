@@ -110,7 +110,7 @@ FixDictMp::~FixDictMp()
 //*************************************************************************************************************
 
 Dictionary::Dictionary()
-: type(AtomType::GABORATOM)
+: type(GABORATOM)
 , sample_count(0)
 {
 

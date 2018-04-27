@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     orbitalcameracontroller.cpp
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     May, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Connectivity class declaration.
+* @brief    OrbitalCameraController class definition.
 *
 */
-
-#ifndef CONNECTIVITY_H
-#define CONNECTIVITY_H
 
 
 //*************************************************************************************************************
@@ -42,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "orbitalcameracontroller.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +47,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
+#include <Qt3DRender/QCamera>
 
 
 //*************************************************************************************************************
@@ -58,70 +55,103 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE GLOBAL METHODS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-class ConnectivitySettings;
-class Network;
-
-
-//=============================================================================================================
-/**
-* This class handles the incoming settings and computes the actual connectivity estimation.
-*
-* @brief This class is a container for connectivity settings.
-*/
-class CONNECTIVITYSHARED_EXPORT Connectivity
+OrbitalCameraController::OrbitalCameraController(Qt3DCore::QNode *pParent)
+    :QAbstractCameraController(pParent)
 {
-
-public:
-    typedef QSharedPointer<Connectivity> SPtr;            /**< Shared pointer type for Connectivity. */
-    typedef QSharedPointer<const Connectivity> ConstSPtr; /**< Const shared pointer type for Connectivity. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a Connectivity object.
-    */
-    explicit Connectivity(const ConnectivitySettings& connectivitySettings);
-
-    //=========================================================================================================
-    /**
-    * Computes the network based on the current settings.
-    *
-    * @return Returns the network.
-    */
-    Network calculateConnectivity() const;
-
-protected:
-    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
-};
+    initController();
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+
+void OrbitalCameraController::invertCameraRotation(bool newStatusFlag)
+{
+    if(newStatusFlag == true) {
+        m_rotationInversFactor = -1.0f;
+    }
+    else {
+        m_rotationInversFactor = 1.0f;
+    }
+}
 
 
-} // namespace CONNECTIVITYLIB
+//*************************************************************************************************************
 
-#endif // CONNECTIVITY_H
+void OrbitalCameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::InputState &state, float dt)
+{
+    Qt3DRender::QCamera *pCamera = this->camera();
+
+    if(pCamera == nullptr) {
+        return;
+    }
+
+    //Mouse input
+    if(state.rightMouseButtonActive) {
+        if(state.altKeyActive) {
+            //translate camera in x/y direction
+            pCamera->translate(QVector3D(state.rxAxisValue * this->linearSpeed() * dt * 0.2f,
+                                         state.ryAxisValue * this->linearSpeed() * dt * 0.2f,
+                                         0.0f));
+        }
+        else {
+            // orbit around view center
+            pCamera->panAboutViewCenter(state.rxAxisValue * this->lookSpeed() * dt * m_rotationInversFactor,
+                                        QVector3D(0.0f, 0.0f, 1.0f));
+            pCamera->tiltAboutViewCenter(state.ryAxisValue * this->lookSpeed() * dt * m_rotationInversFactor);
+        }
+    }
+
+    if(state.middleMouseButtonActive) {
+        //translate the cameras view center
+        pCamera->translate(QVector3D(state.rxAxisValue * this->linearSpeed() * dt * 0.2f,
+                                     state.ryAxisValue * this->linearSpeed() * dt * 0.2f,
+                                     0.0f));
+    }
+
+    //zoom with mouse wheel and page up and down
+    if(distance(pCamera->position(), pCamera->viewCenter()) > m_fZoomInLimit) {
+        pCamera->translate(QVector3D(0.0f, 0.0f, state.tzAxisValue * this->linearSpeed() * dt),
+                           pCamera->DontTranslateViewCenter);
+    }
+    else {
+        pCamera->translate(QVector3D(0.0f, 0.0f, -m_fZoomInLimit), pCamera->DontTranslateViewCenter);
+    }
+
+    //Keyboard input: orbit around view center
+    pCamera->panAboutViewCenter(state.txAxisValue * this->lookSpeed() * dt * 0.8f  * m_rotationInversFactor,
+                                QVector3D(0.0f, 0.0f, 1.0f));
+    pCamera->tiltAboutViewCenter(state.tyAxisValue * this->lookSpeed()* dt * 0.8f * m_rotationInversFactor);
+}
+
+
+//*************************************************************************************************************
+
+void OrbitalCameraController::initController()
+{
+    this->setLinearSpeed(0.55f);
+    this->setLookSpeed(143.f);
+    invertCameraRotation(true);
+}
+
+
+//*************************************************************************************************************

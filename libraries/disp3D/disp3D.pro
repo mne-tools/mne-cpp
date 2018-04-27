@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drender 3dinput 3dextras charts concurrent
+QT       += widgets 3dcore 3drender 3dinput 3dextras charts concurrent opengl
 
 DEFINES += DISP3DNEW_LIBRARY
 
@@ -73,9 +73,9 @@ else {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+contains(MNECPP_CONFIG, buildStaticLibraries) {
     CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
+    DEFINES += BUILD_STATIC_LIBRARIES
 }
 else {
     CONFIG += dll
@@ -142,7 +142,8 @@ SOURCES += \
     engine/model/materials/geometrymultipliermaterial.cpp \
     engine/view/customframegraph.cpp \
     engine/model/materials/gpuinterpolationmaterial.cpp \
-    engine/model/materials/abstractphongalphamaterial.cpp
+    engine/model/materials/abstractphongalphamaterial.cpp \
+    engine/view/orbitalcameracontroller.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -196,7 +197,8 @@ HEADERS += \
     engine/model/materials/geometrymultipliermaterial.h \
     engine/view/customframegraph.h \
     engine/model/materials/gpuinterpolationmaterial.h \
-    engine/model/materials/abstractphongalphamaterial.h
+    engine/model/materials/abstractphongalphamaterial.h \
+    engine/view/orbitalcameracontroller.h
 
 FORMS += \
     engine/control/control3dwidget.ui \

@@ -78,14 +78,54 @@ void DipoleFitSettings::initMembers()
     // Init origin
     r0 << 0.0f,0.0f,0.04f;
 
+    filter.filter_on = true;
+    filter.size = 4096;
+    filter.taper_size = 2048;
+    filter.highpass = 0.0;
+    filter.highpass_width = 0.0;
+    filter.lowpass = 40.0;
+    filter.lowpass_width = 5.0;
+    filter.eog_highpass = 0.0;
+    filter.eog_highpass_width = 0.0;
+    filter.eog_lowpass = 40.0;
+    filter.eog_lowpass_width = 5.0;
 
-    filter = {  true,         /* Filter on? */
-                4096,                         /* size */
-                2048,                         /* taper_size */
-                0.0, 0.0,                     /* highpass corner and width */
-                40.0, 5.0,                    /* lowpass corner and width */
-                0.0, 0.0,                     /* EOG highpass corner and width */
-                40.0, 5.0 };                  /* EOG Lowpass corner and width */
+    accurate    = false;         /**< Use accurate coil definitions? */
+
+    guess_rad     = 0.080f;       
+    guess_mindist = 0.010f;       
+    guess_exclude = 0.020f;       
+    guess_grid    = 0.010f;      
+
+    grad_std     = 5e-13f;        
+    mag_std      = 20e-15f;
+    eeg_std      = 0.2e-6f;
+    diagnoise    = false;         
+
+    is_raw       = false;         
+    badname     = NULL;          
+    include_meg  = false;         
+    include_eeg  = false;        
+    tmin         = -2*BIG_TIME;   
+    tmax         = 2*BIG_TIME;
+    tstep        = -1.0;          
+    integ        = 0.0;
+    bmin         = BIG_TIME;      
+    bmax         = BIG_TIME;
+    do_baseline  = false;         
+    setno        = 1;             
+    verbose      = false;
+    omit_data_proj = false;
+         
+    eeg_sphere_rad = 0.09f;      
+    scale_eeg_pos  = false;     
+    mag_reg      = 0.1f;         
+    fit_mag_dipoles = false;
+
+    grad_reg     = 0.1f;         
+    eeg_reg      = 0.1f;                  
+
+    bool gui    = false;               
 }
 
 
