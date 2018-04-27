@@ -50,7 +50,7 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
+#if defined(BUILD_STATIC_LIBRARIES)
 #  define MNESHARED_EXPORT
 #elif defined(MNE_LIBRARY)
 #  define MNESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

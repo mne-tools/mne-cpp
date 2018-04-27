@@ -62,6 +62,7 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -75,10 +76,12 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode, QSharedPointer<NetworkNode> pEndNode, double dWeight)
+NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
+                         QSharedPointer<NetworkNode> pEndNode,
+                         MatrixXd& matWeight)
 : m_pStartNode(pStartNode)
 , m_pEndNode(pEndNode)
-, m_dWeight(dWeight)
+, m_matWeight(matWeight)
 {
 }
 
@@ -101,9 +104,9 @@ QSharedPointer<NetworkNode> NetworkEdge::getEndNode()
 
 //*************************************************************************************************************
 
-double NetworkEdge::getWeight() const
+MatrixXd NetworkEdge::getWeight() const
 {
-    return m_dWeight;
+    return m_matWeight;
 }
 
 
