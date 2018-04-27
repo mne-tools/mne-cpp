@@ -41,11 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include "../ui_quickcontrolwidget.h"
-#include "fiff/fiff_info.h"
-#include "fiff/fiff_constants.h"
-#include "disp/helpers/roundededgeswidget.h"
+#include "disp/helpers/draggableframelesswidget.h"
 
 
 //*************************************************************************************************************
@@ -59,14 +55,26 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QMouseEvent>
-#include <QLabel>
-#include <QDoubleSpinBox>
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QComboBox>
-#include <QSignalMapper>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace Ui {
+    class QuickControlWidget;
+}
+
+class QCheckBox;
+class QDoubleSpinBox;
+class QSlider;
+class QPushButton;
+class QSignalMapper;
+class QTabWidget;
 
 
 //*************************************************************************************************************
@@ -80,16 +88,7 @@ namespace SCDISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace DISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -115,7 +114,7 @@ struct Modality {
 *
 * @brief The ProjectorWidget class provides a quick control widget for scaling, filtering, projector and view options
 */
-class QuickControlWidget : public RoundedEdgesWidget
+class QuickControlWidget : public DISPLIB::DraggableFramelessWidget
 {
     Q_OBJECT
 
@@ -134,7 +133,7 @@ public:
     * @param [in] parent            The parent of widget.
     */
     QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
-                       const FiffInfo::SPtr pFiffInfo,
+                       const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                        const QString& name = "",
                        const QStringList& slFlags = QStringList("Scaling"),
                        QWidget *parent = Q_NULLPTR);
@@ -502,7 +501,7 @@ private:
     QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
     QList<QCheckBox*>                                   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
     QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
-    FiffInfo::SPtr                                      m_pFiffInfo;                    /**< Connected fiff info. */
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */

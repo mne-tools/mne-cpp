@@ -38,15 +38,28 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../ui_quickcontrolwidget.h"
 #include "quickcontrolwidget.h"
+
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_constants.h>
+
+#include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
+#include <QCheckBox>
+#include <QDoubleSpinBox>
+#include <QSlider>
+#include <QPushButton>
+#include <QSignalMapper>
+#include <QColorDialog>
+#include <QTabWidget>
 
 
 //*************************************************************************************************************
@@ -55,6 +68,8 @@
 //=============================================================================================================
 
 using namespace SCDISPLIB;
+using namespace FIFFLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -68,7 +83,7 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32,
                                        const QString& name,
                                        const QStringList& slFlags,
                                        QWidget *parent)
-: RoundedEdgesWidget(parent, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
+: DraggableFramelessWidget(parent, Qt::Window | Qt::CustomizeWindowHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
 , m_pFiffInfo(pFiffInfo)
