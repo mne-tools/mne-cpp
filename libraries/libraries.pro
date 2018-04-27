@@ -45,9 +45,7 @@ SUBDIRS += \
     mne \
     fwd \
     inverse \
-    connectivity \
     realtime \
-
 
 !contains(MNECPP_CONFIG, minimalVersion) {
 
@@ -57,7 +55,8 @@ SUBDIRS += \
     }
 
     SUBDIRS += \
-        disp
+        connectivity \
+        disp \
 
     qtHaveModule(charts) {
         SUBDIRS += \

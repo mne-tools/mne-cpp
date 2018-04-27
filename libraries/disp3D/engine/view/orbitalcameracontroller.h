@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     orbitalcameracontroller.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     May, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Connectivity class declaration.
+* @brief     OrbitalCameraController class declaration.
 *
 */
 
-#ifndef CONNECTIVITY_H
-#define CONNECTIVITY_H
+#ifndef DISP3DLIB_ORBITALCAMERACONTROLLER_H
+#define DISP3DLIB_ORBITALCAMERACONTROLLER_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include <Qt3DExtras/QAbstractCameraController>
+#include "../../disp3D_global.h"
 
 
 //*************************************************************************************************************
@@ -51,14 +52,13 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -69,50 +69,87 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace DISP3DLIB {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class ConnectivitySettings;
-class Network;
 
 
 //=============================================================================================================
 /**
-* This class handles the incoming settings and computes the actual connectivity estimation.
+* This class allows controlling the scene camera along an orbital path.
 *
-* @brief This class is a container for connectivity settings.
+* The controls are:
+* - use arrow key or hold down the right mouse button to orbit the camera around the view center
+* - press page up and down or the mouse wheel to zoom the camera in and out
+* - hold down to the middle mouse button or press the ALT-key + right mouse button
+*   to translate the camera and the view center in x/y direction
+*
+* @brief This class allows controlling the scene camera along an orbital path.
 */
-class CONNECTIVITYSHARED_EXPORT Connectivity
+class DISP3DSHARED_EXPORT OrbitalCameraController : public Qt3DExtras::QAbstractCameraController
 {
+   Q_OBJECT
 
 public:
-    typedef QSharedPointer<Connectivity> SPtr;            /**< Shared pointer type for Connectivity. */
-    typedef QSharedPointer<const Connectivity> ConstSPtr; /**< Const shared pointer type for Connectivity. */
+    typedef QSharedPointer<OrbitalCameraController> SPtr;            /**< Shared pointer type for OrbitalCameraController. */
+    typedef QSharedPointer<const OrbitalCameraController> ConstSPtr; /**< Const shared pointer type for OrbitalCameraController. */
 
     //=========================================================================================================
     /**
-    * Constructs a Connectivity object.
+    * Constructs a OrbitalCameraController object.
     */
-    explicit Connectivity(const ConnectivitySettings& connectivitySettings);
+    OrbitalCameraController(Qt3DCore::QNode *pParent = nullptr);
 
     //=========================================================================================================
     /**
-    * Computes the network based on the current settings.
+    * Default destructor.
+    */
+    ~OrbitalCameraController() = default;
+
+    //=========================================================================================================
+    /**
+    * Turns invers rotation of the camera on and off.
     *
-    * @return Returns the network.
+    * @param[in] newStatusFlag      The new status of the inversion
     */
-    Network calculateConnectivity() const;
+    void invertCameraRotation(bool newStatusFlag);
 
-protected:
-    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
+private:
+    //=========================================================================================================
+    /**
+    * QAbstractCameraController function:
+    *
+    * This method is called whenever a frame action is triggered.
+    * It does implement the camera movement specific to this controller.
+    */
+    void moveCamera(const QAbstractCameraController::InputState &state, float dt) override;
+
+    //=========================================================================================================
+    /**
+    * Initialzes OrbitalCameraController object.
+    */
+    void initController();
+
+    //=========================================================================================================
+    /**
+    * Calcultes the distance between 2 points.
+    *
+    * @param[in] firstPoint     The first point.
+    * @param[in] secondPoint    The second point.
+    *
+    * @returns the distance between the 2 points.
+    */
+    inline float distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const;
+
+    float m_rotationInversFactor = 1.0f;             /**< The factor used to invers the camera rotation. */
+    const float m_fZoomInLimit = 0.04f;         /**< The minimum distance of the camera to the the view center. */
 };
 
 
@@ -121,7 +158,11 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+float OrbitalCameraController::distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const
+{
+    return (secondPoint - firstPoint).length();
+}
 
-} // namespace CONNECTIVITYLIB
+} // namespace DISP3DLIB
 
-#endif // CONNECTIVITY_H
+#endif // DISP3DLIB_ORBITALCAMERACONTROLLER_H

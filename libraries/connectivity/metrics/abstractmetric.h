@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     connectivity.h
+* @file     abstractmetric.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Connectivity class declaration.
+* @brief     AbstractMetric class declaration.
 *
 */
 
-#ifndef CONNECTIVITY_H
-#define CONNECTIVITY_H
+#ifndef ABSTRACTMETRIC_H
+#define ABSTRACTMETRIC_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "../connectivity_global.h"
 
 
 //*************************************************************************************************************
@@ -80,39 +80,28 @@ namespace CONNECTIVITYLIB {
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ConnectivitySettings;
-class Network;
-
 
 //=============================================================================================================
 /**
-* This class handles the incoming settings and computes the actual connectivity estimation.
+* This class provides basic functionalities for all implemented metrics.
 *
-* @brief This class is a container for connectivity settings.
+* @brief This class provides basic functionalities for all implemented metrics.
 */
-class CONNECTIVITYSHARED_EXPORT Connectivity
-{
+class CONNECTIVITYSHARED_EXPORT AbstractMetric
+{    
 
 public:
-    typedef QSharedPointer<Connectivity> SPtr;            /**< Shared pointer type for Connectivity. */
-    typedef QSharedPointer<const Connectivity> ConstSPtr; /**< Const shared pointer type for Connectivity. */
+    typedef QSharedPointer<AbstractMetric> SPtr;            /**< Shared pointer type for AbstractMetric. */
+    typedef QSharedPointer<const AbstractMetric> ConstSPtr; /**< Const shared pointer type for AbstractMetric. */
 
     //=========================================================================================================
     /**
-    * Constructs a Connectivity object.
+    * Constructs a AbstractMetric object.
     */
-    explicit Connectivity(const ConnectivitySettings& connectivitySettings);
-
-    //=========================================================================================================
-    /**
-    * Computes the network based on the current settings.
-    *
-    * @return Returns the network.
-    */
-    Network calculateConnectivity() const;
+    explicit AbstractMetric();
 
 protected:
-    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
+
 };
 
 
@@ -124,4 +113,4 @@ protected:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // CONNECTIVITY_H
+#endif // ABSTRACTMETRIC_H
