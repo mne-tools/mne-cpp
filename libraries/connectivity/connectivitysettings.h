@@ -98,33 +98,14 @@ public:
     /**
     * Constructs a ConnectivitySettings object.
     */
-    explicit ConnectivitySettings(const QStringList &arguments);
+    explicit ConnectivitySettings();
 
-    QString m_sConnectivityMethod;          /**< The connectivity method. */
-    QString m_sAnnotType;                   /**< The annotation type. */
-    QString m_sSubj;                        /**< The subject name. */
-    QString m_sSubjDir;                     /**< The subject's folder. */
-    QString m_sFwd;                         /**< The path to the forward solution. */
-    QString m_sCov;                         /**< The path to the covariance matrix. */
-    QString m_sSourceLocMethod;             /**< The source localization method. */
-    QString m_sMeas;                        /**< The path to the averaged data. */
-    QString m_sCoilType;                    /**< The coil type. Only used if channel type is set to meg. */
-    QString m_sChType;                      /**< The channel type. */
+    QStringList                 m_sConnectivityMethods;         /**< The connectivity methods. */
 
-    bool m_bDoSourceLoc;                    /**< Whether to perform source localization before the connectivity estimation. */
-    bool m_bDoClust;                        /**< Whether to cluster the source space for source localization. */
-
-    double m_dSnr;                          /**< The SNR value. */
-    int m_iAveIdx;                          /**< The The average index to take from the input data. */
+    QList<Eigen::MatrixXd>      m_matDataList;                  /**< The input data. */
+    Eigen::MatrixX3f            m_matNodePositions;             /**< The node position in 3D space. */
 
 protected:
-    //=========================================================================================================
-    /**
-    * Parses the input arguments.
-    *
-    * @param [in] arguments     List of all the arguments.
-    */
-    void parseArguments(const QStringList& arguments);
 
 };
 

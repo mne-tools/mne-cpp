@@ -46,10 +46,10 @@ TARGET = mne_browse
 
 #If one single executable is to be build
 #-> comment out flag in .pri file
-#-> add DEFINES += BUILD_MNECPP_STATIC_LIB in projects .pro file
+#-> add DEFINES += BUILD_STATIC_LIBRARIES in projects .pro file
 #-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
-    DEFINES += BUILD_MNECPP_STATIC_LIB
+contains(MNECPP_CONFIG, buildStaticLibraries) {
+    DEFINES += BUILD_STATIC_LIBRARIES
 }
 
 CONFIG(debug, debug|release) {

@@ -144,7 +144,7 @@ MneSourceSpaceOld::MneSourceSpaceOld(int np)
 
     coord_frame = FIFFV_COORD_MRI;
     id          = FIFFV_MNE_SURF_UNKNOWN;
-    subject     = Q_NULLPTR;
+    subject     = "";
     type        = FIFFV_MNE_SPACE_SURFACE;
 
     nearest = Q_NULLPTR;
@@ -157,7 +157,7 @@ MneSourceSpaceOld::MneSourceSpaceOld(int np)
     voxel_surf_RAS_t     = Q_NULLPTR;
     vol_dims[0] = vol_dims[1] = vol_dims[2] = 0;
 
-    MRI_volume           = Q_NULLPTR;
+    MRI_volume           = "";
     MRI_surf_RAS_RAS_t   = Q_NULLPTR;
     MRI_voxel_surf_RAS_t = Q_NULLPTR;
     MRI_vol_dims[0] = MRI_vol_dims[1] = MRI_vol_dims[2] = 0;

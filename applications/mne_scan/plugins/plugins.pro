@@ -38,7 +38,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
+contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
     message(Building basic MNE Scan version!)
     #Sensors
     SUBDIRS += \
