@@ -45,7 +45,6 @@
 
 #include "scdisp_global.h"
 #include "newmeasurementwidget.h"
-//#include "annotationwindow.h"
 
 
 //*************************************************************************************************************
