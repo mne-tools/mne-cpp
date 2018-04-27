@@ -119,14 +119,6 @@ class RealTimeMultiSampleArrayDelegate;
 class QuickControlWidget;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCMEASLIB;
-
-
 //=============================================================================================================
 /**
 * DECLARE CLASS RealTimeMultiSampleArrayWidget
@@ -146,7 +138,7 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeMultiSampleArrayWidget(QSharedPointer<SCMEASLIB::NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -390,13 +382,13 @@ private slots:
     void onMakeScreenshot(const QString& imageType);
 
 private:
-    QSharedPointer<RealTimeMultiSampleArrayModel>       m_pRTMSAModel;                  /**< RTMSA data model */
-    QSharedPointer<RealTimeMultiSampleArrayDelegate>    m_pRTMSADelegate;               /**< RTMSA data delegate */
-    QSharedPointer<QuickControlWidget>                  m_pQuickControlWidget;          /**< quick control widget. */
-    QSharedPointer<DISPLIB::ChInfoModel>                m_pChInfoModel;                 /**< channel info model. */
-    QSharedPointer<NewRealTimeMultiSampleArray>         m_pRTMSA;                       /**< The real-time sample array measurement. */
-    QSharedPointer<DISPLIB::SelectionManagerWindow>     m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
-    QSharedPointer<DISPLIB::FilterWindow>               m_pFilterWindow;                /**< Filter window. */
+    QSharedPointer<RealTimeMultiSampleArrayModel>           m_pRTMSAModel;                  /**< RTMSA data model */
+    QSharedPointer<RealTimeMultiSampleArrayDelegate>        m_pRTMSADelegate;               /**< RTMSA data delegate */
+    QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;          /**< quick control widget. */
+    QSharedPointer<DISPLIB::ChInfoModel>                    m_pChInfoModel;                 /**< channel info model. */
+    QSharedPointer<SCMEASLIB::NewRealTimeMultiSampleArray>  m_pRTMSA;                       /**< The real-time sample array measurement. */
+    QSharedPointer<DISPLIB::SelectionManagerWindow>         m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
+    QSharedPointer<DISPLIB::FilterWindow>                   m_pFilterWindow;                /**< Filter window. */
 
     bool                                        m_bInitialized;                 /**< Is Initialized */
     bool                                        m_bHideBadChannels;             /**< hide bad channels flag. */
