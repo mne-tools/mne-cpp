@@ -181,7 +181,7 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
         if(!m_pInterpolationItemCPU) {
             m_pInterpolationItemCPU = new AbstractMeshTreeItem(p3DEntityParent,
                                                             Data3DTreeModelItemTypes::AbstractMeshItem,
-                                                            QStringLiteral("3D Plot - Left"));
+                                                            QStringLiteral("3D Plot"));
 
             //Create color from curvature information with default gyri and sulcus colors
             MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(bemSurface.rr.rows());
