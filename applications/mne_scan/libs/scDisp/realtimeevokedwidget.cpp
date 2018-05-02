@@ -74,7 +74,7 @@
 #include <QMessageBox>
 #include <QScroller>
 #include <QSettings>
-
+#include <QSvgGenerator>
 #include <QDebug>
 
 
@@ -424,7 +424,7 @@ void RealTimeEvokedWidget::init()
         m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(this, Qt::Window));
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-        m_pFilterWindow->setFiffInfo(m_pFiffInfo);
+        m_pFilterWindow->init(m_pFiffInfo->sfreq);
         m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 

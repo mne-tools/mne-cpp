@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     filterplotscene.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     draggableframelesswidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2014
+* @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterPlotScene class.
+* @brief    Declaration of the DraggableFramelessWidget Class.
 *
 */
 
-#ifndef FILTERPLOTSCENE_H
-#define FILTERPLOTSCENE_H
+#ifndef DRAGGABLEFRAMELESSWIDGET_H
+#define DRAGGABLEFRAMELESSWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,8 +42,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
-#include "layoutscene.h"
-#include "utils/filterTools/filterdata.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -52,94 +55,103 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
-#include <QPainterPath>
-#include <QGraphicsPathItem>
+#include <QWidget>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STRUCTS
+//=============================================================================================================
+
+
+//=============================================================================================================
 /**
-* DECLARE CLASS FilterPlotScene
+* DECLARE CLASS DraggableFramelessWidget
 *
-* @brief The FilterPlotScene class provides the scene where a filter response can be plotted.
+* @brief The DraggableFramelessWidget class provides draggable and frameless QWidget.
 */
-class DISPSHARED_EXPORT FilterPlotScene : public LayoutScene
+class DISPSHARED_EXPORT DraggableFramelessWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FilterPlotScene> SPtr;            /**< Shared pointer type for FilterPlotScene class. */
-    typedef QSharedPointer<const FilterPlotScene> ConstSPtr; /**< Const shared pointer type for FilterPlotScene class. */
+    typedef QSharedPointer<DraggableFramelessWidget> SPtr;              /**< Shared pointer type for DraggableFramelessWidget. */
+    typedef QSharedPointer<const DraggableFramelessWidget> ConstSPtr;   /**< Const shared pointer type for DraggableFramelessWidget. */
 
     //=========================================================================================================
     /**
-    * Constructs a FilterPlotScene dialog which is a child of parent.
+    * Constructs a DraggableFramelessWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
+    * @param [in] parent        The parent of the widget.
+    * @param [in] flags         The window flags.
+    * @param [in] bRoundEdges   Flag specifying whether to round the edges.
     */
-    FilterPlotScene(QGraphicsView* view, QObject *parent = 0);
+    DraggableFramelessWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0, bool bRoundEdges = false);
 
     //=========================================================================================================
     /**
-    * Updates the current filter.
-    *
-    * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
-    * @param [in] samplingFreq holds the current sampling frequency
-    * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
-    * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
+    * Destructs a DraggableFramelessWidget
     */
-    void updateFilter(const FilterData &operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
+    ~DraggableFramelessWidget();
 
 protected:
     //=========================================================================================================
     /**
-    * Draws the diagram to plot the magnitude.
-    *
-    * @param [in] holds the current sampling frequency
-    * @param [in] holds the current name of the filter
+    * Reimplmented mouseMoveEvent.
     */
-    void plotMagnitudeDiagram(int samplingFreq, QString filtername = QString());
+    void mouseMoveEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
-    * Draws the filter's frequency response.
-    *
+    * Reimplmented mouseMoveEvent.
     */
-    void plotFilterFrequencyResponse();
+    void mousePressEvent(QMouseEvent *event);
 
-    FilterData      m_pCurrentFilter;                   /**< Pointer to the filter operator */
+    //=========================================================================================================
+    /**
+    * Reimplmented mouseMoveEvent.
+    */
+    void resizeEvent(QResizeEvent *event);
 
-    QGraphicsPathItem*          m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
+    //=========================================================================================================
+    /**
+    * Calculates a rect with rounded edged.
+    *
+    * @param [in] rect the rect which is supposed to be rounded.
+    * @param [in] r the radius of round edges.
+    * @return the rounded rect in form of a QRegion
+    */
+    QRegion roundedRect(const QRect& rect, int r);
 
-    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
-    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram. */
-    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines. */
-    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines. */
-    int             m_iAxisTextSize;            /**< point size of the plotted text. */
-    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot.  */
-    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot. */
-    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
-    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
-    int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
-    int             m_iPlotLength;              /**< Length of current filter impulse response plot. */
-
+private:
+    QPoint      m_dragPosition;     /**< The drag position of the window. */
+    bool        m_bRoundEdges;      /**< Flag specifying whether to round the edges. */
 };
 
 } // NAMESPACE DISPLIB
 
-#endif // FILTERPLOTSCENE_H
+
+#endif // DRAGGABLEFRAMELESSWIDGET_H
