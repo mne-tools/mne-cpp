@@ -237,8 +237,8 @@ private:
 //    QSettings m_qSettings;
 
     // Scaling
-    float       m_fMaxValue;        /**< Maximum value of the data to plot. */
-    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    double      m_dMaxValue;        /**< Maximum value of the data to plot. */
+    double      m_dScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
     int         m_iActiveRow;       /**< The current row which the mouse is moved over. */
 
     QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */

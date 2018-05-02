@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "ui_control3dwidget.h"
 #include "control3dwidget.h"
-#include "disp/helpers/roundededgeswidget.h"
 
 #include "../model/data3Dtreedelegate.h"
 #include "../model/data3Dtreemodel.h"
@@ -65,8 +65,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include "ui_control3dwidget.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,7 +72,6 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -85,7 +82,7 @@ using namespace DISPLIB;
 Control3DWidget::Control3DWidget(QWidget* parent,
                                  const QStringList& slFlags,
                                  Qt::WindowType type)
-: QWidget(parent, type)/*RoundedEdgesWidget(parent, type)*/
+: QWidget(parent, type)
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 , m_colCurrentLightColor(QColor(255,255,255))
