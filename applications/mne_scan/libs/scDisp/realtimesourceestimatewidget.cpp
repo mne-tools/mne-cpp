@@ -164,7 +164,7 @@ void RealTimeSourceEstimateWidget::getData()
         // Add rt brain data
         //
         if(!m_pRtItem) {
-            qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
+            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
             m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data",
                                                       *m_pRTSE->getValue(),
                                                       *m_pRTSE->getFwdSolution(),
@@ -181,7 +181,7 @@ void RealTimeSourceEstimateWidget::getData()
             m_pRtItem->setStreamingState(true);
             m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
         } else {
-            qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
+            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
 
             if(m_pRtItem) {
                 m_pRtItem->addData(*m_pRTSE->getValue());

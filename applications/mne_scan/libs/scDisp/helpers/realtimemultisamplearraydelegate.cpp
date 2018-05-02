@@ -69,8 +69,8 @@ using namespace SCDISPLIB;
 
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
-, m_fMaxValue(0.0)
-, m_fScaleY(0.0)
+, m_dMaxValue(0.0)
+, m_dScaleY(0.0)
 , m_iActiveRow(0)
 {
 
@@ -123,76 +123,76 @@ void createPaths(const QModelIndex &index,
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
-    float fMaxValue = 1e-9f;
+    float dMaxValue = 1e-9f;
 
     switch(kind) {
         case FIFFV_MEG_CH: {
             qint32 unit =t_pModel->getUnit(index.row());
             if(unit == FIFF_UNIT_T_M) { //gradiometers
-                fMaxValue = 1e-10f;
+                dMaxValue = 1e-10f;
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
-                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
+                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
             else if(unit == FIFF_UNIT_T) //magnitometers
             {
 //                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-//                    fMaxValue = 1e-11f;
+//                    dMaxValue = 1e-11f;
 //                else
-                fMaxValue = 1e-11f;
+                dMaxValue = 1e-11f;
 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
             }
             break;
         }
 
         case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            fMaxValue = 1e-11f;
+            dMaxValue = 1e-11f;
             if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+                dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;
+            dMaxValue = 1e-4f;
             if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f;
+            dMaxValue = 1e-3f;
             if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
             break;
         }
         case FIFFV_STIM_CH: {
-            fMaxValue = 5;
+            dMaxValue = 5;
             if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
             break;
         }
         case FIFFV_MISC_CH: {
-            fMaxValue = 1e-3f;
+            dMaxValue = 1e-3f;
             if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
             break;
         }
     }
 
-    float fValue;
-    float fScaleY = option.rect.height()/(2*fMaxValue);
+    float dValue;
+    float dScaleY = option.rect.height()/(2*dMaxValue);
 
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
     //Move to initial starting point
     if(data.size() > 0)
     {
 //        float val = data[0];
-        fValue = 0;//(val-data[0])*fScaleY;
+        dValue = 0;//(val-data[0])*dScaleY;
 
-        float newY = y_base-fValue;//Reverse direction -> plot the right way
+        float newY = y_base-dValue;//Reverse direction -> plot the right way
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x());
@@ -204,19 +204,19 @@ void createPaths(const QModelIndex &index,
     qint32 i;
     for(i = 1; i < data.size(); ++i) {
         float val = data[i] - data[0]; //remove first sample data[0] as offset
-        fValue = val*fScaleY;
-        //qDebug()<<"val"<<val<<"fScaleY"<<fScaleY<<"fValue"<<fValue;
+        dValue = val*dScaleY;
+        //qDebug()<<"val"<<val<<"dScaleY"<<dScaleY<<"dValue"<<dValue;
 
-        float newY = y_base-fValue;//Reverse direction -> plot the right way
+        float newY = y_base-dValue;//Reverse direction -> plot the right way
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX(path.currentPosition().x()+fDx);
+        qSamplePosition.setX(path.currentPosition().x()+dDx);
 
         path.lineTo(qSamplePosition);
 
         //Create ellipse position
-        if(i == (qint32)(markerPosition.x()/fDx)) {
-            ellipsePos.setX(path.currentPosition().x()+fDx);
+        if(i == (qint32)(markerPosition.x()/dDx)) {
+            ellipsePos.setX(path.currentPosition().x()+dDx);
             ellipsePos.setY(newY+(option.rect.height()/2));
 
             amplitude = QString::number(data[i]);
@@ -225,30 +225,30 @@ void createPaths(const QModelIndex &index,
 
     //create lines from one to the next sample for last path
     qint32 sample_offset = t_pModel->numVLines() + 1;
-    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
+    qSamplePosition.setX(qSamplePosition.x() + dDx*sample_offset);
 
     //start painting from first sample value
     float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
-    fValue = val*fScaleY;
-    float newY = y_base-fValue;
+    dValue = val*dScaleY;
+    float newY = y_base-dValue;
     qSamplePosition.setY(newY);
 
     lastPath.moveTo(qSamplePosition);
 
     for(i += sample_offset; i < lastData.size(); ++i) {
         val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
-        fValue = val*fScaleY;
+        dValue = val*dScaleY;
 
-        newY = y_base-fValue;
+        newY = y_base-dValue;
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
+        qSamplePosition.setX(lastPath.currentPosition().x()+dDx);
 
         lastPath.lineTo(qSamplePosition);
 
         //Create ellipse position
-        if(i == (qint32)(markerPosition.x()/fDx)) {
-            ellipsePos.setX(lastPath.currentPosition().x()+fDx);
+        if(i == (qint32)(markerPosition.x()/dDx)) {
+            ellipsePos.setX(lastPath.currentPosition().x()+dDx);
             ellipsePos.setY(newY+(option.rect.height()/2));
 
             amplitude = QString::number(lastData[i]);
@@ -484,82 +484,82 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index,
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
-    float fMaxValue = 1e-9f;
+    double dMaxValue = 1e-9f;
 
     switch(kind) {
         case FIFFV_MEG_CH: {
             qint32 unit =t_pModel->getUnit(index.row());
             if(unit == FIFF_UNIT_T_M) { //gradiometers
-                fMaxValue = 1e-10f;
+                dMaxValue = 1e-10f;
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
-                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
+                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
             else if(unit == FIFF_UNIT_T) //magnetometers
             {
-                fMaxValue = 1e-11f;
+                dMaxValue = 1e-11f;
 
                 //TODO: Debug this
 //                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-//                    fMaxValue = 1e-11f;
+//                    dMaxValue = 1e-11f;
 //                else
-//                    fMaxValue = 1e-11f;
+//                    dMaxValue = 1e-11f;
 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
             }
             break;
         }
 
         case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            fMaxValue = 1e-11f;
+            dMaxValue = 1e-11f;
             if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+                dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;
+            dMaxValue = 1e-4f;
             if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f;
+            dMaxValue = 1e-3f;
             if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
             break;
         }
         case FIFFV_STIM_CH: {
-            fMaxValue = 5;
+            dMaxValue = 5;
             if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
             break;
         }
         case FIFFV_MISC_CH: {
-            fMaxValue = 1e-3f;
+            dMaxValue = 1e-3f;
             if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
             break;
         }
     }
 
-    float fValue;
-    float fScaleY = option.rect.height()/(2*fMaxValue);
+    double dValue;
+    double dScaleY = option.rect.height()/(2*dMaxValue);
 
-    float y_base = path.currentPosition().y();
+    double y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    double dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
-    float lastFirstValue = t_pModel->getLastBlockFirstValue(index.row());
+    double lastFirstValue = t_pModel->getLastBlockFirstValue(index.row());
 
     //Move to initial starting point
     if(data.second > 0)
     {
-//        float val = data[0];
-        fValue = 0;//(val-data[0])*fScaleY;
+        dValue = 0;
 
-        float newY = y_base-fValue;//Reverse direction -> plot the right way
+        //Reverse direction -> plot the right way
+        float newY = y_base-dValue;
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x());
@@ -567,7 +567,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index,
         path.moveTo(qSamplePosition);
     }
 
-    float val;
+    double val;
 
     for(qint32 j=0; j < data.second; ++j)
     {
@@ -576,18 +576,18 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index,
         else
             val = *(data.first+j) - lastFirstValue; //do not remove first sample data[0] as offset because this is the last data part
 
-        fValue = val*fScaleY;
-        //qDebug()<<"val"<<val<<"fScaleY"<<fScaleY<<"fValue"<<fValue;
+        dValue = val*dScaleY;
+        //qDebug()<<"val"<<val<<"dScaleY"<<dScaleY<<"dValue"<<dValue;
 
-        float newY = y_base-fValue;//Reverse direction -> plot the right way
+        double newY = y_base-dValue;//Reverse direction -> plot the right way
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX(path.currentPosition().x()+fDx);
+        qSamplePosition.setX(path.currentPosition().x()+dDx);
         path.lineTo(qSamplePosition);
 
         //Create ellipse position
-        if(j == (qint32)(m_markerPosition.x()/fDx)) {
-            ellipsePos.setX(path.currentPosition().x()+fDx);
+        if(j == (qint32)(m_markerPosition.x()/dDx)) {
+            ellipsePos.setX(path.currentPosition().x()+dDx);
             ellipsePos.setY(newY/*+(option.rect.height()/2)*/);
 
             amplitude = QString::number(*(data.first+j));
@@ -603,8 +603,8 @@ void RealTimeMultiSampleArrayDelegate::createCurrentPositionMarkerPath(const QMo
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
     float currentSampleIndex = option.rect.x()+t_pModel->getCurrentSampleIndex();
-    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
-    currentSampleIndex = currentSampleIndex*fDx;
+    float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    currentSampleIndex = currentSampleIndex*dDx;
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
@@ -683,7 +683,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, cons
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
-    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
 
@@ -700,8 +700,8 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, cons
         }
 
         if(triggerPos <= currentSampleIndex + t_pModel->getCurrentOverlapAddDelay()) {
-            path.moveTo(triggerPos*fDx,yStart);
-            path.lineTo(triggerPos*fDx,yEnd);
+            path.moveTo(triggerPos*dDx,yStart);
+            path.lineTo(triggerPos*dDx,yEnd);
         }
 
         painter->drawPath(path);
@@ -721,8 +721,8 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, cons
                 painter->setPen(QPen(mapTriggerTypeColors[detectedTriggersOld[u].second], 1.5, Qt::SolidLine));
             }
 
-            path.moveTo(triggerPos*fDx,yStart);
-            path.lineTo(triggerPos*fDx,yEnd);
+            path.moveTo(triggerPos*dDx,yStart);
+            path.lineTo(triggerPos*dDx,yEnd);
 
             painter->drawPath(path);
             painter->restore();
@@ -741,24 +741,24 @@ void RealTimeMultiSampleArrayDelegate::createTriggerThresholdPath(const QModelIn
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
-    double fMaxValue = 1e-9f;
+    double dMaxValue = 1e-9f;
 
     switch(kind) {
         case FIFFV_STIM_CH: {
-            fMaxValue = 5.0;
+            dMaxValue = 5.0;
             if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
             break;
         }
     }
 
-    double fScaleY = option.rect.height()/(2*fMaxValue);
+    double dScaleY = option.rect.height()/(2*dMaxValue);
     double triggerThreshold = -1*(t_pModel->getTriggerThreshold());
 
-    path.moveTo(option.rect.topLeft().x(), option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold);
-    path.lineTo(option.rect.topRight().x(), option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold);
+    path.moveTo(option.rect.topLeft().x(), option.rect.topLeft().y()+option.rect.height()/2+dScaleY*triggerThreshold);
+    path.lineTo(option.rect.topRight().x(), option.rect.topLeft().y()+option.rect.height()/2+dScaleY*triggerThreshold);
 
-    textPosition = QPointF(option.rect.topLeft().x()+5, option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold-5);
+    textPosition = QPointF(option.rect.topLeft().x()+5, option.rect.topLeft().y()+option.rect.height()/2+dScaleY*triggerThreshold-5);
 }
 
 

@@ -573,7 +573,7 @@ void NoiseReduction::initFilter()
     m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(m_pOptionsWidget.data(), Qt::Window/*0, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
     //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-    m_pFilterWindow->setFiffInfo(m_pFiffInfo);
+    m_pFilterWindow->init(m_pFiffInfo->sfreq);
     m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
     m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
