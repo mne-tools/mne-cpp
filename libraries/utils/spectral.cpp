@@ -128,7 +128,7 @@ RowVectorXd Spectral::psdFromTaperedSpectra(const MatrixXcd &matTapSpectrum,
     }
 
     //Normalization
-    vecPsd /= (double(iNfft) * dSampFreq);
+    vecPsd /= dSampFreq;
 
     return vecPsd;
 }
@@ -165,7 +165,7 @@ RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed
     }
 
     //Normalization
-    vecCsd /= (double(iNfft) * dSampFreq);
+    vecCsd /= dSampFreq;
 
     return vecCsd;
 }
@@ -195,7 +195,7 @@ QPair<MatrixXd, VectorXd> Spectral::generateTapers(int iSignalLength, const QStr
         pairOut.first = hanningWindow(iSignalLength);
         pairOut.second = VectorXd::Ones(1);
     } else if (sWindowType == "ones") {
-        pairOut.first = MatrixXd::Ones(1, iSignalLength);
+        pairOut.first = MatrixXd::Ones(1, iSignalLength) / double(iSignalLength);
         pairOut.second = VectorXd::Ones(1);
     } else {
         pairOut.first = hanningWindow(iSignalLength);
