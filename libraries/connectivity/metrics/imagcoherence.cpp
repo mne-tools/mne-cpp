@@ -142,7 +142,7 @@ QVector<MatrixXd> ImagCoherence::computeImagCoherence(const QList<MatrixXd> &mat
 {
     QVector<MatrixXcd> vecCoherency = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
     QVector<MatrixXd> vecImagCoherence;
-    for(int i = 0; i < matDataList.at(0).rows(); ++i) {
+    for(int i = 0; i < vecCoherency.length(); ++i) {
         vecImagCoherence.append(vecCoherency.at(i).imag());
     }
     return vecImagCoherence;

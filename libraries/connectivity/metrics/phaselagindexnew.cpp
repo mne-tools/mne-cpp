@@ -181,7 +181,7 @@ QVector<MatrixXd> PhaseLagIndexNew::computePLI(const QList<MatrixXd> &matDataLis
             MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
             for (int k = 0; k < iNRows; ++k) {
                 matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
-                                                                tapers.second, iNfft, 1.0);
+                                                                tapers.second, tapers.second, iNfft, 1.0);
             }
             vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.imag().cwiseSign());
         }

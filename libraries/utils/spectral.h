@@ -123,7 +123,8 @@ public:
     *
     * @param[in] vecTapSpectrumSeed      tapered spectrum of the seed
     * @param[in] vecTapSpectrumTarget    tapered spectrum of the target
-    * @param[in] vecTapWeights           taper weights
+    * @param[in] vecTapWeightsSeed       taper weights of the seed
+    * @param[in] vecTapWeightsTarget     taper weights of the target
     * @param[in] iNfft                   FFT length
     * @param[in] dSampFreq               sampling frequency of the input data
     *
@@ -131,7 +132,8 @@ public:
     */
     static Eigen::RowVectorXcd csdFromTaperedSpectra(const Eigen::MatrixXcd &vecTapSpectrumSeed,
                                                      const Eigen::MatrixXcd &vecTapSpectrumTarget,
-                                                     const Eigen::VectorXd &vecTapWeights,
+                                                     const Eigen::VectorXd &vecTapWeightsSeed,
+                                                     const Eigen::VectorXd &vecTapWeightsTarget,
                                                      int iNfft,
                                                      double dSampFreq=1.0);
 

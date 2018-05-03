@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
     //Compute CSD of matTapSpectrumSeed and matTapSpectrumSeed
     //The real part should be equivalent to the PSD of matTapSpectrumSeed)
-    RowVectorXcd vecCsdSeed = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumSeed, vecTapWeights, iNfft);
+    RowVectorXcd vecCsdSeed = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumSeed, vecTapWeights, vecTapWeights, iNfft);
     VectorXd psdTest2 = vecCsdSeed.real();
 
     //Plot PSDTest2
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     MatrixXcd matTapSpectrumTarget = Spectral::computeTaperedSpectra(inputData.row(1), matTaps, iNfft);
 
     //Compute CSD between seed and target
-    RowVectorXcd vecCsd = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumTarget, vecTapWeights, iNfft);
+    RowVectorXcd vecCsd = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumTarget, vecTapWeights, vecTapWeights, iNfft);
 
     //Plot real part of CSD
     VectorXd csd = vecCsd.transpose().real();
