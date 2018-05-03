@@ -138,11 +138,11 @@ Network Coherence::coherence(const QList<MatrixXd> &matDataList, const MatrixX3f
 //*************************************************************************************************************
 
 QVector<MatrixXd> Coherence::computeCoherence(const QList<MatrixXd> &matDataList,
-                                                     int iNfft, const QString &sWindowType)
+                                              int iNfft, const QString &sWindowType)
 {
     QVector<MatrixXcd> vecCoherency = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
     QVector<MatrixXd> vecCoherence;
-    for(int i = 0; i < matDataList.at(0).rows(); ++i) {
+    for(int i = 0; i < vecCoherency.length(); ++i) {
         vecCoherence.append(vecCoherency.at(i).cwiseAbs());
     }
     return vecCoherence;

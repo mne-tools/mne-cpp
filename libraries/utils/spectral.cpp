@@ -117,7 +117,7 @@ RowVectorXd Spectral::psdFromTaperedSpectra(const MatrixXcd &matTapSpectrum,
     }
 
     //Compute PSD (average over tapers if necessary)
-    double denom = vecTapWeights.cwiseAbs2().sum();  //We use fix weights (adaptive weights not yet supported)
+    double denom = vecTapWeights.cwiseAbs2().sum();
     RowVectorXd vecPsd = (vecTapWeights.asDiagonal() * matTapSpectrum).cwiseAbs2().colwise().sum() / denom;
 
     //multiply by 2 due to half spectrum
@@ -138,7 +138,8 @@ RowVectorXd Spectral::psdFromTaperedSpectra(const MatrixXcd &matTapSpectrum,
 
 RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed,
                                              const MatrixXcd &vecTapSpectrumTarget,
-                                             const VectorXd &vecTapWeights,
+                                             const VectorXd &vecTapWeightsSeed,
+                                             const VectorXd &vecTapWeightsTarget,
                                              int iNfft,
                                              double dSampFreq)
 {
@@ -149,13 +150,16 @@ RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed
     if (vecTapSpectrumSeed.cols() != vecTapSpectrumTarget.cols()) {
         return MatrixXcd();
     }
-    if (vecTapSpectrumSeed.rows() != vecTapWeights.rows()) {
+    if (vecTapSpectrumSeed.rows() != vecTapWeightsSeed.rows()) {
+        return MatrixXcd();
+    }
+    if (vecTapSpectrumTarget.rows() != vecTapWeightsTarget.rows()) {
         return MatrixXcd();
     }
 
     //Compute PSD (average over tapers if necessary)
-    double denom = vecTapWeights.cwiseAbs2().sum();    //We use fix weights (adaptive weights not yet supported)
-    RowVectorXcd vecCsd = (vecTapWeights.asDiagonal() * vecTapSpectrumSeed).cwiseProduct((vecTapWeights.asDiagonal() * vecTapSpectrumTarget).conjugate()).colwise().sum() / denom;
+    double denom = sqrt(vecTapWeightsSeed.cwiseAbs2().sum()) * sqrt(vecTapWeightsTarget.cwiseAbs2().sum());
+    RowVectorXcd vecCsd = (vecTapWeightsSeed.asDiagonal() * vecTapSpectrumSeed).cwiseProduct((vecTapWeightsTarget.asDiagonal() * vecTapSpectrumTarget).conjugate()).colwise().sum() / denom;
 
     //multiply by 2 due to half spectrum
     vecCsd *= 2.0;
