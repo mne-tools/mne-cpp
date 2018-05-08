@@ -93,10 +93,8 @@ SOURCES += \
     metrics/correlation.cpp \
     metrics/crosscorrelation.cpp \
     metrics/coherency.cpp \
-    metrics/phaselagindex.cpp \
     metrics/coherence.cpp \
     metrics/imagcoherence.cpp \
-    metrics/phaselagindexnew.cpp \
     metrics/unbiasedsquaredphaselagindex.cpp \
     metrics/phaselockingvalue.cpp \
     metrics/weightedphaselagindex.cpp \
@@ -105,7 +103,8 @@ SOURCES += \
     network/networknode.cpp \
     network/networkedge.cpp \
     connectivitysettings.cpp \
-    connectivity.cpp
+    connectivity.cpp \
+    metrics/phaselagindex.cpp
 
 HEADERS += \
     connectivity_global.h \
@@ -113,10 +112,8 @@ HEADERS += \
     metrics/correlation.h \
     metrics/crosscorrelation.h \
     metrics/coherency.h \
-    metrics/phaselagindex.h \
     metrics/coherence.h \
     metrics/imagcoherence.h \
-    metrics/phaselagindexnew.h \
     metrics/unbiasedsquaredphaselagindex.h \
     metrics/phaselockingvalue.h \
     metrics/weightedphaselagindex.h \
@@ -125,7 +122,8 @@ HEADERS += \
     network/networknode.h \
     network/networkedge.h \
     connectivitysettings.h \
-    connectivity.h
+    connectivity.h \
+    metrics/phaselagindex.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

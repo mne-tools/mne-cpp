@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "phaselagindexnew.h"
+#include "phaselagindex.h"
 #include "unbiasedsquaredphaselagindex.h"
 #include "network/networknode.h"
 #include "network/networkedge.h"
@@ -143,7 +143,7 @@ QVector<MatrixXd> UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(const 
     int iNTrials = matDataList.length();
 
     // Compute standard PLI
-    QVector<MatrixXd> vecUnbiasedSquaredPLI = PhaseLagIndexNew::computePLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> vecUnbiasedSquaredPLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
 
     // Compute unbiased estimator according to Vinck et al., NeuroImage 55, pp. 1548-65, 2011
     for (int j = 0; j < iNRows; ++j) {
