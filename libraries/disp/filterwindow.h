@@ -46,7 +46,6 @@
 #include "helpers/filterdatamodel.h"
 #include "helpers/filterdatadelegate.h"
 #include "helpers/filterplotscene.h"
-#include "helpers/roundededgeswidget.h"
 
 #include "utils/mnemath.h"
 #include "utils/filterTools/filterdata.h"
@@ -62,12 +61,6 @@
 
 #include <QWidget>
 #include <QSettings>
-#include <QGraphicsScene>
-#include <QSvgGenerator>
-#include <QDate>
-#include <QFileDialog>
-#include <QStandardPaths>
-#include <QKeyEvent>
 
 
 //*************************************************************************************************************
@@ -83,15 +76,6 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace UTILSLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -101,7 +85,7 @@ using namespace UTILSLIB;
 *
 * @brief The FilterWindow class provides the filter window.
 */
-class DISPSHARED_EXPORT FilterWindow : public RoundedEdgesWidget
+class DISPSHARED_EXPORT FilterWindow : public QWidget
 {
     Q_OBJECT
 
@@ -126,11 +110,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the new fiff info.
+    * Inits the filter window.
     *
-    * @param[in] fiffInfo the new fiffInfo
+    * @param[in] dSFreq the new sampling frequency
     */
-    void setFiffInfo(const FiffInfo::SPtr &pFiffInfo);
+    void init(double dSFreq);
 
     //=========================================================================================================
     /**
@@ -278,7 +262,7 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *    ui;                         /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterWindowWidget*     ui;                         /**< Pointer to the qt designer generated ui class.*/
 
     FilterData                  m_filterData;               /**< The current filter operator.*/
     FilterDataModel::SPtr       m_pFilterDataModel;         /**< The model to hold current filters.*/
@@ -291,11 +275,9 @@ private:
     int                         m_iFilterTaps;              /**< The current number of filter taps.*/
     double                      m_dSFreq;                   /**< The current sampling frequency.*/
 
-    FiffInfo::SPtr              m_pFiffInfo;                /**< The current fiffInfo.*/
-
     QSettings                   m_qSettings;                /**< QSettings variable used to write or read from independent application sessions.*/
 
-    FilterPlotScene*            m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    FilterPlotScene::SPtr       m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 signals:
     void filterChanged(QList<UTILSLIB::FilterData> activeFilter);
