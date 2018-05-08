@@ -102,7 +102,7 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
     Network finalNetwork("Weighted Phase Lag Index");
 
     if(matDataList.empty()) {
-        qDebug() << "WeightedPhaseLagIndexNew::weightedPhaseLagIndexNew - Input data is empty";
+        qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex - Input data is empty";
         return finalNetwork;
     }
 
