@@ -103,7 +103,7 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
     Network finalNetwork("Debiased Squared Weighted Phase Lag Index");
 
     if(matDataList.empty()) {
-        qDebug() << "DebiasedSquaredWeightedPhaseLagIndexNew::debiasedSquaredWeightedPhaseLagIndexNew - Input data is empty";
+        qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex - Input data is empty";
         return finalNetwork;
     }
 
