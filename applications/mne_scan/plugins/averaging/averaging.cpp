@@ -613,7 +613,7 @@ void Averaging::resetAverage(bool state)
 
 void Averaging::run()
 {
-    qDebug() << "START void Averaging::run()";
+    //qDebug() << "START void Averaging::run()";
     //
     // Read Fiff Info
     //

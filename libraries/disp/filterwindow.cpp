@@ -42,13 +42,20 @@
 #include "ui_filterwindowwidget.h"
 #include "filterwindow.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include <QGraphicsScene>
+#include <QDate>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QKeyEvent>
+#include <QSvgGenerator>
 
 
 //*************************************************************************************************************
@@ -57,6 +64,8 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -65,7 +74,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 FilterWindow::FilterWindow(QWidget *parent, Qt::WindowFlags type)
-: RoundedEdgesWidget(parent, type)
+: QWidget(parent, type)
 , ui(new Ui::FilterWindowWidget)
 , m_iWindowSize(4016)
 , m_iFilterTaps(512)
@@ -93,11 +102,9 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
-void FilterWindow::setFiffInfo(const FiffInfo::SPtr &pFiffInfo)
+void FilterWindow::init(double dSFreq)
 {
-    m_pFiffInfo = pFiffInfo;
-
-    m_dSFreq = m_pFiffInfo->sfreq;
+    m_dSFreq = dSFreq;
 
     filterParametersChanged();
 
@@ -105,7 +112,7 @@ void FilterWindow::setFiffInfo(const FiffInfo::SPtr &pFiffInfo)
     m_pFilterDataModel->addFilter(m_filterData);
 
     //Update min max of spin boxes to nyquist
-    double samplingFrequency = m_pFiffInfo->sfreq;
+    double samplingFrequency = m_dSFreq;
     double nyquistFrequency = samplingFrequency/2;
 
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
@@ -335,9 +342,9 @@ void FilterWindow::initComboBoxes()
 
 void FilterWindow::initFilterPlot()
 {
-    m_pFilterPlotScene = new FilterPlotScene(ui->m_graphicsView_filterPlot, this);
+    m_pFilterPlotScene = FilterPlotScene::SPtr::create(ui->m_graphicsView_filterPlot, this);
 
-    ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
+    ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene.data());
 
     filterSelectionChanged(m_pFilterDataModel->index(m_pFilterDataModel->rowCount()-1,0), QModelIndex());
 }
@@ -405,8 +412,6 @@ void FilterWindow::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-
-    //RoundedEdgesWidget::resizeEvent(event);
 }
 
 
@@ -485,8 +490,9 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
     if(m_lActivationCheckBoxList.size()==allFilters.size())
         return;
 
-    while(!ui->m_layout_defaultFilterActivation->isEmpty())
+    while(!ui->m_layout_defaultFilterActivation->isEmpty()) {
         ui->m_layout_defaultFilterActivation->removeItem(ui->m_layout_defaultFilterActivation->itemAt(0));
+    }
 
     m_lActivationCheckBoxList.clear();
 
@@ -512,7 +518,7 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
 
             m_lActivationCheckBoxList.prepend(checkBox);
 
-            ui->m_layout_designFilter->addWidget(checkBox,6,0,2,2);
+            ui->m_layout_designFilter->addWidget(checkBox,6,0,1,2);
         }
     }
 
