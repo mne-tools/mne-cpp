@@ -121,7 +121,7 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<M
     //Add edges to network
     for(int i = 0; i < vecUnbiasedSquaredPLI.length(); ++i) {
         for(int j = 0; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecUnbiasedSquaredPLI.at(i).row(j);
+            MatrixXd matWeight = vecUnbiasedSquaredPLI.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
 

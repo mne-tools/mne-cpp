@@ -125,7 +125,7 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
     //Add edges to network
     for(int i = 0; i < vecPLV.length(); ++i) {
         for(int j = 0; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecPLV.at(i).row(j);
+            MatrixXd matWeight = vecPLV.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
 

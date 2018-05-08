@@ -122,7 +122,7 @@ Network Coherence::coherence(const QList<MatrixXd> &matDataList, const MatrixX3f
     //Add edges to network
     for(int i = 0; i < vecCoh.length(); ++i) {
         for(int j = 0; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecCoh.at(i).row(j);
+            MatrixXd matWeight = vecCoh.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
 
