@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     phaselagindex.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2018
+* @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -28,6 +28,9 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
+* @note Notes:
+* - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
+*
 *
 * @brief    PhaseLagIndex class definition.
 *
@@ -43,6 +46,8 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+
+#include <utils/spectral.h>
 
 
 //*************************************************************************************************************
@@ -69,6 +74,7 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -89,7 +95,8 @@ PhaseLagIndex::PhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
+Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert,
+                                     int iNfft, const QString &sWindowType)
 {
     Network finalNetwork("Phase Lag Index");
 
@@ -112,18 +119,13 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    //Calculate connectivity matrix over epochs and average afterwards
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
-    resultMat.waitForFinished();
-
-    MatrixXd matDist = resultMat.result();
-    matDist /= matDataList.size();
+    //Calculate all-to-all coherence matrix over epochs
+    QVector<MatrixXd> vecPLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
 
     //Add edges to network
-    for(int i = 0; i < matDist.rows(); ++i) {
-        for(int j = i; j < matDist.cols(); ++j) {            
-            MatrixXd matWeight(1,1);
-            matWeight << abs(matDist(i,j));
+    for(int i = 0; i < vecPLI.length(); ++i) {
+        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+            MatrixXd matWeight = vecPLI.at(i).row(j);
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
 
@@ -138,152 +140,56 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
 
 //*************************************************************************************************************
 
-int PhaseLagIndex::calcPhaseLagIndex(const RowVectorXd& vecFirst, const RowVectorXd& vecSecond)
+QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, int iNfft,
+                                            const QString &sWindowType)
 {
-    Eigen::FFT<double> fft;
+    // Check that iNfft >= signal length
+    int iSignalLength = matDataList.at(0).cols();
+    if (iNfft < iSignalLength) {
+        iNfft = iSignalLength;
+    }
 
-    int N = std::max(vecFirst.cols(), vecSecond.cols());
+    // Generate tapers
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
 
-    //Compute the FFT size as the "next power of 2" of the input vector's length (max)
-    int b = ceil(log2(2.0 * N - 1));
-    int fftsize = pow(2,b);
+    // Initialize vecPsdAvg and vecCsdAvg
+    int iNRows = matDataList.at(0).rows();
+    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+    QVector<MatrixXd> vecCsdAvg;
+    for (int j = 0; j < iNRows; ++j) {
+        vecCsdAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
+    }
 
-    //Zero Padd
-    RowVectorXd xCorrInputVecFirst = RowVectorXd::Zero(fftsize);
-    xCorrInputVecFirst.head(vecFirst.cols()) = vecFirst;
+    // Generate tapered spectra and CSD and sum over epoch
+    // This part could be parallelized with QtConcurrent::mappedReduced
+    for (int i = 0; i < matDataList.length(); ++i) {
+        //Remove mean
+        MatrixXd matInputData = matDataList.at(i);
+        for (int i = 0; i < matInputData.rows(); ++i) {
+            matInputData.row(i).array() -= matInputData.row(i).mean();
+        }
 
-    RowVectorXd xCorrInputVecSecond = RowVectorXd::Zero(fftsize);
-    xCorrInputVecSecond.head(vecSecond.cols()) = vecSecond;
+        // This part could be parallelized with QtConcurrent::mapped
+        QVector<MatrixXcd> vecTapSpectra;
+        for (int j = 0; j < iNRows; ++j) {
+            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
+            vecTapSpectra.append(matTmpSpectra);
+        }
 
-    //FFT for freq domain to both vectors
-    RowVectorXcd freqvec;
-    RowVectorXcd freqvec2;
-
-    fft.fwd(freqvec, xCorrInputVecFirst);
-    fft.fwd(freqvec2, xCorrInputVecSecond);
-
-    //Create conjugate complex
-    freqvec2.conjugate();
-
-    //Main step of cross corr
-    freqvec = freqvec.array() * freqvec2.array();
-
-    std::complex<double> cdCSD = freqvec.mean();
-
-    int iSignResult = 0.0;
-    for (int i = 0; i < freqvec.cols(); i++) {
-        //signum and addition of all values
-        if (cdCSD.imag() > 0.0) {
-            iSignResult = 1.0;
-        } else if (cdCSD.imag() == 0.0) {
-            iSignResult = 0.0;
-        } else {
-            iSignResult = -1.0;
+        // This part could be parallelized with QtConcurrent::mappedReduced
+        for (int j = 0; j < iNRows; ++j) {
+            MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+            for (int k = 0; k < iNRows; ++k) {
+                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
+                                                                tapers.second, tapers.second, iNfft, 1.0);
+            }
+            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.imag().cwiseSign());
         }
     }
 
-    return iSignResult;
-
-//    //Hilbert function
-//    Eigen::FFT<double> fft;
-
-//    int N = std::max(vecFirst.cols(), vecSecond.cols());
-
-//    //Compute the FFT size as the "next power of 2" of the input vector's length (max)
-//    int b = ceil(log2(2.0 * N - 1));
-//    int fftsize = pow(2,b);
-
-//    //Zero Padd
-//    RowVectorXd pLagInputVecFirst = RowVectorXd::Zero(fftsize);
-//    pLagInputVecFirst.head(vecFirst.cols()) = vecFirst;
-
-//    RowVectorXd pLagInputVecSecond = RowVectorXd::Zero(fftsize);
-//    pLagInputVecSecond.head(vecSecond.cols()) = vecSecond;
-
-//    //FFT for freq domain to both vectors
-//    RowVectorXcd freqvec;
-//    RowVectorXcd freqvec2;
-
-//    fft.fwd(freqvec, pLagInputVecFirst);
-//    fft.fwd(freqvec2, pLagInputVecSecond);
-
-//    //removing the negative frequencies
-//    RowVectorXcd freqpos;
-//    RowVectorXcd freqpos2;
-
-//    freqpos = freqvec;
-//    freqpos2 = freqvec2;
-
-//    //inverse FFT of the results
-//    RowVectorXd invfreq;
-//    RowVectorXd invfreq2;
-
-//    fft.inv(invfreq, freqpos);
-//    fft.inv(invfreq2, freqpos2);
-
-//    //Hilbert function end
-//    //Phase calculation
-//    RowVectorXd phase;
-//    RowVectorXd phase2;
-//    RowVectorXd phasediff;
-
-//    phase =  (invfreq.cwiseQuotient(pLagInputVecFirst));
-//    phase2 = (invfreq2.cwiseQuotient(pLagInputVecSecond));
-
-//    for(int i = 0; i<phase.cols(); ++i) {
-//        phase[i] = atan(phase[i]);
-//    }
-
-//    for(int i = 0; i<phase2.cols(); ++i) {
-//        phase2[i] = atan(phase2[i]);
-//    }
-//    phasediff = phase - phase2;
-
-//    //std::cout << phasediff << std::endl;
-
-//    //Main Phase Lag Index calculation
-//    RowVectorXd signResult(phasediff.cols());
-
-//    for (int i = 0; i < phasediff.cols(); i++) {
-//        //signum and addition of all values
-//        if (phasediff[i] > 0) {
-//            signResult[i] = 1.0;
-//        } else if (phasediff[i] == 0) {
-//            signResult[i] = 0.0;
-//        } else {
-//            signResult[i] = -1.0;
-//        }
-//    }
-
-//    return signResult;
-}
-
-
-//*************************************************************************************************************
-
-MatrixXd PhaseLagIndex::calculate(const MatrixXd &data)
-{
-    MatrixXd matDist(data.rows(), data.rows());
-    matDist.setZero();
-
-    for(int i = 0; i < data.rows(); ++i) {
-        for(int j = i; j < data.rows(); ++j) {
-            matDist(i,j) += calcPhaseLagIndex(data.row(i), data.row(j));
-        }
+    QVector<MatrixXd> vecPLI;
+    for (int i = 0; i < iNRows; ++i) {
+        vecPLI.append(vecCsdAvg.at(i).cwiseAbs() / matDataList.length());
     }
-
-    return matDist;
-}
-
-
-//*************************************************************************************************************
-
-void PhaseLagIndex::sum(MatrixXd &resultData, const MatrixXd &data)
-{
-    if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
-        resultData.resize(data.rows(), data.cols());
-        resultData.setZero();
-    }
-
-    resultData += data;
+    return vecPLI;
 }

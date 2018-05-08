@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     phaselagindex.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2018
+* @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -27,6 +27,9 @@
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
+*
+* @note Notes:
+* - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
 *
 * @brief     PhaseLagIndex class declaration.
@@ -110,41 +113,26 @@ public:
     *
     * @param[in] matDataList    The input data.
     * @param[in] matVert        The vertices of each network node.
+    * @param[in] iNfft          The FFT length.
+    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
+    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
+                                 int iNfft=-1, const QString &sWindowType="hanning");
 
-protected:
     //==========================================================================================================
     /**
     * Calculates the actual phase lag index between two data vectors.
     *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
+    * @param[in] matDataList    The input data.
+    * @param[in] iNfft          The FFT length.
+    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
     *
-    * @return                The PLI value.
+    * @return                   The PLI value.
     */
-    static int calcPhaseLagIndex(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
-
-    //=========================================================================================================
-    /**
-    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
-    *
-    * @param[in] data       The input data.
-    *
-    * @return               The connectivity matrix.
-    */
-    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
-
-    //=========================================================================================================
-    /**
-    * Sums up (reduces) the in parallel processed connectivity matrix.
-    *
-    * @param[out] resultData    The result data.
-    * @param[in]  data          The incoming, temporary result data.
-    */
-    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
+    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
+                                               int iNfft, const QString &sWindowType);
 };
 
 
