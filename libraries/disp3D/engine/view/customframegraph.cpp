@@ -64,7 +64,7 @@
 #include <Qt3DRender/QBlendEquation>
 #include <Qt3DRender/QBlendEquationArguments>
 #include <Qt3DRender/QCullFace>
-#include <QSurfaceFormat>
+#include <QGLFormat>
 
 
 //*************************************************************************************************************
@@ -93,7 +93,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomFrameGraph::CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCore::QNode *parent)
+CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
     : QViewport(parent)
     , m_pForwardTranspKey(new QFilterKey)
     , m_pForwardKey(new QFilterKey)
@@ -107,10 +107,7 @@ CustomFrameGraph::CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCor
     , m_bUseOpenGl4_3(false)
 {
     //Test for OpenGL version 4.3
-    if((tSurfaceFormat.majorVersion() == 4
-            && tSurfaceFormat.minorVersion() >= 3
-            || tSurfaceFormat.majorVersion() > 4))
-    {
+    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
         m_bUseOpenGl4_3 = true;
     }
 

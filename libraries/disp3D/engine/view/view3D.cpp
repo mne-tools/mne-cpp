@@ -96,7 +96,7 @@ View3D::View3D()
 , m_vecViewRotationOld(QVector3D(-90.0,130.0,0.0))
 , m_pCameraTransform(new Qt3DCore::QTransform())
 {
-    m_pFrameGraph = new CustomFrameGraph(this->format());
+    m_pFrameGraph = new CustomFrameGraph();
 
     init();
 }
