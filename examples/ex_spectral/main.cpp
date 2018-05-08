@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
 
     // Generate input data
     int iNSamples = 500;
+    double dSampFreq = 23.0;
     MatrixXd inputData = MatrixXd::Random(2, iNSamples);
     for (int n = 0; n < iNSamples; n++) {
         inputData(0, n) += 10.0 * sin(2.0 * M_PI *  10. * n / iNSamples );
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
     MatrixXcd matTapSpectrumSeed = Spectral::computeTaperedSpectra(inputData.row(0), matTaps, iNfft);
 
     //Compute PSD
-    RowVectorXd vecPsd = Spectral::psdFromTaperedSpectra(matTapSpectrumSeed, vecTapWeights, iNfft);
+    RowVectorXd vecPsd = Spectral::psdFromTaperedSpectra(matTapSpectrumSeed, vecTapWeights, iNfft, dSampFreq);
 
     //Plot PSD
     VectorXd psd = vecPsd.transpose();
@@ -133,12 +134,14 @@ int main(int argc, char *argv[])
     plotPsd.show();
 
     //Check PSD
-    VectorXd psdTest = matTapSpectrumSeed.row(0).cwiseAbs2().transpose() / double(iNfft);
+    VectorXd psdTest = matTapSpectrumSeed.row(0).cwiseAbs2().transpose();
     psdTest *= 2.0;
     psdTest(0) /= 2.0;
     if (iNfft % 2 == 0){
         psdTest.tail(1) /= 2.0;
     }
+    //Normalization
+    psdTest /= dSampFreq;
 
     //Plot PSDTest
     Plot plotPsdTest(psdTest);
@@ -150,7 +153,7 @@ int main(int argc, char *argv[])
 
     //Compute CSD of matTapSpectrumSeed and matTapSpectrumSeed
     //The real part should be equivalent to the PSD of matTapSpectrumSeed)
-    RowVectorXcd vecCsdSeed = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumSeed, vecTapWeights, vecTapWeights, iNfft);
+    RowVectorXcd vecCsdSeed = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumSeed, vecTapWeights, vecTapWeights, iNfft, dSampFreq);
     VectorXd psdTest2 = vecCsdSeed.real();
 
     //Plot PSDTest2
@@ -161,18 +164,18 @@ int main(int argc, char *argv[])
     plotPsdTest2.setWindowTitle("Corresponding function to MATLABs plot");
     plotPsdTest2.show();
 
-    //Check energy
+    //Check that sums of different psds of the same signal are equal
+    qDebug()<<psd.sum();
+    qDebug()<<psdTest.sum();
+    qDebug()<<psdTest2.sum();
     RowVectorXd data_hann = inputData.row(0).cwiseProduct(matTaps.row(0));
-    qDebug()<<"data0 energy"<<data_hann.row(0).cwiseAbs2().sum();
-    qDebug()<<"sum psd"<<psd.sum();
-    qDebug()<<"sum psdTest"<<psdTest.sum();
-    qDebug()<<"sum psdTest2"<<psdTest2.sum();
+    qDebug()<<data_hann.row(0).cwiseAbs2().sum() * double(iNSamples) / dSampFreq;
 
     //Compute Spectrum of second row of input data
     MatrixXcd matTapSpectrumTarget = Spectral::computeTaperedSpectra(inputData.row(1), matTaps, iNfft);
 
     //Compute CSD between seed and target
-    RowVectorXcd vecCsd = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumTarget, vecTapWeights, vecTapWeights, iNfft);
+    RowVectorXcd vecCsd = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumTarget, vecTapWeights, vecTapWeights, iNfft, dSampFreq);
 
     //Plot real part of CSD
     VectorXd csd = vecCsd.transpose().real();
