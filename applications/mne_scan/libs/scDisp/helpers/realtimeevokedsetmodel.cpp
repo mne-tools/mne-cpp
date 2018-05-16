@@ -289,7 +289,10 @@ void RealTimeEvokedSetModel::setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESe
     m_fSps = m_pRTESet->info()->sfreq;
 
     //Create the initial SSP projector
-    updateProjection();
+    updateProjection();    
+
+    //Create the initial Compensator projector
+    updateCompensator(0);
 
     //Init list of channels which are to filtered
     createFilterChannelList(m_pRTESet->info()->ch_names);
