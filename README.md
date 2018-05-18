@@ -36,7 +36,7 @@ Requirements
 Dependencies
 ------------
 
-[>= Qt 5.9.4](http://download.qt.io/official_releases/qt/5.9/5.9.4/)
+[>= Qt 5.9](http://download.qt.io/official_releases/qt/5.9/)
 
 
 Contact
