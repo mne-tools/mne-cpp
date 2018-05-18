@@ -2,13 +2,14 @@
 /**
 * @file     view3D.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Lars Debor <lars.debor@tu-ilmenau.de>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -60,10 +61,6 @@
 //=============================================================================================================
 
 class QPropertyAnimation;
-
-namespace Qt3DCore {
-    class QTransform;
-}
 
 namespace Qt3DRender {
     class QPointLight;
@@ -162,6 +159,7 @@ public:
     void setLightIntensity(double value);
 
 protected:
+
     //=========================================================================================================
     /**
     * Init the 3D view
@@ -176,20 +174,9 @@ protected:
 
     //=========================================================================================================
     /**
-    * Init the 3D views transformation matrices
-    */
-    void initTransformations();
-
-    //=========================================================================================================
-    /**
     * Window functions
     */
     void keyPressEvent(QKeyEvent* e) override;
-    void keyReleaseEvent(QKeyEvent* e) override;
-    void mousePressEvent(QMouseEvent* e) override;
-    void wheelEvent(QWheelEvent* e) override;
-    void mouseReleaseEvent(QMouseEvent* e) override;
-    void mouseMoveEvent(QMouseEvent* e) override;
 
     //=========================================================================================================
     /**
@@ -197,7 +184,7 @@ protected:
     *
     * @param[in] parent         The parent identity which will "hold" the coordinate system.
     */
-    void createCoordSystem(Qt3DCore::QEntity *parent);
+    void createCoordSystem(Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
@@ -207,39 +194,18 @@ protected:
     */
     void startModelRotationRecursive(QObject* pObject);
 
-    //=========================================================================================================
-    /**
-    * Sets the rotation for all 3D models being children.
-    *
-    * @param[in] obj         The parent of the children to be rotated.
-    */
-    void setRotationRecursive(QObject* obj);
 
     QPointer<Qt3DCore::QEntity>         m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
-    QPointer<Qt3DRender::QCamera>       m_pCameraEntity;                /**< The camera entity. */
-    QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
-
     QSharedPointer<Qt3DCore::QEntity>   m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
 
-    QPointer<Qt3DCore::QTransform>      m_pCameraTransform;             /**< The main camera transform. */
-
-    bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
-    bool                                m_bRotationMode;                /**< Flag for activating/deactivating the rotation mode. */
-    bool                                m_bModelRotationMode;           /**< Flag for activating/deactivating the rotation model mode (camera is default). */
-
-    QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
-
-    QVector3D                           m_vecViewTrans;                 /**< The camera translation vector. */
-    QVector3D                           m_vecViewTransOld;              /**< The camera old translation vector. */
-    QVector3D                           m_vecViewRotation;              /**< The camera rotation vector. */
-    QVector3D                           m_vecViewRotationOld;           /**< The camera old rotation vector. */
-    QVector3D                           m_vecModelRotation;             /**< The model rotation vector. */
-    QVector3D                           m_vecModelRotationOld;          /**< The model old rotation vector. */
+    QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
+    QPointer<Qt3DRender::QCamera>       m_pCamera;                      /**< The camera entity. */
 
     QList<QPointer<QPropertyAnimation>>  m_lPropertyAnimations;         /**< The animations for each 3D object. */
     QList<QPointer<Qt3DRender::QPointLight>>  m_lLightSources;          /**< The light sources. */
+
 };
 
 } // NAMESPACE

@@ -127,7 +127,6 @@ CustomFrameGraph::~CustomFrameGraph()
     m_pCameraSelector->deleteLater();
     m_pForwardFilter->deleteLater();
     m_pSortPolicy->deleteLater();
-    m_pMemoryBarrier->deleteLater();
     m_pForwardKey->deleteLater();
     m_pComputeKey->deleteLater();
     m_pForwardState->deleteLater();
