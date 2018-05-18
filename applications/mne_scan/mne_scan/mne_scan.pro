@@ -120,7 +120,7 @@ unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 # Icon
 win32 {
-    RC_ICONS = images/appIcons/icon_mne_scan.ico
+    RC_FILE = images/appIcons/mne_scan.rc
 }
 macx {
     ICON = images/appIcons/mne_scan.icns
