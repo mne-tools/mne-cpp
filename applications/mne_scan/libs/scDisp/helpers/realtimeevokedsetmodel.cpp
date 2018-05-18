@@ -288,6 +288,14 @@ void RealTimeEvokedSetModel::setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESe
 
     m_fSps = m_pRTESet->info()->sfreq;
 
+    m_matSparseProjMult = SparseMatrix<double>(m_pRTESet->info()->chs.size(),m_pRTESet->info()->chs.size());
+    m_matSparseCompMult = SparseMatrix<double>(m_pRTESet->info()->chs.size(),m_pRTESet->info()->chs.size());
+    m_matSparseProjCompMult = SparseMatrix<double>(m_pRTESet->info()->chs.size(),m_pRTESet->info()->chs.size());
+
+    m_matSparseProjMult.setIdentity();
+    m_matSparseCompMult.setIdentity();
+    m_matSparseProjCompMult.setIdentity();
+
     //Create the initial SSP projector
     updateProjection();    
 
