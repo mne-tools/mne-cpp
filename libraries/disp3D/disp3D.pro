@@ -142,7 +142,8 @@ SOURCES += \
     engine/model/materials/geometrymultipliermaterial.cpp \
     engine/view/customframegraph.cpp \
     engine/model/materials/gpuinterpolationmaterial.cpp \
-    engine/model/materials/abstractphongalphamaterial.cpp
+    engine/model/materials/abstractphongalphamaterial.cpp \
+    engine/view/orbitalcameracontroller.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -196,7 +197,8 @@ HEADERS += \
     engine/model/materials/geometrymultipliermaterial.h \
     engine/view/customframegraph.h \
     engine/model/materials/gpuinterpolationmaterial.h \
-    engine/model/materials/abstractphongalphamaterial.h
+    engine/model/materials/abstractphongalphamaterial.h \
+    engine/view/orbitalcameracontroller.h
 
 FORMS += \
     engine/control/control3dwidget.ui \
