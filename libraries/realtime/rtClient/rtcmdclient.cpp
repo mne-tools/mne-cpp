@@ -110,8 +110,7 @@ QString RtCmdClient::sendCLICommand(const QString &p_sCommand)
 
 void RtCmdClient::sendCommandJSON(const Command &p_command)
 {
-    const QString t_sCommand = QString("{\"commands\":{%1}}\n").arg(
-            p_command.toStringReadySend());
+    const QString t_sCommand = QString("{\"commands\":{%1}}\n").arg(p_command.toStringReadySend());
 
     QString t_sReply;
 
