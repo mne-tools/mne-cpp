@@ -211,5 +211,6 @@ macx {
     DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
     # Set arg(s) to libpath to find all libs needed to copy into app
     QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -libpath=$${MNE_LIBRARY_DIR}
+    QMAKE_CLEAN += -r $${DEPLOY_TARGET}
 }
 
