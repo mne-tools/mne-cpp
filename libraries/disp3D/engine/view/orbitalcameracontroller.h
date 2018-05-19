@@ -83,9 +83,14 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* Description of what this class is intended to do (in detail).
+* This class allows controlling the scene camera along an orbital path.
 *
-* @brief Brief description of this class.
+* The controls are:
+* - use arrow key or hold down the right mouse button to orbit the camera around the view center
+* - press page up and down or the mouse wheel to zoom the camera in and out
+* - hold down to the middle mouse button to translate the camera and the view center
+*
+* @brief This class allows controlling the scene camera along an orbital path.
 */
 class DISP3DSHARED_EXPORT OrbitalCameraController : public Qt3DExtras::QAbstractCameraController
 {
@@ -101,22 +106,40 @@ public:
     */
     OrbitalCameraController(Qt3DCore::QNode *pParent = nullptr);
 
+    //=========================================================================================================
+    /**
+    * Default destructor.
+    */
     ~OrbitalCameraController() = default;
 
-
-
-protected:
-
 private:
-
-
+    //=========================================================================================================
+    /**
+    * QAbstractCameraController function:
+    *
+    * This method is called whenever a frame action is triggered.
+    * It does implement the camera movement specific to this controller.
+    */
     void moveCamera(const QAbstractCameraController::InputState &state, float dt) override;
 
+    //=========================================================================================================
+    /**
+    * Initialzes OrbitalCameraController object.
+    */
     void initController();
 
-    inline float distance(const QVector3D &firstPoint, const QVector3D &secondPoint);
+    //=========================================================================================================
+    /**
+    * Calcultes the distance between 2 points.
+    *
+    * @param[in] firstPoint     The first point.
+    * @param[in] secondPoint    The second point.
+    *
+    * @returns the distance between the 2 points.
+    */
+    inline float distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const;
 
-    const float m_fZoomInLimit = 0.04f;
+    const float m_fZoomInLimit = 0.04f;         /**< The minimum distance of the camera to the the view center. */
 };
 
 
@@ -125,8 +148,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
-float OrbitalCameraController::distance(const QVector3D &firstPoint, const QVector3D &secondPoint)
+float OrbitalCameraController::distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const
 {
     return (secondPoint - firstPoint).length();
 }
