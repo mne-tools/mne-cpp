@@ -82,6 +82,8 @@ OrbitalCameraController::OrbitalCameraController(Qt3DCore::QNode *pParent)
 }
 
 
+//*************************************************************************************************************
+
 void OrbitalCameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::InputState &state, float dt)
 {
     Qt3DRender::QCamera *pCamera = this->camera();
@@ -90,40 +92,40 @@ void OrbitalCameraController::moveCamera(const Qt3DExtras::QAbstractCameraContro
         return;
     }
 
-    pCamera->upVector();
-
     //Mouse input
     if(state.rightMouseButtonActive) {
         // orbit around view center
         pCamera->panAboutViewCenter(state.rxAxisValue * this->lookSpeed() * dt, QVector3D(0.0f, 0.0f, 1.0f));
-        //pCamera->rollAboutViewCenter((state.rxAxisValue * this->lookSpeed()) * dt);
         pCamera->tiltAboutViewCenter(state.ryAxisValue * this->lookSpeed() * dt);
     }
 
-    else {
-        //zoom
-        if(distance(pCamera->position(), pCamera->viewCenter()) > m_fZoomInLimit) {
-            pCamera->translate(QVector3D(0.0f, 0.0f, state.tzAxisValue * this->linearSpeed() * dt), pCamera->DontTranslateViewCenter);
-        }
-        else {
-            pCamera->translate(QVector3D(0.0f, 0.0f, -m_fZoomInLimit), pCamera->DontTranslateViewCenter);
-        }
-
-        //rotate with keyboard
-        pCamera->panAboutViewCenter(state.txAxisValue * this->lookSpeed() * dt * 0.5f , QVector3D(0.0f, 0.0f, 1.0f));
-        //pCamera->rollAboutViewCenter((state.rxAxisValue * this->lookSpeed()) * dt);
-        pCamera->tiltAboutViewCenter(state.tyAxisValue * this->lookSpeed()* dt * 0.5f);
+    if(state.middleMouseButtonActive) {
+        //translate the cameras view center
+        pCamera->translate(QVector3D(state.rxAxisValue * this->linearSpeed() * dt * 0.2f,
+                                     state.ryAxisValue * this->linearSpeed() * dt * 0.2f,
+                                     0.0f));
     }
 
+    //zoom with mouse wheel and page up and down
+    if(distance(pCamera->position(), pCamera->viewCenter()) > m_fZoomInLimit) {
+        pCamera->translate(QVector3D(0.0f, 0.0f, state.tzAxisValue * this->linearSpeed() * dt), pCamera->DontTranslateViewCenter);
+    }
+    else {
+        pCamera->translate(QVector3D(0.0f, 0.0f, -m_fZoomInLimit), pCamera->DontTranslateViewCenter);
+    }
 
-
-
-
+    //Keyboard input: orbit around view center
+    pCamera->panAboutViewCenter(state.txAxisValue * this->lookSpeed() * dt * 0.5f , QVector3D(0.0f, 0.0f, 1.0f));
+    pCamera->tiltAboutViewCenter(state.tyAxisValue * this->lookSpeed()* dt * 0.5f);
 }
+
+
+//*************************************************************************************************************
 
 void OrbitalCameraController::initController()
 {
     this->setLinearSpeed(0.5f);
+    this->setLookSpeed(90.f);
 }
 
 
