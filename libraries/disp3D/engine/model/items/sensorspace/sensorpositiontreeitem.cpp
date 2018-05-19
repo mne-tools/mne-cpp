@@ -143,7 +143,9 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
                 tempTransform(j, 2) = lChInfo[i].coil_trans.row(j)(2);
             }
 
-            vTransforms.push_back(tempTransform);
+            if(!vTransforms.contains(tempTransform)) {
+                vTransforms.push_back(tempTransform);
+            }
         }
 
         //Set instance Transform
