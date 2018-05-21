@@ -304,7 +304,7 @@ void NihonKhoden::init()
     //
     // Read cfg file
     //
-    QFile t_qFile(QString("%1/resources/mne_rt_server_plugins/FiffSimulation.cfg").arg(QCoreApplication::applicationDirPath()));
+    QFile t_qFile(QString("%1/resources/mne_rt_server_plugins/NihonKhoden.cfg").arg(QCoreApplication::applicationDirPath()));
     if (t_qFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QTextStream in(&t_qFile);
@@ -323,7 +323,7 @@ void NihonKhoden::init()
                 if (t_qFileMeas.open(QIODevice::ReadOnly))
                 {
                     m_sResourceDataPath = sFileName;
-                    std::cout << "\tLoad simulation file: " << sFileName.toUtf8().constData() << std::endl;
+                    std::cout << "\tLoad NihonKhoden file: " << sFileName.toUtf8().constData() << std::endl;
                     t_qFileMeas.close();
                 }
             }
