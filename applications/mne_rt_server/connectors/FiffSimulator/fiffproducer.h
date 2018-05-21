@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dataproducer.h
+* @file     fiffproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     declaration of the DataProducer Class.
+* @brief     Declaration of the FiffProducer class.
 *
 */
 
@@ -42,8 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "circularbuffer.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,19 +53,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffConnectorPlugin
+// DEFINE NAMESPACE FIFFSIMULATORPLUGIN
 //=============================================================================================================
 
 namespace FIFFSIMULATORPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-//using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -82,7 +72,7 @@ class FiffSimulator;
 /**
 * DECLARE CLASS FiffProducer
 *
-* @brief The FiffProducer class provides a ECG data producer for a given sampling rate.
+* @brief The FiffProducer class provides a data producer for a given sampling rate.
 */
 class FiffProducer : public QThread
 {
@@ -90,19 +80,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DataProducer.
+    * Constructs a FiffProducer.
     */
-    FiffProducer(FiffSimulator* simulator);
+    FiffProducer(FiffSimulator* simulator = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destroys the DataProducer.
+    * Destroys the FiffProducer.
     */
     ~FiffProducer();
 
     //=========================================================================================================
     /**
-    * Stops the DataProducer by stopping the producer's thread.
+    * Stops the FiffProducer by stopping the producer's thread.
     */
     virtual bool stop();
 

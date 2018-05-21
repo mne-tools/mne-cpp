@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the FiffSimulator Class.
+* @brief     Declaration of the FiffSimulator class.
 *
 */
 
 #ifndef FIFFSIMULATOR_H
 #define FIFFSIMULATOR_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,12 +44,6 @@
 
 #include "fiffsimulator_global.h"
 #include "../../mne_rt_server/IConnector.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
 
 #include <fiff/fiff_raw_data.h>
 #include <utils/generics/circularmatrixbuffer.h>
@@ -65,7 +60,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffConnectorPlugin
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FIFFSIMULATORPLUGIN
 //=============================================================================================================
 
 namespace FIFFSIMULATORPLUGIN
@@ -74,15 +75,7 @@ namespace FIFFSIMULATORPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace RTSERVER;
-using namespace IOBUFFER;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// FIFFSIMULATORPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffProducer;
@@ -94,7 +87,7 @@ class FiffProducer;
 *
 * @brief The FiffSimulator class provides a Fiff data simulator.
 */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public IConnector
+class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public RTSERVER::IConnector
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "fiffsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -127,7 +120,7 @@ public:
 
     virtual void connectCommandManager();
 
-    virtual ConnectorID getConnectorID() const;
+    virtual RTSERVER::ConnectorID getConnectorID() const;
 
     virtual const char* getName() const;
 
@@ -149,7 +142,7 @@ private:
     *
     * @param[in] p_command  The buffer sample size command.
     */
-    void comBufsize(Command p_command);
+    void comBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
@@ -157,7 +150,7 @@ private:
     *
     * @param[in] p_command  The buffer sample size command.
     */
-    void comGetBufsize(Command p_command);
+    void comGetBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
@@ -165,7 +158,7 @@ private:
     *
     * @param[in] p_command  The acceleration factor command.
     */
-    void comAccel(Command p_command);
+    void comAccel(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
@@ -173,7 +166,7 @@ private:
     *
     * @param[in] p_command  The acceleration factor command.
     */
-    void comGetAccel(Command p_command);
+    void comGetAccel(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
@@ -181,9 +174,7 @@ private:
     *
     * @param[in] p_command  The fiff simulation file command.
     */
-    void comSimfile(Command p_command);
-
-    //////////
+    void comSimfile(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
@@ -191,20 +182,24 @@ private:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * Read the raw FiffInfo.
+    */
     bool readRawInfo();
 
     QMutex mutex;
 
-    FiffProducer*   m_pFiffProducer;        /**< Holds the DataProducer.*/
-    FiffRawData     m_RawInfo;              /**< Holds the fiff raw measurement information. */
-    QString         m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
-    quint32         m_uiBufferSampleSize;   /**< Sample size of the buffer */
-    float           m_AccelerationFactor;   /**< Acceleration factor to simulate different sampling rates. */
-    float           m_TrueSamplingRate;     /**< The true sampling rate of the fif file. */
+    FiffProducer*               m_pFiffProducer;        /**< Holds the DataProducer.*/
+    IOBUFFER::RawMatrixBuffer*  m_pRawMatrixBuffer;     /**< The Circular Raw Matrix Buffer. */
+    FIFFLIB::FiffRawData        m_RawInfo;              /**< Holds the fiff raw measurement information. */
+    QString                     m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
+    quint32                     m_uiBufferSampleSize;   /**< Sample size of the buffer */
+    float                       m_AccelerationFactor;   /**< Acceleration factor to simulate different sampling rates. */
+    float                       m_TrueSamplingRate;     /**< The true sampling rate of the fif file. */
+    bool                        m_bIsRunning;           /**< Flag whether the producer is running.*/
 
-    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    bool            m_bIsRunning;
 };
 
 } // NAMESPACE
