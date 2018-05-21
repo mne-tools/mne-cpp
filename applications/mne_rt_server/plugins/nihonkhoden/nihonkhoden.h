@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulator.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     July, 2012
-*
-* @section  LICENSE
-*
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* @file     nihonkhoden.h
+# @author   Lorenz Esch <lesc@mgh.harvard.edu>;
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @version  1.0
+# @date     May, 2018
+#
+# @section  LICENSE
+#
+# Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Declaration of the FiffSimulator class.
+* @brief     Declaration of the NihonKhoden Class.
 *
 */
 
-#ifndef FIFFSIMULATOR_H
-#define FIFFSIMULATOR_H
+#ifndef NIHONKHODEN_H
+#define NIHONKHODEN_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiffsimulator_global.h"
+#include "nihonkhoden_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
 #include <fiff/fiff_raw_data.h>
@@ -66,35 +66,35 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFSIMULATORPLUGIN
+// DEFINE NAMESPACE NIHONKHODENPLUGIN
 //=============================================================================================================
 
-namespace FIFFSIMULATORPLUGIN
+namespace NIHONKHODENPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFFSIMULATORPLUGIN FORWARD DECLARATIONS
+// NIHONKHODENPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffProducer;
+class NihonKhodenProducer;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffSimulator
+* DECLARE CLASS NihonKhoden
 *
-* @brief The FiffSimulator class provides a Fiff data simulator.
+* @brief The NihonKhoden class provides a way of reading data from a Nihon Khoden file and stream it via TCP/IP.
 */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public RTSERVER::IConnector
+class NIHONKHODENSHARED_EXPORT NihonKhoden : public RTSERVER::IConnector
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "fiffsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "nihonkhoden.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(RTSERVER::IConnector)
 
-    friend class FiffProducer;
+    friend class NihonKhodenProducer;
 
 public:
     struct Commands
@@ -108,15 +108,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulator.
+    * Constructs a NihonKhoden.
     */
-    FiffSimulator();
+    NihonKhoden();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulator.
+    * Destroys the NihonKhoden.
     */
-    virtual ~FiffSimulator();
+    virtual ~NihonKhoden();
 
     virtual void connectCommandManager();
 
@@ -176,7 +176,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Initialise the FiffSimulator.
+    * Initialise the NihonKhoden.
     */
     void init();
 
@@ -188,18 +188,16 @@ private:
 
     QMutex mutex;
 
-    FiffProducer*               m_pFiffProducer;        /**< Holds the DataProducer.*/
+    NihonKhodenProducer*        m_pFiffProducer;        /**< Holds the DataProducer.*/
     IOBUFFER::RawMatrixBuffer*  m_pRawMatrixBuffer;     /**< The Circular Raw Matrix Buffer. */
     FIFFLIB::FiffRawData        m_RawInfo;              /**< Holds the fiff raw measurement information. */
     QString                     m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
     quint32                     m_uiBufferSampleSize;   /**< Sample size of the buffer */
     float                       m_AccelerationFactor;   /**< Acceleration factor to simulate different sampling rates. */
     float                       m_TrueSamplingRate;     /**< The true sampling rate of the fif file. */
-    bool                        m_bIsRunning;           /**< Flag whether the producer is running.*/
-
-
+    bool                        m_bIsRunning;           /**< Whether the producer is running or not.*/
 };
 
 } // NAMESPACE
 
-#endif // FIFFSIMULATOR_H
+#endif // NIHONKHODEN_H
