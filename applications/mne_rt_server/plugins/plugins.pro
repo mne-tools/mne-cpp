@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     connectors.pro
+# @file     plugins.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all connector modules.
+# @brief    This project file builds all connector plugins.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -38,13 +38,13 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    FiffSimulator \
+    fiffsimulator \
     nihonkhoden \
 
 # Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
 unix:!macx{
     SUBDIRS += \
-        Neuromag
+        neuromag
 }
 
 CONFIG += ordered

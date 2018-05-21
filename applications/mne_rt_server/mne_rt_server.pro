@@ -39,6 +39,6 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     mne_rt_server \
-    connectors
+    plugins
 
 CONFIG += ordered
