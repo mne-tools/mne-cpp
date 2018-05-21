@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulator.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     July, 2012
-*
-* @section  LICENSE
-*
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* @file     nihonkhoden.cpp
+# @author   Lorenz Esch <lesc@mgh.harvard.edu>;
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @version  1.0
+# @date     May, 2018
+#
+# @section  LICENSE
+#
+# Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Definition of the FiffSimulator class.
+* @brief     Definition of the NihonKhoden Class.
 *
 */
 
@@ -38,13 +38,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiffsimulator.h"
-#include "fiffproducer.h"
+#include "nihonkhoden.h"
+#include "nihonkhodenproducer.h"
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_types.h>
 
 #include <realtime/rtCommand/command.h>
+
+//#include <mne/mne.h>
+//#include <mne/mne_epoch_data_list.h>
 
 
 //*************************************************************************************************************
@@ -63,7 +66,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFSIMULATORPLUGIN;
+using namespace NIHONKHODENPLUGIN;
 using namespace FIFFLIB;
 using namespace RTSERVER;
 using namespace IOBUFFER;
@@ -74,11 +77,11 @@ using namespace IOBUFFER;
 // DEFINE MEMBER CONSTANTS
 //=============================================================================================================
 
-const QString FiffSimulator::Commands::BUFSIZE      = "bufsize";
-const QString FiffSimulator::Commands::GETBUFSIZE   = "getbufsize";
-const QString FiffSimulator::Commands::ACCEL        = "accel";
-const QString FiffSimulator::Commands::GETACCEL     = "getaccel";
-const QString FiffSimulator::Commands::SIMFILE      = "simfile";
+const QString NihonKhoden::Commands::BUFSIZE      = "bufsize";
+const QString NihonKhoden::Commands::GETBUFSIZE   = "getbufsize";
+const QString NihonKhoden::Commands::ACCEL        = "accel";
+const QString NihonKhoden::Commands::GETACCEL     = "getaccel";
+const QString NihonKhoden::Commands::SIMFILE      = "simfile";
 
 
 //*************************************************************************************************************
@@ -86,8 +89,8 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffSimulator::FiffSimulator()
-: m_pFiffProducer(new FiffProducer(this))
+NihonKhoden::NihonKhoden()
+: m_pFiffProducer(new NihonKhodenProducer(this))
 , m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(100)//(4)
 , m_AccelerationFactor(1.0)
@@ -101,9 +104,9 @@ FiffSimulator::FiffSimulator()
 
 //*************************************************************************************************************
 
-FiffSimulator::~FiffSimulator()
+NihonKhoden::~NihonKhoden()
 {
-    qDebug() << "Destroy FiffSimulator::~FiffSimulator()";
+    qDebug() << "Destroy NihonKhoden::~NihonKhoden()";
 
     delete m_pFiffProducer;
 
@@ -114,7 +117,7 @@ FiffSimulator::~FiffSimulator()
 
 //*************************************************************************************************************
 
-void FiffSimulator::comBufsize(Command p_command)
+void NihonKhoden::comBufsize(Command p_command)
 {
     //ToDO JSON
 
@@ -148,7 +151,7 @@ void FiffSimulator::comBufsize(Command p_command)
 
 //*************************************************************************************************************
 
-void FiffSimulator::comGetBufsize(Command p_command)
+void NihonKhoden::comGetBufsize(Command p_command)
 {
     bool t_bCommandIsJson = p_command.isJson();
     if(t_bCommandIsJson)
@@ -171,7 +174,7 @@ void FiffSimulator::comGetBufsize(Command p_command)
 
 //*************************************************************************************************************
 
-void FiffSimulator::comAccel(Command p_command)
+void NihonKhoden::comAccel(Command p_command)
 {
     //ToDO JSON
 
@@ -204,7 +207,7 @@ void FiffSimulator::comAccel(Command p_command)
 
 //*************************************************************************************************************
 
-void FiffSimulator::comGetAccel(Command p_command)
+void NihonKhoden::comGetAccel(Command p_command)
 {
     bool t_bCommandIsJson = p_command.isJson();
     if(t_bCommandIsJson)
@@ -227,7 +230,7 @@ void FiffSimulator::comGetAccel(Command p_command)
 
 //*************************************************************************************************************
 
-void FiffSimulator::comSimfile(Command p_command)
+void NihonKhoden::comSimfile(Command p_command)
 {
     //
     // simulation file
@@ -267,36 +270,36 @@ void FiffSimulator::comSimfile(Command p_command)
 
 //*************************************************************************************************************
 
-void FiffSimulator::connectCommandManager()
+void NihonKhoden::connectCommandManager()
 {
     //Connect slots
-    QObject::connect(&m_commandManager[Commands::BUFSIZE], &Command::executed, this, &FiffSimulator::comBufsize);
-    QObject::connect(&m_commandManager[Commands::GETBUFSIZE], &Command::executed, this, &FiffSimulator::comGetBufsize);
-    QObject::connect(&m_commandManager[Commands::ACCEL], &Command::executed, this, &FiffSimulator::comAccel);
-    QObject::connect(&m_commandManager[Commands::GETACCEL], &Command::executed, this, &FiffSimulator::comGetAccel);
-    QObject::connect(&m_commandManager[Commands::SIMFILE], &Command::executed, this, &FiffSimulator::comSimfile);
+    QObject::connect(&m_commandManager[Commands::BUFSIZE], &Command::executed, this, &NihonKhoden::comBufsize);
+    QObject::connect(&m_commandManager[Commands::GETBUFSIZE], &Command::executed, this, &NihonKhoden::comGetBufsize);
+    QObject::connect(&m_commandManager[Commands::ACCEL], &Command::executed, this, &NihonKhoden::comAccel);
+    QObject::connect(&m_commandManager[Commands::GETACCEL], &Command::executed, this, &NihonKhoden::comGetAccel);
+    QObject::connect(&m_commandManager[Commands::SIMFILE], &Command::executed, this, &NihonKhoden::comSimfile);
 }
 
 
 //*************************************************************************************************************
 
-ConnectorID FiffSimulator::getConnectorID() const
+ConnectorID NihonKhoden::getConnectorID() const
 {
-    return _FIFFSIMULATOR;
+    return _NIHONKHODEN;
 }
 
 
 //*************************************************************************************************************
 
-const char* FiffSimulator::getName() const
+const char* NihonKhoden::getName() const
 {
-    return "Fiff File Simulator";
+    return "Nihon Khoden";
 }
 
 
 //*************************************************************************************************************
 
-void FiffSimulator::init()
+void NihonKhoden::init()
 {
     //
     // Read cfg file
@@ -339,7 +342,7 @@ void FiffSimulator::init()
 
 //*************************************************************************************************************
 
-bool FiffSimulator::start()
+bool NihonKhoden::start()
 {
     this->init();
 
@@ -354,7 +357,7 @@ bool FiffSimulator::start()
 
 //*************************************************************************************************************
 
-bool FiffSimulator::stop()
+bool NihonKhoden::stop()
 {
     this->m_pFiffProducer->stop();
     m_bIsRunning = false;
@@ -366,7 +369,7 @@ bool FiffSimulator::stop()
 
 //*************************************************************************************************************
 
-void FiffSimulator::info(qint32 ID)
+void NihonKhoden::info(qint32 ID)
 {
 
     if(m_RawInfo.isEmpty())
@@ -379,7 +382,7 @@ void FiffSimulator::info(qint32 ID)
 
 //*************************************************************************************************************
 
-bool FiffSimulator::readRawInfo()
+bool NihonKhoden::readRawInfo()
 {
     if(m_RawInfo.isEmpty())
     {
@@ -496,7 +499,7 @@ bool FiffSimulator::readRawInfo()
 
 //*************************************************************************************************************
 
-void FiffSimulator::run()
+void NihonKhoden::run()
 {
     m_bIsRunning = true;
 
