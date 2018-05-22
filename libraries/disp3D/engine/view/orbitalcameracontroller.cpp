@@ -94,9 +94,17 @@ void OrbitalCameraController::moveCamera(const Qt3DExtras::QAbstractCameraContro
 
     //Mouse input
     if(state.rightMouseButtonActive) {
-        // orbit around view center
-        pCamera->panAboutViewCenter(state.rxAxisValue * this->lookSpeed() * dt, QVector3D(0.0f, 0.0f, 1.0f));
-        pCamera->tiltAboutViewCenter(state.ryAxisValue * this->lookSpeed() * dt);
+        if(state.altKeyActive) {
+            //translate camera in x/y direction
+            pCamera->translate(QVector3D(state.rxAxisValue * this->linearSpeed() * dt * 0.2f,
+                                         state.ryAxisValue * this->linearSpeed() * dt * 0.2f,
+                                         0.0f));
+        }
+        else {
+            // orbit around view center
+            pCamera->panAboutViewCenter(state.rxAxisValue * this->lookSpeed() * dt, QVector3D(0.0f, 0.0f, 1.0f));
+            pCamera->tiltAboutViewCenter(state.ryAxisValue * this->lookSpeed() * dt);
+        }
     }
 
     if(state.middleMouseButtonActive) {

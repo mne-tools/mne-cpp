@@ -88,7 +88,8 @@ namespace DISP3DLIB {
 * The controls are:
 * - use arrow key or hold down the right mouse button to orbit the camera around the view center
 * - press page up and down or the mouse wheel to zoom the camera in and out
-* - hold down to the middle mouse button to translate the camera and the view center
+* - hold down to the middle mouse button or press the ALT-key + right mouse button
+*   to translate the camera and the view center in x/y direction
 *
 * @brief This class allows controlling the scene camera along an orbital path.
 */
