@@ -199,6 +199,22 @@ macx {
 
     loutrc.path = Contents/MacOS/resources/general/2DLayouts
     loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
+
+    filtrc.path = Contents/MacOS/resources/general/default_filters
+    filtrc.files = $${ROOT_DIR}/resources/general/default_filters
+    QMAKE_BUNDLE_DATA += filtrc
+
+    hpirc.path = Contents/MacOS/resources/general/hpiAlignment
+    hpirc.files = $${ROOT_DIR}/resources/general/hpiAlignment
+    QMAKE_BUNDLE_DATA += hpirc
+
+    ssrc.path = Contents/MacOS/resources/general/sensorSurfaces
+    ssrc.files = $${ROOT_DIR}/resources/general/sensorSurfaces
+    QMAKE_BUNDLE_DATA += ssrc
+
+    lout3rc.path = Contents/MacOS/resources/general/3DLayouts
+    lout3rc.files = $${ROOT_DIR}/resources/general/3DLayouts
+    QMAKE_BUNDLE_DATA += lout3rc
     QMAKE_BUNDLE_DATA += loutrc
 
     isEmpty(TARGET_EXT) {

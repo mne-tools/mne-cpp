@@ -171,6 +171,10 @@ macx {
         TARGET_CUSTOM_EXT = $${TARGET_EXT}
     }
 
+    extensions.path = Contents/MacOS/
+    extensions.files = $${ROOT_DIR}/applications/mne_analyze/extensions
+    QMAKE_BUNDLE_DATA += extensions
+
     DEPLOY_COMMAND = macdeployqt
     DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
     # Set arg(s) to libpath to find all libs needed to copy into app
