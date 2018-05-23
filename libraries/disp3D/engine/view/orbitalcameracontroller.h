@@ -113,6 +113,14 @@ public:
     */
     ~OrbitalCameraController() = default;
 
+    //=========================================================================================================
+    /**
+    * Turns invers rotation of the camera on and off.
+    *
+    * @param[in] newStatusFlag      The new status of the inversion
+    */
+    void invertCameraRotation(bool newStatusFlag);
+
 private:
     //=========================================================================================================
     /**
@@ -140,6 +148,7 @@ private:
     */
     inline float distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const;
 
+    float m_rotationInversFactor = 1.0f;             /**< The factor used to invers the camera rotation. */
     const float m_fZoomInLimit = 0.04f;         /**< The minimum distance of the camera to the the view center. */
 };
 
