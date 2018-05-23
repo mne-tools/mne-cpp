@@ -165,18 +165,19 @@ macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
+    isEmpty(TARGET_EXT) {
+        TARGET_CUSTOM_EXT = .app
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    }
 
-#    # Copy libs
-#    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
-#    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
-#    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Inverse.*,libMNE1Disp.*,libMNE1Disp3D.*} $${BUNDLEFRAMEDIR}
+    extensions.path = Contents/MacOS/
+    extensions.files = $${ROOT_DIR}/bin/mne_analyze_extensions
+    QMAKE_BUNDLE_DATA += extensions
 
-#    DEPLOY_COMMAND = macdeployqt
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
+    DEPLOY_COMMAND = macdeployqt
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+    # Set arg(s) to libpath to find all libs needed to copy into app
+    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -libpath=$${MNE_LIBRARY_DIR}
+    QMAKE_CLEAN += -r $${DEPLOY_TARGET}
 }
