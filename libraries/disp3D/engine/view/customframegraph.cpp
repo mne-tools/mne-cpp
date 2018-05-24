@@ -140,6 +140,9 @@ CustomFrameGraph::~CustomFrameGraph()
     m_pBlendEquation->deleteLater();
     m_pBlendArguments->deleteLater();
     m_pNoDepthMask->deleteLater();
+    if(m_bUseOpenGl4_3){
+        m_pMemoryBarrier->deleteLater();
+    }
 }
 
 
