@@ -45,6 +45,10 @@ DEFINES  += QT_NO_SSL
 
 TARGET = mne_sample_data_downloader
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }

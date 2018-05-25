@@ -42,6 +42,10 @@ TARGET = mne_launch
 
 CONFIG += c++11
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }

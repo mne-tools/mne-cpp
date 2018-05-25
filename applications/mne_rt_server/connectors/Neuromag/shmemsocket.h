@@ -115,7 +115,7 @@ public:
     *
     * \return Status OK or FAIL.
     */
-    int receive_tag (QSharedPointer<FIFFLIB::FiffTag> p_pTag);
+    int receive_tag (QSharedPointer<FIFFLIB::FiffTag>& p_pTag);
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================

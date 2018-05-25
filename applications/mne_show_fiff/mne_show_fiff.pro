@@ -44,6 +44,10 @@ VERSION = $${MNE_CPP_VERSION}
 CONFIG   += console
 CONFIG   -= app_bundle
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 TARGET = mne_show_fiff
 
 CONFIG(debug, debug|release) {

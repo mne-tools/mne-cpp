@@ -261,9 +261,9 @@ void DacqServer::run()
     m_bIsRunning = true;
 
     connect(this, &DacqServer::measInfoAvailable,
-            m_pNeuromag, &Neuromag::releaseMeasInfo);
+            m_pNeuromag.data(), &Neuromag::releaseMeasInfo);
 
-    m_pCollectorSock = QSharedPointer<CollectorSocket>::create();
+    m_pCollectorSock = QSharedPointer<CollectorSocket>(new CollectorSocket);
 
     // Make sure the buffer size is at least as big as the minimal buffer size
     if(m_pNeuromag->m_uiBufferSampleSize < MIN_BUFLEN)
@@ -298,7 +298,7 @@ void DacqServer::run()
         printf("[done]\r\n");
     }
 
-    m_pShmemSock = QSharedPointer<ShmemSocket>::create();
+    m_pShmemSock = QSharedPointer<ShmemSocket>(new ShmemSocket);
 
     m_pShmemSock->set_data_filter (NULL, 0);
 
@@ -337,7 +337,7 @@ void DacqServer::run()
 
             // Create buffer
             if(!m_pNeuromag->m_info.isEmpty())
-                m_pNeuromag->m_pRawMatrixBuffer = RawMatrixBuffer::SPtr::create(RAW_BUFFFER_SIZE, m_pNeuromag->m_info.nchan, m_pNeuromag->m_uiBufferSampleSize);
+                m_pNeuromag->m_pRawMatrixBuffer = RawMatrixBuffer::SPtr(new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_info.nchan, m_pNeuromag->m_uiBufferSampleSize));
         }
         else
             m_bIsRunning = false;
