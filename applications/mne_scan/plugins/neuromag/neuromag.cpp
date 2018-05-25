@@ -78,12 +78,12 @@ Neuromag::Neuromag()
 : m_sNeuromagClientAlias("mne_scan")
 , m_pRtCmdClient(NULL)
 , m_bCmdClientIsConnected(false)
-, m_sNeuromagIP("141.35.69.116")//("127.0.0.1")
+, m_sNeuromagIP("172.21.16.88")//("127.0.0.1")
 , m_pNeuromagProducer(new NeuromagProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
 , m_bIsRunning(false)
-, m_sFiffHeader(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/neuromag/header.fif")
+, m_sFiffHeader(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/neuromag/header.fif")
 , m_iActiveConnectorId(0)
 {
 
@@ -335,8 +335,15 @@ bool Neuromag::start()
 
         return true;
     }
-    else
+    else {
+        if(!m_pFiffInfo) {
+            qWarning()<<"Neuromag::start - FiffInfo is empty (NULL).";
+        }
+        if(!m_bCmdClientIsConnected) {
+            qWarning()<<"Neuromag::start - m_bCmdClientIsConnected is false.";
+        }
         return false;
+    }
 }
 
 
