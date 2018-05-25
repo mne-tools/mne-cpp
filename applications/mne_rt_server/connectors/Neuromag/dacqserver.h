@@ -131,10 +131,9 @@ private:
 
     bool getMeasInfo(FIFFLIB::FiffInfo &p_FiffInfo);
 
-//    QString         m_sCollectorHost;
     QSharedPointer<CollectorSocket>     m_pCollectorSock;
     QSharedPointer<ShmemSocket>         m_pShmemSock;
-    QPointer<Neuromag>                   m_pNeuromag;
+    QPointer<Neuromag>                  m_pNeuromag;
 
     bool                m_bIsRunning;
     bool                m_bMeasInfoRequest;

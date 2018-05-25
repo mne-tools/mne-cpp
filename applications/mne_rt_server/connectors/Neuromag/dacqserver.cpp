@@ -335,13 +335,9 @@ void DacqServer::run()
                 m_bMeasInfoRequest = false;
             }
 
-            // Reset Buffer Size
-            if(m_pNeuromag->m_pRawMatrixBuffer)
-                delete m_pNeuromag->m_pRawMatrixBuffer;
-            m_pNeuromag->m_pRawMatrixBuffer = NULL;
-
+            // Create buffer
             if(!m_pNeuromag->m_info.isEmpty())
-                m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_info.nchan, m_pNeuromag->m_uiBufferSampleSize);
+                m_pNeuromag->m_pRawMatrixBuffer = RawMatrixBuffer::SPtr::create(RAW_BUFFFER_SIZE, m_pNeuromag->m_info.nchan, m_pNeuromag->m_uiBufferSampleSize);
         }
         else
             m_bIsRunning = false;
