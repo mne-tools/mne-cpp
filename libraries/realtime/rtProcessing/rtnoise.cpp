@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RtNoise Class.
+* @brief     Definition of the RtNoise Class.
 *
 */
 

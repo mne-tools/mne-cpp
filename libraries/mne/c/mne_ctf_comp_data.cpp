@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneCTFCompData Class.
+* @brief    Definition of the MneCTFCompData Class.
 *
 */
 

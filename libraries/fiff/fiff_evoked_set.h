@@ -148,7 +148,7 @@ public:
     /**
     * mne_compensate_to
     *
-    * ### MNE toolbox root function ### Implementation of the mne_compensate_to function
+    * ### MNE toolbox root function ### Definition of the mne_compensate_to function
     *
     * Apply compensation to the data as desired
     *

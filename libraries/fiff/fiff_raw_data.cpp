@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffRawData Class.
+* @brief    Definition of the FiffRawData Class.
 *
 */
 

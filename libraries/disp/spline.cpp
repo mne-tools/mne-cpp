@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    implementation of spline class
+* @brief    Definition of spline class
 *
 */
 

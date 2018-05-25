@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SelectionManagerWindow class.
+* @brief    Definition of the SelectionManagerWindow class.
 *
 */
 

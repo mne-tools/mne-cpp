@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the FiffStreamThread Class.
+* @brief     Definition of the FiffStreamThread Class.
 *
 */
 

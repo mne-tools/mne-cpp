@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeMultiSampleArrayWidget Class.
+* @brief    Definition of the RealTimeMultiSampleArrayWidget Class.
 *
 */
 

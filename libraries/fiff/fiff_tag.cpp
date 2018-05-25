@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffTag Class.
+* @brief    Definition of the FiffTag Class.
 *
 */
 

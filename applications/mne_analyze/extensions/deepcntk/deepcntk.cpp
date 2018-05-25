@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DeepCNTK class.
+* @brief    Definition of the DeepCNTK class.
 *
 */
 

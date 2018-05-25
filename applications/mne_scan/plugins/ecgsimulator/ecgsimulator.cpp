@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSimulator class.
+* @brief    Definition of the ECGSimulator class.
 *
 */
 

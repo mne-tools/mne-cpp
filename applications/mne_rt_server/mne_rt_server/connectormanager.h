@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the ConnectorManager Class.
+* @brief     Definition of the ConnectorManager Class.
 *
 */
 
