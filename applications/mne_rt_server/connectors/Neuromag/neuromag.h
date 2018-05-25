@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     declaration of the Neuromag Class.
+* @brief     Declaration of the Neuromag Class.
 *
 */
 
@@ -44,16 +44,7 @@
 #include "neuromag_global.h"
 #include "../../mne_rt_server/IConnector.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_raw_data.h>
 #include <utils/generics/circularmatrixbuffer.h>
-
-#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -61,31 +52,22 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
 #include <QMutex>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
+// DEFINE NAMESPACE NEUROMAGRTSERVERPLUGIN
 //=============================================================================================================
 
-namespace NeuromagPlugin
+namespace NEUROMAGRTSERVERPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace RTSERVER;
-using namespace IOBUFFER;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// NEUROMAGRTSERVERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class DacqServer;
@@ -97,7 +79,7 @@ class DacqServer;
 *
 * @brief The Neuromag class provides an Elekta Neuromag connector.
 */
-class NEUROMAGSHARED_EXPORT Neuromag : public IConnector
+class NEUROMAGSHARED_EXPORT Neuromag : public RTSERVER::IConnector
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -114,7 +96,6 @@ public:
     */
     Neuromag();
 
-
     //=========================================================================================================
     /**
     * Destroys the Neuromag Connector.
@@ -124,7 +105,7 @@ public:
 
     virtual void connectCommandManager();
 
-    virtual ConnectorID getConnectorID() const;
+    virtual RTSERVER::ConnectorID getConnectorID() const;
 
     virtual const char* getName() const;
 
@@ -134,24 +115,19 @@ public:
 
     virtual bool stop();
 
-
     void releaseMeasInfo();
-
-//public slots: --> in Qt 5 not anymore declared as slot
 
 protected:
     virtual void run();
 
 private:
-
-    //Slots
     //=========================================================================================================
     /**
     * Sets the buffer sample size
     *
     * @param[in] p_command  The buffer sample size command.
     */
-    void comBufsize(Command p_command);
+    void comBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
@@ -159,7 +135,7 @@ private:
     *
     * @param[in] p_command  The buffer sample size command.
     */
-    void comGetBufsize(Command p_command);
+    void comGetBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
@@ -167,19 +143,15 @@ private:
     */
     void init();
 
+    QMutex                      mutex;
 
-    QMutex mutex;
+    QSharedPointer<DacqServer>  m_pDacqServer;
+    IOBUFFER::RawMatrixBuffer*  m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    DacqServer*     m_pDacqServer;
-
-    FiffInfo        m_info;
+    FIFFLIB::FiffInfo           m_info;
 
     int             m_iID;
-
-    quint32         m_uiBufferSampleSize;   /**< Sample size of the buffer */
-
-    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
-
+    quint32         m_uiBufferSampleSize;       /**< Sample size of the buffer */
     bool            m_bIsRunning;
 
 };
