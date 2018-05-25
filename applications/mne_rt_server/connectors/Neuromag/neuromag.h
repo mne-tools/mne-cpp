@@ -143,12 +143,12 @@ private:
     */
     void init();
 
-    QMutex                      mutex;
+    QMutex                          mutex;
 
-    QSharedPointer<DacqServer>  m_pDacqServer;
-    IOBUFFER::RawMatrixBuffer*  m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
+    QSharedPointer<DacqServer>      m_pDacqServer;
+    IOBUFFER::RawMatrixBuffer::SPtr m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
 
-    FIFFLIB::FiffInfo           m_info;
+    FIFFLIB::FiffInfo               m_info;
 
     int             m_iID;
     quint32         m_uiBufferSampleSize;       /**< Sample size of the buffer */

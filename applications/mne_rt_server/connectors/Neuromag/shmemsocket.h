@@ -88,6 +88,7 @@ namespace NEUROMAGRTSERVERPLUGIN
 class ShmemSocket : public QObject
 {
     Q_OBJECT
+
 public:
     explicit ShmemSocket(QObject *parent = 0);
 
