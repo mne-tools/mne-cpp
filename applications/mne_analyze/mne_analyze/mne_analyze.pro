@@ -43,20 +43,15 @@ qtHaveModule(printsupport): QT += printsupport
 
 TARGET = mne_analyze
 
-#If one single executable is to be build
-#-> comment out flag in .pri file
-#-> add DEFINES += BUILD_STATIC_LIBRARIES in projects .pro file
-#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
-contains(MNECPP_CONFIG, buildStaticLibraries) {
-    DEFINES += BUILD_STATIC_LIBRARIES
-}
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-#Note that the static flag is ingored when building against a dynamic qt version
-CONFIG += static console #DEBUG console
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
+CONFIG += console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {

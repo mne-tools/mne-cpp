@@ -66,7 +66,7 @@ using namespace RTSERVER;
 //=============================================================================================================
 
 Neuromag::Neuromag()
-: m_pDacqServer(QSharedPointer<DacqServer>::create(this))
+: m_pDacqServer(QSharedPointer<DacqServer>(new DacqServer(this)))
 , m_iID(-1)
 , m_uiBufferSampleSize(600)
 , m_bIsRunning(false)
