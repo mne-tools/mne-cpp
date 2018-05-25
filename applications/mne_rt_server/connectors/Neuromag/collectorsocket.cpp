@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CollectorSocket Class.
+* @brief     Definition of the CollectorSocket class.
 *
 */
 
@@ -54,7 +54,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NeuromagPlugin;
+using namespace NEUROMAGRTSERVERPLUGIN;
 
 
 //*************************************************************************************************************
@@ -69,6 +69,7 @@ CollectorSocket::CollectorSocket(QObject *parent)
 {
 
 }
+
 
 //*************************************************************************************************************
 
@@ -118,10 +119,10 @@ bool CollectorSocket::open()
 
 
 //*************************************************************************************************************
-// ToDo doesn't work without setting first buffersize first
+
 int CollectorSocket::getMaxBuflen()
 {
-
+// ToDo doesn't work without setting first buffersize first
     int maxbuflen = -1;
 
     QString t_sSend = QString("%1\r\n").arg(COLLECTOR_GETVARS);

@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "types_definitions.h"
-#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -55,27 +54,28 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace NeuromagPlugin
+namespace FIFFLIB {
+    class FiffTag;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE NEUROMAGRTSERVERPLUGIN
+//=============================================================================================================
+
+namespace NEUROMAGRTSERVERPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// NEUROMAGRTSERVERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-//class FiffTag;
 
 
 //=============================================================================================================
@@ -93,8 +93,6 @@ public:
 
     virtual ~ShmemSocket();
 
-
-    // client_socket.c
     //=========================================================================================================
     /**
     * Receive one tag from the data server.
@@ -110,11 +108,13 @@ public:
     * data.It is needed also if the conndedtion needs to be
     * closed after an error.
     *
+    * Ported from client_socket.c
+    *
     * @param[in] p_pTag ToDo
     *
     * \return Status OK or FAIL.
     */
-    int receive_tag (FiffTag::SPtr& p_pTag);
+    int receive_tag (QSharedPointer<FIFFLIB::FiffTag> p_pTag);
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
@@ -163,12 +163,8 @@ public:
     */
     int interesting_data (int kind);
 
-
-
-
 private:
-
-    // shmem.c
+    //Ported from shmem.c
     //=========================================================================================================
     /**
     *
@@ -184,7 +180,6 @@ private:
     */
     int init_shmem();
 
-
     //=========================================================================================================
     /**
     * Release the shared memory
@@ -193,7 +188,6 @@ private:
     */
     int release_shmem();
 
-
     //=========================================================================================================
     /**
     *
@@ -201,42 +195,34 @@ private:
     */
     FILE* open_fif (char *name);
 
-
     //=========================================================================================================
     /**
     *
     *
-    * fd        File to read from
-    * pos       Position in file
-    * size      How long
-    * data);    Put data here
+    * @param[in] fd     File to read from
+    * @param[in] pos    Position in file
+    * @param[in] size   How long
+    * @param[in] data   Put data here
+    *
     * @return
     */
     int read_fif (FILE *fd, long pos, size_t size, char *data);
 
-
 private:
+    int*            filter_kinds;   /**< Filter these tags */
+    int             nfilt;          /**< How many are they */
 
-    int* filter_kinds;  /**< Filter these tags */
-    int nfilt;          /**< How many are they */
+    int             shmid;
+    dacqShmBlock    shmptr;
 
-    int shmid;
-    dacqShmBlock shmptr;
+    int             m_iShmemSock;
+    int             m_iShmemId;
 
-    int     m_iShmemSock;
-    int     m_iShmemId;
+    FILE*           fd;             /**<  The temporary file */
+    FILE*           shmem_fd;
+    char*           filename;
 
-    FILE   *fd;		/* The temporary file */
-    FILE   *shmem_fd;
-    char   *filename;
-
-    FILE *read_fd;
-
-    
-signals:
-    
-public slots:
-    
+    FILE*           read_fd;
 };
 
 } // NAMESPACE
