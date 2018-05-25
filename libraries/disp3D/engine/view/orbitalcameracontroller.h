@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     view3D.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Lars Debor <lars.debor@tu-ilmenau.de>
+* @file     orbitalcameracontroller.h
+* @author   Lars Debor <lars.debor@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     May, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch, Lars Debor and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,18 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    View3D class declaration.
+* @brief     OrbitalCameraController class declaration.
 *
 */
 
-#ifndef DISP3DLIB_VIEW3D_H
-#define DISP3DLIB_VIEW3D_H
+#ifndef DISP3DLIB_ORBITALCAMERACONTROLLER_H
+#define DISP3DLIB_ORBITALCAMERACONTROLLER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include <Qt3DExtras/QAbstractCameraController>
 #include "../../disp3D_global.h"
 
 
@@ -50,9 +51,14 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DExtras/Qt3DWindow>
+#include <QSharedPointer>
 #include <QVector3D>
-#include <QPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -60,20 +66,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QPropertyAnimation;
-
-namespace Qt3DRender {
-    class QPointLight;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
-{
+namespace DISP3DLIB {
 
 
 //*************************************************************************************************************
@@ -81,132 +80,89 @@ namespace DISP3DLIB
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Data3DTreeModel;
-class CustomFrameGraph;
-
 
 //=============================================================================================================
 /**
-* Visualizes 3D/2D objects in a 3D space such as brain, DTI, MRI, sensor, helmet data.
+* This class allows controlling the scene camera along an orbital path.
 *
-* @brief Visualizes 3D data
+* The controls are:
+* - use arrow key or hold down the right mouse button to orbit the camera around the view center
+* - press page up and down or the mouse wheel to zoom the camera in and out
+* - hold down to the middle mouse button or press the ALT-key + right mouse button
+*   to translate the camera and the view center in x/y direction
+*
+* @brief This class allows controlling the scene camera along an orbital path.
 */
-class DISP3DSHARED_EXPORT View3D : public Qt3DExtras::Qt3DWindow
+class DISP3DSHARED_EXPORT OrbitalCameraController : public Qt3DExtras::QAbstractCameraController
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
-    typedef QSharedPointer<View3D> SPtr;             /**< Shared pointer type for View3D class. */
-    typedef QSharedPointer<const View3D> ConstSPtr;  /**< Const shared pointer type for View3D class. */
+    typedef QSharedPointer<OrbitalCameraController> SPtr;            /**< Shared pointer type for OrbitalCameraController. */
+    typedef QSharedPointer<const OrbitalCameraController> ConstSPtr; /**< Const shared pointer type for OrbitalCameraController. */
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Constructs a OrbitalCameraController object.
     */
-    explicit View3D(/*QWidget *parent = 0*/);
+    OrbitalCameraController(Qt3DCore::QNode *pParent = nullptr);
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Default destructor.
     */
-    ~View3D() = default;
+    ~OrbitalCameraController() = default;
 
     //=========================================================================================================
     /**
-    * Return the tree model which holds the subject information.
+    * Turns invers rotation of the camera on and off.
     *
-    * @param[in] pModel     The tree model holding the 3d models.
+    * @param[in] newStatusFlag      The new status of the inversion
     */
-    void setModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
+    void invertCameraRotation(bool newStatusFlag);
 
+private:
     //=========================================================================================================
     /**
-    * Set the background color of the scene.
+    * QAbstractCameraController function:
     *
-    * @param[in] colSceneColor          The new background color of the view.
+    * This method is called whenever a frame action is triggered.
+    * It does implement the camera movement specific to this controller.
     */
-    void setSceneColor(const QColor& colSceneColor);
+    void moveCamera(const QAbstractCameraController::InputState &state, float dt) override;
 
     //=========================================================================================================
     /**
-    * Starts or stops to rotate all loaded 3D models.
+    * Initialzes OrbitalCameraController object.
     */
-    void startStopModelRotation(bool checked);
+    void initController();
 
     //=========================================================================================================
     /**
-    * Toggle the coord axis visibility.
-    */
-    void toggleCoordAxis(bool checked);
-
-    //=========================================================================================================
-    /**
-    * Show fullscreen.
-    */
-    void showFullScreen(bool checked);
-
-    //=========================================================================================================
-    /**
-    * Change light color.
-    */
-    void setLightColor(const QColor &color);
-
-    //=========================================================================================================
-    /**
-    * Set light intensity.
-    */
-    void setLightIntensity(double value);
-
-protected:
-
-    //=========================================================================================================
-    /**
-    * Init the 3D view
-    */
-    void init();
-
-    //=========================================================================================================
-    /**
-    * Init the light for the 3D view
-    */
-    void initLight();
-
-    //=========================================================================================================
-    /**
-    * Window function
-    */
-    void keyPressEvent(QKeyEvent* e) override;
-
-    //=========================================================================================================
-    /**
-    * Creates a coordiante system (x/Green, y/Red, z/Blue).
+    * Calcultes the distance between 2 points.
     *
-    * @param[in] parent         The parent identity which will "hold" the coordinate system.
-    */
-    void createCoordSystem(Qt3DCore::QEntity* parent);
-
-    //=========================================================================================================
-    /**
-    * Starts the automated rotation animation for all 3D models being childern.
+    * @param[in] firstPoint     The first point.
+    * @param[in] secondPoint    The second point.
     *
-    * @param[in] pObject         The parent of the children to be rotated.
+    * @returns the distance between the 2 points.
     */
-    void startModelRotationRecursive(QObject* pObject);
+    inline float distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const;
 
-
-    QPointer<Qt3DCore::QEntity>         m_pRootEntity;                  /**< The root/most top level entity buffer. */
-    QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
-    QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
-    QSharedPointer<Qt3DCore::QEntity>   m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
-
-    QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
-    QPointer<Qt3DRender::QCamera>       m_pCamera;                      /**< The camera entity. */
-
-    QList<QPointer<QPropertyAnimation>>  m_lPropertyAnimations;         /**< The animations for each 3D object. */
-    QList<QPointer<Qt3DRender::QPointLight>>  m_lLightSources;          /**< The light sources. */
-
+    float m_rotationInversFactor = 1.0f;             /**< The factor used to invers the camera rotation. */
+    const float m_fZoomInLimit = 0.04f;         /**< The minimum distance of the camera to the the view center. */
 };
 
-} // NAMESPACE
 
-#endif // DISP3DLIB_VIEW3D_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+float OrbitalCameraController::distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const
+{
+    return (secondPoint - firstPoint).length();
+}
+
+} // namespace DISP3DLIB
+
+#endif // DISP3DLIB_ORBITALCAMERACONTROLLER_H
