@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNEProjOp Class.
+* @brief    Definition of the MNEProjOp Class.
 *
 */
 

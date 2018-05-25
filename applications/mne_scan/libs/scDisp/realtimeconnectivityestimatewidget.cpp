@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeConnectivityEstimateWidget Class.
+* @brief    Definition of the RealTimeConnectivityEstimateWidget Class.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffCtfComp Class.
+* @brief    Definition of the FiffCtfComp Class.
 *
 */
 

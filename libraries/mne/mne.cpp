@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNE Wrapper Class.
+* @brief     Definition of the MNE Wrapper Class.
 *
 */
 

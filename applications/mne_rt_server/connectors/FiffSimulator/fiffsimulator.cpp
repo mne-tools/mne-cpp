@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the FiffSimulator Class.
+* @brief     Definition of the FiffSimulator Class.
 *
 */
 

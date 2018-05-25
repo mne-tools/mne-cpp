@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AverageSceneItem class.
+* @brief    Definition of the AverageSceneItem class.
 *
 */
 

@@ -129,7 +129,7 @@ public:
     /**
     * mne_make_compensator
     *
-    * ### MNE toolbox root function ### Implementation of the mne_make_compensator function
+    * ### MNE toolbox root function ### Definition of the mne_make_compensator function
     *
     * Create a compensation matrix to bring the data from one compensation state to another
     *
@@ -146,7 +146,7 @@ public:
     /**
     * mne_get_current_comp
     *
-    * ### MNE toolbox root function ### Implementation of the mne_get_current_comp function
+    * ### MNE toolbox root function ### Definition of the mne_get_current_comp function
     *
     * Get the current compensation in effect in the data
     *
@@ -158,7 +158,7 @@ public:
     /**
     * mne_make_projector_info
     *
-    * ### MNE toolbox root function ###  Implementation of the mne_make_projector_info function
+    * ### MNE toolbox root function ###  Definition of the mne_make_projector_info function
     *
     * Make a SSP operator using the meas info
     *
@@ -172,7 +172,7 @@ public:
     /**
     * mne_make_projector_info
     *
-    * ### MNE toolbox root function ###  Implementation of the mne_make_projector_info function
+    * ### MNE toolbox root function ###  Definition of the mne_make_projector_info function
     *
     * Make a SSP operator using the meas info
     *
@@ -209,7 +209,7 @@ public:
     /**
     * mne_set_current_comp
     *
-    * ### MNE toolbox root function ### Implementation of the mne_set_current_comp function
+    * ### MNE toolbox root function ### Definition of the mne_set_current_comp function
     *
     * Consider taking the member function of set_current_comp(fiff_int_t value),
     * when compensation should be applied to the channels of FiffInfo

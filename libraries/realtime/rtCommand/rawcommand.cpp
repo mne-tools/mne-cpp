@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RawCommand Class.
+* @brief     Definition of the RawCommand Class.
 *
 */
 

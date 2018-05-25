@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FrequencySpectrumDelegate Class.
+* @brief    Definition of the FrequencySpectrumDelegate Class.
 *
 */
 

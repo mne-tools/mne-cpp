@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RtDataClient Class.
+* @brief     Definition of the RtDataClient Class.
 *
 */
 
