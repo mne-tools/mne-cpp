@@ -379,8 +379,7 @@ int main(int argc, char *argv[])
                                                                    sourceEstimate,
                                                                    t_clusteredFwd,
                                                                    t_surfSet,
-                                                                   t_annotationSet,
-                                                                   p3DAbstractView->getView()->format());
+                                                                   t_annotationSet);
 
     p3DAbstractView->show();
 
@@ -390,5 +389,5 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileClusteredStc);
     }
 
-    return a.exec();//1;//a.exec();
+    return a.exec();
 }

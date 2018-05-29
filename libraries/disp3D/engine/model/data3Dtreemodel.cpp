@@ -255,8 +255,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
                                                     const MNESourceEstimate& tSourceEstimate,
                                                     const MNELIB::MNEForwardSolution& tForwardSolution,
                                                     const FSLIB::SurfaceSet& tSurfSet,
-                                                    const FSLIB::AnnotationSet& tAnnotSet,
-                                                    const QSurfaceFormat &tSurfaceFormat)
+                                                    const FSLIB::AnnotationSet& tAnnotSet)
 {
     bool bUseGPU = false;
 
@@ -474,8 +473,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                                    const MatrixXd& matSensorData,
                                                    const MNEBemSurface& tBemSurface,
                                                    const FiffInfo& fiffInfo,
-                                                   const QString& sDataType,
-                                                   const QSurfaceFormat &tSurfaceFormat)
+                                                   const QString& sDataType)
 {
     bool bUseGPU = false;
 

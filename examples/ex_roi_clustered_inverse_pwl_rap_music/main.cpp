@@ -394,8 +394,7 @@ int main(int argc, char *argv[])
                                                                    sourceEstimate,
                                                                    t_clusteredFwd,
                                                                    t_surfSet,
-                                                                   t_annotationSet,
-                                                                   p3DAbstractView->getView()->format());
+                                                                   t_annotationSet);
 
     p3DAbstractView->show();
 
