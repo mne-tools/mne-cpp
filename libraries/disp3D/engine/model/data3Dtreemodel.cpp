@@ -64,10 +64,9 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-
 #include <Qt3DCore/QEntity>
-
 #include <QSurfaceFormat>
+#include <QGLFormat>
 
 
 //*************************************************************************************************************
@@ -262,12 +261,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
     bool bUseGPU = false;
 
     // Only support CPU support until we figured out the QBuffer memory problem when dealing with large matrices
-//    //Test for OpenGL version 4.3
-//    if((tSurfaceFormat.majorVersion() == 4
-//            && tSurfaceFormat.minorVersion() >= 3
-//            || tSurfaceFormat.majorVersion() > 4))
-//    {
-//        //use compute shader version
+//    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
 //        bUseGPU = true;
 //        qDebug("Using compute shader version for 3D visualization.");
 //    }
@@ -486,14 +480,9 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
     bool bUseGPU = false;
 
     // Only support CPU support until we figured out the QBuffer memory problem when dealing with large matrices
-//    //Test for OpenGL version 4.3
-//    if((tSurfaceFormat.majorVersion() == 4
-//            && tSurfaceFormat.minorVersion() >= 3
-//            || tSurfaceFormat.majorVersion() > 4))
-//    {
-//        //use compute shader version
+//    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
 //        bUseGPU = true;
-//        qDebug("Using compute shader version of SensorDataTreeItem.");
+//        qDebug("Using compute shader version for 3D visualization.");
 //    }
 
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;
