@@ -23,6 +23,30 @@ defineTest(minQtVersion) {
     return(false)
 }
 
+defineReplace(MacDeployArgs) {
+    target = $$1
+    target_ext = $$2
+    mne_binary_dir = $$3
+    mne_library_dir = $$4
+    extra_libs = $$5
+
+    isEmpty($${target_ext}) {
+        target_custom_ext = .app
+    } else {
+        target_custom_ext = $${target_ext}
+    }
+
+    deploy_cmd = macdeployqt
+
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+
+    deploy_libs_to_copy = -libpath=$${mne_library_dir}
+    !isEmpty($${extra_libs}) {
+       deploy_libs_to_copy += -libpath=$${extra_libs}
+    }
+
+    return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
+ }
 
 ############################################### GLOBAL DEFINES ################################################
 
@@ -46,8 +70,8 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## Build MNE-CPP Deep library
 MNECPP_CONFIG += buildDeep
 
-#Build minimalVersion for qt versions <5.9.1
-!minQtVersion(5, 9, 1) {
+#Build minimalVersion for qt versions < 5.10.0
+!minQtVersion(5, 10, 0) {
     message("Building minimal version due to Qt version $${QT_VERSION}.")
     MNECPP_CONFIG += minimalVersion
 }
