@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Defintion of the DacqServer class.
+* @brief     Definition of the DacqServer class.
 *
 */
 
