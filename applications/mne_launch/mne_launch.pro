@@ -85,27 +85,24 @@ unix:!macx {
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
-
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .app
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = macdeployqt
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-    # Set arg(s) with libpath and qmldir for Quick frameworks
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -libpath=$${MNE_LIBRARY_DIR} -qmldir=$${PWD}/qml
-    QMAKE_CLEAN += -r $${DEPLOY_TARGET}
+    EXTRA_LIBDIRS = -qmldir=$${PWD}/qml
+ 
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 
     # fix up app bundle via install target to have soft links to enable running external binaries
+    DEPLOY_TARGET = $$member(DEPLOY_CMD, 1)
     browse.path = $${DEPLOY_TARGET}/Contents/MacOS/
     browse.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../mne_browse.app/Contents/MacOS/mne_browse .)
     analyze.path = $${DEPLOY_TARGET}/Contents/MacOS/
     analyze.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../mne_analyze.app/Contents/MacOS/mne_analyze .)
     scan.path = $${DEPLOY_TARGET}/Contents/MacOS/
     scan.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../mne_scan.app/Contents/MacOS/mne_scan .)
-    INSTALLS += browse analyze scan
+    data.path = $${DEPLOY_TARGET}/Contents/MacOS/
+    data.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../MNE-sample-data .)
+    INSTALLS += browse analyze scan data
 }
 
 HEADERS += \

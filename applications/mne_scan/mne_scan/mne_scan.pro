@@ -151,27 +151,27 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     # Copy Resource folder to app bundle
-    filtrc.path = Contents/MacOS/resources/general/default_filters
+    filtrc.path = Contents/MacOS/resources/general/
     filtrc.files = $${ROOT_DIR}/resources/general/default_filters
     QMAKE_BUNDLE_DATA += filtrc
 
-    sgrc.path = Contents/MacOS/resources/general/selectionGroups
+    sgrc.path = Contents/MacOS/resources/general/
     sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
     QMAKE_BUNDLE_DATA += sgrc
 
-    loutrc.path = Contents/MacOS/resources/general/2DLayouts
+    loutrc.path = Contents/MacOS/resources/general/
     loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
     QMAKE_BUNDLE_DATA += loutrc
 
-    hpirc.path = Contents/MacOS/resources/general/hpiAlignment
+    hpirc.path = Contents/MacOS/resources/general/
     hpirc.files = $${ROOT_DIR}/resources/general/hpiAlignment
     QMAKE_BUNDLE_DATA += hpirc
 
-    ssrc.path = Contents/MacOS/resources/general/sensorSurfaces
+    ssrc.path = Contents/MacOS/resources/general/
     ssrc.files = $${ROOT_DIR}/resources/general/sensorSurfaces
     QMAKE_BUNDLE_DATA += ssrc
 
-    lout3rc.path = Contents/MacOS/resources/general/3DLayouts
+    lout3rc.path = Contents/MacOS/resources/general/
     lout3rc.files = $${ROOT_DIR}/resources/general/3DLayouts
     QMAKE_BUNDLE_DATA += lout3rc
 
@@ -182,17 +182,13 @@ macx {
     plugins.path = Contents/MacOS/
     plugins.files = $${ROOT_DIR}/bin/mne_scan_plugins
     QMAKE_BUNDLE_DATA += plugins
-
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .app
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = macdeployqt
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-    # Set arg(s) to libpath to find all libs needed to copy into app
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -libpath=$${MNE_LIBRARY_DIR}
-    QMAKE_CLEAN += -r $${DEPLOY_TARGET}
+    EXTRA_LIBDIRS = -dmg
+ 
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    deploy_app = $$member(DEPLOY_CMD, 1)
+    dmg_file = $$replace(deploy_app, .app, .dmg)
+    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
 
 }

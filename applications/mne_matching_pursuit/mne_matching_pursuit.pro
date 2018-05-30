@@ -117,18 +117,13 @@ macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
     QMAKE_RPATHDIR += @executable_path/../libs
+    EXTRA_LIBDIRS =
 
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .app
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 
-    DEPLOY_COMMAND = macdeployqt
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-    # Set arg(s) to libpath to find all libs needed to copy into app
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -libpath=$${MNE_LIBRARY_DIR}
-    QMAKE_CLEAN += -r $${DEPLOY_TARGET}
 }
 win32 {
     isEmpty(TARGET_EXT) {
