@@ -64,7 +64,7 @@
 #include <Qt3DRender/QBlendEquation>
 #include <Qt3DRender/QBlendEquationArguments>
 #include <Qt3DRender/QCullFace>
-#include <QSurfaceFormat>
+#include <QGLFormat>
 
 
 //*************************************************************************************************************
@@ -93,7 +93,7 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomFrameGraph::CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCore::QNode *parent)
+CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
     : QViewport(parent)
     , m_pForwardTranspKey(new QFilterKey)
     , m_pForwardKey(new QFilterKey)
@@ -107,10 +107,7 @@ CustomFrameGraph::CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCor
     , m_bUseOpenGl4_3(false)
 {
     //Test for OpenGL version 4.3
-    if((tSurfaceFormat.majorVersion() == 4
-            && tSurfaceFormat.minorVersion() >= 3
-            || tSurfaceFormat.majorVersion() > 4))
-    {
+    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
         m_bUseOpenGl4_3 = true;
     }
 
@@ -130,7 +127,6 @@ CustomFrameGraph::~CustomFrameGraph()
     m_pCameraSelector->deleteLater();
     m_pForwardFilter->deleteLater();
     m_pSortPolicy->deleteLater();
-    m_pMemoryBarrier->deleteLater();
     m_pForwardKey->deleteLater();
     m_pComputeKey->deleteLater();
     m_pForwardState->deleteLater();
@@ -144,6 +140,9 @@ CustomFrameGraph::~CustomFrameGraph()
     m_pBlendEquation->deleteLater();
     m_pBlendArguments->deleteLater();
     m_pNoDepthMask->deleteLater();
+    if(m_bUseOpenGl4_3){
+        m_pMemoryBarrier->deleteLater();
+    }
 }
 
 
@@ -192,6 +191,9 @@ void CustomFrameGraph::init()
     {
         m_pMemoryBarrier = new QMemoryBarrier(m_pCameraSelector);
         m_pForwardState = new QRenderStateSet(m_pMemoryBarrier);
+
+        //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
+        m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
     }
     else
     {
@@ -251,9 +253,6 @@ void CustomFrameGraph::init()
     //Set draw policy
     QVector<QSortPolicy::SortType> sortTypes = {QSortPolicy::StateChangeCost, QSortPolicy::BackToFront};
     m_pSortPolicy->setSortTypes(sortTypes);
-
-    //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
-    m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
 }
 
 

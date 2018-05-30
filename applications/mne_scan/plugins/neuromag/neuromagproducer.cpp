@@ -198,15 +198,17 @@ void NeuromagProducer::run()
         {
             m_pNeuromag->rtServerMutex.lock();
             m_pNeuromag->m_pFiffInfo = m_pRtDataClient->readInfo();
-            emit m_pNeuromag->fiffInfoAvailable();
             m_pNeuromag->rtServerMutex.unlock();
 
             producerMutex.lock();
-            m_bFlagInfoRequest = false;
+            if(m_pNeuromag->m_pFiffInfo) {
+                m_bFlagInfoRequest = false;
+                emit m_pNeuromag->fiffInfoAvailable();
+            }
             producerMutex.unlock();
         }
 
-        if(m_bFlagMeasuring)
+        if(m_bFlagMeasuring && !m_bFlagInfoRequest)
         {
             m_pRtDataClient->readRawBuffer(m_pNeuromag->m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
