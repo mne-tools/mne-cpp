@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/LorenzE/mne-cpp/blob/mne_scan_improvements/tools/design/logos/MNE-CPP_Logo.svg" width="600" height="300" alt="MNE-CPP"><br><br>
+  <img src="/tools/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"><br><br>
 </div>
 
 -----------------
