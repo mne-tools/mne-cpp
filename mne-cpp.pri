@@ -40,12 +40,10 @@ defineReplace(MacDeployArgs) {
 
     deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
 
-    message("$$extra_args")
     deploy_libs_to_copy = -libpath=$${mne_library_dir}
     !isEmpty(extra_args) {
       deploy_libs_to_copy += $${extra_args}
     }
-    message("$$deploy_cmd $$deploy_target $$deploy_libs_to_copy")
     return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
  }
 
