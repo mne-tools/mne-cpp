@@ -103,12 +103,6 @@ macx {
     # Mac now creates app bundle
     CONFIG += app_bundle
 
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .app
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     # Copy Resource folder to app bundle
@@ -116,11 +110,11 @@ macx {
     explain.path = Contents/MacOS/resources/general/explanations
     explain.files = $${ROOT_DIR}/resources/general/explanations/fiff_explanations.txt
     QMAKE_BUNDLE_DATA += explain
+    EXTRA_LIBDIRS =
 
-    DEPLOY_COMMAND = macdeployqt
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-    # Set arg(s) to libpath to find all libs needed to copy into app
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -libpath=$${MNE_LIBRARY_DIR}
-    QMAKE_CLEAN += -r $${DEPLOY_TARGET}
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 
 }

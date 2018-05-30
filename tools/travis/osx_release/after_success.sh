@@ -4,16 +4,6 @@ if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     # === Deployment ===
     TANGIBLES=(mne_scan mne_browse mne_analyze)
     n_elements=${#TANGIBLES[@]}
-    for ((i = 0; i < n_elements; i++)); do
-        fixfile="./bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
-        destdir="./bin/${TANGIBLES[i]}.app/Contents/Frameworks/"
-
-        dylibbundler -od -b -x $fixfile -d $destdir -p @executable_path/../Frameworks/
-		
-        tangible="./bin/${TANGIBLES[i]}.app"
-        macdeployqt $tangible -dmg
-	done
-
 	
     # === Copy Tangibles ===
     if [[ $TRAVIS_BRANCH == 'master' ]]; then

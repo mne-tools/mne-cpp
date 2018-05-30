@@ -28,7 +28,7 @@ defineReplace(MacDeployArgs) {
     target_ext = $$2
     mne_binary_dir = $$3
     mne_library_dir = $$4
-    extra_libs = $$5
+    extra_args = $$5
 
     isEmpty($${target_ext}) {
         target_custom_ext = .app
@@ -40,11 +40,12 @@ defineReplace(MacDeployArgs) {
 
     deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
 
+    message("$$extra_args")
     deploy_libs_to_copy = -libpath=$${mne_library_dir}
-    !isEmpty($${extra_libs}) {
-       deploy_libs_to_copy += -libpath=$${extra_libs}
+    !isEmpty(extra_args) {
+      deploy_libs_to_copy += $${extra_args}
     }
-
+    message("$$deploy_cmd $$deploy_target $$deploy_libs_to_copy")
     return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
  }
 
