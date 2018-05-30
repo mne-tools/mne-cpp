@@ -1,10 +1,6 @@
 <div align="center">
-  <img src="http://www.mne-cpp.org/wp-content/uploads/2016/06/MNE-CPP_GitHub_Logo.png" width="600" height="300" alt="MNE-CPP"><br><br>
+  <img src="https://github.com/LorenzE/mne-cpp/blob/mne_scan_improvements/tools/design/logos/MNE-CPP_Logo.svg" width="600" height="300" alt="MNE-CPP"><br><br>
 </div>
-
-<p align="center">
-  <img width="600" height="300" src="http://www.mne-cpp.org/wp-content/uploads/2016/06/MNE-CPP_GitHub_Logo.png">
-</p>
 
 -----------------
 
