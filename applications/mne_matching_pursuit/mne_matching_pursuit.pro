@@ -116,7 +116,6 @@ unix:!macx {
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
-    QMAKE_RPATHDIR += @executable_path/../libs
     EXTRA_LIBDIRS =
 
     # 3 entries returned in DEPLOY_CMD
