@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     testframes.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     test_spectral_connectivity.pro
+# @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     May, 2018
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,29 +29,49 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the unit tests.
+# @brief    Builds the spectral connectivity unit test
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    test_codecov \
-    test_dipole_fit \
-    test_fiff_rwr \
-    test_fiff_mne_types_io \
-    test_forward_solution \
-    test_fiff_cov \
-    test_fiff_digitizer \
-    test_mne_msh_display_surface_set \
-    test_spectral_connectivity \
+VERSION = $${MNE_CPP_VERSION}
 
-!contains(MNECPP_CONFIG, minimalVersion) {
-    qtHaveModule(charts) {
-        SUBDIRS += \
-            test_interpolation \
-            test_geometryinfo \
-    }
+QT += testlib
+QT -= gui
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = test_spectral_connectivity
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Connectivity
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+    test_spectral_connectivity.cpp
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+contains(MNECPP_CONFIG, withCodeCov) {
+    LIBS += -lgcov
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 }
