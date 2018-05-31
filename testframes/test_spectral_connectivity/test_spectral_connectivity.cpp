@@ -43,6 +43,7 @@
 #include <mne/mne.h>
 #include <utils/ioutils.h>
 #include "connectivity/metrics/coherence.h"
+#include "connectivity/metrics/imagcoherence.h"
 
 
 //*************************************************************************************************************
@@ -153,7 +154,52 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     //*********************************************************************************************************
 
     refConnectivity = MatrixXd();
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/ref_spectral_connectivity_coh.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_coh.txt");
+    IOUtils::read_eigen_matrix(refConnectivity, refFileName);
+    m_RefConnectivityOutput = refConnectivity.row(0);
+
+    //*********************************************************************************************************
+    // Compare Connectivity
+    //*********************************************************************************************************
+
+    compareConnectivity();
+}
+
+
+//*************************************************************************************************************
+
+void TestSpectralConnectivity::spectralConnectivityImagCoherence()
+{
+    //*********************************************************************************************************
+    // Load Data
+    //*********************************************************************************************************
+
+    inputTrials = MatrixXd();
+    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
+    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
+    int iNTrials = inputTrials.rows() / 2;
+    int iNfft = inputTrials.cols();
+    QString sWindowType = "hanning";
+
+    QList<MatrixXd> matDataList;
+    for (int i = 0; i < iNTrials; ++i)
+    {
+        matDataList.append(inputTrials.middleRows(i * 2, 2));
+    }
+
+    //*********************************************************************************************************
+    // Compute Connectivity
+    //*********************************************************************************************************
+
+    QVector<MatrixXd> Coh = Coherence::computeImagCoherence(matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = Coh.at(0).row(1);
+
+    //*********************************************************************************************************
+    // Load MNE-PYTHON Results As Reference
+    //*********************************************************************************************************
+
+    refConnectivity = MatrixXd();
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_icoh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
 
