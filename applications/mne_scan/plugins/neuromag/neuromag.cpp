@@ -235,7 +235,7 @@ void Neuromag::connectCmdClient()
                 requestInfo();
 
             if(m_pFiffInfo)
-                readHeader();
+                readProjectors();
 
             //
             // Read Connectors
@@ -399,7 +399,7 @@ QWidget* Neuromag::setupWidget()
 
 //*************************************************************************************************************
 
-bool Neuromag::readHeader()
+bool Neuromag::readProjectors()
 {
     QFile t_headerFiffFile(m_sFiffHeader);
 
