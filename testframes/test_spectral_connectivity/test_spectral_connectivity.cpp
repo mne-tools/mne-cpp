@@ -47,6 +47,7 @@
 #include "connectivity/metrics/phaselockingvalue.h"
 #include "connectivity/metrics/phaselagindex.h"
 #include "connectivity/metrics/unbiasedsquaredphaselagindex.h"
+#include "connectivity/metrics/weightedphaselagindex.h"
 
 
 //*************************************************************************************************************
@@ -337,7 +338,52 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     //*********************************************************************************************************
 
     refConnectivity = MatrixXd();
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_pli.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_pli2.txt");
+    IOUtils::read_eigen_matrix(refConnectivity, refFileName);
+    m_RefConnectivityOutput = refConnectivity.row(0);
+
+    //*********************************************************************************************************
+    // Compare Connectivity
+    //*********************************************************************************************************
+
+    compareConnectivity();
+}
+
+
+//*************************************************************************************************************
+
+void TestSpectralConnectivity::spectralConnectivityWPLI()
+{
+    //*********************************************************************************************************
+    // Load Data
+    //*********************************************************************************************************
+
+    inputTrials = MatrixXd();
+    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
+    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
+    int iNTrials = inputTrials.rows() / 2;
+    int iNfft = inputTrials.cols();
+    QString sWindowType = "hanning";
+
+    QList<MatrixXd> matDataList;
+    for (int i = 0; i < iNTrials; ++i)
+    {
+        matDataList.append(inputTrials.middleRows(i * 2, 2));
+    }
+
+    //*********************************************************************************************************
+    // Compute Connectivity
+    //*********************************************************************************************************
+
+    QVector<MatrixXd> WPLI = WeightedPhaseLagIndex::computeWPLI(matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = WPLI.at(0).row(1);
+
+    //*********************************************************************************************************
+    // Load MNE-PYTHON Results As Reference
+    //*********************************************************************************************************
+
+    refConnectivity = MatrixXd();
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_wpli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
 
