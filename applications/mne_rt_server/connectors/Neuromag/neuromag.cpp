@@ -89,7 +89,7 @@ using namespace MNELIB;
 Neuromag::Neuromag()
 : m_pDacqServer(new DacqServer(this))
 , m_iID(-1)
-, m_uiBufferSampleSize(100)
+, m_uiBufferSampleSize(600)
 , m_pRawMatrixBuffer(NULL)
 , m_bIsRunning(false)
 {
