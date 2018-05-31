@@ -413,7 +413,11 @@ void TestSpectralConnectivity::compareConnectivity()
             qDebug() << m_RefConnectivityOutput(i);
         }
 
-        QVERIFY( abs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) < epsilon );
+        if (m_RefConnectivityOutput(i) == 0.0){
+            QVERIFY( m_ConnectivityOutput(i) == m_RefConnectivityOutput(i) );
+        } else {
+            QVERIFY( (abs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / abs(m_RefConnectivityOutput(i))) < epsilon );
+        }
     }
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Spectral Connectivities Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
