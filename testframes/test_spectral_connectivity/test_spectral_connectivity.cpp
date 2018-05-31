@@ -45,6 +45,7 @@
 #include "connectivity/metrics/coherence.h"
 #include "connectivity/metrics/imagcoherence.h"
 #include "connectivity/metrics/phaselockingvalue.h"
+#include "connectivity/metrics/phaselagindex.h"
 
 
 //*************************************************************************************************************
@@ -192,8 +193,8 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> Coh = ImagCoherence::computeImagCoherence(matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = Coh.at(0).row(1);
+    QVector<MatrixXd> ImagCoh = ImagCoherence::computeImagCoherence(matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = ImagCoh.at(0).row(1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -237,8 +238,8 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> Coh = PhaseLockingValue::computePLV(matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = Coh.at(0).row(1);
+    QVector<MatrixXd> PLV = PhaseLockingValue::computePLV(matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = PLV.at(0).row(1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -246,6 +247,51 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
 
     refConnectivity = MatrixXd();
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_plv.txt");
+    IOUtils::read_eigen_matrix(refConnectivity, refFileName);
+    m_RefConnectivityOutput = refConnectivity.row(0);
+
+    //*********************************************************************************************************
+    // Compare Connectivity
+    //*********************************************************************************************************
+
+    compareConnectivity();
+}
+
+
+//*************************************************************************************************************
+
+void TestSpectralConnectivity::spectralConnectivityPLI()
+{
+    //*********************************************************************************************************
+    // Load Data
+    //*********************************************************************************************************
+
+    inputTrials = MatrixXd();
+    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
+    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
+    int iNTrials = inputTrials.rows() / 2;
+    int iNfft = inputTrials.cols();
+    QString sWindowType = "hanning";
+
+    QList<MatrixXd> matDataList;
+    for (int i = 0; i < iNTrials; ++i)
+    {
+        matDataList.append(inputTrials.middleRows(i * 2, 2));
+    }
+
+    //*********************************************************************************************************
+    // Compute Connectivity
+    //*********************************************************************************************************
+
+    QVector<MatrixXd> PLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = PLI.at(0).row(1);
+
+    //*********************************************************************************************************
+    // Load MNE-PYTHON Results As Reference
+    //*********************************************************************************************************
+
+    refConnectivity = MatrixXd();
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_pli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
 
