@@ -112,7 +112,7 @@ private:
 //*************************************************************************************************************
 
 TestSpectralConnectivity::TestSpectralConnectivity()
-: epsilon(0.000001)
+: epsilon(0.0000001)
 {
 }
 
@@ -151,12 +151,11 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_coh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.row(0);
+    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
 
     //*********************************************************************************************************
     // Compare Connectivity
     //*********************************************************************************************************
-
     compareConnectivity();
 }
 
@@ -185,9 +184,9 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_icoh.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_imagcoh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.row(0);
+    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -221,9 +220,9 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_plv.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_plv.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.row(0);
+    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -257,9 +256,9 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_pli.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.row(0);
+    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -293,9 +292,9 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_pli2.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.row(0);
+    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -329,9 +328,9 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_wpli.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.row(0);
+    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -365,9 +364,9 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_wpli2.txt");
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.row(0);
+    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -409,7 +408,12 @@ void TestSpectralConnectivity::compareConnectivity()
     QVERIFY( m_ConnectivityOutput.cols() == m_RefConnectivityOutput.cols() );
     for (int i = 0; i < m_ConnectivityOutput.cols(); ++i)
     {
-        QVERIFY( (m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / m_RefConnectivityOutput(i) < epsilon );
+        if ((m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / m_RefConnectivityOutput(i) >= epsilon){
+            qDebug() << m_ConnectivityOutput(i);
+            qDebug() << m_RefConnectivityOutput(i);
+        }
+
+        QVERIFY( abs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) < epsilon );
     }
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Spectral Connectivities Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
