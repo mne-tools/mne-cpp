@@ -102,6 +102,7 @@ private slots:
 
 private:
     void compareConnectivity();
+    QList<MatrixXd> readConnectivityData();
     double epsilon;
     RowVectorXd m_ConnectivityOutput;
     RowVectorXd m_RefConnectivityOutput;
@@ -132,18 +133,9 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     // Load Data
     //*********************************************************************************************************
 
-    MatrixXd inputTrials;
-    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
-    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
-    int iNTrials = inputTrials.rows() / 2;
-    int iNfft = inputTrials.cols();
+    QList<MatrixXd> matDataList = readConnectivityData();
+    int iNfft = matDataList.at(0).cols();
     QString sWindowType = "hanning";
-
-    QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
-        matDataList.append(inputTrials.middleRows(i * 2, 2));
-    }
 
     //*********************************************************************************************************
     // Compute Connectivity
@@ -177,18 +169,9 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Load Data
     //*********************************************************************************************************
 
-    MatrixXd inputTrials;
-    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
-    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
-    int iNTrials = inputTrials.rows() / 2;
-    int iNfft = inputTrials.cols();
+    QList<MatrixXd> matDataList = readConnectivityData();
+    int iNfft = matDataList.at(0).cols();
     QString sWindowType = "hanning";
-
-    QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
-        matDataList.append(inputTrials.middleRows(i * 2, 2));
-    }
 
     //*********************************************************************************************************
     // Compute Connectivity
@@ -222,18 +205,9 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     // Load Data
     //*********************************************************************************************************
 
-    MatrixXd inputTrials;
-    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
-    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
-    int iNTrials = inputTrials.rows() / 2;
-    int iNfft = inputTrials.cols();
+    QList<MatrixXd> matDataList = readConnectivityData();
+    int iNfft = matDataList.at(0).cols();
     QString sWindowType = "hanning";
-
-    QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
-        matDataList.append(inputTrials.middleRows(i * 2, 2));
-    }
 
     //*********************************************************************************************************
     // Compute Connectivity
@@ -267,18 +241,9 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     // Load Data
     //*********************************************************************************************************
 
-    MatrixXd inputTrials;
-    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
-    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
-    int iNTrials = inputTrials.rows() / 2;
-    int iNfft = inputTrials.cols();
+    QList<MatrixXd> matDataList = readConnectivityData();
+    int iNfft = matDataList.at(0).cols();
     QString sWindowType = "hanning";
-
-    QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
-        matDataList.append(inputTrials.middleRows(i * 2, 2));
-    }
 
     //*********************************************************************************************************
     // Compute Connectivity
@@ -312,18 +277,9 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     // Load Data
     //*********************************************************************************************************
 
-    MatrixXd inputTrials;
-    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
-    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
-    int iNTrials = inputTrials.rows() / 2;
-    int iNfft = inputTrials.cols();
+    QList<MatrixXd> matDataList = readConnectivityData();
+    int iNfft = matDataList.at(0).cols();
     QString sWindowType = "hanning";
-
-    QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
-        matDataList.append(inputTrials.middleRows(i * 2, 2));
-    }
 
     //*********************************************************************************************************
     // Compute Connectivity
@@ -357,18 +313,9 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     // Load Data
     //*********************************************************************************************************
 
-    MatrixXd inputTrials;
-    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
-    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
-    int iNTrials = inputTrials.rows() / 2;
-    int iNfft = inputTrials.cols();
+    QList<MatrixXd> matDataList = readConnectivityData();
+    int iNfft = matDataList.at(0).cols();
     QString sWindowType = "hanning";
-
-    QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
-        matDataList.append(inputTrials.middleRows(i * 2, 2));
-    }
 
     //*********************************************************************************************************
     // Compute Connectivity
@@ -402,18 +349,9 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     // Load Data
     //*********************************************************************************************************
 
-    MatrixXd inputTrials;
-    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
-    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
-    int iNTrials = inputTrials.rows() / 2;
-    int iNfft = inputTrials.cols();
+    QList<MatrixXd> matDataList = readConnectivityData();
+    int iNfft = matDataList.at(0).cols();
     QString sWindowType = "hanning";
-
-    QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
-        matDataList.append(inputTrials.middleRows(i * 2, 2));
-    }
 
     //*********************************************************************************************************
     // Compute Connectivity
@@ -436,6 +374,25 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     //*********************************************************************************************************
 
     compareConnectivity();
+}
+
+
+//*************************************************************************************************************
+
+QList<MatrixXd> TestSpectralConnectivity::readConnectivityData()
+{
+    MatrixXd inputTrials;
+    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
+    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
+    int iNTrials = inputTrials.rows() / 2;
+
+    QList<MatrixXd> matDataList;
+    for (int i = 0; i < iNTrials; ++i)
+    {
+        matDataList.append(inputTrials.middleRows(i * 2, 2));
+    }
+
+    return matDataList;
 }
 
 
