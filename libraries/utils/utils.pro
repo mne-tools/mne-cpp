@@ -40,7 +40,7 @@ TEMPLATE = lib
 
 QT -= gui
 QT += xml core
-QT += network concurrent # Check with HP-UX
+QT += concurrent # Check with HP-UX
 
 DEFINES += UTILS_LIBRARY
 

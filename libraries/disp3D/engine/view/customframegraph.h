@@ -86,8 +86,6 @@ namespace Qt3DRender {
         class QCullFace;
 }
 
-class QSurfaceFormat;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -121,10 +119,9 @@ public:
     /**
     * Constructs a CustomFrameGraph object.
     *
-    * @param[in] tSurfaceFormat         Surface format for OpenGL version detection.
     * @param[in] parent                 Pointer to parent node.
     */
-    explicit CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCore::QNode *parent = 0);
+    explicit CustomFrameGraph(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
