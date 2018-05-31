@@ -44,6 +44,7 @@
 #include <utils/ioutils.h>
 #include "connectivity/metrics/coherence.h"
 #include "connectivity/metrics/imagcoherence.h"
+#include "connectivity/metrics/phaselockingvalue.h"
 
 
 //*************************************************************************************************************
@@ -191,7 +192,7 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> Coh = Coherence::computeImagCoherence(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> Coh = ImagCoherence::computeImagCoherence(matDataList, iNfft, sWindowType);
     m_ConnectivityOutput = Coh.at(0).row(1);
 
     //*********************************************************************************************************
@@ -200,6 +201,51 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
 
     refConnectivity = MatrixXd();
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_icoh.txt");
+    IOUtils::read_eigen_matrix(refConnectivity, refFileName);
+    m_RefConnectivityOutput = refConnectivity.row(0);
+
+    //*********************************************************************************************************
+    // Compare Connectivity
+    //*********************************************************************************************************
+
+    compareConnectivity();
+}
+
+
+//*************************************************************************************************************
+
+void TestSpectralConnectivity::spectralConnectivityPLV()
+{
+    //*********************************************************************************************************
+    // Load Data
+    //*********************************************************************************************************
+
+    inputTrials = MatrixXd();
+    QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
+    IOUtils::read_eigen_matrix(inputTrials, dataFileName);
+    int iNTrials = inputTrials.rows() / 2;
+    int iNfft = inputTrials.cols();
+    QString sWindowType = "hanning";
+
+    QList<MatrixXd> matDataList;
+    for (int i = 0; i < iNTrials; ++i)
+    {
+        matDataList.append(inputTrials.middleRows(i * 2, 2));
+    }
+
+    //*********************************************************************************************************
+    // Compute Connectivity
+    //*********************************************************************************************************
+
+    QVector<MatrixXd> Coh = PhaseLockingValue::computePLV(matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = Coh.at(0).row(1);
+
+    //*********************************************************************************************************
+    // Load MNE-PYTHON Results As Reference
+    //*********************************************************************************************************
+
+    refConnectivity = MatrixXd();
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_plv.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
 
