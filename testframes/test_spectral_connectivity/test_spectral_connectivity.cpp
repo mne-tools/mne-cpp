@@ -39,8 +39,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <mne/mne.h>
 #include <utils/ioutils.h>
 #include "connectivity/metrics/coherence.h"
 #include "connectivity/metrics/imagcoherence.h"
@@ -120,7 +118,7 @@ TestSpectralConnectivity::TestSpectralConnectivity()
 
 //*************************************************************************************************************
 
-void TestSpectralConnectivity::TestSpectralConnectivity()
+void TestSpectralConnectivity::initTestCase()
 {
 
 }
@@ -134,7 +132,7 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     // Load Data
     //*********************************************************************************************************
 
-    inputTrials = MatrixXd();
+    MatrixXd inputTrials;
     QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
@@ -158,7 +156,7 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     // Load MNE-PYTHON Results As Reference
     //*********************************************************************************************************
 
-    refConnectivity = MatrixXd();
+    MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_coh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
@@ -179,7 +177,7 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Load Data
     //*********************************************************************************************************
 
-    inputTrials = MatrixXd();
+    MatrixXd inputTrials;
     QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
@@ -203,7 +201,7 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Load MNE-PYTHON Results As Reference
     //*********************************************************************************************************
 
-    refConnectivity = MatrixXd();
+    MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_icoh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
@@ -224,7 +222,7 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     // Load Data
     //*********************************************************************************************************
 
-    inputTrials = MatrixXd();
+    MatrixXd inputTrials;
     QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
@@ -248,7 +246,7 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     // Load MNE-PYTHON Results As Reference
     //*********************************************************************************************************
 
-    refConnectivity = MatrixXd();
+    MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_plv.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
@@ -269,7 +267,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     // Load Data
     //*********************************************************************************************************
 
-    inputTrials = MatrixXd();
+    MatrixXd inputTrials;
     QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
@@ -293,7 +291,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     // Load MNE-PYTHON Results As Reference
     //*********************************************************************************************************
 
-    refConnectivity = MatrixXd();
+    MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_pli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
@@ -314,7 +312,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     // Load Data
     //*********************************************************************************************************
 
-    inputTrials = MatrixXd();
+    MatrixXd inputTrials;
     QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
@@ -338,7 +336,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     // Load MNE-PYTHON Results As Reference
     //*********************************************************************************************************
 
-    refConnectivity = MatrixXd();
+    MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_pli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
@@ -359,7 +357,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     // Load Data
     //*********************************************************************************************************
 
-    inputTrials = MatrixXd();
+    MatrixXd inputTrials;
     QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
@@ -383,7 +381,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     // Load MNE-PYTHON Results As Reference
     //*********************************************************************************************************
 
-    refConnectivity = MatrixXd();
+    MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_wpli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
@@ -404,7 +402,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     // Load Data
     //*********************************************************************************************************
 
-    inputTrials = MatrixXd();
+    MatrixXd inputTrials;
     QString dataFileName(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
@@ -428,7 +426,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     // Load MNE-PYTHON Results As Reference
     //*********************************************************************************************************
 
-    refConnectivity = MatrixXd();
+    MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivty/ref_spectral_connectivity_wpli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.row(0);
@@ -474,3 +472,4 @@ void TestSpectralConnectivity::cleanupTestCase()
 //=============================================================================================================
 
 QTEST_APPLESS_MAIN(TestSpectralConnectivity)
+#include "test_spectral_connectivity.moc"
