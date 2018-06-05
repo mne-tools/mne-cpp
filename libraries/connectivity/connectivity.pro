@@ -2,13 +2,14 @@
 #
 # @file     connectivity.pro
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+#           Daniel Strohmeier <daniel.Strohmeier@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Lorenz Esch, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -51,19 +52,9 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
