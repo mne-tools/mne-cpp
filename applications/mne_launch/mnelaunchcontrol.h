@@ -109,7 +109,7 @@ signals:
     void sampleDataAvailableChanged_Signal();
 
 private:
-    QList<QPointer<QProcess>> m_ListProcesses;  /**< List of started processes. */
+    QList<QPointer<QProcess> > m_ListProcesses;  /**< List of started processes. */
     QStringList m_requiredSampleFiles;          /**< List of required sample data files. */
 };
 
