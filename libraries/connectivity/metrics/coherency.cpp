@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     coherency.cpp
-* @author   Daniel Strohmeier <daniel.Strohmeier@tu-ilmenau.de>;
+* @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
@@ -30,6 +30,7 @@
 *
 * @note Notes:
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
+* - QtConcurrent can be used to speed up computation.
 *
 * @brief     Coherency class declaration.
 *
