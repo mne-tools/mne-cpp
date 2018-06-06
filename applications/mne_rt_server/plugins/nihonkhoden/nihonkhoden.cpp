@@ -42,12 +42,8 @@
 #include "nihonkhodenproducer.h"
 
 #include <fiff/fiff.h>
-#include <fiff/fiff_types.h>
 
 #include <realtime/rtCommand/command.h>
-
-//#include <mne/mne.h>
-//#include <mne/mne_epoch_data_list.h>
 
 
 //*************************************************************************************************************
@@ -90,7 +86,7 @@ const QString NihonKhoden::Commands::SIMFILE      = "simfile";
 //=============================================================================================================
 
 NihonKhoden::NihonKhoden()
-: m_pFiffProducer(new NihonKhodenProducer(this))
+: m_pFiffProducer(QSharedPointer<NihonKhodenProducer>(new NihonKhodenProducer(this)))
 , m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(100)//(4)
 , m_AccelerationFactor(1.0)
@@ -107,8 +103,6 @@ NihonKhoden::NihonKhoden()
 NihonKhoden::~NihonKhoden()
 {
     qDebug() << "Destroy NihonKhoden::~NihonKhoden()";
-
-    delete m_pFiffProducer;
 
     m_bIsRunning = false;
     QThread::wait();
@@ -331,12 +325,8 @@ void NihonKhoden::init()
         t_qFile.close();
     }
 
-    if(m_pRawMatrixBuffer)
-        delete m_pRawMatrixBuffer;
-    m_pRawMatrixBuffer = NULL;
-
     if(!m_RawInfo.isEmpty())
-        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->m_uiBufferSampleSize);
+        m_pRawMatrixBuffer = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->m_uiBufferSampleSize));
 }
 
 
@@ -486,9 +476,7 @@ bool NihonKhoden::readRawInfo()
         //
         // Create circular buffer to transfer data form producer to simulator
         //
-        if(m_pRawMatrixBuffer)
-            delete m_pRawMatrixBuffer;
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info.nchan, m_uiBufferSampleSize);
+        m_pRawMatrixBuffer = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(10, m_RawInfo.info.nchan, m_uiBufferSampleSize));
 
         mutex.unlock();
     }
