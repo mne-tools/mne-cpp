@@ -146,7 +146,7 @@ private:
     * @param[in] mat unprocessed data-set
     * @param[out] QPair containing the data-set without all unwanted channels and a QList containing the channel indices.
     */
-    QPair<Eigen::MatrixXd, QList<int>> prepareData(Eigen::MatrixXd mat);
+    QPair<Eigen::MatrixXd, QList<int> > prepareData(Eigen::MatrixXd mat);
 
     //=========================================================================================================
     /**
