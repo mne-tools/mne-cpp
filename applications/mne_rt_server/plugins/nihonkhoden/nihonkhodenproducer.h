@@ -83,6 +83,8 @@ class NihonKhoden;
 class NihonKhodenProducer : public QThread
 {
 public:
+    typedef QSharedPointer<NihonKhodenProducer> SPtr;            /**< Shared pointer type for NihonKhodenProducer. */
+    typedef QSharedPointer<const NihonKhodenProducer> ConstSPtr; /**< Const shared pointer type for NihonKhodenProducer. */
 
     //=========================================================================================================
     /**
