@@ -51,10 +51,10 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -90,12 +90,12 @@ SOURCES += \
     metrics/phaselockingvalue.cpp \
     metrics/weightedphaselagindex.cpp \
     metrics/debiasedsquaredweightedphaselagindex.cpp \
+    metrics/phaselagindex.cpp \
     network/network.cpp \
     network/networknode.cpp \
     network/networkedge.cpp \
     connectivitysettings.cpp \
-    connectivity.cpp \
-    metrics/phaselagindex.cpp
+    connectivity.cpp
 
 HEADERS += \
     connectivity_global.h \
@@ -109,12 +109,12 @@ HEADERS += \
     metrics/phaselockingvalue.h \
     metrics/weightedphaselagindex.h \
     metrics/debiasedsquaredweightedphaselagindex.h \
+    metrics/phaselagindex.h \
     network/network.h \
     network/networknode.h \
     network/networkedge.h \
     connectivitysettings.h \
-    connectivity.h \
-    metrics/phaselagindex.h
+    connectivity.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
