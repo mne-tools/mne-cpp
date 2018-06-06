@@ -113,7 +113,7 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = $${HEADERS}
-header_files.path = $${MNE_SCAN_INCLUDE_DIR}/scMeas
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/scMeas
 
 INSTALLS += header_files
 
