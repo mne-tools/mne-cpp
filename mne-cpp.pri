@@ -146,3 +146,9 @@ isEmpty( MNE_BINARY_DIR ) {
 # repository dir
 ROOT_DIR = $${PWD}
 
+# install
+MNE_INSTALL_INCLUDE_DIR = $$MNE_INSTALL_INCLUDE_DIR
+isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
+    MNE_INSTALL_INCLUDE_DIR = $${PWD}/include
+}
+

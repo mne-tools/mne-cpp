@@ -142,7 +142,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/inverse
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/inverse
 
 header_files_dipole_fit.files = ./dipoleFit/*.h
 header_files_dipole_fit.path = $${MNE_INCLUDE_DIR}/inverse/dipoleFit
