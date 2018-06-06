@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     coherence.cpp
-* @author   Daniel Strohmeier <daniel.Strohmeier@tu-ilmenau.de>;
+* @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
