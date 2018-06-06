@@ -95,9 +95,12 @@ void MNELaunchControl::invokeAnalyze()
 void MNELaunchControl::invokeApplication(const QString &application, const QStringList &arguments)
 {
     QFile file(QCoreApplication::applicationDirPath()+ "/" + application);
-#if defined(_WIN32) || defined(_WIN32_WCE)
-    file.setFileName(file.fileName() + ".exe");
-#endif
+    #if defined(Q_OS_WIN)
+        file.setFileName(file.fileName() + ".exe");
+    #elif defined(Q_OS_MACOS)
+        //On MacOS we use .app bundle structures. Executable path is: .app/Contents/MacOS/
+        file.setFileName("../../" + application);
+    #endif
 
     if(file.exists()) {
         try {
