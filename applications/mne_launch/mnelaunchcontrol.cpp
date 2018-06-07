@@ -99,7 +99,7 @@ void MNELaunchControl::invokeApplication(const QString &application, const QStri
         file.setFileName(file.fileName() + ".exe");
     #elif defined(Q_OS_MACOS)
         //On MacOS we use .app bundle structures. Executable path is: .app/Contents/MacOS/
-        file.setFileName("../../" + application);
+        file.setFileName("../../" + application + ".app");
     #endif
 
     if(file.exists()) {
