@@ -234,8 +234,9 @@ void Neuromag::connectCmdClient()
             if(!m_pFiffInfo)
                 requestInfo();
 
-            if(m_pFiffInfo)
-                readProjectors();
+            // This will read projectors from an external file and replace the one received from mne_rt_server
+            //if(m_pFiffInfo)
+            //    readProjectors();
 
             //
             // Read Connectors
