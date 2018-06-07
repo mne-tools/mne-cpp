@@ -45,7 +45,56 @@ defineReplace(MacDeployArgs) {
       deploy_libs_to_copy += $${extra_args}
     }
     return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
- }
+}
+
+defineReplace(WinDeployArgs) {
+    target = $$1
+    target_ext = $$2
+    mne_binary_dir = $$3
+    libs_to_deploy = $$4
+    extra_args = $$5
+
+    isEmpty($${target_ext}) {
+        target_custom_ext = .exe
+    } else {
+        target_custom_ext = $${target_ext}
+    }
+
+    deploy_cmd = windeployqt
+
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+
+    deploy_extra_args
+
+    !isEmpty(extra_args) {
+      deploy_extra_args += $${extra_args}
+    }
+
+    final_deploy_command += $$deploy_cmd $$deploy_target $$deploy_extra_args $$escape_expand(\\n\\t)
+
+    # Parse libs from libs_to_deploy copy them to the bin folder and deploy qt dependecies for each of them
+    for(FILE, libs_to_deploy) {
+        FILE ~= s,-lMNE,MNE,g
+        FILE = $${FILE}.dll
+        TRGTDIR = $$shell_quote($$shell_path($${MNE_BINARY_DIR}))
+        FILEPATH= $$shell_quote($$shell_path($${MNE_LIBRARY_DIR}/$${FILE}))
+
+        exists($${FILEPATH}) {
+            # Copy library
+            final_deploy_command += $${QMAKE_COPY} $$quote($${FILEPATH}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+
+            # Deploy Qt dependencies for the library
+            deploy_target = $$shell_quote($$shell_path($${TRGTDIR}/$${FILE}))
+            final_deploy_command += windeployqt $${deploy_target} $$deploy_extra_args $$escape_expand(\\n\\t)
+
+            #warning(Deploying $${FILEPATH} to $${TRGTDIR})
+            #warning($${deploy_target})
+        }
+    }
+
+    return( $${final_deploy_command} )
+}
+
 
 ############################################### GLOBAL DEFINES ################################################
 
