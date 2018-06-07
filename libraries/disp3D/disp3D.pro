@@ -39,7 +39,7 @@ TEMPLATE = lib
 
 QT       += widgets 3dcore 3drender 3dinput 3dextras charts concurrent opengl
 
-DEFINES += DISP3DNEW_LIBRARY
+DEFINES += DISP3D_LIBRARY
 
 TARGET = Disp3D
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
