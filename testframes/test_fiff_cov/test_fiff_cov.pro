@@ -75,3 +75,10 @@ contains(MNECPP_CONFIG, withCodeCov) {
     LIBS += -lgcov
     QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 }
+
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$WinDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
+}
