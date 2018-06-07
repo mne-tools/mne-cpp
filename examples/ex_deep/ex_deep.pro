@@ -104,5 +104,3 @@ INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
-
-
