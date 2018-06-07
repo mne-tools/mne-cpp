@@ -127,11 +127,6 @@ void FiffSimulatorSetupWidget::bufferSizeEdited()
         m_pFiffSimulator->m_iBufferSize = t_iBufferSize;
     else
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pFiffSimulator->m_iBufferSize));
-
-    qDebug()<<"t_iBufferSize" <<t_iBufferSize;
-    qDebug()<<"m_pFiffSimulator->m_iBufferSize" <<m_pFiffSimulator->m_iBufferSize;
-
-
 }
 
 
