@@ -54,6 +54,7 @@ defineReplace(WinDeployArgs) {
     libs_to_deploy = $$4
     extra_args = $$5
 
+    # Deploy qt dependecies for main application
     isEmpty($${target_ext}) {
         target_custom_ext = .exe
     } else {
@@ -64,13 +65,7 @@ defineReplace(WinDeployArgs) {
 
     deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
 
-    deploy_extra_args
-
-    !isEmpty(extra_args) {
-      deploy_extra_args += $${extra_args}
-    }
-
-    final_deploy_command += $$deploy_cmd $$deploy_target $$deploy_extra_args $$escape_expand(\\n\\t)
+    final_deploy_command += $$deploy_cmd $$deploy_target $$extra_args $$escape_expand(\\n\\t)
 
     # Parse libs from libs_to_deploy copy them to the bin folder and deploy qt dependecies for each of them
     for(FILE, libs_to_deploy) {
@@ -85,7 +80,7 @@ defineReplace(WinDeployArgs) {
 
             # Deploy Qt dependencies for the library
             deploy_target = $$shell_quote($$shell_path($${TRGTDIR}/$${FILE}))
-            final_deploy_command += windeployqt $${deploy_target} $$deploy_extra_args $$escape_expand(\\n\\t)
+            final_deploy_command += windeployqt $${deploy_target} $$extra_args $$escape_expand(\\n\\t)
 
             #warning(Deploying $${FILEPATH} to $${TRGTDIR})
             #warning($${deploy_target})
