@@ -38,7 +38,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    connectors \
     mne_rt_server \
-    connectors
 
 CONFIG += ordered
