@@ -98,10 +98,12 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/fs
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/fs
 
 INSTALLS += header_files
+
+INSTALLS += fs
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 

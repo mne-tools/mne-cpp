@@ -144,8 +144,8 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/fwd
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/fwd
 
 INSTALLS += header_files
 
