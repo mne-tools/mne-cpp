@@ -46,12 +46,12 @@ SUBDIRS += \
     test_fiff_cov \
     test_fiff_digitizer \
     test_mne_msh_display_surface_set \
-    test_spectral_connectivity \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
             test_interpolation \
             test_geometryinfo \
+            test_spectral_connectivity
     }
 }
