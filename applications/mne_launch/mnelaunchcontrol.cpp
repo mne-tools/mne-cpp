@@ -99,13 +99,24 @@ void MNELaunchControl::invokeApplication(const QString &application, const QStri
         file.setFileName(file.fileName() + ".exe");
     #elif defined(Q_OS_MACOS)
         //On MacOS we use .app bundle structures. Executable path is: .app/Contents/MacOS/
-        file.setFileName("../../" + application + ".app");
+        file.setFileName("../../../" + application + ".app/Contents/MacOS/" + application);
     #endif
+
+    qDebug()<<"file.fileName()"<<file.fileName();
+    qDebug()<<"QCoreApplication::applicationDirPath()"<<QCoreApplication::applicationDirPath();
+
+
 
     if(file.exists()) {
         try {
             QPointer<QProcess> process( new QProcess );
-            process->start(file.fileName(), arguments);
+
+            #if defined(Q_OS_MACOS)
+                process->start("open", {file.fileName()});
+            #else
+                process->start(file.fileName(), arguments);
+            #endif
+
             m_ListProcesses.append(process);
         } catch (int e) {
             qWarning() << "Not able to start" << file.fileName() << ". Error:" << e;
