@@ -52,6 +52,10 @@ SOURCES += main.cpp \
     application.cpp \
     mnelaunchcontrol.cpp
 
+HEADERS += \
+    application.h \
+    mnelaunchcontrol.h
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
@@ -91,20 +95,5 @@ macx {
     DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
-
-    # fix up app bundle via install target to have soft links to enable running external binaries
-    DEPLOY_TARGET = $$member(DEPLOY_CMD, 1)
-    browse.path = $${DEPLOY_TARGET}/Contents/MacOS/
-    browse.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../mne_browse.app/Contents/MacOS/mne_browse .)
-    analyze.path = $${DEPLOY_TARGET}/Contents/MacOS/
-    analyze.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../mne_analyze.app/Contents/MacOS/mne_analyze .)
-    scan.path = $${DEPLOY_TARGET}/Contents/MacOS/
-    scan.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../mne_scan.app/Contents/MacOS/mne_scan .)
-    data.path = $${DEPLOY_TARGET}/Contents/MacOS/
-    data.extra = (cd $${DEPLOY_TARGET}/Contents/MacOS && ln -s ../../../MNE-sample-data .)
-    INSTALLS += browse analyze scan data
 }
 
-HEADERS += \
-    application.h \
-    mnelaunchcontrol.h
