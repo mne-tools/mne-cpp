@@ -112,14 +112,10 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_SCAN_INCLUDE_DIR}/scMeas
-
-header_files_measurement.files = ./Measurement/*.h
-header_files_measurement.path = $${MNE_SCAN_INCLUDE_DIR}/scMeas/Measurement
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/scMeas
 
 INSTALLS += header_files
-INSTALLS += header_files_measurement
 
 # Deploy Qt Dependencies
 win32 {

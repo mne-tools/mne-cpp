@@ -188,27 +188,37 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     # Copy resources to app bundle
-    sgrc.path = Contents/MacOS/resources/general/selectionGroups
+    sgrc.path = Contents/MacOS/resources/general/
     sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
     QMAKE_BUNDLE_DATA += sgrc
 
-    loutrc.path = Contents/MacOS/resources/general/2DLayouts
+    loutrc.path = Contents/MacOS/resources/general/
     loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
+
+    filtrc.path = Contents/MacOS/resources/general/
+    filtrc.files = $${ROOT_DIR}/resources/general/default_filters
+    QMAKE_BUNDLE_DATA += filtrc
+
+    hpirc.path = Contents/MacOS/resources/general/
+    hpirc.files = $${ROOT_DIR}/resources/general/hpiAlignment
+    QMAKE_BUNDLE_DATA += hpirc
+
+    ssrc.path = Contents/MacOS/resources/general/
+    ssrc.files = $${ROOT_DIR}/resources/general/sensorSurfaces
+    QMAKE_BUNDLE_DATA += ssrc
+
+    lout3rc.path = Contents/MacOS/resources/general/
+    lout3rc.files = $${ROOT_DIR}/resources/general/3DLayouts
+    QMAKE_BUNDLE_DATA += lout3rc
     QMAKE_BUNDLE_DATA += loutrc
+    EXTRA_LIBDIRS = -dmg
+ 
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    deploy_app = $$member(DEPLOY_CMD, 1)
+    dmg_file = $$replace(deploy_app, .app, .dmg)
+    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
 
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
-
-#    # Copy libs
-#    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
-#    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
-#    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
-
-#    DEPLOY_COMMAND = macdeployqt
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
 }
 
