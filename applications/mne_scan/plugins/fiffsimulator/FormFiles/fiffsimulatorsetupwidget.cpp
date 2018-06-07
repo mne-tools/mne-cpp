@@ -88,7 +88,7 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
     connect(m_pFiffSimulator, &FiffSimulator::fiffInfoAvailable, this, &FiffSimulatorSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &FiffSimulatorSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged, this, &FiffSimulatorSetupWidget::bufferSizeEdited);
 
     //CLI
     connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &FiffSimulatorSetupWidget::pressedSendCLI);
@@ -127,6 +127,11 @@ void FiffSimulatorSetupWidget::bufferSizeEdited()
         m_pFiffSimulator->m_iBufferSize = t_iBufferSize;
     else
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pFiffSimulator->m_iBufferSize));
+
+    qDebug()<<"t_iBufferSize" <<t_iBufferSize;
+    qDebug()<<"m_pFiffSimulator->m_iBufferSize" <<m_pFiffSimulator->m_iBufferSize;
+
+
 }
 
 
