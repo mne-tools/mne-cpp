@@ -42,7 +42,6 @@ QT -= gui
 VERSION = $${MNE_CPP_VERSION}
 
 CONFIG   += console
-CONFIG   -= app_bundle
 
 TARGET = mne_show_fiff
 
@@ -109,10 +108,7 @@ unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
-
-    # Mac now creates app bundle
-    CONFIG += app_bundle
-
+    # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     # Copy Resource folder to app bundle

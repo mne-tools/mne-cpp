@@ -41,7 +41,6 @@ QT += network concurrent
 QT -= gui
 
 CONFIG   += console
-CONFIG   -= app_bundle
 
 TARGET = mne_rt_server
 
@@ -124,10 +123,6 @@ unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
-
-    # Mac now creates app bundle
-    CONFIG += app_bundle
-
     rcplugins.path = Contents/MacOS/resources/
     rcplugins.files = $${ROOT_DIR}/resources/mne_rt_server_plugins
     QMAKE_BUNDLE_DATA += rcplugins
