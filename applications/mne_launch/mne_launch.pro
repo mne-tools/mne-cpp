@@ -63,24 +63,12 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 RESOURCES +=    qml.qrc \
                 images.qrc
 
-
 # Deploy Qt Dependencies
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    # remember to also deploy qml depnedencies with --qmldir $${PWD} $${DESTDIR}
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} --qmldir $${PWD}/qml $${DESTDIR}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$WinDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 unix:!macx {
     # === Unix ===
