@@ -42,7 +42,6 @@ VERSION = $${MNE_CPP_VERSION}
 QT += widgets
 
 CONFIG   += console
-CONFIG   -= app_bundle
 
 TARGET = mne_forward_solution
 
@@ -95,9 +94,6 @@ unix:!macx {
 }
 macx {
     # === Mac ===
-    # Mac now creates app bundle
-    CONFIG += app_bundle
-
     QMAKE_RPATHDIR += @executable_path/../Frameworks
     EXTRA_LIBDIRS =
 

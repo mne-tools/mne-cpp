@@ -42,7 +42,6 @@ VERSION = $${MNE_CPP_VERSION}
 QT += widgets 3dextras
 
 CONFIG   += console
-CONFIG   -= app_bundle
 
 TARGET = mne_dipole_fit
 
@@ -99,9 +98,6 @@ unix:!macx {
 }
 macx {
     # === Mac ===
-    # Mac now creates app bundle
-    CONFIG += app_bundle
-
     QMAKE_RPATHDIR += @executable_path/../Frameworks
     EXTRA_LIBDIRS =
 
