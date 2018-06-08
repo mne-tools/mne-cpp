@@ -89,6 +89,10 @@ win32 {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
 macx {
     # === Mac ===
     # Mac now creates app bundle

@@ -14,7 +14,10 @@
 # the following conditions are met:
 #     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
 #       following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+#     * Redistributions in unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}binary form must reproduce the above copyright notice, this list of conditions and
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
@@ -89,4 +92,8 @@ win32 {
     DEPLOY_CMD = $$WinDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
+}
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
 }

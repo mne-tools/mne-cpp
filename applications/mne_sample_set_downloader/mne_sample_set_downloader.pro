@@ -75,7 +75,8 @@ win32 {
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 unix:!macx {
-    #ToDo Unix
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
     # === Mac ===
