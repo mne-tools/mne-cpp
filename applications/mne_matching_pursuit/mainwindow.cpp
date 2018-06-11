@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of MainWindow class.
+* @brief    Definition of MainWindow class.
 */
 
 //*************************************************************************************************************

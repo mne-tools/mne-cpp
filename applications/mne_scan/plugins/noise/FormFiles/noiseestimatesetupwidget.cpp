@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the NoiseEstimateSetupWidget class.
+* @brief    Definition of the NoiseEstimateSetupWidget class.
 *
 */
 

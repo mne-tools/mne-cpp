@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the PwlRapMusic Algorithm Class.
+* @brief    Definition of the PwlRapMusic Algorithm Class.
 *
 */
 

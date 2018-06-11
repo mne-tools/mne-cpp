@@ -43,13 +43,17 @@ qtHaveModule(3dextras) {
     QT += 3dextras
 }
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 TARGET = mne_scan
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += console #DEBUG
+CONFIG += console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {

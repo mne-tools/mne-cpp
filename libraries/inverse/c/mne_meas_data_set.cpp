@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Meas Data Set (MneMeasDataSet) Class.
+* @brief    Definition of the MNE Meas Data Set (MneMeasDataSet) Class.
 *
 */
 

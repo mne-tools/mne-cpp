@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtSssAlgo class.
+* @brief    Definition of the RtSssAlgo class.
 *
 * @remarks  This rtsssalgo is implemented based on a paper, 'Real-Time Robust Signal Space Separation for Magnetoencephalography',
 *           authored by Chenlei Guo, Xin Li, Samu Taulu, Wei Wang, and Douglas J. Weber,

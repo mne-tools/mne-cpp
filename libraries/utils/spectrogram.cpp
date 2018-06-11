@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of spectrogram class.
+* @brief    Definition of spectrogram class.
 */
 
 //*************************************************************************************************************

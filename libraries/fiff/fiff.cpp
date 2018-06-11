@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FIFF Wrapper Class.
+* @brief    Definition of the FIFF Wrapper Class.
 *
 */
 

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ssvepBCISetupStimulusWidget class.
+* @brief    Definition of the ssvepBCISetupStimulusWidget class.
 *
 */
 

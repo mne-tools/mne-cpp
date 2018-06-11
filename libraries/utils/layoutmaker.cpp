@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the LayoutMaker class
+* @brief    Definition of the LayoutMaker class
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the FiffStreamServer Class.
+* @brief     Definition of the FiffStreamServer Class.
 *
 */
 

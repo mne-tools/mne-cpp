@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeSourceEstimateWidget Class.
+* @brief    Definition of the RealTimeSourceEstimateWidget Class.
 *
 */
 
@@ -169,8 +169,7 @@ void RealTimeSourceEstimateWidget::getData()
                                                       *m_pRTSE->getValue(),
                                                       *m_pRTSE->getFwdSolution(),
                                                       m_surfSet,
-                                                      m_annotationSet,
-                                                      m_p3DView->format());
+                                                      m_annotationSet);
 
             m_pRtItem->setLoopState(false);
             m_pRtItem->setTimeInterval(17);

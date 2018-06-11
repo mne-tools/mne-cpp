@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RtInvOp Class.
+* @brief     Definition of the RtInvOp Class.
 *
 */
 

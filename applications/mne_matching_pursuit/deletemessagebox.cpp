@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the DeleteMesssageBox Class.
+* @brief    Definition of the DeleteMesssageBox Class.
 *
 */
 

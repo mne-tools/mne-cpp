@@ -153,7 +153,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_find_source_space_hemi function
+    * ### MNE toolbox root function ###: Definition of the mne_find_source_space_hemi function
     *
     * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
     *
@@ -185,7 +185,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_patch_info function
+    * ### MNE toolbox root function ###: Definition of the mne_patch_info function
     *
     * Generate the patch information from the 'nearest' vector in a source space. For vertex in the source
     * space it provides the list of neighboring vertices in the high resolution triangulation.
@@ -208,7 +208,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_read_source_spaces function
+    * ### MNE toolbox root function ###: Definition of the mne_read_source_spaces function
     *
     * Reads source spaces from a fif file
     *
@@ -230,7 +230,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_transform_source_space_to function
+    * ### MNE toolbox root function ###: Definition of the mne_transform_source_space_to function
     * Wrapper for the MNESourceSpace transform_source_space_to member function
     *
     * Note: In difference to mne-matlab this is not a static function. This is a method of the MNESourceSpace
@@ -247,7 +247,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the write_source_spaces_to_fid function
+    * ### MNE toolbox root function ###: Definition of the write_source_spaces_to_fid function
     *
     * Write the source spaces to a FIF stream
     *
@@ -299,7 +299,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Implementation of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+    * Definition of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
     *
     * Completes triangulation info
     *
@@ -311,7 +311,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Implementation of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+    * Definition of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
     *
     * Reads a single source space (hemisphere)
     *
