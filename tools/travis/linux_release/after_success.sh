@@ -1,11 +1,11 @@
 #!/bin/bash
 #set -ev
 
-if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+if [[ "${TRAVIS_PULL_REQUEST}" == "true" ]]; then
 
     # === Copy Libs ===
-	QT_LIB_DIR=/opt/qt56/bin
-    QT_LIBS=(libQt5Core libQt5Concurrent libQt5Gui libQt5Svg libQt5Widgets libQt5Xml)
+	QT_LIB_DIR=/opt/qt510/bin
+    QT_LIBS=(libQt5Charts libQt5Concurrent libQt5Core libQt5Gui libQt5Network libQt5PrintSupport libQt5Qml libQt5Svg libQt5Test libQt5Widgets libQt5Xml)
     n_elements=${#QT_LIBS[@]}
     for ((i = 0; i < n_elements; i++)); do
         libpath="$QT_LIB_DIR/${QT_LIBS[i]}.*"
