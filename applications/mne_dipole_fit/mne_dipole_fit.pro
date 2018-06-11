@@ -92,7 +92,7 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$WinDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
@@ -106,7 +106,7 @@ macx {
     EXTRA_LIBDIRS =
 
     # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 
