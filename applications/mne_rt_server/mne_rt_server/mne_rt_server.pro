@@ -115,7 +115,7 @@ for(FILE, RESOURCE_FILES) {
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
     EXTRA_ARGS =
     DEPLOY_CMD = $$WinDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
