@@ -78,7 +78,7 @@ defineReplace(WinDeployArgs) {
             # Copy library
             final_deploy_command += $${QMAKE_COPY} $$quote($${FILEPATH}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
 
-            # Deploy Qt dependencies for the library
+            # Deploy dependencies for the library
             deploy_target = $$shell_quote($$shell_path($${TRGTDIR}/$${FILE}))
             final_deploy_command += windeployqt $${deploy_target} $$extra_args $$escape_expand(\\n\\t)
 

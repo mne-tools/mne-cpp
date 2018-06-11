@@ -130,7 +130,7 @@ macx {
     ICON = images/appIcons/mne_scan.icns
 }
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
     EXTRA_ARGS =
     DEPLOY_CMD = $$WinDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})

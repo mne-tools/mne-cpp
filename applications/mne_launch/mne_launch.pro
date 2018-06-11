@@ -67,7 +67,7 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 RESOURCES +=    qml.qrc \
                 images.qrc
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
     EXTRA_ARGS =
     DEPLOY_CMD = $$WinDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
