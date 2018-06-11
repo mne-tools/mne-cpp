@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     implementation of the RtCmdClient Class.
+ * @brief     Definition of the RtCmdClient Class.
  *
  */
 

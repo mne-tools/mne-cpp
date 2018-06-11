@@ -220,10 +220,9 @@ private:
     */
     void initConnector();
 
-    bool readHeader();
+    bool readProjectors();
 
     QMutex rtServerMutex;
-
 
     QString m_sNeuromagClientAlias;     /**< The rt server client alias.*/
 

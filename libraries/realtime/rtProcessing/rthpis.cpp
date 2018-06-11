@@ -32,7 +32,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RtHPIS Class.
+* @brief     Definition of the RtHPIS Class.
 *
 */
 

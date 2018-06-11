@@ -143,7 +143,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
+    * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
     *
     * Read a specific raw data segment
     *
@@ -159,7 +159,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
+    * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
     *
     * Read a specific raw data segment
     *
@@ -176,7 +176,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
+    * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
     *
     * Read a specific raw data segment
     *

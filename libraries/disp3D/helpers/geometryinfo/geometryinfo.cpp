@@ -178,7 +178,7 @@ QVector<qint32> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
         return vecOutputArray;
     }
     // split input array + thread start
-    QVector<QFuture<QVector<qint32>>> vecThreads(iCores - 1);
+    QVector<QFuture<QVector<qint32> > > vecThreads(iCores - 1);
     qint32 iBeginOffset = iSubArraySize;
     qint32 iEndOffset = iBeginOffset + iSubArraySize;
     for(qint32 i = 0; i < vecThreads.size(); ++i)
@@ -208,7 +208,7 @@ QVector<qint32> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
                                           vecSensorPositions.constBegin() + iSubArraySize));
 
     //wait for threads to finish
-    for (QFuture<QVector<qint32>>& f : vecThreads) {
+    for (QFuture<QVector<qint32> >& f : vecThreads) {
         f.waitForFinished();
     }
 

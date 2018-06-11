@@ -134,7 +134,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Implementation of the   mne_add_triangle_data function in mne_add_geometry_info.c
+    * Definition of the   mne_add_triangle_data function in mne_add_geometry_info.c
     *
     * Completes triangulation info
     *
@@ -152,7 +152,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Implementation of the addVertexNormals function in mne_add_geometry_info.c
+    * Definition of the addVertexNormals function in mne_add_geometry_info.c
     *
     * Completes triangulation info
     *

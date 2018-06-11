@@ -424,7 +424,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_read_forward_solution function
+    * ### MNE toolbox root function ###: Definition of the mne_read_forward_solution function
     *
     * Reads a forward solution from a fif file
     *
@@ -485,7 +485,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Implementation of the read_one function in mne_read_forward_solution.m
+    * Definition of the read_one function in mne_read_forward_solution.m
     *
     * Reads all interesting stuff for one forward solution
     *

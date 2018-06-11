@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneMshPicked Class.
+* @brief    Definition of the MneMshPicked Class.
 *
 */
 

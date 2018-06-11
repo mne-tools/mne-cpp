@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Epidetect class.
+* @brief    Definition of the Epidetect class.
 *
 */
 
@@ -226,7 +226,7 @@ void Epidetect::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 //*************************************************************************************************************
 
 
-QPair<Eigen::MatrixXd, QList<int>> Epidetect::prepareData(Eigen::MatrixXd mat)
+QPair<Eigen::MatrixXd, QList<int> > Epidetect::prepareData(Eigen::MatrixXd mat)
 {
     MatrixXd trimmedMatrix;
     QList<int> stimLocations;
@@ -257,7 +257,7 @@ QPair<Eigen::MatrixXd, QList<int>> Epidetect::prepareData(Eigen::MatrixXd mat)
     qSort(stimLocations);
 
     trimmedMatrix.conservativeResize(j,trimmedMatrix.cols());
-    QPair<MatrixXd, QList<int>> out;
+    QPair<MatrixXd, QList<int> > out;
     out.first = trimmedMatrix;
     out.second = stimLocations;
 
@@ -292,7 +292,7 @@ void Epidetect::run()
     while(m_bIsRunning)
     {
         QElapsedTimer timer;
-        QPair<MatrixXd,QList<int>> data;
+        QPair<MatrixXd,QList<int> > data;
 
         m_dMuGes = 0;
 
