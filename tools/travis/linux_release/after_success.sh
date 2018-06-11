@@ -1,7 +1,8 @@
 #!/bin/bash
 #set -ev
 
-if [[ "${TRAVIS_PULL_REQUEST}" == "true" ]]; then
+#if [[ "${TRAVIS_PULL_REQUEST}" == "true" ]]; then
+    echo -e "Packaging binaries and libs"
 
     # === Copy Libs ===
 	QT_LIB_DIR=/opt/qt510/bin
@@ -24,4 +25,4 @@ if [[ "${TRAVIS_PULL_REQUEST}" == "true" ]]; then
         # upload artifacts
         curl -u $ONEOO_LOGIN:$ONEOO_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/
     fi
-fi
+#fi
