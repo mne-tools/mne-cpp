@@ -125,7 +125,7 @@ public:
 
 //    //=========================================================================================================
 //    /**
-//    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - decoding part
+//    * ### MNE toolbox root function ###: Definition of the mne_block_diag function - decoding part
 //    */
 //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
 
@@ -200,7 +200,7 @@ public:
     /**
     * ToDo make this a template function
     *
-    * ### MNE toolbox root function ###: Implementation of the mne_block_diag function - encoding part
+    * ### MNE toolbox root function ###: Definition of the mne_block_diag function - encoding part
     *
     * Make a sparse block diagonal matrix
     *

@@ -289,8 +289,7 @@ int main(int argc, char *argv[])
                                                                              evoked.data,
                                                                              t_sensorSurfaceVV[0],
                                                                              evoked.info,
-                                                                             "MEG",
-                                                                             p3DAbstractView->getView()->format())) {
+                                                                             "MEG")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
@@ -306,8 +305,7 @@ int main(int argc, char *argv[])
                                                                              evoked.data,
                                                                              t_Bem[0],
                                                                              evoked.info,
-                                                                             "EEG",
-                                                                             p3DAbstractView->getView()->format())) {
+                                                                             "EEG")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
@@ -324,8 +322,7 @@ int main(int argc, char *argv[])
                                                                           sourceEstimate,
                                                                           t_clusteredFwd,
                                                                           tSurfSet,
-                                                                          tAnnotSet,
-                                                                          p3DAbstractView->getView()->format())) {
+                                                                          tAnnotSet)) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);

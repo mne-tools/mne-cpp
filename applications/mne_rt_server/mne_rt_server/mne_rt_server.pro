@@ -42,6 +42,10 @@ QT -= gui
 
 CONFIG   += console
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 TARGET = mne_rt_server
 
 CONFIG(debug, debug|release) {

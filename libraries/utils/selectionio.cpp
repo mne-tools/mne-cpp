@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the SelectionIO class
+* @brief    Definition of the SelectionIO class
 *
 */
 

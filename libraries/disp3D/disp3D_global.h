@@ -50,7 +50,7 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(BUILD_STATIC_LIBRARIES)
+#if defined(STATICLIB)
 #  define DISP3DSHARED_EXPORT
 #elif defined(DISP3D_LIBRARY)
 #  define DISP3DSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

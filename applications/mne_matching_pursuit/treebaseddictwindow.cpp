@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the EditorWindow class.
+* @brief    Definition of the EditorWindow class.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the IOUtils class.
+* @brief    Definition of the IOUtils class.
 *
 */
 

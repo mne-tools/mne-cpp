@@ -290,8 +290,6 @@ protected:
     float                                       m_fRotZ;                 /**< The z axis rotation value. */
     QVector3D                                   m_position;              /**< The position/translation value. */
 
-
-
 signals:
     //=========================================================================================================
     /**

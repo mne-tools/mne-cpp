@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the DataProducer Class.
+* @brief     Definition of the DataProducer Class.
 *
 */
 

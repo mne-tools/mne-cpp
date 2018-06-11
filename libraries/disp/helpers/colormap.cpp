@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the ColorMap class.
+* @brief    Definition of the ColorMap class.
 *
 */
 

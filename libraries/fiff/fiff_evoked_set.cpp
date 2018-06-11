@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffEvokedSet Class.
+* @brief    Definition of the FiffEvokedSet Class.
 *
 */
 

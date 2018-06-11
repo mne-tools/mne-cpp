@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNEEpochDataList Class.
+* @brief     Definition of the MNEEpochDataList Class.
 *
 */
 

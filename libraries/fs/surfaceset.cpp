@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the SurfaceSet class.
+* @brief    Definition of the SurfaceSet class.
 *
 */
 

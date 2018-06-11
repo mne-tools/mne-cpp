@@ -109,10 +109,8 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
 ## To disable applications run: qmake MNECPP_CONFIG+=noApplications
 ## To build basic MNE Scan version run: qmake MNECPP_CONFIG+=buildBasicMneScanVersion
-## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=buildStaticLibraries
-
-## Build MNE-CPP Deep library
-MNECPP_CONFIG += buildDeep
+## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
+## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {

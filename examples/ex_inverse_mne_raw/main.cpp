@@ -578,8 +578,7 @@ int main(int argc, char *argv[])
                                                                       sourceEstimate,
                                                                       t_Fwd,
                                                                       t_surfSet,
-                                                                      t_annotationSet,
-                                                                      p3DAbstractView->getView()->format())) {
+                                                                      t_annotationSet)) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);

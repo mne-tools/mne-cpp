@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffDirNode Class.
+* @brief    Definition of the FiffDirNode Class.
 *
 */
 

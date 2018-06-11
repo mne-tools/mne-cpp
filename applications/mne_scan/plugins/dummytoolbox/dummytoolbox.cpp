@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DummyToolbox class.
+* @brief    Definition of the DummyToolbox class.
 *
 */
 

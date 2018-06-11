@@ -44,7 +44,11 @@ QT += widgets
 QT += network core widgets concurrent
 QT += xml
 
-CONFIG   += console
+CONFIG += console
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
 
 TARGET = mne_matching_pursuit
 

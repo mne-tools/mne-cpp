@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffRawDir Class.
+* @brief    Definition of the FiffRawDir Class.
 *
 */
 
