@@ -23,7 +23,7 @@ defineTest(minQtVersion) {
     return(false)
 }
 
-defineReplace(MacDeployArgs) {
+defineReplace(macDeployArgs) {
     target = $$1
     target_ext = $$2
     mne_binary_dir = $$3
@@ -47,7 +47,7 @@ defineReplace(MacDeployArgs) {
     return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
 }
 
-defineReplace(WinDeployArgs) {
+defineReplace(winDeployArgs) {
     target = $$1
     target_ext = $$2
     mne_binary_dir = $$3
@@ -67,7 +67,7 @@ defineReplace(WinDeployArgs) {
 
     final_deploy_command += $$deploy_cmd $$deploy_target $$extra_args $$escape_expand(\\n\\t)
 
-    # Parse libs from libs_to_deploy copy them to the bin folder and deploy qt dependecies for each of them
+    # Parse libs from libs_to_deploy, copy them to the bin folder and deploy qt dependecies for each of them
     for(FILE, libs_to_deploy) {
         FILE ~= s,-lMNE,MNE,g
         FILE = $${FILE}.dll
@@ -82,8 +82,8 @@ defineReplace(WinDeployArgs) {
             deploy_target = $$shell_quote($$shell_path($${TRGTDIR}/$${FILE}))
             final_deploy_command += windeployqt $${deploy_target} $$extra_args $$escape_expand(\\n\\t)
 
-            #warning(Deploying $${FILEPATH} to $${TRGTDIR})
-            #warning($${deploy_target})
+            warning(Deploying $${FILEPATH} to $${TRGTDIR})
+            warning($${deploy_target})
         }
     }
 
