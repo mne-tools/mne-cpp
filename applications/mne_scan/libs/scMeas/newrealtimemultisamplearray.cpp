@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeMultiSampleArrayNew class.
+* @brief    Definition of the RealTimeMultiSampleArrayNew class.
 *
 */
 

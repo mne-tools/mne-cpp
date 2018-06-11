@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Graph class.
+* @brief    Definition of the Graph class.
 *
 */
 

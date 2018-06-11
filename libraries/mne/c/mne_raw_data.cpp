@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneRawData Class.
+* @brief    Definition of the MneRawData Class.
 *
 */
 

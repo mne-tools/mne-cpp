@@ -43,6 +43,10 @@ QT += widgets 3dextras
 
 CONFIG   += console
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 TARGET = mne_dipole_fit
 
 CONFIG(debug, debug|release) {

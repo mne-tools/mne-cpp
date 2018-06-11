@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FrequencySpectrumSettingsWidget Class.
+* @brief    Definition of the FrequencySpectrumSettingsWidget Class.
 *
 */
 

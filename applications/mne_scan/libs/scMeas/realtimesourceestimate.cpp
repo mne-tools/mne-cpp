@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Definition of the RealTimeSourceEstimate class.
 *
 */
 

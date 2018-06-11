@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Sphere Class.
+* @brief    Definition of the Sphere Class.
 *
 */
 

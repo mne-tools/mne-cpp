@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtSss class.
+* @brief    Definition of the RtSss class.
 *
 */
 

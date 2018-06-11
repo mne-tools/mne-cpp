@@ -43,6 +43,10 @@ QT += widgets
 
 CONFIG   += console
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 TARGET = mne_forward_solution
 
 CONFIG(debug, debug|release) {

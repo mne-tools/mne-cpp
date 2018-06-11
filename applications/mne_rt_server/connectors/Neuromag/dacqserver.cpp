@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the DacqServer Class.
+* @brief     Definition of the DacqServer class.
 *
 */
 
@@ -42,8 +42,9 @@
 #include "neuromag.h"
 #include "collectorsocket.h"
 #include "shmemsocket.h"
+
 #include <fiff/fiff_stream.h>
-#include <fiff/fiff_file.h>
+#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -51,18 +52,15 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-#include <QTcpSocket>
-#include <QtNetwork>
-#include <QDataStream>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NeuromagPlugin;
+using namespace NEUROMAGRTSERVERPLUGIN;
+using namespace IOBUFFER;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -72,8 +70,6 @@ using namespace NeuromagPlugin;
 
 DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 : QThread(parent)
-, m_pCollectorSock(NULL)
-, m_pShmemSock(NULL)
 , m_bIsRunning(false)
 , m_bMeasInfoRequest(true)
 , m_bMeasRequest(true)
@@ -88,10 +84,6 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 
 DacqServer::~DacqServer()
 {
-    if(m_pCollectorSock)
-        delete m_pCollectorSock;
-    if(m_pShmemSock)
-        delete m_pShmemSock;
 }
 
 
@@ -99,9 +91,6 @@ DacqServer::~DacqServer()
 
 bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
 {
-
-//    if (p_pFiffInfo)
-//        delete p_pFiffInfo;
     p_fiffInfo.clear();
 
 #ifdef DACQ_AUTOSTART
@@ -177,7 +166,6 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
             
             printf("[done]\r\n");   
         }
-
 
         switch(t_pTag->kind)
         {
@@ -266,28 +254,18 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
 }
 
 
-
-
 //*************************************************************************************************************
-//=============================================================================================================
-// run
-//=============================================================================================================
 
 void DacqServer::run()
 {
     m_bIsRunning = true;
 
     connect(this, &DacqServer::measInfoAvailable,
-            m_pNeuromag, &Neuromag::releaseMeasInfo);
+            m_pNeuromag.data(), &Neuromag::releaseMeasInfo);
 
+    m_pCollectorSock = QSharedPointer<CollectorSocket>(new CollectorSocket);
 
-    if(m_pCollectorSock)
-        delete m_pCollectorSock;
-    m_pCollectorSock = new CollectorSocket();
-    
-    //
     // Make sure the buffer size is at least as big as the minimal buffer size
-    //
     if(m_pNeuromag->m_uiBufferSampleSize < MIN_BUFLEN)
         m_pNeuromag->m_uiBufferSampleSize = MIN_BUFLEN;
 
@@ -320,13 +298,7 @@ void DacqServer::run()
         printf("[done]\r\n");
     }
 
-
-
-////
-
-    if(m_pShmemSock)
-        delete m_pShmemSock;
-    m_pShmemSock = new ShmemSocket();
+    m_pShmemSock = QSharedPointer<ShmemSocket>(new ShmemSocket);
 
     m_pShmemSock->set_data_filter (NULL, 0);
 
@@ -337,14 +309,12 @@ void DacqServer::run()
     }
 
 
-    /* Mainloop */
+    // Mainloop
 //    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
 //         meg_mag_multiplier, meg_grad_multiplier, eeg_multiplier);
     printf("Waiting for the measurement to start...\n");
-    
-    //
+
     // Receive shmem tags
-    //
     qint32 nchan = -1;
     float sfreq = -1.0f;
 
@@ -352,11 +322,8 @@ void DacqServer::run()
     
     qint32 t_nSamples = 0;
     qint32 t_nSamplesNew = 0;
-    
 
-    //
     // Requesting new header info: read it every time a measurement starts or a measurement info is requested
-    //
     if(m_pNeuromag->m_info.isEmpty() || m_bMeasInfoRequest)
     {
         m_pNeuromag->mutex.lock();
@@ -368,13 +335,9 @@ void DacqServer::run()
                 m_bMeasInfoRequest = false;
             }
 
-            // Reset Buffer Size
-            if(m_pNeuromag->m_pRawMatrixBuffer)
-                delete m_pNeuromag->m_pRawMatrixBuffer;
-            m_pNeuromag->m_pRawMatrixBuffer = NULL;
-
+            // Create buffer
             if(!m_pNeuromag->m_info.isEmpty())
-                m_pNeuromag->m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_info.nchan, m_pNeuromag->m_uiBufferSampleSize);
+                m_pNeuromag->m_pRawMatrixBuffer = RawMatrixBuffer::SPtr(new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_pNeuromag->m_info.nchan, m_pNeuromag->m_uiBufferSampleSize));
         }
         else
             m_bIsRunning = false;
@@ -385,9 +348,7 @@ void DacqServer::run()
             this->wait();
     }
 
-    //
     // Control measurement start through Neuromag connector. ToDo: in Case Realtime measurement should be performed during normal acqusition process, change this!!
-    //
 #ifdef DACQ_AUTOSTART
     if(m_bMeasRequest)
         m_pCollectorSock->server_start();
@@ -483,18 +444,13 @@ void DacqServer::run()
         }
     }
 
-    //
     // Stop and clean up
-    //
 #ifdef DACQ_AUTOSTART
     m_pCollectorSock->server_stop();
 #endif
     
     m_pShmemSock->disconnect_client();
     m_pCollectorSock->close();
-
-    delete m_pCollectorSock;
-    m_pCollectorSock = NULL;
 
     printf("\r\n");
 }

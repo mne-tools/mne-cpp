@@ -94,9 +94,9 @@ CalcMetric::CalcMetric()
 
 //*************************************************************************************************************
 
-QPair<RowVectorXd, QPair<QList<double>, int>> createInputList(RowVectorXd input, int dim, double r, double n, double mean, double stdDev)
+QPair<RowVectorXd, QPair<QList<double>, int> > createInputList(RowVectorXd input, int dim, double r, double n, double mean, double stdDev)
 {
-    QPair<RowVectorXd, QPair<QList<double>, int>> funcInput;
+    QPair<RowVectorXd, QPair<QList<double>, int> > funcInput;
     funcInput.first = input;
     QPair<QList<double>, int> inputValues;
     QList<double> doubleInputValues;
@@ -114,7 +114,7 @@ QPair<RowVectorXd, QPair<QList<double>, int>> createInputList(RowVectorXd input,
 
 //*************************************************************************************************************
 
-double calcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int>> input)//RowVectorXd data, double mean, double stdDev, int dim, double r, double n)
+double calcFuzzyEn(QPair<RowVectorXd, QPair<QList<double>, int> > input)//RowVectorXd data, double mean, double stdDev, int dim, double r, double n)
 {
     RowVectorXd data = input.first;
     QPair<QList<double>, int> inputValues = input.second;
@@ -252,13 +252,13 @@ void CalcMetric::setData(Eigen::MatrixXd input)
 VectorXd CalcMetric::onSeizureDetection(int dim, double r, double n, QList<int> checkChs)
 {
     qSort(m_lFuzzyEnUsedChs);
-    QList<QPair<RowVectorXd, QPair<QList<double>, int>>> inputList;
+    QList<QPair<RowVectorXd, QPair<QList<double>, int> > > inputList;
 
     for (int i = 0; i < checkChs.length(); i++)
     {
         if (!m_lFuzzyEnUsedChs.contains(checkChs[i]))
         {
-            QPair<RowVectorXd, QPair<QList<double>, int>> funcInput = createInputList(m_dmatData.row(checkChs[i]), dim, r, n, m_dvecMean(checkChs[i]), m_dvecStdDev(checkChs[i]));
+            QPair<RowVectorXd, QPair<QList<double>, int> > funcInput = createInputList(m_dmatData.row(checkChs[i]), dim, r, n, m_dvecMean(checkChs[i]), m_dvecStdDev(checkChs[i]));
             inputList << funcInput;
         }
     }
@@ -435,12 +435,12 @@ void CalcMetric::calcAll(Eigen::MatrixXd input, int dim, double r, double n)
         }
     }
 
-    QList<QPair<RowVectorXd, QPair<QList<double>, int>>> inputList;
+    QList<QPair<RowVectorXd, QPair<QList<double>, int> > > inputList;
 
     for (int i = m_iFuzzyEnStart; i< m_iChannelCount; i=i+m_iFuzzyEnStep)
     {
         m_lFuzzyEnUsedChs << i;
-        QPair<RowVectorXd, QPair<QList<double>, int>> funcInput = createInputList(input.row(i), dim, r, n, m_dvecMean(i), m_dvecStdDev(i));
+        QPair<RowVectorXd, QPair<QList<double>, int> > funcInput = createInputList(input.row(i), dim, r, n, m_dvecMean(i), m_dvecStdDev(i));
         inputList << funcInput;
     }
 

@@ -166,7 +166,7 @@ public:
     *
     * ### MNE toolbox root function ###
     *
-    * Implementation of the mne_transform_source_space_to for a single hemisphere function
+    * Definition of the mne_transform_source_space_to for a single hemisphere function
     * Transform source space data to the desired coordinate system.
     *
     * @param[in] dest       The id of the destination coordinate system (FIFFV_COORD_...)

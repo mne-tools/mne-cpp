@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneMshDisplaySurfaceSet Class.
+* @brief    Definition of the MneMshDisplaySurfaceSet Class.
 *
 */
 

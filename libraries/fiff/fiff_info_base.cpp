@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffInfoBase Class.
+* @brief    Definition of the FiffInfoBase Class.
 *
 */
 

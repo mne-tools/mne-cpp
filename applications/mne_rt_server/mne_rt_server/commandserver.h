@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandServer Class.
+* @brief     Definition of the CommandServer Class.
 *
 */
 

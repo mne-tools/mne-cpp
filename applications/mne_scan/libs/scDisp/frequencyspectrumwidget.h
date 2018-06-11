@@ -160,13 +160,11 @@ public:
     */
     virtual void init();
 
-
     //=========================================================================================================
     /**
     * Initialise the SettingsWidget.
     */
     void initSettingsWidget();
-
 
     virtual bool eventFilter(QObject * watched, QEvent * event);
 
@@ -183,7 +181,6 @@ private:
     * Show the frequency spectrum settings widget
     */
     void showFrequencySpectrumSettingsWidget();
-
 
     QAction* m_pActionFrequencySettings;        /**< Frequency spectrum settings action */
 

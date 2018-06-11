@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffChPos Class.
+* @brief    Definition of the FiffChPos Class.
 *
 */
 
