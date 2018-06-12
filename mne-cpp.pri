@@ -69,12 +69,15 @@ defineReplace(winDeployArgs) {
 
     # Parse libs from libs_to_deploy, copy them to the bin folder and deploy qt dependecies for each of them
     for(FILE, libs_to_deploy) {
-        FILE ~= s,-l,,g
-        FILE = $${FILE}.dll
-        TRGTDIR = $$shell_quote($$shell_path($${MNE_BINARY_DIR}))
-        FILEPATH= $$shell_quote($$shell_path($${MNE_LIBRARY_DIR}/$${FILE}))
+        # Only parse if the variable specified in libs_to_deploy does not contain / and -L (as seen in lib path definitions)
+        PARSE = $$find(FILE, -L) $$find(FILE, /)
 
-        exists($${FILEPATH}) {
+        isEmpty(PARSE) {
+            FILE ~= s,-l,,g
+            FILE = $${FILE}.dll
+            TRGTDIR = $$shell_quote($$shell_path($${MNE_BINARY_DIR}))
+            FILEPATH= $$shell_quote($$shell_path($${MNE_LIBRARY_DIR}/$${FILE}))
+
             # Copy library
             final_deploy_command += $${QMAKE_COPY} $$quote($${FILEPATH}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
 
@@ -83,7 +86,6 @@ defineReplace(winDeployArgs) {
             final_deploy_command += windeployqt $${deploy_target} $$extra_args $$escape_expand(\\n\\t)
 
             #warning(Deploying $${FILEPATH} to $${TRGTDIR})
-            #warning($${deploy_target})
         }
     }
 
