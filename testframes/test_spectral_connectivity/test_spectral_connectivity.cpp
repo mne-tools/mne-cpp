@@ -411,18 +411,20 @@ void TestSpectralConnectivity::compareConnectivity()
     printf ("2\n");
     QCOMPARE( m_ConnectivityOutput.cols(), m_RefConnectivityOutput.cols() );
 
+    printf ("3 sizes: %d %d %d %d\n", int(m_ConnectivityOutput.rows()), int(m_RefConnectivityOutput.rows()), int(m_ConnectivityOutput.cols()), int(m_RefConnectivityOutput.cols()));
+
     //for (int i = 0; i < m_ConnectivityOutput.cols(); ++i)
     for (int i = m_ConnectivityOutput.cols() - 1; i >= 0; --i)
     {
         if (m_RefConnectivityOutput(i) == 0.0){
-            printf ("3 sample: %d \n", i);
+            printf ("4 sample: %d \n", i);
             QCOMPARE( m_ConnectivityOutput(i), m_RefConnectivityOutput(i) );
         } else {
-            printf ("4 sample: %d \n", i);
+            printf ("5 sample: %d \n", i);
             if ((abs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / abs(m_RefConnectivityOutput(i))) >= epsilon){
                 printf ("actual: %.10f  --  reference: %.10f  -- difference: %.10f  --  rel. difference: %.10f\n", m_ConnectivityOutput(i), m_RefConnectivityOutput(i), abs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)), (abs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / abs(m_RefConnectivityOutput(i))));
             }
-            printf ("5 sample: %d \n", i);
+            printf ("6 sample: %d \n", i);
             QVERIFY( (abs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / abs(m_RefConnectivityOutput(i))) < epsilon );
         }
     }
