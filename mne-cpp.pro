@@ -58,4 +58,8 @@ SUBDIRS += \
     SUBDIRS += testframes
 }
 
-CONFIG += ordered
+# Specify library dependencies
+libraries.depends =
+applications.depends = libraries
+examples.depends = libraries
+testframes.depends = libraries
