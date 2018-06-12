@@ -132,16 +132,16 @@ isEmpty(EIGEN_INCLUDE_DIR) {
 CNTK_INCLUDE_DIR = $$CNTK_INCLUDE_DIR
 isEmpty( CNTK_INCLUDE_DIR ) {
     # Check CNTK Path options
-    exists($$(CNTKPATH)/cntk/Include/Eval.h) {
+    exists($$shell_path($$(CNTKPATH)/cntk/Include/Eval.h)) {
         CNTK_TEST_DIR = $$shell_path($$(CNTKPATH)/cntk)
     }
-    exists($$(CNTKPATH)/Include/Eval.h) {
+    exists($$shell_path($$(CNTKPATH)/Include/Eval.h)) {
         CNTK_TEST_DIR = $$(CNTKPATH)
     }
-    exists($$(MYCNTKPATH)/cntk/Include/Eval.h) {
+    exists($$shell_path($$(MYCNTKPATH)/cntk/Include/Eval.h)) {
         CNTK_TEST_DIR = $$shell_path($$(MYCNTKPATH)/cntk)
     }
-    exists($$(MYCNTKPATH)/Include/Eval.h) {
+    exists($$shell_path($$(MYCNTKPATH)/Include/Eval.h)) {
         CNTK_TEST_DIR = $$(MYCNTKPATH)
     }
     # Set CNTK path variables
@@ -177,7 +177,7 @@ isEmpty( MNE_LIBRARY_DIR ) {
 contains(MNECPP_CONFIG, buildDeep) {
     CNTK_LIBRARY_DIR = $$CNTK_LIBRARY_DIR
     isEmpty( CNTK_LIBRARY_DIR ) {
-        CNTK_LIBRARY_DIR = C:/local/cntk/cntk
+        CNTK_LIBRARY_DIR = $$shell_path(C:/local/cntk/cntk)
     }
 }
 
