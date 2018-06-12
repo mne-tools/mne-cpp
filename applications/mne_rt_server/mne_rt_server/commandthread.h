@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandThread Class.
+* @brief     Definition of the CommandThread Class.
 *
 */
 

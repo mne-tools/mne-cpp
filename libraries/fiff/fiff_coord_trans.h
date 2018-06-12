@@ -126,7 +126,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: implementation of the fiff_invert_transform function
+    * ### MNE toolbox root function ###: Definition of the fiff_invert_transform function
     *
     * Invert a coordinate transformation
     * (actual obsolete - cause trans and inverse are both stored)
@@ -148,7 +148,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_transform_coordinates function
+    * ### MNE toolbox root function ###: Definition of the mne_transform_coordinates function
     *
     * Reads a coordinate transform from a fif file
     *
@@ -161,7 +161,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_transform_source_space_to function
+    * ### MNE toolbox root function ###: Definition of the mne_transform_source_space_to function
     *
     * TODO: dest       - The id of the destination coordinate system (FIFFV_COORD_...)
     *
@@ -187,7 +187,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C root function ###: Implementation of the mne_coord_frame_name function
+    * ### MNE C root function ###: Definition of the mne_coord_frame_name function
     *
     * Map coordinate frame integers to human-readable names
     *
@@ -199,7 +199,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C root function ###: Implementation of the fiff_make_transform function
+    * ### MNE C root function ###: Definition of the fiff_make_transform function
     *
     * Compose the coordinate transformation structure
     * from a known forward transform
@@ -215,7 +215,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C root function ###: Implementation of the add_inverse function
+    * ### MNE C root function ###: Definition of the add_inverse function
     *
     * @param[in] t      Fiff coordinate transform to which the inverse should be added
     *

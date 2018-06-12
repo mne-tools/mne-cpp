@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the DipoleForward Class.
+* @brief    Definition of the DipoleForward Class.
 *
 */
 

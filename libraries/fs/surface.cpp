@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Surface class.
+* @brief    Definition of the Surface class.
 *
 */
 

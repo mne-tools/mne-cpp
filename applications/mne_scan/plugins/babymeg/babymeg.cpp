@@ -854,7 +854,7 @@ void BabyMEG::createDigTrig(MatrixXf& data)
     QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(), m_lTriggerChannelIndices, 0, 3.0, false, "Rising");
 
     //Combine and write results into data block's digital trigger channel
-    QMapIterator<int,QList<QPair<int,double> >> i(qMapDetectedTrigger);
+    QMapIterator<int,QList<QPair<int,double> > > i(qMapDetectedTrigger);
     int counter = 0;
     int idxDigTrig = m_pFiffInfo->ch_names.indexOf("DTRG01");
 

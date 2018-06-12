@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AveragingSettingsWidget class.
+* @brief    Definition of the AveragingSettingsWidget class.
 *
 */
 

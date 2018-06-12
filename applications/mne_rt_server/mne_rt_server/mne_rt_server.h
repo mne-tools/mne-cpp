@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNERTServer Class.
+* @brief     Declaration of the MNERTServer Class.
 *
 */
 

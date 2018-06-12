@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeMultiSampleArrayWidget Class.
+* @brief    Definition of the RealTimeMultiSampleArrayWidget Class.
 *
 */
 
@@ -336,8 +336,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                                                                     data,
                                                                     (*m_pBemHead.data())[0],
                                                                     *m_pFiffInfo.data(),
-                                                                    "EEG",
-                                                                    m_p3DView->format());
+                                                                    "EEG");
 
                 if(m_pRtEEGSensorDataItem) {
                     m_pRtEEGSensorDataItem->setLoopState(false);
@@ -363,8 +362,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
                                                                     data,
                                                                     (*m_pBemSensor.data())[0],
                                                                     *m_pFiffInfo.data(),
-                                                                    "MEG",
-                                                                    m_p3DView->format());
+                                                                    "MEG");
 
                 if(m_pRtMEGSensorDataItem) {
                     m_pRtMEGSensorDataItem->setLoopState(false);

@@ -43,20 +43,15 @@ qtHaveModule(printsupport): QT += printsupport
 
 TARGET = mne_analyze
 
-#If one single executable is to be build
-#-> comment out flag in .pri file
-#-> add DEFINES += BUILD_STATIC_LIBRARIES in projects .pro file
-#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
-contains(MNECPP_CONFIG, buildStaticLibraries) {
-    DEFINES += BUILD_STATIC_LIBRARIES
-}
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-#Note that the static flag is ingored when building against a dynamic qt version
-CONFIG += static console #DEBUG console
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
+CONFIG += console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -165,18 +160,16 @@ macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
+    extensions.path = Contents/MacOS/
+    extensions.files = $${ROOT_DIR}/applications/mne_analyze/extensions
+    QMAKE_BUNDLE_DATA += extensions
+    EXTRA_LIBDIRS = -dmg
 
-#    # Copy libs
-#    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
-#    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
-#    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Inverse.*,libMNE1Disp.*,libMNE1Disp3D.*} $${BUNDLEFRAMEDIR}
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    deploy_app = $$member(DEPLOY_CMD, 1)
+    dmg_file = $$replace(deploy_app, .app, .dmg)
+    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
 
-#    DEPLOY_COMMAND = macdeployqt
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
 }

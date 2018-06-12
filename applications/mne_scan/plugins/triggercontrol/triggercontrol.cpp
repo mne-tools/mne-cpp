@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TriggerControlclass.
+* @brief    Definition of the TriggerControlclass.
 *
 */
 

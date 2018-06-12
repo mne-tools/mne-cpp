@@ -42,6 +42,10 @@ TARGET = mne_launch
 
 CONFIG += c++11
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -51,6 +55,10 @@ DESTDIR = $${MNE_BINARY_DIR}
 SOURCES += main.cpp \
     application.cpp \
     mnelaunchcontrol.cpp
+
+HEADERS += \
+    application.h \
+    mnelaunchcontrol.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -85,10 +93,11 @@ unix:!macx {
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
-
-    #ToDo copy dependcies to app bundle
+    EXTRA_LIBDIRS = -qmldir=$${PWD}/qml
+ 
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 
-HEADERS += \
-    application.h \
-    mnelaunchcontrol.h

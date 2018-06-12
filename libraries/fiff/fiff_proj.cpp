@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffProj Class.
+* @brief    Definition of the FiffProj Class.
 *
 */
 

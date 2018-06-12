@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains implementation of RunWidget class.
+* @brief    Contains Definition of RunWidget class.
 *
 */
 
