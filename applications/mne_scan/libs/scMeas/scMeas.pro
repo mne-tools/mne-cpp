@@ -104,3 +104,10 @@ header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/scMeas
 
 INSTALLS += header_files
+
+# Deploy library
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}

@@ -109,3 +109,11 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/connectivity
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# Deploy library
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+

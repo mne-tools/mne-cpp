@@ -127,4 +127,9 @@ INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-FORMS += \
+# Deploy library
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
