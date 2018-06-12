@@ -88,7 +88,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
