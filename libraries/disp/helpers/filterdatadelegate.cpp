@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FilterDataDelegate Class.
+* @brief    Definition of the FilterDataDelegate Class.
 *
 */
 

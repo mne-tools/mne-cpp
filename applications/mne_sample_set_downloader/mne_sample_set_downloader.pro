@@ -45,6 +45,10 @@ DEFINES  += QT_NO_SSL
 
 TARGET = mne_sample_data_downloader
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -75,19 +79,13 @@ macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
     QMAKE_RPATHDIR += @executable_path/../libs
+    EXTRA_LIBDIRS =
 
-    #macdeployqt is done in an separate deploy script
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
-#
-#    DEPLOY_COMMAND = macdeployqt
-#
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#
-#    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
+
 }
 win32 {
     isEmpty(TARGET_EXT) {

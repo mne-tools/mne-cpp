@@ -113,18 +113,10 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_SCAN_INCLUDE_DIR}/scShared
-
-header_files_interfaces.files = ./Interfaces/*.h
-header_files_interfaces.path = $${MNE_SCAN_INCLUDE_DIR}/scShared/Interfaces
-
-header_files_management.files = ./Interfaces/*.h
-header_files_management.path = $${MNE_SCAN_INCLUDE_DIR}/scShared/Management
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/scShared
 
 INSTALLS += header_files
-INSTALLS += header_files_interfaces
-INSTALLS += header_files_management
 
 
 unix:!macx {

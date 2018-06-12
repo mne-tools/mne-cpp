@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeMultiSampleArrayModel Class.
+* @brief    Definition of the RealTimeMultiSampleArrayModel Class.
 *
 */
 
@@ -830,16 +830,16 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
         MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-        if(sSytemType == "VectorView") {
+        if(sSytemType == "VectorView" && m_matSpharaVVGradLoaded.size() != 0 && m_matSpharaVVMagLoaded.size() != 0) {
             matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
             matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
         }
 
-        if(sSytemType == "BabyMEG") {
+        if(sSytemType == "BabyMEG" && m_matSpharaBabyMEGInnerLoaded.size() != 0) {
             matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
-        if(sSytemType == "EEG") {
+        if(sSytemType == "EEG" && m_matSpharaEEGLoaded.size() != 0) {
             matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 

@@ -44,6 +44,10 @@ VERSION = $${MNE_CPP_VERSION}
 CONFIG   += console
 CONFIG   -= app_bundle
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 TARGET = mne_show_fiff
 
 CONFIG(debug, debug|release) {
@@ -97,3 +101,24 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+macx {
+
+    # Mac now creates app bundle
+    CONFIG += app_bundle
+
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+
+    # Copy Resource folder to app bundle
+
+    explain.path = Contents/MacOS/resources/general/explanations
+    explain.files = $${ROOT_DIR}/resources/general/explanations/fiff_explanations.txt
+    QMAKE_BUNDLE_DATA += explain
+    EXTRA_LIBDIRS =
+
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
+
+}

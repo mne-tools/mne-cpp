@@ -230,7 +230,6 @@ public:
     * @param[in] tForwardSolution       The MNEForwardSolution.
     * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
     * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
-    * @param[in] tSurfaceFormat         Surface format form View3D. It is used to determine the OpenGL version.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
@@ -239,8 +238,7 @@ public:
                                        const MNELIB::MNESourceEstimate& tSourceEstimate,
                                        const MNELIB::MNEForwardSolution& tForwardSolution,
                                        const FSLIB::SurfaceSet& tSurfSet,
-                                       const FSLIB::AnnotationSet& tAnnotSet,
-                                       const QSurfaceFormat &tSurfaceFormat);
+                                       const FSLIB::AnnotationSet& tAnnotSet);
 
     //=========================================================================================================
     /**
@@ -339,7 +337,6 @@ public:
     * @param[in] tBemSurface            The Bem Surface data.
     * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
     * @param[in] sDataType              The data type ("MEG" or "EEG").
-    * @param[in] tSurfaceFormat         Surface format form View3D. It is used to determine the OpenGL version.
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
@@ -348,8 +345,7 @@ public:
                                       const Eigen::MatrixXd& matSensorData,
                                       const MNELIB::MNEBemSurface& tBemSurface,
                                       const FIFFLIB::FiffInfo &fiffInfo,
-                                      const QString &sDataType,
-                                      const QSurfaceFormat &tSurfaceFormat);
+                                      const QString &sDataType);
 
     //=========================================================================================================
     /**

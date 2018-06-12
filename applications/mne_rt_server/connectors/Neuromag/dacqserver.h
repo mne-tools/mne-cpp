@@ -29,10 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     declaration of the DacqServer Class.
+* @brief     Declaration of the DacqServer Class.
 *
 */
-
 
 #ifndef DACQSERVER_H
 #define DACQSERVER_H
@@ -42,10 +41,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "types_definitions.h"
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_tag.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -53,27 +48,8 @@
 //=============================================================================================================
 
 #include <QThread>
-
-#include <QTcpSocket>
-
-#include <QByteArray>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
-//=============================================================================================================
-
-namespace NeuromagPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
+#include <QSharedPointer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -81,10 +57,28 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE NEUROMAGRTSERVERPLUGIN
+//=============================================================================================================
+
+namespace NEUROMAGRTSERVERPLUGIN
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// NEUROMAGRTSERVERPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
+
 class Neuromag;
 class CollectorSocket;
 class ShmemSocket;
-//class FiffInfo;
 
 
 //=============================================================================================================
@@ -100,30 +94,22 @@ class DacqServer : public QThread
     friend class Neuromag;
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a acquisition Server.
     */
     explicit DacqServer(Neuromag* p_pNeuromag, QObject * parent = 0);
-    
-    
+        
     //=========================================================================================================
     /**
     * Constructs a acquisition Server.
     */
     ~DacqServer();
 
-    
-public slots: //--> in Qt 5 not anymore declared as slot
-
     void readCollectorMsg();
 
-
 signals:
-
     void measInfoAvailable();
-
 
 protected:
     //=========================================================================================================
@@ -135,7 +121,6 @@ protected:
     virtual void run();
 
 private:
-
     //=========================================================================================================
     /**
     * Quit function
@@ -144,27 +129,17 @@ private:
     */
 //    void clean_up();
 
+    bool getMeasInfo(FIFFLIB::FiffInfo &p_FiffInfo);
 
+    QSharedPointer<CollectorSocket>     m_pCollectorSock;
+    QSharedPointer<ShmemSocket>         m_pShmemSock;
+    QPointer<Neuromag>                  m_pNeuromag;
 
-    //newly written stuff ported to qt
-//    QString         m_sCollectorHost;
-    CollectorSocket*    m_pCollectorSock;
-
-    ShmemSocket*        m_pShmemSock;
-
-//dacqserver
-
-    bool m_bIsRunning;
-
-    bool m_bMeasInfoRequest;
-    bool m_bMeasRequest;
-    bool m_bMeasStopRequest;
-    bool m_bSetBuffersizeRequest;
-
-    bool getMeasInfo(FiffInfo &p_FiffInfo);
-
-    Neuromag* m_pNeuromag;
-
+    bool                m_bIsRunning;
+    bool                m_bMeasInfoRequest;
+    bool                m_bMeasRequest;
+    bool                m_bMeasStopRequest;
+    bool                m_bSetBuffersizeRequest;
 };
 
 } // NAMESPACE

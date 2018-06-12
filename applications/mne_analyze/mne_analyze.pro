@@ -39,7 +39,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     libs \
+    extensions \
     mne_analyze \
-    extensions
 
 CONFIG += ordered

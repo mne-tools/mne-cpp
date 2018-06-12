@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNECorSourceEstimate Class.
+* @brief    Definition of the MNECorSourceEstimate Class.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneRawBufDef Class.
+* @brief    Definition of the MneRawBufDef Class.
 *
 */
 

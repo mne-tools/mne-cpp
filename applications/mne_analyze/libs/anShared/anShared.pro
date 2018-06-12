@@ -97,19 +97,10 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_ANALYZE_INCLUDE_DIR}/anShared
-
-header_files_interfaces.files = ./Interfaces/*.h
-header_files_interfaces.path = $${MNE_ANALYZE_INCLUDE_DIR}/anShared/Interfaces
-
-header_files_management.files = ./Interfaces/*.h
-header_files_management.path = $${MNE_ANALYZE_INCLUDE_DIR}/anShared/Management
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/anShared
 
 INSTALLS += header_files
-INSTALLS += header_files_interfaces
-INSTALLS += header_files_management
-
 
 unix:!macx {
     QMAKE_CXXFLAGS += -std=c++0x

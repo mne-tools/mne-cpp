@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Electric Current Dipole Set (ECDSet) Class.
+* @brief    Definition of the Electric Current Dipole Set (ECDSet) Class.
 *
 */
 

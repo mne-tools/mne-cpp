@@ -50,7 +50,7 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(BUILD_STATIC_LIBRARIES)
+#if defined(STATICLIB)
 #  define FIFFSHARED_EXPORT
 #elif defined(FIFF_LIBRARY)
 #  define FIFFSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

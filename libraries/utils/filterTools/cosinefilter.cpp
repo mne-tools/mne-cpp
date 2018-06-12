@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the CosineFilter class
+* @brief    Definition of the CosineFilter class
 *
 */
 
