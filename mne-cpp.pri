@@ -69,7 +69,7 @@ defineReplace(winDeployArgs) {
 
     # Parse libs from libs_to_deploy, copy them to the bin folder and deploy qt dependecies for each of them
     for(FILE, libs_to_deploy) {
-        FILE ~= s,-lMNE,MNE,g
+        FILE ~= s,-l,,g
         FILE = $${FILE}.dll
         TRGTDIR = $$shell_quote($$shell_path($${MNE_BINARY_DIR}))
         FILEPATH= $$shell_quote($$shell_path($${MNE_LIBRARY_DIR}/$${FILE}))
@@ -82,8 +82,8 @@ defineReplace(winDeployArgs) {
             deploy_target = $$shell_quote($$shell_path($${TRGTDIR}/$${FILE}))
             final_deploy_command += windeployqt $${deploy_target} $$extra_args $$escape_expand(\\n\\t)
 
-            warning(Deploying $${FILEPATH} to $${TRGTDIR})
-            warning($${deploy_target})
+            #warning(Deploying $${FILEPATH} to $${TRGTDIR})
+            #warning($${deploy_target})
         }
     }
 
