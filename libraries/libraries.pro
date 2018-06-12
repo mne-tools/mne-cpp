@@ -66,5 +66,15 @@ SUBDIRS += \
     }
 }
 
-
-CONFIG += ordered
+# Specify library dependencies
+utils.depends =
+fs.depends = utils
+fiff.depends = utils
+mne.depends = utils fs fiff
+fwd.depends = utils fs fiff mne
+inverse.depends = utils fs fiff mne fwd
+realtime.depends = utils fiff mne fwd inverse
+deep.depends = utils fs fiff mne
+connectivity.depends = utils fs fiff mne fwd inverse
+disp.depends = utils fs fiff mne fwd inverse
+disp3D.depends = utils fs fiff mne fwd inverse disp
