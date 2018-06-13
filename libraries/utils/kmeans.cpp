@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the KMeans class
+* @brief    Definition of the KMeans class
 *
 */
 

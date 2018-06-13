@@ -52,5 +52,6 @@ SUBDIRS += \
         SUBDIRS += \
             test_interpolation \
             test_geometryinfo \
+            test_spectral_connectivity
     }
 }

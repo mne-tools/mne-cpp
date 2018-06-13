@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     declaration of the CollectorSocket Class.
+* @brief     Declaration of the CollectorSocket class.
 *
 */
 
@@ -54,10 +54,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NeuromagPlugin
+// DEFINE NAMESPACE NEUROMAGRTSERVERPLUGIN
 //=============================================================================================================
 
-namespace NeuromagPlugin
+namespace NEUROMAGRTSERVERPLUGIN
 {
 
 
@@ -72,7 +72,6 @@ class CollectorSocket : public QTcpSocket
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a acquisition Server.
@@ -95,7 +94,6 @@ public:
     */
 //    int close();
 
-
     inline bool isMeasuring()
     {
         return m_bIsMeasuring;
@@ -109,7 +107,6 @@ public:
     */
     int getMaxBuflen();
 
-
     //=========================================================================================================
     /**
     * Set the desired maximum buffer length
@@ -117,7 +114,6 @@ public:
     * @return
     */
     int setMaxBuflen(int maxbuflen);
-
 
     // new client.c to qt functions
     //=========================================================================================================
@@ -128,7 +124,6 @@ public:
     */
     bool server_command(const QString& p_sCommand);
 
-
     //=========================================================================================================
     /**
     *
@@ -136,7 +131,6 @@ public:
     * @return
     */
     bool server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
-
 
     //=========================================================================================================
     /**
@@ -146,7 +140,6 @@ public:
     */
     bool server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
-
     //=========================================================================================================
     /**
     *
@@ -155,24 +148,17 @@ public:
     */
     bool server_start();
 
-
     //=========================================================================================================
     /**
     *
     *
     * @return
-//    */
+    */
     bool server_stop();
 
-
-
 private:
-
     QString     m_sCollectorHost;
-
     bool        m_bIsMeasuring;
-
-
 };
 
 } // NAMESPACE

@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of mne_browse
+* @brief    Definition of delegate of mne_browse
 *
 */
 

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FIFFEvoked Class.
+* @brief    Definition of the FIFFEvoked Class.
 *
 */
 

@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RtNoise Class.
+* @brief     Definition of the RtNoise Class.
 *
 */
 
@@ -81,7 +81,7 @@ RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_data
 , m_iBlockIndex(0)
 {
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
-    //qRegisterMetaType<QVector<double>>("QVector<double>");
+    //qRegisterMetaType<QVector<double> >("QVector<double>");
 
     m_Fs = m_pFiffInfo->sfreq;
 

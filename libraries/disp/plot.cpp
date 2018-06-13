@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Plot class.
+* @brief    Definition of the Plot class.
 *
 */
 

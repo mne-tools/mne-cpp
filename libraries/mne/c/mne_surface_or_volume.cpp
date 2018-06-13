@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Surface or Volume (MneSurfaceOrVolume) Class.
+* @brief    Definition of the MNE Surface or Volume (MneSurfaceOrVolume) Class.
 *
 */
 

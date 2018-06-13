@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MinimumNorm Class.
+* @brief    Definition of the MinimumNorm Class.
 *
 */
 
