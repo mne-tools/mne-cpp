@@ -105,6 +105,9 @@ public:
     QList<Eigen::MatrixXd>      m_matDataList;                  /**< The input data. */
     Eigen::MatrixX3f            m_matNodePositions;             /**< The node position in 3D space. */
 
+    int                         m_iNfft;                        /**< The FFT length used for spectral estimation. */
+    QString                     m_sWindowType;                  /**< The window type used to compute tapered spectra. */
+
 protected:
 
 };

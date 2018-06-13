@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.h
+* @file     imagcoherenence.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -30,14 +30,14 @@
 *
 * @note Notes:
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
+* - QtConcurrent can be used to speed up computation.
 *
-*
-* @brief     PhaseLagIndex class declaration.
+* @brief     Imaginary coherence class declaration.
 *
 */
 
-#ifndef PHASELAGINDEX_H
-#define PHASELAGINDEX_H
+#ifndef IMAGCOHERENCE_H
+#define IMAGCOHERENCE_H
 
 
 //*************************************************************************************************************
@@ -90,26 +90,26 @@ class Network;
 
 //=============================================================================================================
 /**
-* This class computes the phase lag index connectivity metric.
+* This class computes the imaginary coherence connectivity metric.
 *
-* @brief This class computes the phase lag index connectivity metric.
+* @brief This class computes the imaginary coherence connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
+class CONNECTIVITYSHARED_EXPORT ImagCoherence : public AbstractMetric
 {    
 
 public:
-    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
-    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
+    typedef QSharedPointer<ImagCoherence> SPtr;            /**< Shared pointer type for ImagCoherence. */
+    typedef QSharedPointer<const ImagCoherence> ConstSPtr; /**< Const shared pointer type for ImagCoherence. */
 
     //=========================================================================================================
     /**
-    * Constructs a PhaseLagIndex object.
+    * Constructs a ImagCoherence object.
     */
-    explicit PhaseLagIndex();
+    explicit ImagCoherence();
 
     //=========================================================================================================
     /**
-    * Calculates the phase lag index between the rows of the data matrix.
+    * Calculates the imaginary coherence between the rows of the data matrix.
     *
     * @param[in] matDataList    The input data.
     * @param[in] matVert        The vertices of each network node.
@@ -118,21 +118,21 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
+    static Network imagCoherence(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
                                  int iNfft=-1, const QString &sWindowType="hanning");
 
-    //==========================================================================================================
+    //=========================================================================================================
     /**
-    * Calculates the actual phase lag index between two data vectors.
+    * Calculates the imaginary coherence of the rows of the data matrix.
     *
     * @param[in] matDataList    The input data.
     * @param[in] iNfft          The FFT length.
     * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
     *
-    * @return                   The PLI value.
+    * @return                   The connectivity information in form of a QVector of matrices.
     */
-    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType);
+    static QVector<Eigen::MatrixXd> computeImagCoherence(const QList<Eigen::MatrixXd> &matDataList,
+                                                         int iNfft, const QString &sWindowType);
 };
 
 
@@ -144,4 +144,4 @@ public:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // PHASELAGINDEX_H
+#endif // IMAGCOHERENCE_H
