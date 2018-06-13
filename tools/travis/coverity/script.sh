@@ -13,7 +13,7 @@ fi
 COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
 COVERITY_SCAN_NOTIFICATION_EMAIL="christoph.dinh@mne-cpp.org"
 COVERITY_SCAN_BRANCH_PATTERN="master"
-COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r"
+COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r MNECPP_CONFIG+=noTests"
 COVERITY_SCAN_BUILD_COMMAND="make -j2"
 
 # Environment check
@@ -91,7 +91,7 @@ SHA=`git rev-parse --short HEAD`
 
 echo -e "\033[33;1mUploading Coverity Scan Analysis results...\033[0m"
 response=$(curl \
-  --verbose --write-out "\n%{http_code}\n" \
+  --silent --write-out "\n%{http_code}\n" \
   --form project=$COVERITY_SCAN_PROJECT_NAME \
   --form token=$COVERITY_SCAN_TOKEN \
   --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
