@@ -50,7 +50,7 @@ matrix:
 before_install: . tools/travis/$BUILD/before_install.sh
 install: . tools/travis/$BUILD/install.sh
 before_script: . tools/travis/$BUILD/before_script.sh
-script: bash -x tools/travis/$BUILD/script.sh
+script: . tools/travis/$BUILD/script.sh
 after_success: . tools/travis/$BUILD/after_success.sh
 
 notifications:
