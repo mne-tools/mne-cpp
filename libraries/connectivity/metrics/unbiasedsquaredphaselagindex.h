@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.h
+* @file     unbiasedsquaredphaselagindex.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -32,12 +32,12 @@
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
 *
-* @brief     PhaseLagIndex class declaration.
+* @brief     UnbiasedSquaredPhaseLagIndex class declaration.
 *
 */
 
-#ifndef PHASELAGINDEX_H
-#define PHASELAGINDEX_H
+#ifndef UNBIASEDSQUAREDPHASELAGINDEX_H
+#define UNBIASEDSQUAREDPHASELAGINDEX_H
 
 
 //*************************************************************************************************************
@@ -90,22 +90,22 @@ class Network;
 
 //=============================================================================================================
 /**
-* This class computes the phase lag index connectivity metric.
+* This class computes the unbiased squared phase lag index connectivity metric.
 *
-* @brief This class computes the phase lag index connectivity metric.
+* @brief This class computes the unbiased squared phase lag index connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
+class CONNECTIVITYSHARED_EXPORT UnbiasedSquaredPhaseLagIndex : public AbstractMetric
 {    
 
 public:
-    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
-    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
+    typedef QSharedPointer<UnbiasedSquaredPhaseLagIndex> SPtr;            /**< Shared pointer type for UnbiasedSquaredPhaseLagIndex. */
+    typedef QSharedPointer<const UnbiasedSquaredPhaseLagIndex> ConstSPtr; /**< Const shared pointer type for UnbiasedSquaredPhaseLagIndex. */
 
     //=========================================================================================================
     /**
-    * Constructs a PhaseLagIndex object.
+    * Constructs a UnbiasedSquaredPhaseLagIndex object.
     */
-    explicit PhaseLagIndex();
+    explicit UnbiasedSquaredPhaseLagIndex();
 
     //=========================================================================================================
     /**
@@ -118,8 +118,9 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-                                 int iNfft=-1, const QString &sWindowType="hanning");
+    static Network unbiasedSquaredPhaseLagIndex(const QList<Eigen::MatrixXd> &matDataList,
+                                                const Eigen::MatrixX3f& matVert,
+                                                int iNfft=-1, const QString &sWindowType="hanning");
 
     //==========================================================================================================
     /**
@@ -131,8 +132,8 @@ public:
     *
     * @return                   The PLI value.
     */
-    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType);
+    static QVector<Eigen::MatrixXd> computeUnbiasedSquaredPLI(const QList<Eigen::MatrixXd> &matDataList,
+                                                              int iNfft, const QString &sWindowType);
 };
 
 
@@ -144,4 +145,4 @@ public:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // PHASELAGINDEX_H
+#endif // UNBIASEDSQUAREDPHASELAGINDEX_H

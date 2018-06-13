@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.h
+* @file     weightedphaselagindex.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -32,12 +32,12 @@
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
 *
-* @brief     PhaseLagIndex class declaration.
+* @brief    WeightedPhaseLagIndex class declaration.
 *
 */
 
-#ifndef PHASELAGINDEX_H
-#define PHASELAGINDEX_H
+#ifndef WEIGHTEDPHASELAGINDEX_H
+#define WEIGHTEDPHASELAGINDEX_H
 
 
 //*************************************************************************************************************
@@ -90,26 +90,26 @@ class Network;
 
 //=============================================================================================================
 /**
-* This class computes the phase lag index connectivity metric.
+* This class computes the weighted phase lag index connectivity metric.
 *
-* @brief This class computes the phase lag index connectivity metric.
+* @brief This class computes the weighted phase lag index connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
+class CONNECTIVITYSHARED_EXPORT WeightedPhaseLagIndex : public AbstractMetric
 {    
 
 public:
-    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
-    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
+    typedef QSharedPointer<WeightedPhaseLagIndex> SPtr;            /**< Shared pointer type for WeightedPhaseLagIndex. */
+    typedef QSharedPointer<const WeightedPhaseLagIndex> ConstSPtr; /**< Const shared pointer type for WeightedPhaseLagIndex. */
 
     //=========================================================================================================
     /**
-    * Constructs a PhaseLagIndex object.
+    * Constructs a WeightedPhaseLagIndex object.
     */
-    explicit PhaseLagIndex();
+    explicit WeightedPhaseLagIndex();
 
     //=========================================================================================================
     /**
-    * Calculates the phase lag index between the rows of the data matrix.
+    * Calculates the weighted phase lag index between the rows of the data matrix.
     *
     * @param[in] matDataList    The input data.
     * @param[in] matVert        The vertices of each network node.
@@ -118,21 +118,21 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-                                 int iNfft=-1, const QString &sWindowType="hanning");
+    static Network weightedPhaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
+                                         int iNfft=-1, const QString &sWindowType="hanning");
 
     //==========================================================================================================
     /**
-    * Calculates the actual phase lag index between two data vectors.
+    * Calculates the actual weighted phase lag index between two data vectors.
     *
     * @param[in] matDataList    The input data.
     * @param[in] iNfft          The FFT length.
     * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
     *
-    * @return                   The PLI value.
+    * @return                   The WPLI value.
     */
-    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType);
+    static QVector<Eigen::MatrixXd> computeWPLI(const QList<Eigen::MatrixXd> &matDataList,
+                                                int iNfft, const QString &sWindowType);
 };
 
 
@@ -144,4 +144,4 @@ public:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // PHASELAGINDEX_H
+#endif // WEIGHTEDPHASELAGINDEX_H

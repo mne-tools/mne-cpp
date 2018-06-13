@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.cpp
+* @file     weightedphaselagindex.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -32,7 +32,7 @@
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
 *
-* @brief    PhaseLagIndex class definition.
+* @brief    WeightedPhaseLagIndex class definition.
 *
 */
 
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "phaselagindex.h"
+#include "weightedphaselagindex.h"
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
@@ -88,20 +88,21 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PhaseLagIndex::PhaseLagIndex()
+WeightedPhaseLagIndex::WeightedPhaseLagIndex()
 {
 }
 
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert,
-                                     int iNfft, const QString &sWindowType)
+Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matDataList,
+                                                     const MatrixX3f& matVert,
+                                                     int iNfft, const QString &sWindowType)
 {
-    Network finalNetwork("Phase Lag Index");
+    Network finalNetwork("Weighted Phase Lag Index");
 
     if(matDataList.empty()) {
-        qDebug() << "PhaseLagIndex::phaseLagIndex - Input data is empty";
+        qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex - Input data is empty";
         return finalNetwork;
     }
 
@@ -120,12 +121,12 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
     }
 
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecPLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> vecWPLI = WeightedPhaseLagIndex::computeWPLI(matDataList, iNfft, sWindowType);
 
     //Add edges to network
-    for(int i = 0; i < vecPLI.length(); ++i) {
+    for(int i = 0; i < vecWPLI.length(); ++i) {
         for(int j = 0; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecPLI.at(i).row(j).transpose();
+            MatrixXd matWeight = vecWPLI.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
 
@@ -140,8 +141,8 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, int iNfft,
-                                            const QString &sWindowType)
+QVector<MatrixXd> WeightedPhaseLagIndex::computeWPLI(const QList<MatrixXd> &matDataList, int iNfft,
+                                                     const QString &sWindowType)
 {
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
@@ -156,8 +157,10 @@ QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, 
     int iNRows = matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
     QVector<MatrixXd> vecCsdAvg;
+    QVector<MatrixXd> vecCsdAbsAvg;
     for (int j = 0; j < iNRows; ++j) {
         vecCsdAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
+        vecCsdAbsAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
     }
 
     // Generate tapered spectra and CSD and sum over epoch
@@ -183,13 +186,16 @@ QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, 
                 matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
                                                                 tapers.second, tapers.second, iNfft, 1.0);
             }
-            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.imag().cwiseSign());
+            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.imag());
+            vecCsdAbsAvg.replace(j, vecCsdAbsAvg.at(j) + matCsd.imag().cwiseAbs());
         }
     }
 
-    QVector<MatrixXd> vecPLI;
+    QVector<MatrixXd> vecWPLI;
     for (int i = 0; i < iNRows; ++i) {
-        vecPLI.append(vecCsdAvg.at(i).cwiseAbs() / matDataList.length());
+        MatrixXd matDenom = vecCsdAbsAvg.at(i);
+        matDenom = (matDenom.array() == 0.).select(INFINITY, matDenom);
+        vecWPLI.append(vecCsdAvg.at(i).cwiseAbs().cwiseQuotient(matDenom));
     }
-    return vecPLI;
+    return vecWPLI;
 }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.h
+* @file     unbiasedsquaredphaselagindex.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -28,16 +28,10 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
-* @note Notes:
-* - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
-*
-* @brief     PhaseLagIndex class declaration.
+* @brief    UnbiasedSquaredPhaseLagIndex class definition.
 *
 */
-
-#ifndef PHASELAGINDEX_H
-#define PHASELAGINDEX_H
 
 
 //*************************************************************************************************************
@@ -45,9 +39,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../connectivity_global.h"
-
-#include "abstractmetric.h"
+#include "phaselagindex.h"
+#include "unbiasedsquaredphaselagindex.h"
+#include "network/networknode.h"
+#include "network/networkedge.h"
+#include "network/network.h"
 
 
 //*************************************************************************************************************
@@ -55,7 +51,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
+#include <QDebug>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -63,85 +60,94 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace CONNECTIVITYLIB;
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
+{
+}
+
+
+//*******************************************************************************************************
+
+Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<MatrixXd> &matDataList,
+                                                                   const MatrixX3f& matVert,
+                                                                   int iNfft, const QString &sWindowType)
+{
+    Network finalNetwork("Unbiased Squared Phase Lag Index");
+
+    if(matDataList.empty()) {
+        qDebug() << "UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex - Input data is empty";
+        return finalNetwork;
+    }
+
+    //Create nodes
+    int rows = matDataList.first().rows();
+    RowVectorXf rowVert = RowVectorXf::Zero(3);
+
+    for(int i = 0; i < rows; ++i) {
+        if(matVert.rows() != 0 && i < matVert.rows()) {
+            rowVert(0) = matVert.row(i)(0);
+            rowVert(1) = matVert.row(i)(1);
+            rowVert(2) = matVert.row(i)(2);
+        }
+
+        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
+    }
+
+    //Calculate all-to-all coherence matrix over epochs
+    QVector<MatrixXd> vecUnbiasedSquaredPLI = UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(matDataList, iNfft, sWindowType);
+
+    //Add edges to network
+    for(int i = 0; i < vecUnbiasedSquaredPLI.length(); ++i) {
+        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+            MatrixXd matWeight = vecUnbiasedSquaredPLI.at(i).row(j).transpose();
+
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
+
+            finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.append(pEdge);
+        }
+    }
+
+    return finalNetwork;
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
-//=============================================================================================================
 
-class Network;
+QVector<MatrixXd> UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(const QList<MatrixXd> &matDataList,
+                                                                          int iNfft, const QString &sWindowType)
+{
+    int iNRows = matDataList.at(0).rows();
+    int iNTrials = matDataList.length();
 
+    // Compute standard PLI
+    QVector<MatrixXd> vecUnbiasedSquaredPLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
 
-//=============================================================================================================
-/**
-* This class computes the phase lag index connectivity metric.
-*
-* @brief This class computes the phase lag index connectivity metric.
-*/
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
-{    
-
-public:
-    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
-    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a PhaseLagIndex object.
-    */
-    explicit PhaseLagIndex();
-
-    //=========================================================================================================
-    /**
-    * Calculates the phase lag index between the rows of the data matrix.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The connectivity information in form of a network structure.
-    */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-                                 int iNfft=-1, const QString &sWindowType="hanning");
-
-    //==========================================================================================================
-    /**
-    * Calculates the actual phase lag index between two data vectors.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The PLI value.
-    */
-    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType);
-};
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-} // namespace CONNECTIVITYLIB
-
-#endif // PHASELAGINDEX_H
+    // Compute unbiased estimator according to Vinck et al., NeuroImage 55, pp. 1548-65, 2011
+    for (int j = 0; j < iNRows; ++j) {
+        vecUnbiasedSquaredPLI.replace(j, (double(iNTrials) * vecUnbiasedSquaredPLI.at(j).array().square() - 1.0) / double(iNTrials - 1));
+    }
+    return vecUnbiasedSquaredPLI;
+}
