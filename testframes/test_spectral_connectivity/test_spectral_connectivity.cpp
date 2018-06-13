@@ -419,11 +419,7 @@ void TestSpectralConnectivity::compareConnectivity()
             printf ("4 sample: %d \n", i);
             QCOMPARE( m_ConnectivityOutput(i), m_RefConnectivityOutput(i) );
         } else {
-            printf ("5 sample: %d \n", i);
-            if ((fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / fabs(m_RefConnectivityOutput(i))) >= epsilon){
-                printf ("actual: %.10f  --  reference: %.10f  -- difference: %.10f  --  rel. difference: %.10f\n", m_ConnectivityOutput(i), m_RefConnectivityOutput(i), fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)), (fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / fabs(m_RefConnectivityOutput(i))));
-            }
-            printf ("6 sample: %d \n", i);
+            printf ("5 sample: %d  --  actual: %.10f  --  reference: %.10f  -- difference: %.10f  --  rel. difference: %.10f\n", i, m_ConnectivityOutput(i), m_RefConnectivityOutput(i), fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)), (fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / fabs(m_RefConnectivityOutput(i))));
             QVERIFY( (fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / fabs(m_RefConnectivityOutput(i))) < epsilon );
         }
     }
