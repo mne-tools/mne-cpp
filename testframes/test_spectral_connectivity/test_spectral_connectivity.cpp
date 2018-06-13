@@ -413,8 +413,7 @@ void TestSpectralConnectivity::compareConnectivity()
 
     printf ("3 sizes: %d %d %d %d\n", int(m_ConnectivityOutput.rows()), int(m_RefConnectivityOutput.rows()), int(m_ConnectivityOutput.cols()), int(m_RefConnectivityOutput.cols()));
 
-    //for (int i = 0; i < m_ConnectivityOutput.cols(); ++i)
-    for (int i = m_ConnectivityOutput.cols() - 1; i >= 0; --i)
+    for (int i = 0; i < m_ConnectivityOutput.cols(); ++i)
     {
         if (m_RefConnectivityOutput(i) == 0.0){
             printf ("4 sample: %d \n", i);
