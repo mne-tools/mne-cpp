@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.h
+* @file     coherency.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -30,14 +30,11 @@
 *
 * @note Notes:
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
+* - QtConcurrent can be used to speed up computation.
 *
-*
-* @brief     PhaseLagIndex class declaration.
+* @brief     Coherency class declaration.
 *
 */
-
-#ifndef PHASELAGINDEX_H
-#define PHASELAGINDEX_H
 
 
 //*************************************************************************************************************
@@ -45,9 +42,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../connectivity_global.h"
+#include "coherency.h"
+#include "network/networknode.h"
+#include "network/networkedge.h"
+#include "network/network.h"
 
-#include "abstractmetric.h"
+#include <utils/spectral.h>
 
 
 //*************************************************************************************************************
@@ -55,7 +55,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
+#include <QDebug>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -63,85 +64,100 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace CONNECTIVITYLIB;
+using namespace Eigen;
+using namespace UTILSLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+Coherency::Coherency()
+{
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
-//=============================================================================================================
 
-class Network;
+QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataList,
+                                               int iNfft, const QString &sWindowType)
+{
+    // Check that iNfft >= signal length
+    int iSignalLength = matDataList.at(0).cols();
+    if (iNfft < iSignalLength) {
+        iNfft = iSignalLength;
+    }
 
+    // Generate tapers
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
 
-//=============================================================================================================
-/**
-* This class computes the phase lag index connectivity metric.
-*
-* @brief This class computes the phase lag index connectivity metric.
-*/
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
-{    
+    // Initialize vecPsdAvg and vecCsdAvg
+    int iNRows = matDataList.at(0).rows();
+    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+    MatrixXd matPsdAvg = MatrixXd::Zero(iNRows, iNFreqs);
+    QVector<MatrixXcd> vecCsdAvg;
+    for (int j = 0; j < iNRows; ++j) {
+        vecCsdAvg.append(MatrixXcd::Zero(iNRows, iNFreqs));
+    }
 
-public:
-    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
-    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
+    // Generate tapered spectra, PSD, and CSD and sum over epoch
+    // This part could be parallelized with QtConcurrent::mappedReduced
+    for (int i = 0; i < matDataList.length(); ++i) {
+        //Remove mean
+        MatrixXd matInputData = matDataList.at(i);
+        for (int i = 0; i < matInputData.rows(); ++i) {
+            matInputData.row(i).array() -= matInputData.row(i).mean();
+        }
 
-    //=========================================================================================================
-    /**
-    * Constructs a PhaseLagIndex object.
-    */
-    explicit PhaseLagIndex();
+        // This part could be parallelized with QtConcurrent::mapped
+        QVector<MatrixXcd> vecTapSpectra;
+        for (int j = 0; j < iNRows; ++j) {
+            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
+            vecTapSpectra.append(matTmpSpectra);
+        }
 
-    //=========================================================================================================
-    /**
-    * Calculates the phase lag index between the rows of the data matrix.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The connectivity information in form of a network structure.
-    */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-                                 int iNfft=-1, const QString &sWindowType="hanning");
+        // This part could be parallelized with QtConcurrent::mappedReduced
+        for (int j = 0; j < iNRows; ++j) {
+            RowVectorXd vecTmpPsd = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j), tapers.second,
+                                                                    iNfft, 1.0);
+            matPsdAvg.row(j) += vecTmpPsd;
+        }
 
-    //==========================================================================================================
-    /**
-    * Calculates the actual phase lag index between two data vectors.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The PLI value.
-    */
-    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType);
-};
+        // This part could be parallelized with QtConcurrent::mappedReduced
+        for (int j = 0; j < iNRows; ++j) {
+            MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+            for (int k = 0; k < iNRows; ++k) {
+                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
+                                                                tapers.second, tapers.second, iNfft, 1.0);
+            }
+            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd);
+        }
+    }
+    matPsdAvg = matPsdAvg.cwiseSqrt();
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-} // namespace CONNECTIVITYLIB
-
-#endif // PHASELAGINDEX_H
+    QVector<MatrixXcd> vecCoherency;
+    for (int i = 0; i < iNRows; ++i) {
+        MatrixXd matPSDtmp = MatrixXd::Zero(iNRows, iNFreqs);
+        for(int j = 0; j < iNRows; ++j){
+            matPSDtmp.row(j) = matPsdAvg.row(i).cwiseProduct(matPsdAvg.row(j));
+        }
+        vecCoherency.append(vecCsdAvg.at(i).cwiseQuotient(matPSDtmp));
+    }
+    return vecCoherency;
+}

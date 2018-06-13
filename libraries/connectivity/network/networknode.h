@@ -121,7 +121,7 @@ public:
     *
     * @return   Returns the list with all outgoing edges.
     */
-    const QList<QSharedPointer<NetworkEdge>>& getEdgesOut() const;
+    const QList<QSharedPointer<NetworkEdge> >& getEdgesOut() const;
 
     //=========================================================================================================
     /**
