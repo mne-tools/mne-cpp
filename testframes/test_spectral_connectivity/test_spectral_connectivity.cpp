@@ -405,21 +405,22 @@ void TestSpectralConnectivity::compareConnectivity()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Spectral Connectivities >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    printf ("1\n");
-    QCOMPARE( m_ConnectivityOutput.rows(), m_RefConnectivityOutput.rows() );
+    //*********************************************************************************************************
+    // Compare shape of the input data
+    //*********************************************************************************************************
 
-    printf ("2\n");
+    QCOMPARE( m_ConnectivityOutput.rows(), m_RefConnectivityOutput.rows() );
     QCOMPARE( m_ConnectivityOutput.cols(), m_RefConnectivityOutput.cols() );
 
-    printf ("3 sizes: %d %d %d %d\n", int(m_ConnectivityOutput.rows()), int(m_RefConnectivityOutput.rows()), int(m_ConnectivityOutput.cols()), int(m_RefConnectivityOutput.cols()));
+    //*********************************************************************************************************
+    // Compare connectivity estimate for each frequency bin
+    //*********************************************************************************************************
 
     for (int i = 0; i < m_ConnectivityOutput.cols(); ++i)
     {
         if (m_RefConnectivityOutput(i) == 0.0){
-            printf ("4 sample: %d \n", i);
             QCOMPARE( m_ConnectivityOutput(i), m_RefConnectivityOutput(i) );
         } else {
-            printf ("5 sample: %d  --  actual: %.10f  --  reference: %.10f  -- difference: %.10f  --  rel. difference: %.10f\n", i, m_ConnectivityOutput(i), m_RefConnectivityOutput(i), fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)), (fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / fabs(m_RefConnectivityOutput(i))));
             QVERIFY( (fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / fabs(m_RefConnectivityOutput(i))) < epsilon );
         }
     }
