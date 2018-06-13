@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.cpp
+* @file     debiasedsquaredweightedphaselagindex.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -32,7 +32,7 @@
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
 *
-* @brief    PhaseLagIndex class definition.
+* @brief    DebiasedSquaredWeightedPhaseLagIndex class definition.
 *
 */
 
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "phaselagindex.h"
+#include "debiasedsquaredweightedphaselagindex.h"
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
@@ -88,20 +88,22 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PhaseLagIndex::PhaseLagIndex()
+DebiasedSquaredWeightedPhaseLagIndex::DebiasedSquaredWeightedPhaseLagIndex()
 {
 }
 
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert,
-                                     int iNfft, const QString &sWindowType)
+Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex(const QList<MatrixXd> &matDataList,
+                                                                                   const MatrixX3f& matVert,
+                                                                                   int iNfft,
+                                                                                   const QString &sWindowType)
 {
-    Network finalNetwork("Phase Lag Index");
+    Network finalNetwork("Debiased Squared Weighted Phase Lag Index");
 
     if(matDataList.empty()) {
-        qDebug() << "PhaseLagIndex::phaseLagIndex - Input data is empty";
+        qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex - Input data is empty";
         return finalNetwork;
     }
 
@@ -120,12 +122,14 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
     }
 
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecPLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> vecDebiasedSquaredWPLI = DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(matDataList,
+                                                                                                                iNfft,
+                                                                                                                sWindowType);
 
     //Add edges to network
-    for(int i = 0; i < vecPLI.length(); ++i) {
+    for(int i = 0; i < vecDebiasedSquaredWPLI.length(); ++i) {
         for(int j = 0; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecPLI.at(i).row(j).transpose();
+            MatrixXd matWeight = vecDebiasedSquaredWPLI.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
 
@@ -140,8 +144,9 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, int iNfft,
-                                            const QString &sWindowType)
+QVector<MatrixXd> DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(const QList<MatrixXd> &matDataList,
+                                                                                   int iNfft,
+                                                                                   const QString &sWindowType)
 {
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
@@ -156,8 +161,12 @@ QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, 
     int iNRows = matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
     QVector<MatrixXd> vecCsdAvg;
+    QVector<MatrixXd> vecSquaredCsdAvg;
+    QVector<MatrixXd> vecCsdAbsAvg;
     for (int j = 0; j < iNRows; ++j) {
         vecCsdAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
+        vecSquaredCsdAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
+        vecCsdAbsAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
     }
 
     // Generate tapered spectra and CSD and sum over epoch
@@ -183,13 +192,22 @@ QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, 
                 matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
                                                                 tapers.second, tapers.second, iNfft, 1.0);
             }
-            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.imag().cwiseSign());
+            MatrixXd matCsdImag = matCsd.imag();
+            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsdImag);
+            MatrixXd matCsdImag2 = matCsdImag.array().square();
+            vecSquaredCsdAvg.replace(j, vecSquaredCsdAvg.at(j) + matCsdImag2);
+            vecCsdAbsAvg.replace(j, vecCsdAbsAvg.at(j) + matCsdImag.cwiseAbs());
         }
     }
 
-    QVector<MatrixXd> vecPLI;
-    for (int i = 0; i < iNRows; ++i) {
-        vecPLI.append(vecCsdAvg.at(i).cwiseAbs() / matDataList.length());
+    QVector<MatrixXd> vecDebiasedSquaredWPLI;
+    for (int j = 0; j < iNRows; ++j) {
+        MatrixXd matNom = vecCsdAvg.at(j).array().square();
+        matNom -= vecSquaredCsdAvg.at(j);
+        MatrixXd matDenom = vecCsdAbsAvg.at(j).array().square();
+        matDenom -= vecSquaredCsdAvg.at(j);
+        matDenom = (matDenom.array() == 0.).select(INFINITY, matDenom);
+        vecDebiasedSquaredWPLI.append(matNom.cwiseQuotient(matDenom));
     }
-    return vecPLI;
+    return vecDebiasedSquaredWPLI;
 }

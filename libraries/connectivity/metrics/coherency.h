@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.h
+* @file     coherency.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -30,14 +30,14 @@
 *
 * @note Notes:
 * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
+* - QtConcurrent can be used to speed up computation.
 *
-*
-* @brief     PhaseLagIndex class declaration.
+* @brief     Coherency class declaration.
 *
 */
 
-#ifndef PHASELAGINDEX_H
-#define PHASELAGINDEX_H
+#ifndef COHERENCY_H
+#define COHERENCY_H
 
 
 //*************************************************************************************************************
@@ -90,49 +90,36 @@ class Network;
 
 //=============================================================================================================
 /**
-* This class computes the phase lag index connectivity metric.
+* This class computes the coherency connectivity metric.
 *
-* @brief This class computes the phase lag index connectivity metric.
+* @brief This class computes the coherency connectivity metric.
 */
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
+class CONNECTIVITYSHARED_EXPORT Coherency : public AbstractMetric
 {    
 
 public:
-    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
-    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
+    typedef QSharedPointer<Coherency> SPtr;            /**< Shared pointer type for Coherency. */
+    typedef QSharedPointer<const Coherency> ConstSPtr; /**< Const shared pointer type for Coherency. */
 
     //=========================================================================================================
     /**
-    * Constructs a PhaseLagIndex object.
+    * Constructs a Coherency object.
     */
-    explicit PhaseLagIndex();
+    explicit Coherency();
 
     //=========================================================================================================
     /**
-    * Calculates the phase lag index between the rows of the data matrix.
+    * Calculates the coherency of the rows of the data matrix.
     *
     * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
-    * @param[in] iNfft          The FFT length.
+    * @param[in] iNfft          FFT length
     * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
     *
-    * @return                   The connectivity information in form of a network structure.
+    * @return                   The connectivity information in form of a QVector of matrices.
     */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-                                 int iNfft=-1, const QString &sWindowType="hanning");
-
-    //==========================================================================================================
-    /**
-    * Calculates the actual phase lag index between two data vectors.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The PLI value.
-    */
-    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType);
+    static QVector<Eigen::MatrixXcd> computeCoherency(const QList<Eigen::MatrixXd> &matDataList,
+                                                      int iNfft=-1,
+                                                      const QString &sWindowType="hanning");
 };
 
 
@@ -144,4 +131,4 @@ public:
 
 } // namespace CONNECTIVITYLIB
 
-#endif // PHASELAGINDEX_H
+#endif // COHERENCY_H
