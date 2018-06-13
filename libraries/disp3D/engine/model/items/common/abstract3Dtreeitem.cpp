@@ -147,7 +147,7 @@ void Abstract3DTreeItem::initItem()
     list << new QStandardItem("The color options");
     this->appendRow(list);
 
-    float fAlpha = 0.35f;
+    float fAlpha = 0.75f;
     MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::AlphaValue, QString("%1").arg(fAlpha));
     connect(itemAlpha, &MetaTreeItem::dataChanged,
             this, &Abstract3DTreeItem::onAlphaChanged);

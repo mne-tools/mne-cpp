@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneFiffExpSet class.
+* @brief    Definition of the MneFiffExpSet class.
 *
 */
 

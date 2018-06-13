@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Mne Data (MneMneData) Class.
+* @brief    Definition of the MNE Mne Data (MneMneData) Class.
 *
 */
 

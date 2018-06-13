@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of a generic Fiff IO interface
+* @brief    Definition of a generic Fiff IO interface
 *
 */
 

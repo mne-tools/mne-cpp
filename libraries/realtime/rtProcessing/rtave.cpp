@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the RtCov Class.
+* @brief     Definition of the RtCov Class.
 *
 */
 

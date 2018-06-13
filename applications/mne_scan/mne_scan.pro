@@ -39,7 +39,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     libs \
+    plugins \
     mne_scan \
-    plugins
 
 CONFIG += ordered

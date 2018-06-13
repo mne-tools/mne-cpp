@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FwdEegSphereModel Class.
+* @brief    Definition of the FwdEegSphereModel Class.
 *
 */
 

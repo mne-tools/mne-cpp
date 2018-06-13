@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the DetectTrigger class.
+* @brief    Definition of the DetectTrigger class.
 *
 */
 

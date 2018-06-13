@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the ShmemSocket Class.
+* @brief     Definition of the ShmemSocket Class.
 *
 */
 
@@ -39,6 +39,8 @@
 //=============================================================================================================
 
 #include "shmemsocket.h"
+
+#include <fiff/fiff_tag.h>
 
 
 //*************************************************************************************************************
@@ -61,7 +63,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NeuromagPlugin;
+using namespace NEUROMAGRTSERVERPLUGIN;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the ImageSc class.
+* @brief    Definition of the ImageSc class.
 *
 */
 

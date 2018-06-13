@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffDirEntry Class.
+* @brief    Definition of the FiffDirEntry Class.
 *
 */
 

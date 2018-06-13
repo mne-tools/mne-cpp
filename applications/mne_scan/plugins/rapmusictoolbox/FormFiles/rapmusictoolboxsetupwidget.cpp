@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RapMusicToolboxSetupWidget class.
+* @brief    Definition of the RapMusicToolboxSetupWidget class.
 *
 */
 

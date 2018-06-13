@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ssvepBCIScreen class.
+* @brief    Definition of the ssvepBCIScreen class.
 *
 */
 

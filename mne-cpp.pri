@@ -23,6 +23,29 @@ defineTest(minQtVersion) {
     return(false)
 }
 
+defineReplace(MacDeployArgs) {
+    target = $$1
+    target_ext = $$2
+    mne_binary_dir = $$3
+    mne_library_dir = $$4
+    extra_args = $$5
+
+    isEmpty($${target_ext}) {
+        target_custom_ext = .app
+    } else {
+        target_custom_ext = $${target_ext}
+    }
+
+    deploy_cmd = macdeployqt
+
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+
+    deploy_libs_to_copy = -libpath=$${mne_library_dir}
+    !isEmpty(extra_args) {
+      deploy_libs_to_copy += $${extra_args}
+    }
+    return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
+ }
 
 ############################################### GLOBAL DEFINES ################################################
 
@@ -40,11 +63,10 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## To set CodeCov coverage compiler flag run: qmake MNECPP_CONFIG+=withCodeCov
 ## To disable tests run: qmake MNECPP_CONFIG+=noTests
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
+## To disable applications run: qmake MNECPP_CONFIG+=noApplications
 ## To build basic MNE Scan version run: qmake MNECPP_CONFIG+=buildBasicMneScanVersion
-## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=buildStaticLibraries
-
-## Build MNE-CPP Deep library
-MNECPP_CONFIG += buildDeep
+## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
+## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
@@ -122,4 +144,10 @@ isEmpty( MNE_BINARY_DIR ) {
 
 # repository dir
 ROOT_DIR = $${PWD}
+
+# install
+MNE_INSTALL_INCLUDE_DIR = $$MNE_INSTALL_INCLUDE_DIR
+isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
+    MNE_INSTALL_INCLUDE_DIR = $${PWD}/include
+}
 
