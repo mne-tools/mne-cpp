@@ -24,3 +24,4 @@ if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
         done
     fi
 fi
+
