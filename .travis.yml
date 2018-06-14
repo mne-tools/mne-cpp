@@ -16,6 +16,7 @@ env:
     - secure: bQ7qDeGFDGiYIpudj50F+AXQkwi6HqBPmnrBEJ8DxAkYOy2evBxvACigUM+kx78LM1idOl+njye5HAtlLN8ZiQKikt9YSUXlxbX5es/wk0ABUZ/icWgsbiPU+ThHTNeP4mu33HW8o/vuoKARbaSjkOWn5RejGoiJKNDdnkgJTHw=
 
 matrix:
+  fast_finish: true
   include:
     - os: linux
       dist: trusty
@@ -41,6 +42,12 @@ matrix:
       sudo: required
       compiler: gcc
       env: BUILD=documentation
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      env: BUILD=coverity
+  allow_failures:
     - os: linux
       dist: trusty
       sudo: required
