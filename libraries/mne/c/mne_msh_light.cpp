@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneMshLight Class.
+* @brief    Definition of the MneMshLight Class.
 *
 */
 

@@ -42,4 +42,7 @@ SUBDIRS += \
     extensions \
     mne_analyze \
 
-CONFIG += ordered
+# Specify dependencies because of packaging on MacOS
+libs.depends =
+extensions.depends = libs
+mne_analyze.depends = libs extensions

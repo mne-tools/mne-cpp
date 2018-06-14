@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of time-frequency plot class.
+* @brief    Definition of time-frequency plot class.
 */
 
 //*************************************************************************************************************

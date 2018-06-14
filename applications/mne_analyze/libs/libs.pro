@@ -40,4 +40,5 @@ TEMPLATE = subdirs
 SUBDIRS += \
     anShared \
 
-CONFIG += ordered
+# Specify library dependencies
+anShared.depends =

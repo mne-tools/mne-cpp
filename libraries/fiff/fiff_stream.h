@@ -196,7 +196,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_end_block function
+    * ### MNE toolbox root function ###: Definition of the fiff_end_block function
     *
     * Writes a FIFF_BLOCK_END tag
     *
@@ -216,7 +216,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_finish_writing_raw function
+    * ### MNE toolbox root function ###: Definition of the fiff_finish_writing_raw function
     *
     * Finishes a raw file by writing all necessary end tags.
     *

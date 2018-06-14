@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FwdBemModel Class.
+* @brief    Definition of the FwdBemModel Class.
 *
 */
 

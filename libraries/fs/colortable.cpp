@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Colortable Class.
+* @brief    Definition of the Colortable Class.
 *
 */
 

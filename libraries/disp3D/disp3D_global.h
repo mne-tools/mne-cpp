@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     disp3D_global.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <lesch@nmr.mgh.harvard.edu>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -49,9 +50,9 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(BUILD_STATIC_LIBRARIES)
+#if defined(STATICLIB)
 #  define DISP3DSHARED_EXPORT
-#elif defined(DISP3DNEW_LIBRARY)
+#elif defined(DISP3D_LIBRARY)
 #  define DISP3DSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

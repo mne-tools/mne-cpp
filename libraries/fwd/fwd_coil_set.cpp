@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FwdCoilSet Class.
+* @brief    Definition of the FwdCoilSet Class.
 *
 */
 

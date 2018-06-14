@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneCTFCompDataSet Class.
+* @brief    Definition of the MneCTFCompDataSet Class.
 *
 */
 

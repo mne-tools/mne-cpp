@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeEvokedModel Class.
+* @brief    Definition of the RealTimeEvokedModel Class.
 *
 */
 

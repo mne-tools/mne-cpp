@@ -202,8 +202,8 @@ protected:
     QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
     QPointer<Qt3DRender::QCamera>       m_pCamera;                      /**< The camera entity. */
 
-    QList<QPointer<QPropertyAnimation>>  m_lPropertyAnimations;         /**< The animations for each 3D object. */
-    QList<QPointer<Qt3DRender::QPointLight>>  m_lLightSources;          /**< The light sources. */
+    QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;         /**< The animations for each 3D object. */
+    QList<QPointer<Qt3DRender::QPointLight> >  m_lLightSources;          /**< The light sources. */
 
 };
 

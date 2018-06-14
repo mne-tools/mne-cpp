@@ -23,17 +23,16 @@ defineTest(minQtVersion) {
     return(false)
 }
 
-defineReplace(MacDeployArgs) {
+defineReplace(macDeployArgs) {
     target = $$1
     target_ext = $$2
     mne_binary_dir = $$3
     mne_library_dir = $$4
     extra_args = $$5
 
-    isEmpty($${target_ext}) {
+    target_custom_ext = $${target_ext}
+    isEmpty($${target_custom_ext}) {
         target_custom_ext = .app
-    } else {
-        target_custom_ext = $${target_ext}
     }
 
     deploy_cmd = macdeployqt
@@ -45,7 +44,53 @@ defineReplace(MacDeployArgs) {
       deploy_libs_to_copy += $${extra_args}
     }
     return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
- }
+}
+
+defineReplace(winDeployLibArgs) {
+    # Copy library to bin folder
+    target = $$1
+    target_ext = $$2
+    mne_binary_dir = $$3
+    mne_library_dir = $$4
+    extra_args = $$5
+
+    target_custom_ext = $${target_ext}
+    isEmpty($${target_custom_ext}) {
+        target_custom_ext = .dll
+    }
+
+    file = $$shell_quote($$shell_path($${mne_library_dir}/$${target}$${target_custom_ext}))
+    final_deploy_command += $${QMAKE_COPY} $${file} $$shell_quote($${mne_binary_dir}) $$escape_expand(\\n\\t)
+
+    # Deploy qt dependecies for the library
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+    deploy_cmd = windeployqt
+
+    final_deploy_command += $$deploy_cmd $$deploy_target $$extra_args $$escape_expand(\\n\\t)
+
+    return($${final_deploy_command})
+}
+
+defineReplace(winDeployAppArgs) {
+    target = $$1
+    target_ext = $$2
+    mne_binary_dir = $$3
+    extra_args = $$5
+
+    # Deploy qt dependecies for the application
+    target_custom_ext = $${target_ext}
+    isEmpty($${target_custom_ext}) {
+        target_custom_ext = .exe
+    }
+
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+    deploy_cmd = windeployqt
+
+    final_deploy_command += $$deploy_cmd $$deploy_target $$extra_args $$escape_expand(\\n\\t)
+
+    return($${final_deploy_command})
+}
+
 
 ############################################### GLOBAL DEFINES ################################################
 
@@ -65,10 +110,8 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
 ## To disable applications run: qmake MNECPP_CONFIG+=noApplications
 ## To build basic MNE Scan version run: qmake MNECPP_CONFIG+=buildBasicMneScanVersion
-## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=buildStaticLibraries
-
-## Build MNE-CPP Deep library
-MNECPP_CONFIG += buildDeep
+## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
+## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
@@ -82,66 +125,66 @@ MNECPP_CONFIG += buildDeep
 # Eigen
 EIGEN_INCLUDE_DIR = $$EIGEN_INCLUDE_DIR
 isEmpty(EIGEN_INCLUDE_DIR) {
-    EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty/eigen3
+    EIGEN_INCLUDE_DIR = $$shell_path($${PWD}/include/3rdParty/eigen3)
 }
 
 #CNTK
 CNTK_INCLUDE_DIR = $$CNTK_INCLUDE_DIR
 isEmpty( CNTK_INCLUDE_DIR ) {
     # Check CNTK Path options
-    exists($$(CNTKPATH)/cntk/Include/Eval.h) {
-        CNTK_TEST_DIR = $$(CNTKPATH)/cntk
+    exists($$shell_path($$(CNTKPATH)/cntk/Include/Eval.h)) {
+        CNTK_TEST_DIR = $$shell_path($$(CNTKPATH)/cntk)
     }
-    exists($$(CNTKPATH)/Include/Eval.h) {
+    exists($$shell_path($$(CNTKPATH)/Include/Eval.h)) {
         CNTK_TEST_DIR = $$(CNTKPATH)
     }
-    exists($$(MYCNTKPATH)/cntk/Include/Eval.h) {
-        CNTK_TEST_DIR = $$(MYCNTKPATH)/cntk
+    exists($$shell_path($$(MYCNTKPATH)/cntk/Include/Eval.h)) {
+        CNTK_TEST_DIR = $$shell_path($$(MYCNTKPATH)/cntk)
     }
-    exists($$(MYCNTKPATH)/Include/Eval.h) {
+    exists($$shell_path($$(MYCNTKPATH)/Include/Eval.h)) {
         CNTK_TEST_DIR = $$(MYCNTKPATH)
     }
     # Set CNTK path variables
     !isEmpty( CNTK_TEST_DIR ) {
-        CNTK_INCLUDE_DIR = $${CNTK_TEST_DIR}/Include
-        CNTK_LIBRARY_DIR = $${CNTK_TEST_DIR}/cntk
+        CNTK_INCLUDE_DIR = $$shell_path($${CNTK_TEST_DIR}/Include)
+        CNTK_LIBRARY_DIR = $$shell_path($${CNTK_TEST_DIR}/cntk)
     }
 }
 
 # include
 MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR
 isEmpty( MNE_INCLUDE_DIR ) {
-    MNE_INCLUDE_DIR = $${PWD}/libraries
+    MNE_INCLUDE_DIR = $$shell_path($${PWD}/libraries)
 }
 MNE_SCAN_INCLUDE_DIR = $$MNE_SCAN_INCLUDE_DIR
 isEmpty( MNE_SCAN_INCLUDE_DIR ) {
-    MNE_SCAN_INCLUDE_DIR = $${PWD}/applications/mne_scan/libs
+    MNE_SCAN_INCLUDE_DIR = $$shell_path($${PWD}/applications/mne_scan/libs)
 }
 MNE_ANALYZE_INCLUDE_DIR = $$MNE_ANALYZE_INCLUDE_DIR
 isEmpty( MNE_ANALYZE_INCLUDE_DIR ) {
-    MNE_ANALYZE_INCLUDE_DIR = $${PWD}/applications/mne_analyze/libs
+    MNE_ANALYZE_INCLUDE_DIR = $$shell_path($${PWD}/applications/mne_analyze/libs)
 }
 MNE_ANALYZE_EXTENSIONS_DIR = $$MNE_ANALYZE_EXTENSIONS_DIR
 isEmpty( MNE_ANALYZE_EXTENSIONS_DIR ) {
-    MNE_ANALYZE_EXTENSIONS_DIR = $${PWD}/applications/mne_analyze/extensions
+    MNE_ANALYZE_EXTENSIONS_DIR = $$shell_path($${PWD}/applications/mne_analyze/extensions)
 }
 
 # lib
 MNE_LIBRARY_DIR = $$MNE_LIBRARY_DIR
 isEmpty( MNE_LIBRARY_DIR ) {
-    MNE_LIBRARY_DIR = $${PWD}/lib
+    MNE_LIBRARY_DIR = $$shell_path($${PWD}/lib)
 }
 contains(MNECPP_CONFIG, buildDeep) {
     CNTK_LIBRARY_DIR = $$CNTK_LIBRARY_DIR
     isEmpty( CNTK_LIBRARY_DIR ) {
-        CNTK_LIBRARY_DIR = C:/local/cntk/cntk
+        CNTK_LIBRARY_DIR = $$shell_path(C:/local/cntk/cntk)
     }
 }
 
 # bin
 MNE_BINARY_DIR = $$MNE_BINARY_DIR
 isEmpty( MNE_BINARY_DIR ) {
-    MNE_BINARY_DIR = $${PWD}/bin
+    MNE_BINARY_DIR = $$shell_path($${PWD}/bin)
 }
 
 # repository dir
@@ -150,6 +193,6 @@ ROOT_DIR = $${PWD}
 # install
 MNE_INSTALL_INCLUDE_DIR = $$MNE_INSTALL_INCLUDE_DIR
 isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
-    MNE_INSTALL_INCLUDE_DIR = $${PWD}/include
+    MNE_INSTALL_INCLUDE_DIR = $$shell_path($${PWD}/include)
 }
 

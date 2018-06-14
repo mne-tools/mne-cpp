@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the DisplayManager Class.
+* @brief    Definition of the DisplayManager Class.
 *
 */
 

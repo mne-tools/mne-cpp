@@ -13,7 +13,7 @@ set -e
 COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
 COVERITY_SCAN_NOTIFICATION_EMAIL="christoph.dinh@mne-cpp.org"
 COVERITY_SCAN_BRANCH_PATTERN="master"
-COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r"
+COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r MNECPP_CONFIG+=noTests"
 COVERITY_SCAN_BUILD_COMMAND="make -j2"
 
 # Environment check
@@ -100,6 +100,9 @@ response=$(curl \
   --form description="Travis CI build" \
   $UPLOAD_URL)
 status_code=$(echo "$response" | sed -n '$p')
+
+echo -e "\033[33;1mDEBUG:$status_code\033[0m"
+
 if [ "$status_code" != "201" ]; then
   TEXT=$(echo "$response" | sed '$d')
   echo -e "\033[33;1mCoverity Scan upload failed: $TEXT.\033[0m"

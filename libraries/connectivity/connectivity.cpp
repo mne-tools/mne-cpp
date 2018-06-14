@@ -45,7 +45,13 @@
 #include "network/network.h"
 #include "metrics/correlation.h"
 #include "metrics/crosscorrelation.h"
+#include "metrics/coherence.h"
+#include "metrics/imagcoherence.h"
 #include "metrics/phaselagindex.h"
+#include "metrics/phaselockingvalue.h"
+#include "metrics/weightedphaselagindex.h"
+#include "metrics/unbiasedsquaredphaselagindex.h"
+#include "metrics/debiasedsquaredweightedphaselagindex.h"
 
 
 //*************************************************************************************************************
@@ -93,7 +99,31 @@ Network Connectivity::calculateConnectivity() const
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("XCOR")) {
         return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLI")) {
-        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
+        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
+                                            m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COH")) {
+        return Coherence::coherence(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
+                                    m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("IMAGCOH")) {
+        return ImagCoherence::imagCoherence(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
+                                    m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLV")) {
+        return PhaseLockingValue::phaseLockingValue(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
+                                                    m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("WPLI")) {
+        return WeightedPhaseLagIndex::weightedPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
+                                                            m_pConnectivitySettings->m_matNodePositions,
+                                                            m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("USPLI")) {
+        return UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
+                                                                          m_pConnectivitySettings->m_matNodePositions,
+                                                                          m_pConnectivitySettings->m_iNfft,
+                                                                          m_pConnectivitySettings->m_sWindowType);
+    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("DSWPLI")) {
+        return DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
+                                                                                          m_pConnectivitySettings->m_matNodePositions,
+                                                                                          m_pConnectivitySettings->m_iNfft,
+                                                                                          m_pConnectivitySettings->m_sWindowType);
     }
 
     return Network();

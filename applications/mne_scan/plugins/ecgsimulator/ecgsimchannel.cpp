@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGChannel class.
+* @brief    Definition of the ECGChannel class.
 *
 */
 
