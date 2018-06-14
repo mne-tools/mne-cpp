@@ -66,18 +66,6 @@ else {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-}
-
 SOURCES += \
     Management/analyzedata.cpp \
     Management/analyzesettings.cpp \
@@ -102,6 +90,12 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/anShared
 
 INSTALLS += header_files
 
+# Deploy library
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
 unix:!macx {
     QMAKE_CXXFLAGS += -std=c++0x
     QMAKE_CXXFLAGS += -Wno-attributes
@@ -110,22 +104,3 @@ macx {
     QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc++
     CONFIG +=c++11
 }
-
-
-# Deploy Qt Dependencies
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
-}
-

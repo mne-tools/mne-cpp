@@ -136,21 +136,11 @@ macx {
     ICON = resources/images/appIcons/mne_analyze.icns
 }
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
     # === Unix ===
@@ -166,10 +156,7 @@ macx {
     EXTRA_LIBDIRS = -dmg
 
     # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
-    deploy_app = $$member(DEPLOY_CMD, 1)
-    dmg_file = $$replace(deploy_app, .app, .dmg)
-    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
 
 }
