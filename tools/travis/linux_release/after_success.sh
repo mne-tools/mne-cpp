@@ -20,9 +20,9 @@ if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     #Master
     if [[ $TRAVIS_BRANCH == 'master' ]]; then
         # upload artifacts
-        curl -u $MASTER_LOGIN:$MASTER_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/
+        curl -u $MASTER_LOGIN:$MASTER_PASSWORD -T $archive_name http://$REMOTE_SERVER/ --connect-timeout 8 --retry 10 --retry-delay 3
     elif [[ $TRAVIS_BRANCH == '1.0.0' ]]; then
         # upload artifacts
-        curl -u $ONEOO_LOGIN:$ONEOO_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/
+        curl -u $ONEOO_LOGIN:$ONEOO_PASSWORD -T $archive_name http://$REMOTE_SERVER/ --connect-timeout 8 --retry 10 --retry-delay 3
     fi
 fi
