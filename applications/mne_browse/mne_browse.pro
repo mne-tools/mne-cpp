@@ -201,10 +201,10 @@ macx {
     lout3rc.files = $${ROOT_DIR}/resources/general/3DLayouts
     QMAKE_BUNDLE_DATA += lout3rc
     QMAKE_BUNDLE_DATA += loutrc
-    EXTRA_LIBDIRS = -dmg
+    EXTRA_ARGS = -dmg
  
     # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 
 }
