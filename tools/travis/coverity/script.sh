@@ -4,10 +4,10 @@
 set -e
 
 # Do not run on pull requests
-if [ $TRAVIS_PULL_REQUEST != "false" ]; then
-  echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
-  exit 0
-fi
+# if [ $TRAVIS_PULL_REQUEST != "false" ]; then
+#  echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
+#  exit 0
+# fi
 
 # Defines
 COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
@@ -91,7 +91,7 @@ SHA=`git rev-parse --short HEAD`
 
 echo -e "\033[33;1mUploading Coverity Scan Analysis results...\033[0m"
 response=$(curl \
-  --silent --write-out "\n%{http_code}\n" \
+  --verbose --write-out "\n%{http_code}\n" \
   --form project=$COVERITY_SCAN_PROJECT_NAME \
   --form token=$COVERITY_SCAN_TOKEN \
   --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
