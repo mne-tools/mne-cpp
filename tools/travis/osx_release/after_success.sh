@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xf
 
 if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     # === Deployment ===
