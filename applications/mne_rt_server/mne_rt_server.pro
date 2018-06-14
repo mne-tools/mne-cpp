@@ -41,4 +41,6 @@ SUBDIRS += \
     connectors \
     mne_rt_server \
 
-CONFIG += ordered
+# Specify dependencies because of packaging on MacOS
+connectors.depends =
+mne_rt_server.depends = connectors
