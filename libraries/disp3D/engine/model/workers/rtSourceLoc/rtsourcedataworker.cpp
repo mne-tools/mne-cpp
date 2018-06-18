@@ -106,7 +106,7 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
         if(m_lDataQ.size() < m_dSFreq) {
             m_lDataQ.push_back(data.col(i));
         } else {
-            qDebug() <<"RtSourceDataWorker::addData - worker is full!";
+            qDebug() <<"RtSourceDataWorker::addData - worker is full ("<<m_lDataQ.size()<<")";
             break;
         }
     }

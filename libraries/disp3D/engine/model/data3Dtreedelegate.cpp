@@ -142,7 +142,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
             pSpinBox->setSuffix(" mSec");
-            pSpinBox->setMinimum(17);
+            pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(50000);
             pSpinBox->setSingleStep(1);
             return pSpinBox;
