@@ -88,6 +88,9 @@ MNE::MNE()
 
 MNE::~MNE()
 {
+    m_future.cancel();
+    m_future.waitForFinished();
+
     if(this->isRunning())
         stop();
 }
@@ -133,7 +136,7 @@ void MNE::init()
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
     // start clustering
-    QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
+    QFuture<void> m_future = QtConcurrent::run(this, &MNE::doClustering);
 
     //
     // Set the fwd, annotation and surface data

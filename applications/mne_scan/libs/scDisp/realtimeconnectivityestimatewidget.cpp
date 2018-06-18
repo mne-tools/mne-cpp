@@ -118,13 +118,13 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     m_p3DView->setModel(m_pData3DModel);
 
     m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
-                                                                 QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
-                                                                 Qt::Window));
+                                                                 QStringList() << "Data" << "Window" << "View" << "Light"));
     m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
     QGridLayout *mainLayoutView = new QGridLayout;
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    mainLayoutView->addWidget(pWidgetContainer);
+    mainLayoutView->addWidget(pWidgetContainer,0,0);
+    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
 
     this->setLayout(mainLayoutView);
 

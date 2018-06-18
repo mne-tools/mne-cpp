@@ -217,6 +217,7 @@ private:
     CircularMatrixBuffer<double>::SPtr                      m_pMatrixDataBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
 
     QMutex m_qMutex;
+    QFuture<void> m_future;
 
     QVector<FiffEvoked> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
