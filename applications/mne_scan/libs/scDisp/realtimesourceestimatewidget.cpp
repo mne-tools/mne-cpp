@@ -168,8 +168,8 @@ void RealTimeSourceEstimateWidget::getData()
             m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data",
                                                       *m_pRTSE->getValue(),
                                                       *m_pRTSE->getFwdSolution(),
-                                                      m_surfSet,
-                                                      m_annotationSet);
+                                                      *m_pRTSE->getSurfSet(),
+                                                      *m_pRTSE->getAnnotSet());
 
             m_pRtItem->setLoopState(false);
             m_pRtItem->setTimeInterval(17);
