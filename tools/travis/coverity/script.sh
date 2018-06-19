@@ -103,7 +103,8 @@ status_code=$(echo "$response" | sed -n '$p')
 
 echo -e "\033[33;1mDEBUG:$status_code\033[0m"
 
-if [ "$status_code" != "201" ]; then
+# If status is unequal to 2xx HTML status output failed
+if [ $status_code -lt 200 ] || [ $status_code -gt 299 ]; then
   TEXT=$(echo "$response" | sed '$d')
   echo -e "\033[33;1mCoverity Scan upload failed: $TEXT.\033[0m"
   exit 1
