@@ -99,7 +99,7 @@ void MNELaunchControl::invokeApplication(const QString &application, const QStri
         file.setFileName(file.fileName() + ".exe");
     #elif defined(Q_OS_MACOS)
         //On MacOS we use .app bundle structures. MNE Launch executable path is: mne_launch.app/Contents/MacOS/
-        file.setFileName("QCoreApplication::applicationDirPath() + "/../../../" + application + ".app");
+        file.setFileName(QCoreApplication::applicationDirPath() + "/../../../" + application + ".app");
     #endif
 
     if(file.exists()) {
