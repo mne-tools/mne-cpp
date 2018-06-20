@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 
     std::cout  << std::endl << "<<< Example 2 >>>" << std::endl << std::endl;
 
-    QString fileName("./resources/mne_deep/models/trainModel.v2");
+    QString fileName(QCoreApplication::applicationDirPath() + "/resources/mne_deep/models/trainModel.v2");
 
     Deep deep_2;
 
@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
 
 
 /*
-    if(deep.loadModel("./resources/mne_deep/models/examples/output/models/ex_deep_one_hidden", device)) {
+    if(deep.loadModel(QCoreApplication::applicationDirPath() + "/resources/mne_deep/models/examples/output/models/ex_deep_one_hidden", device)) {
         fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
 
         size_t inDim = deep.inputDimensions();

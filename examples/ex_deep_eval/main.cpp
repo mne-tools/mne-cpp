@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
     Deep deep_v2;
 
-    if(deep_v2.loadModel("./resources/mne_deep/models/examples/output/models/ex_deep_one_hidden", device)) {
+    if(deep_v2.loadModel(QCoreApplication::applicationDirPath() + "/resources/mne_deep/models/examples/output/models/ex_deep_one_hidden", device)) {
         fprintf(stderr, "\n##### Run evaluation using pre-trained model on CPU. #####\n");
 
         size_t inDim = deep_v2.inputDimensions();
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
         std::cout << "outputs\n" << outputs << std::endl;
 
 
-        deep_v2.saveModel("./resources/mne_deep/models/examples/ex_deep_one_hidden.v2");
+        deep_v2.saveModel(QCoreApplication::applicationDirPath() + "/resources/mne_deep/models/examples/ex_deep_one_hidden.v2");
 
 
         //
