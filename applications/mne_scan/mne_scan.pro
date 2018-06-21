@@ -42,4 +42,7 @@ SUBDIRS += \
     plugins \
     mne_scan \
 
-CONFIG += ordered
+# Specify dependencies because of packaging on MacOS
+libs.depends =
+plugins.depends = libs
+mne_scan.depends = libs plugins

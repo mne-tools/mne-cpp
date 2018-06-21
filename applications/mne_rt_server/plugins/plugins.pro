@@ -45,5 +45,3 @@ unix:!macx{
     SUBDIRS += \
         neuromag
 }
-
-CONFIG += ordered

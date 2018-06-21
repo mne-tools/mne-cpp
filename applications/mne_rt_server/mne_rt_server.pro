@@ -41,4 +41,6 @@ SUBDIRS += \
     mne_rt_server \
     plugins
 
-CONFIG += ordered
+# Specify dependencies because of packaging on MacOS
+connectors.depends =
+mne_rt_server.depends = connectors
