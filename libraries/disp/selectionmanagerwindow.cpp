@@ -395,7 +395,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     QList<QVector<float> > inputPoints;
     QList<QVector<float> > outputPoints;
     QStringList names;
-    QFile out("manualLayout.lout");//(/*"./resources/general/selectionGroups/*/"manualLayout.lout");
+    QFile out("manualLayout.lout");
 
     for(int i = 0; i < m_pChInfoModel->rowCount(); i++) {
         QModelIndex digIndex = m_pChInfoModel->index(i,1);
