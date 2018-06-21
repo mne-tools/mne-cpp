@@ -141,5 +141,5 @@ macx {
     DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 
-
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
