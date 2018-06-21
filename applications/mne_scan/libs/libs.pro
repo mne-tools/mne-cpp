@@ -42,4 +42,7 @@ SUBDIRS += \
     scDisp \
     scShared
 
-CONFIG += ordered
+# Specify library dependencies
+scMeas.depends =
+scDisp.depends = scMeas
+scShared.depends = scMeas scDisp

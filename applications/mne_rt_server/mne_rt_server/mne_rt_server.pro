@@ -41,7 +41,6 @@ QT += network concurrent
 QT -= gui
 
 CONFIG   += console
-CONFIG   -= app_bundle
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
@@ -116,31 +115,17 @@ for(FILE, RESOURCE_FILES) {
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
     # === Unix ===
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
-
-    # Mac now creates app bundle
-    CONFIG += app_bundle
-
     rcplugins.path = Contents/MacOS/resources/
     rcplugins.files = $${ROOT_DIR}/resources/mne_rt_server_plugins
     QMAKE_BUNDLE_DATA += rcplugins
@@ -150,11 +135,11 @@ macx {
     QMAKE_BUNDLE_DATA += plugins
 
     QMAKE_RPATHDIR += @executable_path/../Frameworks
-    EXTRA_LIBDIRS =
+    EXTRA_ARGS =
 
     # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$MacDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
-    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
+
 
 }
