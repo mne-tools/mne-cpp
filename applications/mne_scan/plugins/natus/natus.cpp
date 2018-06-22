@@ -1,0 +1,338 @@
+//=============================================================================================================
+/**
+* @file     natus.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     June, 2018
+*
+* @section  LICENSE
+*
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the definition of the Natus class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "natus.h"
+#include "natusproducer.h"
+
+#include <fiff/fiff.h>
+#include <scMeas/newrealtimemultisamplearray.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace NATUSPLUGIN;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+Natus::Natus()
+    : m_iSamplingFreq(500)
+    , m_iNumberChannels(5)
+    , m_bIsRunning(false)
+    //, m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >(new QList<Eigen::MatrixXd>))
+{
+}
+
+
+//*************************************************************************************************************
+
+Natus::~Natus()
+{
+    //If the program is closed while the sampling is in process
+    if(this->isRunning())
+        this->stop();
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> Natus::clone() const
+{
+    QSharedPointer<Natus> pNatusClone(new Natus());
+    return pNatusClone;
+}
+
+
+//*************************************************************************************************************
+
+void Natus::init()
+{
+    m_pRMTSA_Natus = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Natus", "EEG output data");
+
+    m_outputConnectors.append(m_pRMTSA_Natus);
+
+    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
+
+    m_pNatusProducer = QSharedPointer<NatusProducer>(new NatusProducer);
+
+    connect(m_pNatusProducer.data(), &NatusProducer::newDataAvailable,
+            this, &Natus::onNewDataAvailable);
+}
+
+
+//*************************************************************************************************************
+
+void Natus::unload()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void Natus::setUpFiffInfo()
+{
+    //
+    //Clear old fiff info data
+    //
+    m_pFiffInfo->clear();
+
+    //
+    //Set number of channels, sampling frequency and high/-lowpass
+    //
+    m_pFiffInfo->nchan = m_iNumberChannels;
+    m_pFiffInfo->sfreq = m_iSamplingFreq;
+    m_pFiffInfo->highpass = (float)0.001;
+    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
+
+    //
+    //Set up the channel info
+    //
+    QStringList QSLChNames;
+    m_pFiffInfo->chs.clear();
+
+    for(int i = 0; i < m_pFiffInfo->nchan; ++i)
+    {
+        //Create information for each channel
+        QString sChType;
+        FiffChInfo fChInfo;
+
+//        //EEG Channels
+//        if(i <= m_pFiffInfo->nchan-2)
+//        {
+            //Set channel name
+            sChType = QString("EEG ");
+            if(i<10) {
+                sChType.append("00");
+            }
+
+            if(i>=10 && i<100) {
+                sChType.append("0");
+            }
+
+            fChInfo.ch_name = sChType.append(sChType.number(i));
+
+            //Set channel type
+            fChInfo.kind = FIFFV_EEG_CH;
+
+            //Set logno
+            fChInfo.logNo = i;
+
+            //Set coord frame
+            fChInfo.coord_frame = FIFFV_COORD_HEAD;
+
+            //Set unit
+            fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit_mul = 0;
+
+            //Set EEG electrode location - Convert from mm to m
+            fChInfo.eeg_loc(0,0) = 0;
+            fChInfo.eeg_loc(1,0) = 0;
+            fChInfo.eeg_loc(2,0) = 0;
+
+            //Set EEG electrode direction - Convert from mm to m
+            fChInfo.eeg_loc(0,1) = 0;
+            fChInfo.eeg_loc(1,1) = 0;
+            fChInfo.eeg_loc(2,1) = 0;
+
+            //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
+            fChInfo.chpos.r0(0) = 0;
+            fChInfo.chpos.r0(1) = 0;
+            fChInfo.chpos.r0(2) = 0;
+
+            fChInfo.chpos.ex(0) = 1;
+            fChInfo.chpos.ex(1) = 0;
+            fChInfo.chpos.ex(2) = 0;
+
+            fChInfo.chpos.ey(0) = 0;
+            fChInfo.chpos.ey(1) = 1;
+            fChInfo.chpos.ey(2) = 0;
+
+            fChInfo.chpos.ez(0) = 0;
+            fChInfo.chpos.ez(1) = 0;
+            fChInfo.chpos.ez(2) = 1;
+//        }
+
+//        //Digital input channel
+//        if(i == m_pFiffInfo->nchan-1)
+//        {
+//            //Set channel type
+//            fChInfo.kind = FIFFV_STIM_CH;
+
+//            sChType = QString("STIM");
+//            fChInfo.ch_name = sChType;
+//        }
+
+        QSLChNames << sChType;
+
+        m_pFiffInfo->chs.append(fChInfo);
+    }
+
+    //Set channel names in fiff_info_base
+    m_pFiffInfo->ch_names = QSLChNames;
+
+    //
+    //Set head projection
+    //
+    m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
+    m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
+    m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
+    m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
+}
+
+
+//*************************************************************************************************************
+
+bool Natus::start()
+{
+    //Check if the thread is already or still running.
+    //This can happen if the start button is pressed immediately after the stop button was pressed.
+    //In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning()) {
+        QThread::wait();
+    }
+
+    m_bIsRunning = true;
+
+    //Setup fiff info
+    setUpFiffInfo();
+
+    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+    m_pRMTSA_Natus->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_Natus->data()->setMultiArraySize(1);
+    m_pRMTSA_Natus->data()->setSamplingRate(m_iSamplingFreq);
+
+    QThread::start();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool Natus::stop()
+{
+    //Wait until this thread (Natus) is stopped
+    m_bIsRunning = false;
+
+    m_pRMTSA_Natus->data()->clear();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType Natus::getType() const
+{
+    return _ISensor;
+}
+
+
+//*************************************************************************************************************
+
+QString Natus::getName() const
+{
+    return "Natus EEG";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* Natus::setupWidget()
+{
+//    BrainAMPSetupWidget* widget = new BrainAMPSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+
+//    //init properties dialog
+//    widget->initGui();
+
+    return new QWidget();
+}
+
+
+//*************************************************************************************************************
+
+void Natus::onNewDataAvailable(const Eigen::MatrixXd &matData)
+{
+    m_mutex.lock();
+    m_pListReceivedSamples.append(matData);
+    m_mutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void Natus::run()
+{
+    while(m_bIsRunning)
+    {
+        m_mutex.lock();
+        if(!m_pListReceivedSamples.isEmpty())
+        {
+            MatrixXd matData = m_pListReceivedSamples.first();
+            qDebug()<<"matData.rows(): "<< matData.rows();
+            qDebug()<<"matData.cols(): "<< matData.cols();
+            m_pListReceivedSamples.removeFirst();
+            m_pRMTSA_Natus->data()->setValue(matData);
+        }
+        m_mutex.unlock();
+    }
+}
+
