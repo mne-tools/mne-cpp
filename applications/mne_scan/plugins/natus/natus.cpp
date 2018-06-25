@@ -74,11 +74,15 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 Natus::Natus()
-    : m_iSamplingFreq(500)
-    , m_iNumberChannels(5)
-    , m_bIsRunning(false)
-    //, m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >(new QList<Eigen::MatrixXd>))
+: m_iSamplingFreq(500)
+, m_iNumberChannels(20)
+, m_bIsRunning(false)
+, m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
+, m_pFiffInfo(QSharedPointer<FiffInfo>::create())
+, m_pRMTSA_Natus(PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 {
+
+
 }
 
 
@@ -105,16 +109,7 @@ QSharedPointer<IPlugin> Natus::clone() const
 
 void Natus::init()
 {
-    m_pRMTSA_Natus = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Natus", "EEG output data");
-
     m_outputConnectors.append(m_pRMTSA_Natus);
-
-    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
-
-    m_pNatusProducer = QSharedPointer<NatusProducer>(new NatusProducer);
-
-    connect(m_pNatusProducer.data(), &NatusProducer::newDataAvailable,
-            this, &Natus::onNewDataAvailable);
 }
 
 
@@ -122,7 +117,6 @@ void Natus::init()
 
 void Natus::unload()
 {
-
 }
 
 
@@ -140,7 +134,7 @@ void Natus::setUpFiffInfo()
     //
     m_pFiffInfo->nchan = m_iNumberChannels;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
-    m_pFiffInfo->highpass = (float)0.001;
+    m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = m_iSamplingFreq/2;
 
     //
@@ -247,7 +241,7 @@ bool Natus::start()
     //This can happen if the start button is pressed immediately after the stop button was pressed.
     //In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning()) {
-        QThread::wait();
+        this->wait();
     }
 
     m_bIsRunning = true;
@@ -258,9 +252,17 @@ bool Natus::start()
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_Natus->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRMTSA_Natus->data()->setMultiArraySize(1);
-    m_pRMTSA_Natus->data()->setSamplingRate(m_iSamplingFreq);
 
     QThread::start();
+
+    // Start the producer
+    m_pNatusProducer = QSharedPointer<NatusProducer>::create();
+    m_pNatusProducer->moveToThread(&m_pProducerThread);
+    connect(m_pNatusProducer.data(), &NatusProducer::newDataAvailable,
+            this, &Natus::onNewDataAvailable,
+            Qt::DirectConnection);
+    m_pProducerThread.start();
+
     return true;
 }
 
@@ -271,8 +273,12 @@ bool Natus::stop()
 {
     //Wait until this thread (Natus) is stopped
     m_bIsRunning = false;
+    this->wait();
 
     m_pRMTSA_Natus->data()->clear();
+
+    m_pProducerThread.quit();
+    m_pProducerThread.wait();
 
     return true;
 }
@@ -312,7 +318,9 @@ QWidget* Natus::setupWidget()
 void Natus::onNewDataAvailable(const Eigen::MatrixXd &matData)
 {
     m_mutex.lock();
-    m_pListReceivedSamples.append(matData);
+    if(m_bIsRunning) {
+        m_pListReceivedSamples->append(matData);
+    }
     m_mutex.unlock();
 }
 
@@ -324,12 +332,11 @@ void Natus::run()
     while(m_bIsRunning)
     {
         m_mutex.lock();
-        if(!m_pListReceivedSamples.isEmpty())
+        if(!m_pListReceivedSamples->isEmpty())
         {
-            MatrixXd matData = m_pListReceivedSamples.first();
-            qDebug()<<"matData.rows(): "<< matData.rows();
-            qDebug()<<"matData.cols(): "<< matData.cols();
-            m_pListReceivedSamples.removeFirst();
+            MatrixXd matData = m_pListReceivedSamples->takeFirst();
+//            qDebug()<<"Natus::run - matData.rows(): "<< matData.rows();
+//            qDebug()<<"Natus::run - matData.cols(): "<< matData.cols();
             m_pRMTSA_Natus->data()->setValue(matData);
         }
         m_mutex.unlock();
