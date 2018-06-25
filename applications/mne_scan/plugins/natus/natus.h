@@ -176,6 +176,7 @@ protected:
 
     int                     m_iSamplingFreq;                        /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     int                     m_iNumberChannels;                      /**< The number of channels to be received.*/
+    int                     m_iBlockSize;
     bool                    m_bIsRunning;                           /**< Whether BrainAMP is running.*/
 
     QThread                                         m_pProducerThread;
