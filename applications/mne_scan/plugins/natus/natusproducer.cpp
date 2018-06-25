@@ -70,10 +70,9 @@ using namespace Eigen;
 //=============================================================================================================
 
 NatusProducer::NatusProducer(QObject *parent)
-    : QObject(parent)
-    , m_iMatDataSampleIterator(1)
+: QObject(parent)
+, m_iMatDataSampleIterator(1)
 {
-
     //qRegisterMetaType<Eigen::MatrixXd>();
 
     //Init socket
@@ -105,21 +104,30 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     QByteArray data = datagram.data();
     QDataStream stream(data);
 
+    // Read info
     float fPackageNumber, fNumberSamples, fNumberChannels;
 
-    char cData[(3+2500)*sizeof(float)];
-    stream.readRawData(cData, sizeof(cData));
+    char cInfo[3*sizeof(float)];
+    stream.readRawData(cInfo, sizeof(cInfo));
 
-    float* fData = reinterpret_cast<float*>(cData);
+    float* fInfo = reinterpret_cast<float*>(cInfo);
 
-    fPackageNumber = fData[0];
-    fNumberSamples = fData[1];
-    fNumberChannels = fData[2];
+    fPackageNumber = fInfo[0];
+    fNumberSamples = fInfo[1];
+    fNumberChannels = fInfo[2];
 
+    // Print info about received data
     qDebug()<<"fPackageNumber "<<fPackageNumber;
     qDebug()<<"fNumberSamples "<<fNumberSamples;
     qDebug()<<"fNumberChannels "<<fNumberChannels;
     qDebug()<<"data.size() "<<data.size();
+
+    // Read actual data
+    int iDataSize = int(fNumberSamples * fNumberChannels);
+    char *cData = new char[iDataSize*sizeof(float)];
+    stream.readRawData(cData, iDataSize*sizeof(float));
+
+    float* fData = reinterpret_cast<float*>(cData);
 
     //Get data
     Eigen::MatrixXf matData;
@@ -130,6 +138,9 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
             matData(i,j) = fData[itr++]/10e06;
         }
     }
+
+    delete cData;
+    emit newDataAvailable(matData.cast<double>());
 
 //    std::cout << matData << std::endl;
 //    emit newDataAvailable(matData.cast<double>());
@@ -150,7 +161,7 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
 //        m_iMatDataSampleIterator = 0;
         //qDebug()<<"Emit data";
 //        MatrixXd matEmit = m_matData;
-        emit newDataAvailable(matData.cast<double>());
+//        emit newDataAvailable(matData.cast<double>());
 //    }
 
     //m_pListReceivedSamples->append(matData.cast<double>()/10.0e06);

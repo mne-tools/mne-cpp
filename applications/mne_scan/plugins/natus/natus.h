@@ -174,16 +174,16 @@ protected:
     */
     virtual void run();
 
-    int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                                 m_iNumberChannels;
+    int                     m_iSamplingFreq;                        /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int                     m_iNumberChannels;                      /**< The number of channels to be received.*/
+    bool                    m_bIsRunning;                           /**< Whether BrainAMP is running.*/
 
-    bool                                m_bIsRunning;                       /**< Whether BrainAMP is running.*/
-
+    QThread                                         m_pProducerThread;
     QSharedPointer<NATUSPLUGIN::NatusProducer>      m_pNatusProducer;
-    QList<Eigen::MatrixXd>             m_pListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
+    QSharedPointer<QList<Eigen::MatrixXd> >         m_pListReceivedSamples;     /**< List with alle the received samples in form of differentley sized matrices. Use QSharedPointer so it is thread safe. */
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray> >  m_pRMTSA_Natus;       /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;            /**< Fiff measurement info.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray> >  m_pRMTSA_Natus;     /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;        /**< Fiff measurement info.*/
 
     QMutex m_mutex;
 };
