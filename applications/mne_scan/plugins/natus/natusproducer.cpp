@@ -69,7 +69,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NatusProducer::NatusProducer(QObject *parent)
+NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
 : QObject(parent)
 , m_iMatDataSampleIterator(1)
 {
@@ -81,7 +81,7 @@ NatusProducer::NatusProducer(QObject *parent)
     connect(m_pUdpSocket.data(), &QUdpSocket::readyRead,
             this, &NatusProducer::readPendingDatagrams);
 
-    m_matData.resize(10, 1000);
+    m_matData.resize(iChannelSize, iBlockSize);
 }
 
 
@@ -140,42 +140,25 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     }
 
     delete cData;
-    emit newDataAvailable(matData.cast<double>());
 
-//    std::cout << matData << std::endl;
-//    emit newDataAvailable(matData.cast<double>());
+    if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
+        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
 
-//    if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
-//        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>()/10.0e06;
+        m_iMatDataSampleIterator += matData.cols();
+    } else {
+        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator) = matData.block(0, 0, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator).cast<double>();
 
-//        m_iMatDataSampleIterator += matData.cols();
-//    } else {
-//        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator) = matData.block(0, 0, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator).cast<double>()/10.0e06;
+        m_iMatDataSampleIterator = 0;
+    }
 
-//        m_iMatDataSampleIterator = 0;
-//    }
+    //qDebug() << "m_iMatDataSampleIterator" << m_iMatDataSampleIterator;
 
-//    //qDebug() << "m_iMatDataSampleIterator" << m_iMatDataSampleIterator;
-
-//    if(m_iMatDataSampleIterator == m_matData.cols()) {
-//        m_iMatDataSampleIterator = 0;
+    if(m_iMatDataSampleIterator == m_matData.cols()) {
+        m_iMatDataSampleIterator = 0;
         //qDebug()<<"Emit data";
-//        MatrixXd matEmit = m_matData;
-//        emit newDataAvailable(matData.cast<double>());
-//    }
-
-    //m_pListReceivedSamples->append(matData.cast<double>()/10.0e06);
-    //qDebug()<<"m_pListReceivedSamples->size()"<<m_pListReceivedSamples->size();
-
-//        qDebug() << "iSamplePacketIdentifier " << iSamplePacketIdentifier;
-//        qDebug() << "iUnitIndication " << iUnitIndication;
-//        qDebug() << "iPacketSequencyNumber " << iPacketSequencyNumber;
-//        qDebug() << "iNumberChannels " << iNumberChannels;
-//        qDebug() << "iNumberSamplesInBundle " << iNumberSamplesInBundle;
-//        qDebug() << "iSampleIndex " << iSampleIndex;
-//        qDebug() << "iTimeStamp " << iTimeStamp;
-
-        //std::cout << matData << std::endl;
+        MatrixXd matEmit = m_matData.cast<double>();
+        emit newDataAvailable(matEmit);
+    }
 }
 
 

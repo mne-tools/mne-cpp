@@ -76,6 +76,7 @@ using namespace FIFFLIB;
 Natus::Natus()
 : m_iSamplingFreq(500)
 , m_iNumberChannels(20)
+, m_iBlockSize(250)
 , m_bIsRunning(false)
 , m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
@@ -256,7 +257,7 @@ bool Natus::start()
     QThread::start();
 
     // Start the producer
-    m_pNatusProducer = QSharedPointer<NatusProducer>::create();
+    m_pNatusProducer = QSharedPointer<NatusProducer>::create(m_iBlockSize, m_iNumberChannels);
     m_pNatusProducer->moveToThread(&m_pProducerThread);
     connect(m_pNatusProducer.data(), &NatusProducer::newDataAvailable,
             this, &Natus::onNewDataAvailable,

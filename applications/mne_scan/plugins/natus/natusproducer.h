@@ -97,7 +97,7 @@ class NATUSSHARED_EXPORT NatusProducer : public QObject
     Q_OBJECT
 
 public:
-    explicit NatusProducer(QObject *parent = 0);
+    explicit NatusProducer(int iBlockSize, int iChannelSize, QObject *parent = 0);
 
 protected:
     void readPendingDatagrams();
