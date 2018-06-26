@@ -117,10 +117,10 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     fNumberChannels = fInfo[2];
 
     // Print info about received data
-    qDebug()<<"fPackageNumber "<<fPackageNumber;
-    qDebug()<<"fNumberSamples "<<fNumberSamples;
-    qDebug()<<"fNumberChannels "<<fNumberChannels;
-    qDebug()<<"data.size() "<<data.size();
+//    qDebug()<<"fPackageNumber "<<fPackageNumber;
+//    qDebug()<<"fNumberSamples "<<fNumberSamples;
+//    qDebug()<<"fNumberChannels "<<fNumberChannels;
+//    qDebug()<<"data.size() "<<data.size();
 
     // Read actual data
     int iDataSize = int(fNumberSamples * fNumberChannels);
@@ -155,7 +155,7 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
 
     if(m_iMatDataSampleIterator == m_matData.cols()) {
         m_iMatDataSampleIterator = 0;
-        //qDebug()<<"Emit data";
+        qDebug()<<"Emit data";
         MatrixXd matEmit = m_matData.cast<double>();
         emit newDataAvailable(matEmit);
     }
