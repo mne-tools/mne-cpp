@@ -137,7 +137,7 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     //Get data
     Eigen::MatrixXf matData;
     matData.resize(fNumberChannels, fNumberSamples);
-    int itr = 3;
+    int itr = 0;
     for(int j = 0; j < fNumberSamples; ++j) {
         for(int i = 0; i < fNumberChannels; ++i) {
             matData(i,j) = fData[itr++]/10e06;
