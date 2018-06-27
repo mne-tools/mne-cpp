@@ -351,8 +351,8 @@ void Natus::run()
         if(!m_pListReceivedSamples->isEmpty())
         {
             MatrixXd matData = m_pListReceivedSamples->takeFirst();
-            qDebug()<<"Natus::run - matData.rows(): "<< matData.rows();
-            qDebug()<<"Natus::run - matData.cols(): "<< matData.cols();
+            //qDebug()<<"Natus::run - matData.rows(): "<< matData.rows();
+            //qDebug()<<"Natus::run - matData.cols(): "<< matData.cols();
             m_pRMTSA_Natus->data()->setValue(matData);
         }
         m_mutex.unlock();
