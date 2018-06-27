@@ -84,8 +84,9 @@ Natus::Natus()
 , m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRMTSA_Natus(PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/natus/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/natus/")
 {
+    qDebug() << m_qStringResourcePath;
 }
 
 

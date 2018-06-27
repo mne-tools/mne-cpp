@@ -147,7 +147,7 @@ void Neuromag::initConnector()
 
         m_pRTMSA_Neuromag->data()->setVisibility(true);
 
-        m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./mne_scan_plugins/resources/Neuromag/VectorViewLayout.xml");
+        m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./resources/mne_scan/plugins/Neuromag/VectorViewLayout.xml");
 
         m_outputConnectors.append(m_pRTMSA_Neuromag);
     }
