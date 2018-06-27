@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>BrainAmp Connector</string>
+      <string>Natus Connector</string>
      </property>
     </widget>
    </item>
@@ -176,7 +176,17 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <property name="text">
+            <string>128</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>250</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>256</string>
            </property>
           </item>
           <item>
@@ -186,38 +196,106 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <property name="text">
+            <string>512</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>1000</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>2500</string>
+            <string>1024</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>5000</string>
+            <string>2000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2048</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Blocksize (samples):</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="m_spinBox_BlockSize">
+        <item row="1" column="1">
+         <widget class="QComboBox" name="m_comboBox_blockSize">
+          <item>
+           <property name="text">
+            <string>100</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>128</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>200</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>256</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>500</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>512</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1024</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2048</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Number of channels:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="m_spinBox_numberChannels">
           <property name="minimum">
-           <number>10</number>
+           <number>1</number>
           </property>
           <property name="maximum">
-           <number>10000</number>
-          </property>
-          <property name="value">
-           <number>512</number>
+           <number>500</number>
           </property>
          </widget>
         </item>

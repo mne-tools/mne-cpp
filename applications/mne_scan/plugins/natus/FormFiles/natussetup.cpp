@@ -72,9 +72,11 @@ NatusSetup::NatusSetup(Natus* pNatus, QWidget* parent)
 
     //Connect device sampling properties
     connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &NatusSetup::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &NatusSetup::setDeviceSamplingProperties);
+            this, &NatusSetup::setSamplingFreq);
+    connect(ui.m_comboBox_blockSize, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &NatusSetup::setSamplesPerBlock);
+    connect(ui.m_spinBox_numberChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &NatusSetup::setNumberChannels);
 
     //Fill info box
     QFile file(m_pNatus->m_qStringResourcePath+"readme.txt");
@@ -95,7 +97,6 @@ NatusSetup::NatusSetup(Natus* pNatus, QWidget* parent)
 
 NatusSetup::~NatusSetup()
 {
-
 }
 
 
@@ -105,15 +106,30 @@ void NatusSetup::initGui()
 {
     //Init device sampling properties
     ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pNatus->m_iSamplingFreq));
-    ui.m_spinBox_BlockSize->setValue(m_pNatus->m_iSamplesPerBlock);
+    ui.m_comboBox_blockSize->setCurrentText(QString::number(m_pNatus->m_iSamplesPerBlock));
+    ui.m_spinBox_numberChannels->setValue(m_pNatus->m_iNumberChannels);
 }
 
 
 //*************************************************************************************************************
 
-void NatusSetup::setDeviceSamplingProperties()
+void NatusSetup::setSamplingFreq()
 {
     m_pNatus->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
-    m_pNatus->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
 }
 
+
+//*************************************************************************************************************
+
+void NatusSetup::setNumberChannels()
+{
+    m_pNatus->m_iNumberChannels = ui.m_spinBox_numberChannels->value();
+}
+
+
+//*************************************************************************************************************
+
+void NatusSetup::setSamplesPerBlock()
+{
+    m_pNatus->m_iSamplesPerBlock = ui.m_comboBox_blockSize->currentText().toInt();
+}

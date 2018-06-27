@@ -260,7 +260,7 @@ bool Natus::start()
 
     m_bIsRunning = true;
 
-    //Setup fiff info
+    //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
@@ -323,7 +323,7 @@ QWidget* Natus::setupWidget()
     //init properties dialog
     widget->initGui();
 
-    return new QWidget();
+    return widget;
 }
 
 

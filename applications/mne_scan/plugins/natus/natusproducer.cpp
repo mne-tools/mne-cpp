@@ -133,10 +133,12 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     fNumberChannels = fInfo[2];
 
     // Print info about received data
-//    qDebug()<<"fPackageNumber "<<fPackageNumber;
-//    qDebug()<<"fNumberSamples "<<fNumberSamples;
-//    qDebug()<<"fNumberChannels "<<fNumberChannels;
-//    qDebug()<<"data.size() "<<data.size();
+    qDebug()<<"fPackageNumber "<<fPackageNumber;
+    qDebug()<<"fNumberSamples "<<fNumberSamples;
+    qDebug()<<"fNumberChannels "<<fNumberChannels;
+    qDebug()<<"data.size() "<<data.size();
+    qDebug()<<"data.size() "<<data.size();
+    qDebug()<<"data.size() "<<data.size();
 
     // Read actual data
     int iDataSize = int(fNumberSamples * fNumberChannels);
