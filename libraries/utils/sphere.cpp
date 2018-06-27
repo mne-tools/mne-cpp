@@ -126,9 +126,11 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 {
     VectorXf center;
     float R;
-    fit_sphere_to_points( points, simplex_size, center, R);
+    if(fit_sphere_to_points( points, simplex_size, center, R)) {
+        return Sphere(center, R);
+    }
 
-    return Sphere(center, R);
+    return Sphere(Vector3f(), 0.0f);
 }
 
 
@@ -209,7 +211,9 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
                                                     neval,          /* Number of function evaluations */
                                                     report_interval,/* How often to report (-1 = no_reporting) */
                                                     report_func))   /* The function to be called when reporting */
+    {
         return false;
+    }
 
     r0 = init_simplex.row(0);
     R = opt_rad(r0, &user);
