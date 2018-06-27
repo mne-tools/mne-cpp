@@ -48,6 +48,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+#include <QDataStream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,22 +90,6 @@ NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
 
 //*************************************************************************************************************
 
-void NatusProducer::setChannelSize(int iChannelSize)
-{
-    m_matData.resize(iChannelSize, m_matData.cols());
-}
-
-
-//*************************************************************************************************************
-
-void NatusProducer::setBlockSize(int iBlockSize)
-{
-    m_matData.resize(m_matData.rows(), iBlockSize);
-}
-
-
-//*************************************************************************************************************
-
 void NatusProducer::readPendingDatagrams()
 {
     while (m_pUdpSocket->hasPendingDatagrams()) {
@@ -132,7 +119,7 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     fNumberSamples = fInfo[1];
     fNumberChannels = fInfo[2];
 
-    // Print info about received data
+//    // Print info about received data
 //    qDebug()<<"fPackageNumber "<<fPackageNumber;
 //    qDebug()<<"fNumberSamples "<<fNumberSamples;
 //    qDebug()<<"fNumberChannels "<<fNumberChannels;
@@ -177,23 +164,4 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
         MatrixXd matEmit = m_matData.cast<double>();
         emit newDataAvailable(matEmit);
     }
-}
-
-
-//*************************************************************************************************************
-
-float NatusProducer::sampleFloat(char *pData) {
-    float result = (
-        pData[0] << 24 |
-        pData[1] << 16 |
-        pData[2] << 8 |
-        pData[3]
-    );
-
-//    if (result > 8388608) // 2^24/2
-//    {
-//        result = result - 16777216; // 2^24
-//    }
-
-    return result;
 }
