@@ -92,7 +92,7 @@ FORMS += \
         FormFiles/brainampsetupprojectwidget.ui \
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/brainamp/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/brainamp/readme.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

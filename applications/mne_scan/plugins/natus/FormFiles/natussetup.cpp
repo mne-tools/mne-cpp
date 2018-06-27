@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     natusproducer.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     natussetup.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2018
 *
@@ -29,20 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NatusProducer class.
+* @brief    Contains the implementation of the NatusSetup class.
 *
 */
-
-#ifndef NATUSPRODUCER_H
-#define NATUSPRODUCER_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "natus_global.h"
+#include "natussetup.h"
+#include "../natus.h"
 
 
 //*************************************************************************************************************
@@ -50,79 +47,73 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QUdpSocket>
-#include <QNetworkDatagram>
-#include <QObject>
 #include <QDebug>
-#include <QDataStream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// EIGEN INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <Eigen/Core>
+using namespace NATUSPLUGIN;
+
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
+
+NatusSetup::NatusSetup(Natus* pNatus, QWidget* parent)
+: QWidget(parent)
+, m_pNatus(pNatus)
+{
+    ui.setupUi(this);
+
+    //Connect device sampling properties
+    connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &NatusSetup::setDeviceSamplingProperties);
+    connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &NatusSetup::setDeviceSamplingProperties);
+
+    //Fill info box
+    QFile file(m_pNatus->m_qStringResourcePath+"readme.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+    while (!in.atEnd())
+    {
+        QString line = in.readLine();
+        ui.m_qTextBrowser_Information->insertHtml(line);
+        ui.m_qTextBrowser_Information->insertHtml("<br>");
+    }
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE NATUSPLUGIN
-//=============================================================================================================
 
-namespace NATUSPLUGIN
+NatusSetup::~NatusSetup()
 {
 
+}
+
 
 //*************************************************************************************************************
-//=============================================================================================================
-// NATUSPLUGIN FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* The NatusProducer class.
-*
-* @brief The NatusProducer class provides producer to receive data from the connected Natus amplifier and forward it to the main plugin class.
-*/
-class NATUSSHARED_EXPORT NatusProducer : public QObject
+void NatusSetup::initGui()
 {
-    Q_OBJECT
-
-public:
-    explicit NatusProducer(int iBlockSize, int iChannelSize, QObject *parent = 0);
-
-    void setChannelSize(int iChannelSize);
-    void setBlockSize(int iBlockSize);
-
-protected:
-    void readPendingDatagrams();
-
-    void processDatagram(const QNetworkDatagram &datagram);
-
-    float sampleFloat(char *pData);
-
-    QSharedPointer<QUdpSocket>          m_pUdpSocket;
-    Eigen::MatrixXd                     m_matData;
-
-    int                                 m_iMatDataSampleIterator;
-    float                               m_fSampleFreq;
-    float                               m_fChannelSize;
-
-signals:
-    void newDataAvailable(const Eigen::MatrixXd &matData);
-    void newChannelSize(int iChannelSize);
-    void newSampleFreq(int iSampleFreq);
-};
+    //Init device sampling properties
+    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pNatus->m_iSamplingFreq));
+    ui.m_spinBox_BlockSize->setValue(m_pNatus->m_iSamplesPerBlock);
+}
 
 
-} // NAMESPACE
+//*************************************************************************************************************
 
-#endif // NATUSPRODUCER_H
+void NatusSetup::setDeviceSamplingProperties()
+{
+    m_pNatus->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
+    m_pNatus->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
+}
+

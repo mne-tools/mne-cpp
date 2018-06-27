@@ -52,7 +52,11 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lscMeasd \
             -lscDispd \
@@ -60,7 +64,11 @@ CONFIG(debug, debug|release) {
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lscMeas \
             -lscDisp \
@@ -71,15 +79,20 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         natus.cpp \
-        natusproducer.cpp
+        natusproducer.cpp \
+        FormFiles/natussetup.cpp \
 
 HEADERS += \
         natus.h \
         natus_global.h \
-        natusproducer.h
+        natusproducer.h \
+        FormFiles/natussetup.h \
 
-#RESOURCE_FILES +=\
-#    $${MNE_DIR}/resources/mne_scan/plugins/natus/readme.txt \
+FORMS += \
+        FormFiles/natussetup.ui \
+
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/mne_scan/plugins/natus/readme.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
