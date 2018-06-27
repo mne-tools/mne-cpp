@@ -87,6 +87,22 @@ NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
 
 //*************************************************************************************************************
 
+void NatusProducer::setChannelSize(int iChannelSize)
+{
+    m_matData.resize(iChannelSize, m_matData.cols());
+}
+
+
+//*************************************************************************************************************
+
+void NatusProducer::setBlockSize(int iBlockSize)
+{
+    m_matData.resize(m_matData.rows(), iBlockSize);
+}
+
+
+//*************************************************************************************************************
+
 void NatusProducer::readPendingDatagrams()
 {
     while (m_pUdpSocket->hasPendingDatagrams()) {

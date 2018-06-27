@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     natusproducer.h
+* @file     natussetup.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NatusProducer class.
+* @brief    Contains the declaration of the NatusSetup class.
 *
 */
 
-#ifndef NATUSPRODUCER_H
-#define NATUSPRODUCER_H
+#ifndef NATUSSETUP_H
+#define NATUSSETUP_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "natus_global.h"
+#include "../ui_natussetup.h"
 
 
 //*************************************************************************************************************
@@ -50,25 +50,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QUdpSocket>
-#include <QNetworkDatagram>
-#include <QObject>
-#include <QDebug>
-#include <QDataStream>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
@@ -82,47 +64,60 @@ namespace NATUSPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// NATUSPLUGIN FORWARD DECLARATIONS
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+class Natus;
 
 
 //=============================================================================================================
 /**
-* The NatusProducer class.
+* DECLARE CLASS NatusSetup
 *
-* @brief The NatusProducer class provides producer to receive data from the connected Natus amplifier and forward it to the main plugin class.
+* @brief The NatusSetup class provides the Natus configuration window.
 */
-class NATUSSHARED_EXPORT NatusProducer : public QObject
+class NatusSetup : public QWidget
 {
     Q_OBJECT
-
 public:
-    explicit NatusProducer(int iBlockSize, int iChannelSize, QObject *parent = 0);
 
-    void setChannelSize(int iChannelSize);
-    void setBlockSize(int iBlockSize);
+    //=========================================================================================================
+    /**
+    * Constructs a NatusSetup which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NatusSetup becomes a window. If parent is another widget, NatusSetup becomes a child window inside parent. NatusSetup is deleted when its parent is deleted.
+    * @param [in] pNatus a pointer to the corresponding parent.
+    */
+    NatusSetup(Natus* pNatus, QWidget *parent = 0);
 
-protected:
-    void readPendingDatagrams();
+    //=========================================================================================================
+    /**
+    * Destroys the NatusSetup.
+    * All NatusSetup's children are deleted first. The application exits if NatusSetup is the main widget.
+    */
+    ~NatusSetup();
 
-    void processDatagram(const QNetworkDatagram &datagram);
+    //=========================================================================================================
+    /**
+    * Initializes the Connector's GUI properties.
+    *
+    */
+    void initGui();
 
-    float sampleFloat(char *pData);
+private:
 
-    QSharedPointer<QUdpSocket>          m_pUdpSocket;
-    Eigen::MatrixXd                     m_matData;
+    //=========================================================================================================
+    /**
+    * Sets the device sampling properties.
+    *
+    */
+    void setDeviceSamplingProperties();
 
-    int                                 m_iMatDataSampleIterator;
-    float                               m_fSampleFreq;
-    float                               m_fChannelSize;
 
-signals:
-    void newDataAvailable(const Eigen::MatrixXd &matData);
-    void newChannelSize(int iChannelSize);
-    void newSampleFreq(int iSampleFreq);
+    Natus*                  m_pNatus;          /**< a pointer to corresponding Natus.*/
+    Ui::NatusSetupWidget    ui;                /**< the user interface for the NatusSetup.*/
 };
-
 
 } // NAMESPACE
 
-#endif // NATUSPRODUCER_H
+#endif // NATUSSETUP_H

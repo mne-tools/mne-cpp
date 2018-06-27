@@ -40,6 +40,7 @@
 
 #include "natus.h"
 #include "natusproducer.h"
+#include "FormFiles/natussetup.h"
 
 #include <fiff/fiff.h>
 #include <scMeas/newrealtimemultisamplearray.h>
@@ -49,6 +50,8 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -76,14 +79,13 @@ using namespace FIFFLIB;
 Natus::Natus()
 : m_iSamplingFreq(2048)
 , m_iNumberChannels(46)
-, m_iBlockSize(256)
+, m_iSamplesPerBlock(256)
 , m_bIsRunning(false)
 , m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRMTSA_Natus(PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/natus/")
 {
-
-
 }
 
 
@@ -94,6 +96,12 @@ Natus::~Natus()
     //If the program is closed while the sampling is in process
     if(this->isRunning())
         this->stop();
+
+    //Store settings for next use
+    QSettings settings;
+    settings.setValue(QString("NATUS/sFreq"), m_iSamplingFreq);
+    settings.setValue(QString("NATUS/samplesPerBlock"), m_iSamplesPerBlock);
+    settings.setValue(QString("NATUS/numberChannels"), m_iNumberChannels);
 }
 
 
@@ -111,6 +119,11 @@ QSharedPointer<IPlugin> Natus::clone() const
 void Natus::init()
 {
     m_outputConnectors.append(m_pRMTSA_Natus);
+
+    QSettings settings;
+    m_iSamplingFreq = settings.value(QString("NATUS/sFreq"), 2048).toInt();
+    m_iSamplesPerBlock = settings.value(QString("NATUS/samplesPerBlock"), 256).toInt();
+    m_iNumberChannels = settings.value(QString("NATUS/numberChannels"), 150).toInt();
 }
 
 
@@ -257,7 +270,7 @@ bool Natus::start()
     QThread::start();
 
     // Start the producer
-    m_pNatusProducer = QSharedPointer<NatusProducer>::create(m_iBlockSize, m_iNumberChannels);
+    m_pNatusProducer = QSharedPointer<NatusProducer>::create(m_iSamplesPerBlock, m_iNumberChannels);
     m_pNatusProducer->moveToThread(&m_pProducerThread);
     connect(m_pNatusProducer.data(), &NatusProducer::newDataAvailable,
             this, &Natus::onNewDataAvailable,
@@ -305,10 +318,10 @@ QString Natus::getName() const
 
 QWidget* Natus::setupWidget()
 {
-//    BrainAMPSetupWidget* widget = new BrainAMPSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    NatusSetup* widget = new NatusSetup(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
-//    //init properties dialog
-//    widget->initGui();
+    //init properties dialog
+    widget->initGui();
 
     return new QWidget();
 }

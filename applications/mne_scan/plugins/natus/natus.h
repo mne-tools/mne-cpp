@@ -94,6 +94,7 @@ namespace NATUSPLUGIN
 //=============================================================================================================
 
 class NatusProducer;
+class NatusSetup;
 
 
 //=============================================================================================================
@@ -108,6 +109,8 @@ class NATUSSHARED_EXPORT Natus : public SCSHAREDLIB::ISensor
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "natus.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
+
+    friend class NatusSetup;
 
 public:
     //=========================================================================================================
@@ -174,10 +177,12 @@ protected:
     */
     virtual void run();
 
-    int                     m_iSamplingFreq;                        /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                     m_iNumberChannels;                      /**< The number of channels to be received.*/
-    int                     m_iBlockSize;
-    bool                    m_bIsRunning;                           /**< Whether BrainAMP is running.*/
+    int                     m_iSamplingFreq;                /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int                     m_iNumberChannels;              /**< The number of channels to be received.*/
+    int                     m_iSamplesPerBlock;
+    bool                    m_bIsRunning;                   /**< Whether Natus is running.*/
+
+    QString                 m_qStringResourcePath;          /**< The path to the EEG resource directory.*/
 
     QThread                                         m_pProducerThread;
     QSharedPointer<NATUSPLUGIN::NatusProducer>      m_pNatusProducer;
