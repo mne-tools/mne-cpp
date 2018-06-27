@@ -105,14 +105,32 @@ public:
     void initGui();
 
 private:
-
     //=========================================================================================================
     /**
     * Sets the device sampling properties.
-    *
     */
     void setDeviceSamplingProperties();
 
+    //=========================================================================================================
+    /**
+    * Forward the device sampling frequency.
+    *
+    */
+    void setSamplingFreq();
+
+    //=========================================================================================================
+    /**
+    * Forward the device number of channels.
+    *
+    */
+    void setNumberChannels();
+
+    //=========================================================================================================
+    /**
+    * Forward the device samples per block.
+    *
+    */
+    void setSamplesPerBlock();
 
     Natus*                  m_pNatus;          /**< a pointer to corresponding Natus.*/
     Ui::NatusSetupWidget    ui;                /**< the user interface for the NatusSetup.*/
