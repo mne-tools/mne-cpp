@@ -53,8 +53,6 @@
 #include <QUdpSocket>
 #include <QNetworkDatagram>
 #include <QObject>
-#include <QDebug>
-#include <QDataStream>
 
 
 //*************************************************************************************************************
@@ -97,31 +95,48 @@ class NATUSSHARED_EXPORT NatusProducer : public QObject
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a NatusProducer which is a child of parent.
+    *
+    * @param [in] iBlockSize The block size to init the data matrix with.
+    * @param [in] iChannelSize The channel size to init the data matrix with.
+    * @param [in] parent pointer to parent widget.
+    */
     explicit NatusProducer(int iBlockSize,
                            int iChannelSize,
                            QObject *parent = 0);
 
-    void setChannelSize(int iChannelSize);
-    void setBlockSize(int iBlockSize);
-
 protected:
+    //=========================================================================================================
+    /**
+    * Called whenever a new datagram was received.
+    */
     void readPendingDatagrams();
 
+    //=========================================================================================================
+    /**
+    * Parsed the received datagram.
+    *
+    * @param [in] datagram The received datagram.
+    */
     void processDatagram(const QNetworkDatagram &datagram);
 
-    float sampleFloat(char *pData);
+    QSharedPointer<QUdpSocket>          m_pUdpSocket;                   /**< A pointer to the UDP socket.*/
+    Eigen::MatrixXd                     m_matData;                      /**< The data matrix storing the received data.*/
 
-    QSharedPointer<QUdpSocket>          m_pUdpSocket;
-    Eigen::MatrixXd                     m_matData;
-
-    int                                 m_iMatDataSampleIterator;
-    float                               m_fSampleFreq;
-    float                               m_fChannelSize;
+    int                                 m_iMatDataSampleIterator;       /**< The current iterator of the current data matrix.*/
+    float                               m_fSampleFreq;                  /**< The current sample frequency.*/
+    float                               m_fChannelSize;                 /**< The current channel size.*/
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever a new data matrix is available.
+    *
+    * @param [in] matData The newly parsed data.
+    */
     void newDataAvailable(const Eigen::MatrixXd &matData);
-    void newChannelSize(int iChannelSize);
-    void newSampleFreq(int iSampleFreq);
 };
 
 

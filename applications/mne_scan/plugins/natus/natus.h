@@ -99,9 +99,9 @@ class NatusSetup;
 
 //=============================================================================================================
 /**
-* The Natus class provides a EEG connector for receiving data from Natus UDP digital out.
+* The Natus class provides a EEG connector for receiving data from Natus UDP SDK.
 *
-* @brief The Natus class provides a EEG connector for receiving data from Natus UDP digital out.
+* @brief The Natus class provides a EEG connector for receiving data from Natus UDP SDK.
 */
 class NATUSSHARED_EXPORT Natus : public SCSHAREDLIB::ISensor
 {
@@ -166,7 +166,12 @@ public:
     virtual QWidget* setupWidget();
 
 protected:
-
+    //=========================================================================================================
+    /**
+    * Call this function whenenver you received new data.
+    *
+    * @param [in] matData The new data.
+    */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
@@ -179,19 +184,20 @@ protected:
 
     int                     m_iSamplingFreq;                /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     int                     m_iNumberChannels;              /**< The number of channels to be received.*/
-    int                     m_iSamplesPerBlock;
+    int                     m_iSamplesPerBlock;             /**< The number of samples per block to be received.*/
     bool                    m_bIsRunning;                   /**< Whether Natus is running.*/
 
     QString                 m_qStringResourcePath;          /**< The path to the EEG resource directory.*/
 
-    QThread                                         m_pProducerThread;
-    QSharedPointer<NATUSPLUGIN::NatusProducer>      m_pNatusProducer;
+    QMutex                  m_mutex;                        /**< The mutex guarding data shared by different threads.*/
+
+    QThread                                         m_pProducerThread;          /**< The thread used to host the producer.*/
+    QSharedPointer<NATUSPLUGIN::NatusProducer>      m_pNatusProducer;           /**< The producer object.*/
     QSharedPointer<QList<Eigen::MatrixXd> >         m_pListReceivedSamples;     /**< List with alle the received samples in form of differentley sized matrices. Use QSharedPointer so it is thread safe. */
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray> >  m_pRMTSA_Natus;     /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;        /**< Fiff measurement info.*/
 
-    QMutex m_mutex;
 };
 
 
