@@ -844,9 +844,9 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
         }
 
         //Write final operator matrices to file
-//        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-//        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
-//        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
 
         //
         // Make operators sparse
