@@ -399,7 +399,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pRTMSAModel->setFiffInfo(m_pFiffInfo);
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
-        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT);
+        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, true);
 
         //
         //-------- Init the delegate --------
