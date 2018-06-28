@@ -38,8 +38,8 @@ include(../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mne_rt_server \
     plugins \
+    mne_rt_server \
 
 # Specify dependencies because of packaging on MacOS
 plugins.depends =
