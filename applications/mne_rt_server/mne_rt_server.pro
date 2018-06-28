@@ -39,7 +39,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     mne_rt_server \
-    plugins
+    plugins \
 
 # Specify dependencies because of packaging on MacOS
 plugins.depends =
