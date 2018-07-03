@@ -119,11 +119,11 @@ macx {
     explain.path = Contents/MacOS/resources/general/explanations
     explain.files = $${ROOT_DIR}/resources/general/explanations/fiff_explanations.txt
     QMAKE_BUNDLE_DATA += explain
-    EXTRA_LIBDIRS =
+    EXTRA_ARGS =
 
     # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 
-
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }

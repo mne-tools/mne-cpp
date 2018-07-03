@@ -163,21 +163,21 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     ui->m_groupBox_3dControl->setLayout(gridLayout);
 
     //Add sensor surface
-    QFile t_fileBabyMEGSensorSurfaceBEM("./resources/general/sensorSurfaces/BabyMEG.fif");
+    QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/BabyMEG.fif");
     MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
     m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM);
 
-    QFile t_fileVVSensorSurfaceBEM("./resources/general/sensorSurfaces/306m.fif");
+    QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
 
-    QFile t_fileHeadKid("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_fileHeadKid(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadKid(t_fileHeadKid);
     m_pBemHeadKid = m_pData3DModel->addBemData("Head", "Child", t_BemHeadKid);
     m_pBemHeadKid->setCheckState(Qt::Unchecked);
 
-    QFile t_fileHeadAdult("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_fileHeadAdult(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_BemHeadAdult(t_fileHeadAdult);
     m_pBemHeadAdult = m_pData3DModel->addBemData("Head", "Adult", t_BemHeadAdult);
     m_pBemHeadAdult->setCheckState(Qt::Unchecked);
@@ -376,14 +376,14 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
 
 void HPIWidget::alignFiducials(const QString& fileNameDigData)
 {
-    QFile test("./resources/general/hpiAlignment/fsaverage-fiducials.fif");
+    QFile test(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
     FiffDigPointSet testdata(test);
     m_pData3DModel->addDigitizerData("Head", "avr", testdata);
 
     //Calculate the alignment of the fiducials
     MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
     MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
-                                             "./resources/general/hpiAlignment/fsaverage-head.fif",
+                                             QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
                                              FIFFV_BEM_SURF_ID_HEAD,
                                              "head",
                                              1,
@@ -393,7 +393,7 @@ void HPIWidget::alignFiducials(const QString& fileNameDigData)
     QFile t_fileDigData(fileNameDigData);
     FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
 
-    QFile t_fileDigDataReference("./resources/general/hpiAlignment/fsaverage-fiducials.fif");
+    QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
     FiffDigitizerData* t_digDataReference = new FiffDigitizerData(t_fileDigDataReference);
 
     MneSurfaceOrVolume::align_fiducials(t_digData,

@@ -233,13 +233,13 @@ void RealTimeMultiSampleArrayModel::init()
 void RealTimeMultiSampleArrayModel::initSphara()
 {
     //Load SPHARA matrices for babymeg and vectorview
-    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString("./resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString("./resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString("./resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString("./resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString("./resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
 
     //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
