@@ -69,7 +69,7 @@ RESOURCES +=    qml.qrc \
 
 # Deploy dependencies
 win32 {
-    EXTRA_ARGS =
+    EXTRA_ARGS = -qmldir=$${PWD}/qml
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
@@ -80,11 +80,12 @@ unix:!macx {
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
-    EXTRA_LIBDIRS = -qmldir=$${PWD}/qml
+    EXTRA_ARGS = -qmldir=$${PWD}/qml
  
     # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 

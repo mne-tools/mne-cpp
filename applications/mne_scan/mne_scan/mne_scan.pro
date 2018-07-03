@@ -176,10 +176,13 @@ macx {
     plugins.path = Contents/MacOS/
     plugins.files = $${ROOT_DIR}/bin/mne_scan_plugins
     QMAKE_BUNDLE_DATA += plugins
-    EXTRA_LIBDIRS = -dmg
+    EXTRA_ARGS = -dmg
  
     # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_LIBDIRS})
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 
+    deploy_app = $$member(DEPLOY_CMD, 1)
+    dmg_file = $$replace(deploy_app, .app, .dmg)
+    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
 }
