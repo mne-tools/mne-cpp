@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     plot.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     tfplot.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 * @version  1.0
-* @date     June, 2013
+* @date     September, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Martin Henfling and Daniel Knobl. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,32 +29,30 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Plot class declaration
-*
+* @brief    Declaration of time-frequency plot class.
 */
-#ifndef PLOT_H
-#define PLOT_H
+
+#ifndef TFPLOT_H
+#define TFPLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
-#include "graph.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QString>
-#include <QList>
-#include <QVector>
-#include <QPointF>
-#include <QSharedPointer>
+#include <QImage>
+#include <QGridLayout>
+#include <QGraphicsView>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsSceneResizeEvent>
 
 
 //*************************************************************************************************************
@@ -63,15 +61,13 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
+#include <unsupported/Eigen/FFT>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
-//=============================================================================================================
 
 namespace DISPLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,82 +76,79 @@ namespace DISPLIB
 
 using namespace Eigen;
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-
-//=============================================================================================================
-/**
-* Plots vector data, similiar to MATLABs plot
-*
-* @brief Vector plot
-*/
-class DISPSHARED_EXPORT Plot : public Graph
+enum ColorMaps
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<Plot> SPtr;            /**< Shared pointer type for MatrixView class. */
-    typedef QSharedPointer<const Plot> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
-
-    //=========================================================================================================
-    /**
-    * Creates the plot.
-    *
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit Plot(QWidget *parent = Q_NULLPTR);
-
-    //=========================================================================================================
-    /**
-    * Creates the plot using a given double vector.
-    *
-    * @param[in] p_dVec     The double data vector
-    * @param[in] parent     Parent QObject (optional)
-    */
-    explicit Plot(VectorXd &p_dVec, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destructs the Plot object
-    */
-    ~Plot();
-
-    //=========================================================================================================
-    /**
-    * Initializes the Plot object
-    */
-    void init();
-
-    //=========================================================================================================
-    /**
-    * Updates the plot using a given double vector without given X data.
-    *
-    * @param[in] p_dVec     The double data vector
-    */
-    void updateData(VectorXd &p_dVec);
-
-protected:
-    void paintEvent(QPaintEvent*);
-
-    bool m_bHoldOn;             /**< If multiple plots */
-
-    QList<QVector<QPointF> > m_qListVecPointFPaths;     /**< List of point series */
-
-    double m_dMinX;             /**< Minimal X value */
-    double m_dMaxX;             /**< Maximal X value */
-    double m_dMinY;             /**< Minimal Y value */
-    double m_dMaxY;             /**< Maximal Y value */
+    Hot,
+    HotNeg1,
+    HotNeg2,
+    Jet,
+    Bone,
+    RedBlue
 };
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+class DISPSHARED_EXPORT TFplot : public QWidget
+{
 
-} // NAMESPACE
+public:
 
-#endif // PLOT_H
+    //=========================================================================================================
+    /**
+    * TFplot_TFplot
+    *
+    * ### display tf-plot function ###
+    *
+    * Constructor
+    *
+    * constructs TFplot class
+    *
+    *  @param[in] tf_matrix         given spectrogram
+    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    *  @param[in] lower_frq         lower bound frequency, that should be plotted
+    *  @param[in] upper_frq         upper bound frequency, that should be plotted
+    *  @param[in] cmap              colormap used to plot the spectrogram
+    *
+    */
+    TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
+
+    //=========================================================================================================
+    /**
+    * TFplot_TFplot
+    *
+    * ### display tf-plot function ###
+    *
+    * Constructor
+    *
+    * constructs TFplot class
+    *
+    *  @param[in] tf_matrix         given spectrogram
+    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    *  @param[in] cmap              colormap used to plot the spectrogram
+    *
+    */
+    TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap);
+
+private:
+    //=========================================================================================================
+    /**
+    * TFplot_calc_plot
+    *
+    * ### display tf-plot function ###
+    *
+    * calculates a image to plot the tf_matrix
+    *
+    *  @param[in] tf_matrix         given spectrogram
+    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    *  @param[in] cmap              colormap used to plot the spectrogram
+    *  @param[in] lower_frq         lower bound frequency, that should be plotted
+    *  @param[in] upper_frq         upper bound frequency, that should be plotted
+    *
+    */
+    void calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
+
+protected:
+     virtual void resizeEvent(QResizeEvent *event);
+};
+
+}
+
+#endif // TFPLOT_H

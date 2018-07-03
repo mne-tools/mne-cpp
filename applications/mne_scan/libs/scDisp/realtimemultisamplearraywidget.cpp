@@ -526,19 +526,19 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_qListBadChannels << i;
 
         //-------- Init filter window --------
-        m_pFilterWindow = FilterWindow::SPtr::create(this, Qt::Window);
+        m_pFilterWindow = FilterView::SPtr::create(this, Qt::Window);
 
         m_pFilterWindow->init(m_pFiffInfo->sfreq);
         m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
-        connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
+        connect(m_pFilterWindow.data(),static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
                 m_pRTMSAModel.data(),static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
 
-        connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
+        connect(m_pFilterWindow.data(), &FilterView::filterChanged,
                 m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterChanged);
 
-        connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
+        connect(m_pFilterWindow.data(), &FilterView::filterActivated,
                 m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterActivated);
 
         //Set stored filter settings from last session
@@ -628,7 +628,7 @@ void RealTimeMultiSampleArrayWidget::init()
                 this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
 
         //Handle Filtering
-        connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
+        connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
                 m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,

@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     filterplotscene.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     plot.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2014
+* @date     June, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterPlotScene class.
+* @brief    Plot class declaration
 *
 */
-
-#ifndef FILTERPLOTSCENE_H
-#define FILTERPLOTSCENE_H
+#ifndef PLOT_H
+#define PLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,8 +41,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
-#include "layoutscene.h"
-#include "utils/filterTools/filterdata.h"
+#include "graph.h"
 
 
 //*************************************************************************************************************
@@ -52,9 +49,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
-#include <QPainterPath>
-#include <QGraphicsPathItem>
+#include <QWidget>
+#include <QString>
+#include <QList>
+#include <QVector>
+#include <QPointF>
+#include <QSharedPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -70,76 +78,84 @@ namespace DISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
+using namespace Eigen;
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+
+//=============================================================================================================
 /**
-* DECLARE CLASS FilterPlotScene
+* Plots vector data, similiar to MATLABs plot
 *
-* @brief The FilterPlotScene class provides the scene where a filter response can be plotted.
+* @brief Vector plot
 */
-class DISPSHARED_EXPORT FilterPlotScene : public LayoutScene
+class DISPSHARED_EXPORT Plot : public Graph
 {
     Q_OBJECT
-
 public:
-    typedef QSharedPointer<FilterPlotScene> SPtr;            /**< Shared pointer type for FilterPlotScene class. */
-    typedef QSharedPointer<const FilterPlotScene> ConstSPtr; /**< Const shared pointer type for FilterPlotScene class. */
+    typedef QSharedPointer<Plot> SPtr;            /**< Shared pointer type for MatrixView class. */
+    typedef QSharedPointer<const Plot> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
 
     //=========================================================================================================
     /**
-    * Constructs a FilterPlotScene dialog which is a child of parent.
+    * Creates the plot.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
+    * @param[in] parent     Parent QObject (optional)
     */
-    FilterPlotScene(QGraphicsView* view, QObject *parent = 0);
+    explicit Plot(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Updates the current filter.
+    * Creates the plot using a given double vector.
     *
-    * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
-    * @param [in] samplingFreq holds the current sampling frequency
-    * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
-    * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
+    * @param[in] p_dVec     The double data vector
+    * @param[in] parent     Parent QObject (optional)
     */
-    void updateFilter(const FilterData &operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
+    explicit Plot(VectorXd &p_dVec, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destructs the Plot object
+    */
+    ~Plot();
+
+    //=========================================================================================================
+    /**
+    * Initializes the Plot object
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
+    * Updates the plot using a given double vector without given X data.
+    *
+    * @param[in] p_dVec     The double data vector
+    */
+    void updateData(VectorXd &p_dVec);
 
 protected:
-    //=========================================================================================================
-    /**
-    * Draws the diagram to plot the magnitude.
-    *
-    * @param [in] holds the current sampling frequency
-    * @param [in] holds the current name of the filter
-    */
-    void plotMagnitudeDiagram(int samplingFreq, QString filtername = QString());
+    void paintEvent(QPaintEvent*);
 
-    //=========================================================================================================
-    /**
-    * Draws the filter's frequency response.
-    *
-    */
-    void plotFilterFrequencyResponse();
+    bool m_bHoldOn;             /**< If multiple plots */
 
-    FilterData      m_pCurrentFilter;                   /**< Pointer to the filter operator */
+    QList<QVector<QPointF> > m_qListVecPointFPaths;     /**< List of point series */
 
-    QGraphicsPathItem*          m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
-
-    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
-    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram. */
-    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines. */
-    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines. */
-    int             m_iAxisTextSize;            /**< point size of the plotted text. */
-    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot.  */
-    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot. */
-    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
-    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
-    int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
-    int             m_iPlotLength;              /**< Length of current filter impulse response plot. */
-
+    double m_dMinX;             /**< Minimal X value */
+    double m_dMaxX;             /**< Maximal X value */
+    double m_dMinY;             /**< Minimal Y value */
+    double m_dMaxY;             /**< Maximal Y value */
 };
 
-} // NAMESPACE DISPLIB
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-#endif // FILTERPLOTSCENE_H
+} // NAMESPACE
+
+#endif // PLOT_H

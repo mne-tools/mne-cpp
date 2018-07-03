@@ -120,9 +120,9 @@ SOURCES += \
     engine/model/materials/shownormalsmaterial.cpp \
     engine/model/materials/networkmaterial.cpp \
     engine/control/control3dwidget.cpp \
-    adapters/ecdview.cpp \
-    adapters/abstractview.cpp \
-    adapters/networkview.cpp \
+    viewers/ecdview.cpp \
+    viewers/abstractview.cpp \
+    viewers/networkview.cpp \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
     helpers/interpolation/interpolation.cpp \
     helpers/geometryinfo/geometryinfo.cpp \
@@ -174,9 +174,9 @@ HEADERS += \
     engine/model/materials/shownormalsmaterial.h \
     engine/model/materials/networkmaterial.h \
     engine/control/control3dwidget.h \
-    adapters/ecdview.h \
-    adapters/abstractview.h \
-    adapters/networkview.h \
+    viewers/ecdview.h \
+    viewers/abstractview.h \
+    viewers/networkview.h \
     disp3D_global.h \
     engine/model/items/sensordata/sensordatatreeitem.h \
     helpers/interpolation/interpolation.h \

@@ -38,7 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <spline.h>
+#include "spline.h"
+
+#include "helpers/colormap.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +53,6 @@
 #include <QtCharts/QLegendMarker>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChartView>
-#include <disp/helpers/colormap.h>
 #include <QtGui/QMouseEvent>
 #include <QDebug>
 

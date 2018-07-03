@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "rtsourcedataworker.h"
-#include <disp/helpers/colormap.h>
+#include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
 
 

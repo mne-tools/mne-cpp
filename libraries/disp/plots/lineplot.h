@@ -1,16 +1,14 @@
 //=============================================================================================================
 /**
-* @file     chinfomodel.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     lineplot.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2014
+* @date     January, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2017 Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -20,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-*
+* 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -31,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the channel info model of the model/view framework of mne_browse application.
+* @brief    LinePlot class declaration.
 *
 */
 
-#ifndef CHINFOCLASS_H
-#define CHINFOCLASS_H
+#ifndef LINEPLOT_H
+#define LINEPLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,16 +42,6 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
-#include "mneoperator.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QAbstractTableModel>
-#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -66,19 +54,19 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
+#include <QChart>
+#include <QChartView>
+#include <QLineSeries>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace Eigen;
-using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -94,134 +82,117 @@ namespace DISPLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
-//Declare type roles
-namespace ChInfoModelRoles
-{
-    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
-                  GetMappedLayoutChName = Qt::UserRole + 1010,
-                  GetChNumber = Qt::UserRole + 1011,
-                  GetChKind = Qt::UserRole + 1012,
-                  GetMEGType = Qt::UserRole + 1013,
-                  GetChUnit = Qt::UserRole + 1014,
-                  GetChAlias = Qt::UserRole + 1015,
-                  GetChPosition = Qt::UserRole + 1016,
-                  GetChDigitizer = Qt::UserRole + 1017,
-                  GetChActiveFilter = Qt::UserRole + 1018,
-                  GetChCoilType = Qt::UserRole + 1019,
-                  GetIsBad = Qt::UserRole + 1020};
-}
-
 //=============================================================================================================
 /**
-* DECLARE CLASS ChInfoModel
+* Line Plot based on QtCharts
+*
+* @brief Line Plot
 */
-class DISPSHARED_EXPORT ChInfoModel : public QAbstractTableModel
+class DISPSHARED_EXPORT LinePlot : public QtCharts::QChartView
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<ChInfoModel> SPtr;              /**< Shared pointer type for ChInfoModel. */
-    typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
-
-    ChInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent = 0);
-    ChInfoModel(QObject *parent = 0);
+    typedef QSharedPointer<LinePlot> SPtr;            /**< Shared pointer type for DeepViewer. */
+    typedef QSharedPointer<const LinePlot> ConstSPtr; /**< Const shared pointer type for DeepViewer. */
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    */
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
-
-    //=========================================================================================================
-    /**
-    * Updates the fiff info
+    * Constructs a line series plot
     *
-    * @param fiffInfo fiff info variabel.
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
     */
-    void fiffInfoChanged(FiffInfo::SPtr& pFiffInfo);
+    LinePlot(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Updates the fiff info
+    * Constructs a line series plot
     *
-    * @param assignedOperators the filter operators which are currently active.
+    * @param [in] y         The double data vector
+    * @param [in] title     Plot title
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
     */
-    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
+    LinePlot(const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Updates the layout map
+    * Constructs a line series plot
     *
-    * @param layoutMap the layout map with the 2D positions.
+    * @param [in] x         X-Axis data to plot
+    * @param [in] y         Y-Axis data to plot
+    * @param [in] title     Plot title
+    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
     */
-    void layoutChanged(const QMap<QString,QPointF> &layoutMap);
+    LinePlot(const QVector<double>& x, const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Updates the layout map
-    *
-    * @return the current mapped channel list
+    * Destructs the line series plot
     */
-    const QStringList & getMappedChannelsList();
+    virtual ~LinePlot();
 
     //=========================================================================================================
     /**
-    * Returns the model index for the given input channel fro mthe original channel list
+    * Sets the scaled image view title.
     *
-    * @param chName the channel name for which the model index is needed.
-    * @return the index number. if channel was not found in the data this functions returns -1
+    * @param[in] p_sTitle   The title
     */
-    int getIndexFromOrigChName(QString chName);
+    void setTitle(const QString &p_sTitle);
 
     //=========================================================================================================
     /**
-    * Returns the model index for the given input channel fro mthe mapped channel list
+    * Sets the label of the y axes
     *
-    * @param chName the channel name for which the model index is needed.
-    * @return the index number. if channel was not found in the data this functions returns -1
+    * @param [in] p_sXLabel   The x axes label
     */
-    int getIndexFromMappedChName(QString chName);
-
-    QStringList getBadChannelList();
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever channels where mapped to a layout
-    *
-    */
-    void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
-
-protected:
-    //=========================================================================================================
-    /**
-    * clearModel clears all model's members
-    *
-    */
-    void clearModel();
+    void setXLabel(const QString &p_sXLabel);
 
     //=========================================================================================================
     /**
-    * Maps the currently loaded channels to the loaded layout file
+    * Sets the label of the y axes
     *
+    * @param [in] p_sXLabel   The y axes label
     */
-    void mapLayoutToChannels();
+    void setYLabel(const QString &p_sYLabel);
 
-    FiffInfo::SPtr          m_pFiffInfo;            /**< The fiff info of the currently loaded fiff file. */
-    QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
-    QStringList             m_aliasNames;           /**< list of given channel aliases. */
-    QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
-    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
+    //=========================================================================================================
+    /**
+    * Updates the plot using a given double vector without given X data.
+    *
+    * @param [in] y          The double data vector
+    */
+    void updateData(const QVector<double>& y);
 
+    //=========================================================================================================
+    /**
+    * Updates the plot using the given vectors.
+    *
+    * @param [in] x         X-Axis data to plot
+    * @param [in] y         Y-Axis data to plot
+    */
+    void updateData(const QVector<double>& x, const QVector<double>& y);
+
+private:
+    //=========================================================================================================
+    /**
+    * Updates the plot.
+    */
+    void update();
+
+private:
+    QString m_sTitle;                       /**< Title */
+    QString m_sXLabel;                      /**< X axes label */
+    QString m_sYLabel;                      /**< Y axes label */
+
+    QtCharts::QLineSeries*  m_pLineSeries;  /**< Line series */
+    QtCharts::QChart*       m_pChart;       /**< The chart */
 };
 
-} // NAMESPACE DISPLIB
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-#endif // CHINFOCLASS_H
+
+} // NAMESPACE
+
+#endif // LINEPLOT_H
