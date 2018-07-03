@@ -151,23 +151,23 @@ qtHaveModule(charts) {
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SOURCES += \
-        deepmodelviewers/controls.cpp \
-        deepmodelviewers/edge.cpp \
-        deepmodelviewers/node.cpp \
-        deepmodelviewers/view.cpp \
-        deepmodelviewers/network.cpp \
-        deepmodelviewers/deepviewer.cpp
+        viewers/deepmodelviewers/controls.cpp \
+        viewers/deepmodelviewers/edge.cpp \
+        viewers/deepmodelviewers/node.cpp \
+        viewers/deepmodelviewers/view.cpp \
+        viewers/deepmodelviewers/network.cpp \
+        viewers/deepmodelviewers/deepviewer.cpp
 
     HEADERS += \
-        deepmodelviewers/controls.h \
-        deepmodelviewers/edge.h \
-        deepmodelviewers/node.h \
-        deepmodelviewers/view.h \
-        deepmodelviewers/network.h \
-        deepmodelviewers/deepviewer.h
+        viewers/deepmodelviewers/controls.h \
+        viewers/deepmodelviewers/edge.h \
+        viewers/deepmodelviewers/node.h \
+        viewers/deepmodelviewers/view.h \
+        viewers/deepmodelviewers/network.h \
+        viewers/deepmodelviewers/deepviewer.h
 
     RESOURCES += \
-        deepmodelviewers/images.qrc
+        viewers/deepmodelviewers/images.qrc
 }
 
 FORMS += \
