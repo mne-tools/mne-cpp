@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     draggableframelesswidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     averagesceneitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     April, 2018
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,25 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the DraggableFramelessWidget Class.
+* @brief    Contains the declaration of the AverageSceneItem class.
 *
 */
 
-#ifndef DRAGGABLEFRAMELESSWIDGET_H
-#define DRAGGABLEFRAMELESSWIDGET_H
+#ifndef AVERAGESCENEITEM_H
+#define AVERAGESCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
+#include "../../disp_global.h"
+#include <iostream>
+#include <Eigen/Core>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -55,17 +53,31 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QMouseEvent>
+#include <QGraphicsObject>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
+
+typedef QPair<const double*,qint32> RowVectorPair;
 
 
 //*************************************************************************************************************
@@ -74,84 +86,86 @@ namespace DISPLIB
 //=============================================================================================================
 
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STRUCTS
-//=============================================================================================================
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS DraggableFramelessWidget
+* AverageSceneItem...
 *
-* @brief The DraggableFramelessWidget class provides draggable and frameless QWidget.
+* @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class DISPSHARED_EXPORT DraggableFramelessWidget : public QWidget
+class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DraggableFramelessWidget> SPtr;              /**< Shared pointer type for DraggableFramelessWidget. */
-    typedef QSharedPointer<const DraggableFramelessWidget> ConstSPtr;   /**< Const shared pointer type for DraggableFramelessWidget. */
+    //=========================================================================================================
+    /**
+    * Constructs a AverageSceneItem.
+    */
+    AverageSceneItem(const QString& channelName,
+                     int channelNumber,
+                     const QPointF& channelPosition,
+                     int channelKind,
+                     int channelUnit,
+                     const QColor& color = Qt::yellow);
 
     //=========================================================================================================
     /**
-    * Constructs a DraggableFramelessWidget which is a child of parent.
+    * Reimplemented virtual functions
+    */
+    QRectF boundingRect() const;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    //=========================================================================================================
+    /**
+    * Set the average information for each average type
     *
-    * @param [in] parent        The parent of the widget.
-    * @param [in] flags         The window flags.
-    * @param [in] bRoundEdges   Flag specifying whether to round the edges.
+    * @param [in] mapAvr     The new color for all channels.
     */
-    DraggableFramelessWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0, bool bRoundEdges = false);
+    void setSignalMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
 
-    //=========================================================================================================
-    /**
-    * Destructs a DraggableFramelessWidget
-    */
-    ~DraggableFramelessWidget();
+    QString                                         m_sChannelName;             /**< The channel name.*/
+    int                                             m_iChannelNumber;           /**< The channel number.*/
+    int                                             m_iChannelKind;             /**< The channel kind.*/
+    int                                             m_iChannelUnit;             /**< The channel unit.*/
+    int                                             m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
+    int                                             m_iFontTextSize;            /**< The font text size of the electrode names.*/
+    int                                             m_iMaxWidth;
+    int                                             m_iMaxHeigth;
+
+    QPointF                                         m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+    QList<QColor>                                   m_lAverageColors;           /**< The current average color.*/
+    QList<QPair<double, RowVectorPair> >            m_lAverageData;             /**< The channels average data which is to be plotted.*/
+
+    QPair<int,int>                                  m_firstLastSample;          /**< The first and last sample.*/
+    QMap<qint32,float>                              m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
+
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;             /**< Average colors and names. */
+
+    QRectF                                          m_rectBoundingRect;
 
 protected:
     //=========================================================================================================
     /**
-    * Reimplmented mouseMoveEvent.
-    */
-    void mouseMoveEvent(QMouseEvent *event);
-
-    //=========================================================================================================
-    /**
-    * Reimplmented mouseMoveEvent.
-    */
-    void mousePressEvent(QMouseEvent *event);
-
-    //=========================================================================================================
-    /**
-    * Reimplmented mouseMoveEvent.
-    */
-    void resizeEvent(QResizeEvent *event);
-
-    //=========================================================================================================
-    /**
-    * Calculates a rect with rounded edged.
+    * Create a plot path and paint the average data
     *
-    * @param [in] rect the rect which is supposed to be rounded.
-    * @param [in] r the radius of round edges.
-    * @return the rounded rect in form of a QRegion
+    * @param [in] painter The painter used to plot in this item.
     */
-    QRegion roundedRect(const QRect& rect, int r);
+    void paintAveragePath(QPainter *painter);
 
-private:
-    QPoint      m_dragPosition;     /**< The drag position of the window. */
-    bool        m_bRoundEdges;      /**< Flag specifying whether to round the edges. */
+    //=========================================================================================================
+    /**
+    * Create a plot path and paint the average data
+    *
+    * @param [in] painter The painter used to plot in this item.
+    */
+    void paintStimLine(QPainter *painter);
+
+signals:
+    void sceneUpdateRequested();
 };
 
 } // NAMESPACE DISPLIB
 
-
-#endif // DRAGGABLEFRAMELESSWIDGET_H
+#endif // AVERAGESCENEITEM_H

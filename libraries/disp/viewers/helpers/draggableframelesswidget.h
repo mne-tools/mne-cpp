@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     averagescene.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     draggableframelesswidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2014
+* @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,22 +29,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AverageScene class.
+* @brief    Declaration of the DraggableFramelessWidget Class.
 *
 */
 
-#ifndef AVERAGESCENE_H
-#define AVERAGESCENE_H
+#ifndef DRAGGABLEFRAMELESSWIDGET_H
+#define DRAGGABLEFRAMELESSWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
-#include "layoutscene.h"
-#include "averagesceneitem.h"
-#include "selectionsceneitem.h"
+#include "../../disp_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -53,13 +55,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
-#include <QList>
+#include <QWidget>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
@@ -72,78 +74,84 @@ namespace DISPLIB
 //=============================================================================================================
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class SelectionSceneItem;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STRUCTS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* AverageScene...
+* DECLARE CLASS DraggableFramelessWidget
 *
-* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+* @brief The DraggableFramelessWidget class provides draggable and frameless QWidget.
 */
-class DISPSHARED_EXPORT AverageScene : public LayoutScene
+class DISPSHARED_EXPORT DraggableFramelessWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AverageScene> SPtr;              /**< Shared pointer type for AverageScene. */
-    typedef QSharedPointer<const AverageScene> ConstSPtr;   /**< Const shared pointer type for AverageScene. */
+    typedef QSharedPointer<DraggableFramelessWidget> SPtr;              /**< Shared pointer type for DraggableFramelessWidget. */
+    typedef QSharedPointer<const DraggableFramelessWidget> ConstSPtr;   /**< Const shared pointer type for DraggableFramelessWidget. */
 
     //=========================================================================================================
     /**
-    * Constructs a AverageScene.
-    */
-    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Sets the scale map to scaleMap.
+    * Constructs a DraggableFramelessWidget which is a child of parent.
     *
-    * @param [in] scaleMap map with all channel types and their current scaling value.
+    * @param [in] parent        The parent of the widget.
+    * @param [in] flags         The window flags.
+    * @param [in] bRoundEdges   Flag specifying whether to round the edges.
     */
-    void setScaleMap(const QMap<qint32, float> &scaleMap);
+    DraggableFramelessWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0, bool bRoundEdges = false);
 
     //=========================================================================================================
     /**
-    * Repaints all items from the layout data in the scene.
+    * Destructs a DraggableFramelessWidget
+    */
+    ~DraggableFramelessWidget();
+
+protected:
+    //=========================================================================================================
+    /**
+    * Reimplmented mouseMoveEvent.
+    */
+    void mouseMoveEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplmented mouseMoveEvent.
+    */
+    void mousePressEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplmented mouseMoveEvent.
+    */
+    void resizeEvent(QResizeEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Calculates a rect with rounded edged.
     *
-    *  @param [in] selectedChannelItems items which are to painted to the average scene
+    * @param [in] rect the rect which is supposed to be rounded.
+    * @param [in] r the radius of round edges.
+    * @return the rounded rect in form of a QRegion
     */
-    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
-
-    //=========================================================================================================
-    /**
-    * Updates and repaints the scene
-    */
-    void updateScene();
-
-    //=========================================================================================================
-    /**
-    * Set the average map information
-    *
-    * @param [in] mapAvr     The average data information including the color per average type.
-    */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
-
-    //=========================================================================================================
-    /**
-    * Set the signal color for all items in the scene
-    *
-    * @return   The color used for all the itmes' signal paths.
-    */
-    const QColor& getSignalColorForAllItems();
+    QRegion roundedRect(const QRect& rect, int r);
 
 private:
-    QColor                          m_colGlobalItemSignalColor;     /**< The color used in all items to draw the signals.*/
-
-    QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
+    QPoint      m_dragPosition;     /**< The drag position of the window. */
+    bool        m_bRoundEdges;      /**< Flag specifying whether to round the edges. */
 };
 
 } // NAMESPACE DISPLIB
 
-#endif // AverageScene_H
+
+#endif // DRAGGABLEFRAMELESSWIDGET_H

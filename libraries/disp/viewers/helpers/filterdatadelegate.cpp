@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     selectionscene.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     filterdatadelegate.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2014
+* @date     April, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,41 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SelectionScene class.
+* @brief    Definition of the FilterDataDelegate Class.
 *
 */
-
-#ifndef SELECTIONSCENE_H
-#define SELECTIONSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
-#include "layoutscene.h"
-#include "selectionsceneitem.h"
-#include <fiff/fiff.h>
+#include "filterdatadelegate.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QGraphicsScene>
-#include <QWidget>
-#include <QMutableListIterator>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
-//=============================================================================================================
-
-namespace DISPLIB
-{
+#include "filterdatamodel.h"
 
 
 //*************************************************************************************************************
@@ -72,44 +48,95 @@ namespace DISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* SelectionScene...
-*
-* @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
-*/
-class DISPSHARED_EXPORT SelectionScene : public LayoutScene
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+FilterDataDelegate::FilterDataDelegate(QObject *parent)
+: QItemDelegate (parent)
 {
-    Q_OBJECT
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a SelectionScene.
-    */
-    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
+}
 
-    //=========================================================================================================
-    /**
-    * Updates layout data.
-    *
-    * @param [in] layoutMap layout data map.
-    * @param [in] bad channel list.
-    */
-    void repaintItems(const QMap<QString, QPointF> &layoutMap, QStringList badChannels);
 
-    //=========================================================================================================
-    /**
-    * Hides all items described in list.
-    *
-    * @param [in] list string list with items name which are to be hidden.
-    */
-    void hideItems(QStringList visibleItems);
+//*************************************************************************************************************
 
-    int         m_iChannelTypeMode;
-};
+void FilterDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    switch(index.column()) {
+        case 0: { //filter state
+            drawCheck(painter, option, option.rect, index.data().toBool() ? Qt::Checked : Qt::Unchecked);
+            break;
+        }
+        case 1: { //filter names
+            drawDisplay(painter, option, option.rect, index.model()->data(index, Qt::DisplayRole).toString());
+            break;
+        }
+        default:
+            QItemDelegate::paint(painter, option, index);
+            break;
+    }
+}
 
-} // NAMESPACE DISPLIB
+//*************************************************************************************************************
 
-#endif // SelectionScene_H
+QWidget *FilterDataDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index) const
+{
+    Q_UNUSED(option);
+    Q_UNUSED(index);
+
+    if(index.column() == 0) {
+        BooleanWidget* widget = new BooleanWidget(parent);
+
+        return widget;
+    }
+
+    return 0;
+}
+
+
+//*************************************************************************************************************
+
+void FilterDataDelegate::setEditorData(QWidget *checkBox, const QModelIndex &index) const
+{
+    if(index.column() != 0)
+        return;
+
+    bool value = index.model()->data(index, Qt::DisplayRole).toBool();
+
+    BooleanWidget *checkBoxState = static_cast<BooleanWidget*>(checkBox);
+
+    checkBoxState->setChecked(value);
+}
+
+
+//*************************************************************************************************************
+
+void FilterDataDelegate::setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if(index.column() != 0)
+        return;
+
+    BooleanWidget *checkBoxState = static_cast<BooleanWidget*>(checkBox);
+
+    bool value = checkBoxState->isChecked();
+
+    model->setData(index, value, Qt::EditRole);
+}
+
+
+//*************************************************************************************************************
+
+void FilterDataDelegate::updateEditorGeometry(QWidget *checkBox, const QStyleOptionViewItem &option, const QModelIndex & index) const
+{
+    Q_UNUSED(index);
+
+    if(index.column() != 0)
+        return;
+
+    checkBox->setGeometry(option.rect);
+}

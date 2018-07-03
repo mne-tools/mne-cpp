@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
-* @file     selectionsceneitem.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     filterplotscene.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     September, 2014
 *
@@ -30,20 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SelectionSceneItem class.
+* @brief    Contains the declaration of the FilterPlotScene class.
 *
 */
 
-#ifndef SELECTIONSCENEITEM_H
-#define SELECTIONSCENEITEM_H
+#ifndef FILTERPLOTSCENE_H
+#define FILTERPLOTSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
-#include <iostream>
+#include "../../disp_global.h"
+#include "layoutscene.h"
+#include "utils/filterTools/filterdata.h"
 
 
 //*************************************************************************************************************
@@ -51,12 +52,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
+#include <QGraphicsScene>
+#include <QPainterPath>
+#include <QGraphicsPathItem>
 
 
 //*************************************************************************************************************
@@ -67,51 +65,81 @@
 namespace DISPLIB
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace UTILSLIB;
 
-//=============================================================================================================
+
 /**
-* SelectionSceneItem...
+* DECLARE CLASS FilterPlotScene
 *
-* @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+* @brief The FilterPlotScene class provides the scene where a filter response can be plotted.
 */
-class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
+class DISPSHARED_EXPORT FilterPlotScene : public LayoutScene
 {
+    Q_OBJECT
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a SelectionSceneItem.
-    */
-    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor = Qt::blue, bool bIsBadChannel = false);
+    typedef QSharedPointer<FilterPlotScene> SPtr;            /**< Shared pointer type for FilterPlotScene class. */
+    typedef QSharedPointer<const FilterPlotScene> ConstSPtr; /**< Const shared pointer type for FilterPlotScene class. */
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+    * Constructs a FilterPlotScene dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
     */
-    QRectF boundingRect() const;
+    FilterPlotScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Reimplemented paint function.
+    * Updates the current filter.
+    *
+    * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
+    * @param [in] samplingFreq holds the current sampling frequency
+    * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
+    * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void updateFilter(const FilterData &operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
 
-    QString     m_sChannelName;             /**< The channel's name.*/
-    int         m_iChannelNumber;           /**< The channel number.*/
-    int         m_iChannelKind;             /**< The channel kind.*/
-    int         m_iChannelUnit;             /**< The channel unit.*/
-    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< The current channel color.*/
-    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
-    bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
+protected:
+    //=========================================================================================================
+    /**
+    * Draws the diagram to plot the magnitude.
+    *
+    * @param [in] holds the current sampling frequency
+    * @param [in] holds the current name of the filter
+    */
+    void plotMagnitudeDiagram(int samplingFreq, QString filtername = QString());
+
+    //=========================================================================================================
+    /**
+    * Draws the filter's frequency response.
+    *
+    */
+    void plotFilterFrequencyResponse();
+
+    FilterData      m_pCurrentFilter;                   /**< Pointer to the filter operator */
+
+    QGraphicsPathItem*          m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
+
+    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
+    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram. */
+    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines. */
+    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines. */
+    int             m_iAxisTextSize;            /**< point size of the plotted text. */
+    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot.  */
+    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot. */
+    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
+    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
+    int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
+    int             m_iPlotLength;              /**< Length of current filter impulse response plot. */
+
 };
 
 } // NAMESPACE DISPLIB
 
-#endif // SELECTIONSCENEITEM_H
+#endif // FILTERPLOTSCENE_H

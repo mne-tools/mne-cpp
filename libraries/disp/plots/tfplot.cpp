@@ -40,7 +40,7 @@
 #include "tfplot.h"
 
 #include "math.h"
-#include <disp/helpers/colormap.h>
+#include "helpers/colormap.h"
 
 
 //*************************************************************************************************************

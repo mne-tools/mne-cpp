@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tfplot.cpp
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+* @file     averagescene.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2015
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Martin Henfling and Daniel Knobl. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,41 +30,37 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of time-frequency plot class.
+* @brief    Contains the declaration of the AverageScene class.
+*
 */
 
-#ifndef TFPLOT_H
-#define TFPLOT_H
+#ifndef AVERAGESCENE_H
+#define AVERAGESCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
+#include "../../disp_global.h"
+#include "layoutscene.h"
+#include "averagesceneitem.h"
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QImage>
-#include <QGridLayout>
-#include <QGraphicsView>
-#include <QGraphicsPixmapItem>
-#include <QGraphicsSceneResizeEvent>
+#include <QGraphicsScene>
+#include <QList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
-
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
-
 
 namespace DISPLIB
 {
@@ -74,81 +71,79 @@ namespace DISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 
-enum ColorMaps
-{
-    Hot,
-    HotNeg1,
-    HotNeg2,
-    Jet,
-    Bone,
-    RedBlue
-};
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-class DISPSHARED_EXPORT TFplot : public QWidget
+class SelectionSceneItem;
+
+
+//=============================================================================================================
+/**
+* AverageScene...
+*
+* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+*/
+class DISPSHARED_EXPORT AverageScene : public LayoutScene
 {
+    Q_OBJECT
 
 public:
+    typedef QSharedPointer<AverageScene> SPtr;              /**< Shared pointer type for AverageScene. */
+    typedef QSharedPointer<const AverageScene> ConstSPtr;   /**< Const shared pointer type for AverageScene. */
 
     //=========================================================================================================
     /**
-    * TFplot_TFplot
-    *
-    * ### display tf-plot function ###
-    *
-    * Constructor
-    *
-    * constructs TFplot class
-    *
-    *  @param[in] tf_matrix         given spectrogram
-    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
-    *  @param[in] lower_frq         lower bound frequency, that should be plotted
-    *  @param[in] upper_frq         upper bound frequency, that should be plotted
-    *  @param[in] cmap              colormap used to plot the spectrogram
-    *
+    * Constructs a AverageScene.
     */
-    TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
+    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * TFplot_TFplot
+    * Sets the scale map to scaleMap.
     *
-    * ### display tf-plot function ###
-    *
-    * Constructor
-    *
-    * constructs TFplot class
-    *
-    *  @param[in] tf_matrix         given spectrogram
-    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
-    *  @param[in] cmap              colormap used to plot the spectrogram
-    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
     */
-    TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap);
+    void setScaleMap(const QMap<qint32, float> &scaleMap);
+
+    //=========================================================================================================
+    /**
+    * Repaints all items from the layout data in the scene.
+    *
+    *  @param [in] selectedChannelItems items which are to painted to the average scene
+    */
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * Updates and repaints the scene
+    */
+    void updateScene();
+
+    //=========================================================================================================
+    /**
+    * Set the average map information
+    *
+    * @param [in] mapAvr     The average data information including the color per average type.
+    */
+    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+
+    //=========================================================================================================
+    /**
+    * Set the signal color for all items in the scene
+    *
+    * @return   The color used for all the itmes' signal paths.
+    */
+    const QColor& getSignalColorForAllItems();
 
 private:
-    //=========================================================================================================
-    /**
-    * TFplot_calc_plot
-    *
-    * ### display tf-plot function ###
-    *
-    * calculates a image to plot the tf_matrix
-    *
-    *  @param[in] tf_matrix         given spectrogram
-    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
-    *  @param[in] cmap              colormap used to plot the spectrogram
-    *  @param[in] lower_frq         lower bound frequency, that should be plotted
-    *  @param[in] upper_frq         upper bound frequency, that should be plotted
-    *
-    */
-    void calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
+    QColor                          m_colGlobalItemSignalColor;     /**< The color used in all items to draw the signals.*/
 
-protected:
-     virtual void resizeEvent(QResizeEvent *event);
+    QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
 };
 
-}
+} // NAMESPACE DISPLIB
 
-#endif // TFPLOT_H
+#endif // AverageScene_H

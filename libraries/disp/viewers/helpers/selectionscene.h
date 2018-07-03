@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     mneoperator.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     selectionscene.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     February, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,35 +30,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all MNEOperators.
+* @brief    Contains the declaration of the SelectionScene class.
 *
 */
-#ifndef MNEOPERATOR_H
-#define MNEOPERATOR_H
 
-
+#ifndef SELECTIONSCENE_H
+#define SELECTIONSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
+#include "../../disp_global.h"
+#include "layoutscene.h"
+#include "selectionsceneitem.h"
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
+#include <QGraphicsScene>
+#include <QWidget>
+#include <QMutableListIterator>
 
 
 //*************************************************************************************************************
@@ -70,35 +66,50 @@
 namespace DISPLIB
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS MNEOperator
+* SelectionScene...
+*
+* @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class DISPSHARED_EXPORT MNEOperator
+class DISPSHARED_EXPORT SelectionScene : public LayoutScene
 {
+    Q_OBJECT
+
 public:
-    enum OperatorType {
-        FILTER,
-        PCA,
-        AVERAGE,
-        UNKNOWN
-    } m_OperatorType;
-
-    MNEOperator();
-
-    MNEOperator(const MNEOperator& obj);
-
-    MNEOperator(OperatorType type);
+    //=========================================================================================================
+    /**
+    * Constructs a SelectionScene.
+    */
+    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructor
+    * Updates layout data.
+    *
+    * @param [in] layoutMap layout data map.
+    * @param [in] bad channel list.
     */
-    virtual ~MNEOperator();
+    void repaintItems(const QMap<QString, QPointF> &layoutMap, QStringList badChannels);
 
-    QString m_sName;
+    //=========================================================================================================
+    /**
+    * Hides all items described in list.
+    *
+    * @param [in] list string list with items name which are to be hidden.
+    */
+    void hideItems(QStringList visibleItems);
+
+    int         m_iChannelTypeMode;
 };
 
 } // NAMESPACE DISPLIB
 
-#endif // MNEOPERATOR_H
+#endif // SelectionScene_H

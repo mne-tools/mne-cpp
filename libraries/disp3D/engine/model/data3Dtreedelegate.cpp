@@ -43,10 +43,10 @@
 #include "data3Dtreedelegate.h"
 #include "data3Dtreemodel.h"
 
-#include <disp/imagesc.h>
+#include <disp/plots/imagesc.h>
+#include <disp/plots/spline.h>
 
 #include <utils/mnemath.h>
-#include <disp/spline.h>
 
 
 //*************************************************************************************************************

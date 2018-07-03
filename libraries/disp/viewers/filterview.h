@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     filterview.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the FilterView class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef FILTERVIEW_H
+#define FILTERVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,7 +68,7 @@
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace Ui {class FilterWindowWidget;} //This must be defined outside of the DISPLIB namespace
+namespace Ui {class FilterViewWidget;} //This must be defined outside of the DISPLIB namespace
 
 namespace DISPLIB
 {
@@ -81,32 +81,32 @@ namespace DISPLIB
 
 
 /**
-* DECLARE CLASS FilterWindow
+* DECLARE CLASS FilterView
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The FilterView class provides the a manager for temporal filtering.
 */
-class DISPSHARED_EXPORT FilterWindow : public QWidget
+class DISPSHARED_EXPORT FilterView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FilterWindow> SPtr;              /**< Shared pointer type for FilterWindow. */
-    typedef QSharedPointer<const FilterWindow> ConstSPtr;   /**< Const shared pointer type for FilterWindow. */
+    typedef QSharedPointer<FilterView> SPtr;              /**< Shared pointer type for FilterView. */
+    typedef QSharedPointer<const FilterView> ConstSPtr;   /**< Const shared pointer type for FilterView. */
 
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
+    * Constructs a FilterView dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterView becomes a window. If parent is another widget, FilterView becomes a child window inside parent. FilterView is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0, Qt::WindowFlags type = 0);
+    FilterView(QWidget *parent = 0, Qt::WindowFlags type = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Destroys the FilterView.
+    * All FilterView's children are deleted first. The application exits if FilterView is the main widget.
     */
-    ~FilterWindow();
+    ~FilterView();
 
     //=========================================================================================================
     /**
@@ -262,7 +262,7 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget*     ui;                         /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterViewWidget*       ui;                         /**< Pointer to the qt designer generated ui class.*/
 
     FilterData                  m_filterData;               /**< The current filter operator.*/
     FilterDataModel::SPtr       m_pFilterDataModel;         /**< The model to hold current filters.*/
@@ -356,4 +356,4 @@ protected slots:
 
 } // NAMESPACE DISPLIB
 
-#endif // FILTERWINDOW_H
+#endif // FILTERVIEW_H

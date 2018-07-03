@@ -96,79 +96,83 @@ else {
 }
 
 SOURCES += \
-    helpers/colormap.cpp \
-    imagesc.cpp \
-    plot.cpp \
-    graph.cpp \
-    tfplot.cpp \
-    filterwindow.cpp \
-    helpers/layoutscene.cpp \
-    helpers/averagescene.cpp \
-    helpers/averagesceneitem.cpp \
-    helpers/filterdatadelegate.cpp \
-    helpers/filterdatamodel.cpp \
-    helpers/filterplotscene.cpp \
-    helpers/selectionscene.cpp \
-    helpers/selectionsceneitem.cpp \
-    selectionmanagerwindow.cpp \
-    helpers/chinfomodel.cpp \
-    helpers/mneoperator.cpp \
-    helpers/draggableframelesswidget.cpp \
+    plots/imagesc.cpp \
+    plots/plot.cpp \
+    plots/graph.cpp \
+    plots/tfplot.cpp \
+    plots/helpers/colormap.cpp \
+    viewers/filterview.cpp \
+    viewers/selectionmanagerwindow.cpp \
+    viewers/helpers/layoutscene.cpp \
+    viewers/helpers/averagescene.cpp \
+    viewers/helpers/averagesceneitem.cpp \
+    viewers/helpers/filterdatadelegate.cpp \
+    viewers/helpers/filterdatamodel.cpp \
+    viewers/helpers/filterplotscene.cpp \
+    viewers/helpers/selectionscene.cpp \
+    viewers/helpers/selectionsceneitem.cpp \
+    viewers/helpers/chinfomodel.cpp \
+    viewers/helpers/mneoperator.cpp \
+    viewers/helpers/draggableframelesswidget.cpp \
 
 HEADERS += \
     disp_global.h \
-    helpers/colormap.h \
-    imagesc.h \
-    plot.h \
-    graph.h \
-    tfplot.h \
-    filterwindow.h \
-    selectionmanagerwindow.h \
-    helpers/layoutscene.h \
-    helpers/averagescene.h \
-    helpers/averagesceneitem.h \
-    helpers/filterdatadelegate.h \
-    helpers/filterdatamodel.h \
-    helpers/filterplotscene.h \
-    helpers/selectionscene.h \
-    helpers/selectionsceneitem.h \
-    helpers/chinfomodel.h \
-    helpers/mneoperator.h \
-    helpers/draggableframelesswidget.h \
+    plots/imagesc.h \
+    plots/plot.h \
+    plots/graph.h \
+    plots/tfplot.h \
+    plots/helpers/colormap.h \
+    viewers/filterview.h \
+    viewers/selectionmanagerwindow.h \
+    viewers/helpers/layoutscene.h \
+    viewers/helpers/averagescene.h \
+    viewers/helpers/averagesceneitem.h \
+    viewers/helpers/filterdatadelegate.h \
+    viewers/helpers/filterdatamodel.h \
+    viewers/helpers/filterplotscene.h \
+    viewers/helpers/selectionscene.h \
+    viewers/helpers/selectionsceneitem.h \
+    viewers/helpers/chinfomodel.h \
+    viewers/helpers/mneoperator.h \
+    viewers/helpers/draggableframelesswidget.h \
 
 qtHaveModule(charts) {
     SOURCES += \
-        bar.cpp \
-        spline.cpp \
-        lineplot.cpp \
+        plots/bar.cpp \
+        plots/spline.cpp \
+        plots/lineplot.cpp \
 
     HEADERS += \
-        bar.h \
-        spline.h \
-        lineplot.h \
+        plots/bar.h \
+        plots/spline.h \
+        plots/lineplot.h \
 }
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SOURCES += \
-        deepmodelviewer/controls.cpp \
-        deepmodelviewer/edge.cpp \
-        deepmodelviewer/node.cpp \
-        deepmodelviewer/view.cpp \
-        deepmodelviewer/network.cpp \
-        deepmodelviewer/deepviewer.cpp
+        deepmodelviewers/controls.cpp \
+        deepmodelviewers/edge.cpp \
+        deepmodelviewers/node.cpp \
+        deepmodelviewers/view.cpp \
+        deepmodelviewers/network.cpp \
+        deepmodelviewers/deepviewer.cpp
 
     HEADERS += \
-        deepmodelviewer/controls.h \
-        deepmodelviewer/edge.h \
-        deepmodelviewer/node.h \
-        deepmodelviewer/view.h \
-        deepmodelviewer/network.h \
-        deepmodelviewer/deepviewer.h
+        deepmodelviewers/controls.h \
+        deepmodelviewers/edge.h \
+        deepmodelviewers/node.h \
+        deepmodelviewers/view.h \
+        deepmodelviewers/network.h \
+        deepmodelviewers/deepviewer.h
 
     RESOURCES += \
-        deepmodelviewer/images.qrc
+        deepmodelviewers/images.qrc
 }
+
+FORMS += \
+    viewers/filterview.ui \
+    viewers/selectionmanagerwindow.ui
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
@@ -214,10 +218,6 @@ header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
-
-FORMS += \
-    filterwindowwidget.ui \
-    selectionmanagerwindow.ui
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
