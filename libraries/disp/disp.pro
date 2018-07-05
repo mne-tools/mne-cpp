@@ -102,7 +102,6 @@ SOURCES += \
     viewers/filterview.cpp \
     viewers/butterflyview.cpp \
     viewers/channelselectionview.cpp \
-    #viewers/helpers/evokedmodel.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -126,7 +125,6 @@ HEADERS += \
     viewers/filterview.h \
     viewers/butterflyview.h \
     viewers/channelselectionview.h \
-    #viewers/helpers/evokedmodel.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
