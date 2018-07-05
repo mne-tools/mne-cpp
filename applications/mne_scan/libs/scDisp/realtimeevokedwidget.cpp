@@ -110,7 +110,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 , m_pAverageScene(Q_NULLPTR)
 , m_pRTE(pRTE)
 , m_pQuickControlWidget(Q_NULLPTR)
-, m_pSelectionManagerWindow(Q_NULLPTR)
+, m_pChannelSelectionView(Q_NULLPTR)
 , m_pChInfoModel(Q_NULLPTR)
 , m_pFilterView(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
@@ -225,8 +225,8 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), m_qMapChScaling[FIFFV_MISC_CH]);
 
         //Store selected layout file
-        if(!m_pSelectionManagerWindow == 0) {
-            settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+        if(!m_pChannelSelectionView == 0) {
+            settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pChannelSelectionView->getCurrentLayoutFile());
         }
 
         //Store current view toolbox index - butterfly or 2D layout
@@ -451,21 +451,21 @@ void RealTimeEvokedWidget::init()
         //-------- Init channel selection manager --------
         //
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
-        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel));
+        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>(new ChannelSelectionView(this, m_pChInfoModel));
 
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
 
         //Connect channel info model
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
 
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
-                m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+                m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
         m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
-        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
+        m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
 
         m_pActionSelectSensors->setVisible(true);
 
@@ -543,7 +543,7 @@ void RealTimeEvokedWidget::init()
         m_pAverageScene->setBackgroundBrush(brush);
 
         //Connect selection manager with average manager
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::selectionChanged,
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 this, &RealTimeEvokedWidget::channelSelectionManagerChanged);
 
         connect(m_pRTEModel.data(), &RealTimeEvokedModel::dataChanged,
@@ -552,7 +552,7 @@ void RealTimeEvokedWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedWidget::scaleAveragedData);
 
-        m_pSelectionManagerWindow->updateDataView();
+        m_pChannelSelectionView->updateDataView();
 
         //
         //-------- Init signal and background colors --------
@@ -598,10 +598,10 @@ void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap
 
 void RealTimeEvokedWidget::showSensorSelectionWidget()
 {
-    if(!m_pSelectionManagerWindow)
-        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow);
+    if(!m_pChannelSelectionView)
+        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>(new ChannelSelectionView);
 
-    m_pSelectionManagerWindow->show();
+    m_pChannelSelectionView->show();
 }
 
 

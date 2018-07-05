@@ -53,7 +53,7 @@
 #include "helpers/quickcontrolwidget.h"
 
 #include <disp/viewers/filterview.h>
-#include <disp/viewers/selectionmanagerwindow.h>
+#include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/chinfomodel.h>
 
 #include <scMeas/newrealtimemultisamplearray.h>
@@ -242,8 +242,8 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_bHideBadChannels);
 
         //Store selected layout file
-        if(m_pSelectionManagerWindow) {
-            settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+        if(m_pChannelSelectionView) {
+            settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), m_pChannelSelectionView->getCurrentLayoutFile());
         }
 
         //Store show/hide bad channel flag
@@ -556,24 +556,24 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
 
-        m_pSelectionManagerWindow = SelectionManagerWindow::SPtr(new SelectionManagerWindow(this, m_pChInfoModel));
+        m_pChannelSelectionView = ChannelSelectionView::SPtr(new ChannelSelectionView(this, m_pChInfoModel));
 
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 this, &RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly);
 
         //Connect channel info model
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
 
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
-                m_pSelectionManagerWindow.data(), &SelectionManagerWindow::updateBadChannels);
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
+                m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
 
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
-                m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+                m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
         m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
-        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName),
+        m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName),
                                                                        "babymeg-mag-inner-layer.lout").toString());
 
         //
@@ -950,7 +950,7 @@ void RealTimeMultiSampleArrayWidget::markChBad()
 
     m_pRTMSAModel->updateProjection();
 
-    m_pSelectionManagerWindow->updateBadChannels();
+    m_pChannelSelectionView->updateBadChannels();
 
     //Update 3D plot and interpolation
     if(m_bVisualize3DSensorData) {
@@ -1012,11 +1012,11 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget(bool state)
 
 void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 {
-    if(m_pSelectionManagerWindow->isActiveWindow())
-        m_pSelectionManagerWindow->hide();
+    if(m_pChannelSelectionView->isActiveWindow())
+        m_pChannelSelectionView->hide();
     else {
-        m_pSelectionManagerWindow->activateWindow();
-        m_pSelectionManagerWindow->show();
+        m_pChannelSelectionView->activateWindow();
+        m_pChannelSelectionView->show();
     }
 }
 

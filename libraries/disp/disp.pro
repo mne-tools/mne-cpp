@@ -100,7 +100,7 @@ SOURCES += \
     plots/tfplot.cpp \
     plots/helpers/colormap.cpp \
     viewers/filterview.cpp \
-    viewers/selectionmanagerwindow.cpp \
+    viewers/channelselectionview.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
     viewers/helpers/averagesceneitem.cpp \
@@ -121,7 +121,7 @@ HEADERS += \
     plots/tfplot.h \
     plots/helpers/colormap.h \
     viewers/filterview.h \
-    viewers/selectionmanagerwindow.h \
+    viewers/channelselectionview.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
     viewers/helpers/averagesceneitem.h \
@@ -170,7 +170,7 @@ qtHaveModule(charts) {
 
 FORMS += \
     viewers/formfiles/filterview.ui \
-    viewers/formfiles/selectionmanagerwindow.ui \
+    viewers/formfiles/channelselectionview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
