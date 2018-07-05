@@ -96,7 +96,7 @@ using namespace MNELIB;
 RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA,
                                                                QSharedPointer<QTime> &pTime,
                                                                QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_pRTMSA(pRTMSA)
@@ -788,7 +788,7 @@ bool RealTimeMultiSampleArrayWidget::eventFilter(QObject *object, QEvent *event)
         return true;
     }
 
-    return NewMeasurementWidget::eventFilter(object, event);
+    return MeasurementWidget::eventFilter(object, event);
 }
 
 

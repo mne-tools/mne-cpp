@@ -104,7 +104,7 @@ enum Tool
 //=============================================================================================================
 
 RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTEModel(Q_NULLPTR)
 , m_pButterflyPlot(Q_NULLPTR)
 , m_pAverageScene(Q_NULLPTR)

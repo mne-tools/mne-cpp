@@ -100,7 +100,7 @@ enum Tool
 //=============================================================================================================
 
 FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectrum> pFS, QSharedPointer<QTime> &pTime, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pFSModel(Q_NULLPTR)
 , m_pFSDelegate(Q_NULLPTR)
 , m_pTableView(Q_NULLPTR)

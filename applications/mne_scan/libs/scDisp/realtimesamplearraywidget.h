@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scdisp_global.h"
-#include "newmeasurementwidget.h"
+#include "measurementwidget.h"
 #include "ui_realtimesamplearraywidget.h"
 
 
@@ -94,7 +94,7 @@ using namespace SCMEASLIB;
 *
 * @brief The NewRealTimeSampleArrayWidget class provides a real-time curve display.
 */
-class SCDISPSHARED_EXPORT RealTimeSampleArrayWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeSampleArrayWidget : public MeasurementWidget
 {
     Q_OBJECT
 public:

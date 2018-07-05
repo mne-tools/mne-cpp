@@ -100,7 +100,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
