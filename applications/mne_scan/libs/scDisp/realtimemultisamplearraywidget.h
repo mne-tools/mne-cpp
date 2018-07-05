@@ -44,7 +44,7 @@
 //=============================================================================================================
 
 #include "scdisp_global.h"
-#include "newmeasurementwidget.h"
+#include "measurementwidget.h"
 
 
 //*************************************************************************************************************
@@ -125,7 +125,7 @@ class QuickControlWidget;
 *
 * @brief The RealTimeMultiSampleArrayWidget class provides a real-time curve display.
 */
-class SCDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public MeasurementWidget
 {
     Q_OBJECT
 

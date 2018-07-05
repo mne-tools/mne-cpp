@@ -94,7 +94,7 @@ enum Tool
 //=============================================================================================================
 
 RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC, QSharedPointer<QTime> &pTime, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTC(pRTC)
 , m_bInitialized(false)
 {

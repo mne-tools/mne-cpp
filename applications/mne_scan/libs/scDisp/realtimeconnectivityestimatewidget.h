@@ -44,7 +44,7 @@
 
 #include "scdisp_global.h"
 
-#include "newmeasurementwidget.h"
+#include "measurementwidget.h"
 
 #include "fs/annotationset.h"
 #include "fs/surfaceset.h"
@@ -119,7 +119,7 @@ namespace SCDISPLIB
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
 
-class SCDISPSHARED_EXPORT RealTimeConnectivityEstimateWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeConnectivityEstimateWidget : public MeasurementWidget
 {
     Q_OBJECT
 

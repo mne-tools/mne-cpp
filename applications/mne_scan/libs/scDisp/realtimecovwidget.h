@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scdisp_global.h"
-#include "newmeasurementwidget.h"
+#include "measurementwidget.h"
 #include "helpers/covmodalitywidget.h"
 #include <disp/plots/imagesc.h>
 
@@ -117,7 +117,7 @@ using namespace DISPLIB;
 *
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
-class SCDISPSHARED_EXPORT RealTimeCovWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeCovWidget : public MeasurementWidget
 {
     Q_OBJECT
 

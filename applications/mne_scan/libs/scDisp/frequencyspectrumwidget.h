@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scdisp_global.h"
-#include "newmeasurementwidget.h"
+#include "measurementwidget.h"
 #include "helpers/frequencyspectrummodel.h"
 #include "helpers/frequencyspectrumdelegate.h"
 #include "helpers/frequencyspectrumsettingswidget.h"
@@ -118,7 +118,7 @@ using namespace SCMEASLIB;
 *
 * @brief The FrequencySpectrumWidget class provides a equalizer display
 */
-class SCDISPSHARED_EXPORT FrequencySpectrumWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT FrequencySpectrumWidget : public MeasurementWidget
 {
     Q_OBJECT
 

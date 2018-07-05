@@ -99,7 +99,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTCE(pRTCE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)

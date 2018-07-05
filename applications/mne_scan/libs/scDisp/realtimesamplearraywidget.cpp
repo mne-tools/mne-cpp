@@ -83,7 +83,7 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTSA(pRTSA)
 , m_bMeasurement(false)
 , m_bPosition(true)

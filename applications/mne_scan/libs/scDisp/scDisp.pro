@@ -79,7 +79,6 @@ DESTDIR = $${MNE_LIBRARY_DIR}
 
 SOURCES += \
     measurementwidget.cpp \
-    newmeasurementwidget.cpp \
     realtimemultisamplearraywidget.cpp \
     realtimesamplearraywidget.cpp \
     realtimeevokedsetwidget.cpp \
@@ -102,7 +101,6 @@ SOURCES += \
 HEADERS += \
     scdisp_global.h \
     measurementwidget.h \
-    newmeasurementwidget.h \
     realtimemultisamplearraywidget.h \
     realtimesamplearraywidget.h \
     realtimeevokedsetwidget.h \
@@ -123,8 +121,8 @@ HEADERS += \
     realtimeconnectivityestimatewidget.h \
 
 FORMS += \
-    FormFiles/realtimesamplearraywidget.ui \
     helpers/quickcontrolwidget.ui \
+    formfiles/realtimesamplearraywidget.ui \
 
 RESOURCES += \
     scDisp.qrc

@@ -44,7 +44,7 @@
 
 #include "scdisp_global.h"
 
-#include "newmeasurementwidget.h"
+#include "measurementwidget.h"
 #include "helpers/realtimeevokedsetmodel.h"
 #include "helpers/realtimebutterflyplot.h"
 #include "helpers/quickcontrolwidget.h"
@@ -128,7 +128,7 @@ using namespace DISPLIB;
 *
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
-class SCDISPSHARED_EXPORT RealTimeEvokedSetWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeEvokedSetWidget : public MeasurementWidget
 {
     Q_OBJECT
 
