@@ -150,7 +150,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pToolBox->hide();
 
     //Butterfly
-    m_pButterflyPlot = RealTimeButterflyPlot::SPtr(new RealTimeButterflyPlot(this));
+    m_pButterflyPlot = ButterflyView::SPtr(new ButterflyView(this));
     m_pButterflyPlot->installEventFilter(this);
 
     m_pToolBox->insertItem(0, m_pButterflyPlot.data(), QIcon(), "Butterfly plot");
@@ -308,7 +308,7 @@ void RealTimeEvokedSetWidget::init()
 
         m_pToolBox->show();
 
-        m_pRTESetModel = RealTimeEvokedSetModel::SPtr(new RealTimeEvokedSetModel(this));
+        m_pRTESetModel = EvokedSetModel::SPtr(new EvokedSetModel(this));
         m_pRTESetModel->setRTESet(m_pRTESet);
 
         m_pButterflyPlot->setModel(m_pRTESetModel.data());
@@ -442,10 +442,10 @@ void RealTimeEvokedSetWidget::init()
         m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pRTESetModel.data(),static_cast<void (RealTimeEvokedSetModel::*)(QString)>(&RealTimeEvokedSetModel::setFilterChannelType));
+                m_pRTESetModel.data(),static_cast<void (EvokedSetModel::*)(QString)>(&EvokedSetModel::setFilterChannelType));
 
         connect(m_pFilterView.data(), &FilterView::filterChanged,
-                m_pRTESetModel.data(), &RealTimeEvokedSetModel::filterChanged);
+                m_pRTESetModel.data(), &EvokedSetModel::filterChanged);
 
         //Init downsampled sampling frequency
         m_pFilterView->setSamplingRate(m_pFiffInfo->sfreq);
@@ -507,11 +507,11 @@ void RealTimeEvokedSetWidget::init()
 
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                m_pRTESetModel.data(), &RealTimeEvokedSetModel::updateCompensator);
+                m_pRTESetModel.data(), &EvokedSetModel::updateCompensator);
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                m_pRTESetModel.data(), &RealTimeEvokedSetModel::updateProjection);
+                m_pRTESetModel.data(), &EvokedSetModel::updateProjection);
 
         //Handle modalities
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
@@ -526,7 +526,7 @@ void RealTimeEvokedSetWidget::init()
 
         //Handle updating the butterfly and layout plot
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pButterflyPlot.data(), &RealTimeButterflyPlot::updateView);
+                m_pButterflyPlot.data(), &ButterflyView::updateView);
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
@@ -558,21 +558,21 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 this, &RealTimeEvokedSetWidget::channelSelectionManagerChanged);
 
-        connect(m_pRTESetModel.data(), &RealTimeEvokedSetModel::dataChanged,
+        connect(m_pRTESetModel.data(), &EvokedSetModel::dataChanged,
                 this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedSetWidget::broadcastScaling);
 
         //Handle averages
-        connect(this->m_pRTESetModel.data(), &RealTimeEvokedSetModel::newAverageTypeReceived,
+        connect(this->m_pRTESetModel.data(), &EvokedSetModel::newAverageTypeReceived,
                 m_pQuickControlWidget.data(), &QuickControlWidget::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
                 m_pAverageScene.data(), &AverageScene::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
-                m_pButterflyPlot.data(), &RealTimeButterflyPlot::setAverageInformationMap);
+                m_pButterflyPlot.data(), &ButterflyView::setAverageInformationMap);
 
         QVariant data;
         QMap<double, QPair<QColor, QPair<QString,bool> > > emptyMap;
@@ -683,7 +683,7 @@ void RealTimeEvokedSetWidget::onSelectionChanged()
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<QPair<double, SCDISPLIB::RowVectorPair> > averageData = m_pRTESetModel->data(0, 2, RealTimeEvokedSetModelRoles::GetAverageData).value<QList<QPair<double, SCDISPLIB::RowVectorPair> > >();
+        QList<QPair<double, SCDISPLIB::RowVectorPair> > averageData = m_pRTESetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, SCDISPLIB::RowVectorPair> > >();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);

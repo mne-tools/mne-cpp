@@ -241,7 +241,7 @@ private:
 
     QList<QColor>                       m_qListChColors;    /**< Channel color for butterfly plot.*/
 
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo; /**< Channel info list.*/
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list.*/
 
     bool                                m_bInitialized;     /**< If values are stored.*/
 

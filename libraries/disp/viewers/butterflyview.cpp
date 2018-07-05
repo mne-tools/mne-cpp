@@ -1,21 +1,56 @@
+//=============================================================================================================
+/**
+* @file     butterflyview.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     July, 2018
+*
+* @section  LICENSE
+*
+* Copyright (C) 2018, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Definition of the ButterflyView class.
+*
+*/
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimebutterflyplot.h"
-#include "../realtimeevokedwidget.h"
+#include "butterflyview.h"
+
+#include "helpers/evokedsetmodel.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QPainter>
 #include <QDebug>
-#include <iostream>
 
 
 //*************************************************************************************************************
@@ -23,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -31,9 +66,9 @@ using namespace SCDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
+ButterflyView::ButterflyView(QWidget *parent)
 : QWidget(parent)
-, m_pRealTimeEvokedModel(NULL)
+, m_pEvokedModel(NULL)
 , m_bIsInit(false)
 , m_iNumChannels(-1)
 , m_bShowMAG(true)
@@ -53,15 +88,26 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+void ButterflyView::setModel(QSharedPointer<EvokedSetModel> model)
+{
+    m_pEvokedModel = model;
+
+    connect(m_pEvokedModel.data(), &EvokedSetModel::dataChanged,
+            this, &ButterflyView::dataUpdate);
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
     Q_UNUSED(topLeft);
     Q_UNUSED(bottomRight);
     Q_UNUSED(roles);
 
-    if(!m_bIsInit && m_pRealTimeEvokedModel->isInit())
+    if(!m_bIsInit && m_pEvokedModel->isInit())
     {
-        m_iNumChannels = m_pRealTimeEvokedModel->rowCount();
+        m_iNumChannels = m_pEvokedModel->rowCount();
         m_bIsInit = true;
     }
 
@@ -71,7 +117,7 @@ void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelI
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
+void ButterflyView::paintEvent(QPaintEvent* paintEvent)
 {
     QPainter painter(this);
 
@@ -85,21 +131,21 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
     if(m_bIsInit)
     {
         //Draw baseline correction area
-        if(m_pRealTimeEvokedModel->getBaselineInfo().first.toString() != "None" &&
-                m_pRealTimeEvokedModel->getBaselineInfo().second.toString() != "None") {
-            float from = m_pRealTimeEvokedModel->getBaselineInfo().first.toFloat();
-            float to = m_pRealTimeEvokedModel->getBaselineInfo().second.toFloat();
+        if(m_pEvokedModel->getBaselineInfo().first.toString() != "None" &&
+                m_pEvokedModel->getBaselineInfo().second.toString() != "None") {
+            float from = m_pEvokedModel->getBaselineInfo().first.toFloat();
+            float to = m_pEvokedModel->getBaselineInfo().second.toFloat();
 
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
             painter.setBrush(Qt::red);
             painter.setOpacity(0.1);
 
-            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
+            float fDx = (float)(this->width()) / ((float)m_pEvokedModel->getNumSamples());
 
-            float fromSamp = ((from)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float fromSamp = ((from)*m_pEvokedModel->getSamplingFrequency())+m_pEvokedModel->getNumPreStimSamples();
             float posX = fDx*(fromSamp);
-            float toSamp = ((to)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float toSamp = ((to)*m_pEvokedModel->getSamplingFrequency())+m_pEvokedModel->getNumPreStimSamples();
             float width = fDx*(toSamp-fromSamp);
 
             QRect rect(posX,0,width,this->height());
@@ -110,12 +156,12 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
         }
 
         //Stimulus bar
-        if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
+        if(m_pEvokedModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
-            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
-            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples());
+            float fDx = (float)(this->width()) / ((float)m_pEvokedModel->getNumSamples());
+            float posX = fDx * ((float)m_pEvokedModel->getNumPreStimSamples());
             painter.drawLine(posX, 1, posX, this->height());
 
             painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
@@ -124,7 +170,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
         }
 
         //Vertical time spacers
-        if(m_pRealTimeEvokedModel->getNumberOfTimeSpacers() > 0)
+        if(m_pEvokedModel->getNumberOfTimeSpacers() > 0)
         {
             painter.save();
             QColor colorTimeSpacer = Qt::black;
@@ -135,14 +181,14 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
             float yEnd = this->rect().bottomRight().y();
 
             float fDx = 1;
-            if(m_pRealTimeEvokedModel->getNumSamples() != 0) {
-                fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
+            if(m_pEvokedModel->getNumSamples() != 0) {
+                fDx = (float)(this->width()) / ((float)m_pEvokedModel->getNumSamples());
             }
 
-            float sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float sampleCounter = m_pEvokedModel->getNumPreStimSamples();
             int counter = 1;
             float timeDistanceMSec = 50.0;
-            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pRealTimeEvokedModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
+            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pEvokedModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
 
             //spacers before stim
             while(sampleCounter-timeDistanceSamples>0) {
@@ -155,8 +201,8 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
             //spacers after stim
             counter = 1;
-            sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
-            while(sampleCounter+timeDistanceSamples<m_pRealTimeEvokedModel->getNumSamples()) {
+            sampleCounter = m_pEvokedModel->getNumPreStimSamples();
+            while(sampleCounter+timeDistanceSamples<m_pEvokedModel->getNumSamples()) {
                 sampleCounter+=timeDistanceSamples;
                 float x = fDx*sampleCounter;
                 painter.drawLine(x, yStart, x, yEnd);
@@ -168,7 +214,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
         }
 
         //Zero line
-        if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
+        if(m_pEvokedModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
 
@@ -182,12 +228,12 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
         //Actual average data
         for(qint32 r = 0; r < m_iNumChannels; ++r) {
             if(m_lSelectedChannels.contains(r)) {
-                qint32 kind = m_pRealTimeEvokedModel->getKind(r);
+                qint32 kind = m_pEvokedModel->getKind(r);
 
                 //Display only selected kinds
                 switch(kind) {
                     case FIFFV_MEG_CH: {
-                        qint32 unit = m_pRealTimeEvokedModel->getUnit(r);
+                        qint32 unit = m_pEvokedModel->getUnit(r);
                         if(unit == FIFF_UNIT_T_M) {
                             if(m_bShowGRAD)
                                 break;
@@ -227,12 +273,12 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
                 painter.save();
 
-                if(m_pRealTimeEvokedModel->isFreezed()) {
-                    QColor freezeColor = m_pRealTimeEvokedModel->getColor(r);
+                if(m_pEvokedModel->isFreezed()) {
+                    QColor freezeColor = m_pEvokedModel->getColor(r);
                     freezeColor.setAlphaF(0.5);
                     painter.setPen(QPen(freezeColor, 1));
                 } else {
-                    painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
+                    painter.setPen(QPen(m_pEvokedModel->getColor(r), 1));
                 }
 
                 createPlotPath(r, painter);
@@ -248,61 +294,61 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
+void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = m_pRealTimeEvokedModel->getKind(row);
+    qint32 kind = m_pEvokedModel->getKind(row);
     float fMaxValue = 1e-9f;
 
     switch(kind) {
         case FIFFV_MEG_CH: {
-            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
+            qint32 unit = m_pEvokedModel->getUnit(row);
             if(unit == FIFF_UNIT_T_M) { //gradiometers
                 fMaxValue = 1e-10f;
-                if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T_M))
-                    fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T_M];
+                if(m_pEvokedModel->getScaling().contains(FIFF_UNIT_T_M))
+                    fMaxValue = m_pEvokedModel->getScaling()[FIFF_UNIT_T_M];
             }
             else if(unit == FIFF_UNIT_T) //magnitometers
             {
-//                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+//                if(m_pEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
 //                    fMaxValue = 1e-11f;
 //                else
                 fMaxValue = 1e-11f;
 
-                if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T))
-                    fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T];
+                if(m_pEvokedModel->getScaling().contains(FIFF_UNIT_T))
+                    fMaxValue = m_pEvokedModel->getScaling()[FIFF_UNIT_T];
             }
             break;
         }
 
         case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
             fMaxValue = 1e-11f;
-            if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T))
-                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T];
+            if(m_pEvokedModel->getScaling().contains(FIFF_UNIT_T))
+                fMaxValue = m_pEvokedModel->getScaling()[FIFF_UNIT_T];
             break;
         }
         case FIFFV_EEG_CH: {
             fMaxValue = 1e-4f;
-            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_EEG_CH))
-                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_EEG_CH];
+            if(m_pEvokedModel->getScaling().contains(FIFFV_EEG_CH))
+                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
             fMaxValue = 1e-3f;
-            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_EOG_CH))
-                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_EOG_CH];
+            if(m_pEvokedModel->getScaling().contains(FIFFV_EOG_CH))
+                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_EOG_CH];
             break;
         }
         case FIFFV_STIM_CH: {
             fMaxValue = 5;
-            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_STIM_CH))
-                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_STIM_CH];
+            if(m_pEvokedModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_STIM_CH];
             break;
         }
         case FIFFV_MISC_CH: {
             fMaxValue = 1e-3f;
-            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_MISC_CH))
-                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_MISC_CH];
+            if(m_pEvokedModel->getScaling().contains(FIFFV_MISC_CH))
+                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_MISC_CH];
             break;
         }
     }
@@ -312,16 +358,16 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
 
     //restrictions for paint performance
     float fWinMaxVal = ((float)this->height()-2)/2.0f;
-    qint32 iDownSampling = (m_pRealTimeEvokedModel->getNumSamples() * 4 / (this->width()-2));
+    qint32 iDownSampling = (m_pEvokedModel->getNumSamples() * 4 / (this->width()-2));
     if(iDownSampling < 1) {
         iDownSampling = 1;
     }
 
     QPointF qSamplePosition;
 
-    float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pRealTimeEvokedModel->getMaxSamples();
+    float fDx = (float)(this->width()-2) / ((float)m_pEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pEvokedModel->getMaxSamples();
 
-    QList<SCDISPLIB::AvrTypeRowVector> rowVec = m_pRealTimeEvokedModel->data(row,1).value<QList<SCDISPLIB::AvrTypeRowVector> >();
+    QList<DISPLIB::AvrTypeRowVector> rowVec = m_pEvokedModel->data(row,1).value<QList<DISPLIB::AvrTypeRowVector> >();
 
     //Do for all average types
     for(int j = 0; j < rowVec.size(); ++j) {
@@ -340,7 +386,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
             if(rowVec.at(j).second.cols() > 0)
             {
                 float val = rowVec.at(j).second[0];
-                fValue = (val/*-rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
+                fValue = (val/*-rowVec.at(j)[m_pEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
 
                 float newY = y_base+fValue;
 
@@ -353,7 +399,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
             //create lines from one to the next sample
             qint32 i;
             for(i = 1; i < rowVec.at(j).second.cols() && path.elementCount() <= this->width(); i += dsFactor) {
-                float val = /*rowVec.at(j)[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j).second[i]; //remove first sample data[0] as offset
+                float val = /*rowVec.at(j)[m_pEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j).second[i]; //remove first sample data[0] as offset
                 fValue = val*fScaleY;
 
                 //Cut plotting if out of widget area
@@ -369,7 +415,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
             }
 
         //    //create lines from one to the next sample for last path
-        //    qint32 sample_offset = m_pRealTimeEvokedModel->numVLines() + 1;
+        //    qint32 sample_offset = m_pEvokedModel->numVLines() + 1;
         //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
         //    lastPath.moveTo(qSamplePosition);
 
@@ -393,7 +439,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainter& painter) const
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::setSettings(const QList< Modality >& p_qListModalities)
+void ButterflyView::setSettings(const QList<Modality>& p_qListModalities)
 {
     for(qint32 i = 0; i < p_qListModalities.size(); ++i)
     {
@@ -433,7 +479,7 @@ void RealTimeButterflyPlot::setSettings(const QList< Modality >& p_qListModaliti
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::setSelectedChannels(const QList<int> &selectedChannels)
+void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
 {
     m_lSelectedChannels = selectedChannels;
 
@@ -443,7 +489,7 @@ void RealTimeButterflyPlot::setSelectedChannels(const QList<int> &selectedChanne
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::updateView()
+void ButterflyView::updateView()
 {
     update();
 }
@@ -451,7 +497,7 @@ void RealTimeButterflyPlot::updateView()
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::setBackgroundColor(const QColor& backgroundColor)
+void ButterflyView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_colCurrentBackgroundColor = backgroundColor;
 
@@ -461,7 +507,7 @@ void RealTimeButterflyPlot::setBackgroundColor(const QColor& backgroundColor)
 
 //*************************************************************************************************************
 
-const QColor& RealTimeButterflyPlot::getBackgroundColor()
+const QColor& ButterflyView::getBackgroundColor()
 {
     return m_colCurrentBackgroundColor;
 }
@@ -469,7 +515,7 @@ const QColor& RealTimeButterflyPlot::getBackgroundColor()
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+void ButterflyView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
 {
     m_qMapAverageColor = mapAvr;
 

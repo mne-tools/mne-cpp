@@ -85,11 +85,8 @@ SOURCES += \
     realtimeevokedwidget.cpp \
     realtimecovwidget.cpp \
     frequencyspectrumwidget.cpp \
-    helpers/realtimebutterflyplot.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
-    helpers/realtimeevokedmodel.cpp \
-    helpers/realtimeevokedsetmodel.cpp \
     helpers/covmodalitywidget.cpp \
     helpers/frequencyspectrummodel.cpp \
     helpers/frequencyspectrumdelegate.cpp \
@@ -109,9 +106,6 @@ HEADERS += \
     frequencyspectrumwidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
-    helpers/realtimeevokedmodel.h \
-    helpers/realtimeevokedsetmodel.h \
-    helpers/realtimebutterflyplot.h \
     helpers/covmodalitywidget.h \
     helpers/frequencyspectrumdelegate.h \
     helpers/frequencyspectrummodel.h \

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedsetmodel.cpp
+* @file     evokedsetmodel.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,15 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeEvokedSetModel Class.
+* @brief    Definition of the EvokedSetModel Class.
 *
 */
 
-#include "realtimeevokedsetmodel.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "evokedsetmodel.h"
+
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked_set.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QDebug>
 #include <QBrush>
 #include <QThread>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 
 //*************************************************************************************************************
@@ -45,7 +61,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
+using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -53,7 +71,7 @@ using namespace SCDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvokedSetModel::RealTimeEvokedSetModel(QObject *parent)
+EvokedSetModel::EvokedSetModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_fSps(1024.0f)
 , m_bIsFreezed(false)
@@ -67,15 +85,14 @@ RealTimeEvokedSetModel::RealTimeEvokedSetModel(QObject *parent)
 
 //*************************************************************************************************************
 
-RealTimeEvokedSetModel::~RealTimeEvokedSetModel()
+EvokedSetModel::~EvokedSetModel()
 {
-    std::cout<<"RealTimeEvokedSetModel::~RealTimeEvokedSetModel"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 //virtual functions
-int RealTimeEvokedSetModel::rowCount(const QModelIndex & /*parent*/) const
+int EvokedSetModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_qMapIdxRowSelection.empty()) {
         return m_qMapIdxRowSelection.size();
@@ -87,7 +104,7 @@ int RealTimeEvokedSetModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int RealTimeEvokedSetModel::columnCount(const QModelIndex & /*parent*/) const
+int EvokedSetModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
@@ -95,9 +112,9 @@ int RealTimeEvokedSetModel::columnCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
+QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RealTimeEvokedSetModelRoles::GetAverageData) {
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != EvokedSetModelRoles::GetAverageData) {
         return QVariant();
     }
 
@@ -106,7 +123,7 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
 
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole) {
-            return QVariant(m_pRTESet->info()->ch_names[row]);
+            return QVariant(m_pEvokedSet->info.ch_names);
         }
 
         //******** second column (butterfly data plot) ********
@@ -114,8 +131,8 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
         if(index.column()==1) {
             QVariant v;
 
-            QList<SCDISPLIB::AvrTypeRowVector> lRowDataPerTrigType;
-            SCDISPLIB::AvrTypeRowVector pairItem;
+            QList<DISPLIB::AvrTypeRowVector> lRowDataPerTrigType;
+            DISPLIB::AvrTypeRowVector pairItem;
 
             switch(role) {
                 case Qt::DisplayRole: {
@@ -177,11 +194,11 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
         //******** third column (2D layout data plot, this third column is needed because the te data needs to be in another structure for the 2D layout to work) ********
         if(index.column()==2) {
             QVariant v;
-            QList<SCDISPLIB::AvrTypeRowVectorPair> lRowDataPerTrigType;
-            SCDISPLIB::AvrTypeRowVectorPair averagedData;
+            QList<DISPLIB::AvrTypeRowVectorPair> lRowDataPerTrigType;
+            DISPLIB::AvrTypeRowVectorPair averagedData;
 
             switch(role) {
-                case RealTimeEvokedSetModelRoles::GetAverageData: {
+                case EvokedSetModelRoles::GetAverageData: {
                     if(m_bIsFreezed){
                         // data freeze
                         if(m_filterData.isEmpty()) {
@@ -237,7 +254,7 @@ QVariant RealTimeEvokedSetModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-QVariant RealTimeEvokedSetModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant EvokedSetModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
@@ -271,26 +288,26 @@ QVariant RealTimeEvokedSetModel::headerData(int section, Qt::Orientation orienta
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESet)
+void EvokedSetModel::setRTESet(QSharedPointer<FiffEvokedSet> &pEvokedSet)
 {
     beginResetModel();
-    m_pRTESet = pRTESet;
+    m_pEvokedSet = pEvokedSet;
 
     //Generate bad channel index list
     RowVectorXi sel;// = RowVectorXi(0,0);
     QStringList emptyExclude;
 
-    if(m_pRTESet->info()->bads.size() > 0) {
-        sel = FiffInfoBase::pick_channels(m_pRTESet->info()->ch_names, m_pRTESet->info()->bads, emptyExclude);
+    if(m_pEvokedSet->info.bads.size() > 0) {
+        sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
     }
 
     m_vecBadIdcs = sel;
 
-    m_fSps = m_pRTESet->info()->sfreq;
+    m_fSps = m_pEvokedSet->info.sfreq;
 
-    m_matSparseProjMult = SparseMatrix<double>(m_pRTESet->info()->chs.size(),m_pRTESet->info()->chs.size());
-    m_matSparseCompMult = SparseMatrix<double>(m_pRTESet->info()->chs.size(),m_pRTESet->info()->chs.size());
-    m_matSparseProjCompMult = SparseMatrix<double>(m_pRTESet->info()->chs.size(),m_pRTESet->info()->chs.size());
+    m_matSparseProjMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+    m_matSparseCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+    m_matSparseProjCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
 
     m_matSparseProjMult.setIdentity();
     m_matSparseCompMult.setIdentity();
@@ -303,7 +320,7 @@ void RealTimeEvokedSetModel::setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESe
     updateCompensator(0);
 
     //Init list of channels which are to filtered
-    createFilterChannelList(m_pRTESet->info()->ch_names);
+    createFilterChannelList(m_pEvokedSet->info.ch_names);
 
     endResetModel();
 
@@ -313,40 +330,40 @@ void RealTimeEvokedSetModel::setRTESet(QSharedPointer<RealTimeEvokedSet> &pRTESe
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::updateData()
+void EvokedSetModel::updateData()
 {
     m_matData.clear();
     m_matDataFiltered.clear();
     m_lAvrTypes.clear();
 
-    for(int i = 0; i < m_pRTESet->getValue()->evoked.size(); ++i) {
-        bool doProj = m_bProjActivated && m_pRTESet->getValue()->evoked.at(i).data.cols() > 0 && m_pRTESet->getValue()->evoked.at(i).data.rows() == m_matProj.cols() ? true : false;
+    for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
+        bool doProj = m_bProjActivated && m_pEvokedSet->evoked.at(i).data.cols() > 0 && m_pEvokedSet->evoked.at(i).data.rows() == m_matProj.cols() ? true : false;
 
-        bool doComp = m_bCompActivated && m_pRTESet->getValue()->evoked.at(i).data.cols() > 0 && m_pRTESet->getValue()->evoked.at(i).data.rows() == m_matComp.cols() ? true : false;
+        bool doComp = m_bCompActivated && m_pEvokedSet->evoked.at(i).data.cols() > 0 && m_pEvokedSet->evoked.at(i).data.rows() == m_matComp.cols() ? true : false;
 
         if(doComp) {
             if(doProj) {
                 //Comp + Proj
-                m_matData.append(m_matSparseProjCompMult * m_pRTESet->getValue()->evoked.at(i).data);
+                m_matData.append(m_matSparseProjCompMult * m_pEvokedSet->evoked.at(i).data);
             } else {
                 //Comp
-                m_matData.append(m_matSparseCompMult * m_pRTESet->getValue()->evoked.at(i).data);
+                m_matData.append(m_matSparseCompMult * m_pEvokedSet->evoked.at(i).data);
             }
         } else {
             if(doProj) {
                 //Proj
-                m_matData.append(m_matSparseProjMult * m_pRTESet->getValue()->evoked.at(i).data);
+                m_matData.append(m_matSparseProjMult * m_pEvokedSet->evoked.at(i).data);
             } else {
                 //None - Raw
-                m_matData.append(m_pRTESet->getValue()->evoked.at(i).data);
+                m_matData.append(m_pEvokedSet->evoked.at(i).data);
             }
         }
 
-        m_matDataFiltered.append(MatrixXd::Zero(m_pRTESet->getValue()->evoked.at(i).data.rows(), m_pRTESet->getValue()->evoked.at(i).data.cols()));
+        m_matDataFiltered.append(MatrixXd::Zero(m_pEvokedSet->evoked.at(i).data.rows(), m_pEvokedSet->evoked.at(i).data.cols()));
 
-        m_pairBaseline = m_pRTESet->getValue()->evoked.at(i).baseline;
+        m_pairBaseline = m_pEvokedSet->evoked.at(i).baseline;
 
-        m_lAvrTypes.append(m_pRTESet->getValue()->evoked.at(i).comment.toDouble());
+        m_lAvrTypes.append(m_pEvokedSet->evoked.at(i).comment.toDouble());
     }
 
     if(!m_filterData.isEmpty()) {
@@ -357,14 +374,14 @@ void RealTimeEvokedSetModel::updateData()
 
     //Update average information map
     bool bFoundNewType = false;
-    for(int i = 0; i < m_pRTESet->getValue()->evoked.size(); ++i) {
+    for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
         //Check if average type already exists in the map
-        double avrType = m_pRTESet->getValue()->evoked.at(i).comment.toDouble();
+        double avrType = m_pEvokedSet->evoked.at(i).comment.toDouble();
         if(!m_qMapAverageInformation.contains(avrType)) {
             QPair<QColor, QPair<QString,bool> > pairFinal;
             QPair<QString,bool> pairTemp;
 
-            pairTemp.first = m_pRTESet->getValue()->evoked.at(i).comment;
+            pairTemp.first = m_pEvokedSet->evoked.at(i).comment;
             pairTemp.second = true;
 
             pairFinal.first = Qt::yellow;
@@ -382,7 +399,7 @@ void RealTimeEvokedSetModel::updateData()
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_pRTESet->info()->nchan-1,1);
+    QModelIndex bottomRight = this->index(m_pEvokedSet->info.nchan-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
@@ -390,11 +407,13 @@ void RealTimeEvokedSetModel::updateData()
 
 //*************************************************************************************************************
 
-QColor RealTimeEvokedSetModel::getColor(qint32 row) const
+QColor EvokedSetModel::getColor(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTESet->chColor()[chRow];
+        if(m_qListChColors.size() < chRow) {
+            return m_qListChColors[chRow];
+        }
     }
 
     return QColor();
@@ -403,11 +422,11 @@ QColor RealTimeEvokedSetModel::getColor(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeEvokedSetModel::getKind(qint32 row) const
+fiff_int_t EvokedSetModel::getKind(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTESet->info()->chs[chRow].kind;
+        return m_pEvokedSet->info.chs[chRow].kind;
     }
 
     return 0;
@@ -416,11 +435,11 @@ fiff_int_t RealTimeEvokedSetModel::getKind(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeEvokedSetModel::getUnit(qint32 row) const
+fiff_int_t EvokedSetModel::getUnit(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTESet->info()->chs[chRow].unit;
+        return m_pEvokedSet->info.chs[chRow].unit;
     }
 
     return FIFF_UNIT_NONE;
@@ -429,11 +448,11 @@ fiff_int_t RealTimeEvokedSetModel::getUnit(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeEvokedSetModel::getCoil(qint32 row) const
+fiff_int_t EvokedSetModel::getCoil(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTESet->info()->chs[chRow].chpos.coil_type;
+        return m_pEvokedSet->info.chs[chRow].chpos.coil_type;
     }
 
     return FIFFV_COIL_NONE;
@@ -442,7 +461,135 @@ fiff_int_t RealTimeEvokedSetModel::getCoil(qint32 row) const
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::selectRows(const QList<qint32> &selection)
+bool EvokedSetModel::isInit() const
+{
+    return m_bIsInit;
+}
+
+
+//*************************************************************************************************************
+
+qint32 EvokedSetModel::getNumSamples() const
+{
+    qint32 iNumSamples = 0;
+
+    if(!m_matData.isEmpty()) {
+        iNumSamples = m_matData.first().cols();
+    }
+
+    return m_bIsInit ? iNumSamples : 0;
+}
+
+
+//*************************************************************************************************************
+
+QVariant EvokedSetModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
+}
+
+
+//*************************************************************************************************************
+
+const QMap<qint32,qint32>& EvokedSetModel::getIdxSelMap() const
+{
+    return m_qMapIdxRowSelection;
+}
+
+
+//*************************************************************************************************************
+
+qint32 EvokedSetModel::numVLines() const
+{
+    qint32 iNumSamples = 0;
+
+    if(!m_matData.isEmpty()) {
+        iNumSamples = m_matData.first().cols();
+    }
+
+    return (qint32)(iNumSamples/m_fSps) - 1;
+}
+
+
+//*************************************************************************************************************
+
+qint32 EvokedSetModel::getNumPreStimSamples() const
+{
+    int iPreSamples = 0;
+    RowVectorXf times = m_pEvokedSet->evoked.first().times;
+
+    // Search for stim onset via times
+    for(int i = 0; i < times.cols(); i++) {
+        if(times(i) == 0.0f) {
+            break;
+        }
+
+        iPreSamples++;
+    }
+
+    return iPreSamples;
+}
+
+
+//*************************************************************************************************************
+
+float EvokedSetModel::getSamplingFrequency() const
+{
+    return m_fSps;
+}
+
+
+//*************************************************************************************************************
+
+bool EvokedSetModel::isFreezed() const
+{
+    return m_bIsFreezed;
+}
+
+
+//*************************************************************************************************************
+
+const QMap< qint32,float >& EvokedSetModel::getScaling() const
+{
+    return m_qMapChScaling;
+}
+
+
+//*************************************************************************************************************
+
+int EvokedSetModel::getNumberOfTimeSpacers() const
+{
+    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
+    qint32 iNumSamples = 0;
+
+    if(!m_matData.isEmpty()) {
+        iNumSamples = m_matData.first().cols();
+    }
+
+    return floor((iNumSamples/m_fSps)*10);
+}
+
+
+//*************************************************************************************************************
+
+QPair<QVariant,QVariant> EvokedSetModel::getBaselineInfo() const
+{
+    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
+    return m_pairBaseline;
+}
+
+
+//*************************************************************************************************************
+
+int EvokedSetModel::getNumAverages() const
+{
+    return m_matData.size();
+}
+
+
+//*************************************************************************************************************
+
+void EvokedSetModel::selectRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -450,7 +597,7 @@ void RealTimeEvokedSetModel::selectRows(const QList<qint32> &selection)
 
     qint32 count = 0;
     for(qint32 i = 0; i < selection.size(); ++i) {
-        if(selection[i] < m_pRTESet->info()->nchan) {
+        if(selection[i] < m_pEvokedSet->info.nchan) {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
         }
@@ -464,13 +611,13 @@ void RealTimeEvokedSetModel::selectRows(const QList<qint32> &selection)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::resetSelection()
+void EvokedSetModel::resetSelection()
 {
     beginResetModel();
 
     m_qMapIdxRowSelection.clear();
 
-    for(qint32 i = 0; i < m_pRTESet->info()->nchan; ++i) {
+    for(qint32 i = 0; i < m_pEvokedSet->info.nchan; ++i) {
         m_qMapIdxRowSelection.insert(i,i);
     }
 
@@ -480,7 +627,7 @@ void RealTimeEvokedSetModel::resetSelection()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
+void EvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 {
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;
@@ -490,28 +637,28 @@ void RealTimeEvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScal
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::updateProjection()
+void EvokedSetModel::updateProjection()
 {
     //
     //  Update the SSP projector
     //
-    if(m_pRTESet->info()->chs.size()>0) {
+    if(m_pEvokedSet->info.chs.size()>0) {
         m_bProjActivated = false;
-        for(qint32 i = 0; i < m_pRTESet->info()->projs.size(); ++i) {
-            if(m_pRTESet->info()->projs[i].active) {
+        for(qint32 i = 0; i < m_pEvokedSet->info.projs.size(); ++i) {
+            if(m_pEvokedSet->info.projs[i].active) {
                 m_bProjActivated = true;
             }
         }
 
-        m_pRTESet->info()->make_projector(m_matProj);
+        m_pEvokedSet->info.make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated :: m_bProjActivated is "<<m_bProjActivated;
 
         //set columns of matrix to zero depending on bad channels indexes
         RowVectorXi sel;// = RowVectorXi(0,0);
         QStringList emptyExclude;
 
-        if(m_pRTESet->info()->bads.size() > 0) {
-            sel = FiffInfoBase::pick_channels(m_pRTESet->info()->ch_names, m_pRTESet->info()->bads, emptyExclude);
+        if(m_pEvokedSet->info.bads.size() > 0) {
+            sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
         }
 
         m_vecBadIdcs = sel;
@@ -524,7 +671,7 @@ void RealTimeEvokedSetModel::updateProjection()
 //        std::cout << "Proj\n";
 //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
 
-        qint32 nchan = m_pRTESet->info()->nchan;
+        qint32 nchan = m_pEvokedSet->info.nchan;
         qint32 i, k;
 
         typedef Eigen::Triplet<double> T;
@@ -557,12 +704,12 @@ void RealTimeEvokedSetModel::updateProjection()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::updateCompensator(int to)
+void EvokedSetModel::updateCompensator(int to)
 {
     //
     //  Update the compensator
     //
-    if(m_pRTESet->info())
+    if(m_pEvokedSet)
     {
         if(to == 0) {
             m_bCompActivated = false;
@@ -575,7 +722,7 @@ void RealTimeEvokedSetModel::updateCompensator(int to)
 //        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
 
         FiffCtfComp newComp;
-        m_pRTESet->info()->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        m_pEvokedSet->info.make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
 
         //We do not need to call this->m_pFiffInfo->set_current_comp(to);
         //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
@@ -585,7 +732,7 @@ void RealTimeEvokedSetModel::updateCompensator(int to)
         //
         // Make proj sparse
         //
-        qint32 nchan = m_pRTESet->info()->nchan;
+        qint32 nchan = m_pEvokedSet->info.nchan;
         qint32 i, k;
 
         typedef Eigen::Triplet<double> T;
@@ -615,7 +762,7 @@ void RealTimeEvokedSetModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::toggleFreeze()
+void EvokedSetModel::toggleFreeze()
 {
     m_bIsFreezed = !m_bIsFreezed;
 
@@ -634,7 +781,7 @@ void RealTimeEvokedSetModel::toggleFreeze()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::filterChanged(QList<FilterData> filterData)
+void EvokedSetModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 
@@ -652,7 +799,7 @@ void RealTimeEvokedSetModel::filterChanged(QList<FilterData> filterData)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::setFilterChannelType(QString channelType)
+void EvokedSetModel::setFilterChannelType(QString channelType)
 {
     m_sFilterChannelType = channelType;
     m_filterChannelList = m_visibleChannelList;
@@ -661,14 +808,14 @@ void RealTimeEvokedSetModel::setFilterChannelType(QString channelType)
     //Create channel filter list independent from channelNames
     m_filterChannelList.clear();
 
-    for(int i = 0; i<m_pRTESet->info()->chs.size(); i++) {
-        if((m_pRTESet->info()->chs.at(i).kind == FIFFV_MEG_CH || m_pRTESet->info()->chs.at(i).kind == FIFFV_EEG_CH ||
-            m_pRTESet->info()->chs.at(i).kind == FIFFV_EOG_CH || m_pRTESet->info()->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pRTESet->info()->chs.at(i).kind == FIFFV_EMG_CH) && !m_pRTESet->info()->bads.contains(m_pRTESet->info()->chs.at(i).ch_name)) {
+    for(int i = 0; i<m_pEvokedSet->info.chs.size(); i++) {
+        if((m_pEvokedSet->info.chs.at(i).kind == FIFFV_MEG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EOG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EMG_CH) && !m_pEvokedSet->info.bads.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
             if(m_sFilterChannelType == "All") {
-                m_filterChannelList << m_pRTESet->info()->chs.at(i).ch_name;
-            } else if(m_pRTESet->info()->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_filterChannelList << m_pRTESet->info()->chs.at(i).ch_name;
+                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
+            } else if(m_pEvokedSet->info.chs.at(i).ch_name.contains(m_sFilterChannelType)) {
+                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
             }
         }
     }
@@ -692,7 +839,15 @@ void RealTimeEvokedSetModel::setFilterChannelType(QString channelType)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::createFilterChannelList(QStringList channelNames)
+void EvokedSetModel::setChannelColors(QList<QColor> channelColors)
+{
+    m_qListChColors = channelColors;
+}
+
+
+//*************************************************************************************************************
+
+void EvokedSetModel::createFilterChannelList(QStringList channelNames)
 {
     m_filterChannelList.clear();
     m_visibleChannelList = channelNames;
@@ -710,14 +865,14 @@ void RealTimeEvokedSetModel::createFilterChannelList(QStringList channelNames)
     //    }
 
     //Create channel filter list independent from channelNames
-    for(int i = 0; i<m_pRTESet->info()->chs.size(); i++) {
-        if((m_pRTESet->info()->chs.at(i).kind == FIFFV_MEG_CH || m_pRTESet->info()->chs.at(i).kind == FIFFV_EEG_CH ||
-            m_pRTESet->info()->chs.at(i).kind == FIFFV_EOG_CH || m_pRTESet->info()->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pRTESet->info()->chs.at(i).kind == FIFFV_EMG_CH) && !m_pRTESet->info()->bads.contains(m_pRTESet->info()->chs.at(i).ch_name)) {
+    for(int i = 0; i<m_pEvokedSet->info.chs.size(); i++) {
+        if((m_pEvokedSet->info.chs.at(i).kind == FIFFV_MEG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EOG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EMG_CH) && !m_pEvokedSet->info.bads.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
             if(m_sFilterChannelType == "All") {
-                m_filterChannelList << m_pRTESet->info()->chs.at(i).ch_name;
-            } else if(m_pRTESet->info()->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_filterChannelList << m_pRTESet->info()->chs.at(i).ch_name;
+                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
+            } else if(m_pEvokedSet->info.chs.at(i).ch_name.contains(m_sFilterChannelType)) {
+                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
             }
         }
     }
@@ -743,9 +898,9 @@ void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetModel::filterChannelsConcurrently()
+void EvokedSetModel::filterChannelsConcurrently()
 {    
-    //std::cout<<"START RealTimeEvokedSetModel::filterChannelsConcurrently()"<<std::endl;
+    //std::cout<<"START EvokedSetModel::filterChannelsConcurrently()"<<std::endl;
 
     if(m_filterData.isEmpty()) {
         //qDebug()<<"data filter empty";
@@ -759,7 +914,7 @@ void RealTimeEvokedSetModel::filterChannelsConcurrently()
 
         //Also append mirrored data in front and back to get rid of edge effects
         for(qint32 i = 0; i < m_matData.at(j).rows(); ++i) {
-            if(m_filterChannelList.contains(m_pRTESet->info()->chs.at(i).ch_name)) {
+            if(m_filterChannelList.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
                 RowVectorXd datTemp(m_matData.at(j).row(i).cols() + 2 * m_iMaxFilterLength);
                 datTemp << m_matData.at(j).row(i).head(m_iMaxFilterLength).reverse(), m_matData.at(j).row(i), m_matData.at(j).row(i).tail(m_iMaxFilterLength).reverse();
                 timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,datTemp)));
@@ -786,6 +941,6 @@ void RealTimeEvokedSetModel::filterChannelsConcurrently()
         }
     }
 
-    //std::cout<<"END RealTimeEvokedSetModel::filterChannelsConcurrently()"<<std::endl;
+    //std::cout<<"END EvokedSetModel::filterChannelsConcurrently()"<<std::endl;
 }
 

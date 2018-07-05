@@ -227,16 +227,16 @@ public:
     void applyBaselineCorrection(QPair<QVariant,QVariant>& p_baseline);
 
 public:
-    FiffInfo    info;               /**< Measurement info. */
-    fiff_int_t  nave;               /**< Number of averaged epochs. */
-    fiff_int_t  aspect_kind;        /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
-    fiff_int_t  first;              /**< First time sample. */
-    fiff_int_t  last;               /**< Last time sample. */
-    QString     comment;            /**< Comment on dataset. Can be the condition. */
-    RowVectorXf times;              /**< Vector of time instants in seconds. */
-    MatrixXd    data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
-    MatrixXd    proj;               /**< SSP projection */
-    QPair<QVariant,QVariant>    baseline;   /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    FiffInfo                    info;               /**< Measurement info. */
+    fiff_int_t                  nave;               /**< Number of averaged epochs. */
+    fiff_int_t                  aspect_kind;        /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
+    fiff_int_t                  first;              /**< First time sample. */
+    fiff_int_t                  last;               /**< Last time sample. */
+    QString                     comment;            /**< Comment on dataset. Can be the condition. */
+    RowVectorXf                 times;              /**< Vector of time instants in seconds. */
+    MatrixXd                    data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
+    MatrixXd                    proj;               /**< SSP projection */
+    QPair<QVariant,QVariant>    baseline;           /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 };
 
 //*************************************************************************************************************

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedmodel.cpp
+* @file     evokedmodel.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,11 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeEvokedModel Class.
+* @brief    Definition of the EvokedModel Class.
 *
 */
 
-#include "realtimeevokedmodel.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "evokedmodel.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
 
 #include <QDebug>
 #include <QBrush>
@@ -45,7 +56,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -53,7 +65,7 @@ using namespace SCDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
+EvokedModel::EvokedModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_matData(MatrixXd(0,0))
 , m_matDataFreeze(MatrixXd(0,0))
@@ -70,15 +82,15 @@ RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
 
 //*************************************************************************************************************
 
-RealTimeEvokedModel::~RealTimeEvokedModel()
+EvokedModel::~EvokedModel()
 {
-    std::cout<<"RealTimeEvokedModel::~RealTimeEvokedModel"<<std::endl;
+    std::cout<<"EvokedModel::~EvokedModel"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 //virtual functions
-int RealTimeEvokedModel::rowCount(const QModelIndex & /*parent*/) const
+int EvokedModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_qMapIdxRowSelection.empty()) {
         return m_qMapIdxRowSelection.size();
@@ -90,7 +102,7 @@ int RealTimeEvokedModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int RealTimeEvokedModel::columnCount(const QModelIndex & /*parent*/) const
+int EvokedModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
@@ -98,9 +110,9 @@ int RealTimeEvokedModel::columnCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
+QVariant EvokedModel::data(const QModelIndex &index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RealTimeEvokedModelRoles::GetAverageData) {
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != EvokedModelRoles::GetAverageData) {
         return QVariant();
     }
 
@@ -165,7 +177,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
             RowVectorPair averagedData;
 
             switch(role) {
-                case RealTimeEvokedModelRoles::GetAverageData: {
+                case EvokedModelRoles::GetAverageData: {
                     if(m_bIsFreezed){
                         // data freeze
                         if(m_filterData.isEmpty()) {
@@ -204,7 +216,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-QVariant RealTimeEvokedModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant EvokedModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
@@ -238,7 +250,7 @@ QVariant RealTimeEvokedModel::headerData(int section, Qt::Orientation orientatio
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
+void EvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 {
     beginResetModel();
     m_pRTE = pRTE;
@@ -269,7 +281,7 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::updateData()
+void EvokedModel::updateData()
 {
     if(m_matData.cols() != m_pRTE->getValue()->data.cols()) {
         //init data matrix
@@ -323,7 +335,7 @@ void RealTimeEvokedModel::updateData()
 
 //*************************************************************************************************************
 
-QColor RealTimeEvokedModel::getColor(qint32 row) const
+QColor EvokedModel::getColor(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -336,7 +348,7 @@ QColor RealTimeEvokedModel::getColor(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
+fiff_int_t EvokedModel::getKind(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -349,7 +361,7 @@ fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeEvokedModel::getUnit(qint32 row) const
+fiff_int_t EvokedModel::getUnit(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -362,7 +374,7 @@ fiff_int_t RealTimeEvokedModel::getUnit(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeEvokedModel::getCoil(qint32 row) const
+fiff_int_t EvokedModel::getCoil(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -375,7 +387,7 @@ fiff_int_t RealTimeEvokedModel::getCoil(qint32 row) const
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::selectRows(const QList<qint32> &selection)
+void EvokedModel::selectRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -397,7 +409,7 @@ void RealTimeEvokedModel::selectRows(const QList<qint32> &selection)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::resetSelection()
+void EvokedModel::resetSelection()
 {
     beginResetModel();
 
@@ -413,7 +425,7 @@ void RealTimeEvokedModel::resetSelection()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
+void EvokedModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 {
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;
@@ -423,7 +435,7 @@ void RealTimeEvokedModel::setScaling(const QMap< qint32,float >& p_qMapChScaling
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::updateProjection()
+void EvokedModel::updateProjection()
 {
     //
     //  Update the SSP projector
@@ -490,7 +502,7 @@ void RealTimeEvokedModel::updateProjection()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::updateCompensator(int to)
+void EvokedModel::updateCompensator(int to)
 {
     //
     //  Update the compensator
@@ -548,7 +560,7 @@ void RealTimeEvokedModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::toggleFreeze()
+void EvokedModel::toggleFreeze()
 {
     m_bIsFreezed = !m_bIsFreezed;
 
@@ -567,7 +579,7 @@ void RealTimeEvokedModel::toggleFreeze()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::filterChanged(QList<FilterData> filterData)
+void EvokedModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 
@@ -585,7 +597,7 @@ void RealTimeEvokedModel::filterChanged(QList<FilterData> filterData)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::setFilterChannelType(QString channelType)
+void EvokedModel::setFilterChannelType(QString channelType)
 {
     m_sFilterChannelType = channelType;
     m_filterChannelList = m_visibleChannelList;
@@ -625,7 +637,7 @@ void RealTimeEvokedModel::setFilterChannelType(QString channelType)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::createFilterChannelList(QStringList channelNames)
+void EvokedModel::createFilterChannelList(QStringList channelNames)
 {
     m_filterChannelList.clear();
     m_visibleChannelList = channelNames;
@@ -676,9 +688,9 @@ void doFilterPerChannelRTE(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &cha
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::filterChannelsConcurrently()
+void EvokedModel::filterChannelsConcurrently()
 {    
-    //std::cout<<"START RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
+    //std::cout<<"START EvokedModel::filterChannelsConcurrently()"<<std::endl;
 
     if(m_filterData.isEmpty()) {
         return;
@@ -716,6 +728,6 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
         m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matData.row(notFilterChannelIndex.at(i));
     }
 
-    //std::cout<<"END RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
+    //std::cout<<"END EvokedModel::filterChannelsConcurrently()"<<std::endl;
 }
 
