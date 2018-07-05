@@ -279,8 +279,7 @@ void RealTimeEvokedSetWidget::getData()
 
             m_pEvokedSetModel->updateData();
         }
-    }
-    else {
+    } else {
         //Check if block size has changed, if yes update the filter
         if(!m_pRTESet->getValue()->evoked.isEmpty()) {
             if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
