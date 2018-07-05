@@ -46,7 +46,7 @@
 #include <utils/ioutils.h>
 #include <fiff/fiff_info.h>
 #include <scMeas/newrealtimemultisamplearray.h>
-#include <scDisp/hpiwidget.h>
+#include <disp3D/viewers/hpiview.h>
 
 
 //*************************************************************************************************************
@@ -74,7 +74,7 @@ using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace REALTIMELIB;
-using namespace SCDISPLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -440,8 +440,8 @@ void FiffSimulator::showHPIDialog()
         return;
     } else {
         if (!m_pHPIWidget) {
-            m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-            connect(m_pHPIWidget.data(), &HPIWidget::continousHPIToggled,
+            m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
+            connect(m_pHPIWidget.data(), &HpiView::continousHPIToggled,
                     this, &FiffSimulator::onContinousHPIToggled);
         }
 

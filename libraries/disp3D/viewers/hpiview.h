@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     hpiwidget.h
+* @file     hpiview.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    HPIWidget class declaration.
+* @brief    HpiView class declaration.
 *
 */
 
-#ifndef HPIWIDGET_H
-#define HPIWIDGET_H
+#ifndef HPIVIEW_H
+#define HPIVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "scdisp_global.h"
+#include "../disp3d_global.h"
 
 #include <fiff/fiff_coord_trans.h>
 
@@ -71,14 +71,7 @@
 //=============================================================================================================
 
 namespace Ui {
-    class HPIWidget;
-}
-
-namespace DISP3DLIB {
-    class View3D;
-    class Data3DTreeModel;
-    class BemTreeItem;
-    class DigitizerSetTreeItem;
+    class HpiViewWidget;
 }
 
 namespace FIFFLIB {
@@ -90,39 +83,44 @@ namespace FIFFLIB {
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BABYMEGPLUGIN
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace DISP3DLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class View3D;
+class Data3DTreeModel;
+class BemTreeItem;
+class DigitizerSetTreeItem;
 
 
 //=============================================================================================================
 /**
-* The HPIWidget class provides a QDialog for the HPI controls.
+* The HpiView class provides a QDialog for the HPI controls.
 *
-* @brief The HPIWidget class provides a QDialog for the HPI controls.
+* @brief The HpiView class provides a QDialog for the HPI controls.
 */
-class SCDISPSHARED_EXPORT HPIWidget : public QWidget
+class DISP3DSHARED_EXPORT HpiView : public QWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a HPIWidget object.
+    * Constructs a HpiView object.
     *
     * @param[in] pFiffInfo      The FiffInfo.
     * @param[in] parent         The parent widget.
     */
-    HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
-    ~HPIWidget();
+    HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
+    ~HpiView();
 
     //=========================================================================================================
     /**
@@ -251,7 +249,7 @@ protected:
 //    int alignFiducials(digitizerData head_dig,
 //                       digitizerData mri_dig);
 
-    Ui::HPIWidget*                              ui;                     /**< The HPI dialog. */
+    Ui::HpiViewWidget*                          ui;                     /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
     QVector<double>                             m_vGof;                 /**< The goodness of fit in mm for each fitted HPI coil. */
@@ -291,4 +289,4 @@ signals:
 };
 
 } //NAMESPACE
-#endif // HPIWIDGET_H
+#endif // HPIVIEW_H
