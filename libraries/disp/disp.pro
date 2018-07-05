@@ -100,7 +100,10 @@ SOURCES += \
     plots/tfplot.cpp \
     plots/helpers/colormap.cpp \
     viewers/filterview.cpp \
+    viewers/butterflyview.cpp \
     viewers/channelselectionview.cpp \
+    #viewers/helpers/evokedmodel.cpp \
+    viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
     viewers/helpers/averagesceneitem.cpp \
@@ -121,7 +124,10 @@ HEADERS += \
     plots/tfplot.h \
     plots/helpers/colormap.h \
     viewers/filterview.h \
+    viewers/butterflyview.h \
     viewers/channelselectionview.h \
+    #viewers/helpers/evokedmodel.h \
+    viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
     viewers/helpers/averagesceneitem.h \

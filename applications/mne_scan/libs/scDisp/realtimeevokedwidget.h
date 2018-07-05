@@ -44,8 +44,8 @@
 
 #include "scdisp_global.h"
 #include "measurementwidget.h"
-#include "helpers/realtimeevokedmodel.h"
-#include "helpers/realtimebutterflyplot.h"
+#include "helpers/evokedmodel.h"
+#include "helpers/butterflyview.h"
 #include "helpers/quickcontrolwidget.h"
 
 #include <disp/viewers/helpers/averagescene.h>
@@ -77,9 +77,8 @@
 
 class QTime;
 
-namespace SCMEASLIB
-{
-class RealTimeEvoked;
+namespace SCMEASLIB {
+    class RealTimeEvoked;
 }
 
 
@@ -266,8 +265,8 @@ private:
     */
     bool virtual eventFilter(QObject *object, QEvent *event);
 
-    RealTimeEvokedModel::SPtr           m_pRTEModel;                /**< RTE data model */
-    RealTimeButterflyPlot::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
+    EvokedModel::SPtr           m_pRTEModel;                /**< RTE data model */
+    ButterflyView::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
     AverageScene::SPtr                  m_pAverageScene;            /**< The pointer to the average scene. */
     RealTimeEvoked::SPtr                m_pRTE;                     /**< The real-time evoked measurement. */
     QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */

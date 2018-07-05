@@ -45,8 +45,8 @@
 #include "scdisp_global.h"
 
 #include "measurementwidget.h"
-#include "helpers/realtimeevokedsetmodel.h"
-#include "helpers/realtimebutterflyplot.h"
+#include "helpers/evokedsetmodel.h"
+#include "helpers/butterflyview.h"
 #include "helpers/quickcontrolwidget.h"
 
 #include <disp/viewers/channelselectionview.h>
@@ -256,12 +256,12 @@ private:
     */
     bool virtual eventFilter(QObject *object, QEvent *event);
 
-    RealTimeEvokedSetModel::SPtr        m_pRTESetModel;             /**< RTE data model */
-    RealTimeButterflyPlot::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
+    EvokedSetModel::SPtr        m_pRTESetModel;             /**< RTE data model */
+    ButterflyView::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
     AverageScene::SPtr                  m_pAverageScene;            /**< The pointer to the average scene. */
     RealTimeEvokedSet::SPtr             m_pRTESet;                  /**< The real-time evoked measurement. */
     QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
-    ChannelSelectionView::SPtr        m_pChannelSelectionView;  /**< ChannelSelectionView. */
+    ChannelSelectionView::SPtr          m_pChannelSelectionView;    /**< ChannelSelectionView. */
     ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
     FilterView::SPtr                    m_pFilterView;              /**< Filter view. */
 

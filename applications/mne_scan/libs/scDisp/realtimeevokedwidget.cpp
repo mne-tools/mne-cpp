@@ -150,7 +150,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pToolBox->hide();
 
     //Butterfly
-    m_pButterflyPlot = RealTimeButterflyPlot::SPtr(new RealTimeButterflyPlot(this));
+    m_pButterflyPlot = ButterflyView::SPtr(new ButterflyView(this));
     m_pButterflyPlot->installEventFilter(this);
 
     m_pToolBox->insertItem(0, m_pButterflyPlot.data(), QIcon(), "Butterfly plot");
@@ -295,7 +295,7 @@ void RealTimeEvokedWidget::init()
 
         m_pToolBox->show();
 
-        m_pRTEModel = RealTimeEvokedModel::SPtr(new RealTimeEvokedModel(this));
+        m_pRTEModel = EvokedModel::SPtr(new EvokedModel(this));
         m_pRTEModel->setRTE(m_pRTE);
 
         //m_pButterflyPlot->setModel(m_pRTEModel.data());
@@ -429,10 +429,10 @@ void RealTimeEvokedWidget::init()
         m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pRTEModel.data(),static_cast<void (RealTimeEvokedModel::*)(QString)>(&RealTimeEvokedModel::setFilterChannelType));
+                m_pRTEModel.data(),static_cast<void (EvokedModel::*)(QString)>(&EvokedModel::setFilterChannelType));
 
         connect(m_pFilterView.data(), &FilterView::filterChanged,
-                m_pRTEModel.data(), &RealTimeEvokedModel::filterChanged);
+                m_pRTEModel.data(), &EvokedModel::filterChanged);
 
         //Init downsampled sampling frequency
         m_pFilterView->setSamplingRate(m_pFiffInfo->sfreq);
@@ -494,11 +494,11 @@ void RealTimeEvokedWidget::init()
 
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                m_pRTEModel.data(), &RealTimeEvokedModel::updateCompensator);
+                m_pRTEModel.data(), &EvokedModel::updateCompensator);
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                m_pRTEModel.data(), &RealTimeEvokedModel::updateProjection);
+                m_pRTEModel.data(), &EvokedModel::updateProjection);
 
         //Handle modalities
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
@@ -513,7 +513,7 @@ void RealTimeEvokedWidget::init()
 
         //Handle updating the butterfly and layout plot
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pButterflyPlot.data(), &RealTimeButterflyPlot::updateView);
+                m_pButterflyPlot.data(), &ButterflyView::updateView);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 this, &RealTimeEvokedWidget::onSelectionChanged);
@@ -546,7 +546,7 @@ void RealTimeEvokedWidget::init()
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 this, &RealTimeEvokedWidget::channelSelectionManagerChanged);
 
-        connect(m_pRTEModel.data(), &RealTimeEvokedModel::dataChanged,
+        connect(m_pRTEModel.data(), &EvokedModel::dataChanged,
                 this, &RealTimeEvokedWidget::onSelectionChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
@@ -657,7 +657,7 @@ void RealTimeEvokedWidget::onSelectionChanged()
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        RowVectorPair averageData = m_pRTEModel->data(0, 2, RealTimeEvokedModelRoles::GetAverageData).value<RowVectorPair>();
+        RowVectorPair averageData = m_pRTEModel->data(0, 2, EvokedModelRoles::GetAverageData).value<RowVectorPair>();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);

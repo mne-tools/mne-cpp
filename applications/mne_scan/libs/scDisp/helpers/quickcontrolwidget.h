@@ -112,7 +112,7 @@ struct Modality {
 /**
 * DECLARE CLASS QuickControlWidget
 *
-* @brief The ProjectorWidget class provides a quick control widget for scaling, filtering, projector and view options
+* @brief The QuickControlWidget class provides a quick control widget for scaling, filtering, projector and other control options.
 */
 class QuickControlWidget : public DISPLIB::DraggableFramelessWidget
 {

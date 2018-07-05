@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedmodel.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     evokedsetmodel.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     August, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeEvokedModel Class.
+* @brief    Declaration of the EvokedSetModel Class.
 *
 */
 
-#ifndef REALTIMEEVOKEDMODEL_H
-#define REALTIMEEVOKEDMODEL_H
+#ifndef EVOKEDSETMODEL_H
+#define EVOKEDSETMODEL_H
 
 
 //*************************************************************************************************************
@@ -42,11 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <scMeas/realtimesamplearraychinfo.h>
-#include <scMeas/realtimeevoked.h>
 #include <fiff/fiff_types.h>
-#include <iostream>
-
 #include <utils/filterTools/filterdata.h>
 
 
@@ -56,8 +52,7 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
-#include <QtConcurrent/QtConcurrent>
-#include <QFuture>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -71,31 +66,32 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCDISPLIB
-{
-
-namespace RealTimeEvokedModelRoles
-{
-    enum ItemRole{GetAverageData = Qt::UserRole + 1020};
+namespace FIFFLIB {
+    class FiffEvokedSet;
 }
-
-typedef QPair<const double*,qint32> RowVectorPair;
-typedef QPair<double, Eigen::RowVectorXd> AvrTypeRowVector;
-typedef QPair<double, SCDISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
-using namespace UTILSLIB;
-using namespace SCDISPLIB;
+namespace DISPLIB
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace EvokedSetModelRoles
+{
+    enum ItemRole{GetAverageData = Qt::UserRole + 1020};
+}
 
 
 //*************************************************************************************************************
@@ -103,22 +99,25 @@ using namespace SCDISPLIB;
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> MatrixXdR;
+typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<double, Eigen::RowVectorXd> AvrTypeRowVector;
+typedef QPair<double, DISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeEvokedModel
+* DECLARE CLASS EvokedSetModel
 *
-* @brief The RealTimeEvokedModel class implements the data access model for a real-time multi sample array data stream
+* @brief The EvokedSetModel class implements the data access model for evoked set data
 */
-class RealTimeEvokedModel : public QAbstractTableModel
+class EvokedSetModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeEvokedModel> SPtr;              /**< Shared pointer type for RealTimeEvokedModel. */
-    typedef QSharedPointer<const RealTimeEvokedModel> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedModel. */
+    typedef QSharedPointer<EvokedSetModel> SPtr;              /**< Shared pointer type for EvokedSetModel. */
+    typedef QSharedPointer<const EvokedSetModel> ConstSPtr;   /**< Const shared pointer type for EvokedSetModel. */
 
     //=========================================================================================================
     /**
@@ -126,8 +125,8 @@ public:
     *
     * @param[in] parent     parent of the table model
     */
-    RealTimeEvokedModel(QObject *parent = 0);
-    ~RealTimeEvokedModel();
+    EvokedSetModel(QObject *parent = 0);
+    ~EvokedSetModel();
 
     inline bool isInit() const;
 
@@ -190,11 +189,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets corresponding real-time evoked
+    * Sets corresponding evoked set
     *
-    * @param [in] pRTE      The real-time evoked
+    * @param [in] pEvokedSet      The evoked set
     */
-    void setRTE(QSharedPointer<RealTimeEvoked> &pRTE);
+    void setRTESet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet);
 
     //=========================================================================================================
     /**
@@ -220,7 +219,7 @@ public:
     *
     * @return kind of given channel number
     */
-    fiff_int_t getKind(qint32 row) const;
+    FIFFLIB::fiff_int_t getKind(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -230,7 +229,7 @@ public:
     *
     * @return unit of given channel number
     */
-    fiff_int_t getUnit(qint32 row) const;
+    FIFFLIB::fiff_int_t getUnit(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -240,7 +239,7 @@ public:
     *
     * @return coil type of given channel number
     */
-    fiff_int_t getCoil(qint32 row) const;
+    FIFFLIB::fiff_int_t getCoil(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -248,7 +247,7 @@ public:
     *
     * @return the channel idx to selection status
     */
-    inline const QMap<qint32,qint32>& getIdxSelMap() const;
+    const QMap<qint32,qint32>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
@@ -256,7 +255,7 @@ public:
     *
     * @return the current scaling
     */
-    inline const QMap< qint32,float >& getScaling() const;
+    const QMap< qint32,float >& getScaling() const;
 
     //=========================================================================================================
     /**
@@ -264,7 +263,7 @@ public:
     *
     * @return the current number for the time spacers
     */
-    inline int getNumberOfTimeSpacers() const;
+    int getNumberOfTimeSpacers() const;
 
     //=========================================================================================================
     /**
@@ -272,7 +271,15 @@ public:
     *
     * @return the current baseline information as a from to QPair
     */
-    inline QPair<QVariant,QVariant> getBaselineInfo() const;
+    QPair<QVariant,QVariant> getBaselineInfo() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current number of stored averages
+    *
+    * @return the current number of stored averages
+    */
+    int getNumAverages() const;
 
     //=========================================================================================================
     /**
@@ -280,7 +287,7 @@ public:
     *
     * @return the number of pre-stimulus samples
     */
-    inline qint32 getNumPreStimSamples() const;
+    qint32 getNumPreStimSamples() const;
 
     //=========================================================================================================
     /**
@@ -288,7 +295,7 @@ public:
     *
     * @return the current sampling frequency
     */
-    inline float getSamplingFrequency() const;
+    float getSamplingFrequency() const;
 
     //=========================================================================================================
     /**
@@ -310,7 +317,7 @@ public:
     *
     * @return number of vertical lines
     */
-    inline qint32 numVLines() const;
+    qint32 numVLines() const;
 
     //=========================================================================================================
     /**
@@ -318,7 +325,7 @@ public:
     *
     * @return the current freezing status
     */
-    inline bool isFreezed() const;
+    bool isFreezed() const;
 
     //=========================================================================================================
     /**
@@ -354,7 +361,7 @@ public:
     *
     * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(QList<FilterData> filterData);
+    void filterChanged(QList<UTILSLIB::FilterData> filterData);
 
     //=========================================================================================================
     /**
@@ -366,11 +373,61 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the channel colors
+    *
+    * @param[in] channelColors    the channel colors
+    */
+    void setChannelColors(QList<QColor> channelColors);
+
+    //=========================================================================================================
+    /**
     * Create list of channels which are to be filtered based on channel names
     *
     * @param[in] channelNames    the channel names which are to be filtered
     */
     void createFilterChannelList(QStringList channelNames);
+
+private:
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the channels in m_matData
+    */
+    void filterChannelsConcurrently();
+
+    QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pEvokedSet;                   /**< The evoked set measurement. */
+
+    QMap<qint32,qint32>                     m_qMapIdxRowSelection;          /**< Selection mapping.*/
+    QMap<qint32,float>                      m_qMapChScaling;                /**< Channel scaling map. */
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInformation;             /**< Average colors and names. */
+
+    QList<Eigen::MatrixXd>                  m_matData;                      /**< List that holds the data*/
+    QList<Eigen::MatrixXd>                  m_matDataFreeze;                /**< List that holds the data when freezed*/
+    QList<Eigen::MatrixXd>                  m_matDataFiltered;              /**< The filtered data */
+    QList<Eigen::MatrixXd>                  m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
+    QList<double>                           m_lAvrTypes;                    /**< The average types */
+    QList<QColor>                           m_qListChColors;                /**< Channel color for butterfly plot.*/
+
+    Eigen::MatrixXd                         m_matProj;                      /**< SSP projector */
+    Eigen::MatrixXd                         m_matComp;                      /**< Compensator */
+    Eigen::SparseMatrix<double>             m_matSparseProjCompMult;        /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double>             m_matSparseProjMult;            /**< The final sparse SSP projector */
+    Eigen::SparseMatrix<double>             m_matSparseCompMult;            /**< The final sparse compensator matrix */
+
+    Eigen::RowVectorXi                      m_vecBadIdcs;                   /**< Idcs of bad channels */
+
+    QPair<QVariant,QVariant>                m_pairBaseline;                 /**< Baseline information */
+
+    bool                                    m_bIsInit;                      /**< Init flag */
+    bool                                    m_bIsFreezed;                   /**< Display is freezed */
+    bool                                    m_bProjActivated;               /**< Doo projections flag */
+    bool                                    m_bCompActivated;               /**< Compensator activated */
+    float                                   m_fSps;                         /**< Sampling rate */
+    qint32                                  m_iMaxFilterLength;             /**< Max order of the current filters */
+
+    QString                                 m_sFilterChannelType;           /**< Kind of channel which is to be filtered */
+    QList<UTILSLIB::FilterData>             m_filterData;                   /**< List of currently active filters. */
+    QStringList                             m_filterChannelList;            /**< List of channels which are to be filtered.*/
+    QStringList                             m_visibleChannelList;           /**< List of currently visible channels in the view.*/
 
 signals:
     //=========================================================================================================
@@ -381,46 +438,13 @@ signals:
     */
     void newSelection(QList<qint32> selection);
 
-private:
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the channels in m_matData
+    * Emmited when new average type has been received
+    *
+    * @param [in] qMapAverageColor     the average information map
     */
-    void filterChannelsConcurrently();
-
-    QSharedPointer<RealTimeEvoked>      m_pRTE;                         /**< The real-time evoked measurement. */
-
-    QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
-    QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
-
-    Eigen::MatrixXd                     m_matData;                      /**< List that holds the data*/
-    Eigen::MatrixXd                     m_matDataFreeze;                /**< List that holds the data when freezed*/
-
-    Eigen::MatrixXd                     m_matProj;                      /**< SSP projector */
-    Eigen::MatrixXd                     m_matComp;                      /**< Compensator */
-
-    Eigen::MatrixXd                     m_matDataFiltered;              /**< The filtered data */
-    Eigen::MatrixXd                     m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
-
-    Eigen::SparseMatrix<double>         m_matSparseProjCompMult;        /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>         m_matSparseProjMult;            /**< The final sparse SSP projector */
-    Eigen::SparseMatrix<double>         m_matSparseCompMult;            /**< The final sparse compensator matrix */
-
-    Eigen::RowVectorXi                  m_vecBadIdcs;                   /**< Idcs of bad channels */
-
-    QPair<QVariant,QVariant>            m_pairBaseline;                 /**< Baseline information */
-
-    bool                                m_bIsInit;                      /**< Init flag */
-    bool                                m_bIsFreezed;                   /**< Display is freezed */
-    bool                                m_bProjActivated;               /**< Doo projections flag */
-    bool                                m_bCompActivated;               /**< Compensator activated */
-    float                               m_fSps;                         /**< Sampling rate */
-    qint32                              m_iMaxFilterLength;             /**< Max order of the current filters */
-
-    QString                             m_sFilterChannelType;           /**< Kind of channel which is to be filtered */
-    QList<FilterData>                   m_filterData;                   /**< List of currently active filters. */
-    QStringList                         m_filterChannelList;            /**< List of channels which are to be filtered.*/
-    QStringList                         m_visibleChannelList;           /**< List of currently visible channels in the view.*/
+    void newAverageTypeReceived(QMap<double, QPair<QColor, QPair<QString,bool> > > qMapAverageColor);
 };
 
 
@@ -430,103 +454,16 @@ private:
 //=============================================================================================================
 
 
-inline bool RealTimeEvokedModel::isInit() const
-{
-    return m_bIsInit;
-}
-
-
-//*************************************************************************************************************
-
-inline qint32 RealTimeEvokedModel::getNumSamples() const
-{
-    return m_bIsInit ? m_matData.cols() : 0;
-}
-
-
-//*************************************************************************************************************
-
-inline QVariant RealTimeEvokedModel::data(int row, int column, int role) const
-{
-    return data(index(row, column), role);
-}
-
-
-//*************************************************************************************************************
-
-inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
-{
-    return m_qMapIdxRowSelection;
-}
-
-
-//*************************************************************************************************************
-
-inline qint32 RealTimeEvokedModel::numVLines() const
-{
-    return (qint32)(m_matData.cols()/m_fSps) - 1;
-}
-
-
-//*************************************************************************************************************
-
-inline qint32 RealTimeEvokedModel::getNumPreStimSamples() const
-{
-    return m_pRTE->getNumPreStimSamples();
-}
-
-
-//*************************************************************************************************************
-
-inline float RealTimeEvokedModel::getSamplingFrequency() const
-{
-    return m_fSps;
-}
-
-
-//*************************************************************************************************************
-
-inline bool RealTimeEvokedModel::isFreezed() const
-{
-    return m_bIsFreezed;
-}
-
-
-//*************************************************************************************************************
-
-inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
-{
-    return m_qMapChScaling;
-}
-
-
-//*************************************************************************************************************
-
-inline int RealTimeEvokedModel::getNumberOfTimeSpacers() const
-{
-    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
-    return floor((m_matData.cols()/m_fSps)*10);
-}
-
-
-//*************************************************************************************************************
-
-inline QPair<QVariant,QVariant> RealTimeEvokedModel::getBaselineInfo() const
-{
-    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
-    return m_pairBaseline;
-}
-
 } // NAMESPACE
 
-#ifndef metatype_rowvectorxd
-#define metatype_rowvectorxd
-Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+#ifndef metatype_listrowvectorxd
+#define metatype_listrowvectorxd
+Q_DECLARE_METATYPE(DISPLIB::AvrTypeRowVector);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
 #endif
 
-#ifndef metatype_rowvectorpair
-#define metatype_rowvectorpair
-Q_DECLARE_METATYPE(SCDISPLIB::RowVectorPair);
+#ifndef metatype_listrowvectorpair
+#define metatype_listrowvectorpair
+Q_DECLARE_METATYPE(DISPLIB::AvrTypeRowVectorPair);
 #endif
 
-#endif // REALTIMEEVOKEDMODEL_H
+#endif // EVOKEDSETMODEL_H
