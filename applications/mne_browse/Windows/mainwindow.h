@@ -85,7 +85,7 @@
 #include "chinfowindow.h"
 #include "noisereductionwindow.h"
 
-#include <disp/viewers/selectionmanagerwindow.h>
+#include <disp/viewers/channelselectionview.h>
 
 
 //*************************************************************************************************************
@@ -265,13 +265,13 @@ private:
     DataWindow*             m_pDataWindow;                  /**< Data widget which display the data for the user. */
     AboutWindow*            m_pAboutWindow;                 /**< About widget which displays information about this application.*/
     InformationWindow*      m_pInformationWindow;           /**< Information widget which displays information about this application (log, etc.).*/
-    SelectionManagerWindow* m_pSelectionManagerWindow;      /**< Selection manager window which can be used to select channels.*/
+    ChannelSelectionView* m_pChannelSelectionView;      /**< Selection manager window which can be used to select channels.*/
     AverageWindow*          m_pAverageWindow;               /**< Average window can be used to plot calculated averages in a 2D layout scene.*/
     ScaleWindow*            m_pScaleWindow;                 /**< Scale widget can be used to set the scaling of the different channels types. */
     ChInfoWindow*           m_pChInfoWindow;                /**< Dock window which shows the information about the curretly loaded data channels. */
     NoiseReductionWindow*   m_pNoiseReductionWindow;        /**< Dock widget to hold he projection manager. */
 
-    QDockWidget*            m_pSelectionManagerWindowDock;
+    QDockWidget*            m_pChannelSelectionViewDock;
 
     //application settings
     QSettings               m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions. */

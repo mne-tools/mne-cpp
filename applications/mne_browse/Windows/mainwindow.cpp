@@ -115,11 +115,11 @@ void MainWindow::setupWindowWidgets()
     m_pChInfoWindow->hide();
 
     //Create selection manager window - QTDesigner used - see / FormFiles
-    m_pSelectionManagerWindowDock = new QDockWidget(this);
-    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindowDock);
-    m_pSelectionManagerWindow = new SelectionManagerWindow(m_pSelectionManagerWindowDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
-    m_pSelectionManagerWindowDock->setWidget(m_pSelectionManagerWindow);
-    m_pSelectionManagerWindowDock->hide();
+    m_pChannelSelectionViewDock = new QDockWidget(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pChannelSelectionViewDock);
+    m_pChannelSelectionView = new ChannelSelectionView(m_pChannelSelectionViewDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
+    m_pChannelSelectionViewDock->setWidget(m_pChannelSelectionView);
+    m_pChannelSelectionViewDock->hide();
 
     //Create average manager window - QTDesigner used - see / FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
@@ -164,11 +164,11 @@ void MainWindow::setupWindowWidgets()
             m_pAverageWindow, &AverageWindow::scaleAveragedData);
 
     //Hide non selected channels in the data view
-    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
+    connect(m_pChannelSelectionView, &ChannelSelectionView::showSelectedChannelsOnly,
             m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
 
     //Connect selection manager with average manager
-    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
+    connect(m_pChannelSelectionView, &ChannelSelectionView::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
@@ -178,18 +178,18 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
             m_pChInfoWindow->getDataModel().data(), &ChInfoModel::assignedOperatorsChanged);
 
-    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
+    connect(m_pChannelSelectionView, &ChannelSelectionView::loadedLayoutMap,
             m_pChInfoWindow->getDataModel().data(), &ChInfoModel::layoutChanged);
 
     connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
-            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+            m_pChannelSelectionView, &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
     connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
             m_pAverageWindow, &AverageWindow::setMappedChannelNames);
 
     //Connect selection manager with a new file loaded signal
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pSelectionManagerWindow, &SelectionManagerWindow::newFiffFileLoaded);
+            m_pChannelSelectionView, &ChannelSelectionView::newFiffFileLoaded);
 
     //Connect filter window with new file loaded signal
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
@@ -209,9 +209,9 @@ void MainWindow::setupWindowWidgets()
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
-        m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-        m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+        m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+        m_pChannelSelectionView->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
@@ -289,7 +289,7 @@ void MainWindow::createToolBar()
     QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
     showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
     connect(showSelectionManager, &QAction::triggered, this, [=](){
-        showWindow(m_pSelectionManagerWindowDock);
+        showWindow(m_pChannelSelectionViewDock);
     });
     toolBar->addAction(showSelectionManager);
 
@@ -364,7 +364,7 @@ void MainWindow::connectMenus()
         showWindow(m_pInformationWindow);
     });
     connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [=](){
-        showWindow(m_pSelectionManagerWindowDock);
+        showWindow(m_pChannelSelectionViewDock);
     });
     connect(ui->m_averageWindowAction, &QAction::triggered, this, [=](){
         showWindow(m_pAverageWindow);

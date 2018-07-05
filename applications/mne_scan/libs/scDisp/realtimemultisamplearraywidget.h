@@ -81,7 +81,7 @@ namespace DISP3DLIB {
 }
 
 namespace DISPLIB {
-    class SelectionManagerWindow;
+    class ChannelSelectionView;
     class FilterView;
     class ChInfoModel;
 }
@@ -387,7 +387,7 @@ private:
     QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;          /**< quick control widget. */
     QSharedPointer<DISPLIB::ChInfoModel>                    m_pChInfoModel;                 /**< channel info model. */
     QSharedPointer<SCMEASLIB::NewRealTimeMultiSampleArray>  m_pRTMSA;                       /**< The real-time sample array measurement. */
-    QSharedPointer<DISPLIB::SelectionManagerWindow>         m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
+    QSharedPointer<DISPLIB::ChannelSelectionView>         m_pChannelSelectionView;      /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::FilterView>                   m_pFilterWindow;                /**< Filter window. */
 
     bool                                        m_bInitialized;                 /**< Is Initialized */

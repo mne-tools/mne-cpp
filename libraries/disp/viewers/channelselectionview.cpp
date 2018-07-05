@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     selectionmanagerwindow.cpp
+* @file     channelselectionview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the SelectionManagerWindow class.
+* @brief    Definition of the ChannelSelectionView class.
 *
 */
 
@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_selectionmanagerwindow.h"
-#include "selectionmanagerwindow.h"
+#include "channelselectionview.h"
+#include "ui_channelselectionview.h"
 
 
 //*************************************************************************************************************
@@ -49,6 +49,8 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -56,9 +58,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPtr pChInfoModel, Qt::WindowType type)
+ChannelSelectionView::ChannelSelectionView(QWidget *parent, ChInfoModel::SPtr pChInfoModel, Qt::WindowType type)
 : QWidget(parent, type)
-, ui(new Ui::SelectionManagerWindow)
+, ui(new Ui::ChannelSelectionViewWidget)
 , m_pChInfoModel(pChInfoModel)
 {
     ui->setupUi(this);
@@ -74,7 +76,7 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPt
 
 //*************************************************************************************************************
 
-SelectionManagerWindow::~SelectionManagerWindow()
+ChannelSelectionView::~ChannelSelectionView()
 {
     delete ui;
 }
@@ -82,7 +84,7 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::initListWidgets()
+void ChannelSelectionView::initListWidgets()
 {
     //Install event filter to receive key press events
     ui->m_listWidget_userDefined->installEventFilter(this);
@@ -90,31 +92,31 @@ void SelectionManagerWindow::initListWidgets()
 
     //Connect list widgets to update themselves and other list widgets when changed
     connect(ui->m_listWidget_selectionGroups, &QListWidget::currentItemChanged,
-                this, &SelectionManagerWindow::updateSelectionGroupsList);
+                this, &ChannelSelectionView::updateSelectionGroupsList);
 
     //Update data view whenever a drag and drop item movement is performed
     //TODO: This is inefficient because updateDataView is called everytime the list's viewport is entered
     connect(ui->m_listWidget_userDefined->model(), &QAbstractTableModel::dataChanged,
-                this, &SelectionManagerWindow::updateDataView);
+                this, &ChannelSelectionView::updateDataView);
 }
 
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::initSelectionSceneView()
+void ChannelSelectionView::initSelectionSceneView()
 {
     //Create layout scene and set to view
     m_pSelectionScene = new SelectionScene(ui->m_graphicsView_layoutPlot);
     ui->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);
 
     connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
-                this, &SelectionManagerWindow::updateUserDefinedChannelsList);
+                this, &ChannelSelectionView::updateUserDefinedChannelsList);
 }
 
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::initComboBoxes()
+void ChannelSelectionView::initComboBoxes()
 {
     ui->m_comboBox_layoutFile->clear();
     ui->m_comboBox_layoutFile->insertItems(0, QStringList()
@@ -131,7 +133,7 @@ void SelectionManagerWindow::initComboBoxes()
     );
 
     connect(ui->m_comboBox_layoutFile, &QComboBox::currentTextChanged,
-                this, &SelectionManagerWindow::onComboBoxLayoutChanged);
+                this, &ChannelSelectionView::onComboBoxLayoutChanged);
 
     //Initialise layout as neuromag vectorview with all channels
     QString selectionName("babymeg-mag-inner-layer.lout");
@@ -145,33 +147,33 @@ void SelectionManagerWindow::initComboBoxes()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::initButtons()
+void ChannelSelectionView::initButtons()
 {
     connect(ui->m_pushButton_saveSelection, &QPushButton::clicked,
-                this, &SelectionManagerWindow::onBtnSaveUserSelection);
+                this, &ChannelSelectionView::onBtnSaveUserSelection);
 
     connect(ui->m_pushButton_loadSelection, &QPushButton::clicked,
-                this, &SelectionManagerWindow::onBtnLoadUserSelection);
+                this, &ChannelSelectionView::onBtnLoadUserSelection);
 
     connect(ui->m_pushButton_addToSelectionGroups, &QPushButton::clicked,
-                this, &SelectionManagerWindow::onBtnAddToSelectionGroups);
+                this, &ChannelSelectionView::onBtnAddToSelectionGroups);
 }
 
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::initCheckBoxes()
+void ChannelSelectionView::initCheckBoxes()
 {
     connect(ui->m_checkBox_showBadChannelsAsRed, &QCheckBox::clicked,
-                this, &SelectionManagerWindow::updateBadChannels);
+                this, &ChannelSelectionView::updateBadChannels);
 }
 
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames)
+void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames)
 {
-    //std::cout<<"SelectionManagerWindow::setCurrentlyMappedFiffChannels"<<std::endl;
+    //std::cout<<"ChannelSelectionView::setCurrentlyMappedFiffChannels"<<std::endl;
     m_currentlyLoadedFiffChannels = mappedLayoutChNames;
 
     //Clear the visible channel list
@@ -200,7 +202,7 @@ void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &m
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::highlightChannels(QModelIndexList channelIndexList)
+void ChannelSelectionView::highlightChannels(QModelIndexList channelIndexList)
 {
     QStringList channelList;
     for(int i = 0; i < channelIndexList.size(); i++) {
@@ -224,7 +226,7 @@ void SelectionManagerWindow::highlightChannels(QModelIndexList channelIndexList)
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::selectChannels(QStringList channelList)
+void ChannelSelectionView::selectChannels(QStringList channelList)
 {
     QList<QGraphicsItem *> allSceneItems = m_pSelectionScene->items();
 
@@ -242,7 +244,7 @@ void SelectionManagerWindow::selectChannels(QStringList channelList)
 
 //*************************************************************************************************************
 
-QStringList SelectionManagerWindow::getSelectedChannels()
+QStringList ChannelSelectionView::getSelectedChannels()
 {
     //if no channels have been selected by the user -> show selected group channels
     QListWidget* targetListWidget;
@@ -265,7 +267,7 @@ QStringList SelectionManagerWindow::getSelectedChannels()
 
 //*************************************************************************************************************
 
-QListWidgetItem* SelectionManagerWindow::getItemForChName(QListWidget* listWidget, QString channelName)
+QListWidgetItem* ChannelSelectionView::getItemForChName(QListWidget* listWidget, QString channelName)
 {
     for(int i=0; i < listWidget->count(); i++)
         if(listWidget->item(i)->text() == channelName)
@@ -277,7 +279,7 @@ QListWidgetItem* SelectionManagerWindow::getItemForChName(QListWidget* listWidge
 
 //*************************************************************************************************************
 
-const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
+const QMap<QString,QPointF>& ChannelSelectionView::getLayoutMap()
 {
     return m_layoutMap;
 }
@@ -285,7 +287,7 @@ const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::newFiffFileLoaded(FiffInfo::SPtr& pFiffInfo)
+void ChannelSelectionView::newFiffFileLoaded(FiffInfo::SPtr& pFiffInfo)
 {
     Q_UNUSED(pFiffInfo);
 
@@ -295,7 +297,7 @@ void SelectionManagerWindow::newFiffFileLoaded(FiffInfo::SPtr& pFiffInfo)
 
 //*************************************************************************************************************
 
-QString SelectionManagerWindow::getCurrentLayoutFile()
+QString ChannelSelectionView::getCurrentLayoutFile()
 {
     return ui->m_comboBox_layoutFile->currentText();
 }
@@ -303,7 +305,7 @@ QString SelectionManagerWindow::getCurrentLayoutFile()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::setCurrentLayoutFile(QString currentLayoutFile)
+void ChannelSelectionView::setCurrentLayoutFile(QString currentLayoutFile)
 {
     ui->m_comboBox_layoutFile->setCurrentText(currentLayoutFile);
 
@@ -313,7 +315,7 @@ void SelectionManagerWindow::setCurrentLayoutFile(QString currentLayoutFile)
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateBadChannels()
+void ChannelSelectionView::updateBadChannels()
 {
     QStringList badChannelMappedNames;
     QStringList badChannelList = m_pChInfoModel->getBadChannelList();
@@ -340,7 +342,7 @@ void SelectionManagerWindow::updateBadChannels()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateDataView()
+void ChannelSelectionView::updateDataView()
 {
     //if no channels have been selected by the user -> show selected group channels
     QListWidget* targetListWidget;
@@ -387,7 +389,7 @@ void SelectionManagerWindow::updateDataView()
 
 //*************************************************************************************************************
 
-bool SelectionManagerWindow::loadLayout(QString path)
+bool ChannelSelectionView::loadLayout(QString path)
 {
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
 
@@ -468,7 +470,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
 
 //*************************************************************************************************************
 
-bool SelectionManagerWindow::loadSelectionGroups(QString path)
+bool ChannelSelectionView::loadSelectionGroups(QString path)
 {
     //Clear the visible channel list
     ui->m_listWidget_visibleChannels->clear();
@@ -530,7 +532,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::cleanUpMEGChannels()
+void ChannelSelectionView::cleanUpMEGChannels()
 {
     QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
 
@@ -557,7 +559,7 @@ void SelectionManagerWindow::cleanUpMEGChannels()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous)
+void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous)
 {
     Q_UNUSED(previous);
 
@@ -583,7 +585,7 @@ void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* current,
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateSceneItems()
+void ChannelSelectionView::updateSceneItems()
 {
     QStringList visibleItems;
 
@@ -596,7 +598,7 @@ void SelectionManagerWindow::updateSceneItems()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateUserDefinedChannelsList()
+void ChannelSelectionView::updateUserDefinedChannelsList()
 {
     QList<QGraphicsItem*> itemList = m_pSelectionScene->selectedItems();
     QStringList userDefinedChannels;
@@ -615,7 +617,7 @@ void SelectionManagerWindow::updateUserDefinedChannelsList()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::onBtnLoadUserSelection()
+void ChannelSelectionView::onBtnLoadUserSelection()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 QString("Open selection file"),
@@ -631,7 +633,7 @@ void SelectionManagerWindow::onBtnLoadUserSelection()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::onBtnSaveUserSelection()
+void ChannelSelectionView::onBtnSaveUserSelection()
 {
     QDate date;
     QString path = QFileDialog::getSaveFileName(this,
@@ -654,7 +656,7 @@ void SelectionManagerWindow::onBtnSaveUserSelection()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::onBtnAddToSelectionGroups()
+void ChannelSelectionView::onBtnAddToSelectionGroups()
 {
     QStringList temp;
     for(int i = 0; i < ui->m_listWidget_userDefined->count(); i++)
@@ -667,7 +669,7 @@ void SelectionManagerWindow::onBtnAddToSelectionGroups()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::onComboBoxLayoutChanged()
+void ChannelSelectionView::onComboBoxLayoutChanged()
 {
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
     loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
@@ -676,7 +678,7 @@ void SelectionManagerWindow::onComboBoxLayoutChanged()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
+void ChannelSelectionView::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
 
@@ -687,7 +689,7 @@ void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
 
 //*************************************************************************************************************
 
-bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
+bool ChannelSelectionView::eventFilter(QObject *obj, QEvent *event)
 {
     //Setup delete key on user defined channel list
     if (obj == ui->m_listWidget_userDefined && event->type() == QEvent::KeyRelease) {

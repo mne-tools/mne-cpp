@@ -49,7 +49,7 @@
 #include "helpers/realtimebutterflyplot.h"
 #include "helpers/quickcontrolwidget.h"
 
-#include <disp/viewers/selectionmanagerwindow.h>
+#include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/chinfomodel.h>
 #include <disp/viewers/helpers/averagescene.h>
 #include <disp/viewers/helpers/averagesceneitem.h>
@@ -261,7 +261,7 @@ private:
     AverageScene::SPtr                  m_pAverageScene;            /**< The pointer to the average scene. */
     RealTimeEvokedSet::SPtr             m_pRTESet;                  /**< The real-time evoked measurement. */
     QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
-    SelectionManagerWindow::SPtr        m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    ChannelSelectionView::SPtr        m_pChannelSelectionView;  /**< ChannelSelectionView. */
     ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
     FilterView::SPtr                    m_pFilterView;              /**< Filter view. */
 

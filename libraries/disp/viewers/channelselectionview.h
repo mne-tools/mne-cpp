@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     selectionmanagerwindow.h
+* @file     channelselectionview.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SelectionManagerWindow class.
+* @brief    Contains the declaration of the ChannelSelectionView class.
 *
 */
 
-#ifndef SELECTIONMANAGERWINDOW_H
-#define SELECTIONMANAGERWINDOW_H
+#ifndef CHANNELSELECTIONVIEW_H
+#define CHANNELSELECTIONVIEW_H
 
 
 //*************************************************************************************************************
@@ -44,12 +44,14 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
-#include "utils/layoutloader.h"             //MNE-CPP utils
-#include "utils/selectionio.h"              //MNE-CPP utils
-#include "utils/layoutmaker.h"              //MNE-CPP utils
-#include "helpers/selectionscene.h"
-#include "fiff/fiff.h"
 #include "helpers/chinfomodel.h"
+#include "helpers/selectionscene.h"
+
+#include <utils/layoutloader.h>             //MNE-CPP utils
+#include <utils/selectionio.h>              //MNE-CPP utils
+#include <utils/layoutmaker.h>              //MNE-CPP utils
+
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -65,11 +67,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace UTILSLIB;
+namespace Ui {
+    class ChannelSelectionViewWidget;
+} //This must be defined outside of the DISPLIB namespace
 
 
 //*************************************************************************************************************
@@ -77,46 +80,44 @@ using namespace UTILSLIB;
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace Ui {class SelectionManagerWindow;} //This must be defined outside of the DISPLIB namespace
-
 namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 /**
-* DECLARE CLASS SelectionManagerWindow
+* DECLARE CLASS ChannelSelectionView
 *
-* @brief The SelectionManagerWindow class provides a channel selection window.
+* @brief The ChannelSelectionView class provides a channel selection window.
 */
-class DISPSHARED_EXPORT SelectionManagerWindow : public QWidget
+class DISPSHARED_EXPORT ChannelSelectionView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SelectionManagerWindow> SPtr;              /**< Shared pointer type for SelectionManagerWindow. */
-    typedef QSharedPointer<const SelectionManagerWindow> ConstSPtr;   /**< Const shared pointer type for SelectionManagerWindow. */
+    typedef QSharedPointer<ChannelSelectionView> SPtr;              /**< Shared pointer type for ChannelSelectionView. */
+    typedef QSharedPointer<const ChannelSelectionView> ConstSPtr;   /**< Const shared pointer type for ChannelSelectionView. */
 
     //=========================================================================================================
     /**
-    * Constructs a SelectionManagerWindow which is a child of parent.
+    * Constructs a ChannelSelectionView which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ChannelSelectionView becomes a window. If parent is another widget, ChannelSelectionView becomes a child window inside parent. ChannelSelectionView is deleted when its parent is deleted.
     * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0), Qt::WindowType type = Qt::Window);
+    ChannelSelectionView(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0), Qt::WindowType type = Qt::Window);
 
     //=========================================================================================================
     /**
-    * Destroys the SelectionManagerWindow.
-    * All SelectionManagerWindow's children are deleted first. The application exits if SelectionManagerWindow is the main widget.
+    * Destroys the ChannelSelectionView.
+    * All ChannelSelectionView's children are deleted first. The application exits if ChannelSelectionView is the main widget.
     */
-    ~SelectionManagerWindow();
+    ~ChannelSelectionView();
 
     //=========================================================================================================
     /**
@@ -325,16 +326,16 @@ private:
     */
     bool eventFilter(QObject *obj, QEvent *event);
 
-    Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
+    Ui::ChannelSelectionViewWidget*     ui;                                 /**< Pointer to the qt designer generated ui class. */
 
-    ChInfoModel::SPtr               m_pChInfoModel;                     /**< Pointer to the channel info model. */
+    ChInfoModel::SPtr                   m_pChInfoModel;                     /**< Pointer to the channel info model. */
 
-    QMap<QString,QPointF>           m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
-    QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
+    QMap<QString,QPointF>               m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
+    QMap<QString,QStringList>           m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
-    SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class. */
+    SelectionScene*                     m_pSelectionScene;                  /**< Pointer to the selection scene class. */
 
-    QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
+    QStringList                         m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
 
 signals:
     //=========================================================================================================
@@ -364,4 +365,4 @@ signals:
 
 } // NAMESPACE DISPLIB
 
-#endif // SELECTIONMANAGERWINDOW_H
+#endif // CHANNELSELECTIONVIEW_H
