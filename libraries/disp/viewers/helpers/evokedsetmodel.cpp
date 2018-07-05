@@ -411,12 +411,12 @@ QColor EvokedSetModel::getColor(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        if(m_qListChColors.size() < chRow) {
+        if(chRow < m_qListChColors.size()) {
             return m_qListChColors[chRow];
         }
     }
 
-    return QColor();
+    return QColor(0,0,0);
 }
 
 
@@ -639,9 +639,7 @@ void EvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 void EvokedSetModel::updateProjection()
 {
-    //
     //  Update the SSP projector
-    //
     if(m_pEvokedSet->info.chs.size()>0) {
         m_bProjActivated = false;
         for(qint32 i = 0; i < m_pEvokedSet->info.projs.size(); ++i) {
@@ -709,7 +707,7 @@ void EvokedSetModel::updateCompensator(int to)
     //
     //  Update the compensator
     //
-    if(m_pEvokedSet)
+    if(m_pEvokedSet->info.chs.size()>0)
     {
         if(to == 0) {
             m_bCompActivated = false;

@@ -275,8 +275,6 @@ void RealTimeEvokedSetWidget::getData()
 
             init();
 
-            m_pEvokedSetModel->setEvokedSet(m_pRTESet->getValue());
-
             m_pEvokedSetModel->updateData();
         }
     } else {
@@ -312,7 +310,8 @@ void RealTimeEvokedSetWidget::init()
         m_pToolBox->show();
 
         m_pEvokedSetModel = EvokedSetModel::SPtr(new EvokedSetModel(this));
-        //m_pEvokedSetModel->setRTESet(m_pRTESet->getValue());
+        m_pEvokedSetModel->setChannelColors(m_pRTESet->chColor());
+        m_pEvokedSetModel->setEvokedSet(m_pRTESet->getValue());
 
         m_pButterflyView->setModel(m_pEvokedSetModel);
 
