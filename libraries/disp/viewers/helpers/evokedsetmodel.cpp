@@ -288,7 +288,7 @@ QVariant EvokedSetModel::headerData(int section, Qt::Orientation orientation, in
 
 //*************************************************************************************************************
 
-void EvokedSetModel::setRTESet(QSharedPointer<FiffEvokedSet> &pEvokedSet)
+void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> &pEvokedSet)
 {
     beginResetModel();
     m_pEvokedSet = pEvokedSet;

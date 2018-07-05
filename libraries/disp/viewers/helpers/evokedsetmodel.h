@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../../disp_global.h"
+
 #include <fiff/fiff_types.h>
 #include <utils/filterTools/filterdata.h>
 
@@ -111,7 +113,7 @@ typedef QPair<double, DISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 *
 * @brief The EvokedSetModel class implements the data access model for evoked set data
 */
-class EvokedSetModel : public QAbstractTableModel
+class DISPSHARED_EXPORT EvokedSetModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -193,7 +195,7 @@ public:
     *
     * @param [in] pEvokedSet      The evoked set
     */
-    void setRTESet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet);
+    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet);
 
     //=========================================================================================================
     /**
