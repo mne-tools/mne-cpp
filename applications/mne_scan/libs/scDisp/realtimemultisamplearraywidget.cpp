@@ -52,9 +52,9 @@
 #include "helpers/realtimemultisamplearraydelegate.h"
 #include "helpers/quickcontrolwidget.h"
 
-#include <disp/filterwindow.h>
-#include <disp/selectionmanagerwindow.h>
-#include <disp/helpers/chinfomodel.h>
+#include <disp/viewers/filterview.h>
+#include <disp/viewers/selectionmanagerwindow.h>
+#include <disp/viewers/helpers/chinfomodel.h>
 
 #include <scMeas/newrealtimemultisamplearray.h>
 

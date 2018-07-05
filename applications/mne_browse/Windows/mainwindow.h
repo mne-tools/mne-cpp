@@ -80,11 +80,12 @@
 #include "datawindow.h"
 #include "aboutwindow.h"
 #include "informationwindow.h"
-#include "disp/selectionmanagerwindow.h"
 #include "averagewindow.h"
 #include "scalewindow.h"
 #include "chinfowindow.h"
 #include "noisereductionwindow.h"
+
+#include <disp/viewers/selectionmanagerwindow.h>
 
 
 //*************************************************************************************************************

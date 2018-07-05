@@ -112,7 +112,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 , m_pQuickControlWidget(Q_NULLPTR)
 , m_pSelectionManagerWindow(Q_NULLPTR)
 , m_pChInfoModel(Q_NULLPTR)
-, m_pFilterWindow(Q_NULLPTR)
+, m_pFilterView(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
 , m_bInitialized(false)
 {
@@ -190,8 +190,8 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
         }
 
         //Store filter
-        if(m_pFilterWindow != 0) {
-            FilterData filter = m_pFilterWindow->getUserDesignedFilter();
+        if(m_pFilterView != 0) {
+            FilterData filter = m_pFilterView->getUserDesignedFilter();
 
             settings.setValue(QString("RTEW/%1/filterHP").arg(t_sRTEWName), filter.m_dHighpassFreq);
             settings.setValue(QString("RTEW/%1/filterLP").arg(t_sRTEWName), filter.m_dLowpassFreq);
@@ -199,8 +199,8 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/filterType").arg(t_sRTEWName), (int)filter.m_Type);
             settings.setValue(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), (int)filter.m_designMethod);
             settings.setValue(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), filter.m_dParksWidth*(filter.m_sFreq/2));
-            settings.setValue(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), m_pFilterWindow->userDesignedFiltersIsActive());
-            settings.setValue(QString("RTEW/%1/filterChannelType").arg(t_sRTEWName), m_pFilterWindow->getChannelType());
+            settings.setValue(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), m_pFilterView->userDesignedFiltersIsActive());
+            settings.setValue(QString("RTEW/%1/filterChannelType").arg(t_sRTEWName), m_pFilterView->getChannelType());
         }
 
         //Store scaling
@@ -272,8 +272,8 @@ void RealTimeEvokedWidget::getData()
         if(m_iMaxFilterTapSize != m_pRTE->getValue()->data.cols()) {
             m_iMaxFilterTapSize = m_pRTE->getValue()->data.cols();
 
-            m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
-            m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+            m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
+            m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
         }
 
         m_pRTEModel->updateData();
@@ -421,24 +421,24 @@ void RealTimeEvokedWidget::init()
         //
         //-------- Init filter window --------
         //
-        m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(this, Qt::Window));
-        //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+        m_pFilterView = FilterView::SPtr(new FilterView(this, Qt::Window));
+        //m_pFilterView->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-        m_pFilterWindow->init(m_pFiffInfo->sfreq);
-        m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
-        m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+        m_pFilterView->init(m_pFiffInfo->sfreq);
+        m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
+        m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
 
-        connect(m_pFilterWindow.data(), static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
+        connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
                 m_pRTEModel.data(),static_cast<void (RealTimeEvokedModel::*)(QString)>(&RealTimeEvokedModel::setFilterChannelType));
 
-        connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
+        connect(m_pFilterView.data(), &FilterView::filterChanged,
                 m_pRTEModel.data(), &RealTimeEvokedModel::filterChanged);
 
         //Init downsampled sampling frequency
-        m_pFilterWindow->setSamplingRate(m_pFiffInfo->sfreq);
+        m_pFilterView->setSamplingRate(m_pFiffInfo->sfreq);
 
         //Set stored filter settings from last session
-        m_pFilterWindow->setFilterParameters(settings.value(QString("RTEW/%1/filterHP").arg(t_sRTEWName), 5.0).toDouble(),
+        m_pFilterView->setFilterParameters(settings.value(QString("RTEW/%1/filterHP").arg(t_sRTEWName), 5.0).toDouble(),
                                                 settings.value(QString("RTEW/%1/filterLP").arg(t_sRTEWName), 40.0).toDouble(),
                                                 settings.value(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), 128).toInt(),
                                                 settings.value(QString("RTEW/%1/filterType").arg(t_sRTEWName), 2).toInt(),
@@ -505,7 +505,7 @@ void RealTimeEvokedWidget::init()
                 this, &RealTimeEvokedWidget::broadcastSettings);
 
         //Handle filtering
-        connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
+        connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
                 m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
@@ -522,7 +522,7 @@ void RealTimeEvokedWidget::init()
                                                      settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),
                                                      settings.value(QString("RTEW/%1/viewOpacity").arg(t_sRTEWName), 95).toInt());
 
-        m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+        m_pQuickControlWidget->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
 
         QColor signalDefault = Qt::darkBlue;
         QColor butterflyBackgroundDefault = Qt::white;
@@ -682,14 +682,14 @@ void RealTimeEvokedWidget::onSelectionChanged()
 void RealTimeEvokedWidget::showFilterWidget(bool state)
 {
     if(state) {
-        if(m_pFilterWindow->isActiveWindow())
-            m_pFilterWindow->hide();
+        if(m_pFilterView->isActiveWindow())
+            m_pFilterView->hide();
         else {
-            m_pFilterWindow->activateWindow();
-            m_pFilterWindow->show();
+            m_pFilterView->activateWindow();
+            m_pFilterView->show();
         }
     } else {
-        m_pFilterWindow->hide();
+        m_pFilterView->hide();
     }
 }
 

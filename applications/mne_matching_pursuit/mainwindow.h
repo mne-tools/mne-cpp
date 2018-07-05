@@ -46,13 +46,13 @@
 //=============================================================================================================
 
 #include <mne/mne.h>
-#include <disp/plot.h>
-#include <disp/helpers/colormap.h>
+#include <disp/plots/plot.h>
+#include <disp/plots/helpers/colormap.h>
 #include <utils/spectrogram.h>
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
 #include <utils/mp/fixdictmp.h>
-#include <disp/tfplot.h>
+#include <disp/plots/tfplot.h>
 
 #include "editorwindow.h"
 #include "ui_editorwindow.h"

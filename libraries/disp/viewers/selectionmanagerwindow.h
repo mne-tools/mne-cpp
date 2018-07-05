@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
+#include "../disp_global.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "utils/selectionio.h"              //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils

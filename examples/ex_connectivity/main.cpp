@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/adapters/networkview.h>
+#include <disp3D/viewers/networkview.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
