@@ -184,21 +184,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtseWidget);
             rtseWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >())
-        {
-            QSharedPointer<RealTimeEvoked>* pRealTimeEvoked = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >()->data();
-
-            RealTimeEvokedWidget* rteWidget = new RealTimeEvokedWidget(*pRealTimeEvoked, pT, newDisp);
-
-            qListActions.append(rteWidget->getDisplayActions());
-            qListWidgets.append(rteWidget->getDisplayWidgets());
-
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rteWidget, &RealTimeEvokedWidget::update, Qt::BlockingQueuedConnection);
-
-            vboxLayout->addWidget(rteWidget);
-            rteWidget->init();
-        }
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >())
         {
             QSharedPointer<RealTimeEvokedSet>* pRealTimeEvokedSet = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()->data();
