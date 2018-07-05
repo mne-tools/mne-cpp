@@ -72,8 +72,8 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace SCDISPLIB {
-    class HPIWidget;
+namespace DISP3DLIB {
+    class HpiView;
 }
 
 
@@ -233,7 +233,7 @@ protected:
     QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
     QSharedPointer<REALTIMELIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
-    QSharedPointer<SCDISPLIB::HPIWidget>        m_pHPIWidget;               /**< HPI widget. */
+    QSharedPointer<DISP3DLIB::HpiView>          m_pHPIWidget;               /**< HPI widget. */
 
     QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
 

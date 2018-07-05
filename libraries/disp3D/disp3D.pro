@@ -55,9 +55,9 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Realtimed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
@@ -66,9 +66,9 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Realtime \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Disp \
-
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -123,6 +123,7 @@ SOURCES += \
     viewers/ecdview.cpp \
     viewers/abstractview.cpp \
     viewers/networkview.cpp \
+    viewers/hpiview.cpp \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
     helpers/interpolation/interpolation.cpp \
     helpers/geometryinfo/geometryinfo.cpp \
@@ -177,6 +178,7 @@ HEADERS += \
     viewers/ecdview.h \
     viewers/abstractview.h \
     viewers/networkview.h \
+    viewers/hpiview.h \
     disp3D_global.h \
     engine/model/items/sensordata/sensordatatreeitem.h \
     helpers/interpolation/interpolation.h \
@@ -189,9 +191,35 @@ HEADERS += \
     engine/view/orbitalcameracontroller.h
 
 FORMS += \
-    engine/control/control3dwidget.ui \
+    engine/control/formfiles/control3dwidget.ui \
+    viewers/formfiles/hpiview.ui \
 
 RESOURCES += $$PWD/disp3d.qrc \
+
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/general/sensorSurfaces/306m.fif \
+    $${ROOT_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
+    $${ROOT_DIR}/resources/general/sensorSurfaces/BabyMEG.fif \
+    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
+    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
+    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-fiducials.fif \
+    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-head.fif \
+    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-inner_skull-bem.fif \
+    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-trans.fif \
+
+# Copy resource files to bin resource folder
+for(FILE, RESOURCE_FILES) {
+    FILEDIR = $$dirname(FILE)
+    FILEDIR = $$dirname(FILE)
+    FILEDIR ~= s,/resources,/bin/resources,g
+    FILEDIR = $$shell_path($${FILEDIR})
+    TRGTDIR = $${FILEDIR}
+
+    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+    FILE = $$shell_path($${FILE})
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

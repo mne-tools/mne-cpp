@@ -98,7 +98,6 @@ SOURCES += \
     helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
     realtimeconnectivityestimatewidget.cpp \
-    hpiwidget.cpp \
 
 HEADERS += \
     scdisp_global.h \
@@ -122,26 +121,15 @@ HEADERS += \
     helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \
-    hpiwidget.h \
 
 FORMS += \
     FormFiles/realtimesamplearraywidget.ui \
     helpers/quickcontrolwidget.ui \
-    FormFiles/hpiwidget.ui
 
 RESOURCES += \
     scDisp.qrc
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabyMEG.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-fiducials.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-head.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-inner_skull-bem.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-trans.fif \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt \
@@ -166,7 +154,6 @@ for(FILE, RESOURCE_FILES) {
 UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 

@@ -82,8 +82,8 @@ namespace SCMEASLIB {
     class NewRealTimeMultiSampleArray;
 }
 
-namespace SCDISPLIB {
-    class HPIWidget;
+namespace DISP3DLIB {
+    class HpiView;
 }
 
 #define MAX_DATA_LEN    2000000000L
@@ -408,7 +408,7 @@ protected:
     QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
     QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
     QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
-    QSharedPointer<SCDISPLIB::HPIWidget>    m_pHPIWidget;                   /**< HPI widget. */
+    QSharedPointer<DISP3DLIB::HpiView>      m_pHPIWidget;                   /**< HPI widget. */
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */

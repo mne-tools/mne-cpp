@@ -83,8 +83,6 @@ else {
     }
 }
 
-
-
 DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
@@ -171,8 +169,8 @@ qtHaveModule(charts) {
 }
 
 FORMS += \
-    viewers/filterview.ui \
-    viewers/selectionmanagerwindow.ui
+    viewers/formfiles/filterview.ui \
+    viewers/formfiles/selectionmanagerwindow.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \

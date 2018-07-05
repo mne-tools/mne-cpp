@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     hpiwidget.cpp
+* @file     hpiview.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    HPIWidget class definition.
+* @brief    HpiView class definition.
 *
 */
 
@@ -38,28 +38,29 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "hpiwidget.h"
-#include "ui_hpiwidget.h"
+#include "hpiview.h"
+#include "ui_hpiview.h"
+
+#include "../engine/view/view3D.h"
+#include "../engine/control/control3dwidget.h"
+#include "../engine/model/data3Dtreemodel.h"
+#include "../engine/model/items/bem/bemtreeitem.h"
+#include "../engine/model/items/bem/bemsurfacetreeitem.h"
+#include "../engine/model/items/digitizer/digitizersettreeitem.h"
+#include "../engine/model/items/digitizer/digitizertreeitem.h"
+#include "../engine/model/3dhelpers/renderable3Dentity.h"
 
 #include <fiff/fiff_dig_point_set.h>
 
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/bem/bemtreeitem.h>
-#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
-#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
-#include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
-#include <disp3D/engine/model/3dhelpers/renderable3Dentity.h>
-
 #include <inverse/hpiFit/hpifit.h>
 
-#include <mne/mne_bem.h>
 #include <fwd/fwd_bem_model.h>
 
 #include <mne/c/mne_msh_display_surface_set.h>
 #include <mne/c/mne_msh_display_surface.h>
 #include <mne/c/mne_surface_or_volume.h>
+#include <mne/mne_bem.h>
+
 #include <fiff/c/fiff_digitizer_data.h>
 
 
@@ -86,7 +87,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
@@ -99,9 +99,9 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent)
+HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent)
 : QWidget(parent)
-, ui(new Ui::HPIWidget)
+, ui(new Ui::HpiViewWidget)
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
@@ -117,30 +117,30 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
 
     //Do GUI connects
     connect(ui->m_pushButton_doSingleFit, &QPushButton::released,
-            this, &HPIWidget::onBtnDoSingleFit);
+            this, &HpiView::onBtnDoSingleFit);
 
     connect(ui->m_pushButton_loadDigitizers, &QPushButton::released,
-            this, &HPIWidget::onBtnLoadPolhemusFile);
+            this, &HpiView::onBtnLoadPolhemusFile);
 
     connect(ui->m_spinBox_freqCoil1, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
-            this, &HPIWidget::onFreqsChanged);
+            this, &HpiView::onFreqsChanged);
     connect(ui->m_spinBox_freqCoil2, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
-            this, &HPIWidget::onFreqsChanged);
+            this, &HpiView::onFreqsChanged);
     connect(ui->m_spinBox_freqCoil3, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
-            this, &HPIWidget::onFreqsChanged);
+            this, &HpiView::onFreqsChanged);
     connect(ui->m_spinBox_freqCoil4, static_cast<void(QSpinBox::*)(const QString &)>(&QSpinBox::valueChanged),
-            this, &HPIWidget::onFreqsChanged);
+            this, &HpiView::onFreqsChanged);
 
     connect(ui->m_checkBox_continousHPI, &QCheckBox::clicked,
-            this, &HPIWidget::onDoContinousHPI);
+            this, &HpiView::onDoContinousHPI);
 
     connect(ui->m_doubleSpinBox_maxHPIContinousDist, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &HPIWidget::onContinousHPIMaxDistChanged);
+            this, &HpiView::onContinousHPIMaxDistChanged);
 
     connect(ui->m_checkBox_useSSP, &QCheckBox::clicked,
-            this, &HPIWidget::onSSPCompUsageChanged);
+            this, &HpiView::onSSPCompUsageChanged);
     connect(ui->m_checkBox_useComp, &QCheckBox::clicked,
-            this, &HPIWidget::onSSPCompUsageChanged);
+            this, &HpiView::onSSPCompUsageChanged);
 
     //Init from default values
     ui->m_checkBox_useSSP->setChecked(m_bUseSSP);
@@ -194,13 +194,13 @@ HPIWidget::HPIWidget(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *paren
     //Init RtHPIs
     m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
     connect(m_pRtHPI.data(), &RtHPIS::newFittingResultAvailable,
-            this, &HPIWidget::onNewFittingResultAvailable);
+            this, &HpiView::onNewFittingResultAvailable);
 }
 
 
 //*************************************************************************************************************
 
-HPIWidget::~HPIWidget()
+HpiView::~HpiView()
 {
     delete ui;
 }
@@ -208,7 +208,7 @@ HPIWidget::~HPIWidget()
 
 //*************************************************************************************************************
 
-void HPIWidget::setData(const Eigen::MatrixXd& matData)
+void HpiView::setData(const Eigen::MatrixXd& matData)
 {
     //If bad channels changed, recalcluate projectors
     if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matCompProjectors.rows() == 0 || m_matCompProjectors.cols() == 0) {
@@ -227,7 +227,7 @@ void HPIWidget::setData(const Eigen::MatrixXd& matData)
 
 //*************************************************************************************************************
 
-QVector<double> HPIWidget::getGOF()
+QVector<double> HpiView::getGOF()
 {
     return m_vGof;
 }
@@ -235,7 +235,7 @@ QVector<double> HPIWidget::getGOF()
 
 //*************************************************************************************************************
 
-bool HPIWidget::wasLastFitOk()
+bool HpiView::wasLastFitOk()
 {
     return m_bLastFitGood;
 }
@@ -243,7 +243,7 @@ bool HPIWidget::wasLastFitOk()
 
 //*************************************************************************************************************
 
-void HPIWidget::closeEvent(QCloseEvent *event)
+void HpiView::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
 }
@@ -251,7 +251,7 @@ void HPIWidget::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
-void HPIWidget::updateProjections()
+void HpiView::updateProjections()
 {
     m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
@@ -289,7 +289,7 @@ void HPIWidget::updateProjections()
 
 //*************************************************************************************************************
 
-bool HPIWidget::hpiLoaded()
+bool HpiView::hpiLoaded()
 {
     if(ui->m_label_numberLoadedCoils->text().toInt() >= 3) {
         return true;
@@ -301,7 +301,7 @@ bool HPIWidget::hpiLoaded()
 
 //*************************************************************************************************************
 
-QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
+QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
 {
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
@@ -374,7 +374,7 @@ QList<FiffDigPoint> HPIWidget::readPolhemusDig(const QString& fileName)
 
 //*************************************************************************************************************
 
-void HPIWidget::alignFiducials(const QString& fileNameDigData)
+void HpiView::alignFiducials(const QString& fileNameDigData)
 {
     QFile test(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
     FiffDigPointSet testdata(test);
@@ -431,7 +431,7 @@ void HPIWidget::alignFiducials(const QString& fileNameDigData)
 
 //*************************************************************************************************************
 
-void HPIWidget::onNewFittingResultAvailable(REALTIMELIB::FittingResult fitResult)
+void HpiView::onNewFittingResultAvailable(REALTIMELIB::FittingResult fitResult)
 {
     m_vGof = fitResult.errorDistances;
 
@@ -441,7 +441,7 @@ void HPIWidget::onNewFittingResultAvailable(REALTIMELIB::FittingResult fitResult
 
 //*************************************************************************************************************
 
-void HPIWidget::onBtnDoSingleFit()
+void HpiView::onBtnDoSingleFit()
 {    
     if(!this->hpiLoaded()) {
        QMessageBox msgBox;
@@ -467,7 +467,7 @@ void HPIWidget::onBtnDoSingleFit()
 
 //*************************************************************************************************************
 
-void HPIWidget::onBtnLoadPolhemusFile()
+void HpiView::onBtnLoadPolhemusFile()
 {
     //Get file location
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
@@ -498,7 +498,7 @@ void HPIWidget::onBtnLoadPolhemusFile()
 
 //*************************************************************************************************************
 
-void HPIWidget::onFreqsChanged()
+void HpiView::onFreqsChanged()
 {
     m_vCoilFreqs.clear();
     m_vCoilFreqs.append(ui->m_spinBox_freqCoil1->value());
@@ -512,7 +512,7 @@ void HPIWidget::onFreqsChanged()
 
 //*************************************************************************************************************
 
-void HPIWidget::onDoContinousHPI()
+void HpiView::onDoContinousHPI()
 {
     if(!this->hpiLoaded()) {
        QMessageBox msgBox;
@@ -536,7 +536,7 @@ void HPIWidget::onDoContinousHPI()
 
 //*************************************************************************************************************
 
-void HPIWidget::onContinousHPIMaxDistChanged()
+void HpiView::onContinousHPIMaxDistChanged()
 {
     m_dMaxHPIFitError = ui->m_doubleSpinBox_maxHPIContinousDist->value() * 0.001;
 }
@@ -544,7 +544,7 @@ void HPIWidget::onContinousHPIMaxDistChanged()
 
 //*************************************************************************************************************
 
-void HPIWidget::onSSPCompUsageChanged()
+void HpiView::onSSPCompUsageChanged()
 {
     m_bUseSSP = ui->m_checkBox_useSSP->isChecked();
     m_bUseComp = ui->m_checkBox_useComp->isChecked();
@@ -555,7 +555,7 @@ void HPIWidget::onSSPCompUsageChanged()
 
 //*************************************************************************************************************
 
-void HPIWidget::updateErrorLabels()
+void HpiView::updateErrorLabels()
 {
     //Update gof labels and transform from m to mm
     QString sGof("0mm");
@@ -594,7 +594,7 @@ void HPIWidget::updateErrorLabels()
 
 //*************************************************************************************************************
 
-void HPIWidget::updateTransLabels()
+void HpiView::updateTransLabels()
 {
     //Update labels with new dev/trans matrix
     FiffCoordTrans devHeadTrans = m_pFiffInfo->dev_head_t;
@@ -623,7 +623,7 @@ void HPIWidget::updateTransLabels()
 
 //*************************************************************************************************************
 
-void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPointSet& fittedCoils)
+void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPointSet& fittedCoils)
 {
     //Check if git meets distance requirement (GOF)
     if(m_vGof.size() > 0) {
@@ -660,7 +660,7 @@ void HPIWidget::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPo
 
 //*************************************************************************************************************
 
-void HPIWidget::update3DView()
+void HpiView::update3DView()
 {
     if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAdult && m_pBemHeadKid) {
         //Prepare new transform
