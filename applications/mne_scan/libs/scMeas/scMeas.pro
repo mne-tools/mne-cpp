@@ -73,7 +73,6 @@ SOURCES += \
     newnumeric.cpp \
     newmeasurement.cpp \
     measurementtypes.cpp \
-    realtimeevoked.cpp \
     realtimeevokedset.cpp \
     realtimecov.cpp \
     frequencyspectrum.cpp
@@ -89,7 +88,6 @@ HEADERS += \
     newnumeric.h \
     newmeasurement.h \
     measurementtypes.h \
-    realtimeevoked.h \
     realtimeevokedset.h \
     realtimecov.h \
     frequencyspectrum.h
