@@ -639,7 +639,13 @@ void Averaging::run()
     //
     // Init Real-Time average
     //
-    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_iBaselineFromSeconds, m_iBaselineToSeconds, m_qListStimChs.at(m_iStimChan), m_pFiffInfo));
+    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages,
+                                     m_iPreStimSamples,
+                                     m_iPostStimSamples,
+                                     m_iBaselineFromSeconds,
+                                     m_iBaselineToSeconds,
+                                     m_qListStimChs.at(m_iStimChan),
+                                     m_pFiffInfo));
     m_pRtAve->setBaselineFrom(m_iBaselineFromSamples, m_iBaselineFromSeconds);
     m_pRtAve->setBaselineTo(m_iBaselineToSamples, m_iBaselineToSeconds);
     m_pRtAve->setBaselineActive(m_bDoBaselineCorrection);
