@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
+#include "../disp_global.h"
 #include "helpers/filterdatamodel.h"
 #include "helpers/filterdatadelegate.h"
 #include "helpers/filterplotscene.h"

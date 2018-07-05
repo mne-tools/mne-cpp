@@ -47,7 +47,7 @@
 #include <utils/filterTools/sphara.h>
 #include <utils/ioutils.h>
 
-#include "disp/filterwindow.h"
+#include <disp/viewers/filterview.h>
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
@@ -302,10 +302,10 @@ private:
     NoiseReductionOptionsWidget::SPtr               m_pOptionsWidget;           /**< The noise reduction option widget object.*/
     QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
 
-    DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
-    REALTIMELIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
+    DISPLIB::FilterView::SPtr                       m_pFilterView;              /**< Filter view. */
+    REALTIMELIB::RtFilter::SPtr                     m_pRtFilter;                /**< Real time filter object. */
 
-    SCMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
+    SCMEASLIB::NewRealTimeMultiSampleArray::SPtr    m_pRTMSA;                   /**< the real time multi sample array object. */
 
     PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
     PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/

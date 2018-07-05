@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/imagesc.h>
-#include <disp/plot.h>
-#include <disp/tfplot.h>
+#include <disp/plots/imagesc.h>
+#include <disp/plots/plot.h>
+#include <disp/plots/tfplot.h>
 
 #include <fiff/fiff.h>
 

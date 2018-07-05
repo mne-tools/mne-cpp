@@ -46,12 +46,13 @@
 #include "newmeasurementwidget.h"
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
-#include "disp/selectionmanagerwindow.h"
-#include "disp/helpers/chinfomodel.h"
 #include "helpers/quickcontrolwidget.h"
-#include "disp/helpers/averagescene.h"
-#include "disp/helpers/averagesceneitem.h"
-#include "disp/filterwindow.h"
+
+#include <disp/viewers/helpers/averagescene.h>
+#include <disp/viewers/helpers/averagesceneitem.h>
+#include <disp/viewers/filterview.h>
+#include <disp/viewers/selectionmanagerwindow.h>
+#include <disp/viewers/helpers/chinfomodel.h>
 
 
 //*************************************************************************************************************
@@ -272,7 +273,7 @@ private:
     QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
     SelectionManagerWindow::SPtr        m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
     ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
-    FilterWindow::SPtr                  m_pFilterWindow;            /**< Filter window. */
+    FilterView::SPtr                    m_pFilterView;              /**< Filter view. */
 
     bool            m_bInitialized;             /**< Is Initialized */
     bool            m_bHideBadChannels;         /**< hide bad channels flag. */

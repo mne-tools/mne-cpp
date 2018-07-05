@@ -43,9 +43,10 @@
 //=============================================================================================================
 
 #include "ui_chinfowindow.h"
-#include "fiff/fiff.h"
 
-#include "disp/helpers/chinfomodel.h"
+#include <fiff/fiff.h>
+
+#include <disp/viewers/helpers/chinfomodel.h>
 
 
 //*************************************************************************************************************

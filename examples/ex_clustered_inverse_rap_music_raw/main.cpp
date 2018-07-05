@@ -54,7 +54,7 @@
 
 #include <inverse/rapMusic/rapmusic.h>
 
-#include <disp3D/adapters/abstractview.h>
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>

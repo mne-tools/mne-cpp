@@ -45,7 +45,7 @@
 #include "scdisp_global.h"
 #include "newmeasurementwidget.h"
 #include "helpers/covmodalitywidget.h"
-#include <disp/imagesc.h>
+#include <disp/plots/imagesc.h>
 
 
 //*************************************************************************************************************

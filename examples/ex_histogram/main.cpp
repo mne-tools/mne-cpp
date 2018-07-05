@@ -49,8 +49,8 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/mnemath.h>
-#include <disp/bar.h>
-#include <disp/spline.h>
+#include <disp/plots/bar.h>
+#include <disp/plots/spline.h>
 
 //includes for source localization data
 #include <fs/label.h>
