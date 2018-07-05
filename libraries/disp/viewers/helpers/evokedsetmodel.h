@@ -55,6 +55,8 @@
 
 #include <QAbstractTableModel>
 #include <QSharedPointer>
+#include <QPair>
+#include <QColor>
 
 
 //*************************************************************************************************************

@@ -56,6 +56,7 @@
 #include <QGraphicsObject>
 #include <QString>
 #include <QColor>
+#include <QPair>
 #include <QPainter>
 #include <QStaticText>
 #include <QDebug>

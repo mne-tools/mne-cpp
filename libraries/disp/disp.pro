@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets svg
+QT  += core widgets svg concurrent
 
 # Deep Model Viewer
 qtHaveModule(printsupport): QT += printsupport
