@@ -114,7 +114,7 @@ void RapMusicToolbox::init()
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.white", m_sSurfaceDir+"/rh.white"));
 
     // Input
-    m_pRTEInput = PluginInputData<RealTimeEvoked>::create(this, "RapMusic Toolbox RTE In", "RapMusic Toolbox real-time evoked input data");
+    m_pRTEInput = PluginInputData<RealTimeEvokedSet>::create(this, "RapMusic Toolbox RTE In", "RapMusic Toolbox real-time evoked input data");
     connect(m_pRTEInput.data(), &PluginInputConnector::notify, this, &RapMusicToolbox::updateRTE, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTEInput);
 
@@ -272,7 +272,7 @@ QWidget* RapMusicToolbox::setupWidget()
 
 void RapMusicToolbox::updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeEvoked> pRTE = pMeasurement.dynamicCast<RealTimeEvoked>();
+    QSharedPointer<RealTimeEvokedSet> pRTE = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
     QMutexLocker locker(&m_qMutex);
     //MEG
@@ -344,7 +344,7 @@ void RapMusicToolbox::run()
             if(m_pPwlRapMusic && ((skip_count % 10) == 0))
             {
                 m_qMutex.lock();
-                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
+                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0].evoked.first();
                 m_pPwlRapMusic->setStcAttr(t_fiffEvoked.data.cols()/4.0,0.0);
                 m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();

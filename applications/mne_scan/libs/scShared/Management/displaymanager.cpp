@@ -45,7 +45,6 @@
 #include <scDisp/realtimemultisamplearraywidget.h>
 #include <scDisp/realtimesourceestimatewidget.h>
 #include <scDisp/realtimeconnectivityestimatewidget.h>
-#include <scDisp/realtimeevokedwidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
 #include <scDisp/frequencyspectrumwidget.h>
@@ -54,26 +53,9 @@
 #include <scMeas/newrealtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
-#include <scMeas/realtimeevoked.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/frequencyspectrum.h>
-
-
-//#include <scDisp/measurementwidget.h>
-//#include <scDisp/numericwidget.h>
-//#include <scDisp/realtimemultisamplearraywidget.h>
-//#include <scDisp/realtimemultisamplearray_new_widget.h>
-//#include <scDisp/realtimesourceestimatewidget.h>
-//#include <scDisp/progressbarwidget.h>
-//#include <scDisp/textwidget.h>
-
-//#include <scMeas/Measurement/text.h>
-//#include <scMeas/Measurement/realtimesourceestimate.h>
-//#include <scMeas/Measurement/realtimemultisamplearray_new.h>
-//#include <scMeas/Measurement/realtimemultisamplearray.h>
-//#include <scMeas/Measurement/progressbar.h>
-//#include <scMeas/Measurement/numeric.h>
 
 
 //*************************************************************************************************************

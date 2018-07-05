@@ -56,7 +56,7 @@
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <scMeas/realtimesourceestimate.h>
-#include <scMeas/realtimeevoked.h>
+#include <scMeas/realtimeevokedset.h>
 
 
 //*************************************************************************************************************
@@ -182,13 +182,13 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<RealTimeEvoked>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeEvokedSet>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
     QMutex m_qMutex;
 
-    QVector<FiffEvoked> m_qVecFiffEvoked;
+    QVector<FiffEvokedSet> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
 
     bool m_bIsRunning;      /**< If source lab is running */
