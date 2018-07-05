@@ -45,8 +45,6 @@
 #include "scdisp_global.h"
 
 #include "measurementwidget.h"
-#include "helpers/evokedsetmodel.h"
-#include "helpers/butterflyview.h"
 #include "helpers/quickcontrolwidget.h"
 
 #include <disp/viewers/channelselectionview.h>
@@ -54,6 +52,8 @@
 #include <disp/viewers/helpers/averagescene.h>
 #include <disp/viewers/helpers/averagesceneitem.h>
 #include <disp/viewers/filterview.h>
+#include <disp/viewers/helpers/evokedsetmodel.h>
+#include <disp/viewers/butterflyview.h>
 
 #include <scMeas/realtimeevokedset.h>
 
@@ -87,12 +87,11 @@
 namespace SCDISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-struct Modality;
 
 typedef QMap<double, QPair<QColor, QPair<QString,bool> > > AverageInfoMap;
 
@@ -256,8 +255,8 @@ private:
     */
     bool virtual eventFilter(QObject *object, QEvent *event);
 
-    EvokedSetModel::SPtr        m_pRTESetModel;             /**< RTE data model */
-    ButterflyView::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
+    EvokedSetModel::SPtr                m_pEvokedSetModel;          /**< RTE data model */
+    ButterflyView::SPtr                 m_pButterflyView;           /**< Butterfly plot */
     AverageScene::SPtr                  m_pAverageScene;            /**< The pointer to the average scene. */
     RealTimeEvokedSet::SPtr             m_pRTESet;                  /**< The real-time evoked measurement. */
     QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
@@ -279,7 +278,7 @@ private:
     QToolBox*                           m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
     QGraphicsView*                      m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
-    QList<Modality>                     m_qListModalities;
+    QList<DISPLIB::Modality>            m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on*/
     QMap<qint32,float>                  m_qMapChScaling;            /**< Channel scaling values. */

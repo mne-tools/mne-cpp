@@ -103,8 +103,8 @@ enum Tool
 
 RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSet> pRTESet, QSharedPointer<QTime> &pTime, QWidget* parent)
 : MeasurementWidget(parent)
-, m_pRTESetModel(Q_NULLPTR)
-, m_pButterflyPlot(Q_NULLPTR)
+, m_pEvokedSetModel(Q_NULLPTR)
+, m_pButterflyView(Q_NULLPTR)
 , m_pAverageScene(Q_NULLPTR)
 , m_pRTESet(pRTESet)
 , m_pQuickControlWidget(Q_NULLPTR)
@@ -150,10 +150,10 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pToolBox->hide();
 
     //Butterfly
-    m_pButterflyPlot = ButterflyView::SPtr(new ButterflyView(this));
-    m_pButterflyPlot->installEventFilter(this);
+    m_pButterflyView = ButterflyView::SPtr(new ButterflyView(this));
+    m_pButterflyView->installEventFilter(this);
 
-    m_pToolBox->insertItem(0, m_pButterflyPlot.data(), QIcon(), "Butterfly plot");
+    m_pToolBox->insertItem(0, m_pButterflyView.data(), QIcon(), "Butterfly plot");
 
     //2D layout plot
     m_pAverageLayoutView = new QGraphicsView(this);
@@ -235,7 +235,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
         }
 
         //Store average colors per type
-        if(m_pRTESetModel) {
+        if(m_pEvokedSetModel) {
             QVariant data;
             SCDISPLIB::AverageInfoMap avrMap = m_pQuickControlWidget->getAverageInformationMap();
             data.setValue(avrMap);
@@ -245,7 +245,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
         //Store signal and background colors
         if(m_pQuickControlWidget != 0) {
             settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESWName), m_pQuickControlWidget->getSignalColor());
-            settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), m_pButterflyPlot->getBackgroundColor());
+            settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), m_pButterflyView->getBackgroundColor());
             settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), m_pAverageScene->backgroundBrush().color());
         }
     }
@@ -275,7 +275,9 @@ void RealTimeEvokedSetWidget::getData()
 
             init();
 
-            m_pRTESetModel->updateData();
+            m_pEvokedSetModel->setEvokedSet(m_pRTESet->getValue());
+
+            m_pEvokedSetModel->updateData();
         }
     }
     else {
@@ -289,7 +291,9 @@ void RealTimeEvokedSetWidget::getData()
             }
         }
 
-        m_pRTESetModel->updateData();
+        m_pEvokedSetModel->setEvokedSet(m_pRTESet->getValue());
+
+        m_pEvokedSetModel->updateData();
     }
 }
 
@@ -308,10 +312,10 @@ void RealTimeEvokedSetWidget::init()
 
         m_pToolBox->show();
 
-        m_pRTESetModel = EvokedSetModel::SPtr(new EvokedSetModel(this));
-        m_pRTESetModel->setRTESet(m_pRTESet);
+        m_pEvokedSetModel = EvokedSetModel::SPtr(new EvokedSetModel(this));
+        //m_pEvokedSetModel->setRTESet(m_pRTESet->getValue());
 
-        m_pButterflyPlot->setModel(m_pRTESetModel.data());
+        m_pButterflyView->setModel(m_pEvokedSetModel);
 
         //Choose current view toolbox index - butterfly or 2D layout
         m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESWName), 0).toInt());
@@ -369,7 +373,7 @@ void RealTimeEvokedSetWidget::init()
             m_qListModalities.append(Modality("MISC",sel,val));
         }
 
-        m_pButterflyPlot->setSettings(m_qListModalities);
+        m_pButterflyView->setSettings(m_qListModalities);
 
         //
         //-------- Init scaling --------
@@ -428,7 +432,7 @@ void RealTimeEvokedSetWidget::init()
                 m_qMapChScaling.insert(FIFFV_MISC_CH, val);
             }
 
-            m_pRTESetModel->setScaling(m_qMapChScaling);
+            m_pEvokedSetModel->setScaling(m_qMapChScaling);
         }
 
         //
@@ -442,10 +446,10 @@ void RealTimeEvokedSetWidget::init()
         m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pRTESetModel.data(),static_cast<void (EvokedSetModel::*)(QString)>(&EvokedSetModel::setFilterChannelType));
+                m_pEvokedSetModel.data(),static_cast<void (EvokedSetModel::*)(QString)>(&EvokedSetModel::setFilterChannelType));
 
         connect(m_pFilterView.data(), &FilterView::filterChanged,
-                m_pRTESetModel.data(), &EvokedSetModel::filterChanged);
+                m_pEvokedSetModel.data(), &EvokedSetModel::filterChanged);
 
         //Init downsampled sampling frequency
         m_pFilterView->setSamplingRate(m_pFiffInfo->sfreq);
@@ -507,11 +511,11 @@ void RealTimeEvokedSetWidget::init()
 
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                m_pRTESetModel.data(), &EvokedSetModel::updateCompensator);
+                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                m_pRTESetModel.data(), &EvokedSetModel::updateProjection);
+                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
         //Handle modalities
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
@@ -526,7 +530,7 @@ void RealTimeEvokedSetWidget::init()
 
         //Handle updating the butterfly and layout plot
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pButterflyPlot.data(), &ButterflyView::updateView);
+                m_pButterflyView.data(), &ButterflyView::updateView);
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
@@ -544,7 +548,7 @@ void RealTimeEvokedSetWidget::init()
         m_pActionQuickControl->setVisible(true);
 
         //Activate projections as default
-        m_pRTESetModel->updateProjection();
+        m_pEvokedSetModel->updateProjection();
 
         //
         //-------- Init average scene --------
@@ -558,21 +562,21 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 this, &RealTimeEvokedSetWidget::channelSelectionManagerChanged);
 
-        connect(m_pRTESetModel.data(), &EvokedSetModel::dataChanged,
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
                 this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedSetWidget::broadcastScaling);
 
         //Handle averages
-        connect(this->m_pRTESetModel.data(), &EvokedSetModel::newAverageTypeReceived,
+        connect(this->m_pEvokedSetModel.data(), &EvokedSetModel::newAverageTypeReceived,
                 m_pQuickControlWidget.data(), &QuickControlWidget::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
                 m_pAverageScene.data(), &AverageScene::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
-                m_pButterflyPlot.data(), &ButterflyView::setAverageInformationMap);
+                m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
 
         QVariant data;
         QMap<double, QPair<QColor, QPair<QString,bool> > > emptyMap;
@@ -591,7 +595,7 @@ void RealTimeEvokedSetWidget::init()
         backgroundBrush.setColor(settings.value(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), layoutBackgroundDefault).value<QColor>());
         m_pAverageScene->setBackgroundBrush(backgroundBrush);
 
-        m_pButterflyPlot->setBackgroundColor(settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), butterflyBackgroundDefault).value<QColor>());
+        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), butterflyBackgroundDefault).value<QColor>());
 
         //Initialized
         m_bInitialized = true;
@@ -637,7 +641,7 @@ void RealTimeEvokedSetWidget::showSelectedChannelsOnly(QStringList selectedChann
     for(int i = 0; i<selectedChannels.size(); i++)
         selectedChannelsIndexes<<m_pChInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
 
-    m_pButterflyPlot->setSelectedChannels(selectedChannelsIndexes);
+    m_pButterflyView->setSelectedChannels(selectedChannelsIndexes);
 }
 
 
@@ -648,7 +652,7 @@ void RealTimeEvokedSetWidget::broadcastScaling(QMap<qint32,float> scaleMap)
     //Set the scale map received from the scale window
     m_pAverageScene->setScaleMap(scaleMap);
     m_qMapChScaling = scaleMap;
-    m_pRTESetModel->setScaling(scaleMap);
+    m_pEvokedSetModel->setScaling(scaleMap);
 }
 
 
@@ -657,7 +661,7 @@ void RealTimeEvokedSetWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 void RealTimeEvokedSetWidget::broadcastSettings(QList<Modality> modalityList)
 {
     m_qListModalities = modalityList;
-    m_pButterflyPlot->setSettings(modalityList);
+    m_pButterflyView->setSettings(modalityList);
 }
 
 
@@ -683,7 +687,7 @@ void RealTimeEvokedSetWidget::onSelectionChanged()
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<QPair<double, SCDISPLIB::RowVectorPair> > averageData = m_pRTESetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, SCDISPLIB::RowVectorPair> > >();
+        QList<QPair<double, SCDISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, SCDISPLIB::RowVectorPair> > >();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
@@ -736,7 +740,7 @@ void RealTimeEvokedSetWidget::onTableViewBackgroundColorChanged(const QColor& ba
     }
 
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
-        m_pButterflyPlot->setBackgroundColor(backgroundColor);
+        m_pButterflyView->setBackgroundColor(backgroundColor);
     }
 }
 
@@ -784,21 +788,21 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
             // Generate screenshot
             QSvgGenerator svgGen;
             svgGen.setFileName(fileName);
-            svgGen.setSize(m_pButterflyPlot->size());
-            svgGen.setViewBox(m_pButterflyPlot->rect());
+            svgGen.setSize(m_pButterflyView->size());
+            svgGen.setViewBox(m_pButterflyView->rect());
 
-            m_pButterflyPlot->render(&svgGen);
+            m_pButterflyView->render(&svgGen);
         }
 
         if(imageType.contains("PNG"))
         {
             QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
 
-            QImage image(m_pButterflyPlot->size(), QImage::Format_ARGB32);
+            QImage image(m_pButterflyView->size(), QImage::Format_ARGB32);
             image.fill(Qt::transparent);
 
             QPainter painter(&image);
-            m_pButterflyPlot->render(&painter);
+            m_pButterflyView->render(&painter);
             image.save(fileName);
         }
     }
@@ -817,8 +821,8 @@ void RealTimeEvokedSetWidget::wheelEvent(QWheelEvent * event)
 
 bool RealTimeEvokedSetWidget::eventFilter(QObject *object, QEvent *event)
 {
-    if ((object == m_pButterflyPlot || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
-        m_pRTESetModel->toggleFreeze();
+    if ((object == m_pButterflyView || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
+        m_pEvokedSetModel->toggleFreeze();
     }
     return false;
 }

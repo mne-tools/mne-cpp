@@ -194,4 +194,6 @@ private:
 
 } // NAMESPACE
 
+Q_DECLARE_METATYPE(QList<DISPLIB::Modality>);
+
 #endif // BUTTERFLYVIEW_H
