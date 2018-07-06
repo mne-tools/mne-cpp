@@ -298,7 +298,7 @@ void BrainAMPSetupProjectWidget::changeOutputFile()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save to fif file",
-                "mne_scan_plugins/resources/brainamp/EEG_data_001_raw.fif",
+                "resources/mne_scan/plugins/brainamp/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
     if(path==NULL){

@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainampsetupwidget.h
+* @file     natussetup.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     October, 2016
+* @date     June, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BrainAMPSetupWidget class.
+* @brief    Contains the declaration of the NatusSetup class.
 *
 */
 
-#ifndef BRAINAMPSETUPWIDGET_H
-#define BRAINAMPSETUPWIDGET_H
+#ifndef NATUSSETUP_H
+#define NATUSSETUP_H
 
 
 //*************************************************************************************************************
@@ -43,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_brainampsetup.h"
+#include "../ui_natussetup.h"
 
 
 //*************************************************************************************************************
@@ -56,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BRAINAMPPLUGIN
+// DEFINE NAMESPACE NATUSPLUGIN
 //=============================================================================================================
 
-namespace BRAINAMPPLUGIN
+namespace NATUSPLUGIN
 {
 
 
@@ -68,77 +67,71 @@ namespace BRAINAMPPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainAMP;
+class Natus;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BrainAMPSetupWidget
+* DECLARE CLASS NatusSetup
 *
-* @brief The BrainAMPSetupWidget class provides the BrainAMP configuration window.
+* @brief The NatusSetup class provides the Natus configuration window.
 */
-class BrainAMPSetupWidget : public QWidget
+class NatusSetup : public QWidget
 {
     Q_OBJECT
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a BrainAMPSetupWidget which is a child of parent.
+    * Constructs a NatusSetup which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
-    * @param [in] pBrainAMP a pointer to the corresponding ECGSimulator.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NatusSetup becomes a window. If parent is another widget, NatusSetup becomes a child window inside parent. NatusSetup is deleted when its parent is deleted.
+    * @param [in] pNatus a pointer to the corresponding parent.
     */
-    BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget *parent = 0);
+    NatusSetup(Natus* pNatus, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BrainAMPSetupWidget.
-    * All BrainAMPSetupWidget's children are deleted first. The application exits if BrainAMPSetupWidget is the main widget.
+    * Destroys the NatusSetup.
+    * All NatusSetup's children are deleted first. The application exits if NatusSetup is the main widget.
     */
-    ~BrainAMPSetupWidget();
+    ~NatusSetup();
 
     //=========================================================================================================
     /**
     * Initializes the Connector's GUI properties.
-    *
     */
     void initGui();
 
 private:
-
     //=========================================================================================================
     /**
     * Sets the device sampling properties.
-    *
     */
     void setDeviceSamplingProperties();
 
     //=========================================================================================================
     /**
     * Forward the device sampling frequency.
-    *
     */
     void setSamplingFreq();
 
     //=========================================================================================================
     /**
-    * Forward the device samples per block.
-    *
+    * Forward the device number of channels.
     */
-    void setSamplesPerBlock();
+    void setNumberChannels();
 
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
+    * Forward the device samples per block.
     */
-    void showAboutDialog();
+    void setSamplesPerBlock();
 
-    BrainAMP*               m_pBrainAMP;            /**< a pointer to corresponding BrainAMP.*/
-    Ui::BrainAMPSetupClass  ui;                     /**< the user interface for the BrainAMPSetupWidget.*/
+    Natus*                  m_pNatus;          /**< A pointer to corresponding Natus.*/
+    Ui::NatusSetupWidget    ui;                /**< The user interface for the NatusSetup.*/
 };
 
 } // NAMESPACE
 
-#endif // BRAINAMPSETUPWIDGET_H
+#endif // NATUSSETUP_H
