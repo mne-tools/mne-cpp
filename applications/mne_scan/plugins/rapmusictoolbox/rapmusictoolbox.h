@@ -163,7 +163,7 @@ public:
     *
     * @param[in] pMeasurement   The evoked to be appended
     */
-    void updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 signals:
     //=========================================================================================================

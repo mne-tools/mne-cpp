@@ -47,7 +47,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/frequencyspectrum.h>
 #include <realtime/rtProcessing/rtnoise.h>
 
@@ -157,7 +157,7 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -187,7 +187,7 @@ private:
     */
     void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The NewRealTimeMultiSampleArray of the noise plugin input.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The RealTimeMultiSampleArray of the noise plugin input.*/
     PluginOutputData<FrequencySpectrum>::SPtr  m_pFSOutput;                   /**< The NE of the noise plugin output.*/
 
 

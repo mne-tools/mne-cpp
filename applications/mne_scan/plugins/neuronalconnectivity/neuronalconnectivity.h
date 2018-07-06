@@ -80,7 +80,7 @@ namespace FIFFLIB {
 
 namespace SCMEASLIB {
     class RealTimeSourceEstimate;
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
     class RealTimeConnectivityEstimate;
 }
 
@@ -143,17 +143,17 @@ public:
     /**
     * Udates the pugin with new (incoming) data.
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
     * Updates the real time multi sample array data
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -175,7 +175,7 @@ private:
     QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 

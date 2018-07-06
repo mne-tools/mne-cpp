@@ -43,7 +43,7 @@
 #include "../scshared_global.h"
 
 #include "pluginconnector.h"
-#include <scMeas/newmeasurement.h>
+#include <scMeas/measurement.h>
 
 
 //*************************************************************************************************************
@@ -100,7 +100,7 @@ public:
     virtual bool isOutputConnector() const;
 
 signals:
-    void notify(SCMEASLIB::NewMeasurement::SPtr);
+    void notify(SCMEASLIB::Measurement::SPtr);
 
 };
 

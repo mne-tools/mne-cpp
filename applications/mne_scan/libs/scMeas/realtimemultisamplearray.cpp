@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "newrealtimemultisamplearray.h"
+#include "realtimemultisamplearray.h"
 
 #include <iostream>
 
@@ -64,8 +64,8 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
-: NewMeasurement(QMetaType::type("NewRealTimeMultiSampleArray::SPtr"), parent)
+RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
+: Measurement(QMetaType::type("RealTimeMultiSampleArray::SPtr"), parent)
 , m_dSamplingRate(0)
 , m_iMultiArraySize(10)
 , m_bChInfoIsInit(false)
@@ -76,7 +76,7 @@ NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
 
 //*************************************************************************************************************
 
-NewRealTimeMultiSampleArray::~NewRealTimeMultiSampleArray()
+RealTimeMultiSampleArray::~RealTimeMultiSampleArray()
 {
 
 }
@@ -84,7 +84,7 @@ NewRealTimeMultiSampleArray::~NewRealTimeMultiSampleArray()
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
+void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo = chInfo;
@@ -104,7 +104,7 @@ void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
+void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
@@ -238,7 +238,7 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::setValue(const MatrixXd& mat)
+void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
 {
     if(!m_bChInfoIsInit)
         return;
@@ -272,7 +272,7 @@ void NewRealTimeMultiSampleArray::setValue(const MatrixXd& mat)
 
 //*************************************************************************************************************
 
-//void NewRealTimeMultiSampleArray::setValue(MatrixXd& v)
+//void RealTimeMultiSampleArray::setValue(MatrixXd& v)
 //{
 
 //}

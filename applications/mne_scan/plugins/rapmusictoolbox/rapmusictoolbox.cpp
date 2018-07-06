@@ -270,7 +270,7 @@ QWidget* RapMusicToolbox::setupWidget()
 
 //*************************************************************************************************************
 
-void RapMusicToolbox::updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void RapMusicToolbox::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvokedSet> pRTE = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 

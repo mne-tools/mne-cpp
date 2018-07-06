@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -91,7 +91,7 @@ using namespace FSLIB;
 *
 * @brief Real-time source estimate measurement.
 */
-class SCMEASSHARED_EXPORT RealTimeSourceEstimate : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeSourceEstimate : public Measurement
 {
 public:
     typedef QSharedPointer<RealTimeSourceEstimate> SPtr;               /**< Shared pointer type for RealTimeSourceEstimate. */

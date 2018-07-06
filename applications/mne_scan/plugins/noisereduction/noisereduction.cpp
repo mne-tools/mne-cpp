@@ -72,7 +72,7 @@ NoiseReduction::NoiseReduction()
 , m_bProjActivated(false)
 , m_bCompActivated(false)
 , m_sCurrentSystem("VectorView")
-, m_pRTMSA(NewRealTimeMultiSampleArray::SPtr(new NewRealTimeMultiSampleArray()))
+, m_pRTMSA(RealTimeMultiSampleArray::SPtr(new RealTimeMultiSampleArray()))
 , m_pFilterView(Q_NULLPTR)
 {
     if(m_sCurrentSystem == "BabyMEG") {
@@ -147,13 +147,13 @@ QSharedPointer<IPlugin> NoiseReduction::clone() const
 void NoiseReduction::init()
 {
     // Input
-    m_pNoiseReductionInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionIn", "NoiseReduction input data");
+    m_pNoiseReductionInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionIn", "NoiseReduction input data");
     connect(m_pNoiseReductionInput.data(), &PluginInputConnector::notify,
             this, &NoiseReduction::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pNoiseReductionInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-    m_pNoiseReductionOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
+    m_pNoiseReductionOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
     m_outputConnectors.append(m_pNoiseReductionOutput);
 
     QStringList slFlags;
@@ -241,11 +241,11 @@ QWidget* NoiseReduction::setupWidget()
 
 //*************************************************************************************************************
 
-void NoiseReduction::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    //QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    //QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
-    m_pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    m_pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(m_pRTMSA) {
         //Check if buffer initialized

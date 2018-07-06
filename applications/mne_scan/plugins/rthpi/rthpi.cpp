@@ -108,12 +108,12 @@ QSharedPointer<IPlugin> RtHpi::clone() const
 void RtHpi::init()
 {
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI In", "RT HPI input data");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "Rt HPI In", "RT HPI input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RtHpi::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI Out", "RT HPI output data");
+    m_pRTMSAOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "Rt HPI Out", "RT HPI output data");
     m_pRTMSAOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSAOutput);
 
@@ -216,9 +216,9 @@ QWidget* RtHpi::setupWidget()
 
 //*************************************************************************************************************
 
-void RtHpi::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void RtHpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA)
     {

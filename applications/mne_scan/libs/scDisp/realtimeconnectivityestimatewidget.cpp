@@ -147,7 +147,7 @@ RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
 
 //*************************************************************************************************************
 
-void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }

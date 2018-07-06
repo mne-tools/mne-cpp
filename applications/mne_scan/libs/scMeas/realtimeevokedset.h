@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_evoked_set.h>
@@ -95,7 +95,7 @@ namespace SCMEASLIB
 *
 * @brief The RealTimeEvokedSet class provides a data stream which holds FiffEvokedSet data.
 */
-class SCMEASSHARED_EXPORT RealTimeEvokedSet : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeEvokedSet : public Measurement
 {
     Q_OBJECT
 public:

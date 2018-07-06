@@ -40,11 +40,16 @@
 
 #include "measurementtypes.h"
 
-#include "newmeasurement.h"
-#include "newrealtimesamplearray.h"
-#include "newrealtimemultisamplearray.h"
-#include "newnumeric.h"
+#include "measurement.h"
+#include "realtimesamplearray.h"
+#include "realtimemultisamplearray.h"
+#include "numeric.h"
 #include "realtimesourceestimate.h"
+#include "realtimeconnectivityestimate.h"
+#include "frequencyspectrum.h"
+#include "realtimesamplearraychinfo.h"
+#include "realtimecov.h"
+#include "realtimeevokedset.h"
 
 
 //*************************************************************************************************************
@@ -70,9 +75,14 @@ MeasurementTypes::MeasurementTypes(QObject *parent)
 
 void MeasurementTypes::registerTypes()
 {
-    qRegisterMetaType< NewMeasurement::SPtr >("NewMeasurement::SPtr");
-    qRegisterMetaType< NewRealTimeSampleArray::SPtr >("NewRealTimeSampleArray::SPtr");
-    qRegisterMetaType< NewRealTimeMultiSampleArray::SPtr >("NewRealTimeMultiSampleArray::SPtr");
-    qRegisterMetaType< NewNumeric::SPtr >("NewNumeric::SPtr");
+    qRegisterMetaType< Measurement::SPtr >("Measurement::SPtr");
+    qRegisterMetaType< RealTimeSampleArray::SPtr >("RealTimeSampleArray::SPtr");
+    qRegisterMetaType< RealTimeMultiSampleArray::SPtr >("RealTimeMultiSampleArray::SPtr");
+    qRegisterMetaType< Numeric::SPtr >("Numeric::SPtr");
+    qRegisterMetaType< FrequencySpectrum::SPtr >("FrequencySpectrum::SPtr");
     qRegisterMetaType< RealTimeSourceEstimate::SPtr >("RealTimeSourceEstimate::SPtr");
+    qRegisterMetaType< RealTimeConnectivityEstimate::SPtr >("RealTimeConnectivityEstimate::SPtr");
+    qRegisterMetaType< RealTimeCov::SPtr >("RealTimeCov::SPtr");
+    qRegisterMetaType< RealTimeEvokedSet::SPtr >("RealTimeEvokedSet::SPtr");
+    qRegisterMetaType< RealTimeSampleArrayChInfo::SPtr >("RealTimeSampleArrayChInfo::SPtr");
 }

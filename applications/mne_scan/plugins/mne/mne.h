@@ -57,7 +57,7 @@
 #include <realtime/rtProcessing/rtinvop.h>
 
 #include <scMeas/realtimesourceestimate.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimeevokedset.h>
 
@@ -166,14 +166,14 @@ public:
     * Slot to update the real time multi sample array data
     *
     */
-    void updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
     * Slot to update the fiff covariance
     *
     */
-    void updateRTC(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ public:
     *
     * @param[in] pMeasurement   The evoked to be appended
     */
-    void updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -208,7 +208,7 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeEvokedSet>::SPtr                m_pRTESInput;            /**< The RealTimeEvoked input.*/
     PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;            /**< The RealTimeCov input.*/
 

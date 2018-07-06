@@ -43,7 +43,7 @@
 #include "realtimesamplearraywidget.h"
 //#include "annotationwindow.h"
 
-#include <scMeas/newrealtimesamplearray.h>
+#include <scMeas/realtimesamplearray.h>
 #include "iostream"
 
 
@@ -82,7 +82,7 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
+RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
 : MeasurementWidget(parent)
 , m_pRTSA(pRTSA)
 , m_bMeasurement(false)
@@ -128,7 +128,7 @@ RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeS
 
 RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
 {
-//    qDebug() << "NewRealTimeSampleArrayWidget deleted";
+//    qDebug() << "RealTimeSampleArrayWidget deleted";
     // Clear sampling rate vector
     RealTimeSampleArrayWidget::s_listSamplingRates.clear();
 }
@@ -167,7 +167,7 @@ void RealTimeSampleArrayWidget::actualize()
         dMax = value > dMax ? value : dMax;
 
 //    // Set new sample widths
-//    foreach(NewRealTimeSampleArrayWidget* pRTSAW, DisplayManager::getRTSAWidgets().values())
+//    foreach(RealTimeSampleArrayWidget* pRTSAW, DisplayManager::getRTSAWidgets().values())
 //        pRTSAW->m_dSampleWidth = dMax/pRTSAW->m_pRTSA->getSamplingRate();
 }
 
@@ -202,7 +202,7 @@ void RealTimeSampleArrayWidget::minValueChanged(double minValue)
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     if(m_pRTSA->getSampleArray().size() > 0)
     {
@@ -240,7 +240,7 @@ void RealTimeSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
         }
     }
     else
-        qWarning() << "NewRealTimeSampleArrayWidget::update; getArraySize():" << m_pRTSA->getArraySize() << "getSampleArray():" << m_pRTSA->getSampleArray().size();
+        qWarning() << "RealTimeSampleArrayWidget::update; getArraySize():" << m_pRTSA->getArraySize() << "getSampleArray():" << m_pRTSA->getSampleArray().size();
 }
 
 

@@ -71,7 +71,7 @@
 //=============================================================================================================
 
 namespace SCMEASLIB{
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
     class RealTimeEvokedSet;
 }
 
@@ -136,7 +136,7 @@ public:
     virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ private:
     */
     void initConnector();
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;                 /**< Holds incoming data.*/

@@ -44,7 +44,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_info.h>
@@ -84,7 +84,7 @@ using namespace FIFFLIB;
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class SCMEASSHARED_EXPORT FrequencySpectrum : public NewMeasurement
+class SCMEASSHARED_EXPORT FrequencySpectrum : public Measurement
 {
     Q_OBJECT
 public:

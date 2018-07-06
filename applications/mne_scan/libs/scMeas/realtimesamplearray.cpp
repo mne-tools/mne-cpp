@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimesamplearray.cpp
+* @file     realtimesamplearray.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the NewRealTimeSampleArray class.
+* @brief    Definition of the RealTimeSampleArray class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "newrealtimesamplearray.h"
+#include "realtimesamplearray.h"
 
 
 //*************************************************************************************************************
@@ -61,8 +61,8 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewRealTimeSampleArray::NewRealTimeSampleArray(QObject *parent)
-: NewMeasurement(QMetaType::type("NewRealTimeSampleArray::SPtr"), parent)
+RealTimeSampleArray::RealTimeSampleArray(QObject *parent)
+: Measurement(QMetaType::type("RealTimeSampleArray::SPtr"), parent)
 , m_dMinValue(0)
 , m_dMaxValue(65535)
 , m_dSamplingRate(0)
@@ -77,7 +77,7 @@ NewRealTimeSampleArray::NewRealTimeSampleArray(QObject *parent)
 
 //*************************************************************************************************************
 
-NewRealTimeSampleArray::~NewRealTimeSampleArray()
+RealTimeSampleArray::~RealTimeSampleArray()
 {
 
 }
@@ -85,7 +85,7 @@ NewRealTimeSampleArray::~NewRealTimeSampleArray()
 
 //*************************************************************************************************************
 
-double NewRealTimeSampleArray::getValue() const
+double RealTimeSampleArray::getValue() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_dValue;
@@ -94,7 +94,7 @@ double NewRealTimeSampleArray::getValue() const
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArray::setValue(double v)
+void RealTimeSampleArray::setValue(double v)
 {
     m_qMutex.lock();
     if(v < m_dMinValue) v = m_dMinValue;

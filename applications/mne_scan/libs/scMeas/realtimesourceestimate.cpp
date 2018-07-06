@@ -62,7 +62,7 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
+: Measurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
 , m_bStcSend(true)
 , m_pMNEStc(new MNESourceEstimate)
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))

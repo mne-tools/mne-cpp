@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     newmeasurement.h
+* @file     numeric.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2013
 *
 * @section  LICENSE
 *
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NewMeasurement class.
+* @brief    Contains the declaration of the Numeric class.
 *
 */
 
-#ifndef NEWMEASUREMENT_H
-#define NEWMEASUREMENT_H
+#ifndef NEWNUMERIC_H
+#define NEWNUMERIC_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,6 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
+#include "measurement.h"
 
 
 //*************************************************************************************************************
@@ -49,7 +51,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <QSharedPointer>
 #include <QMutex>
 #include <QMutexLocker>
@@ -63,85 +64,71 @@
 namespace SCMEASLIB
 {
 
-class SCMEASSHARED_EXPORT NewMeasurement : public QObject
+
+//=============================================================================================================
+/**
+* The Numeric class provides a Numeric Measurement.
+*
+* @brief The Numeric class provides a Numeric Measurement.
+*/
+class SCMEASSHARED_EXPORT Numeric : public Measurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NewMeasurement> SPtr;               /**< Shared pointer type for NewMeasurement. */
-    typedef QSharedPointer<const NewMeasurement> ConstSPtr;    /**< Const shared pointer type for NewMeasurement. */
+    typedef QSharedPointer<Numeric> SPtr;               /**< Shared pointer type for Numeric. */
+    typedef QSharedPointer<const Numeric> ConstSPtr;    /**< Const shared pointer type for Numeric. */
 
     //=========================================================================================================
     /**
-    * Constructs a Measurement.
+    * Constructs a Numeric.
+    */
+    Numeric(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the Numeric.
+    */
+    virtual ~Numeric();
+
+    //=========================================================================================================
+    /**
+    * Sets the unit of the numeric data.
     *
-    * @param[in] type       the QMetaType id of the Measurement.
-    * @param[in] parent     the parent object
+    * @param [in] unit of the data.
     */
-    explicit NewMeasurement(int type = QMetaType::UnknownType, QObject *parent = 0);
+    inline void setUnit(const QString& unit);
 
     //=========================================================================================================
     /**
-    * Constructs the Measurement.
-    */
-    virtual ~NewMeasurement();
-
-    //=========================================================================================================
-    /**
-    * Returns the name of the Measurement.
+    * Returns the unit of the numeric measurement.
     *
-    * @return the name of the Measurement.
+    * @return the unit of the data of measurement.
     */
-    inline const QString& getName() const;
+    inline const QString& getUnit() const;
 
     //=========================================================================================================
     /**
-    * Sets the name of the Measurement.
+    * Sets a value and notify() all attached observers.
+    * This method is inherited by Measurement.
     *
-    * @param[in] name which should be set.
+    * @param [in] v the value which is set to the Numeric measurement.
     */
-    inline void setName(const QString& name);
+    virtual void setValue(double v);
 
     //=========================================================================================================
     /**
-    * Returns whether Measurement is visible.
+    * Returns the current value.
+    * This method is inherited by Measurement.
     *
-    * @return true if Measurement is visible, otherwise false.
+    * @return the current value of the Numeric measurement.
     */
-    inline bool isVisible() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the visibility of the Measurement, whether Measurement is visible at the display or just data are send invisible.
-    *
-    * @param [in] visibility of the Measurement.
-    */
-    inline void setVisibility(bool visibility);
-
-    //=========================================================================================================
-    /**
-    * Returns the type of the Measurement.
-    *
-    * @return the type of the Measurement.
-    */
-    inline int type() const;
-
-signals:
-    void notify();
-
-protected:
-    //=========================================================================================================
-    /**
-    * Sets the type of the Measurement. Use QMetaType::type("the type") to generate the type.
-    *
-    * @param[in] type   the QMetaType id of the Measurement.
-    */
-    inline void setType(int type);
+    virtual double getValue() const;
 
 private:
     mutable QMutex  m_qMutex;   /**< Mutex to ensure thread safety */
-    int     m_iMetaTypeId;      /**< QMetaType id of the Measurement */
-    QString m_qString_Name;     /**< Name of the Measurement */
-    bool    m_bVisibility;      /**< Visibility status */
+
+    QString m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
+    double  m_dValue;           /**< Holds current set value.*/
 };
 
 
@@ -150,59 +137,23 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QString& NewMeasurement::getName() const
+inline void Numeric::setUnit(const QString& unit)
 {
     QMutexLocker locker(&m_qMutex);
-    return m_qString_Name;
+    m_qString_Unit = unit;
 }
 
 
 //*************************************************************************************************************
 
-inline void NewMeasurement::setType(int type)
+inline const QString& Numeric::getUnit() const
 {
     QMutexLocker locker(&m_qMutex);
-    m_iMetaTypeId = type;
+    return m_qString_Unit;
 }
 
+} // NAMESPACE
 
-//*************************************************************************************************************
+Q_DECLARE_METATYPE(SCMEASLIB::Numeric::SPtr)
 
-inline void NewMeasurement::setName(const QString& name)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_qString_Name = name;
-}
-
-
-//*************************************************************************************************************
-
-inline bool NewMeasurement::isVisible() const
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_bVisibility;
-}
-
-
-//*************************************************************************************************************
-
-inline void NewMeasurement::setVisibility(bool visibility)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_bVisibility = visibility;
-}
-
-
-//*************************************************************************************************************
-
-inline int NewMeasurement::type() const
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_iMetaTypeId;
-}
-
-} //NAMESPACE
-
-Q_DECLARE_METATYPE(SCMEASLIB::NewMeasurement::SPtr)
-
-#endif // NEWMEASUREMENT_H
+#endif // NUMERIC_H

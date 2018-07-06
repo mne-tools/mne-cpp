@@ -116,7 +116,7 @@ void Covariance::init()
     m_iEstimationSamples = settings.value(QString("Plugin/%1/estimationSamples").arg(this->getName()), 5000).toInt();
 
     // Input
-    m_pCovarianceInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "CovarianceIn", "Covariance input data");
+    m_pCovarianceInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "CovarianceIn", "Covariance input data");
     connect(m_pCovarianceInput.data(), &PluginInputConnector::notify, this, &Covariance::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pCovarianceInput);
 
@@ -211,9 +211,9 @@ QWidget* Covariance::setupWidget()
 
 //*************************************************************************************************************
 
-void Covariance::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA)
     {

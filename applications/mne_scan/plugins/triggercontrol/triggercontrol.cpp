@@ -140,19 +140,19 @@ void TriggerControl::init()
 {
     // Beginn Zeitmessung
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
     // Ende Zeitmessung*/
 
 
-    m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "TriggerControlInII", "TriggerControl input data II");
+    m_pRTSAInput = PluginInputData<RealTimeSampleArray>::create(this, "TriggerControlInII", "TriggerControl input data II");
     connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::updateSingleChannel, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSAInput);
 
 
     // Output
-    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
+    m_pTriggerOutput = PluginOutputData<RealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
     m_outputConnectors.append(m_pTriggerOutput);
 
     m_pTriggerOutput->data()->setName("Dummy Output");
@@ -315,9 +315,9 @@ QWidget* TriggerControl::setupWidget()
 
 //*************************************************************************************************************
 
-void TriggerControl::updateSingleChannel(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void TriggerControl::updateSingleChannel(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+    QSharedPointer<RealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<RealTimeSampleArray>();
     if(pRTSA)
     {
 //        m_qMutex.lock();
@@ -331,10 +331,10 @@ void TriggerControl::updateSingleChannel(SCMEASLIB::NewMeasurement::SPtr pMeasur
 
 //*************************************************************************************************************
 
-void TriggerControl::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void TriggerControl::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     ///* Beginn Zeitmessung
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
     if(pRTMSA)
     {
         //Check if buffer initialized
