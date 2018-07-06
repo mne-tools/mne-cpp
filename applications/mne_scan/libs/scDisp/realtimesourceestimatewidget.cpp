@@ -148,7 +148,7 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }

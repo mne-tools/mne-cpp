@@ -95,7 +95,7 @@ namespace MNELIB {
 }
 
 namespace SCMEASLIB{
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
     class RealTimeSampleArrayChInfo;
 }
 
@@ -138,7 +138,7 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeMultiSampleArrayWidget(QSharedPointer<SCMEASLIB::NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeMultiSampleArrayWidget(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -152,7 +152,7 @@ public:
     *
     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    virtual void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -386,7 +386,7 @@ private:
     QSharedPointer<RealTimeMultiSampleArrayDelegate>        m_pRTMSADelegate;               /**< RTMSA data delegate */
     QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;          /**< quick control widget. */
     QSharedPointer<DISPLIB::ChInfoModel>                    m_pChInfoModel;                 /**< channel info model. */
-    QSharedPointer<SCMEASLIB::NewRealTimeMultiSampleArray>  m_pRTMSA;                       /**< The real-time sample array measurement. */
+    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>  m_pRTMSA;                       /**< The real-time sample array measurement. */
     QSharedPointer<DISPLIB::ChannelSelectionView>         m_pChannelSelectionView;      /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::FilterView>                   m_pFilterWindow;                /**< Filter window. */
 

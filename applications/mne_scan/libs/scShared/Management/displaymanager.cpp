@@ -49,8 +49,8 @@
 #include <scDisp/realtimecovwidget.h>
 #include <scDisp/frequencyspectrumwidget.h>
 
-#include <scMeas/newrealtimesamplearray.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimesamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimeevokedset.h>
@@ -110,9 +110,9 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
     foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, outputConnectorList)
     {
-        if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >())
+        if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSampleArray> >())
         {
-            QSharedPointer<NewRealTimeSampleArray>* pRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
+            QSharedPointer<RealTimeSampleArray>* pRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSampleArray> >()->data();
             RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(*pRealTimeSampleArray, pT, newDisp);
 
             qListActions.append(rtsaWidget->getDisplayActions());
@@ -124,10 +124,10 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtsaWidget);
             rtsaWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >())
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >())
         {
-            QSharedPointer<NewRealTimeMultiSampleArray>* pNewRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()->data();
-            RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT, newDisp);
+            QSharedPointer<RealTimeMultiSampleArray>* pRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >()->data();
+            RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(*pRealTimeMultiSampleArray, pT, newDisp);
 
             qListActions.append(rtmsaWidget->getDisplayActions());
             qListWidgets.append(rtmsaWidget->getDisplayWidgets());

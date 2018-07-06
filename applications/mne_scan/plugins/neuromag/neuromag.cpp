@@ -140,7 +140,7 @@ void Neuromag::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pRTMSA_Neuromag = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Realtime", "MNE Rt Client");
+        m_pRTMSA_Neuromag = PluginOutputData<RealTimeMultiSampleArray>::create(this, "Realtime", "MNE Rt Client");
 
         m_pRTMSA_Neuromag->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_Neuromag->data()->setMultiArraySize(1);

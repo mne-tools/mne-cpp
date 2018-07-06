@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimemultisamplearray.h
+* @file     realtimemultisamplearray.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NewRealTimeMultiSampleArray class.
+* @brief    Contains the declaration of the RealTimeMultiSampleArray class.
 *
 */
 
-#ifndef NEWREALTIMEMULTISAMPLEARRAY_H
-#define NEWREALTIMEMULTISAMPLEARRAY_H
+#ifndef REALTIMEMULTISAMPLEARRAY_H
+#define REALTIMEMULTISAMPLEARRAY_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_info.h>
@@ -80,28 +80,28 @@ using namespace FIFFLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS NewRealTimeMultiSampleArray -> ToDo check feasibilty of QAbstractTableModel
+* DECLARE CLASS RealTimeMultiSampleArray -> ToDo check feasibilty of QAbstractTableModel
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class SCMEASSHARED_EXPORT NewRealTimeMultiSampleArray : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeMultiSampleArray : public Measurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NewRealTimeMultiSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeMultiSampleArray. */
-    typedef QSharedPointer<const NewRealTimeMultiSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeMultiSampleArray. */
+    typedef QSharedPointer<RealTimeMultiSampleArray> SPtr;               /**< Shared pointer type for RealTimeMultiSampleArray. */
+    typedef QSharedPointer<const RealTimeMultiSampleArray> ConstSPtr;    /**< Const shared pointer type for RealTimeMultiSampleArray. */
 
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
     */
-    explicit NewRealTimeMultiSampleArray(QObject *parent = 0);
+    explicit RealTimeMultiSampleArray(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayNew.
     */
-    virtual ~NewRealTimeMultiSampleArray();
+    virtual ~RealTimeMultiSampleArray();
 
     //=========================================================================================================
     /**
@@ -266,7 +266,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void NewRealTimeMultiSampleArray::clear()
+inline void RealTimeMultiSampleArray::clear()
 {
     QMutexLocker locker(&m_qMutex);
     m_matSamples.clear();
@@ -275,7 +275,7 @@ inline void NewRealTimeMultiSampleArray::clear()
 
 //*************************************************************************************************************
 
-inline bool NewRealTimeMultiSampleArray::isChInit() const
+inline bool RealTimeMultiSampleArray::isChInit() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bChInfoIsInit;
@@ -284,7 +284,7 @@ inline bool NewRealTimeMultiSampleArray::isChInit() const
 
 //*************************************************************************************************************
 
-inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
+inline const QString& RealTimeMultiSampleArray::getXMLLayoutFile() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_sXMLLayoutFile;
@@ -293,7 +293,7 @@ inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
+inline void RealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 {
     QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
@@ -302,7 +302,7 @@ inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setDisplayFlags(const QStringList& slFlags)
+inline void RealTimeMultiSampleArray::setDisplayFlags(const QStringList& slFlags)
 {
     QMutexLocker locker(&m_qMutex);
     m_slDisplayFlag = slFlags;
@@ -311,7 +311,7 @@ inline void NewRealTimeMultiSampleArray::setDisplayFlags(const QStringList& slFl
 
 //*************************************************************************************************************
 
-inline const QStringList& NewRealTimeMultiSampleArray::getDisplayFlags()
+inline const QStringList& RealTimeMultiSampleArray::getDisplayFlags()
 {
     QMutexLocker locker(&m_qMutex);
     return m_slDisplayFlag;
@@ -320,7 +320,7 @@ inline const QStringList& NewRealTimeMultiSampleArray::getDisplayFlags()
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
+inline void RealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 {
     QMutexLocker locker(&m_qMutex);
     m_dSamplingRate = dSamplingRate;
@@ -329,7 +329,7 @@ inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 
 //*************************************************************************************************************
 
-inline double NewRealTimeMultiSampleArray::getSamplingRate() const
+inline double RealTimeMultiSampleArray::getSamplingRate() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
@@ -338,7 +338,7 @@ inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 
 //*************************************************************************************************************
 
-inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
+inline unsigned int RealTimeMultiSampleArray::getNumChannels() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_qListChInfo.size();
@@ -347,7 +347,7 @@ inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 
 //*************************************************************************************************************
 
-inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
+inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArray::chInfo()
 {
     QMutexLocker locker(&m_qMutex);
     return m_qListChInfo;
@@ -356,7 +356,7 @@ inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::info()
+inline FiffInfo::SPtr& RealTimeMultiSampleArray::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
@@ -365,7 +365,7 @@ inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::info()
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
+inline void RealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
 {
     QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
@@ -378,7 +378,7 @@ inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySiz
 
 //*************************************************************************************************************
 
-qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
+qint32 RealTimeMultiSampleArray::getMultiArraySize() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_iMultiArraySize;
@@ -387,13 +387,13 @@ qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
 
 //*************************************************************************************************************
 
-inline const QList< MatrixXd >& NewRealTimeMultiSampleArray::getMultiSampleArray()
+inline const QList< MatrixXd >& RealTimeMultiSampleArray::getMultiSampleArray()
 {
     return m_matSamples;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(SCMEASLIB::NewRealTimeMultiSampleArray::SPtr)
+Q_DECLARE_METATYPE(SCMEASLIB::RealTimeMultiSampleArray::SPtr)
 
 #endif // REALTIMEMULTISAMPLEARRAYNEW_H

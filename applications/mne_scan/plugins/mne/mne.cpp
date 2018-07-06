@@ -118,7 +118,7 @@ void MNE::init()
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
@@ -359,9 +359,9 @@ QWidget* MNE::setupWidget()
 
 //*************************************************************************************************************
 
-void MNE::updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA && m_bReceiveData) {
         //Check if buffer initialized
@@ -390,7 +390,7 @@ void MNE::updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateRTC(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
 
@@ -413,7 +413,7 @@ void MNE::updateRTC(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 

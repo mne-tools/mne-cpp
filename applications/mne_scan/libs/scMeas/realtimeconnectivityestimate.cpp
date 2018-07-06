@@ -72,7 +72,7 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
+: Measurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
 , m_bConnectivitySend(true)
 , m_pNetwork(Network::SPtr(new Network))
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))

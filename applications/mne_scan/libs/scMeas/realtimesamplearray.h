@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimesamplearray.h
+* @file     realtimesamplearray.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NewRealTimeSampleArray class.
+* @brief    Contains the declaration of the RealTimeSampleArray class.
 *
 */
 
-#ifndef NEWREALTIMESAMPLEARRAY_H
-#define NEWREALTIMESAMPLEARRAY_H
+#ifndef REALTIMESAMPLEARRAY_H
+#define REALTIMESAMPLEARRAY_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 
 
 //*************************************************************************************************************
@@ -75,30 +75,30 @@ namespace SCMEASLIB
 
 //=========================================================================================================
 /**
-* DECLARE CLASS NewRealTimeSampleArray
+* DECLARE CLASS RealTimeSampleArray
 *
-* @brief The NewRealTimeSampleArray class is the base class of every NewRealTimeSampleArray Measurement.
+* @brief The RealTimeSampleArray class is the base class of every RealTimeSampleArray Measurement.
 */
-class SCMEASSHARED_EXPORT NewRealTimeSampleArray : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeSampleArray : public Measurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NewRealTimeSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeSampleArray. */
-    typedef QSharedPointer<const NewRealTimeSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeSampleArray. */
+    typedef QSharedPointer<RealTimeSampleArray> SPtr;               /**< Shared pointer type for RealTimeSampleArray. */
+    typedef QSharedPointer<const RealTimeSampleArray> ConstSPtr;    /**< Const shared pointer type for RealTimeSampleArray. */
 
     //=========================================================================================================
     /**
-    * Constructs a NewRealTimeSampleArray.
+    * Constructs a RealTimeSampleArray.
     *
     * @param[in] parent     the QObject parent of this measurement
     */
-    NewRealTimeSampleArray(QObject *parent = 0);
+    RealTimeSampleArray(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NewRealTimeSampleArray.
+    * Destroys the RealTimeSampleArray.
     */
-    virtual ~NewRealTimeSampleArray();
+    virtual ~RealTimeSampleArray();
 
     //=========================================================================================================
     /**
@@ -140,17 +140,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the NewRealTimeSampleArray Measurement.
+    * Sets the sampling rate of the RealTimeSampleArray Measurement.
     *
-    * @param [in] dSamplingRate the sampling rate of the NewRealTimeSampleArray.
+    * @param [in] dSamplingRate the sampling rate of the RealTimeSampleArray.
     */
     inline void setSamplingRate(double dSamplingRate);
 
     //=========================================================================================================
     /**
-    * Returns the sampling rate of the NewRealTimeSampleArray Measurement.
+    * Returns the sampling rate of the RealTimeSampleArray Measurement.
     *
-    * @return the sampling rate of the NewRealTimeSampleArray.
+    * @return the sampling rate of the RealTimeSampleArray.
     */
     inline double getSamplingRate() const;
 
@@ -180,7 +180,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the unit of the NewRealTimeSampleArray data.
+    * Sets the unit of the RealTimeSampleArray data.
     *
     * @param [in] unit of the data.
     */
@@ -188,7 +188,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the unit of the NewRealTimeSampleArray measurement.
+    * Returns the unit of the RealTimeSampleArray measurement.
     *
     * @return the unit of the data of measurement.
     */
@@ -217,7 +217,7 @@ private:
 
     double              m_dMinValue;        /**< Holds the minimal value.*/
     double              m_dMaxValue;        /**< Holds the maximal value.*/
-    double              m_dSamplingRate;    /**< Holds sampling rate of the NewRealTimeSampleArray.*/
+    double              m_dSamplingRate;    /**< Holds sampling rate of the RealTimeSampleArray.*/
     QString             m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
     double              m_dValue;           /**< Holds the current attached value.*/
     unsigned char       m_ucArraySize;      /**< Holds vector size of the sample array vector.*/
@@ -230,13 +230,13 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void NewRealTimeSampleArray::clear()
+inline void RealTimeSampleArray::clear()
 {
     QMutexLocker locker(&m_qMutex);
     m_vecSamples.clear();
 }
 
-inline void NewRealTimeSampleArray::setMinValue(double minValue)
+inline void RealTimeSampleArray::setMinValue(double minValue)
 {
     QMutexLocker locker(&m_qMutex);
     m_dMinValue = minValue;
@@ -245,7 +245,7 @@ inline void NewRealTimeSampleArray::setMinValue(double minValue)
 
 //*************************************************************************************************************
 
-inline double NewRealTimeSampleArray::getMinValue() const
+inline double RealTimeSampleArray::getMinValue() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_dMinValue;
@@ -254,7 +254,7 @@ inline double NewRealTimeSampleArray::getMinValue() const
 
 //*************************************************************************************************************
 
-inline void NewRealTimeSampleArray::setMaxValue(double maxValue)
+inline void RealTimeSampleArray::setMaxValue(double maxValue)
 {
     QMutexLocker locker(&m_qMutex);
     m_dMaxValue = maxValue;
@@ -263,7 +263,7 @@ inline void NewRealTimeSampleArray::setMaxValue(double maxValue)
 
 //*************************************************************************************************************
 
-inline double NewRealTimeSampleArray::getMaxValue() const
+inline double RealTimeSampleArray::getMaxValue() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_dMaxValue;
@@ -272,7 +272,7 @@ inline double NewRealTimeSampleArray::getMaxValue() const
 
 //*************************************************************************************************************
 
-inline void NewRealTimeSampleArray::setSamplingRate(double dSamplingRate)
+inline void RealTimeSampleArray::setSamplingRate(double dSamplingRate)
 {
     QMutexLocker locker(&m_qMutex);
     m_dSamplingRate = dSamplingRate;
@@ -281,7 +281,7 @@ inline void NewRealTimeSampleArray::setSamplingRate(double dSamplingRate)
 
 //*************************************************************************************************************
 
-inline double NewRealTimeSampleArray::getSamplingRate() const
+inline double RealTimeSampleArray::getSamplingRate() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
@@ -290,7 +290,7 @@ inline double NewRealTimeSampleArray::getSamplingRate() const
 
 //*************************************************************************************************************
 
-inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
+inline void RealTimeSampleArray::setArraySize(unsigned char ucArraySize)
 {
     QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
@@ -303,7 +303,7 @@ inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
 
 //*************************************************************************************************************
 
-unsigned char NewRealTimeSampleArray::getArraySize() const
+unsigned char RealTimeSampleArray::getArraySize() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_ucArraySize;
@@ -312,7 +312,7 @@ unsigned char NewRealTimeSampleArray::getArraySize() const
 
 //*************************************************************************************************************
 
-inline const QVector<double>& NewRealTimeSampleArray::getSampleArray()
+inline const QVector<double>& RealTimeSampleArray::getSampleArray()
 {
     QMutexLocker locker(&m_qMutex);
     return m_vecSamples;
@@ -321,7 +321,7 @@ inline const QVector<double>& NewRealTimeSampleArray::getSampleArray()
 
 //*************************************************************************************************************
 
-inline void NewRealTimeSampleArray::setUnit(const QString& unit)
+inline void RealTimeSampleArray::setUnit(const QString& unit)
 {
     QMutexLocker locker(&m_qMutex);
     m_qString_Unit = unit;
@@ -330,7 +330,7 @@ inline void NewRealTimeSampleArray::setUnit(const QString& unit)
 
 //*************************************************************************************************************
 
-inline const QString& NewRealTimeSampleArray::getUnit() const
+inline const QString& RealTimeSampleArray::getUnit() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_qString_Unit;
@@ -338,6 +338,6 @@ inline const QString& NewRealTimeSampleArray::getUnit() const
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(SCMEASLIB::NewRealTimeSampleArray::SPtr)
+Q_DECLARE_METATYPE(SCMEASLIB::RealTimeSampleArray::SPtr)
 
-#endif // NEWREALTIMESAMPLEARRAY_H
+#endif // REALTIMESAMPLEARRAY_H

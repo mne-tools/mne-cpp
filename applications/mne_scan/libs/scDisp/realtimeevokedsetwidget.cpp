@@ -254,7 +254,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }

@@ -47,7 +47,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <realtime/rtProcessing/rthpis.h>
 
 
@@ -139,7 +139,7 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 
 
@@ -160,8 +160,8 @@ private:
     */
     void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;      /**< The NewRealTimeMultiSampleArray of the RtHpi input.*/
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAOutput;    /**< The NewRealTimeMultiSampleArray of the RtHpi output.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;      /**< The RealTimeMultiSampleArray of the RtHpi input.*/
+    PluginOutputData<RealTimeMultiSampleArray>::SPtr  m_pRTMSAOutput;    /**< The RealTimeMultiSampleArray of the RtHpi output.*/
 
 
     FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/

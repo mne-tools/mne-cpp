@@ -46,7 +46,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <realtime/rtProcessing/rtcov.h>
 
@@ -152,7 +152,7 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     void appendCovariance(FiffCov::SPtr p_pCovariance);
 
@@ -173,7 +173,7 @@ protected:
 private:
     QMutex mutex;
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceInput;     /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr  m_pCovarianceInput;     /**< The RealTimeMultiSampleArray of the Covariance input.*/
     PluginOutputData<RealTimeCov>::SPtr                 m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
 
     FiffInfo::SPtr  m_pFiffInfo;                                /**< Fiff measurement info.*/

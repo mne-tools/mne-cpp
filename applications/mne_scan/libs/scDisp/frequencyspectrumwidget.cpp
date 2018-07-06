@@ -165,7 +165,7 @@ FrequencySpectrumWidget::~FrequencySpectrumWidget()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void FrequencySpectrumWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }

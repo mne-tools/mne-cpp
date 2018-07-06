@@ -43,7 +43,7 @@
 
 #include "scdisp_global.h"
 
-#include <scMeas/newmeasurement.h>
+#include <scMeas/measurement.h>
 
 
 //*************************************************************************************************************
@@ -115,7 +115,7 @@ public:
     *
     * @param [in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
     */
-    virtual void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement) = 0;
+    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement) = 0;
 
     //=========================================================================================================
     /**

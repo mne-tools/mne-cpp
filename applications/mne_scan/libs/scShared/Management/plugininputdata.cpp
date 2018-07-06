@@ -84,7 +84,7 @@ void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
 //*************************************************************************************************************
 
 template <class T>
-void PluginInputData<T>::notifyCallbackFunction(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void PluginInputData<T>::notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     qDebug() << "Here in input data.";
     if(m_pFunc)

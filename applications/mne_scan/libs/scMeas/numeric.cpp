@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     newmeasurement.cpp
+* @file     numeric.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the NewMeasurement base class.
+* @brief    Definition of the Numeric class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "newmeasurement.h"
+#include "numeric.h"
 
 
 //*************************************************************************************************************
@@ -54,18 +54,38 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewMeasurement::NewMeasurement(int type, QObject *parent)
-: QObject(parent)
-, m_iMetaTypeId(type)
-, m_bVisibility(true)
+Numeric::Numeric(QObject *parent)
+: Measurement(QMetaType::type("Numeric::SPtr"), parent)
+, m_qString_Unit("")
+, m_dValue(-1)
 {
-//    qWarning() << "QMetaType" << type;
+
 }
 
 
 //*************************************************************************************************************
 
-NewMeasurement::~NewMeasurement()
+Numeric::~Numeric()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void Numeric::setValue(double v)
+{
+    m_qMutex.lock();
+    m_dValue = v;
+    m_qMutex.unlock();
+    emit notify();
+}
+
+
+//*************************************************************************************************************
+
+double Numeric::getValue() const
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_dValue;
 }

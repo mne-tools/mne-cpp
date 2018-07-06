@@ -45,7 +45,7 @@
 
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
@@ -115,7 +115,7 @@ void NeuronalConnectivity::init()
     connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &NeuronalConnectivity::updateSource, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSEInput);
 
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "NeuronalConnectivityInSensor", "NeuronalConnectivity sensor input data");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "NeuronalConnectivityInSensor", "NeuronalConnectivity sensor input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &NeuronalConnectivity::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
@@ -200,7 +200,7 @@ QWidget* NeuronalConnectivity::setupWidget()
 
 //*************************************************************************************************************
 
-void NeuronalConnectivity::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
 
@@ -257,9 +257,9 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasure
 
 //*************************************************************************************************************
 
-void NeuronalConnectivity::updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Fiff information

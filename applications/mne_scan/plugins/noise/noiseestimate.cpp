@@ -113,7 +113,7 @@ void NoiseEstimate::init()
     m_x_scale_type = settings.value(QString("Plugin/%1/ScaleType").arg(this->getName()), 0).toInt();
 
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &NoiseEstimate::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
@@ -243,9 +243,9 @@ QWidget* NoiseEstimate::setupWidget()
 
 //*************************************************************************************************************
 
-void NoiseEstimate::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void NoiseEstimate::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA)
     {

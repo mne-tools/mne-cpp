@@ -56,7 +56,7 @@
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/chinfomodel.h>
 
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 #include <mne/mne_bem.h>
 
@@ -93,7 +93,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA,
+RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<RealTimeMultiSampleArray> pRTMSA,
                                                                QSharedPointer<QTime> &pTime,
                                                                QWidget* parent)
 : MeasurementWidget(parent)
@@ -271,7 +271,7 @@ void RealTimeMultiSampleArrayWidget::broadcastScaling(QMap<qint32,float> scaleMa
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     if(!m_bInitialized)
     {

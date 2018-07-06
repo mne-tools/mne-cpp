@@ -55,7 +55,7 @@
 
 #include <utils/generics/circularmatrixbuffer.h>
 
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 #include "FormFiles/noisereductionsetupwidget.h"
 #include "FormFiles/noisereductionoptionswidget.h"
@@ -149,9 +149,9 @@ public:
     /**
     * Udates the pugin with new (incoming) data.
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 public slots:
     //=========================================================================================================
@@ -305,10 +305,10 @@ private:
     DISPLIB::FilterView::SPtr                       m_pFilterView;              /**< Filter view. */
     REALTIMELIB::RtFilter::SPtr                     m_pRtFilter;                /**< Real time filter object. */
 
-    SCMEASLIB::NewRealTimeMultiSampleArray::SPtr    m_pRTMSA;                   /**< the real time multi sample array object. */
+    SCMEASLIB::RealTimeMultiSampleArray::SPtr    m_pRTMSA;                   /**< the real time multi sample array object. */
 
-    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
-    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/
+    PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
+    PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
 
 signals:
     //=========================================================================================================

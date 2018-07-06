@@ -139,7 +139,7 @@ RealTimeCovWidget::~RealTimeCovWidget()
 
 //*************************************************************************************************************
 
-void RealTimeCovWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }

@@ -79,7 +79,7 @@
 //=============================================================================================================
 
 namespace SCMEASLIB {
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
 }
 
 namespace DISP3DLIB {
@@ -399,7 +399,7 @@ protected:
     */
     void onRecordingRemainingTimeChange();
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<IOBUFFER::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
 
