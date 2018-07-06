@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Definition of the DataProducer Class.
+* @brief     Definition of the FiffProducer class.
 *
 */
 
@@ -40,6 +40,8 @@
 
 #include "fiffproducer.h"
 #include "fiffsimulator.h"
+
+#include <utils/generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -56,7 +58,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFSIMULATORPLUGIN;
+using namespace FIFFLIB;
+using namespace FIFFSIMULATORRTSERVERPLUGIN;
 
 
 //*************************************************************************************************************

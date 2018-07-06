@@ -188,8 +188,9 @@ public:
     *
     * @param[in] sps        Samples per second of incomming data
     * @param[in] T          Time window length to display
+    * @param[in] bSetZero   If data should be set to zero. Default is false.
     */
-    void setSamplingInfo(float sps, int T);
+    void setSamplingInfo(float sps, int T, bool bSetZero = false);
 
     MatrixXd getLastBlock();
 

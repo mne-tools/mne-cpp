@@ -1,15 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     brainamp.pro
+# @file     natus.pro
 # @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     October, 2016
+# @date     June, 2018
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -30,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the brainamp plug-in.
+# @brief    This project file generates the makefile for the Natus plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -40,11 +39,12 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += BRAINAMP_LIBRARY
+DEFINES += NATUS_LIBRARY
 
 QT += core widgets
+QT += network
 
-TARGET = brainamp
+TARGET = natus
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -52,7 +52,11 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lscMeasd \
             -lscDispd \
@@ -60,7 +64,11 @@ CONFIG(debug, debug|release) {
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lscMeas \
             -lscDisp \
@@ -70,29 +78,21 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
-        brainamp.cpp \
-        brainampproducer.cpp \
-        FormFiles/brainampsetupwidget.cpp \
-        FormFiles/brainampaboutwidget.cpp \
-        brainampdriver.cpp \
-        FormFiles/brainampsetupprojectwidget.cpp \
+        natus.cpp \
+        natusproducer.cpp \
+        FormFiles/natussetup.cpp \
 
 HEADERS += \
-        brainamp.h\
-        brainamp_global.h \
-        brainampproducer.h \
-        FormFiles/brainampsetupwidget.h \
-        FormFiles/brainampaboutwidget.h \
-        brainampdriver.h \
-        FormFiles/brainampsetupprojectwidget.h \
+        natus.h \
+        natus_global.h \
+        natusproducer.h \
+        FormFiles/natussetup.h \
 
 FORMS += \
-        FormFiles/brainampsetup.ui \
-        FormFiles/brainampabout.ui \
-        FormFiles/brainampsetupprojectwidget.ui \
+        FormFiles/natussetup.ui \
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/mne_scan/plugins/brainamp/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/natus/readme.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
@@ -111,7 +111,7 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-OTHER_FILES += brainamp.json
+OTHER_FILES += natus.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
@@ -121,7 +121,13 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
-RESOURCES += \
-    brainamp.qrc
+###not sure about below:
+#RESOURCES += \
+#    brainamp.qrc
 
-DISTFILES +=
+#DISTFILES +=
+
+DISTFILES += \
+    natus.json
+
+
