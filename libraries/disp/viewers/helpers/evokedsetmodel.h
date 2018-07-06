@@ -196,8 +196,9 @@ public:
     * Sets corresponding evoked set
     *
     * @param [in] pEvokedSet      The evoked set
+    * @param [in] bRese           Whether to reset the model
     */
-    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet);
+    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet, bool bReset = false);
 
     //=========================================================================================================
     /**

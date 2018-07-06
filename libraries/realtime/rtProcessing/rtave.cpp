@@ -120,7 +120,7 @@ RtAve::RtAve(quint32 numAverages,
 {
     qRegisterMetaType<FIFFLIB::FiffEvokedSet::SPtr>("FIFFLIB::FiffEvokedSet::SPtr");
 
-    m_pStimEvokedSet->info = *p_pFiffInfo.data();
+    m_pStimEvokedSet->info = *m_pFiffInfo.data();
 
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
