@@ -288,7 +288,9 @@ void RealTimeEvokedSetWidget::getData()
             }
         }
 
-        m_pEvokedSetModel->setEvokedSet(m_pRTESet->getValue());
+        FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
+        pEvokedSet->info = *m_pFiffInfo.data();
+        m_pEvokedSetModel->setEvokedSet(pEvokedSet);
 
         m_pEvokedSetModel->updateData();
     }
@@ -311,7 +313,10 @@ void RealTimeEvokedSetWidget::init()
 
         m_pEvokedSetModel = EvokedSetModel::SPtr(new EvokedSetModel(this));
         m_pEvokedSetModel->setChannelColors(m_pRTESet->chColor());
-        m_pEvokedSetModel->setEvokedSet(m_pRTESet->getValue());
+
+        FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
+        pEvokedSet->info = *m_pFiffInfo.data();
+        m_pEvokedSetModel->setEvokedSet(pEvokedSet, true);
 
         m_pButterflyView->setModel(m_pEvokedSetModel);
 

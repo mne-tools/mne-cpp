@@ -288,43 +288,47 @@ QVariant EvokedSetModel::headerData(int section, Qt::Orientation orientation, in
 
 //*************************************************************************************************************
 
-void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> &pEvokedSet)
+void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> &pEvokedSet, bool bReset)
 {
-    beginResetModel();
-    m_pEvokedSet = pEvokedSet;
+    if(bReset) {
+        beginResetModel();
+        m_pEvokedSet = pEvokedSet;
 
-    //Generate bad channel index list
-    RowVectorXi sel;// = RowVectorXi(0,0);
-    QStringList emptyExclude;
+        //Generate bad channel index list
+        RowVectorXi sel;// = RowVectorXi(0,0);
+        QStringList emptyExclude;
 
-    if(m_pEvokedSet->info.bads.size() > 0) {
-        sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
+        if(m_pEvokedSet->info.bads.size() > 0) {
+            sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
+        }
+
+        m_vecBadIdcs = sel;
+
+        m_fSps = m_pEvokedSet->info.sfreq;
+
+        m_matSparseProjMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+        m_matSparseCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+        m_matSparseProjCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+
+        m_matSparseProjMult.setIdentity();
+        m_matSparseCompMult.setIdentity();
+        m_matSparseProjCompMult.setIdentity();
+
+        //Create the initial SSP projector
+        updateProjection();
+
+        //Create the initial Compensator projector
+        updateCompensator(0);
+
+        //Init list of channels which are to filtered
+        createFilterChannelList(m_pEvokedSet->info.ch_names);
+
+        endResetModel();
+
+        resetSelection();
+    } else {
+        m_pEvokedSet = pEvokedSet;
     }
-
-    m_vecBadIdcs = sel;
-
-    m_fSps = m_pEvokedSet->info.sfreq;
-
-    m_matSparseProjMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
-    m_matSparseCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
-    m_matSparseProjCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
-
-    m_matSparseProjMult.setIdentity();
-    m_matSparseCompMult.setIdentity();
-    m_matSparseProjCompMult.setIdentity();
-
-    //Create the initial SSP projector
-    updateProjection();    
-
-    //Create the initial Compensator projector
-    updateCompensator(0);
-
-    //Init list of channels which are to filtered
-    createFilterChannelList(m_pEvokedSet->info.ch_names);
-
-    endResetModel();
-
-    resetSelection();
 }
 
 
@@ -639,8 +643,8 @@ void EvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 void EvokedSetModel::updateProjection()
 {
-    //  Update the SSP projector
-    if(m_pEvokedSet->info.chs.size()>0) {
+    // Update the SSP projector
+    if(m_pEvokedSet->info.chs.size() > 0) {
         m_bProjActivated = false;
         for(qint32 i = 0; i < m_pEvokedSet->info.projs.size(); ++i) {
             if(m_pEvokedSet->info.projs[i].active) {
@@ -704,10 +708,8 @@ void EvokedSetModel::updateProjection()
 
 void EvokedSetModel::updateCompensator(int to)
 {
-    //
-    //  Update the compensator
-    //
-    if(m_pEvokedSet->info.chs.size()>0)
+    // Update the compensator
+    if(m_pEvokedSet->info.chs.size() > 0)
     {
         if(to == 0) {
             m_bCompActivated = false;
