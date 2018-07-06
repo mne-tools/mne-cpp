@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainampsetupwidget.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     fiffproducer.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2016
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BrainAMPSetupWidget class.
+* @brief     Declaration of the FiffProducer class.
 *
 */
 
-#ifndef BRAINAMPSETUPWIDGET_H
-#define BRAINAMPSETUPWIDGET_H
+#ifndef FIFFPRODUCER_H
+#define FIFFPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -43,102 +42,74 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_brainampsetup.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QThread>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BRAINAMPPLUGIN
+// DEFINE NAMESPACE FIFFSIMULATORRTSERVERPLUGIN
 //=============================================================================================================
 
-namespace BRAINAMPPLUGIN
+namespace FIFFSIMULATORRTSERVERPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// FIFFSIMULATORRTSERVERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainAMP;
+class FiffSimulator;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BrainAMPSetupWidget
+* DECLARE CLASS FiffProducer
 *
-* @brief The BrainAMPSetupWidget class provides the BrainAMP configuration window.
+* @brief The FiffProducer class provides a data producer for a given sampling rate.
 */
-class BrainAMPSetupWidget : public QWidget
+class FiffProducer : public QThread
 {
-    Q_OBJECT
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a BrainAMPSetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
-    * @param [in] pBrainAMP a pointer to the corresponding ECGSimulator.
+    * Constructs a FiffProducer.
     */
-    BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget *parent = 0);
+    FiffProducer(FiffSimulator* simulator = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destroys the BrainAMPSetupWidget.
-    * All BrainAMPSetupWidget's children are deleted first. The application exits if BrainAMPSetupWidget is the main widget.
+    * Destroys the FiffProducer.
     */
-    ~BrainAMPSetupWidget();
+    ~FiffProducer();
 
     //=========================================================================================================
     /**
-    * Initializes the Connector's GUI properties.
-    *
+    * Stops the FiffProducer by stopping the producer's thread.
     */
-    void initGui();
+    virtual bool stop();
+
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
 private:
-
-    //=========================================================================================================
-    /**
-    * Sets the device sampling properties.
-    *
-    */
-    void setDeviceSamplingProperties();
-
-    //=========================================================================================================
-    /**
-    * Forward the device sampling frequency.
-    *
-    */
-    void setSamplingFreq();
-
-    //=========================================================================================================
-    /**
-    * Forward the device samples per block.
-    *
-    */
-    void setSamplesPerBlock();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-    BrainAMP*               m_pBrainAMP;            /**< a pointer to corresponding BrainAMP.*/
-    Ui::BrainAMPSetupClass  ui;                     /**< the user interface for the BrainAMPSetupWidget.*/
+    FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
+    bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
 };
 
 } // NAMESPACE
 
-#endif // BRAINAMPSETUPWIDGET_H
+#endif // FIFFPRODUCER_H

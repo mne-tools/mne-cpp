@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     Neuromag.pro
+# @file     plugins.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,71 +29,19 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the neuromag plug-in.
+# @brief    This project file builds all connector plugins.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../../mne-cpp.pri)
+include(../../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = subdirs
 
-CONFIG += plugin
+SUBDIRS += \
+    fiffsimulator \
 
-DEFINES += NEUROMAG_LIBRARY
-
-#DEFINES += DACQ_OLD_CONNECTION_SCHEME # HP-UX
-
-QT += network concurrent
-QT -= gui
-
-TARGET = Neuromag
-
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
+# Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
+unix:!macx{
+    SUBDIRS += \
+        neuromag
 }
-
-LIBS += -L$${MNE_LIBRARY_DIR}
-
-CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Realtimed
-}
-else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Realtime
-}
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
-
-SOURCES += \
-        neuromag.cpp \
-        dacqserver.cpp \
-        collectorsocket.cpp \
-        shmemsocket.cpp
-
-HEADERS += \
-        neuromag.h\
-        neuromag_global.h \
-        ../../mne_rt_server/IConnector.h \  #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
-        types_definitions.h \
-        dacqserver.h \
-        collectorsocket.h \
-        shmemsocket.h
-
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-OTHER_FILES += neuromag.json
-
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
-
-unix: QMAKE_CXXFLAGS += -Wno-attributes

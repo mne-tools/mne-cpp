@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainampsetupwidget.cpp
+* @file     natussetup.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2016
+* @date     June, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch, Viktor Klüber and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BrainAMPSetupWidget class.
+* @brief    Contains the implementation of the NatusSetup class.
 *
 */
 
@@ -39,9 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brainampsetupwidget.h"
-#include "brainampaboutwidget.h"
-#include "../brainamp.h"
+#include "natussetup.h"
+#include "../natus.h"
 
 
 //*************************************************************************************************************
@@ -57,7 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BRAINAMPPLUGIN;
+using namespace NATUSPLUGIN;
 
 
 
@@ -66,23 +64,22 @@ using namespace BRAINAMPPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
+NatusSetup::NatusSetup(Natus* pNatus, QWidget* parent)
 : QWidget(parent)
-, m_pBrainAMP(pBrainAMP)
+, m_pNatus(pNatus)
 {
     ui.setupUi(this);
 
     //Connect device sampling properties
     connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &BrainAMPSetupWidget::setSamplingFreq);
-    connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &BrainAMPSetupWidget::setSamplesPerBlock);
-
-    //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BrainAMPSetupWidget::showAboutDialog);
+            this, &NatusSetup::setSamplingFreq);
+    connect(ui.m_comboBox_blockSize, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &NatusSetup::setSamplesPerBlock);
+    connect(ui.m_spinBox_numberChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &NatusSetup::setNumberChannels);
 
     //Fill info box
-    QFile file(m_pBrainAMP->m_qStringResourcePath+"readme.txt");
+    QFile file(m_pNatus->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
@@ -98,42 +95,41 @@ BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
 
 //*************************************************************************************************************
 
-BrainAMPSetupWidget::~BrainAMPSetupWidget()
+NatusSetup::~NatusSetup()
 {
-
 }
 
 
 //*************************************************************************************************************
 
-void BrainAMPSetupWidget::initGui()
+void NatusSetup::initGui()
 {
     //Init device sampling properties
-    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pBrainAMP->m_iSamplingFreq));
-    ui.m_spinBox_BlockSize->setValue(m_pBrainAMP->m_iSamplesPerBlock);
+    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pNatus->m_iSamplingFreq));
+    ui.m_comboBox_blockSize->setCurrentText(QString::number(m_pNatus->m_iSamplesPerBlock));
+    ui.m_spinBox_numberChannels->setValue(m_pNatus->m_iNumberChannels);
 }
 
 
 //*************************************************************************************************************
 
-void BrainAMPSetupWidget::setSamplingFreq()
+void NatusSetup::setSamplingFreq()
 {
-    m_pBrainAMP->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
+    m_pNatus->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
 }
 
 
 //*************************************************************************************************************
 
-void BrainAMPSetupWidget::setSamplesPerBlock()
+void NatusSetup::setNumberChannels()
 {
-    m_pBrainAMP->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
+    m_pNatus->m_iNumberChannels = ui.m_spinBox_numberChannels->value();
 }
 
 
 //*************************************************************************************************************
 
-void BrainAMPSetupWidget::showAboutDialog()
+void NatusSetup::setSamplesPerBlock()
 {
-    BrainAMPAboutWidget aboutDialog(this);
-    aboutDialog.exec();
+    m_pNatus->m_iSamplesPerBlock = ui.m_comboBox_blockSize->currentText().toInt();
 }

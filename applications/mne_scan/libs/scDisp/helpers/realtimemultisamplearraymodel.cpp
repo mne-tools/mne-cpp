@@ -379,7 +379,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
+void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, bool bSetZero)
 {
     beginResetModel();
 
@@ -393,8 +393,16 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
     m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
     m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
 
-    if(m_iCurrentSample>m_iMaxSamples)
+    if(bSetZero) {
+        m_matDataRaw.setZero();
+        m_matDataFiltered.setZero();
+        m_vecLastBlockFirstValuesRaw.setZero();
+        m_vecLastBlockFirstValuesFiltered.setZero();
+    }
+
+    if(m_iCurrentSample>m_iMaxSamples) {
         m_iCurrentSample = 0;
+    }
 
     endResetModel();
 }
@@ -844,9 +852,9 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
         }
 
         //Write final operator matrices to file
-//        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-//        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
-//        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
 
         //
         // Make operators sparse

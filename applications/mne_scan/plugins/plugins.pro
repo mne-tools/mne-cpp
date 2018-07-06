@@ -59,6 +59,7 @@ contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
         # eegosports \
         # brainamp \
         # tmsi \
+        natus \
 
     #Algorithms
     SUBDIRS += \
