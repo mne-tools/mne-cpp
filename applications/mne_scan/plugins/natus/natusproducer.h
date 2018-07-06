@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulator.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     natusproducer.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2012
+* @date     June, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,29 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Definition of the FiffSimulator Class.
+* @brief    Contains the declaration of the NatusProducer class.
 *
 */
 
-#ifndef FIFFSIMULATOR_H
-#define FIFFSIMULATOR_H
+#ifndef NATUSPRODUCER_H
+#define NATUSPRODUCER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiffsimulator_global.h"
-#include "../../mne_rt_server/IConnector.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_raw_data.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include "natus_global.h"
 
 
 //*************************************************************************************************************
@@ -59,154 +50,96 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QMutex>
+#include <QUdpSocket>
+#include <QNetworkDatagram>
+#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffConnectorPlugin
+// EIGEN INCLUDES
 //=============================================================================================================
 
-namespace FIFFSIMULATORPLUGIN
-{
+#include <Eigen/Core>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace RTSERVER;
-using namespace IOBUFFER;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffProducer;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE NATUSPLUGIN
+//=============================================================================================================
+
+namespace NATUSPLUGIN
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// NATUSPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffSimulator
+* The NatusProducer class.
 *
-* @brief The FiffSimulator class provides a Fiff data simulator.
+* @brief The NatusProducer class provides producer to receive data from the connected Natus amplifier and forward it to the main plugin class.
 */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public IConnector
+class NATUSSHARED_EXPORT NatusProducer : public QObject
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "fiffsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(RTSERVER::IConnector)
-
-    friend class FiffProducer;
 
 public:
-    struct Commands
-    {
-        static const QString BUFSIZE;
-        static const QString GETBUFSIZE;
-        static const QString ACCEL;
-        static const QString GETACCEL;
-        static const QString SIMFILE;
-    };
-
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulator.
+    * Constructs a NatusProducer which is a child of parent.
+    *
+    * @param [in] iBlockSize The block size to init the data matrix with.
+    * @param [in] iChannelSize The channel size to init the data matrix with.
+    * @param [in] parent pointer to parent widget.
     */
-    FiffSimulator();
-
-    //=========================================================================================================
-    /**
-    * Destroys the FiffSimulator.
-    */
-    virtual ~FiffSimulator();
-
-    virtual void connectCommandManager();
-
-    virtual ConnectorID getConnectorID() const;
-
-    virtual const char* getName() const;
-
-    virtual void info(qint32 ID);
-
-    virtual bool start();
-
-    virtual bool stop();
+    explicit NatusProducer(int iBlockSize,
+                           int iChannelSize,
+                           QObject *parent = 0);
 
 protected:
-    virtual void run();
-
-private:
-
-    //Slots
     //=========================================================================================================
     /**
-    * Sets the buffer sample size
+    * Called whenever a new datagram was received.
+    */
+    void readPendingDatagrams();
+
+    //=========================================================================================================
+    /**
+    * Parsed the received datagram.
     *
-    * @param[in] p_command  The buffer sample size command.
+    * @param [in] datagram The received datagram.
     */
-    void comBufsize(Command p_command);
+    void processDatagram(const QNetworkDatagram &datagram);
 
+    QSharedPointer<QUdpSocket>          m_pUdpSocket;                   /**< A pointer to the UDP socket.*/
+    Eigen::MatrixXd                     m_matData;                      /**< The data matrix storing the received data.*/
+
+    int                                 m_iMatDataSampleIterator;       /**< The current iterator of the current data matrix.*/
+    float                               m_fSampleFreq;                  /**< The current sample frequency.*/
+    float                               m_fChannelSize;                 /**< The current channel size.*/
+
+signals:
     //=========================================================================================================
     /**
-    * Returns the buffer sample size
+    * Emit this signal whenever a new data matrix is available.
     *
-    * @param[in] p_command  The buffer sample size command.
+    * @param [in] matData The newly parsed data.
     */
-    void comGetBufsize(Command p_command);
-
-    //=========================================================================================================
-    /**
-    * Sets the acceleration factor
-    *
-    * @param[in] p_command  The acceleration factor command.
-    */
-    void comAccel(Command p_command);
-
-    //=========================================================================================================
-    /**
-    * Returns the acceleration factor
-    *
-    * @param[in] p_command  The acceleration factor command.
-    */
-    void comGetAccel(Command p_command);
-
-    //=========================================================================================================
-    /**
-    * Sets the fiff simulation file
-    *
-    * @param[in] p_command  The fiff simulation file command.
-    */
-    void comSimfile(Command p_command);
-
-    //////////
-
-    //=========================================================================================================
-    /**
-    * Initialise the FiffSimulator.
-    */
-    void init();
-
-    bool readRawInfo();
-
-    QMutex mutex;
-
-    FiffProducer*   m_pFiffProducer;        /**< Holds the DataProducer.*/
-    FiffRawData     m_RawInfo;              /**< Holds the fiff raw measurement information. */
-    QString         m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
-    quint32         m_uiBufferSampleSize;   /**< Sample size of the buffer */
-    float           m_AccelerationFactor;   /**< Acceleration factor to simulate different sampling rates. */
-    float           m_TrueSamplingRate;     /**< The true sampling rate of the fif file. */
-
-    RawMatrixBuffer* m_pRawMatrixBuffer;    /**< The Circular Raw Matrix Buffer. */
-
-    bool            m_bIsRunning;
+    void newDataAvailable(const Eigen::MatrixXd &matData);
 };
+
 
 } // NAMESPACE
 
-#endif // FIFFSIMULATOR_H
+#endif // NATUSPRODUCER_H

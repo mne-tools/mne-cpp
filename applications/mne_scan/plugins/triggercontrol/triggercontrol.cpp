@@ -260,7 +260,7 @@ bool TriggerControl::stop()
     for(int i=0; i<m_vTimes.size(); i++)
         sum += m_vTimes[i];
 
-    QFile file(qApp->applicationDirPath()+"/mne_scan_plugins/resources/triggercontrol/t_meas.txt");
+    QFile file(qApp->applicationDirPath()+"/resources/mne_scan/plugins/triggercontrol/t_meas.txt");
     for(int i=0; i<m_vTimes.size(); i++)
         sum += m_vTimes[i];
 
