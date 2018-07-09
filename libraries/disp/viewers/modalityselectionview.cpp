@@ -68,6 +68,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ModalitySelectionView::ModalitySelectionView(QStringList lModalities, QWidget *parent)
+: QWidget(parent, Qt::Window)
 {
     this->setWindowTitle("Modality Selection");
     this->setMinimumWidth(330);

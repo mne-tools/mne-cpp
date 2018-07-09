@@ -671,7 +671,11 @@ void RealTimeMultiSampleArrayDelegate::createTimeSpacersPath(const QModelIndex &
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter, const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter,
+                                                         const QModelIndex &index,
+                                                         const QStyleOptionViewItem &option,
+                                                         QPainterPath& path,
+                                                         RowVectorPair &data) const
 {
     Q_UNUSED(data)
 

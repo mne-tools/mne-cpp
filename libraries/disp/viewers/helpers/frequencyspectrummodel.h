@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../../disp_global.h"
+
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
@@ -67,7 +69,7 @@
 // DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace DISPLIB
 {
 
 
@@ -86,7 +88,7 @@ using namespace Eigen;
 *
 * @brief The FrequencySpectrumModel class implements the data access model for a real-time multi sample array data stream
 */
-class FrequencySpectrumModel : public QAbstractTableModel
+class DISPSHARED_EXPORT FrequencySpectrumModel : public QAbstractTableModel
 {
     Q_OBJECT
 

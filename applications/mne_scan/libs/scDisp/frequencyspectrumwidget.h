@@ -44,9 +44,6 @@
 
 #include "scdisp_global.h"
 #include "measurementwidget.h"
-#include "helpers/frequencyspectrummodel.h"
-#include "helpers/frequencyspectrumdelegate.h"
-#include "helpers/frequencyspectrumsettingswidget.h"
 
 
 //*************************************************************************************************************
@@ -55,10 +52,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
-#include <QAction>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -67,11 +61,18 @@
 //=============================================================================================================
 
 class QTime;
+class QTableView;
 
-namespace SCMEASLIB
-{
-class FrequencySpectrum;
+namespace SCMEASLIB {
+    class FrequencySpectrum;
 }
+
+namespace DISPLIB {
+    class SpectrumSettingsView;
+    class FrequencySpectrumModel;
+    class FrequencySpectrumDelegate;
+}
+
 
 
 //*************************************************************************************************************
@@ -82,34 +83,11 @@ class FrequencySpectrum;
 namespace SCDISPLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace SCMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
 
 
 //=============================================================================================================
@@ -122,7 +100,6 @@ class SCDISPSHARED_EXPORT FrequencySpectrumWidget : public MeasurementWidget
 {
     Q_OBJECT
 
-    friend class FrequencySpectrumSettingsWidget;
 public:
     //=========================================================================================================
     /**
@@ -132,7 +109,9 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    FrequencySpectrumWidget(QSharedPointer<FrequencySpectrum> pNE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    FrequencySpectrumWidget(QSharedPointer<SCMEASLIB::FrequencySpectrum> pNE,
+                            QSharedPointer<QTime> &pTime,
+                            QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -169,7 +148,6 @@ public:
     virtual bool eventFilter(QObject * watched, QEvent * event);
 
 private:
-
     //=========================================================================================================
     /**
     * Broadcast settings of frequency spectrum settings widget
@@ -180,24 +158,20 @@ private:
     /**
     * Show the frequency spectrum settings widget
     */
-    void showFrequencySpectrumSettingsWidget();
+    void showSpectrumSettingsView();
 
-    QAction* m_pActionFrequencySettings;        /**< Frequency spectrum settings action */
+    QPointer<QAction>                                           m_pActionFrequencySettings;         /**< Frequency spectrum settings action */
+    QPointer<QTableView>                                        m_pTableView;                       /**< the QTableView being part of the model/view framework of Qt */
+    QPointer<DISPLIB::FrequencySpectrumModel>                   m_pFSModel;                         /**< Frequency spectrum model */
+    QPointer<DISPLIB::FrequencySpectrumDelegate>                m_pFSDelegate;                      /**< Frequency spectrum delegate */
 
-    FrequencySpectrumModel*      m_pFSModel;    /**< FS model */
-    FrequencySpectrumDelegate*   m_pFSDelegate; /**< FS delegate */
-    QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
+    QSharedPointer<DISPLIB::SpectrumSettingsView>               m_pSpectrumSettingsView;            /**< Frequency spectrum settings modality widget. */
+    QSharedPointer<SCMEASLIB::FrequencySpectrum>                m_pFS;                              /**< The frequency spectrum measurement. */
 
+    float m_fLowerFrqBound;         /**< Lower frequency bound */
+    float m_fUpperFrqBound;         /**< Upper frequency bound */
 
-    QSharedPointer<FrequencySpectrumSettingsWidget> m_pFrequencySpectrumSettingsWidget;   /**< Frequency spectrum settings modality widget. */
-
-
-    QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
-
-    float m_fLowerFrqBound;                    /**< Lower frequency bound */
-    float m_fUpperFrqBound;                    /**< Upper frequency bound */
-
-    bool m_bInitialized;                        /**< Is Initialized */
+    bool m_bInitialized;            /**< Is Initialized */
 
 signals:
     //=========================================================================================================

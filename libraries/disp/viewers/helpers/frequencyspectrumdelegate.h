@@ -36,13 +36,25 @@
 #ifndef FREQUENCYSPECTRUMDELEGATE_H
 #define FREQUENCYSPECTRUMDELEGATE_H
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../disp_global.h"
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
 #include <QAbstractItemDelegate>
 #include <QTableView>
 #include <QMouseEvent>
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -54,10 +66,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace DISPLIB
 {
 
 
@@ -73,11 +85,12 @@ using namespace Eigen;
 /**
 * DECLARE CLASS FrequencySpectrumDelegate
 *
-* @brief The FrequencySpectrumDelegate class represents a RTMSA delegate which creates the plot paths
+* @brief The FrequencySpectrumDelegate class represents a frequency delegate which creates the plot paths
 */
-class FrequencySpectrumDelegate : public QAbstractItemDelegate
+class DISPSHARED_EXPORT FrequencySpectrumDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**
@@ -164,25 +177,17 @@ private:
     */
     void createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const;
 
+    QPointer<QTableView>    m_tableview; /**< Pointer to the TableView */
 
-    // Scaling
-    float m_fMaxValue;     /**< Maximum value of the data to plot  */
-    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    int         m_tableview_row;    /**< the selected row of the tableview*/
+    int         m_mousex;           /**< the mouse x pos */
+    int         m_mousey;           /**< the mouse y pos */
+    QRect       m_visRect;          /**< visual rect of row of tableview */
+    float       m_x_rate;           /**< the rate of the cursor position in the raw visual rect */
+    float       m_fMaxValue;        /**< Maximum value of the data to plot  */
+    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
 
-    QTableView * m_tableview; /**< Pointer to the TableView */
-
-
-    int m_tableview_row;     /**< the selected row of the tableview*/
-    int m_mousex;            /**< the mouse x pos */
-    int m_mousey;            /**< the mouse y pos */
-    QRect m_visRect;         /**< visual rect of row of tableview */
-    float m_x_rate;          /**< the rate of the cursor position in the raw visual rect */
-
-
-    qint8 m_iScaleType;      /**< scale type */
-
-
-
+    qint8       m_iScaleType;       /**< scale type */
 };
 
 } // NAMESPACE
