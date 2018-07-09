@@ -60,7 +60,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,6 +84,7 @@ FrequencySpectrumDelegate::FrequencySpectrumDelegate(QTableView* m_pTableView,QO
     m_tableview->setMouseTracking(true);
 
 }
+
 
 //*************************************************************************************************************
 
@@ -176,10 +178,6 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
             break;
         }
     }
-
-
-
-
 }
 
 
@@ -206,6 +204,7 @@ QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, co
     return size;
 }
 
+
 //*************************************************************************************************************
 
 void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int mousey, QRect visRect)
@@ -224,6 +223,7 @@ void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int m
     m_tableview->viewport()->repaint();
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -323,6 +323,7 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
     }//correct row to plot
 }
 
+
 //*************************************************************************************************************
 
 void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
@@ -353,7 +354,6 @@ void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const Q
 
         path.moveTo(qSamplePosition);
     }
-
 
     //create lines from one to the next sample
     qint32 i;
@@ -424,6 +424,7 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
     }
 }
 
+
 //*************************************************************************************************************
 
 void FrequencySpectrumDelegate::createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const
@@ -479,8 +480,6 @@ void FrequencySpectrumDelegate::createGridTick(const QModelIndex &index, const Q
         }
 
         // YTick
-
-
     }
 }
 

@@ -176,9 +176,7 @@ private:
     bool m_bIsInit;             /**< If channel info is initialized.*/
     bool m_bContainsValues;     /**< If values are stored.*/
 
-    /* Begin : Added by Limin, 10/19/14  for passing scaletype parameter from noisee stimate to spectrum model*/
     qint8 m_xScaleType;         /**< The scale type of x axis: 0-normal; 1-log.  */
-    /* End */
 };
 
 

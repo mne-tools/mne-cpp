@@ -86,9 +86,6 @@ SOURCES += \
     frequencyspectrumwidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
-    helpers/frequencyspectrummodel.cpp \
-    helpers/frequencyspectrumdelegate.cpp \
-    helpers/frequencyspectrumsettingswidget.cpp \
     helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
     realtimeconnectivityestimatewidget.cpp \
@@ -103,9 +100,6 @@ HEADERS += \
     frequencyspectrumwidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
-    helpers/frequencyspectrumdelegate.h \
-    helpers/frequencyspectrummodel.h \
-    helpers/frequencyspectrumsettingswidget.h \
     helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \

@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -302,8 +302,9 @@ void FrequencySpectrumModel::toggleFreeze(const QModelIndex &)
 
 void FrequencySpectrumModel::setBoundaries(float fLowerFrqBound, float fUpperFrqBound)
 {
-    if(!m_bInitialized)
+    if(!m_bInitialized) {
         return;
+    }
 
     beginResetModel();
 
@@ -313,14 +314,13 @@ void FrequencySpectrumModel::setBoundaries(float fLowerFrqBound, float fUpperFrq
     m_iUpperFrqIdx = m_vecFreqScale.size()-1;
 
     //find boundaries
-    for(qint32 i = 0; i < m_vecFreqScale.size(); ++i)
-    {
+    for(qint32 i = 0; i < m_vecFreqScale.size(); ++i) {
         float val = m_vecFreqScale[i]*nf;
-        if( val < fLowerFrqBound)
+        if(val < fLowerFrqBound) {
             m_iLowerFrqIdx = i;
+        }
 
-        if( val > fUpperFrqBound)
-        {
+        if( val > fUpperFrqBound) {
             m_iUpperFrqIdx = i;
             break;
         }
@@ -328,8 +328,9 @@ void FrequencySpectrumModel::setBoundaries(float fLowerFrqBound, float fUpperFrq
 
     // scale it new
     m_vecFreqScaleBound = m_vecFreqScale;
-    for(qint32 i = 0; i < m_vecFreqScaleBound.size(); ++i)
+    for(qint32 i = 0; i < m_vecFreqScaleBound.size(); ++i) {
         m_vecFreqScaleBound[i] = (m_vecFreqScaleBound[i] - m_vecFreqScale[m_iLowerFrqIdx]) / (m_vecFreqScale[m_iUpperFrqIdx] - m_vecFreqScale[m_iLowerFrqIdx]);
+    }
 
     endResetModel();
 }

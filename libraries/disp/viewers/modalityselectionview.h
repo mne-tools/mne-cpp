@@ -87,7 +87,6 @@ class DISPSHARED_EXPORT ModalitySelectionView : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a ModalitySelectionView which is a child of parent.
