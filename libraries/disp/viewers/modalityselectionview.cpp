@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     covmodalitywidget.cpp
+* @file     modalityselectionview.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the CovModalityWidget Class.
+* @brief    Definition of the ModalitySelectionView Class.
 *
 */
 
@@ -38,8 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "covmodalitywidget.h"
-#include "../realtimecovwidget.h"
+#include "modalityselectionview.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +49,8 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QStringList>
-
+#include <QCheckBox>
+#include <QStringList>
 #include <QDebug>
 
 
@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -67,34 +67,30 @@ using namespace SCDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CovModalityWidget::CovModalityWidget(RealTimeCovWidget *parent)
-: m_pRealTimeCovWidget(parent)
+ModalitySelectionView::ModalitySelectionView(QStringList lModalities, QWidget *parent)
 {
-    this->setWindowTitle("Covariance Modality Settings");
+    this->setWindowTitle("Modality Selection");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 
-    QStringList t_qListModalities;
-    t_qListModalities << "MEG" << "EEG";
-
-
     qint32 count = 0;
-    foreach (const QString &mod, t_qListModalities) {
-
+    foreach (const QString &mod, lModalities) {
+        //Add the label
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality, count,0,1,1);
+        t_pGridLayout->addWidget(t_pLabelModality,count,0,1,1);
         m_qListModalities << mod;
 
+        //Add the check box
         QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        if(m_pRealTimeCovWidget->m_qListPickTypes.contains(mod))
-            t_pCheckBoxModality->setChecked(true);
+        connect(t_pCheckBoxModality, &QCheckBox::stateChanged,
+                this, &ModalitySelectionView::updateSelection);
+
+        t_pCheckBoxModality->setChecked(true);
 
         m_qListModalityCheckBox << t_pCheckBoxModality;
-
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&CovModalityWidget::updateSelection);
 
         t_pGridLayout->addWidget(t_pCheckBoxModality,count,1,1,1);
 
@@ -108,15 +104,17 @@ CovModalityWidget::CovModalityWidget(RealTimeCovWidget *parent)
 
 //*************************************************************************************************************
 
-void CovModalityWidget::updateSelection(qint32 state)
+void ModalitySelectionView::updateSelection(qint32 state)
 {
     Q_UNUSED(state)
 
-    m_pRealTimeCovWidget->m_qListPickTypes.clear();
+    QStringList lModalitySelection;
 
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-        if(m_qListModalityCheckBox[i]->isChecked())
-            m_pRealTimeCovWidget->m_qListPickTypes << m_qListModalities[i];
+    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i) {
+        if(m_qListModalityCheckBox[i]->isChecked()) {
+            lModalitySelection << m_qListModalities[i];
+        }
+    }
 
-    m_pRealTimeCovWidget->m_bInitialized = false;
+    emit newModalitySelection(lModalitySelection);
 }

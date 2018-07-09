@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     covmodalitywidget.h
+* @file     modalityselectionview.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,18 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the CovModalityWidget Class.
+* @brief    Declaration of the ModalitySelectionView Class.
 *
 */
 
-#ifndef COVMODALITYWIDGET_H
-#define COVMODALITYWIDGET_H
+#ifndef MODALITYSELECTIONVIEW_H
+#define MODALITYSELECTIONVIEW_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -49,17 +51,6 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QCheckBox>
-#include <QStringList>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
-//=============================================================================================================
-
-namespace SCDISPLIB
-{
 
 
 //*************************************************************************************************************
@@ -67,39 +58,58 @@ namespace SCDISPLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RealTimeCovWidget;
+class QCheckBox;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS CovModalityWidget
+* DECLARE CLASS ModalitySelectionView
 *
-* @brief The CovModalityWidget class provides the sensor selection widget
+* @brief The ModalitySelectionView class provides a view to select between different modalities
 */
-class CovModalityWidget : public QWidget
+class DISPSHARED_EXPORT ModalitySelectionView : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a CovModalityWidget which is a child of parent.
+    * Constructs a ModalitySelectionView which is a child of parent.
     *
-    * @param [in] parent    parent of widget
-    * @param [in] f         widget flags
+    * @param [in] lModalities   the modalities which should be made available for selection
+    * @param [in] parent        parent of widget
     */
-    CovModalityWidget(RealTimeCovWidget *toolbox);
+    ModalitySelectionView(QStringList lModalities,
+                          QWidget *parent = 0);
 
     void updateSelection(qint32 state);
 
 private:
-    RealTimeCovWidget * m_pRealTimeCovWidget;       /**< Connected real-time covariance widget */
-
     QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
 
-    QStringList m_qListModalities;                  /**< List of modalities */
+    QStringList         m_qListModalities;          /**< List of modalities */
+
+signals:
+    void newModalitySelection(QStringList lModalitySelection);
+
 };
 
 } // NAMESPACE
 
-#endif // COVMODALITYWIDGET_H
+#endif // MODALITYSELECTIONVIEW_H

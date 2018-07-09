@@ -100,6 +100,7 @@ SOURCES += \
     plots/tfplot.cpp \
     plots/helpers/colormap.cpp \
     viewers/filterview.cpp \
+    viewers/modalityselectionview.cpp \
     viewers/butterflyview.cpp \
     viewers/channelselectionview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
@@ -123,6 +124,7 @@ HEADERS += \
     plots/tfplot.h \
     plots/helpers/colormap.h \
     viewers/filterview.h \
+    viewers/modalityselectionview.h \
     viewers/butterflyview.h \
     viewers/channelselectionview.h \
     viewers/helpers/evokedsetmodel.h \

@@ -86,7 +86,6 @@ SOURCES += \
     frequencyspectrumwidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
-    helpers/covmodalitywidget.cpp \
     helpers/frequencyspectrummodel.cpp \
     helpers/frequencyspectrumdelegate.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
@@ -104,7 +103,6 @@ HEADERS += \
     frequencyspectrumwidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
-    helpers/covmodalitywidget.h \
     helpers/frequencyspectrumdelegate.h \
     helpers/frequencyspectrummodel.h \
     helpers/frequencyspectrumsettingswidget.h \
