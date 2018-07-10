@@ -75,8 +75,7 @@ SOURCES += \
     measurementtypes.cpp \
     realtimeevokedset.cpp \
     realtimecov.cpp \
-    frequencyspectrum.cpp
-
+    realtimespectrum.cpp
 
 HEADERS += \
     scmeas_global.h \
@@ -90,7 +89,7 @@ HEADERS += \
     measurementtypes.h \
     realtimeevokedset.h \
     realtimecov.h \
-    frequencyspectrum.h
+    realtimespectrum.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

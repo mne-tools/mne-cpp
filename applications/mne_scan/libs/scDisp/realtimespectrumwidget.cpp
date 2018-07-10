@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrumwidget.cpp
+* @file     realtimespectrumwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the FrequencySpectrumWidget Class.
+* @brief    Definition of the RealTimeSpectrumWidget Class.
 *
 */
 
@@ -40,11 +40,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "frequencyspectrumwidget.h"
+#include "realtimespectrumwidget.h"
 
 #include <disp/viewers/spectrumsettingsview.h>
 #include <disp/viewers/spectrumview.h>
-#include <scMeas/frequencyspectrum.h>
+#include <scMeas/realtimespectrum.h>
 #include <math.h>
 
 
@@ -82,7 +82,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectrum> pFS,
+RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> pFS,
                                                  QSharedPointer<QTime> &pTime,
                                                  QWidget* parent)
 : MeasurementWidget(parent)
@@ -97,7 +97,7 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
     m_pActionFrequencySettings->setShortcut(tr("F12"));
     m_pActionFrequencySettings->setStatusTip(tr("Shows the frequency spectrum settings widget (F12)"));
     connect(m_pActionFrequencySettings, &QAction::triggered,
-            this, &FrequencySpectrumWidget::showSpectrumSettingsView);
+            this, &RealTimeSpectrumWidget::showSpectrumSettingsView);
     addDisplayAction(m_pActionFrequencySettings);
 
     m_pActionFrequencySettings->setVisible(false);
@@ -117,7 +117,7 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
 
 //*************************************************************************************************************
 
-FrequencySpectrumWidget::~FrequencySpectrumWidget()
+RealTimeSpectrumWidget::~RealTimeSpectrumWidget()
 {
     // Store Settings
     if(!m_pFS->getName().isEmpty())  {
@@ -133,7 +133,7 @@ FrequencySpectrumWidget::~FrequencySpectrumWidget()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::update(SCMEASLIB::Measurement::SPtr)
+void RealTimeSpectrumWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }
@@ -141,7 +141,7 @@ void FrequencySpectrumWidget::update(SCMEASLIB::Measurement::SPtr)
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::getData()
+void RealTimeSpectrumWidget::getData()
 {
     if(!m_bInitialized)
     {
@@ -161,7 +161,7 @@ void FrequencySpectrumWidget::getData()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::init()
+void RealTimeSpectrumWidget::init()
 {
     if(m_pFS->getFiffInfo()) {
         QSettings settings;
@@ -182,14 +182,14 @@ void FrequencySpectrumWidget::init()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::initSettingsWidget()
+void RealTimeSpectrumWidget::initSettingsWidget()
 {
     if(!m_pSpectrumSettingsView) {
         m_pSpectrumSettingsView = QSharedPointer<SpectrumSettingsView>(new SpectrumSettingsView(this));
 
         m_pSpectrumSettingsView->setWindowTitle("Frequency Spectrum Settings");
 
-        connect(m_pSpectrumSettingsView.data(), &SpectrumSettingsView::settingsChanged, this, &FrequencySpectrumWidget::broadcastSettings);
+        connect(m_pSpectrumSettingsView.data(), &SpectrumSettingsView::settingsChanged, this, &RealTimeSpectrumWidget::broadcastSettings);
     }
 
     if(m_pFS->isInit() && m_pFS->getFiffInfo())
@@ -209,7 +209,7 @@ void FrequencySpectrumWidget::initSettingsWidget()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::broadcastSettings()
+void RealTimeSpectrumWidget::broadcastSettings()
 {
     if(m_pSpectrumSettingsView)
     {
@@ -222,7 +222,7 @@ void FrequencySpectrumWidget::broadcastSettings()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::showSpectrumSettingsView()
+void RealTimeSpectrumWidget::showSpectrumSettingsView()
 {
     initSettingsWidget();
     m_pSpectrumSettingsView->show();
@@ -231,7 +231,7 @@ void FrequencySpectrumWidget::showSpectrumSettingsView()
 
 //*************************************************************************************************************
 
-bool FrequencySpectrumWidget::eventFilter(QObject *object, QEvent *event)
+bool RealTimeSpectrumWidget::eventFilter(QObject *object, QEvent *event)
 {
     return QWidget::eventFilter(object, event);
 }

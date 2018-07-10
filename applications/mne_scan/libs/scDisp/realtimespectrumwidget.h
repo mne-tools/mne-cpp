@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrumwidget.h
+* @file     realtimespectrumwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the FrequencySpectrumWidget Class.
+* @brief    Declaration of the RealTimeSpectrumWidget Class.
 *
 */
 
@@ -63,7 +63,7 @@
 class QTime;
 
 namespace SCMEASLIB {
-    class FrequencySpectrum;
+    class RealTimeSpectrum;
 }
 
 namespace DISPLIB {
@@ -90,32 +90,32 @@ namespace SCDISPLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FrequencySpectrumWidget
+* DECLARE CLASS RealTimeSpectrumWidget
 *
-* @brief The FrequencySpectrumWidget class provides a equalizer display
+* @brief The RealTimeSpectrumWidget class provides a equalizer display
 */
-class SCDISPSHARED_EXPORT FrequencySpectrumWidget : public MeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeSpectrumWidget : public MeasurementWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a FrequencySpectrumWidget which is a child of parent.
+    * Constructs a RealTimeSpectrumWidget which is a child of parent.
     *
     * @param [in] pNE           pointer to noise estimation measurement.
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    FrequencySpectrumWidget(QSharedPointer<SCMEASLIB::FrequencySpectrum> pNE,
+    RealTimeSpectrumWidget(QSharedPointer<SCMEASLIB::RealTimeSpectrum> pNE,
                             QSharedPointer<QTime> &pTime,
                             QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FrequencySpectrumWidget.
+    * Destroys the RealTimeSpectrumWidget.
     */
-    ~FrequencySpectrumWidget();
+    ~RealTimeSpectrumWidget();
 
     //=========================================================================================================
     /**
@@ -133,7 +133,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the FrequencySpectrumWidget.
+    * Initialise the RealTimeSpectrumWidget.
     */
     virtual void init();
 
@@ -162,7 +162,7 @@ private:
     QPointer<DISPLIB::SpectrumView>                             m_pSpectrumView;                    /**< Frequency spectrum view */
 
     QSharedPointer<DISPLIB::SpectrumSettingsView>               m_pSpectrumSettingsView;            /**< Frequency spectrum settings modality widget. */
-    QSharedPointer<SCMEASLIB::FrequencySpectrum>                m_pFS;                              /**< The frequency spectrum measurement. */
+    QSharedPointer<SCMEASLIB::RealTimeSpectrum>                 m_pFS;                              /**< The frequency spectrum measurement. */
 
     float m_fLowerFrqBound;         /**< Lower frequency bound */
     float m_fUpperFrqBound;         /**< Upper frequency bound */

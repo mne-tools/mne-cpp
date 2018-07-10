@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrum.cpp
+* @file     realtimespectrum.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the FrequencySpectrum class.
+* @brief    Definition of the RealTimeSpectrum class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "frequencyspectrum.h"
+#include "realtimespectrum.h"
 
 
 //*************************************************************************************************************
@@ -63,8 +63,8 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FrequencySpectrum::FrequencySpectrum(QObject *parent)
-: Measurement(QMetaType::type("FrequencySpectrum::SPtr"), parent)
+RealTimeSpectrum::RealTimeSpectrum(QObject *parent)
+: Measurement(QMetaType::type("RealTimeSpectrum::SPtr"), parent)
 , m_bIsInit(false)
 , m_bContainsValues(false)
 , m_xScaleType(0)
@@ -74,7 +74,7 @@ FrequencySpectrum::FrequencySpectrum(QObject *parent)
 
 //*************************************************************************************************************
 
-FrequencySpectrum::~FrequencySpectrum()
+RealTimeSpectrum::~RealTimeSpectrum()
 {
 
 }
@@ -82,7 +82,7 @@ FrequencySpectrum::~FrequencySpectrum()
 
 //*************************************************************************************************************
 
-void FrequencySpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
+void RealTimeSpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
     m_pFiffInfo = p_pFiffInfo;
 
@@ -91,7 +91,7 @@ void FrequencySpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
 //*************************************************************************************************************
 
-void FrequencySpectrum::initScaleType(qint8 ScaleType)
+void RealTimeSpectrum::initScaleType(qint8 ScaleType)
 {
     m_xScaleType = ScaleType;
 
@@ -100,7 +100,7 @@ void FrequencySpectrum::initScaleType(qint8 ScaleType)
 
 //*************************************************************************************************************
 
-MatrixXd FrequencySpectrum::getValue() const
+MatrixXd RealTimeSpectrum::getValue() const
 {
     return m_matValue;
 }
@@ -108,7 +108,7 @@ MatrixXd FrequencySpectrum::getValue() const
 
 //*************************************************************************************************************
 
-void FrequencySpectrum::setValue(MatrixXd& v)
+void RealTimeSpectrum::setValue(MatrixXd& v)
 {
     //Store
     m_matValue = v;

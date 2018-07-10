@@ -118,12 +118,12 @@ public:
 
     void setBoundaries(int iLower, int iUpper);
 
-    virtual bool eventFilter(QObject * watched, QEvent * event);
+    virtual bool eventFilter(QObject* watched, QEvent* event);
 
 protected:
-    QPointer<QTableView>                                        m_pTableView;           /**< the QTableView being part of the model/view framework of Qt */
-    QPointer<DISPLIB::FrequencySpectrumDelegate>                m_pFSDelegate;          /**< Frequency spectrum delegate */
-    QPointer<DISPLIB::FrequencySpectrumModel>                   m_pFSModel;             /**< Frequency spectrum model */
+    QPointer<QTableView>                                m_pTableView;           /**< The QTableView being part of the model/view framework of Qt */
+    QPointer<DISPLIB::FrequencySpectrumDelegate>        m_pFSDelegate;          /**< Frequency spectrum delegate */
+    QPointer<DISPLIB::FrequencySpectrumModel>           m_pFSModel;             /**< Frequency spectrum model */
 
 signals:
     //=========================================================================================================
