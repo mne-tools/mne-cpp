@@ -86,7 +86,10 @@ class DISPSHARED_EXPORT SpectrumSettingsView : public QWidget
 {
     Q_OBJECT
 
-public:
+public:    
+    typedef QSharedPointer<SpectrumSettingsView> SPtr;              /**< Shared pointer type for SpectrumSettingsView. */
+    typedef QSharedPointer<const SpectrumSettingsView> ConstSPtr;   /**< Const shared pointer type for SpectrumSettingsView. */
+
     //=========================================================================================================
     /**
     * Constructs a SpectrumSettingsView which is a child of parent.

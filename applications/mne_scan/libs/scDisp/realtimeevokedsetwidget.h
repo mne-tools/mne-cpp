@@ -79,7 +79,7 @@ namespace DISPLIB {
     class ChannelSelectionView;
     class ChInfoModel;
     class FilterView;
-    class FilterView;
+    class AverageLayoutView;
 }
 
 class QVBoxLayout;
@@ -252,14 +252,14 @@ private:
     bool virtual eventFilter(QObject *object, QEvent *event);
 
     QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */
-    QSharedPointer<DISPLIB::ButterflyView>              m_pButterflyView;           /**< Butterfly plot */
-    QSharedPointer<DISPLIB::AverageScene>               m_pAverageScene;            /**< The pointer to the average scene. */
     QSharedPointer<SCMEASLIB::RealTimeEvokedSet>        m_pRTESet;                  /**< The real-time evoked measurement. */
     QSharedPointer<QuickControlWidget>                  m_pQuickControlWidget;      /**< Quick control widget. */
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::ChInfoModel>                m_pChInfoModel;             /**< Channel info model. */
     QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
+    QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
+    QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
 
     QList<SCMEASLIB::RealTimeSampleArrayChInfo>         m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on.*/
     QList<DISPLIB::Modality>            m_qListModalities;
@@ -276,7 +276,6 @@ private:
     QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout */
     QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label */
     QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
-    QPointer<QGraphicsView>             m_pAverageLayoutView;       /**< View for 2D average layout scene */
 };
 
 } // NAMESPACE SCDISPLIB
