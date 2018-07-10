@@ -4,11 +4,11 @@
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -33,14 +33,26 @@
 *
 */
 
-//ToDo Paint to render area
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "realtimeevokedsetwidget.h"
+#include "helpers/quickcontrolwidget.h"
+
+#include <disp/viewers/channelselectionview.h>
+#include <disp/viewers/helpers/chinfomodel.h>
+#include <disp/viewers/helpers/averagescene.h>
+#include <disp/viewers/helpers/averagesceneitem.h>
+#include <disp/viewers/filterview.h>
+#include <disp/viewers/helpers/evokedsetmodel.h>
+#include <disp/viewers/butterflyview.h>
+
+#include <scMeas/realtimeevokedset.h>
+#include <scMeas/realtimesamplearraychinfo.h>
+
+#include <math.h>
 
 
 //*************************************************************************************************************
@@ -53,26 +65,16 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QPaintEvent>
-#include <QPainter>
-#include <QHeaderView>
-#include <QMenu>
-#include <QMessageBox>
-#include <QScroller>
-#include <QSettings>
+#include <QAction>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QToolBox>
+#include <QGraphicsView>
+#include <QGraphicsItem>
 #include <QSvgGenerator>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -82,17 +84,7 @@
 
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
-
-
-//=============================================================================================================
-/**
-* Tool enumeration.
-*/
-enum Tool
-{
-    Freeze     = 0,     /**< Freezing tool. */
-    Annotation = 1      /**< Annotation tool. */
-};
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -100,17 +92,10 @@ enum Tool
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSet> pRTESet, QSharedPointer<QTime> &pTime, QWidget* parent)
+RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSet> pRTESet,
+                                                 QSharedPointer<QTime> &pTime,
+                                                 QWidget* parent)
 : MeasurementWidget(parent)
-, m_pEvokedSetModel(Q_NULLPTR)
-, m_pButterflyView(Q_NULLPTR)
-, m_pAverageScene(Q_NULLPTR)
-, m_pRTESet(pRTESet)
-, m_pQuickControlWidget(Q_NULLPTR)
-, m_pChannelSelectionView(Q_NULLPTR)
-, m_pChInfoModel(Q_NULLPTR)
-, m_pFilterView(Q_NULLPTR)
-, m_pFiffInfo(Q_NULLPTR)
 , m_bInitialized(false)
 {
     Q_UNUSED(pTime)
@@ -689,7 +674,7 @@ void RealTimeEvokedSetWidget::onSelectionChanged()
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<QPair<double, SCDISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, SCDISPLIB::RowVectorPair> > >();
+        QList<QPair<double, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, DISPLIB::RowVectorPair> > >();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);

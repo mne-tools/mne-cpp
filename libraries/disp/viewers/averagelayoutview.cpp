@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     spectrumsettingsview.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     averagelayoutview.cpp
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the SpectrumSettingsView Class.
+* @brief    Definition of the AverageLayoutView Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "spectrumsettingsview.h"
+#include "averagelayoutview.h"
 
 
 //*************************************************************************************************************
@@ -66,7 +66,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SpectrumSettingsView::SpectrumSettingsView(QWidget *parent)
+AverageLayoutView::AverageLayoutView(QWidget *parent)
 : QWidget(parent, Qt::Window)
 {
     this->setWindowTitle("Spectrum Settings");
@@ -86,9 +86,9 @@ SpectrumSettingsView::SpectrumSettingsView(QWidget *parent)
     m_pSliderUpperBound->setMaximum(100);
 
     connect(m_pSliderLowerBound, &QSlider::valueChanged,
-            this, &SpectrumSettingsView::updateValue);
+            this, &AverageLayoutView::updateValue);
     connect(m_pSliderUpperBound, &QSlider::valueChanged,
-            this, &SpectrumSettingsView::updateValue);
+            this, &AverageLayoutView::updateValue);
 
     t_pGridLayout->addWidget(t_pLabelLower,0,0);
     t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
@@ -101,7 +101,7 @@ SpectrumSettingsView::SpectrumSettingsView(QWidget *parent)
 
 //*************************************************************************************************************
 
-void SpectrumSettingsView::updateValue(qint32 value)
+void AverageLayoutView::updateValue(qint32 value)
 {
     Q_UNUSED(value)
 
