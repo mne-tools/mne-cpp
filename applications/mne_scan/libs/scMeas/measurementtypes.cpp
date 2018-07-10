@@ -46,7 +46,7 @@
 #include "numeric.h"
 #include "realtimesourceestimate.h"
 #include "realtimeconnectivityestimate.h"
-#include "frequencyspectrum.h"
+#include "realtimespectrum.h"
 #include "realtimesamplearraychinfo.h"
 #include "realtimecov.h"
 #include "realtimeevokedset.h"
@@ -79,7 +79,7 @@ void MeasurementTypes::registerTypes()
     qRegisterMetaType< RealTimeSampleArray::SPtr >("RealTimeSampleArray::SPtr");
     qRegisterMetaType< RealTimeMultiSampleArray::SPtr >("RealTimeMultiSampleArray::SPtr");
     qRegisterMetaType< Numeric::SPtr >("Numeric::SPtr");
-    qRegisterMetaType< FrequencySpectrum::SPtr >("FrequencySpectrum::SPtr");
+    qRegisterMetaType< RealTimeSpectrum::SPtr >("RealTimeSpectrum::SPtr");
     qRegisterMetaType< RealTimeSourceEstimate::SPtr >("RealTimeSourceEstimate::SPtr");
     qRegisterMetaType< RealTimeConnectivityEstimate::SPtr >("RealTimeConnectivityEstimate::SPtr");
     qRegisterMetaType< RealTimeCov::SPtr >("RealTimeCov::SPtr");

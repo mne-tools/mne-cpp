@@ -83,7 +83,7 @@ SOURCES += \
     realtimesamplearraywidget.cpp \
     realtimeevokedsetwidget.cpp \
     realtimecovwidget.cpp \
-    frequencyspectrumwidget.cpp \
+    realtimespectrumwidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
     helpers/quickcontrolwidget.cpp \
@@ -97,7 +97,7 @@ HEADERS += \
     realtimesamplearraywidget.h \
     realtimeevokedsetwidget.h \
     realtimecovwidget.h \
-    frequencyspectrumwidget.h \
+    realtimespectrumwidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
     helpers/quickcontrolwidget.h \

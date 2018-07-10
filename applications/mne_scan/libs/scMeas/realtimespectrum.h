@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrum.h
+* @file     realtimespectrum.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FrequencySpectrum class.
+* @brief    Contains the declaration of the RealTimeSpectrum class.
 *
 */
 
-#ifndef FREQUENCYSPECTRUM_H
-#define FREQUENCYSPECTRUM_H
+#ifndef REALTIMESPECTRUM_H
+#define REALTIMESPECTRUM_H
 
 
 //*************************************************************************************************************
@@ -80,28 +80,28 @@ using namespace FIFFLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS FrequencySpectrum
+* DECLARE CLASS RealTimeSpectrum
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class SCMEASSHARED_EXPORT FrequencySpectrum : public Measurement
+class SCMEASSHARED_EXPORT RealTimeSpectrum : public Measurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<FrequencySpectrum> SPtr;               /**< Shared pointer type for FrequencySpectrum. */
-    typedef QSharedPointer<const FrequencySpectrum> ConstSPtr;    /**< Const shared pointer type for FrequencySpectrum. */
+    typedef QSharedPointer<RealTimeSpectrum> SPtr;               /**< Shared pointer type for RealTimeSpectrum. */
+    typedef QSharedPointer<const RealTimeSpectrum> ConstSPtr;    /**< Const shared pointer type for RealTimeSpectrum. */
 
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
     */
-    explicit FrequencySpectrum(QObject *parent = 0);
+    explicit RealTimeSpectrum(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayNew.
     */
-    virtual ~FrequencySpectrum();
+    virtual ~RealTimeSpectrum();
 
     //=========================================================================================================
     /**
@@ -162,9 +162,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns whether FrequencySpectrum contains values
+    * Returns whether RealTimeSpectrum contains values
     *
-    * @return whether FrequencySpectrum contains values.
+    * @return whether RealTimeSpectrum contains values.
     */
     inline bool containsValues() const;
 
@@ -186,7 +186,7 @@ private:
 //=============================================================================================================
 
 
-inline bool FrequencySpectrum::isInit() const
+inline bool RealTimeSpectrum::isInit() const
 {
     return m_bIsInit;
 }
@@ -194,27 +194,27 @@ inline bool FrequencySpectrum::isInit() const
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& FrequencySpectrum::getFiffInfo()
+inline FiffInfo::SPtr& RealTimeSpectrum::getFiffInfo()
 {
     return m_pFiffInfo;
 }
 
 //*************************************************************************************************************
 
-inline qint8 FrequencySpectrum::getScaleType()
+inline qint8 RealTimeSpectrum::getScaleType()
 {
     return m_xScaleType;
 }
 
 //*************************************************************************************************************
 
-inline bool FrequencySpectrum::containsValues() const
+inline bool RealTimeSpectrum::containsValues() const
 {
     return m_bContainsValues;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(SCMEASLIB::FrequencySpectrum::SPtr)
+Q_DECLARE_METATYPE(SCMEASLIB::RealTimeSpectrum::SPtr)
 
-#endif // FREQUENCYSPECTRUM_H
+#endif // REALTIMESPECTRUM_H

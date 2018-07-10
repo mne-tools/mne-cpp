@@ -40,14 +40,13 @@
 
 #include "displaymanager.h"
 
-
 #include <scDisp/realtimesamplearraywidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
 #include <scDisp/realtimesourceestimatewidget.h>
 #include <scDisp/realtimeconnectivityestimatewidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
-#include <scDisp/frequencyspectrumwidget.h>
+#include <scDisp/realtimespectrumwidget.h>
 
 #include <scMeas/realtimesamplearray.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -55,7 +54,7 @@
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
-#include <scMeas/frequencyspectrum.h>
+#include <scMeas/realtimespectrum.h>
 
 
 //*************************************************************************************************************
@@ -65,8 +64,8 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
 #include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -196,17 +195,17 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtcWidget);
             rtcWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >())
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
         {
-            QSharedPointer<FrequencySpectrum>* pFrequencySpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >()->data();
+            QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();
 
-            FrequencySpectrumWidget* fsWidget = new FrequencySpectrumWidget(*pFrequencySpectrum, pT, newDisp);
+            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);
 
             qListActions.append(fsWidget->getDisplayActions());
             qListWidgets.append(fsWidget->getDisplayWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    fsWidget, &FrequencySpectrumWidget::update, Qt::BlockingQueuedConnection);
+                    fsWidget, &RealTimeSpectrumWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(fsWidget);
             fsWidget->init();
