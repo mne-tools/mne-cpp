@@ -48,9 +48,7 @@
 
 #include <QLabel>
 #include <QGridLayout>
-#include <QDoubleValidator>
 #include <QSlider>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -70,8 +68,6 @@ SpectrumSettingsView::SpectrumSettingsView(QWidget *parent)
 : QWidget(parent, Qt::Window)
 {
     this->setWindowTitle("Spectrum Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 

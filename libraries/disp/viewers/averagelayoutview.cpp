@@ -40,6 +40,8 @@
 
 #include "averagelayoutview.h"
 
+#include "helpers/averagescene.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,10 +49,8 @@
 //=============================================================================================================
 
 #include <QLabel>
-#include <QGridLayout>
-#include <QDoubleValidator>
-#include <QSlider>
-#include <QDebug>
+#include <QVBoxLayout>
+#include <QGraphicsView>
 
 
 //*************************************************************************************************************
@@ -69,46 +69,33 @@ using namespace DISPLIB;
 AverageLayoutView::AverageLayoutView(QWidget *parent)
 : QWidget(parent, Qt::Window)
 {
-    this->setWindowTitle("Spectrum Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
+    this->setWindowTitle("Average Layout");
 
-    QGridLayout* t_pGridLayout = new QGridLayout;
+    m_pAverageLayoutView = QSharedPointer<QGraphicsView>(new QGraphicsView(this));
+    m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView.data(), this));
 
-    QLabel *t_pLabelLower = new QLabel;
-    t_pLabelLower->setText("Lower Frequency");
-    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
-    QLabel *t_pLabelUpper = new QLabel;
-    t_pLabelUpper->setText("Upper Frequency");
-    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
+    m_pAverageLayoutView->setScene(m_pAverageScene.data());
+    QBrush brush(Qt::black);
+    m_pAverageScene->setBackgroundBrush(brush);
 
-    m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum(100);
-
-    connect(m_pSliderLowerBound, &QSlider::valueChanged,
-            this, &AverageLayoutView::updateValue);
-    connect(m_pSliderUpperBound, &QSlider::valueChanged,
-            this, &AverageLayoutView::updateValue);
-
-    t_pGridLayout->addWidget(t_pLabelLower,0,0);
-    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
-    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
-    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
-
-    this->setLayout(t_pGridLayout);
+    //set layouts
+    QVBoxLayout *neLayout = new QVBoxLayout(this);
+    neLayout->addWidget(m_pAverageLayoutView.data());
+    this->setLayout(neLayout);
 }
 
 
 //*************************************************************************************************************
 
-void AverageLayoutView::updateValue(qint32 value)
+QSharedPointer<AverageScene> AverageLayoutView::getAverageScene()
 {
-    Q_UNUSED(value)
+    return m_pAverageScene;
+}
 
-    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
-        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
-    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
-        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
 
-    emit settingsChanged();
+//*************************************************************************************************************
+
+QSharedPointer<QGraphicsView> AverageLayoutView::getAverageGraphicsView()
+{
+    return m_pAverageLayoutView;
 }

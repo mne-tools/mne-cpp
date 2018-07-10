@@ -58,7 +58,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QSlider;
+class QGraphicsView;
 
 
 //*************************************************************************************************************
@@ -75,6 +75,8 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class AverageScene;
+
 
 //=============================================================================================================
 /**
@@ -86,7 +88,10 @@ class DISPSHARED_EXPORT AverageLayoutView : public QWidget
 {
     Q_OBJECT
 
-public:
+public:    
+    typedef QSharedPointer<AverageLayoutView> SPtr;              /**< Shared pointer type for AverageLayoutView. */
+    typedef QSharedPointer<const AverageLayoutView> ConstSPtr;   /**< Const shared pointer type for AverageLayoutView. */
+
     //=========================================================================================================
     /**
     * Constructs a AverageLayoutView which is a child of parent.
@@ -95,10 +100,16 @@ public:
     */
     AverageLayoutView(QWidget *toolbox);
 
-signals:
-    void settingsChanged();
+    QSharedPointer<AverageScene> getAverageScene();
+    QSharedPointer<QGraphicsView> getAverageGraphicsView();
 
-public:
+protected:
+    QSharedPointer<AverageScene>        m_pAverageScene;            /**< The pointer to the average scene. */
+    QSharedPointer<QGraphicsView>       m_pAverageLayoutView;       /**< View for 2D average layout scene */
+
+
+signals:
+
 };
 
 } // NAMESPACE

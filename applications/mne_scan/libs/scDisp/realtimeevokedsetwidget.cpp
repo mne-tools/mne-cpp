@@ -48,6 +48,7 @@
 #include <disp/viewers/filterview.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/butterflyview.h>
+#include <disp/viewers/averagelayoutview.h>
 
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimesamplearraychinfo.h>
@@ -97,6 +98,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
                                                  QWidget* parent)
 : MeasurementWidget(parent)
 , m_bInitialized(false)
+, m_pRTESet(pRTESet)
 {
     Q_UNUSED(pTime)
     //qRegisterMetaType<SCDISPLIB::AverageInfoMap>("SCDISPLIB::AverageInfoMap");
@@ -125,7 +127,9 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pLabelInit= new QLabel(this);
     m_pLabelInit->setText("Acquiring Data");
     m_pLabelInit->setAlignment(Qt::AlignCenter);
-    QFont font;font.setBold(true);font.setPointSize(20);
+    QFont font;
+    font.setBold(true);
+    font.setPointSize(20);
     m_pLabelInit->setFont(font);
     m_pRTESetLayout->addWidget(m_pLabelInit);
 
@@ -134,13 +138,13 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pToolBox->hide();
 
     //Butterfly
-    m_pButterflyView = ButterflyView::SPtr(new ButterflyView(this));
+    m_pButterflyView = new ButterflyView(this);
     m_pButterflyView->installEventFilter(this);
 
-    m_pToolBox->insertItem(0, m_pButterflyView.data(), QIcon(), "Butterfly plot");
+    m_pToolBox->insertItem(0, m_pButterflyView, QIcon(), "Butterfly plot");
 
     //2D layout plot
-    m_pAverageLayoutView = new QGraphicsView(this);
+    m_pAverageLayoutView = new AverageLayoutView(this);
 
     //m_pAverageLayoutView->installEventFilter(this);
     m_pToolBox->insertItem(0, m_pAverageLayoutView, QIcon(), "2D Layout plot");
@@ -150,7 +154,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     //set layouts
     this->setLayout(m_pRTESetLayout);
 
-    getData();
+    //getData();
 }
 
 
@@ -230,7 +234,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
         if(m_pQuickControlWidget != 0) {
             settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESWName), m_pQuickControlWidget->getSignalColor());
             settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), m_pButterflyView->getBackgroundColor());
-            settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), m_pAverageScene->backgroundBrush().color());
+            settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), m_pAverageLayoutView->getAverageScene()->backgroundBrush().color());
         }
     }
 }
@@ -518,6 +522,7 @@ void RealTimeEvokedSetWidget::init()
         //Handle updating the butterfly and layout plot
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 m_pButterflyView.data(), &ButterflyView::updateView);
+
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 this, &RealTimeEvokedSetWidget::onSelectionChanged);
 
@@ -540,11 +545,6 @@ void RealTimeEvokedSetWidget::init()
         //
         //-------- Init average scene --------
         //
-        m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView, this));
-        m_pAverageLayoutView->setScene(m_pAverageScene.data());
-        QBrush brush(Qt::black);
-        m_pAverageScene->setBackgroundBrush(brush);
-
         //Connect selection manager with average manager
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 this, &RealTimeEvokedSetWidget::channelSelectionManagerChanged);
@@ -560,7 +560,7 @@ void RealTimeEvokedSetWidget::init()
                 m_pQuickControlWidget.data(), &QuickControlWidget::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
-                m_pAverageScene.data(), &AverageScene::setAverageInformationMap);
+                m_pAverageLayoutView->getAverageScene().data(), &AverageScene::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
                 m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
@@ -578,9 +578,9 @@ void RealTimeEvokedSetWidget::init()
         //
         //-------- Init signal and background colors --------
         //
-        QBrush backgroundBrush = m_pAverageScene->backgroundBrush();
+        QBrush backgroundBrush = m_pAverageLayoutView->getAverageScene()->backgroundBrush();
         backgroundBrush.setColor(settings.value(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), layoutBackgroundDefault).value<QColor>());
-        m_pAverageScene->setBackgroundBrush(backgroundBrush);
+        m_pAverageLayoutView->getAverageScene()->setBackgroundBrush(backgroundBrush);
 
         m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), butterflyBackgroundDefault).value<QColor>());
 
@@ -597,14 +597,14 @@ void RealTimeEvokedSetWidget::channelSelectionManagerChanged(const QList<QGraphi
     //qDebug()<<" RealTimeEvokedWidget::channelSelectionManagerChanged - selectedChannelItems.size()" << selectedChannelItems.size();
 
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems
-    m_pAverageScene->repaintItems(selectedChannelItems);
+    m_pAverageLayoutView->getAverageScene()->repaintItems(selectedChannelItems);
 
     //call the onSelection function manually to replot the data for the givven average items
     onSelectionChanged();
 
     //fit everything in the view and update the scene
-    m_pAverageLayoutView->fitInView(m_pAverageScene->sceneRect(), Qt::KeepAspectRatio);
-    m_pAverageScene->update(m_pAverageScene->sceneRect());
+    m_pAverageLayoutView->getAverageGraphicsView()->fitInView(m_pAverageLayoutView->getAverageScene()->sceneRect(), Qt::KeepAspectRatio);
+    m_pAverageLayoutView->getAverageScene()->update(m_pAverageLayoutView->getAverageScene()->sceneRect());
 }
 
 
@@ -637,7 +637,7 @@ void RealTimeEvokedSetWidget::showSelectedChannelsOnly(QStringList selectedChann
 void RealTimeEvokedSetWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
     //Set the scale map received from the scale window
-    m_pAverageScene->setScaleMap(scaleMap);
+    m_pAverageLayoutView->getAverageScene()->setScaleMap(scaleMap);
     m_qMapChScaling = scaleMap;
     m_pEvokedSetModel->setScaling(scaleMap);
 }
@@ -665,7 +665,7 @@ void RealTimeEvokedSetWidget::showQuickControlWidget()
 void RealTimeEvokedSetWidget::onSelectionChanged()
 {
     //Get current items from the average scene
-    QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
+    QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageLayoutView->getAverageScene()->items();
 
     //Set new data for all averageSceneItems
     for(int i = 0; i<currentAverageSceneItems.size(); i++) {
@@ -694,7 +694,7 @@ void RealTimeEvokedSetWidget::onSelectionChanged()
         }
     }
 
-    m_pAverageScene->update();
+    m_pAverageLayoutView->getAverageScene()->update();
 }
 
 
@@ -721,9 +721,9 @@ void RealTimeEvokedSetWidget::onTableViewBackgroundColorChanged(const QColor& ba
 {
     //Handle the butterfly plot and 2d layout plot differently
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        QBrush backgroundBrush = m_pAverageScene->backgroundBrush();
+        QBrush backgroundBrush = m_pAverageLayoutView->getAverageScene()->backgroundBrush();
         backgroundBrush.setColor(backgroundColor);
-        m_pAverageScene->setBackgroundBrush(backgroundBrush);
+        m_pAverageLayoutView->getAverageScene()->setBackgroundBrush(backgroundBrush);
     }
 
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
@@ -752,11 +752,11 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
             // Generate screenshot
             QSvgGenerator svgGen;
             svgGen.setFileName(fileName);
-            QRectF rect = m_pAverageScene->itemsBoundingRect();
+            QRectF rect = m_pAverageLayoutView->getAverageScene()->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
 
             QPainter painter(&svgGen);
-            m_pAverageScene->render(&painter);
+            m_pAverageLayoutView->getAverageScene()->render(&painter);
         }
 
         if(imageType.contains("PNG"))
