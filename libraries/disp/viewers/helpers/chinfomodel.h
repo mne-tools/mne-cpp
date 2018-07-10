@@ -95,7 +95,6 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-
 //Declare type roles
 namespace ChInfoModelRoles
 {
@@ -112,6 +111,7 @@ namespace ChInfoModelRoles
                   GetChCoilType = Qt::UserRole + 1019,
                   GetIsBad = Qt::UserRole + 1020};
 }
+
 
 //=============================================================================================================
 /**

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     spectrumsettingsview.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     averagelayoutview.cpp
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the SpectrumSettingsView Class.
+* @brief    Declaration of the AverageLayoutView Class.
 *
 */
 
-#ifndef SPECTRUMSETTINGSVIEW_H
-#define SPECTRUMSETTINGSVIEW_H
+#ifndef AVERAGELAYOUTVIEW_H
+#define AVERAGELAYOUTVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,39 +78,29 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SpectrumSettingsView
+* DECLARE CLASS AverageLayoutView
 *
-* @brief The SpectrumSettingsView class provides settings for the spectrum estimation
+* @brief The AverageLayoutView class provides a widget for a 2D average layout
 */
-class DISPSHARED_EXPORT SpectrumSettingsView : public QWidget
+class DISPSHARED_EXPORT AverageLayoutView : public QWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a SpectrumSettingsView which is a child of parent.
+    * Constructs a AverageLayoutView which is a child of parent.
     *
     * @param [in] parent    parent of widget
     */
-    SpectrumSettingsView(QWidget *toolbox);
-
-    //=========================================================================================================
-    /**
-    * Update slider value
-    *
-    * @param [in] value    slider value
-    */
-    void updateValue(qint32 value);
+    AverageLayoutView(QWidget *toolbox);
 
 signals:
     void settingsChanged();
 
 public:
-    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency */
-    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency */
 };
 
 } // NAMESPACE
 
-#endif // SPECTRUMSETTINGSVIEW_H
+#endif // AVERAGELAYOUTVIEW_H

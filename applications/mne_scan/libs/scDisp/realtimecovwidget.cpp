@@ -114,7 +114,7 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
     //set layouts
     this->setLayout(m_pRtcLayout);
 
-    m_qListPickTypes << "EEG";// << "MEG";
+    m_qListPickTypes << "EEG" << "MEG";
 
     getData();
 
@@ -167,9 +167,7 @@ void RealTimeCovWidget::init()
 
         m_pImageSc->setTitle(m_pRTC->getName());
 
-        QStringList lModalities;
-        lModalities << "EEG" << "MEG";
-        onNewModalitySelection(lModalities);
+        onNewModalitySelection(m_qListPickTypes);
 
         m_bInitialized = true;
     }
@@ -182,13 +180,12 @@ void RealTimeCovWidget::showModalitySelectionWidget()
 {
     if(!m_pModalitySelectionWidget)
     {
-        QStringList lModalities;
-        lModalities << "EEG" << "MEG";
-        m_pModalitySelectionWidget = QSharedPointer<ModalitySelectionView>(new ModalitySelectionView(lModalities, this));
+        m_pModalitySelectionWidget = QSharedPointer<ModalitySelectionView>(new ModalitySelectionView(m_qListPickTypes, this));
 
         connect(m_pModalitySelectionWidget.data(), &ModalitySelectionView::newModalitySelection,
                 this, &RealTimeCovWidget::onNewModalitySelection);
     }
+
     m_pModalitySelectionWidget->show();
 }
 
