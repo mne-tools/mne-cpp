@@ -118,7 +118,7 @@ void NoiseEstimate::init()
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pFSOutput = PluginOutputData<FrequencySpectrum>::create(this, "Noise Estimate Out", "Noise Estimate output data");
+    m_pFSOutput = PluginOutputData<RealTimeSpectrum>::create(this, "Noise Estimate Out", "Noise Estimate output data");
     m_pFSOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pFSOutput);
 
