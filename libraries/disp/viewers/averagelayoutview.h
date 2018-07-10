@@ -93,7 +93,7 @@ public:
     *
     * @param [in] parent    parent of widget
     */
-    SpectrumSettingsView(QWidget *parent);
+    SpectrumSettingsView(QWidget *toolbox);
 
     //=========================================================================================================
     /**

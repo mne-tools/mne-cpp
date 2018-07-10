@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     spectrumsettingsview.h
+* @file     spectrumview.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the SpectrumSettingsView Class.
+* @brief    Declaration of the SpectrumView Class.
 *
 */
 
-#ifndef SPECTRUMSETTINGSVIEW_H
-#define SPECTRUMSETTINGSVIEW_H
+#ifndef SPECTRUMVIEW_H
+#define SPECTRUMVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,10 +55,27 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QSlider;
+class QTableView;
+
+namespace DISPLIB {
+    class FrequencySpectrumDelegate;
+    class FrequencySpectrumModel;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -78,39 +95,44 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SpectrumSettingsView
+* DECLARE CLASS SpectrumView
 *
-* @brief The SpectrumSettingsView class provides settings for the spectrum estimation
+* @brief The SpectrumView class provides a spectrum view
 */
-class DISPSHARED_EXPORT SpectrumSettingsView : public QWidget
-{
+class DISPSHARED_EXPORT SpectrumView : public QWidget
+{    
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a SpectrumSettingsView which is a child of parent.
+    * Constructs a SpectrumView which is a child of parent.
     *
     * @param [in] parent    parent of widget
     */
-    SpectrumSettingsView(QWidget *parent);
+    SpectrumView(QWidget* parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Update slider value
-    *
-    * @param [in] value    slider value
-    */
-    void updateValue(qint32 value);
+    void init(QSharedPointer<FIFFLIB::FiffInfo> &info, int iScaleType);
+
+    void addData(const Eigen::MatrixXd &data);
+
+    void setBoundaries(int iLower, int iUpper);
+
+    virtual bool eventFilter(QObject * watched, QEvent * event);
+
+protected:
+    QPointer<QTableView>                                        m_pTableView;           /**< the QTableView being part of the model/view framework of Qt */
+    QPointer<DISPLIB::FrequencySpectrumDelegate>                m_pFSDelegate;          /**< Frequency spectrum delegate */
+    QPointer<DISPLIB::FrequencySpectrumModel>                   m_pFSModel;             /**< Frequency spectrum model */
 
 signals:
-    void settingsChanged();
-
-public:
-    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency */
-    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency */
+    //=========================================================================================================
+    /**
+    * Signals for sending the mouse location to the delegate
+    */
+    void sendMouseLoc(int row, int x, int y, QRect visRect);
 };
 
 } // NAMESPACE
 
-#endif // SPECTRUMSETTINGSVIEW_H
+#endif // SPECTRUMVIEW_H

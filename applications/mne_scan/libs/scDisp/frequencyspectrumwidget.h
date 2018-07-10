@@ -61,7 +61,6 @@
 //=============================================================================================================
 
 class QTime;
-class QTableView;
 
 namespace SCMEASLIB {
     class FrequencySpectrum;
@@ -69,8 +68,7 @@ namespace SCMEASLIB {
 
 namespace DISPLIB {
     class SpectrumSettingsView;
-    class FrequencySpectrumModel;
-    class FrequencySpectrumDelegate;
+    class SpectrumView;
 }
 
 
@@ -145,7 +143,7 @@ public:
     */
     void initSettingsWidget();
 
-    virtual bool eventFilter(QObject * watched, QEvent * event);
+    bool eventFilter(QObject *object, QEvent *event);
 
 private:
     //=========================================================================================================
@@ -161,9 +159,7 @@ private:
     void showSpectrumSettingsView();
 
     QPointer<QAction>                                           m_pActionFrequencySettings;         /**< Frequency spectrum settings action */
-    QPointer<QTableView>                                        m_pTableView;                       /**< the QTableView being part of the model/view framework of Qt */
-    QPointer<DISPLIB::FrequencySpectrumModel>                   m_pFSModel;                         /**< Frequency spectrum model */
-    QPointer<DISPLIB::FrequencySpectrumDelegate>                m_pFSDelegate;                      /**< Frequency spectrum delegate */
+    QPointer<DISPLIB::SpectrumView>                             m_pSpectrumView;                    /**< Frequency spectrum view */
 
     QSharedPointer<DISPLIB::SpectrumSettingsView>               m_pSpectrumSettingsView;            /**< Frequency spectrum settings modality widget. */
     QSharedPointer<SCMEASLIB::FrequencySpectrum>                m_pFS;                              /**< The frequency spectrum measurement. */
@@ -173,12 +169,6 @@ private:
 
     bool m_bInitialized;            /**< Is Initialized */
 
-signals:
-    //=========================================================================================================
-    /**
-    * Signals for sending the mouse location to the delegate
-    */
-    void sendMouseLoc(int row, int x, int y, QRect visRect);
 };
 
 } // NAMESPACE
