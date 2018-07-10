@@ -48,7 +48,7 @@
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <scMeas/frequencyspectrum.h>
+#include <scMeas/realtimespectrum.h>
 #include <realtime/rtProcessing/rtnoise.h>
 
 
@@ -188,7 +188,7 @@ private:
     void initConnector();
 
     PluginInputData<RealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The RealTimeMultiSampleArray of the noise plugin input.*/
-    PluginOutputData<FrequencySpectrum>::SPtr  m_pFSOutput;                   /**< The NE of the noise plugin output.*/
+    PluginOutputData<RealTimeSpectrum>::SPtr  m_pFSOutput;                   /**< The NE of the noise plugin output.*/
 
 
     FiffInfo::SPtr  m_pFiffInfo;                        /**< Fiff measurement info.*/
