@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     spectrumsettingsview.h
+* @file     spectrumsettingsview.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,88 +29,86 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the SpectrumSettingsView Class.
+* @brief    Definition of the SpectrumSettingsView Class.
 *
 */
-
-#ifndef SPECTRUMSETTINGSVIEW_H
-#define SPECTRUMSETTINGSVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
+#include "spectrumsettingsview.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QPointer>
+#include <QLabel>
+#include <QGridLayout>
+#include <QDoubleValidator>
+#include <QSlider>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class QSlider;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace DISPLIB
+SpectrumSettingsView::SpectrumSettingsView(QWidget *parent)
+: QWidget(parent, Qt::Window)
 {
+    this->setWindowTitle("Spectrum Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
+
+    QGridLayout* t_pGridLayout = new QGridLayout;
+
+    QLabel *t_pLabelLower = new QLabel;
+    t_pLabelLower->setText("Lower Frequency");
+    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
+    QLabel *t_pLabelUpper = new QLabel;
+    t_pLabelUpper->setText("Upper Frequency");
+    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
+
+    m_pSliderUpperBound->setMinimum(0);
+    m_pSliderUpperBound->setMaximum(100);
+
+    connect(m_pSliderLowerBound, &QSlider::valueChanged,
+            this, &SpectrumSettingsView::updateValue);
+    connect(m_pSliderUpperBound, &QSlider::valueChanged,
+            this, &SpectrumSettingsView::updateValue);
+
+    t_pGridLayout->addWidget(t_pLabelLower,0,0);
+    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
+    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
+    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
+
+    this->setLayout(t_pGridLayout);
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS SpectrumSettingsView
-*
-* @brief The SpectrumSettingsView class provides settings for the spectrum estimation
-*/
-class DISPSHARED_EXPORT SpectrumSettingsView : public QWidget
+void SpectrumSettingsView::updateValue(qint32 value)
 {
-    Q_OBJECT
+    Q_UNUSED(value)
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a SpectrumSettingsView which is a child of parent.
-    *
-    * @param [in] parent    parent of widget
-    */
-    SpectrumSettingsView(QWidget *parent);
+    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
+        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
+    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
+        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
 
-    //=========================================================================================================
-    /**
-    * Update slider value
-    *
-    * @param [in] value    slider value
-    */
-    void updateValue(qint32 value);
-
-signals:
-    void settingsChanged();
-
-public:
-    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency */
-    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency */
-};
-
-} // NAMESPACE
-
-#endif // SPECTRUMSETTINGSVIEW_H
+    emit settingsChanged();
+}

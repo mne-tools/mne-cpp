@@ -100,6 +100,8 @@ SOURCES += \
     plots/tfplot.cpp \
     plots/helpers/colormap.cpp \
     viewers/filterview.cpp \
+    #viewers/averagelayoutview.cpp \
+    viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
     viewers/butterflyview.cpp \
     viewers/channelselectionview.cpp \
@@ -127,6 +129,8 @@ HEADERS += \
     plots/tfplot.h \
     plots/helpers/colormap.h \
     viewers/filterview.h \
+    #viewers/averagelayoutview.h \
+    viewers/spectrumview.h \
     viewers/modalityselectionview.h \
     viewers/butterflyview.h \
     viewers/channelselectionview.h \
