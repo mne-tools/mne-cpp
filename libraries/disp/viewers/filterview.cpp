@@ -77,8 +77,9 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterView::FilterView(QWidget *parent, Qt::WindowFlags type)
-: QWidget(parent, type)
+FilterView::FilterView(QWidget *parent,
+                       Qt::WindowFlags f)
+: QWidget(parent, f)
 , ui(new Ui::FilterViewWidget)
 , m_iWindowSize(4016)
 , m_iFilterTaps(512)

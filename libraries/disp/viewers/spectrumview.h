@@ -113,7 +113,8 @@ public:
     *
     * @param [in] parent    parent of widget
     */
-    SpectrumView(QWidget* parent = 0);
+    SpectrumView(QWidget* parent = 0,
+                 Qt::WindowFlags f = Qt::Widget);
 
     void init(QSharedPointer<FIFFLIB::FiffInfo> &info, int iScaleType);
 

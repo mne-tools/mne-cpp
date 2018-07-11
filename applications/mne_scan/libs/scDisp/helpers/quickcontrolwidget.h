@@ -556,7 +556,7 @@ signals:
     /**
     * Emit this signal whenever the user changed the modality.
     */
-    void settingsChanged(const QList<DISPLIB::Modality>& modalityList);
+    void modalitiesChanged(const QList<DISPLIB::Modality>& modalityList);
 
     //=========================================================================================================
     /**

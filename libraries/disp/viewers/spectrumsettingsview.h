@@ -96,7 +96,8 @@ public:
     *
     * @param [in] parent    parent of widget
     */
-    SpectrumSettingsView(QWidget *parent);
+    SpectrumSettingsView(QWidget *parent,
+                         Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
