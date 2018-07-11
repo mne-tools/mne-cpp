@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearraydelegate.h
+* @file     channeldatadelegate.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayDelegate Class.
+* @brief    Declaration of the ChannelDataDelegate Class.
 *
 */
 
@@ -58,10 +58,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace DISPLIB
 {
 
 
@@ -83,16 +83,16 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayDelegate
+* DECLARE CLASS ChannelDataDelegate
 *
-* @brief The RealTimeMultiSampleArrayDelegate class represents a RTMSA delegate which creates the plot paths
+* @brief The ChannelDataDelegate class represents a RTMSA delegate which creates the plot paths
 */
-class RealTimeMultiSampleArrayDelegate : public QAbstractItemDelegate
+class ChannelDataDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RealTimeMultiSampleArrayDelegate> SPtr;              /**< Shared pointer type for RealTimeMultiSampleArrayDelegate. */
-    typedef QSharedPointer<const RealTimeMultiSampleArrayDelegate> ConstSPtr;   /**< Const shared pointer type for RealTimeMultiSampleArrayDelegate. */
+    typedef QSharedPointer<ChannelDataDelegate> SPtr;              /**< Shared pointer type for ChannelDataDelegate. */
+    typedef QSharedPointer<const ChannelDataDelegate> ConstSPtr;   /**< Const shared pointer type for ChannelDataDelegate. */
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
     *
     * @param[in] parent     Parent of the delegate
     */
-    RealTimeMultiSampleArrayDelegate(QObject *parent = 0);
+    ChannelDataDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -166,7 +166,7 @@ private:
                         QPainterPath& path,
                         QPointF &ellipsePos,
                         QString &amplitude,
-                        SCDISPLIB::RowVectorPair &data) const;
+                        DISPLIB::RowVectorPair &data) const;
 
     //=========================================================================================================
     /**

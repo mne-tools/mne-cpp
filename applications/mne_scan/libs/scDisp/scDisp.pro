@@ -84,8 +84,6 @@ SOURCES += \
     realtimeevokedsetwidget.cpp \
     realtimecovwidget.cpp \
     realtimespectrumwidget.cpp \
-    helpers/realtimemultisamplearraymodel.cpp \
-    helpers/realtimemultisamplearraydelegate.cpp \
     helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
     realtimeconnectivityestimatewidget.cpp \
@@ -98,8 +96,6 @@ HEADERS += \
     realtimeevokedsetwidget.h \
     realtimecovwidget.h \
     realtimespectrumwidget.h \
-    helpers/realtimemultisamplearraymodel.h \
-    helpers/realtimemultisamplearraydelegate.h \
     helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \

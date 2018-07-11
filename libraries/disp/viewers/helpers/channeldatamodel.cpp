@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearraymodel.cpp
+* @file     channeldatamodel.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,13 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeMultiSampleArrayModel Class.
+* @brief    Definition of the ChannelDataModel Class.
 *
 */
 
-#include "realtimemultisamplearraymodel.h"
 
-#include <iostream>
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "channeldatamodel.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
 
 #include <QDebug>
 #include <QBrush>
@@ -47,7 +57,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
+using namespace UTILSLIB;
+using namespace FIFFLIB;
+using namespace Eigen;
 using namespace UTILSLIB;
 
 
@@ -56,7 +69,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
+ChannelDataModel::ChannelDataModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_bSpharaActivated(false)
 , m_bProjActivated(false)
@@ -84,7 +97,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
-int RealTimeMultiSampleArrayModel::rowCount(const QModelIndex & /*parent*/) const
+int ChannelDataModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_pFiffInfo->chs.empty()) {
         return m_pFiffInfo->chs.size();
@@ -101,7 +114,7 @@ int RealTimeMultiSampleArrayModel::rowCount(const QModelIndex & /*parent*/) cons
 
 //*************************************************************************************************************
 
-int RealTimeMultiSampleArrayModel::columnCount(const QModelIndex & /*parent*/) const
+int ChannelDataModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
@@ -109,7 +122,7 @@ int RealTimeMultiSampleArrayModel::columnCount(const QModelIndex & /*parent*/) c
 
 //*************************************************************************************************************
 
-QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role) const
+QVariant ChannelDataModel::data(const QModelIndex &index, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
@@ -119,7 +132,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
 
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole)
-            return QVariant(m_qListChInfo[row].getChannelName());
+            return QVariant(m_pFiffInfo->ch_names[row]);
 
         //******** second column (data plot) ********
         if(index.column() == 1) {
@@ -159,7 +172,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     break;
                 }
                 case Qt::BackgroundRole: {
-                    if(m_pFiffInfo->bads.contains(m_qListChInfo[row].getChannelName())) {
+                    if(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[row])) {
                         QBrush brush;
                         brush.setStyle(Qt::SolidPattern);
                         //qDebug() << m_qListChInfo[row].getChannelName() << "is marked as bad, index:" << row;
@@ -179,7 +192,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
 
         //******** first column (chname) ********
         if(index.column() == 2 && role == Qt::DisplayRole)
-            return QVariant(m_pFiffInfo->bads.contains(m_qListChInfo[row].getChannelName()));
+            return QVariant(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[row]));
 
     } // end index.valid() check
 
@@ -189,7 +202,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
 
 //*************************************************************************************************************
 
-QVariant RealTimeMultiSampleArrayModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ChannelDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
@@ -222,7 +235,7 @@ QVariant RealTimeMultiSampleArrayModel::headerData(int section, Qt::Orientation 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::init()
+void ChannelDataModel::init()
 {
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
 }
@@ -230,7 +243,7 @@ void RealTimeMultiSampleArrayModel::init()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::initSphara()
+void ChannelDataModel::initSphara()
 {
     //Load SPHARA matrices for babymeg and vectorview
     IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
@@ -284,27 +297,14 @@ void RealTimeMultiSampleArrayModel::initSphara()
     //Create Sphara operator for the first time
     updateSpharaOptions("BabyMEG", 270, 105);
 
-//    qDebug()<<"RealTimeMultiSampleArrayModel::initSphara - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
-//    qDebug()<<"RealTimeMultiSampleArrayModel::initSphara - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterLoaded.rows()<<m_matSpharaBabyMEGOuterLoaded.cols();
+//    qDebug()<<"ChannelDataModel::initSphara - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
+//    qDebug()<<"ChannelDataModel::initSphara - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterLoaded.rows()<<m_matSpharaBabyMEGOuterLoaded.cols();
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setChannelInfo(const QList<RealTimeSampleArrayChInfo>& chInfo)
-{
-    beginResetModel();
-
-    m_qListChInfo = chInfo;
-    endResetModel();
-
-    resetSelection();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
+void ChannelDataModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 {
     if(p_pFiffInfo)
     {
@@ -379,7 +379,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, bool bSetZero)
+void ChannelDataModel::setSamplingInfo(float sps, int T, bool bSetZero)
 {
     beginResetModel();
 
@@ -410,7 +410,7 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, bool bSetZ
 
 //*************************************************************************************************************
 
-MatrixXd RealTimeMultiSampleArrayModel::getLastBlock()
+MatrixXd ChannelDataModel::getLastBlock()
 {
     if(m_filterData.isEmpty()) {
         return m_matDataRaw.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataRaw.rows(), m_iCurrentBlockSize);
@@ -422,7 +422,7 @@ MatrixXd RealTimeMultiSampleArrayModel::getLastBlock()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
+void ChannelDataModel::addData(const QList<MatrixXd> &data)
 {
     //SSP
     bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
@@ -439,7 +439,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         int nRow = data.at(b).rows();
 
         if(nRow != m_matDataRaw.rows()) {
-            std::cout<<"incoming data does not match internal data row size. Returning..."<<std::endl;
+            qDebug()<<"incoming data does not match internal data row size. Returning...";
             return;
         }
 
@@ -568,7 +568,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+    QModelIndex bottomRight = this->index(m_pFiffInfo->ch_names.size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
@@ -576,12 +576,12 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeMultiSampleArrayModel::getKind(qint32 row) const
+fiff_int_t ChannelDataModel::getKind(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getKind();
+        return m_pFiffInfo->chs.at(row).kind;
     }
     else
         return 0;
@@ -591,12 +591,12 @@ fiff_int_t RealTimeMultiSampleArrayModel::getKind(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeMultiSampleArrayModel::getUnit(qint32 row) const
+fiff_int_t ChannelDataModel::getUnit(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getUnit();;
+        return m_pFiffInfo->chs.at(row).unit;
     }
     else
         return FIFF_UNIT_NONE;
@@ -605,12 +605,12 @@ fiff_int_t RealTimeMultiSampleArrayModel::getUnit(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t RealTimeMultiSampleArrayModel::getCoil(qint32 row) const
+fiff_int_t ChannelDataModel::getCoil(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getCoil();;
+        return m_pFiffInfo->chs.at(row).chpos.coil_type;
     }
     else
         return FIFFV_COIL_NONE;
@@ -619,7 +619,7 @@ fiff_int_t RealTimeMultiSampleArrayModel::getCoil(qint32 row) const
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
+void ChannelDataModel::selectRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -627,7 +627,7 @@ void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
 
     qint32 count = 0;
     for(qint32 i = 0; i < selection.size(); ++i) {
-        if(selection[i] < m_qListChInfo.size()) {
+        if(selection[i] < m_pFiffInfo->chs.size()) {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
         }
@@ -641,7 +641,7 @@ void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::hideRows(const QList<qint32> &selection)
+void ChannelDataModel::hideRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -658,13 +658,13 @@ void RealTimeMultiSampleArrayModel::hideRows(const QList<qint32> &selection)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::resetSelection()
+void ChannelDataModel::resetSelection()
 {
     beginResetModel();
 
     m_qMapIdxRowSelection.clear();
 
-    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
         m_qMapIdxRowSelection.insert(i,i);
 
     endResetModel();
@@ -673,7 +673,7 @@ void RealTimeMultiSampleArrayModel::resetSelection()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
+void ChannelDataModel::toggleFreeze(const QModelIndex &)
 {
     m_bIsFreezed = !m_bIsFreezed;
 
@@ -688,7 +688,7 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+    QModelIndex bottomRight = this->index(m_pFiffInfo->chs.size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
@@ -696,7 +696,7 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
+void ChannelDataModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 {
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;
@@ -706,7 +706,7 @@ void RealTimeMultiSampleArrayModel::setScaling(const QMap< qint32,float >& p_qMa
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::updateProjection()
+void ChannelDataModel::updateProjection()
 {
     //
     //  Update the SSP projector
@@ -723,7 +723,7 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         }
 
         this->m_pFiffInfo->make_projector(m_matProj);
-        qDebug() << "RealTimeMultiSampleArrayModel::updateProjection - New projection calculated.";
+        qDebug() << "ChannelDataModel::updateProjection - New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
         for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
@@ -765,7 +765,7 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::updateCompensator(int to)
+void ChannelDataModel::updateCompensator(int to)
 {
     //
     //  Update the compensator
@@ -822,7 +822,7 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::updateSpharaActivation(bool state)
+void ChannelDataModel::updateSpharaActivation(bool state)
 {
     m_bSpharaActivated = state;
 }
@@ -830,10 +830,10 @@ void RealTimeMultiSampleArrayModel::updateSpharaActivation(bool state)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
+void ChannelDataModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
     if(m_pFiffInfo) {
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateSpharaOptions - Creating SPHARA operator for"<<sSytemType;
+        qDebug()<<"ChannelDataModel::updateSpharaOptions - Creating SPHARA operator for"<<sSytemType;
 
         MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
@@ -910,7 +910,7 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
+void ChannelDataModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 
@@ -933,7 +933,7 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterActivated(bool state)
+void ChannelDataModel::filterActivated(bool state)
 {
     //Filter all visible data channels at once
     if(state) {
@@ -945,7 +945,7 @@ void RealTimeMultiSampleArrayModel::filterActivated(bool state)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
+void ChannelDataModel::setFilterChannelType(QString channelType)
 {
     m_sFilterChannelType = channelType;
     m_filterChannelList = m_visibleChannelList;
@@ -985,7 +985,7 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelNames)
+void ChannelDataModel::createFilterChannelList(QStringList channelNames)
 {
     m_filterChannelList.clear();
     m_visibleChannelList = channelNames;
@@ -1027,7 +1027,7 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::markChBad(QModelIndex ch, bool status)
+void ChannelDataModel::markChBad(QModelIndex ch, bool status)
 {
     QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
 
@@ -1056,7 +1056,7 @@ void RealTimeMultiSampleArrayModel::markChBad(QModelIndex ch, bool status)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
+void ChannelDataModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
 {
     m_qMapTriggerColor = colorMap;
     m_bTriggerDetectionActive = active;    
@@ -1084,7 +1084,7 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<double, QColor
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged(int value)
+void ChannelDataModel::distanceTimeSpacerChanged(int value)
 {
     m_iDistanceTimerSpacer = value;
 }
@@ -1092,7 +1092,7 @@ void RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged(int value)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::resetTriggerCounter()
+void ChannelDataModel::resetTriggerCounter()
 {
     m_iDetectedTriggers = 0;
 }
@@ -1100,7 +1100,7 @@ void RealTimeMultiSampleArrayModel::resetTriggerCounter()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::markChBad(QModelIndexList chlist, bool status)
+void ChannelDataModel::markChBad(QModelIndexList chlist, bool status)
 {
     QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
 
@@ -1139,9 +1139,9 @@ void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &c
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
+void ChannelDataModel::filterChannelsConcurrently()
 {
-    //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"START ChannelDataModel::filterChannelsConcurrently"<<std::endl;
 
     if(m_filterData.isEmpty())
         return;
@@ -1203,15 +1203,15 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
         m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
     }
 
-    //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"END ChannelDataModel::filterChannelsConcurrently"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &data, int iDataIndex)
+void ChannelDataModel::filterChannelsConcurrently(const MatrixXd &data, int iDataIndex)
 {
-    //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"START ChannelDataModel::filterChannelsConcurrently"<<std::endl;
 
     if(iDataIndex >= m_matDataFiltered.cols() || data.cols() < m_iMaxFilterLength)
         return;
@@ -1318,13 +1318,13 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
         m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(iDataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
     }
 
-    //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"END ChannelDataModel::filterChannelsConcurrently"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::clearModel()
+void ChannelDataModel::clearModel()
 {
     beginResetModel();
 
@@ -1338,6 +1338,6 @@ void RealTimeMultiSampleArrayModel::clearModel()
 
     endResetModel();
 
-    qDebug("RealTimeMultiSampleArrayModel cleared.");
+    qDebug("ChannelDataModel cleared.");
 
 }

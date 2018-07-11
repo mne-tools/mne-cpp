@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearraydelegate.cpp
+* @file     channeldatadelegate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeMultiSampleArrayDelegate Class.
+* @brief    Definition of the ChannelDataDelegate Class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimemultisamplearraydelegate.h"
+#include "channeldatadelegate.h"
 
-#include "realtimemultisamplearraymodel.h"
+#include "channeldatamodel.h"
 
 
 //*************************************************************************************************************
@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -67,7 +67,7 @@ using namespace SCDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
+ChannelDataDelegate::ChannelDataDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 , m_dMaxValue(0.0)
 , m_dScaleY(0.0)
@@ -79,7 +79,7 @@ RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *pare
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableModel *model)
+void ChannelDataDelegate::initPainterPaths(const QAbstractTableModel *model)
 {
     for(int i = 0; i<model->rowCount(); i++)
         m_painterPaths.append(QPainterPath());
@@ -119,7 +119,7 @@ void createPaths(const QModelIndex &index,
                  const QVector<float> &data,
                  const QVector<float> &lastData)
 {
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
@@ -259,7 +259,7 @@ void createPaths(const QModelIndex &index,
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
 
@@ -299,7 +299,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
             QVariant variant = index.model()->data(index,Qt::DisplayRole);
             RowVectorPair data = variant.value<RowVectorPair>();
 
-            const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+            const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
             if(data.second > 0)
             {
@@ -431,7 +431,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
 //*************************************************************************************************************
 
-QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize ChannelDataDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QSize size;
 
@@ -441,7 +441,7 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
         break;
     case 1:
         QList< QVector<float> > data = index.model()->data(index).value< QList<QVector<float> > >();
-//        qint32 nsamples = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->lastSample()-(static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->firstSample();
+//        qint32 nsamples = (static_cast<const ChannelDataModel*>(index.model()))->lastSample()-(static_cast<const ChannelDataModel*>(index.model()))->firstSample();
 
 //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
         Q_UNUSED(option);
@@ -455,7 +455,7 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRow)
+void ChannelDataDelegate::markerMoved(QPoint position, int activeRow)
 {
     m_markerPosition = position;
     m_iActiveRow = activeRow;
@@ -464,7 +464,7 @@ void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRo
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::setSignalColor(const QColor& signalColor)
+void ChannelDataDelegate::setSignalColor(const QColor& signalColor)
 {
     m_penNormal.setColor(signalColor);
     m_penNormalBad.setColor(signalColor);
@@ -473,14 +473,14 @@ void RealTimeMultiSampleArrayDelegate::setSignalColor(const QColor& signalColor)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index,
+void ChannelDataDelegate::createPlotPath(const QModelIndex &index,
                                                       const QStyleOptionViewItem &option,
                                                       QPainterPath& path,
                                                       QPointF &ellipsePos,
                                                       QString &amplitude,
                                                       RowVectorPair &data) const
 {
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
@@ -598,9 +598,9 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index,
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const
+void ChannelDataDelegate::createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const
 {
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
     float currentSampleIndex = option.rect.x()+t_pModel->getCurrentSampleIndex();
     float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
@@ -616,11 +616,11 @@ void RealTimeMultiSampleArrayDelegate::createCurrentPositionMarkerPath(const QMo
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+void ChannelDataDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
 {
     Q_UNUSED(data)
 
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
     if(t_pModel->numVLines() > 0)
     {
@@ -642,11 +642,11 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+void ChannelDataDelegate::createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
 {
     Q_UNUSED(data)
 
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
     if(t_pModel->getNumberOfTimeSpacers() > 0)
     {
@@ -671,7 +671,7 @@ void RealTimeMultiSampleArrayDelegate::createTimeSpacersPath(const QModelIndex &
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter,
+void ChannelDataDelegate::createTriggerPath(QPainter *painter,
                                                          const QModelIndex &index,
                                                          const QStyleOptionViewItem &option,
                                                          QPainterPath& path,
@@ -679,7 +679,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter,
 {
     Q_UNUSED(data)
 
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
     QList<QPair<int,double> > detectedTriggers = t_pModel->getDetectedTriggers();
     QList<QPair<int,double> > detectedTriggersOld = t_pModel->getDetectedTriggersOld();
@@ -737,11 +737,11 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(QPainter *painter,
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
+void ChannelDataDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
 {
     Q_UNUSED(data)
 
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
@@ -768,7 +768,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerThresholdPath(const QModelIn
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
+void ChannelDataDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
 {
     //horizontal lines
     float distance = m_markerPosition.x();

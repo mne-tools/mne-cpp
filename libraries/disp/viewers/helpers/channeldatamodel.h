@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearraymodel.h
+* @file     channeldatamodel.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayModel Class.
+* @brief    Declaration of the ChannelDataModel Class.
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYMODEL_H
-#define REALTIMEMULTISAMPLEARRAYMODEL_H
+#ifndef CHANNELDATAMODEL_H
+#define CHANNELDATAMODEL_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <scMeas/realtimesamplearraychinfo.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
@@ -76,22 +75,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace DISPLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
-using namespace Eigen;
-using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -100,20 +88,21 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 typedef QPair<const double*,qint32> RowVectorPair;
-typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> MatrixXdR;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayModel
+* DECLARE CLASS ChannelDataModel
 *
-* @brief The RealTimeMultiSampleArrayModel class implements the data access model for a real-time multi sample array data stream
+* @brief The ChannelDataModel class implements the data access model for a real-time multi sample array data stream
 */
-class RealTimeMultiSampleArrayModel : public QAbstractTableModel
+class ChannelDataModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RealTimeMultiSampleArrayModel> SPtr;              /**< Shared pointer type for RealTimeMultiSampleArrayModel. */
-    typedef QSharedPointer<const RealTimeMultiSampleArrayModel> ConstSPtr;   /**< Const shared pointer type for RealTimeMultiSampleArrayModel. */
+    typedef QSharedPointer<ChannelDataModel> SPtr;              /**< Shared pointer type for ChannelDataModel. */
+    typedef QSharedPointer<const ChannelDataModel> ConstSPtr;   /**< Const shared pointer type for ChannelDataModel. */
 
     //=========================================================================================================
     /**
@@ -121,7 +110,7 @@ public:
     *
     * @param[in] parent     parent of the table model
     */
-    RealTimeMultiSampleArrayModel(QObject *parent = 0);
+    ChannelDataModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -167,14 +156,6 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
-    /** ToDo: Obsolete
-    * Sets corresponding channel information
-    *
-    * @param [in] chInfo        The corresponding channel information list
-    */
-    void setChannelInfo(const QList<RealTimeSampleArrayChInfo>& chInfo);
-
-    //=========================================================================================================
     /**
     * Sets corresponding fiff information
     *
@@ -192,7 +173,7 @@ public:
     */
     void setSamplingInfo(float sps, int T, bool bSetZero = false);
 
-    MatrixXd getLastBlock();
+    Eigen::MatrixXd getLastBlock();
 
     //=========================================================================================================
     /**
@@ -200,7 +181,7 @@ public:
     *
     * @param[in] data       data to add (Time points of channel samples)
     */
-    void addData(const QList<MatrixXd> &data);
+    void addData(const QList<Eigen::MatrixXd> &data);
 
     //=========================================================================================================
     /**
@@ -210,7 +191,7 @@ public:
     *
     * @return kind of given channel number
     */
-    fiff_int_t getKind(qint32 row) const;
+    FIFFLIB::fiff_int_t getKind(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -220,7 +201,7 @@ public:
     *
     * @return unit of given channel number
     */
-    fiff_int_t getUnit(qint32 row) const;
+    FIFFLIB::fiff_int_t getUnit(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -230,7 +211,7 @@ public:
     *
     * @return coil type of given channel number
     */
-    fiff_int_t getCoil(qint32 row) const;
+    FIFFLIB::fiff_int_t getCoil(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -438,7 +419,7 @@ public:
     *
     * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(QList<FilterData> filterData);
+    void filterChanged(QList<UTILSLIB::FilterData> filterData);
 
     //=========================================================================================================
     /**
@@ -533,7 +514,7 @@ private:
     * @param [in] data          data which is to be filtered
     * @param [in] iDataIndex    current position in the global data matrix
     */
-    void filterChannelsConcurrently(const MatrixXd &data, int iDataIndex);
+    void filterChannelsConcurrently(const Eigen::MatrixXd &data, int iDataIndex);
 
     //=========================================================================================================
     /**
@@ -564,17 +545,17 @@ private:
     QString                             m_sCurrentTriggerCh;                        /**< Current trigger channel which is beeing scanned */
     QString                             m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
-    FiffInfo::SPtr                      m_pFiffInfo;                                /**< Fiff info */
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                                /**< Fiff info */
 
-    RowVectorXi                         m_vecBadIdcs;                               /**< Idcs of bad channels */
-    VectorXd                            m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block */
-    VectorXd                            m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block */
+    Eigen::RowVectorXi                  m_vecBadIdcs;                               /**< Idcs of bad channels */
+    Eigen::VectorXd                     m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block */
+    Eigen::VectorXd                     m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block */
 
     MatrixXdR                           m_matDataRaw;                               /**< The raw data */
     MatrixXdR                           m_matDataFiltered;                          /**< The filtered data */
     MatrixXdR                           m_matDataRawFreeze;                         /**< The raw data in freeze mode */
     MatrixXdR                           m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode */
-    MatrixXd                            m_matOverlap;                               /**< Last overlap block for the back */
+    Eigen::MatrixXd                     m_matOverlap;                               /**< Last overlap block for the back */
 
     Eigen::VectorXi                     m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA operator in case of a VectorView system.*/
     Eigen::VectorXi                     m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA operator in case of a VectorView system.*/
@@ -603,8 +584,7 @@ private:
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
     QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
-    QList<FilterData>                   m_filterData;                               /**< List of currently active filters. */
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;                              /**< Channel info list. ToDo: Obsolete*/
+    QList<UTILSLIB::FilterData>         m_filterData;                               /**< List of currently active filters. */
     QStringList                         m_filterChannelList;                        /**< List of channels which are to be filtered.*/
     QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
@@ -639,7 +619,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 RealTimeMultiSampleArrayModel::getMaxSamples() const
+inline qint32 ChannelDataModel::getMaxSamples() const
 {
     return m_iMaxSamples;
 }
@@ -647,7 +627,7 @@ inline qint32 RealTimeMultiSampleArrayModel::getMaxSamples() const
 
 //*************************************************************************************************************
 
-inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
+inline qint32 ChannelDataModel::getCurrentSampleIndex() const
 {
     if(m_bIsFreezed)
         return m_iCurrentSampleFreeze;
@@ -665,7 +645,7 @@ inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
 
 //*************************************************************************************************************
 
-inline double RealTimeMultiSampleArrayModel::getLastBlockFirstValue(int row) const
+inline double ChannelDataModel::getLastBlockFirstValue(int row) const
 {
     if(row>m_vecLastBlockFirstValuesFiltered.rows() || row>m_vecLastBlockFirstValuesRaw.rows())
         return 0;
@@ -679,7 +659,7 @@ inline double RealTimeMultiSampleArrayModel::getLastBlockFirstValue(int row) con
 
 //*************************************************************************************************************
 
-inline const QMap<qint32,qint32>& RealTimeMultiSampleArrayModel::getIdxSelMap() const
+inline const QMap<qint32,qint32>& ChannelDataModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -687,7 +667,7 @@ inline const QMap<qint32,qint32>& RealTimeMultiSampleArrayModel::getIdxSelMap() 
 
 //*************************************************************************************************************
 
-inline qint32 RealTimeMultiSampleArrayModel::numVLines() const
+inline qint32 ChannelDataModel::numVLines() const
 {
     return (m_iT - 1);
 }
@@ -695,7 +675,7 @@ inline qint32 RealTimeMultiSampleArrayModel::numVLines() const
 
 //*************************************************************************************************************
 
-inline bool RealTimeMultiSampleArrayModel::isFreezed() const
+inline bool ChannelDataModel::isFreezed() const
 {
     return m_bIsFreezed;
 }
@@ -703,7 +683,7 @@ inline bool RealTimeMultiSampleArrayModel::isFreezed() const
 
 //*************************************************************************************************************
 
-inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() const
+inline const QMap< qint32,float >& ChannelDataModel::getScaling() const
 {
     return m_qMapChScaling;
 }
@@ -711,7 +691,7 @@ inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() c
 
 //*************************************************************************************************************
 
-inline QMap<double, QColor> RealTimeMultiSampleArrayModel::getTriggerColor() const
+inline QMap<double, QColor> ChannelDataModel::getTriggerColor() const
 {
     if(m_bTriggerDetectionActive) {
         return m_qMapTriggerColor;
@@ -724,7 +704,7 @@ inline QMap<double, QColor> RealTimeMultiSampleArrayModel::getTriggerColor() con
 
 //*************************************************************************************************************
 
-inline QList<QPair<int,double> >  RealTimeMultiSampleArrayModel::getDetectedTriggers() const
+inline QList<QPair<int,double> >  ChannelDataModel::getDetectedTriggers() const
 {
     QList<QPair<int,double> > triggerIndices;
 
@@ -741,7 +721,7 @@ inline QList<QPair<int,double> >  RealTimeMultiSampleArrayModel::getDetectedTrig
 
 //*************************************************************************************************************
 
-inline QList<QPair<int,double> > RealTimeMultiSampleArrayModel::getDetectedTriggersOld() const
+inline QList<QPair<int,double> > ChannelDataModel::getDetectedTriggersOld() const
 {
     QList<QPair<int,double> > triggerIndices;
 
@@ -758,7 +738,7 @@ inline QList<QPair<int,double> > RealTimeMultiSampleArrayModel::getDetectedTrigg
 
 //*************************************************************************************************************
 
-inline int RealTimeMultiSampleArrayModel::getNumberOfTimeSpacers() const
+inline int ChannelDataModel::getNumberOfTimeSpacers() const
 {
     //std::cout<<((m_iT*1000)/m_iDistanceTimerSpacer)-1<<std::endl;
     return ((1000)/m_iDistanceTimerSpacer)-1;
@@ -767,7 +747,7 @@ inline int RealTimeMultiSampleArrayModel::getNumberOfTimeSpacers() const
 
 //*************************************************************************************************************
 
-inline double RealTimeMultiSampleArrayModel::getTriggerThreshold() const
+inline double ChannelDataModel::getTriggerThreshold() const
 {
     return m_dTriggerThreshold;
 }
@@ -775,7 +755,7 @@ inline double RealTimeMultiSampleArrayModel::getTriggerThreshold() const
 
 //*************************************************************************************************************
 
-inline QString RealTimeMultiSampleArrayModel::getTriggerName() const
+inline QString ChannelDataModel::getTriggerName() const
 {
     return m_sCurrentTriggerCh;
 }
@@ -783,7 +763,7 @@ inline QString RealTimeMultiSampleArrayModel::getTriggerName() const
 
 //*************************************************************************************************************
 
-inline int RealTimeMultiSampleArrayModel::getCurrentTriggerIndex() const
+inline int ChannelDataModel::getCurrentTriggerIndex() const
 {
     return m_iCurrentTriggerChIndex;
 }
@@ -791,7 +771,7 @@ inline int RealTimeMultiSampleArrayModel::getCurrentTriggerIndex() const
 
 //*************************************************************************************************************
 
-inline bool RealTimeMultiSampleArrayModel::triggerDetectionActive() const
+inline bool ChannelDataModel::triggerDetectionActive() const
 {
     return m_bTriggerDetectionActive;
 }
@@ -799,7 +779,7 @@ inline bool RealTimeMultiSampleArrayModel::triggerDetectionActive() const
 
 //*************************************************************************************************************
 
-inline int RealTimeMultiSampleArrayModel::getCurrentOverlapAddDelay() const
+inline int ChannelDataModel::getCurrentOverlapAddDelay() const
 {
     if(!m_filterData.isEmpty())
         return m_iMaxFilterLength/2;
@@ -812,7 +792,7 @@ inline int RealTimeMultiSampleArrayModel::getCurrentOverlapAddDelay() const
 
 #ifndef metatype_rowvectorpair
 #define metatype_rowvectorpair
-Q_DECLARE_METATYPE(SCDISPLIB::RowVectorPair);
+Q_DECLARE_METATYPE(DISPLIB::RowVectorPair);
 #endif
 
-#endif // REALTIMEMULTISAMPLEARRAYMODEL_H
+#endif // CHANNELDATAMODEL_H
