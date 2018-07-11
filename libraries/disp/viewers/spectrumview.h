@@ -68,11 +68,6 @@
 
 class QTableView;
 
-namespace DISPLIB {
-    class FrequencySpectrumDelegate;
-    class FrequencySpectrumModel;
-}
-
 namespace FIFFLIB {
     class FiffInfo;
 }
@@ -91,6 +86,9 @@ namespace DISPLIB
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class FrequencySpectrumDelegate;
+class FrequencySpectrumModel;
 
 
 //=============================================================================================================

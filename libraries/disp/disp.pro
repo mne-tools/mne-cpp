@@ -104,6 +104,7 @@ SOURCES += \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
     viewers/butterflyview.cpp \
+    viewers/channeldataview.cpp \
     viewers/channelselectionview.cpp \
     viewers/spectrumsettingsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
@@ -120,6 +121,8 @@ SOURCES += \
     viewers/helpers/draggableframelesswidget.cpp \
     viewers/helpers/frequencyspectrumdelegate.cpp \
     viewers/helpers/frequencyspectrummodel.cpp \
+    viewers/helpers/channeldatamodel.cpp \
+    viewers/helpers/channeldatadelegate.cpp \
 
 HEADERS += \
     disp_global.h \
@@ -133,6 +136,7 @@ HEADERS += \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
     viewers/butterflyview.h \
+    viewers/channeldataview.h \
     viewers/channelselectionview.h \
     viewers/spectrumsettingsview.h \
     viewers/helpers/evokedsetmodel.h \
@@ -149,6 +153,8 @@ HEADERS += \
     viewers/helpers/draggableframelesswidget.h \
     viewers/helpers/frequencyspectrumdelegate.h \
     viewers/helpers/frequencyspectrummodel.h \
+    viewers/helpers/channeldatamodel.h \
+    viewers/helpers/channeldatadelegate.h \
 
 qtHaveModule(charts) {
     SOURCES += \

@@ -225,3 +225,4 @@ void AverageLayoutView::updateData()
 
     m_pAverageScene->updateScene();
 }
+
