@@ -110,7 +110,9 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new ChannelSelectionView becomes a window. If parent is another widget, ChannelSelectionView becomes a child window inside parent. ChannelSelectionView is deleted when its parent is deleted.
     * @param [in] pChInfoModel pointer to the channel info model.
     */
-    ChannelSelectionView(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0), Qt::WindowType type = Qt::Window);
+    ChannelSelectionView(QWidget *parent = 0,
+                         ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0),
+                         Qt::WindowType f = Qt::Widget);
 
     //=========================================================================================================
     /**

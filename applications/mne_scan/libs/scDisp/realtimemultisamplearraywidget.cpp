@@ -556,7 +556,7 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
 
-        m_pChannelSelectionView = ChannelSelectionView::SPtr(new ChannelSelectionView(this, m_pChInfoModel));
+        m_pChannelSelectionView = ChannelSelectionView::SPtr(new ChannelSelectionView(this, m_pChInfoModel, Qt::Window));
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 this, &RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly);

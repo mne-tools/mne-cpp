@@ -180,7 +180,7 @@ void RealTimeCovWidget::showModalitySelectionWidget()
 {
     if(!m_pModalitySelectionWidget)
     {
-        m_pModalitySelectionWidget = QSharedPointer<ModalitySelectionView>(new ModalitySelectionView(m_qListPickTypes, this));
+        m_pModalitySelectionWidget = QSharedPointer<ModalitySelectionView>(new ModalitySelectionView(m_qListPickTypes, this, Qt::Window));
 
         connect(m_pModalitySelectionWidget.data(), &ModalitySelectionView::newModalitySelection,
                 this, &RealTimeCovWidget::onNewModalitySelection);

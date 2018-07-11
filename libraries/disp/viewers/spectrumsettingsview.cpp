@@ -64,8 +64,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SpectrumSettingsView::SpectrumSettingsView(QWidget *parent)
-: QWidget(parent, Qt::Window)
+SpectrumSettingsView::SpectrumSettingsView(QWidget *parent, Qt::WindowFlags f)
+: QWidget(parent, f)
 {
     this->setWindowTitle("Spectrum Settings");
 

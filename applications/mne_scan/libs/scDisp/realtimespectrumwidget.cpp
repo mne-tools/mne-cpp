@@ -102,7 +102,7 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 
     m_pActionFrequencySettings->setVisible(false);
 
-    m_pSpectrumView = new SpectrumView(this);
+    m_pSpectrumView = new SpectrumView(this, Qt::Window);
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
@@ -185,7 +185,7 @@ void RealTimeSpectrumWidget::init()
 void RealTimeSpectrumWidget::initSettingsWidget()
 {
     if(!m_pSpectrumSettingsView) {
-        m_pSpectrumSettingsView = QSharedPointer<SpectrumSettingsView>(new SpectrumSettingsView(this));
+        m_pSpectrumSettingsView = QSharedPointer<SpectrumSettingsView>(new SpectrumSettingsView(this, Qt::Window));
 
         m_pSpectrumSettingsView->setWindowTitle("Frequency Spectrum Settings");
 

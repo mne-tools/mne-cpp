@@ -70,8 +70,8 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SpectrumView::SpectrumView(QWidget *parent)
-: QWidget(parent)
+SpectrumView::SpectrumView(QWidget *parent, Qt::WindowFlags f)
+: QWidget(parent, f)
 {
     m_pTableView = new QTableView;
 

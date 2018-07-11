@@ -58,8 +58,10 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSelectionView::ChannelSelectionView(QWidget *parent, ChInfoModel::SPtr pChInfoModel, Qt::WindowType type)
-: QWidget(parent, type)
+ChannelSelectionView::ChannelSelectionView(QWidget *parent,
+                                           ChInfoModel::SPtr pChInfoModel,
+                                           Qt::WindowType f)
+: QWidget(parent, f)
 , ui(new Ui::ChannelSelectionViewWidget)
 , m_pChInfoModel(pChInfoModel)
 {

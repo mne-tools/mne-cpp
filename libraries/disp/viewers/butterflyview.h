@@ -86,6 +86,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class EvokedSetModel;
+class ChInfoModel;
 
 
 //*************************************************************************************************************
@@ -117,7 +118,7 @@ public:
     typedef QSharedPointer<ButterflyView> SPtr;              /**< Shared pointer type for ButterflyView. */
     typedef QSharedPointer<const ButterflyView> ConstSPtr;   /**< Const shared pointer type for ButterflyView. */
 
-    explicit ButterflyView(QWidget *parent = 0);
+    explicit ButterflyView(QWidget *parent = 0, Qt::WindowFlags f = Qt::Widget);
 
     void setModel(QSharedPointer<EvokedSetModel> model);
 
@@ -125,7 +126,8 @@ public:
                     const QModelIndex& bottomRight,
                     const QVector<int>& roles = QVector<int>());
 
-    void setSettings(const QList<Modality>& p_qListModalities);
+    QList<Modality> getModalities();
+    void setModalities(const QList<Modality>& p_qListModalities);
 
     void setSelectedChannels(const QList<int> &selectedChannels);
 
@@ -135,6 +137,8 @@ public:
 
     const QColor& getBackgroundColor();
 
+    void takeScreenshot(const QString& fileName);
+
     //=========================================================================================================
     /**
     * Set the average map information
@@ -142,6 +146,16 @@ public:
     * @param [in] mapAvr     The average data information including the color per average type.
     */
     void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+
+    void setChInfoModel(QSharedPointer<ChInfoModel> &pChInfoModel);
+
+    //=========================================================================================================
+    /**
+    * Only shows the channels defined in the QStringList selectedChannels
+    *
+    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+    */
+    void showSelectedChannelsOnly(QStringList selectedChannels);
 
 protected:
     //=========================================================================================================
@@ -180,8 +194,10 @@ private:
     QColor                  m_colCurrentBackgroundColor;
 
     QList<int>              m_lSelectedChannels;
+    QList<DISPLIB::Modality>m_qListModalities;
 
-    QSharedPointer<EvokedSetModel>                          m_pEvokedModel;
+    QSharedPointer<EvokedSetModel>          m_pEvokedModel;
+    QSharedPointer<ChInfoModel>             m_pChInfoModel;             /**< Channel info model. */
 
     QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;             /**< Average colors and names. */
 };

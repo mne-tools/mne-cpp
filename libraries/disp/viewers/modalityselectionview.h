@@ -98,7 +98,8 @@ public:
     * @param [in] parent        parent of widget
     */
     ModalitySelectionView(QStringList lModalities,
-                          QWidget *parent = 0);
+                          QWidget *parent = 0,
+                          Qt::WindowFlags f = Qt::Widget);
 
     void updateSelection(qint32 state);
 

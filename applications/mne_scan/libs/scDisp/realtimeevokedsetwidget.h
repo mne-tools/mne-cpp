@@ -86,7 +86,6 @@ class QVBoxLayout;
 class QLabel;
 class QToolBox;
 class QGraphicsView;
-class QVBoxLayout;
 class QGraphicsItem;
 
 
@@ -167,14 +166,6 @@ public:
     */
     virtual void init();
 
-    //=========================================================================================================
-    /**
-    * call this whenever the external channel selection manager changes
-    *
-    * * @param [in] selectedChannelItems list of selected graphic items
-    */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
-
 private slots:
     //=========================================================================================================
     /**
@@ -184,37 +175,9 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Only shows the channels defined in the QStringList selectedChannels
-    *
-    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
-    */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
-
-    //=========================================================================================================
-    /**
-    * Broadcast channel scaling
-    *
-    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
-    */
-    void broadcastScaling(QMap<qint32, float> scaleMap);
-
-    //=========================================================================================================
-    /**
-    * Broadcast settings to attached widgets
-    */
-    void broadcastSettings(QList<DISPLIB::Modality> modalityList);
-
-    //=========================================================================================================
-    /**
     * Shows quick control widget
     */
     void showQuickControlWidget();
-
-    //=========================================================================================================
-    /**
-    * call this function whenever a selection was made in teh evoked data set list
-    */
-    void onSelectionChanged();
 
     //=========================================================================================================
     /**
@@ -228,7 +191,7 @@ private slots:
     *
     * @param [in] backgroundColor  The new background color.
     */
-    void onTableViewBackgroundColorChanged(const QColor& backgroundColor);
+    void onBackgroundColorChanged(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
@@ -241,12 +204,6 @@ private slots:
 private:
     //=========================================================================================================
     /**
-    * Reimplemented mouseWheelEvent
-    */
-    virtual void wheelEvent(QWheelEvent * event);    
-
-    //=========================================================================================================
-    /**
     * Reimplemented eventFilter
     */
     bool virtual eventFilter(QObject *object, QEvent *event);
@@ -257,14 +214,12 @@ private:
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::ChInfoModel>                m_pChInfoModel;             /**< Channel info model. */
     QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
     QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
 
     QList<SCMEASLIB::RealTimeSampleArrayChInfo>         m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on.*/
-    QList<DISPLIB::Modality>            m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
-    QMap<qint32,float>                  m_qMapChScaling;            /**< Channel scaling values. */
 
     bool                                m_bInitialized;             /**< Is Initialized */
     bool                                m_bHideBadChannels;         /**< hide bad channels flag. */

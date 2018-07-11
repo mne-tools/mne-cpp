@@ -51,6 +51,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -59,6 +60,11 @@
 //=============================================================================================================
 
 class QGraphicsView;
+class QGraphicsItem;
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -76,6 +82,8 @@ namespace DISPLIB
 //=============================================================================================================
 
 class AverageScene;
+class EvokedSetModel;
+class ChInfoModel;
 
 
 //=============================================================================================================
@@ -98,16 +106,57 @@ public:
     *
     * @param [in] parent    parent of widget
     */
-    AverageLayoutView(QWidget *toolbox);
+    AverageLayoutView(QWidget *parent = 0,
+                      Qt::WindowFlags f = Qt::Widget);
 
-    QSharedPointer<AverageScene> getAverageScene();
-    QSharedPointer<QGraphicsView> getAverageGraphicsView();
+    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &pFiffInfo);
+    void setChInfoModel(QSharedPointer<ChInfoModel> &pChInfoModel);
+    void setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel);
+
+    void setBackgroundColor(const QColor& backgroundColor);
+    QColor getBackgroundColor();
+
+    void takeScreenshot(const QString& fileName);
+
+    //=========================================================================================================
+    /**
+    * Sets the scale map to scaleMap.
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
+    */
+    void setScaleMap(const QMap<qint32, float> &scaleMap);
+
+    //=========================================================================================================
+    /**
+    * Set the average map information
+    *
+    * @param [in] mapAvr     The average data information including the color per average type.
+    */
+    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+
+    //=========================================================================================================
+    /**
+    * call this whenever the external channel selection manager changes
+    *
+    * * @param [in] selectedChannelItems list of selected graphic items
+    */
+    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * call this function whenever the items' data needs to be updated
+    */
+    void updateData();
 
 protected:
     QSharedPointer<AverageScene>        m_pAverageScene;            /**< The pointer to the average scene. */
-    QSharedPointer<QGraphicsView>       m_pAverageLayoutView;       /**< View for 2D average layout scene */
+    QPointer<QGraphicsView>       m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
+    QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */
+    QSharedPointer<DISPLIB::ChInfoModel>                m_pChInfoModel;             /**< Channel info model. */
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
 
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_averageInfos;
 signals:
 
 };

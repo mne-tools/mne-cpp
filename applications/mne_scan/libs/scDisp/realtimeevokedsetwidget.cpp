@@ -43,17 +43,12 @@
 
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/chinfomodel.h>
-#include <disp/viewers/helpers/averagescene.h>
-#include <disp/viewers/helpers/averagesceneitem.h>
 #include <disp/viewers/filterview.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/averagelayoutview.h>
 
 #include <scMeas/realtimeevokedset.h>
-#include <scMeas/realtimesamplearraychinfo.h>
-
-#include <math.h>
 
 
 //*************************************************************************************************************
@@ -75,7 +70,6 @@
 #include <QToolBox>
 #include <QGraphicsView>
 #include <QGraphicsItem>
-#include <QSvgGenerator>
 
 
 //*************************************************************************************************************
@@ -120,10 +114,10 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(false);
 
-    //set vertical layout
+    //Create GUI
     m_pRTESetLayout = new QVBoxLayout(this);
 
-    //Acquire label
+    //Set acquire label
     m_pLabelInit= new QLabel(this);
     m_pLabelInit->setText("Acquiring Data");
     m_pLabelInit->setAlignment(Qt::AlignCenter);
@@ -141,20 +135,17 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pButterflyView = new ButterflyView(this);
     m_pButterflyView->installEventFilter(this);
 
-    m_pToolBox->insertItem(0, m_pButterflyView, QIcon(), "Butterfly plot");
-
     //2D layout plot
     m_pAverageLayoutView = new AverageLayoutView(this);
-
     //m_pAverageLayoutView->installEventFilter(this);
+
+    m_pToolBox->insertItem(0, m_pButterflyView, QIcon(), "Butterfly plot");
     m_pToolBox->insertItem(0, m_pAverageLayoutView, QIcon(), "2D Layout plot");
 
     m_pRTESetLayout->addWidget(m_pToolBox);
 
     //set layouts
     this->setLayout(m_pRTESetLayout);
-
-    //getData();
 }
 
 
@@ -162,64 +153,69 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
 
 RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 {
-    //
     // Store Settings
-    //
     if(!m_pRTESet->getName().isEmpty())
     {
-        QString t_sRTESWName = m_pRTESet->getName();
+        QString t_sRTESName = m_pRTESet->getName();
 
         QSettings settings;
 
         //Store modalities
-        for(qint32 i = 0; i < m_qListModalities.size(); ++i) {
-            settings.setValue(QString("RTESW/%1/%2/active").arg(t_sRTESWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
-            settings.setValue(QString("RTESW/%1/%2/norm").arg(t_sRTESWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
+        if(m_pButterflyView) {
+            QList<Modality> qListModalities = m_pButterflyView->getModalities();
+            for(qint32 i = 0; i < qListModalities.size(); ++i) {
+                settings.setValue(QString("RTESW/%1/%2/active").arg(t_sRTESName).arg(qListModalities[i].m_sName), qListModalities[i].m_bActive);
+                settings.setValue(QString("RTESW/%1/%2/norm").arg(t_sRTESName).arg(qListModalities[i].m_sName), qListModalities[i].m_fNorm);
+            }
         }
 
         //Store filter
-        if(m_pFilterView != 0) {
+        if(m_pFilterView) {
             FilterData filter = m_pFilterView->getUserDesignedFilter();
 
-            settings.setValue(QString("RTESW/%1/filterHP").arg(t_sRTESWName), filter.m_dHighpassFreq);
-            settings.setValue(QString("RTESW/%1/filterLP").arg(t_sRTESWName), filter.m_dLowpassFreq);
-            settings.setValue(QString("RTESW/%1/filterOrder").arg(t_sRTESWName), filter.m_iFilterOrder);
-            settings.setValue(QString("RTESW/%1/filterType").arg(t_sRTESWName), (int)filter.m_Type);
-            settings.setValue(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESWName), (int)filter.m_designMethod);
-            settings.setValue(QString("RTESW/%1/filterTransition").arg(t_sRTESWName), filter.m_dParksWidth*(filter.m_sFreq/2));
-            settings.setValue(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESWName), m_pFilterView->userDesignedFiltersIsActive());
-            settings.setValue(QString("RTESW/%1/filterChannelType").arg(t_sRTESWName), m_pFilterView->getChannelType());
+            settings.setValue(QString("RTESW/%1/filterHP").arg(t_sRTESName), filter.m_dHighpassFreq);
+            settings.setValue(QString("RTESW/%1/filterLP").arg(t_sRTESName), filter.m_dLowpassFreq);
+            settings.setValue(QString("RTESW/%1/filterOrder").arg(t_sRTESName), filter.m_iFilterOrder);
+            settings.setValue(QString("RTESW/%1/filterType").arg(t_sRTESName), (int)filter.m_Type);
+            settings.setValue(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESName), (int)filter.m_designMethod);
+            settings.setValue(QString("RTESW/%1/filterTransition").arg(t_sRTESName), filter.m_dParksWidth*(filter.m_sFreq/2));
+            settings.setValue(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESName), m_pFilterView->userDesignedFiltersIsActive());
+            settings.setValue(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), m_pFilterView->getChannelType());
         }
 
         //Store scaling
-        if(m_qMapChScaling.contains(FIFF_UNIT_T)) {
-            settings.setValue(QString("RTESW/%1/scaleMAG").arg(t_sRTESWName), m_qMapChScaling[FIFF_UNIT_T]);
-            qDebug()<<"m_qMapChScaling[FIFF_UNIT_T]: "<<m_qMapChScaling[FIFF_UNIT_T];
+        if(m_pEvokedSetModel) {
+            QMap<qint32, float> qMapChScaling = m_pEvokedSetModel->getScaling();
+
+            if(qMapChScaling.contains(FIFF_UNIT_T)) {
+                settings.setValue(QString("RTESW/%1/scaleMAG").arg(t_sRTESName), qMapChScaling[FIFF_UNIT_T]);
+                qDebug()<<"qMapChScaling[FIFF_UNIT_T]: "<<qMapChScaling[FIFF_UNIT_T];
+            }
+
+            if(qMapChScaling.contains(FIFF_UNIT_T_M))
+                settings.setValue(QString("RTESW/%1/scaleGRAD").arg(t_sRTESName), qMapChScaling[FIFF_UNIT_T_M]);
+
+            if(qMapChScaling.contains(FIFFV_EEG_CH))
+                settings.setValue(QString("RTESW/%1/scaleEEG").arg(t_sRTESName), qMapChScaling[FIFFV_EEG_CH]);
+
+            if(qMapChScaling.contains(FIFFV_EOG_CH))
+                settings.setValue(QString("RTESW/%1/scaleEOG").arg(t_sRTESName), qMapChScaling[FIFFV_EOG_CH]);
+
+            if(qMapChScaling.contains(FIFFV_STIM_CH))
+                settings.setValue(QString("RTESW/%1/scaleSTIM").arg(t_sRTESName), qMapChScaling[FIFFV_STIM_CH]);
+
+            if(qMapChScaling.contains(FIFFV_MISC_CH))
+                settings.setValue(QString("RTESW/%1/scaleMISC").arg(t_sRTESName), qMapChScaling[FIFFV_MISC_CH]);
         }
 
-        if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
-            settings.setValue(QString("RTESW/%1/scaleGRAD").arg(t_sRTESWName), m_qMapChScaling[FIFF_UNIT_T_M]);
-
-        if(m_qMapChScaling.contains(FIFFV_EEG_CH))
-            settings.setValue(QString("RTESW/%1/scaleEEG").arg(t_sRTESWName), m_qMapChScaling[FIFFV_EEG_CH]);
-
-        if(m_qMapChScaling.contains(FIFFV_EOG_CH))
-            settings.setValue(QString("RTESW/%1/scaleEOG").arg(t_sRTESWName), m_qMapChScaling[FIFFV_EOG_CH]);
-
-        if(m_qMapChScaling.contains(FIFFV_STIM_CH))
-            settings.setValue(QString("RTESW/%1/scaleSTIM").arg(t_sRTESWName), m_qMapChScaling[FIFFV_STIM_CH]);
-
-        if(m_qMapChScaling.contains(FIFFV_MISC_CH))
-            settings.setValue(QString("RTESW/%1/scaleMISC").arg(t_sRTESWName), m_qMapChScaling[FIFFV_MISC_CH]);
-
         //Store selected layout file
-        if(!m_pChannelSelectionView == 0) {
-            settings.setValue(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESWName), m_pChannelSelectionView->getCurrentLayoutFile());
+        if(m_pChannelSelectionView) {
+            settings.setValue(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), m_pChannelSelectionView->getCurrentLayoutFile());
         }
 
         //Store current view toolbox index - butterfly or 2D layout
         if(m_pToolBox) {
-            settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESWName), m_pToolBox->currentIndex());
+            settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESName), m_pToolBox->currentIndex());
         }
 
         //Store average colors per type
@@ -227,14 +223,14 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
             QVariant data;
             SCDISPLIB::AverageInfoMap avrMap = m_pQuickControlWidget->getAverageInformationMap();
             data.setValue(avrMap);
-            settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESWName), data);
+            settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data);
         }
 
         //Store signal and background colors
-        if(m_pQuickControlWidget != 0) {
-            settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESWName), m_pQuickControlWidget->getSignalColor());
-            settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), m_pButterflyView->getBackgroundColor());
-            settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), m_pAverageLayoutView->getAverageScene()->backgroundBrush().color());
+        if(m_pQuickControlWidget) {
+            settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESName), m_pQuickControlWidget->getSignalColor());
+            settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName), m_pButterflyView->getBackgroundColor());
+            settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESName), m_pAverageLayoutView->getBackgroundColor());
         }
     }
 }
@@ -293,148 +289,109 @@ void RealTimeEvokedSetWidget::init()
     {
         qDebug()<<"RealTimeEvokedSetWidget::init() - "<<m_pRTESet->getName();
         QSettings settings;
-        QString t_sRTESWName = m_pRTESet->getName();
+        QString t_sRTESName = m_pRTESet->getName();
+
+        //Remove temporary label andshow actual average display
         m_pRTESetLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
-
         m_pToolBox->show();
+        m_pActionSelectSensors->setVisible(true);
+        m_pActionQuickControl->setVisible(true);
 
-        m_pEvokedSetModel = EvokedSetModel::SPtr(new EvokedSetModel(this));
+        //Choose current view toolbox index - butterfly or 2D layout
+        m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESName), 0).toInt());
+
+        //Init data model
+        m_pEvokedSetModel = EvokedSetModel::SPtr::create(this);
         m_pEvokedSetModel->setChannelColors(m_pRTESet->chColor());
 
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *m_pFiffInfo.data();
         m_pEvokedSetModel->setEvokedSet(pEvokedSet, true);
 
-        m_pButterflyView->setModel(m_pEvokedSetModel);
-
-        //Choose current view toolbox index - butterfly or 2D layout
-        m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESWName), 0).toInt());
-
         //
-        //-------- Init modalities --------
+        //-------- Init modalities and scaling --------
         //
-        m_qListModalities.clear();
-        bool hasMag = false;
-        bool hasGrad = false;
-        bool hasEEG = false;
-        bool hasEOG = false;
-        bool hasMISC = false;
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
-        {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
-            {
-                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
-                    hasMag = true;
-                else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
-                    hasGrad = true;
-            }
-            else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
-                hasEEG = true;
-            else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
-                hasEOG = true;
-            else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
-                hasMISC = true;
-        }
-        bool sel = true;
+        bool sel, hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
         float val = 1e-11f;
-        if(hasMag) {
-            sel = settings.value(QString("RTESW/%1/MAG/active").arg(t_sRTESWName), true).toBool();
-            val = settings.value(QString("RTESW/%1/MAG/norm").arg(t_sRTESWName), 1e-11f).toFloat();
-            m_qListModalities.append(Modality("MAG",sel,val));
-        }
-        if(hasGrad) {
-            sel = settings.value(QString("RTESW/%1/GRAD/active").arg(t_sRTESWName), true).toBool();
-            val = settings.value(QString("RTESW/%1/GRAD/norm").arg(t_sRTESWName), 1e-10f).toFloat();
-            m_qListModalities.append(Modality("GRAD",sel,val));
-        }
-        if(hasEEG) {
-            sel = settings.value(QString("RTESW/%1/EEG/active").arg(t_sRTESWName), true).toBool();
-            val = settings.value(QString("RTESW/%1/EEG/norm").arg(t_sRTESWName), 1e-4f).toFloat();
-            m_qListModalities.append(Modality("EEG",sel,val));
-        }
-        if(hasEOG) {
-            sel = settings.value(QString("RTESW/%1/EOG/active").arg(t_sRTESWName), true).toBool();
-            val = settings.value(QString("RTESW/%1/EOG/norm").arg(t_sRTESWName), 1e-3f).toFloat();
-            m_qListModalities.append(Modality("EOG",sel,val));
-        }
-        if(hasMISC) {
-            sel = settings.value(QString("RTESW/%1/MISC/active").arg(t_sRTESWName), true).toBool();
-            val = settings.value(QString("RTESW/%1/MISC/norm").arg(t_sRTESWName), 1e-3f).toFloat();
-            m_qListModalities.append(Modality("MISC",sel,val));
-        }
+        QMap<qint32, float> qMapChScaling;
+        QList<Modality> qListModalities;
 
-        m_pButterflyView->setSettings(m_qListModalities);
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH) {
+                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T) {
+                    //Modality
+                    sel = settings.value(QString("RTESW/%1/MAG/active").arg(t_sRTESName), true).toBool();
+                    val = settings.value(QString("RTESW/%1/MAG/norm").arg(t_sRTESName), 1e-11f).toFloat();
+                    qListModalities.append(Modality("MAG",sel,val));
 
-        //
-        //-------- Init scaling --------
-        //
-        //Show only spin boxes and labels which type are present in the current loaded fiffinfo
-        QList<FiffChInfo> channelList = m_pFiffInfo->chs;
-        QList<int> availabeChannelTypes;
+                    //Scaling
+                    val = settings.value(QString("RTESW/%1/scaleMAG").arg(t_sRTESName), 1e-11f).toFloat();
+                    qMapChScaling.insert(FIFF_UNIT_T, val);
 
-        for(int i = 0; i<channelList.size(); i++) {
-            int unit = channelList.at(i).unit;
-            int type = channelList.at(i).kind;
+                    hasMag = true;
+                } else if(!hasGrad && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M) {
+                    //Modality
+                    sel = settings.value(QString("RTESW/%1/GRAD/active").arg(t_sRTESName), true).toBool();
+                    val = settings.value(QString("RTESW/%1/GRAD/norm").arg(t_sRTESName), 1e-10f).toFloat();
+                    qListModalities.append(Modality("GRAD",sel,val));
 
-            if(!availabeChannelTypes.contains(unit))
-                availabeChannelTypes.append(unit);
+                    //Scaling
+                    val = settings.value(QString("RTESW/%1/scaleGRAD").arg(t_sRTESName), 1e-10f).toFloat();
+                    qMapChScaling.insert(FIFF_UNIT_T_M, val);
 
-            if(!availabeChannelTypes.contains(type))
-                availabeChannelTypes.append(type);
-        }
+                    hasGrad = true;
+                }
+            } else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH) {
+                //Modality
+                sel = settings.value(QString("RTESW/%1/EEG/active").arg(t_sRTESName), true).toBool();
+                val = settings.value(QString("RTESW/%1/EEG/norm").arg(t_sRTESName), 1e-4f).toFloat();
+                qListModalities.append(Modality("EEG",sel,val));
 
-        QString t_sRTEName = m_pRTESet->getName();
+                //Scaling
+                val = settings.value(QString("RTESW/%1/scaleEEG").arg(t_sRTESName), 1e-4f).toFloat();
+                qMapChScaling.insert(FIFFV_EEG_CH, val);
 
-        if(!t_sRTEName.isEmpty())
-        {
-            qDebug()<<"Init scaling";
-            m_qMapChScaling.clear();
+                hasEEG = true;
+            } else if(!hasEog && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH) {
+                //Modality
+                sel = settings.value(QString("RTESW/%1/EOG/active").arg(t_sRTESName), true).toBool();
+                val = settings.value(QString("RTESW/%1/EOG/norm").arg(t_sRTESName), 1e-3f).toFloat();
+                qListModalities.append(Modality("EOG",sel,val));
 
-            QSettings settings;
-            float val = 0.0f;
-            if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
-                val = settings.value(QString("RTESW/%1/scaleMAG").arg(t_sRTESWName), 1e-11f).toFloat();
-                m_qMapChScaling.insert(FIFF_UNIT_T, val);
+                //Scaling
+                val = settings.value(QString("RTESW/%1/scaleEOG").arg(t_sRTESName), 1e-3f).toFloat();
+                qMapChScaling.insert(FIFFV_EOG_CH, val);
+
+                hasEog = true;
+            } else if(!hasStim && m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+                //Scaling only we do not need it as a modality
+                val = settings.value(QString("RTESW/%1/scaleSTIM").arg(t_sRTESName), 1e-3f).toFloat();
+                qMapChScaling.insert(FIFFV_STIM_CH, val);
+
+                hasStim = true;
+            } else if(!hasMisc && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH) {
+                //Modality
+                sel = settings.value(QString("RTESW/%1/MISC/active").arg(t_sRTESName), true).toBool();
+                val = settings.value(QString("RTESW/%1/MISC/norm").arg(t_sRTESName), 1e-3f).toFloat();
+                qListModalities.append(Modality("MISC",sel,val));
+
+                //Scaling
+                val = settings.value(QString("RTESW/%1/scaleMISC").arg(t_sRTESName), 1e-3f).toFloat();
+                qMapChScaling.insert(FIFFV_MISC_CH, val);
+
+                hasMisc = true;
             }
-
-            if(availabeChannelTypes.contains(FIFF_UNIT_T_M)) {
-                val = settings.value(QString("RTESW/%1/scaleGRAD").arg(t_sRTESWName), 1e-10f).toFloat();
-                m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
-            }
-
-            if(availabeChannelTypes.contains(FIFFV_EEG_CH)) {
-                val = settings.value(QString("RTESW/%1/scaleEEG").arg(t_sRTESWName), 1e-4f).toFloat();
-                m_qMapChScaling.insert(FIFFV_EEG_CH, val);
-            }
-
-            if(availabeChannelTypes.contains(FIFFV_EOG_CH)) {
-                val = settings.value(QString("RTESW/%1/scaleEOG").arg(t_sRTESWName), 1e-3f).toFloat();
-                m_qMapChScaling.insert(FIFFV_EOG_CH, val);
-            }
-
-            if(availabeChannelTypes.contains(FIFFV_STIM_CH)) {
-                val = settings.value(QString("RTESW/%1/scaleSTIM").arg(t_sRTESWName), 1e-3f).toFloat();
-                m_qMapChScaling.insert(FIFFV_STIM_CH, val);
-            }
-
-            if(availabeChannelTypes.contains(FIFFV_MISC_CH)) {
-                val = settings.value(QString("RTESW/%1/scaleMISC").arg(t_sRTESWName), 1e-3f).toFloat();
-                m_qMapChScaling.insert(FIFFV_MISC_CH, val);
-            }
-
-            m_pEvokedSetModel->setScaling(m_qMapChScaling);
         }
+
+        m_pButterflyView->setModalities(qListModalities);
+        m_pEvokedSetModel->setScaling(qMapChScaling);
 
         //
         //-------- Init filter window --------
         //
-        m_pFilterView = FilterView::SPtr(new FilterView(this, Qt::Window));
+        m_pFilterView = FilterView::SPtr::create(this, Qt::Window);
         //m_pFilterView->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-        m_pFilterView->init(m_pFiffInfo->sfreq);
-        m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
-        m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
                 m_pEvokedSetModel.data(),static_cast<void (EvokedSetModel::*)(QString)>(&EvokedSetModel::setFilterChannelType));
@@ -442,27 +399,26 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pFilterView.data(), &FilterView::filterChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::filterChanged);
 
-        //Init downsampled sampling frequency
+        m_pFilterView->init(m_pFiffInfo->sfreq);
+        m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
+        m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
         m_pFilterView->setSamplingRate(m_pFiffInfo->sfreq);
 
         //Set stored filter settings from last session
-        m_pFilterView->setFilterParameters(settings.value(QString("RTESW/%1/filterHP").arg(t_sRTESWName), 5.0).toDouble(),
-                                                settings.value(QString("RTESW/%1/filterLP").arg(t_sRTESWName), 40.0).toDouble(),
-                                                settings.value(QString("RTESW/%1/filterOrder").arg(t_sRTESWName), 128).toInt(),
-                                                settings.value(QString("RTESW/%1/filterType").arg(t_sRTESWName), 2).toInt(),
-                                                settings.value(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESWName), 0).toInt(),
-                                                settings.value(QString("RTESW/%1/filterTransition").arg(t_sRTESWName), 5.0).toDouble(),
-                                                settings.value(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESWName), false).toBool(),
-                                                settings.value(QString("RTESW/%1/filterChannelType").arg(t_sRTESWName), "MEG").toString());
+        m_pFilterView->setFilterParameters(settings.value(QString("RTESW/%1/filterHP").arg(t_sRTESName), 5.0).toDouble(),
+                                                settings.value(QString("RTESW/%1/filterLP").arg(t_sRTESName), 40.0).toDouble(),
+                                                settings.value(QString("RTESW/%1/filterOrder").arg(t_sRTESName), 128).toInt(),
+                                                settings.value(QString("RTESW/%1/filterType").arg(t_sRTESName), 2).toInt(),
+                                                settings.value(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESName), 0).toInt(),
+                                                settings.value(QString("RTESW/%1/filterTransition").arg(t_sRTESName), 5.0).toDouble(),
+                                                settings.value(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESName), false).toBool(),
+                                                settings.value(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), "MEG").toString());
 
         //
         //-------- Init channel selection manager --------
         //
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
-        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>(new ChannelSelectionView(this, m_pChInfoModel));
-
-        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
-                this, &RealTimeEvokedSetWidget::showSelectedChannelsOnly);
+        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(this, m_pChInfoModel, Qt::Window);
 
         //Connect channel info model
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
@@ -472,10 +428,7 @@ void RealTimeEvokedSetWidget::init()
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
         m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
-
-        m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESWName), "babymeg-mag-inner-layer.lout").toString());
-
-        m_pActionSelectSensors->setVisible(true);
+        m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
         //
         //-------- Init quick control widget --------
@@ -483,18 +436,16 @@ void RealTimeEvokedSetWidget::init()
         QStringList slFlags;
         slFlags <<  "projections" << "compensators" << "filter" << "scaling" << "modalities" << "colors" << "averages";
 
-        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", slFlags));
-
-        //m_pQuickControlWidget = QuickControlWidget::SPtr(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>::create(m_pEvokedSetModel->getScaling(), m_pFiffInfo, "RT Averaging", slFlags);
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         //Handle scaling
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                this, &RealTimeEvokedSetWidget::broadcastScaling);
+                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
 
         //Handle background color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
-                this, &RealTimeEvokedSetWidget::onTableViewBackgroundColorChanged);
+                this, &RealTimeEvokedSetWidget::onBackgroundColorChanged);
 
         //Handle screenshot signals
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
@@ -509,8 +460,8 @@ void RealTimeEvokedSetWidget::init()
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
         //Handle modalities
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
-                this, &RealTimeEvokedSetWidget::broadcastSettings);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::modalitiesChanged,
+                m_pButterflyView, &ButterflyView::setModalities);
 
         //Handle filtering
         connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
@@ -519,70 +470,73 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
                 this, &RealTimeEvokedSetWidget::showFilterWidget);
 
-        //Handle updating the butterfly and layout plot
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pButterflyView.data(), &ButterflyView::updateView);
-
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                this, &RealTimeEvokedSetWidget::onSelectionChanged);
-
-        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTESW/%1/viewZoomFactor").arg(t_sRTESWName), 1.0).toFloat(),
-                                                     settings.value(QString("RTESW/%1/viewWindowSize").arg(t_sRTESWName), 10).toInt(),
-                                                     settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESWName), 95).toInt());
+        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTESW/%1/viewZoomFactor").arg(t_sRTESName), 1.0).toFloat(),
+                                                     settings.value(QString("RTESW/%1/viewWindowSize").arg(t_sRTESName), 10).toInt(),
+                                                     settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESName), 95).toInt());
 
         m_pQuickControlWidget->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
 
         QColor signalDefault = Qt::darkBlue;
         QColor butterflyBackgroundDefault = Qt::white;
         QColor layoutBackgroundDefault = Qt::black;
-        m_pQuickControlWidget->setSignalBackgroundColors(settings.value(QString("RTESW/%1/signalColor").arg(t_sRTESWName), signalDefault).value<QColor>(), settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), butterflyBackgroundDefault).value<QColor>());
-
-        m_pActionQuickControl->setVisible(true);
+        m_pQuickControlWidget->setSignalBackgroundColors(settings.value(QString("RTESW/%1/signalColor").arg(t_sRTESName),signalDefault).value<QColor>(),
+                                                         settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName),butterflyBackgroundDefault).value<QColor>());
 
         //Activate projections as default
         m_pEvokedSetModel->updateProjection();
 
         //
-        //-------- Init average scene --------
+        //-------- Init butterfly and layout plot --------
         //
         //Connect selection manager with average manager
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
-                this, &RealTimeEvokedSetWidget::channelSelectionManagerChanged);
+                m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
-                this, &RealTimeEvokedSetWidget::onSelectionChanged);
+                m_pAverageLayoutView, &AverageLayoutView::updateData);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                this, &RealTimeEvokedSetWidget::broadcastScaling);
+                m_pAverageLayoutView, &AverageLayoutView::setScaleMap);
 
         //Handle averages
         connect(this->m_pEvokedSetModel.data(), &EvokedSetModel::newAverageTypeReceived,
                 m_pQuickControlWidget.data(), &QuickControlWidget::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
-                m_pAverageLayoutView->getAverageScene().data(), &AverageScene::setAverageInformationMap);
+                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
-                m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
+                m_pButterflyView, &ButterflyView::setAverageInformationMap);
+
+        //Connect Quick Control Widget
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
+                m_pButterflyView, &ButterflyView::updateView);
+
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
+                m_pButterflyView, &ButterflyView::showSelectedChannelsOnly);
+
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
+                m_pAverageLayoutView, &AverageLayoutView::updateData);
+
+        m_pButterflyView->setModel(m_pEvokedSetModel);
+        m_pButterflyView->setChInfoModel(m_pChInfoModel);
+        m_pButterflyView->setModalities(m_pButterflyView->getModalities());
+
+        m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
+        m_pAverageLayoutView->setChInfoModel(m_pChInfoModel);
+        m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
+        m_pAverageLayoutView->setScaleMap(m_pEvokedSetModel->getScaling());
 
         QVariant data;
         QMap<double, QPair<QColor, QPair<QString,bool> > > emptyMap;
         data.setValue(emptyMap);
-        SCDISPLIB::AverageInfoMap map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESWName), data).value<SCDISPLIB::AverageInfoMap>();
+        SCDISPLIB::AverageInfoMap map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data).value<SCDISPLIB::AverageInfoMap>();
         m_pQuickControlWidget->setAverageInformationMapOld(map);
 
+        m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESName), layoutBackgroundDefault).value<QColor>());
+        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName), butterflyBackgroundDefault).value<QColor>());
+
         m_pChannelSelectionView->updateDataView();
-
-        broadcastScaling(m_qMapChScaling);
-
-        //
-        //-------- Init signal and background colors --------
-        //
-        QBrush backgroundBrush = m_pAverageLayoutView->getAverageScene()->backgroundBrush();
-        backgroundBrush.setColor(settings.value(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESWName), layoutBackgroundDefault).value<QColor>());
-        m_pAverageLayoutView->getAverageScene()->setBackgroundBrush(backgroundBrush);
-
-        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESWName), butterflyBackgroundDefault).value<QColor>());
 
         //Initialized
         m_bInitialized = true;
@@ -592,63 +546,13 @@ void RealTimeEvokedSetWidget::init()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetWidget::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
-{
-    //qDebug()<<" RealTimeEvokedWidget::channelSelectionManagerChanged - selectedChannelItems.size()" << selectedChannelItems.size();
-
-    //Repaint the average items in the average scene based on the input parameter selectedChannelItems
-    m_pAverageLayoutView->getAverageScene()->repaintItems(selectedChannelItems);
-
-    //call the onSelection function manually to replot the data for the givven average items
-    onSelectionChanged();
-
-    //fit everything in the view and update the scene
-    m_pAverageLayoutView->getAverageGraphicsView()->fitInView(m_pAverageLayoutView->getAverageScene()->sceneRect(), Qt::KeepAspectRatio);
-    m_pAverageLayoutView->getAverageScene()->update(m_pAverageLayoutView->getAverageScene()->sceneRect());
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 {
-    if(!m_pChannelSelectionView)
-        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>(new ChannelSelectionView);
+    if(!m_pChannelSelectionView) {
+        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create();
+    }
 
     m_pChannelSelectionView->show();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedSetWidget::showSelectedChannelsOnly(QStringList selectedChannels)
-{
-    QList<int> selectedChannelsIndexes;
-
-    for(int i = 0; i<selectedChannels.size(); i++)
-        selectedChannelsIndexes<<m_pChInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
-
-    m_pButterflyView->setSelectedChannels(selectedChannelsIndexes);
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedSetWidget::broadcastScaling(QMap<qint32,float> scaleMap)
-{
-    //Set the scale map received from the scale window
-    m_pAverageLayoutView->getAverageScene()->setScaleMap(scaleMap);
-    m_qMapChScaling = scaleMap;
-    m_pEvokedSetModel->setScaling(scaleMap);
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedSetWidget::broadcastSettings(QList<Modality> modalityList)
-{
-    m_qListModalities = modalityList;
-    m_pButterflyView->setSettings(modalityList);
 }
 
 
@@ -657,44 +561,6 @@ void RealTimeEvokedSetWidget::broadcastSettings(QList<Modality> modalityList)
 void RealTimeEvokedSetWidget::showQuickControlWidget()
 {
     m_pQuickControlWidget->show();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedSetWidget::onSelectionChanged()
-{
-    //Get current items from the average scene
-    QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageLayoutView->getAverageScene()->items();
-
-    //Set new data for all averageSceneItems
-    for(int i = 0; i<currentAverageSceneItems.size(); i++) {
-        AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
-
-        averageSceneItemTemp->m_lAverageData.clear();
-
-        //Get only the necessary data from the average model (use column 2)
-        QList<QPair<double, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, DISPLIB::RowVectorPair> > >();
-
-        //Get the averageScenItem specific data row
-        int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
-
-        if(channelNumber != -1) {
-            averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
-            averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
-            averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pRTESet->getNumPreStimSamples();
-
-            if(!averageData.isEmpty()) {
-                averageSceneItemTemp->m_firstLastSample.second = averageData.first().second.second - m_pRTESet->getNumPreStimSamples();
-            }
-
-            averageSceneItemTemp->m_iChannelNumber = channelNumber;
-            averageSceneItemTemp->m_iTotalNumberChannels = m_pFiffInfo->ch_names.size();
-            averageSceneItemTemp->m_lAverageData = averageData;
-        }
-    }
-
-    m_pAverageLayoutView->getAverageScene()->update();
 }
 
 
@@ -717,13 +583,11 @@ void RealTimeEvokedSetWidget::showFilterWidget(bool state)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetWidget::onTableViewBackgroundColorChanged(const QColor& backgroundColor)
+void RealTimeEvokedSetWidget::onBackgroundColorChanged(const QColor& backgroundColor)
 {
     //Handle the butterfly plot and 2d layout plot differently
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        QBrush backgroundBrush = m_pAverageLayoutView->getAverageScene()->backgroundBrush();
-        backgroundBrush.setColor(backgroundColor);
-        m_pAverageLayoutView->getAverageScene()->setBackgroundBrush(backgroundBrush);
+        m_pAverageLayoutView->setBackgroundColor(backgroundColor);
     }
 
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
@@ -749,21 +613,13 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
         if(imageType.contains("SVG"))
         {
             QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
-            // Generate screenshot
-            QSvgGenerator svgGen;
-            svgGen.setFileName(fileName);
-            QRectF rect = m_pAverageLayoutView->getAverageScene()->itemsBoundingRect();
-            svgGen.setSize(QSize(rect.width(), rect.height()));
-
-            QPainter painter(&svgGen);
-            m_pAverageLayoutView->getAverageScene()->render(&painter);
+            m_pAverageLayoutView->takeScreenshot(fileName);
         }
 
         if(imageType.contains("PNG"))
         {
             QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
-            QPixmap pixMap = QPixmap::grabWidget(m_pAverageLayoutView);
-            pixMap.save(fileName);
+            m_pAverageLayoutView->takeScreenshot(fileName);
         }
     }
 
@@ -771,36 +627,15 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
         if(imageType.contains("SVG"))
         {
             QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
-
-            // Generate screenshot
-            QSvgGenerator svgGen;
-            svgGen.setFileName(fileName);
-            svgGen.setSize(m_pButterflyView->size());
-            svgGen.setViewBox(m_pButterflyView->rect());
-
-            m_pButterflyView->render(&svgGen);
+            m_pButterflyView->takeScreenshot(fileName);
         }
 
         if(imageType.contains("PNG"))
         {
             QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
-
-            QImage image(m_pButterflyView->size(), QImage::Format_ARGB32);
-            image.fill(Qt::transparent);
-
-            QPainter painter(&image);
-            m_pButterflyView->render(&painter);
-            image.save(fileName);
+            m_pButterflyView->takeScreenshot(fileName);
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedSetWidget::wheelEvent(QWheelEvent * event)
-{
-    Q_UNUSED(event)
 }
 
 

@@ -42,6 +42,7 @@
 #include "butterflyview.h"
 
 #include "helpers/evokedsetmodel.h"
+#include "helpers/chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -51,6 +52,7 @@
 
 #include <QPainter>
 #include <QDebug>
+#include <QSvgGenerator>
 
 
 //*************************************************************************************************************
@@ -66,8 +68,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ButterflyView::ButterflyView(QWidget *parent)
-: QWidget(parent)
+ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
+: QWidget(parent, f)
 , m_pEvokedModel(NULL)
 , m_bIsInit(false)
 , m_iNumChannels(-1)
@@ -112,6 +114,157 @@ void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bo
     }
 
     update();
+}
+
+
+//*************************************************************************************************************
+
+QList<Modality> ButterflyView::getModalities()
+{
+    return m_qListModalities;
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setModalities(const QList<Modality>& p_qListModalities)
+{
+    m_qListModalities = p_qListModalities;
+
+    for(qint32 i = 0; i < m_qListModalities.size(); ++i)
+    {
+        if(m_qListModalities[i].m_sName == ("GRAD"))
+        {
+            m_bShowGRAD = m_qListModalities[i].m_bActive;
+            m_fMaxGRAD = m_qListModalities[i].m_fNorm;
+        }
+
+        if(m_qListModalities[i].m_sName == ("MAG"))
+        {
+            m_bShowMAG = m_qListModalities[i].m_bActive;
+            m_fMaxMAG = m_qListModalities[i].m_fNorm;
+        }
+        if(m_qListModalities[i].m_sName == ("EEG"))
+        {
+            m_bShowEEG = m_qListModalities[i].m_bActive;
+            m_fMaxEEG = m_qListModalities[i].m_fNorm;
+
+        }
+        if(m_qListModalities[i].m_sName == ("EOG"))
+        {
+            m_bShowEOG = m_qListModalities[i].m_bActive;
+            m_fMaxEOG = m_qListModalities[i].m_fNorm;
+
+        }
+        if(m_qListModalities[i].m_sName == ("MISC"))
+        {
+            m_bShowMISC = m_qListModalities[i].m_bActive;
+            m_fMaxMISC = m_qListModalities[i].m_fNorm;
+
+        }
+    }
+
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
+{
+    m_lSelectedChannels = selectedChannels;
+
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::updateView()
+{
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setBackgroundColor(const QColor& backgroundColor)
+{
+    m_colCurrentBackgroundColor = backgroundColor;
+
+    update();
+}
+
+
+//*************************************************************************************************************
+
+const QColor& ButterflyView::getBackgroundColor()
+{
+    return m_colCurrentBackgroundColor;
+}
+
+
+
+//*************************************************************************************************************
+
+void ButterflyView::takeScreenshot(const QString& fileName)
+{
+    if(fileName.contains(".svg", Qt::CaseInsensitive))
+    {
+        // Generate screenshot
+        QSvgGenerator svgGen;
+        svgGen.setFileName(fileName);
+        svgGen.setSize(this->size());
+        svgGen.setViewBox(this->rect());
+
+        this->render(&svgGen);
+    }
+
+    if(fileName.contains(".png", Qt::CaseInsensitive))
+    {
+        QImage image(this->size(), QImage::Format_ARGB32);
+        image.fill(Qt::transparent);
+
+        QPainter painter(&image);
+        this->render(&painter);
+        image.save(fileName);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+{
+    m_qMapAverageColor = mapAvr;
+
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setChInfoModel(QSharedPointer<ChInfoModel> &pChInfoModel)
+{
+    m_pChInfoModel = pChInfoModel;
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::showSelectedChannelsOnly(QStringList selectedChannels)
+{
+    if(!m_pChInfoModel) {
+        qDebug() << "ButterflyView::showSelectedChannelsOnly - m_pChInfoModel is NULL. Returning. ";
+        return;
+    }
+
+    QList<int> selectedChannelsIndexes;
+
+    for(int i = 0; i<selectedChannels.size(); i++)
+        selectedChannelsIndexes<<m_pChInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
+
+    setSelectedChannels(selectedChannelsIndexes);
 }
 
 
@@ -435,90 +588,3 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
         }
     }
 }
-
-
-//*************************************************************************************************************
-
-void ButterflyView::setSettings(const QList<Modality>& p_qListModalities)
-{
-    for(qint32 i = 0; i < p_qListModalities.size(); ++i)
-    {
-        if(p_qListModalities[i].m_sName == ("GRAD"))
-        {
-            m_bShowGRAD = p_qListModalities[i].m_bActive;
-            m_fMaxGRAD = p_qListModalities[i].m_fNorm;
-        }
-
-        if(p_qListModalities[i].m_sName == ("MAG"))
-        {
-            m_bShowMAG = p_qListModalities[i].m_bActive;
-            m_fMaxGRAD = p_qListModalities[i].m_fNorm;
-        }
-        if(p_qListModalities[i].m_sName == ("EEG"))
-        {
-            m_bShowEEG = p_qListModalities[i].m_bActive;
-            m_fMaxEEG = p_qListModalities[i].m_fNorm;
-
-        }
-        if(p_qListModalities[i].m_sName == ("EOG"))
-        {
-            m_bShowEOG = p_qListModalities[i].m_bActive;
-            m_fMaxEOG = p_qListModalities[i].m_fNorm;
-
-        }
-        if(p_qListModalities[i].m_sName == ("MISC"))
-        {
-            m_bShowMISC = p_qListModalities[i].m_bActive;
-            m_fMaxMISC = p_qListModalities[i].m_fNorm;
-
-        }
-    }
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
-{
-    m_lSelectedChannels = selectedChannels;
-
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ButterflyView::updateView()
-{
-    update();
-}
-
-
-//*************************************************************************************************************
-
-void ButterflyView::setBackgroundColor(const QColor& backgroundColor)
-{
-    m_colCurrentBackgroundColor = backgroundColor;
-
-    update();
-}
-
-
-//*************************************************************************************************************
-
-const QColor& ButterflyView::getBackgroundColor()
-{
-    return m_colCurrentBackgroundColor;
-}
-
-
-//*************************************************************************************************************
-
-void ButterflyView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
-{
-    m_qMapAverageColor = mapAvr;
-
-    update();
-}
-

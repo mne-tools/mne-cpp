@@ -113,7 +113,8 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterView becomes a window. If parent is another widget, FilterView becomes a child window inside parent. FilterView is deleted when its parent is deleted.
     */
-    FilterView(QWidget *parent = 0, Qt::WindowFlags type = 0);
+    FilterView(QWidget *parent = 0,
+               Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
