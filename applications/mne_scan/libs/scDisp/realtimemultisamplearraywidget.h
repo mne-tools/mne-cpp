@@ -70,8 +70,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QToolBox;
-
 namespace DISPLIB {
     class ChannelSelectionView;
     class FilterView;
@@ -175,21 +173,19 @@ private slots:
 
 private:
     QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;          /**< quick control widget. */
-    QSharedPointer<DISPLIB::ChInfoModel>                    m_pChInfoModel;                 /**< channel info model. */
     QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
-    QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;      /**< ChannelSelectionView. */
+    QSharedPointer<DISPLIB::ChInfoModel>                    m_pChInfoModel;                 /**< channel info model. */
+    QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::FilterView>                     m_pFilterWindow;                /**< Filter window. */
+    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    bool                                        m_bInitialized;                 /**< Is Initialized */
-    qint32                                      m_iMaxFilterTapSize;            /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+    QPointer<DISPLIB::ChannelDataView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
+    QPointer<QAction>                                       m_pActionSelectSensors;         /**< show roi select widget */
+    QPointer<QAction>                                       m_pActionHideBad;               /**< Hide bad channels. */
+    QPointer<QAction>                                       m_pActionQuickControl;          /**< Show quick control widget. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
-    QPointer<DISPLIB::ChannelDataView>          m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
-    QPointer<QToolBox>                          m_pToolBox;                     /**< The toolbox which holds the table view and real-time interpolation plot. */
-
-    QAction*                                    m_pActionSelectSensors;         /**< show roi select widget */
-    QAction*                                    m_pActionHideBad;               /**< Hide bad channels. */
-    QAction*                                    m_pActionQuickControl;          /**< Show quick control widget. */
+    bool                                                    m_bInitialized;                 /**< Is Initialized */
+    qint32                                                  m_iMaxFilterTapSize;            /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
  };
 
 } // NAMESPACE SCDISPLIB

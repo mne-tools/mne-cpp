@@ -91,15 +91,15 @@ ChannelDataModel::ChannelDataModel(QObject *parent)
 , m_iDetectedTriggers(0)
 , m_iCurrentSampleFreeze(0)
 , m_iCurrentTriggerChIndex(0)
+, m_pFiffInfo(FiffInfo::SPtr::create())
 {
-    init();
 }
 
 //*************************************************************************************************************
 //virtual functions
 int ChannelDataModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_pFiffInfo->chs.empty()) {
+    if(!m_pFiffInfo->chs.isEmpty()) {
         return m_pFiffInfo->chs.size();
     } else {
         return 0;
@@ -191,8 +191,9 @@ QVariant ChannelDataModel::data(const QModelIndex &index, int role) const
         } // end column check
 
         //******** first column (chname) ********
-        if(index.column() == 2 && role == Qt::DisplayRole)
+        if(index.column() == 2 && role == Qt::DisplayRole) {
             return QVariant(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[row]));
+        }
 
     } // end index.valid() check
 
@@ -230,14 +231,6 @@ QVariant ChannelDataModel::headerData(int section, Qt::Orientation orientation, 
     }
 
     return QVariant();
-}
-
-
-//*************************************************************************************************************
-
-void ChannelDataModel::init()
-{
-    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
 }
 
 
@@ -306,17 +299,19 @@ void ChannelDataModel::initSphara()
 
 void ChannelDataModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 {
-    if(p_pFiffInfo)
-    {
+    if(p_pFiffInfo) {
         RowVectorXi sel;// = RowVectorXi(0,0);
         QStringList emptyExclude;
 
-        if(p_pFiffInfo->bads.size() > 0)
+        if(p_pFiffInfo->bads.size() > 0) {
             sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
+        }
 
-        m_vecBadIdcs = sel;
+        m_vecBadIdcs = sel;       
 
         m_pFiffInfo = p_pFiffInfo;
+
+        resetSelection();
 
         //Resize data matrix without touching the stored values
         m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
@@ -351,12 +346,14 @@ void ChannelDataModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         QStringList filterChannels;
 
         if(visibleInit > m_pFiffInfo->chs.size()) {
-            while(visibleInit>m_pFiffInfo->chs.size())
+            while(visibleInit>m_pFiffInfo->chs.size()) {
                 visibleInit--;
+            }
         }
 
-        for(qint32 b = 0; b < visibleInit; ++b)
+        for(qint32 b = 0; b < visibleInit; ++b) {
             filterChannels.append(m_pFiffInfo->ch_names.at(b));
+        }
 
         createFilterChannelList(filterChannels);
 
@@ -368,8 +365,7 @@ void ChannelDataModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         //Init the sphara operators
         initSphara();
-    }
-    else {
+    } else {
         m_vecBadIdcs = RowVectorXi(0,0);
         m_matProj = MatrixXd(0,0);
         m_matComp = MatrixXd(0,0);
@@ -578,14 +574,12 @@ void ChannelDataModel::addData(const QList<MatrixXd> &data)
 
 fiff_int_t ChannelDataModel::getKind(qint32 row) const
 {
-    if(row < m_qMapIdxRowSelection.size())
-    {
+    if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pFiffInfo->chs.at(row).kind;
+        return m_pFiffInfo->chs.at(chRow).kind;
     }
-    else
-        return 0;
 
+    return 0;
 }
 
 
@@ -593,13 +587,12 @@ fiff_int_t ChannelDataModel::getKind(qint32 row) const
 
 fiff_int_t ChannelDataModel::getUnit(qint32 row) const
 {
-    if(row < m_qMapIdxRowSelection.size())
-    {
+    if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pFiffInfo->chs.at(row).unit;
+        return m_pFiffInfo->chs.at(chRow).unit;
     }
-    else
-        return FIFF_UNIT_NONE;
+
+    return FIFF_UNIT_NONE;
 }
 
 
@@ -607,13 +600,12 @@ fiff_int_t ChannelDataModel::getUnit(qint32 row) const
 
 fiff_int_t ChannelDataModel::getCoil(qint32 row) const
 {
-    if(row < m_qMapIdxRowSelection.size())
-    {
+    if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pFiffInfo->chs.at(row).chpos.coil_type;
+        return m_pFiffInfo->chs.at(chRow).chpos.coil_type;
     }
-    else
-        return FIFFV_COIL_NONE;
+
+    return FIFFV_COIL_NONE;
 }
 
 
@@ -646,8 +638,9 @@ void ChannelDataModel::hideRows(const QList<qint32> &selection)
     beginResetModel();
 
     for(qint32 i = 0; i < selection.size(); ++i) {
-        if(m_qMapIdxRowSelection.contains(selection.at(i)))
+        if(m_qMapIdxRowSelection.contains(selection.at(i))) {
             m_qMapIdxRowSelection.remove(selection.at(i));
+        }
     }
 
     emit newSelection(selection);
@@ -664,8 +657,9 @@ void ChannelDataModel::resetSelection()
 
     m_qMapIdxRowSelection.clear();
 
-    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
+    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         m_qMapIdxRowSelection.insert(i,i);
+    }
 
     endResetModel();
 }
@@ -690,6 +684,7 @@ void ChannelDataModel::toggleFreeze(const QModelIndex &)
     QModelIndex topLeft = this->index(0,1);
     QModelIndex bottomRight = this->index(m_pFiffInfo->chs.size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
+
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
@@ -708,11 +703,8 @@ void ChannelDataModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 void ChannelDataModel::updateProjection()
 {
-    //
     //  Update the SSP projector
-    //
-    if(m_pFiffInfo)
-    {
+    if(m_pFiffInfo) {
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         m_bProjActivated = false;
         for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
@@ -726,8 +718,9 @@ void ChannelDataModel::updateProjection()
         qDebug() << "ChannelDataModel::updateProjection - New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j) {
             m_matProj.col(m_vecBadIdcs[j]).setZero();
+        }
 
 //        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
 //        std::cout << "Proj\n";
@@ -754,8 +747,9 @@ void ChannelDataModel::updateProjection()
         }
 
         m_matSparseProjMult = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
-        if(tripletList.size() > 0)
+        if(tripletList.size() > 0) {
             m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
+        }
 
         //Create full multiplication matrix
         m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
@@ -767,11 +761,8 @@ void ChannelDataModel::updateProjection()
 
 void ChannelDataModel::updateCompensator(int to)
 {
-    //
     //  Update the compensator
-    //
-    if(m_pFiffInfo)
-    {
+    if(m_pFiffInfo) {
         if(to == 0) {
             m_bCompActivated = false;
         } else {
@@ -811,8 +802,9 @@ void ChannelDataModel::updateCompensator(int to)
         }
 
         m_matSparseCompMult = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
-        if(tripletList.size() > 0)
+        if(tripletList.size() > 0) {
             m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
+        }
 
         //Create full multiplication matrix
         m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
@@ -1035,8 +1027,7 @@ void ChannelDataModel::markChBad(QModelIndex ch, bool status)
         if(!m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name))
             m_pFiffInfo->bads.append(chInfolist[ch.row()].ch_name);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as bad.";
-    }
-    else if(m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name)) {
+    } else if(m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name)) {
         int index = m_pFiffInfo->bads.indexOf(chInfolist[ch.row()].ch_name);
         m_pFiffInfo->bads.removeAt(index);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
@@ -1109,8 +1100,7 @@ void ChannelDataModel::markChBad(QModelIndexList chlist, bool status)
             if(!m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name))
                 m_pFiffInfo->bads.append(chInfolist[chlist[i].row()].ch_name);
             qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as bad.";
-        }
-        else {
+        } else {
             if(m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name)) {
                 int index = m_pFiffInfo->bads.indexOf(chInfolist[chlist[i].row()].ch_name);
                 m_pFiffInfo->bads.removeAt(index);
@@ -1131,9 +1121,10 @@ void ChannelDataModel::markChBad(QModelIndexList chlist, bool status)
 
 void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
-    for(int i = 0; i < channelDataTime.first.size(); ++i)
+    for(int i = 0; i < channelDataTime.first.size(); ++i) {
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
         channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    }
 }
 
 
@@ -1143,8 +1134,9 @@ void ChannelDataModel::filterChannelsConcurrently()
 {
     //std::cout<<"START ChannelDataModel::filterChannelsConcurrently"<<std::endl;
 
-    if(m_filterData.isEmpty())
+    if(m_filterData.isEmpty()) {
         return;
+    }
 
     //Create temporary filters with higher fft length because we are going to filter all available data at once for one time
     QList<FilterData> tempFilterList;
@@ -1177,9 +1169,9 @@ void ChannelDataModel::filterChannelsConcurrently()
             RowVectorXd datTemp(m_matDataRaw.row(i).cols() + 2 * m_iMaxFilterLength);
             datTemp << m_matDataRaw.row(i).head(m_iMaxFilterLength).reverse(), m_matDataRaw.row(i), m_matDataRaw.row(i).tail(m_iMaxFilterLength).reverse();
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(tempFilterList,QPair<int,RowVectorXd>(i,datTemp)));
-        }
-        else
+        } else {
             notFilterChannelIndex.append(i);
+        }
     }
 
     //Do the concurrent filtering
@@ -1196,8 +1188,9 @@ void ChannelDataModel::filterChannelsConcurrently()
     }
 
     //Fill filtered data with raw data if the channel was not filtered
-    for(int i = 0; i < notFilterChannelIndex.size(); ++i)
+    for(int i = 0; i < notFilterChannelIndex.size(); ++i) {
         m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matDataRaw.row(notFilterChannelIndex.at(i));
+    }
 
     if(!m_bIsFreezed) {
         m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
@@ -1213,18 +1206,20 @@ void ChannelDataModel::filterChannelsConcurrently(const MatrixXd &data, int iDat
 {
     //std::cout<<"START ChannelDataModel::filterChannelsConcurrently"<<std::endl;
 
-    if(iDataIndex >= m_matDataFiltered.cols() || data.cols() < m_iMaxFilterLength)
+    if(iDataIndex >= m_matDataFiltered.cols() || data.cols() < m_iMaxFilterLength) {
         return;
+    }
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
     QList<int> notFilterChannelIndex;
 
     for(qint32 i = 0; i < data.rows(); ++i) {
-        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name))
+        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data.row(i))));
-        else
+        } else {
             notFilterChannelIndex.append(i);
+            }
     }
 
     //Do the concurrent filtering

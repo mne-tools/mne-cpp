@@ -74,6 +74,10 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
+namespace UTILSLIB {
+    class FilterData;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -166,6 +170,8 @@ public:
     */
     void hideBadChannels();
 
+    bool getBadChannelHideStatus();
+
     //=========================================================================================================
     /**
     * Only shows the channels defined in the QStringList selectedChannels
@@ -180,7 +186,9 @@ public:
     *
     * @param [in] zoomFac  time window size;
     */
-    void zoomChanged(double zoomFac);
+    void setZoom(double zoomFac);
+
+    double getZoom();
 
     //=========================================================================================================
     /**
@@ -188,9 +196,92 @@ public:
     *
     * @param [in] T  time window size;
     */
-    void timeWindowChanged(int T);
+    void setWindowSize(int T);
+
+    int getWindowSize();
 
     void takeScreenshot(const QString& fileName);
+
+    //=========================================================================================================
+    /**
+    * Update the SSP projection
+    */
+    void updateProjection();
+
+    //=========================================================================================================
+    /**
+    * Update the compensator
+    *
+    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+    */
+    void updateCompensator(int to);
+
+    //=========================================================================================================
+    /**
+    * Update the SPHARA operator
+    *
+    * @param[in] state            The current state of teh SPHARA tool
+    */
+    void updateSpharaActivation(bool state);
+
+    //=========================================================================================================
+    /**
+    * Update the SPHARA operator
+    *
+    * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
+    * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
+    * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
+    */
+    void updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
+
+    //=========================================================================================================
+    /**
+    * Filter parameters changed
+    *
+    * @param[in] filterData    list of the currently active filter
+    */
+    void filterChanged(QList<UTILSLIB::FilterData> filterData);
+
+    //=========================================================================================================
+    /**
+    * Filter avtivated
+    *
+    * @param[in] state    filter on/off flag
+    */
+    void filterActivated(bool state);
+
+    //=========================================================================================================
+    /**
+    * Sets the type of channel which are to be filtered
+    *
+    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+    */
+    void setFilterChannelType(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * markChBad marks the selected channels as bad/good in m_chInfolist
+    *
+    * @param colorMap       color for each trigger channel
+    * @param activ          real time trigger detection active
+    * @param triggerCh      current trigger channel to scan
+    * @param threshold      threshold for the detection process
+    */
+    void triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold);
+
+    //=========================================================================================================
+    /**
+    * distanceTimeSpacerChanged changes the distance of the time spacers
+    *
+    * @param value the new distance for the time spacers
+    */
+    void distanceTimeSpacerChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * resetTriggerCounter resets the trigger counter
+    */
+    void resetTriggerCounter();
 
 protected:
     //=========================================================================================================
@@ -258,6 +349,12 @@ signals:
     * @param activeRow  the current row which the mouse is moved over
     */
     void markerMoved(QPoint position, int activeRow);
+
+    //=========================================================================================================
+    /**
+    * Emmited when trigger detection was performed
+    */
+    void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
     void channelMarkingChanged();
 };
