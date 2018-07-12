@@ -72,6 +72,7 @@
 #include <QDate>
 #include <QVBoxLayout>
 #include <QCheckBox>
+#include <QGraphicsItem>
 
 
 //*************************************************************************************************************

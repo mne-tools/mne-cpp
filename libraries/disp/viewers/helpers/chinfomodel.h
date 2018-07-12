@@ -53,6 +53,7 @@
 
 #include <QAbstractTableModel>
 #include <QSharedPointer>
+#include <QPointF>
 
 
 //*************************************************************************************************************
