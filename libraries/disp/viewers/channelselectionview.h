@@ -74,6 +74,10 @@ namespace Ui {
     class ChannelSelectionViewWidget;
 } //This must be defined outside of the DISPLIB namespace
 
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -173,7 +177,7 @@ public:
     /**
     * call this whenever a new file was loaded.
     */
-    void newFiffFileLoaded(FiffInfo::SPtr& pFiffInfo);
+    void newFiffFileLoaded(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**

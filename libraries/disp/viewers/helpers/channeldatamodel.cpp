@@ -41,15 +41,30 @@
 
 #include "channeldatamodel.h"
 
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_info.h>
+
+#include <utils/mnemath.h>
+#include <utils/detecttrigger.h>
+#include <utils/ioutils.h>
+#include <utils/filterTools/sphara.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QBrush>
-#include <QThread>
+#include <QCoreApplication>
+#include <QtConcurrent>
+#include <QFuture>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -61,7 +76,6 @@ using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -297,7 +311,7 @@ void ChannelDataModel::initSphara()
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
+void ChannelDataModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo)
 {
     if(p_pFiffInfo) {
         RowVectorXi sel;// = RowVectorXi(0,0);

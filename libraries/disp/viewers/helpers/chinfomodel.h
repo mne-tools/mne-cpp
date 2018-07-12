@@ -35,8 +35,8 @@
 *
 */
 
-#ifndef CHINFOCLASS_H
-#define CHINFOCLASS_H
+#ifndef CHINFOMODEL_H
+#define CHINFOMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,9 +44,6 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
-#include "mneoperator.h"
-
-#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -55,7 +52,7 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
-#include <QVector3D>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -68,17 +65,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -95,7 +87,8 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-//Declare type roles
+class MNEOperator;
+
 namespace ChInfoModelRoles
 {
     enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
@@ -124,7 +117,7 @@ public:
     typedef QSharedPointer<ChInfoModel> SPtr;              /**< Shared pointer type for ChInfoModel. */
     typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
 
-    ChInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent = 0);
+    ChInfoModel(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo, QObject *parent = 0);
     ChInfoModel(QObject *parent = 0);
 
     //=========================================================================================================
@@ -146,7 +139,7 @@ public:
     *
     * @param fiffInfo fiff info variabel.
     */
-    void fiffInfoChanged(FiffInfo::SPtr& pFiffInfo);
+    void fiffInfoChanged(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -190,7 +183,34 @@ public:
     */
     int getIndexFromMappedChName(QString chName);
 
+    //=========================================================================================================
+    /**
+    * Returns bad channel list.
+    *
+    * @return the bad channel list.
+    */
     QStringList getBadChannelList();
+
+protected:
+    //=========================================================================================================
+    /**
+    * clearModel clears all model's members
+    */
+    void clearModel();
+
+    //=========================================================================================================
+    /**
+    * Maps the currently loaded channels to the loaded layout file
+    */
+    void mapLayoutToChannels();
+
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The fiff info of the currently loaded fiff file. */
+
+    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
+    QMap<QString,QPointF>                       m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
+
+    QStringList                 m_aliasNames;           /**< list of given channel aliases. */
+    QStringList                 m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
 
 signals:
     //=========================================================================================================
@@ -199,30 +219,8 @@ signals:
     *
     */
     void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
-
-protected:
-    //=========================================================================================================
-    /**
-    * clearModel clears all model's members
-    *
-    */
-    void clearModel();
-
-    //=========================================================================================================
-    /**
-    * Maps the currently loaded channels to the loaded layout file
-    *
-    */
-    void mapLayoutToChannels();
-
-    FiffInfo::SPtr          m_pFiffInfo;            /**< The fiff info of the currently loaded fiff file. */
-    QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
-    QStringList             m_aliasNames;           /**< list of given channel aliases. */
-    QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
-    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
-
 };
 
 } // NAMESPACE DISPLIB
 
-#endif // CHINFOCLASS_H
+#endif // CHINFOMODEL_H

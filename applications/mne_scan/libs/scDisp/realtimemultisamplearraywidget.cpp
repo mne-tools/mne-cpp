@@ -58,6 +58,7 @@
 
 #include <QMenu>
 #include <QAction>
+#include <QDate>
 #include <QHeaderView>
 
 

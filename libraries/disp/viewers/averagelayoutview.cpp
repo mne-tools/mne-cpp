@@ -43,6 +43,9 @@
 #include "helpers/averagescene.h"
 #include "helpers/evokedsetmodel.h"
 #include "helpers/chinfomodel.h"
+#include "helpers/averagesceneitem.h"
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -54,7 +57,7 @@
 #include <QVBoxLayout>
 #include <QGraphicsView>
 #include <QSvgGenerator>
-
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -63,6 +66,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

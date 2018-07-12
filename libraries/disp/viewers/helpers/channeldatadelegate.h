@@ -33,8 +33,16 @@
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYDELEGATE_H
-#define REALTIMEMULTISAMPLEARRAYDELEGATE_H
+#ifndef CHANNELDATADELEGATE_H
+#define CHANNELDATADELEGATE_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../disp_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,9 +50,6 @@
 //=============================================================================================================
 
 #include <QAbstractItemDelegate>
-#include <QTableView>
-#include <QMap>
-#include <QDebug>
 #include <QPen>
 
 
@@ -53,7 +58,11 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -67,18 +76,16 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE TYPEDEFS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-typedef QPair<const double*,qint32> RowVectorPair;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE TYPEDEFS
 //=============================================================================================================
 
-using namespace Eigen;
+typedef QPair<const double*,qint32> RowVectorPair;
 
 
 //=============================================================================================================
@@ -87,7 +94,7 @@ using namespace Eigen;
 *
 * @brief The ChannelDataDelegate class represents a RTMSA delegate which creates the plot paths
 */
-class ChannelDataDelegate : public QAbstractItemDelegate
+class DISPSHARED_EXPORT ChannelDataDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
@@ -140,7 +147,6 @@ public:
     */
     void markerMoved(QPoint position, int activeRow);
 
-public slots:
     //=========================================================================================================
     /**
     * Set the signal color.
@@ -233,32 +239,30 @@ private:
     */
     void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
 
-    //Settings
-//    QSettings m_qSettings;
-
-    // Scaling
-    double      m_dMaxValue;        /**< Maximum value of the data to plot. */
-    double      m_dScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
-    int         m_iActiveRow;       /**< The current row which the mouse is moved over. */
 
     QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
     QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */
 
-    QMap<double,QColor> m_mapTriggerColors;
+    double              m_dMaxValue;        /**< Maximum value of the data to plot. */
+    double              m_dScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    int                 m_iActiveRow;       /**< The current row which the mouse is moved over. */
 
-    QPen        m_penMarker;            /**< Pen for drawing the data marker. */
-    QPen        m_penGrid;              /**< Pen for drawing the data grid. */
-    QPen        m_penTimeSpacers;       /**< Pen for drawing the time spacer. */
-    QPen        m_penFreeze;            /**< Pen for drawing the data when freeze is on.  */
-    QPen        m_penFreezeSelected;    /**< Pen for drawing the data when freeze is on and channel is selected.  */
-    QPen        m_penFreezeBad;         /**< Pen for drawing the bad data when freeze is on.  */
-    QPen        m_penFreezeSelectedBad; /**< Pen for drawing the bad data when freeze is on and channel is selected.  */
-    QPen        m_penNormal;            /**< Pen for drawing the data when data is plotted normally without freeze on.  */
-    QPen        m_penNormalSelected;    /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected.  */
-    QPen        m_penNormalBad;         /**< Pen for drawing the data when bad data is plotted normally without freeze on.  */
-    QPen        m_penNormalSelectedBad; /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected.  */
+    QPen        m_penMarker;                /**< Pen for drawing the data marker. */
+    QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
+    QPen        m_penTimeSpacers;           /**< Pen for drawing the time spacer. */
+    QPen        m_penFreeze;                /**< Pen for drawing the data when freeze is on.  */
+    QPen        m_penFreezeSelected;        /**< Pen for drawing the data when freeze is on and channel is selected.  */
+    QPen        m_penFreezeBad;             /**< Pen for drawing the bad data when freeze is on.  */
+    QPen        m_penFreezeSelectedBad;     /**< Pen for drawing the bad data when freeze is on and channel is selected.  */
+    QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on.  */
+    QPen        m_penNormalSelected;        /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected.  */
+    QPen        m_penNormalBad;             /**< Pen for drawing the data when bad data is plotted normally without freeze on.  */
+    QPen        m_penNormalSelectedBad;     /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected.  */
+
+    QMap<double,QColor> m_mapTriggerColors; /**< Colors per trigger. */
+
 };
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYDELEGATE_H
+#endif // CHANNELDATADELEGATE_H
