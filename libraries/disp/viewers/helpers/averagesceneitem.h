@@ -43,9 +43,6 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
-#include <iostream>
-#include <Eigen/Core>
-#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -54,20 +51,12 @@
 //=============================================================================================================
 
 #include <QGraphicsObject>
-#include <QString>
-#include <QColor>
-#include <QPair>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -78,12 +67,24 @@ using namespace Eigen;
 namespace DISPLIB
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
+
 typedef QPair<const double*,qint32> RowVectorPair;
 
 
 //=============================================================================================================
 /**
-* AverageSceneItem...
+* DECLARE CLASS AverageSceneItem
 *
 * @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
@@ -126,8 +127,8 @@ public:
     int                                             m_iChannelUnit;             /**< The channel unit.*/
     int                                             m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
     int                                             m_iFontTextSize;            /**< The font text size of the electrode names.*/
-    int                                             m_iMaxWidth;
-    int                                             m_iMaxHeigth;
+    int                                             m_iMaxWidth;                /**< The max width. */
+    int                                             m_iMaxHeigth;               /**< The max heigth. */
 
     QPointF                                         m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
     QList<QColor>                                   m_lAverageColors;           /**< The current average color.*/
@@ -136,9 +137,9 @@ public:
     QPair<int,int>                                  m_firstLastSample;          /**< The first and last sample.*/
     QMap<qint32,float>                              m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
 
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;             /**< Average colors and names. */
+    QRectF                                          m_rectBoundingRect;         /**< The bounding rect. */
 
-    QRectF                                          m_rectBoundingRect;
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;     /**< Average colors and names. */
 
 protected:
     //=========================================================================================================
@@ -158,6 +159,10 @@ protected:
     void paintStimLine(QPainter *painter);
 
 signals:
+    //=========================================================================================================
+    /**
+    * Signal to request a scene update.
+    */
     void sceneUpdateRequested();
 };
 

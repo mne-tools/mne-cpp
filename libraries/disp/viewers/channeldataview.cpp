@@ -44,6 +44,7 @@
 #include "helpers/channeldatamodel.h"
 
 #include <utils/filterTools/filterdata.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************

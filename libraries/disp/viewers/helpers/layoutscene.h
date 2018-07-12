@@ -51,18 +51,23 @@
 //=============================================================================================================
 
 #include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGraphicsSceneMouseEvent>
-#include <QRubberBand>
-#include <QWidget>
-#include <QMouseEvent>
-#include <QGestureEvent>
-#include <QPanGesture>
-#include <QPinchGesture>
-#include <QGraphicsSceneEvent>
-#include <QMutableListIterator>
-#include <QScrollBar>
-#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QGestureEvent;
+class QPanGesture;
+class QPinchGesture;
+class QSwipeGesture;
 
 
 //*************************************************************************************************************
@@ -74,9 +79,15 @@ namespace DISPLIB
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* LayoutScene...
+* DECLARE CLASS LayoutScene
 *
 * @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting. This class handles all the user interaction features (subclass in order to use).
 */
@@ -92,12 +103,6 @@ public:
     LayoutScene(QGraphicsView* view, QObject *parent = 0);
 
 protected:
-    QGraphicsView*                  m_qvView;                       /**< The view which visualizes this scene.*/
-    bool                            m_bDragMode;                    /**< Flag whether the drag mode is activated.*/
-    //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
-    QPointF                         m_mousePressPosition;           /**< The current mouse press location.*/
-    //QList<QGraphicsItem *>          m_selectedItems;                /**< The currently selected items during extended selection mode.*/
-
     //=========================================================================================================
     /**
     * Reimplemented wheel event.
@@ -178,6 +183,14 @@ protected:
     * @param [in] event the current event
     */
     bool eventFilter(QObject *object, QEvent *event);
+
+    QGraphicsView*                  m_qvView;                       /**< The view which visualizes this scene.*/
+    //QList<QGraphicsItem *>          m_selectedItems;                /**< The currently selected items during extended selection mode.*/
+
+    bool                            m_bDragMode;                    /**< Flag whether the drag mode is activated.*/
+    //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
+    QPointF                         m_mousePressPosition;           /**< The current mouse press location.*/
+
 };
 
 } // NAMESPACE DISPLIB

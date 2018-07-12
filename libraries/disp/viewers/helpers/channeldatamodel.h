@@ -42,14 +42,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_types.h>
-#include <fiff/fiff_info.h>
+#include "../../disp_global.h"
 
+#include <fiff/fiff_types.h>
 #include <utils/filterTools/filterdata.h>
-#include <utils/mnemath.h>
-#include <utils/detecttrigger.h>
-#include <utils/ioutils.h>
-#include <utils/filterTools/sphara.h>
 
 
 //*************************************************************************************************************
@@ -58,9 +54,7 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
-
-#include <QtConcurrent/QtConcurrent>
-#include <QFuture>
+#include <QSharedPointer>
 #include <QColor>
 
 
@@ -75,11 +69,31 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace UTILSLIB {
+    class FilterData;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -97,7 +111,7 @@ typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> Matr
 *
 * @brief The ChannelDataModel class implements the data access model for a real-time multi sample array data stream
 */
-class ChannelDataModel : public QAbstractTableModel
+class DISPSHARED_EXPORT ChannelDataModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
@@ -161,7 +175,7 @@ public:
     *
     * @param [in] p_pFiffInfo   The corresponding fiff information
     */
-    void setFiffInfo(FIFFLIB::FiffInfo::SPtr& p_pFiffInfo);
+    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>& p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -173,6 +187,12 @@ public:
     */
     void setSamplingInfo(float sps, int T, bool bSetZero = false);
 
+    //=========================================================================================================
+    /**
+    * Returns the last received data block.
+    *
+    * @return the last data block
+    */
     Eigen::MatrixXd getLastBlock();
 
     //=========================================================================================================
@@ -271,107 +291,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the number of vertical lines (one per second)
-    *
-    * @return number of vertical lines
-    */
-    inline qint32 numVLines() const;
-
-    //=========================================================================================================
-    /**
     * Toggle freeze for all channels when a channel is double clicked
     *
     * @param [in] index     of the channel which has been double clicked
     */
     void toggleFreeze(const QModelIndex &index);
-
-    //=========================================================================================================
-    /**
-    * Returns current freezing status
-    *
-    * @return the current freezing status
-    */
-    inline bool isFreezed() const;
-
-    //=========================================================================================================
-    /**
-    * Returns current scaling
-    *
-    * @return the current scaling
-    */
-    inline const QMap< qint32,float >& getScaling() const;
-
-    //=========================================================================================================
-    /**
-    * Returns current detected trigger flanks
-    *
-    * @return the current detected trigger flanks
-    */
-    inline QList<QPair<int,double> > getDetectedTriggers() const;
-
-    //=========================================================================================================
-    /**
-    * Returns old detected trigger flanks
-    *
-    * @return the old detected trigger flanks
-    */
-    inline QList<QPair<int, double> > getDetectedTriggersOld() const;
-
-    //=========================================================================================================
-    /**
-    * Returns current trigger color
-    *
-    * @return the current trigger color map fpr each detected type
-    */
-    inline QMap<double, QColor> getTriggerColor() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the current number for the time spacers
-    *
-    * @return the current number for the time spacers
-    */
-    inline int getNumberOfTimeSpacers() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the current trigger threshold
-    *
-    * @return the current trigger threshold
-    */
-    inline double getTriggerThreshold() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the current trigger name
-    *
-    * @return the current trigger name
-    */
-    inline QString getTriggerName() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the current trigger channel index
-    *
-    * @return the current trigger channel index
-    */
-    inline int getCurrentTriggerIndex() const;
-
-    //=========================================================================================================
-    /**
-    * Returns whether trigger detection is active or not
-    *
-    * @return whether trigger detection is active or not
-    */
-    inline bool triggerDetectionActive() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the current overlap add delay
-    *
-    * @return the current overlap add delay
-    */
-    inline int getCurrentOverlapAddDelay() const;
 
     //=========================================================================================================
     /**
@@ -487,6 +411,102 @@ public:
     * resetTriggerCounter resets the trigger counter
     */
     void resetTriggerCounter();
+
+    //=========================================================================================================
+    /**
+    * Returns the number of vertical lines (one per second)
+    *
+    * @return number of vertical lines
+    */
+    inline qint32 numVLines() const;
+
+    //=========================================================================================================
+    /**
+    * Returns current freezing status
+    *
+    * @return the current freezing status
+    */
+    inline bool isFreezed() const;
+
+    //=========================================================================================================
+    /**
+    * Returns current scaling
+    *
+    * @return the current scaling
+    */
+    inline const QMap< qint32,float >& getScaling() const;
+
+    //=========================================================================================================
+    /**
+    * Returns current detected trigger flanks
+    *
+    * @return the current detected trigger flanks
+    */
+    inline QList<QPair<int,double> > getDetectedTriggers() const;
+
+    //=========================================================================================================
+    /**
+    * Returns old detected trigger flanks
+    *
+    * @return the old detected trigger flanks
+    */
+    inline QList<QPair<int, double> > getDetectedTriggersOld() const;
+
+    //=========================================================================================================
+    /**
+    * Returns current trigger color
+    *
+    * @return the current trigger color map fpr each detected type
+    */
+    inline QMap<double, QColor> getTriggerColor() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current number for the time spacers
+    *
+    * @return the current number for the time spacers
+    */
+    inline int getNumberOfTimeSpacers() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current trigger threshold
+    *
+    * @return the current trigger threshold
+    */
+    inline double getTriggerThreshold() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current trigger name
+    *
+    * @return the current trigger name
+    */
+    inline QString getTriggerName() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current trigger channel index
+    *
+    * @return the current trigger channel index
+    */
+    inline int getCurrentTriggerIndex() const;
+
+    //=========================================================================================================
+    /**
+    * Returns whether trigger detection is active or not
+    *
+    * @return whether trigger detection is active or not
+    */
+    inline bool triggerDetectionActive() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current overlap add delay
+    *
+    * @return the current overlap add delay
+    */
+    inline int getCurrentOverlapAddDelay() const;
 
 private:
     //=========================================================================================================
@@ -734,7 +754,7 @@ inline QList<QPair<int,double> > ChannelDataModel::getDetectedTriggersOld() cons
 
 inline int ChannelDataModel::getNumberOfTimeSpacers() const
 {
-    //std::cout<<((m_iT*1000)/m_iDistanceTimerSpacer)-1<<std::endl;
+    //qDebug()<<((m_iT*1000)/m_iDistanceTimerSpacer)-1;
     return ((1000)/m_iDistanceTimerSpacer)-1;
 }
 

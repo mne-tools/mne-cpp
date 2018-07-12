@@ -49,9 +49,12 @@
 //=============================================================================================================
 
 #include <QPainter>
-#include <QPainterPath>
-#include <QDebug>
-#include <QThread>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -672,10 +675,10 @@ void ChannelDataDelegate::createTimeSpacersPath(const QModelIndex &index, const 
 //*************************************************************************************************************
 
 void ChannelDataDelegate::createTriggerPath(QPainter *painter,
-                                                         const QModelIndex &index,
-                                                         const QStyleOptionViewItem &option,
-                                                         QPainterPath& path,
-                                                         RowVectorPair &data) const
+                                             const QModelIndex &index,
+                                             const QStyleOptionViewItem &option,
+                                             QPainterPath& path,
+                                             RowVectorPair &data) const
 {
     Q_UNUSED(data)
 
