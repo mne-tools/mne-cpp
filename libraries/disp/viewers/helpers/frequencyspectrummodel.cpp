@@ -300,8 +300,10 @@ void FrequencySpectrumModel::resetSelection()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumModel::toggleFreeze(const QModelIndex &)
+void FrequencySpectrumModel::toggleFreeze(const QModelIndex & index)
 {
+    Q_UNUSED(index);
+
     m_bIsFreezed = !m_bIsFreezed;
 
     if(m_bIsFreezed)
