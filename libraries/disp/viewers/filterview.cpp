@@ -54,6 +54,7 @@
 #include <QStandardPaths>
 #include <QKeyEvent>
 #include <QSvgGenerator>
+#include <QCheckBox>
 
 
 //*************************************************************************************************************

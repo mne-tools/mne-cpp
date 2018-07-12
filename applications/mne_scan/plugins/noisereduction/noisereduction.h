@@ -208,7 +208,7 @@ protected slots:
     *
     * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(QList<FilterData> filterData);
+    void filterChanged(QList<UTILSLIB::FilterData> filterData);
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ private:
     QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
     QPushButton*                    m_pShowFilterOptions;                       /**< Holds the show filter options button. */
-    QList<FilterData>               m_filterData;                               /**< List of currently active filters. */
+    QList<UTILSLIB::FilterData>     m_filterData;                               /**< List of currently active filters. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/

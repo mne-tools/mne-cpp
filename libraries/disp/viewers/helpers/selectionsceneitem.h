@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
-#include <iostream>
 
 
 //*************************************************************************************************************
@@ -52,11 +51,12 @@
 //=============================================================================================================
 
 #include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -70,13 +70,13 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* SelectionSceneItem...
+* DECLARE CLASS SelectionSceneItem
 *
 * @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
 */
@@ -84,11 +84,20 @@ class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
 {
 
 public:
+    typedef QSharedPointer<SelectionSceneItem> SPtr;              /**< Shared pointer type for SelectionSceneItem. */
+    typedef QSharedPointer<const SelectionSceneItem> ConstSPtr;   /**< Const shared pointer type for SelectionSceneItem. */
+
     //=========================================================================================================
     /**
     * Constructs a SelectionSceneItem.
     */
-    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor = Qt::blue, bool bIsBadChannel = false);
+    SelectionSceneItem(QString channelName,
+                       int channelNumber,
+                       QPointF channelPosition,
+                       int channelKind,
+                       int channelUnit,
+                       QColor channelColor = Qt::blue,
+                       bool bIsBadChannel = false);
 
     //=========================================================================================================
     /**

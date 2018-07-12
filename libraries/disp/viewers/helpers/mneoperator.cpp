@@ -31,8 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEOperator class represents the base class of an arbitrary MNEOperator, e.g. FILTER,PCA,AVERAGE.
-*           All specific Operators must be derived from MNEOperator, see the FilterOperator class.
+* @brief    Definition of the MNEOperator Class.
 *
 */
 

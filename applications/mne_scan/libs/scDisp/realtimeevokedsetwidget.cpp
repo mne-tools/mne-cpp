@@ -50,6 +50,8 @@
 
 #include <scMeas/realtimeevokedset.h>
 
+#include <utils/filterTools/filterdata.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,6 +70,8 @@
 #include <QLabel>
 #include <QToolBox>
 #include <QDate>
+#include <QVBoxLayout>
+#include <QCheckBox>
 
 
 //*************************************************************************************************************
@@ -78,6 +82,7 @@
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************

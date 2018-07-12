@@ -58,6 +58,7 @@
 #include <QGraphicsView>
 #include <QSvgGenerator>
 #include <QDebug>
+#include <QGraphicsItem>
 
 
 //*************************************************************************************************************

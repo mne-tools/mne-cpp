@@ -49,11 +49,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-#include <QBrush>
-#include <QThread>
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent>
 #include <QFuture>
+#include <QPair>
+#include <QColor>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -578,7 +583,7 @@ int EvokedSetModel::getNumberOfTimeSpacers() const
 
 QPair<QVariant,QVariant> EvokedSetModel::getBaselineInfo() const
 {
-    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
+    //qDebug()<<floor((m_matData.cols()/m_fSps)*10);
     return m_pairBaseline;
 }
 
@@ -669,9 +674,9 @@ void EvokedSetModel::updateProjection()
             m_matProj.col(m_vecBadIdcs[j]).setZero();
         }
 
-//        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
-//        std::cout << "Proj\n";
-//        std::cout << m_matProj.block(0,0,10,10) << std::endl;
+//        qDebug() << "Bads\n" << m_vecBadIdcs;
+//        qDebug() << "Proj\n";
+//        qDebug() << m_matProj.block(0,0,10,10);
 
         qint32 nchan = m_pEvokedSet->info.nchan;
         qint32 i, k;
@@ -900,7 +905,7 @@ void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &
 
 void EvokedSetModel::filterChannelsConcurrently()
 {    
-    //std::cout<<"START EvokedSetModel::filterChannelsConcurrently()"<<std::endl;
+    //qDebug()<<"START EvokedSetModel::filterChannelsConcurrently()";
 
     if(m_filterData.isEmpty()) {
         //qDebug()<<"data filter empty";
@@ -941,6 +946,6 @@ void EvokedSetModel::filterChannelsConcurrently()
         }
     }
 
-    //std::cout<<"END EvokedSetModel::filterChannelsConcurrently()"<<std::endl;
+    //qDebug()<<"END EvokedSetModel::filterChannelsConcurrently()";
 }
 

@@ -44,11 +44,25 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QPainter>
+#include <QStaticText>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-using namespace std;
 
 
 //*************************************************************************************************************
@@ -56,7 +70,13 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionSceneItem::SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor, bool bIsBadChannel)
+SelectionSceneItem::SelectionSceneItem(QString channelName,
+                                       int channelNumber,
+                                       QPointF channelPosition,
+                                       int channelKind,
+                                       int channelUnit,
+                                       QColor channelColor,
+                                       bool bIsBadChannel)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
@@ -81,7 +101,9 @@ QRectF SelectionSceneItem::boundingRect() const
 
 //*************************************************************************************************************
 
-void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SelectionSceneItem::paint(QPainter *painter,
+                               const QStyleOptionGraphicsItem *option,
+                               QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);

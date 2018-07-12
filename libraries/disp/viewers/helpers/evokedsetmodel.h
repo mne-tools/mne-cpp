@@ -44,8 +44,8 @@
 
 #include "../../disp_global.h"
 
-#include <fiff/fiff_types.h>
 #include <utils/filterTools/filterdata.h>
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -55,7 +55,6 @@
 
 #include <QAbstractTableModel>
 #include <QSharedPointer>
-#include <QPair>
 #include <QColor>
 
 
@@ -92,8 +91,7 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EvokedSetModelRoles
-{
+namespace EvokedSetModelRoles {
     enum ItemRole{GetAverageData = Qt::UserRole + 1020};
 }
 
@@ -166,7 +164,8 @@ public:
     *
     * @return the accessed data
     */
-    inline QVariant data(int row, int column, int role = Qt::DisplayRole) const;
+    inline QVariant data(int row, int column,
+                         int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -177,7 +176,8 @@ public:
     *
     * @return accessed data
     */
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex &index,
+                          int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -189,7 +189,9 @@ public:
     *
     * @return accessed eader data
     */
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant headerData(int section,
+                                Qt::Orientation orientation,
+                                int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -198,7 +200,8 @@ public:
     * @param [in] pEvokedSet      The evoked set
     * @param [in] bRese           Whether to reset the model
     */
-    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet, bool bReset = false);
+    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet,
+                      bool bReset = false);
 
     //=========================================================================================================
     /**
@@ -260,7 +263,7 @@ public:
     *
     * @return the current scaling
     */
-    const QMap< qint32,float >& getScaling() const;
+    const QMap<qint32, float>& getScaling() const;
 
     //=========================================================================================================
     /**

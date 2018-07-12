@@ -36,7 +36,6 @@
 #ifndef FREQUENCYSPECTRUMMODEL_H
 #define FREQUENCYSPECTRUMMODEL_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -45,7 +44,6 @@
 #include "../../disp_global.h"
 
 #include <fiff/fiff_types.h>
-#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -54,6 +52,7 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -66,7 +65,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
@@ -75,11 +84,8 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace Eigen;
 
 
 //=============================================================================================================
@@ -133,7 +139,8 @@ public:
     *
     * @return accessed data
     */
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex &index,
+                          int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -145,7 +152,8 @@ public:
     *
     * @return accessed eader data
     */
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
+                                int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -153,7 +161,7 @@ public:
     *
     * @param [in] inf       The corresponding fiff information object
     */
-    void setInfo(FiffInfo::SPtr &info);
+    void setInfo(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
     //=========================================================================================================
     /**
@@ -169,7 +177,7 @@ public:
     *
     * @param[in] data   the frequency estimation
     */
-    void addData(const MatrixXd &data);
+    void addData(const Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
@@ -177,7 +185,7 @@ public:
     *
     * @return the fiff info
     */
-    inline FiffInfo::SPtr getInfo() const;
+    inline QSharedPointer<FIFFLIB::FiffInfo> getInfo() const;
 
     //=========================================================================================================
     /**
@@ -185,7 +193,7 @@ public:
     *
     * @return the frequency scale of the x axis
     */
-    inline RowVectorXd getFreqScale() const;
+    inline Eigen::RowVectorXd getFreqScale() const;
 
     //=========================================================================================================
     /**
@@ -193,7 +201,7 @@ public:
     *
     * @return the frequency scale of the x axis
     */
-    inline RowVectorXd getFreqScaleBound() const;
+    inline Eigen::RowVectorXd getFreqScaleBound() const;
 
     //=========================================================================================================
     /**
@@ -276,31 +284,22 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
-    FiffInfo::SPtr m_pFiffInfo; /**< Fiff Information.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff Information.*/
 
-    QMap<qint32,qint32> m_qMapIdxRowSelection;  /**< Selection mapping.*/
+    QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
 
-    RowVectorXd m_vecFreqScale;                 /**< Frequency scale */
+    Eigen::RowVectorXd      m_vecFreqScale;         /**< Frequency scale */
+    Eigen::RowVectorXd      m_vecFreqScaleBound;    /**< Frequency scaled to boundaries */
+    Eigen::MatrixXd         m_dataCurrent;          /**< List that holds the current data*/
+    Eigen::MatrixXd         m_dataCurrentFreeze;    /**< List that holds the current data when freezed*/
 
-    RowVectorXd m_vecFreqScaleBound;            /**< Frequency scaled to boundaries */
-
-    //Fiff data structure
-    MatrixXd m_dataCurrent;         /**< List that holds the current data*/
-
-    MatrixXd m_dataCurrentFreeze;   /**< List that holds the current data when freezed*/
-
-    float m_fSps;               /**< Sampling rate */
-    qint32 m_iT;                /**< Time window */
-
-    bool m_bIsFreezed;          /**< Display is freezed */
-
-    bool m_bInitialized;        /**< If it's initailized */
-
-    qint32 m_iLowerFrqIdx;  /**< Upper frequency plotting boundary */
-    qint32 m_iUpperFrqIdx;  /**< Lower frequency plotting boundary */
-
-    qint8 m_iScaleType;
-
+    float       m_fSps;                 /**< Sampling rate */
+    qint32      m_iT;                   /**< Time window */
+    qint32      m_iLowerFrqIdx;         /**< Upper frequency plotting boundary */
+    qint32      m_iUpperFrqIdx;         /**< Lower frequency plotting boundary */
+    qint8       m_iScaleType;           /**< The display scale type */
+    bool        m_bIsFreezed;           /**< Display is freezed */
+    bool        m_bInitialized;         /**< If it's initailized */
 };
 
 
@@ -309,7 +308,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-FiffInfo::SPtr FrequencySpectrumModel::getInfo() const
+QSharedPointer<FIFFLIB::FiffInfo> FrequencySpectrumModel::getInfo() const
 {
     return m_pFiffInfo;
 }
@@ -317,7 +316,7 @@ FiffInfo::SPtr FrequencySpectrumModel::getInfo() const
 
 //*************************************************************************************************************
 
-RowVectorXd FrequencySpectrumModel::getFreqScale() const
+Eigen::RowVectorXd FrequencySpectrumModel::getFreqScale() const
 {
     return m_vecFreqScale;
 }
@@ -325,7 +324,7 @@ RowVectorXd FrequencySpectrumModel::getFreqScale() const
 
 //*************************************************************************************************************
 
-RowVectorXd FrequencySpectrumModel::getFreqScaleBound() const
+Eigen::RowVectorXd FrequencySpectrumModel::getFreqScaleBound() const
 {
     return m_vecFreqScaleBound;
 }
