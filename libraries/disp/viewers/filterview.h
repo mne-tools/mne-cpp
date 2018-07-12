@@ -176,7 +176,7 @@ public:
     *
     * @return returns the list with the currently active filters
     */
-    QList<FilterData> getCurrentFilter();
+    QList<UTILSLIB::FilterData> getCurrentFilter();
 
     //=========================================================================================================
     /**
@@ -184,7 +184,7 @@ public:
     *
     * @return returns the list with the currently loaded filters
     */
-    FilterData getUserDesignedFilter();
+    UTILSLIB::FilterData getUserDesignedFilter();
 
     //=========================================================================================================
     /**
@@ -279,7 +279,7 @@ private:
 
     Ui::FilterViewWidget*       ui;                         /**< Pointer to the qt designer generated ui class.*/
 
-    FilterData                  m_filterData;               /**< The current filter operator.*/
+    UTILSLIB::FilterData        m_filterData;               /**< The current filter operator.*/
     FilterDataModel::SPtr       m_pFilterDataModel;         /**< The model to hold current filters.*/
     FilterDataDelegate::SPtr    m_pFilterDataDelegate;      /**< The delegate to plot the activation check boxes in column one.*/
 

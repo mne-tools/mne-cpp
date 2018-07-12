@@ -49,14 +49,7 @@
 
 #include <QGraphicsView>
 #include <QGraphicsSceneMouseEvent>
-#include <QRubberBand>
-#include <QWidget>
-#include <QMouseEvent>
 #include <QGestureEvent>
-#include <QPanGesture>
-#include <QPinchGesture>
-#include <QGraphicsSceneEvent>
-#include <QMutableListIterator>
 #include <QScrollBar>
 #include <QDebug>
 
@@ -67,7 +60,6 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
-using namespace std;
 
 
 //*************************************************************************************************************

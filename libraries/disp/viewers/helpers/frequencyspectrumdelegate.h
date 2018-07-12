@@ -51,8 +51,6 @@
 //=============================================================================================================
 
 #include <QAbstractItemDelegate>
-#include <QTableView>
-#include <QMouseEvent>
 #include <QPointer>
 
 
@@ -66,6 +64,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QTableView;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
@@ -75,10 +81,8 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace Eigen;
 
 
 //=============================================================================================================
@@ -98,7 +102,8 @@ public:
     *
     * @param[in] parent     Parent of the delegate
     */
-    FrequencySpectrumDelegate(QTableView* m_pTableView,QObject *parent = 0);
+    FrequencySpectrumDelegate(QTableView* m_pTableView,
+                              QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -118,7 +123,9 @@ public:
     * @param[in] option     Describes the parameters used to draw an item in a view widget
     * @param[in] index      Used to locate data in a data model.
     */
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void paint(QPainter *painter,
+                       const QStyleOptionViewItem &option,
+                       const QModelIndex &index) const;
 
     //=========================================================================================================
     /**
@@ -127,7 +134,8 @@ public:
     * @param[in] option     Describes the parameters used to draw an item in a view widget
     * @param[in] index      Used to locate data in a data model.
     */
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option,
+                           const QModelIndex &index) const;
 
     //=========================================================================================================
     /**
@@ -139,7 +147,10 @@ public:
     * @param[in] visRect      visual rect of row_tableview.
     *
     */
-    void rcvMouseLoc( int row, int x, int y, QRect visRect);
+    void rcvMouseLoc(int row,
+                     int x,
+                     int y,
+                     QRect visRect);
 
 private:
     //=========================================================================================================
@@ -149,7 +160,11 @@ private:
     * @param[in]        index   QModelIndex for accessing associated data and model object.
     * @param[in,out]    path    The QPointerPath to create for the data plot.
     */
-    void capturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const;
+    void capturePoint(const QModelIndex &index,
+                      const QStyleOptionViewItem &option,
+                      QPainterPath& path,
+                      Eigen::RowVectorXd& data,
+                      QPainter *painter) const;
 
     //=========================================================================================================
     /**
@@ -158,7 +173,10 @@ private:
     * @param[in]        index   QModelIndex for accessing associated data and model object.
     * @param[in,out]    path    The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
+    void createPlotPath(const QModelIndex &index,
+                        const QStyleOptionViewItem &option,
+                        QPainterPath& path,
+                        Eigen::RowVectorXd& data) const;
 
     //=========================================================================================================
     /**
@@ -167,7 +185,10 @@ private:
     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
     * @param[in] data The row vector of the data matrix <1 x nsamples>.
     */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
+    void createGridPath(const QModelIndex &index,
+                        const QStyleOptionViewItem &option,
+                        QPainterPath& path,
+                        Eigen::RowVectorXd& data) const;
 
     //=========================================================================================================
     /**
@@ -175,7 +196,9 @@ private:
     *
     * Added by LImin Sun; 08.07/2014
     */
-    void createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const;
+    void createGridTick(const QModelIndex &index,
+                        const QStyleOptionViewItem &option,
+                        QPainter *painter) const;
 
     QPointer<QTableView>    m_tableview; /**< Pointer to the TableView */
 
@@ -186,7 +209,6 @@ private:
     float       m_x_rate;           /**< the rate of the cursor position in the raw visual rect */
     float       m_fMaxValue;        /**< Maximum value of the data to plot  */
     float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-
     qint8       m_iScaleType;       /**< scale type */
 };
 

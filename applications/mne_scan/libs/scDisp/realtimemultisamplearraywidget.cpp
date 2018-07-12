@@ -50,6 +50,8 @@
 
 #include <scMeas/realtimemultisamplearray.h>
 
+#include <utils/filterTools/filterdata.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,7 +61,8 @@
 #include <QMenu>
 #include <QAction>
 #include <QDate>
-#include <QHeaderView>
+#include <QVBoxLayout>
+#include <QCheckBox>
 
 
 //*************************************************************************************************************
@@ -70,6 +73,7 @@
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************

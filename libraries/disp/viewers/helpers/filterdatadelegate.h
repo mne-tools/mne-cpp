@@ -50,14 +50,22 @@
 //=============================================================================================================
 
 #include <QItemDelegate>
-#include <QCheckBox>
-#include <QPainter>
-#include <QPainterPath>
-#include <QDebug>
-#include <QThread>
-#include <QStyledItemDelegate>
-#include <QHBoxLayout>
-#include <QEvent>
+#include <QWidget>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QHBoxLayout;
+class QCheckBox;
 
 
 //*************************************************************************************************************
@@ -68,31 +76,35 @@
 namespace DISPLIB
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS BooleanWidget
 *
-* @brief The BooleanWidget class provides a QCheckBox inside of a Qwidget with including Layout
+* @brief The BooleanWidget class provides a QCheckBox inside of a QWidget with including Layout
 */
-class BooleanWidget : public QWidget
+class DISPSHARED_EXPORT BooleanWidget : public QWidget
 {
     Q_OBJECT
 
-    public:
+public:
 
-    QCheckBox * m_pCheckBox;
+    BooleanWidget(QWidget* parent = 0);
 
-    BooleanWidget(QWidget * parent = 0)
-        : QWidget(parent)
-    {
-        m_pCheckBox = new QCheckBox(this);
-        QHBoxLayout * layout = new QHBoxLayout(this);
-        layout->addWidget(m_pCheckBox,0, Qt::AlignCenter);
-    }
+    bool isChecked();
+    void setChecked(bool value);
 
-    bool isChecked(){return m_pCheckBox->isChecked();}
-    void setChecked(bool value){m_pCheckBox->setChecked(value);}
+protected:
+    QCheckBox* m_pCheckBox;
+
 };
+
 
 //=============================================================================================================
 /**

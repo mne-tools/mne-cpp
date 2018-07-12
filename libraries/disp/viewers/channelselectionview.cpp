@@ -41,6 +41,7 @@
 
 #include "channelselectionview.h"
 #include "ui_channelselectionview.h"
+#include "helpers/selectionsceneitem.h"
 
 
 //*************************************************************************************************************

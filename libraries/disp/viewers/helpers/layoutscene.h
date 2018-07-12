@@ -100,7 +100,8 @@ public:
     /**
     * Constructs a LayoutScene.
     */
-    LayoutScene(QGraphicsView* view, QObject *parent = 0);
+    LayoutScene(QGraphicsView* view,
+                QObject *parent = 0);
 
 protected:
     //=========================================================================================================

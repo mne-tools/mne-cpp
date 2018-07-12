@@ -44,8 +44,12 @@
 
 #include "../../disp_global.h"
 #include "layoutscene.h"
-#include "selectionsceneitem.h"
-#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -53,9 +57,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
-#include <QWidget>
-#include <QMutableListIterator>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -69,13 +75,13 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* SelectionScene...
+* DECLARE CLASS SelectionScene
 *
 * @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
@@ -84,6 +90,9 @@ class DISPSHARED_EXPORT SelectionScene : public LayoutScene
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<SelectionScene> SPtr;              /**< Shared pointer type for SelectionScene. */
+    typedef QSharedPointer<const SelectionScene> ConstSPtr;   /**< Const shared pointer type for SelectionScene. */
+
     //=========================================================================================================
     /**
     * Constructs a SelectionScene.
@@ -97,7 +106,8 @@ public:
     * @param [in] layoutMap layout data map.
     * @param [in] bad channel list.
     */
-    void repaintItems(const QMap<QString, QPointF> &layoutMap, QStringList badChannels);
+    void repaintItems(const QMap<QString, QPointF> &layoutMap,
+                      QStringList badChannels);
 
     //=========================================================================================================
     /**
@@ -107,7 +117,7 @@ public:
     */
     void hideItems(QStringList visibleItems);
 
-    int         m_iChannelTypeMode;
+    int         m_iChannelTypeMode;     /**< The channel type mode. */
 };
 
 } // NAMESPACE DISPLIB

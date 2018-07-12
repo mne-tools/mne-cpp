@@ -44,8 +44,9 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
-#include "utils/filterTools/filterdata.h"
-#include "utils/filterTools/filterio.h"
+
+#include <utils/filterTools/filterdata.h>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -54,8 +55,6 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
-#include <QVector3D>
-#include <QList>
 
 
 //*************************************************************************************************************
@@ -68,30 +67,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace UTILSLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
 
-//Declare type roles
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
 namespace FilterDataModelRoles
 {
     enum ItemRole{GetFilterName = Qt::UserRole + 1009,
@@ -107,6 +94,7 @@ namespace FilterDataModelRoles
                     SetUserDesignedFilter = Qt::UserRole + 1019};
 }
 
+
 //=============================================================================================================
 /**
 * DECLARE CLASS FilterDataModel
@@ -120,8 +108,8 @@ public:
     typedef QSharedPointer<const FilterDataModel> ConstSPtr; /**< Const shared pointer type for FilterDataModel class. */
 
     FilterDataModel(QObject *parent = 0);
-    FilterDataModel(QObject *parent, FilterData &dataFilter);
-    FilterDataModel(QObject *parent, QList<FilterData> &dataFilter);
+    FilterDataModel(QObject *parent, UTILSLIB::FilterData &dataFilter);
+    FilterDataModel(QObject *parent, QList<UTILSLIB::FilterData> &dataFilter);
 
     //=========================================================================================================
     /**
@@ -143,7 +131,7 @@ public:
     *
     * @param dataFilter filter list with already loaded filters.
     */
-    void addFilter(const QList<FilterData>& dataFilter);
+    void addFilter(const QList<UTILSLIB::FilterData>& dataFilter);
 
     //=========================================================================================================
     /**
@@ -151,7 +139,7 @@ public:
     *
     * @param dataFilter filter data with an already loaded filter.
     */
-    void addFilter(const FilterData &dataFilter);
+    void addFilter(const UTILSLIB::FilterData &dataFilter);
 
     //=========================================================================================================
     /**
@@ -169,16 +157,16 @@ protected:
     */
     void clearModel();
 
-    QList<FilterData>       m_filterData;           /**< list of the loaded filters and their data. */
-    QList<bool>             m_isActive;             /**< list of the current activation state of the filters. */
+    QList<UTILSLIB::FilterData> m_filterData;           /**< list of the loaded filters and their data. */
+    QList<bool>                 m_isActive;             /**< list of the current activation state of the filters. */
 
-    int                     m_iDesignFilterIndex;   /**< index of the user designed filter. */
+    int                         m_iDesignFilterIndex;   /**< index of the user designed filter. */
 };
 
 } // NAMESPACE DISPLIB
 
-Q_DECLARE_METATYPE(FilterData);
-Q_DECLARE_METATYPE(QList<FilterData>);
+Q_DECLARE_METATYPE(UTILSLIB::FilterData);
+Q_DECLARE_METATYPE(QList<UTILSLIB::FilterData>);
 
 #endif // FILTERDATAMODEL_H
 
