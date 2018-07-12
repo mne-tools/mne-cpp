@@ -56,8 +56,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QSvgGenerator>
-#include <QToolBox>
 #include <QMenu>
 #include <QAction>
 #include <QHeaderView>
@@ -86,7 +84,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 , m_bInitialized(false)
 , m_iMaxFilterTapSize(0)
 , m_pChannelDataView(new ChannelDataView(this))
-, m_pToolBox(new QToolBox(this))
 {
     Q_UNUSED(pTime)
 
@@ -112,22 +109,14 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(true);
 
-    //Create toolboxes with table view and real-time interpolation plot
-    m_pToolBox->hide();
+    //Create table view and set layout
+    m_pChannelDataView->hide();
 
-    //Add views to toolbox
-    m_pToolBox->insertItem(0, m_pChannelDataView, QIcon(), "Channel plot");
-
-    m_pToolBox->setCurrentIndex(0);
-
-    //set layout
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
-    rtmsaLayout->addWidget(m_pToolBox.data());
+    rtmsaLayout->addWidget(m_pChannelDataView);
     this->setLayout(rtmsaLayout);
 
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
-
-    init();
 }
 
 
@@ -179,14 +168,14 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         }
 
         //Store view
-        settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_fZoomFactor);
-        settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_iT);
+        settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_pChannelDataView->getZoom());
+        settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_pChannelDataView->getWindowSize());
         if(m_pQuickControlWidget) {
             settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlWidget->getOpacityValue());
         }
 
         //Store show/hide bad channel flag
-        settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_bHideBadChannels);
+        settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_pChannelDataView->getBadChannelHideStatus());
 
         //Store selected layout file
         if(m_pChannelSelectionView) {
@@ -211,10 +200,8 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
 {
-    if(!m_bInitialized)
-    {
-        if(m_pRTMSA->isChInit())
-        {
+    if(!m_bInitialized) {
+        if(m_pRTMSA->isChInit()) {
             m_pFiffInfo = m_pRTMSA->info();
 
             m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().at(m_pRTMSA->getMultiSampleArray().size()-1).cols();
@@ -232,13 +219,9 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
 
 void RealTimeMultiSampleArrayWidget::init()
 {
-    if(!m_pFiffInfo->chs.isEmpty()) {
+    if(m_pFiffInfo) {
         QSettings settings;
         QString t_sRTMSAWName = m_pRTMSA->getName();
-
-        if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool()) {
-            m_pChannelDataView->hideBadChannels();
-        }
 
         //
         //-------- Init signal and background colors --------
@@ -248,8 +231,14 @@ void RealTimeMultiSampleArrayWidget::init()
         QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
         QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
 
+        m_pChannelDataView->show();
+        m_pChannelDataView->init(m_pFiffInfo);
         m_pChannelDataView->setBackgroundColorChanged(background);
         m_pChannelDataView->setSignalColor(signal);
+
+        if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool()) {
+            m_pChannelDataView->hideBadChannels();
+        }
 
         //
         //-------- Init scaling --------
@@ -269,43 +258,40 @@ void RealTimeMultiSampleArrayWidget::init()
                 availabeChannelTypes.append(type);
         }
 
-//        if(!t_sRTMSAWName.isEmpty())
-//        {
-            QMap<qint32,float> qMapChScaling;
+        QMap<qint32,float> qMapChScaling;
 
-            float val = 0.0f;
-            if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
-                val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
-                qMapChScaling.insert(FIFF_UNIT_T, val);
-            }
+        float val = 0.0f;
+        if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
+            val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
+            qMapChScaling.insert(FIFF_UNIT_T, val);
+        }
 
-            if(availabeChannelTypes.contains(FIFF_UNIT_T_M)) {
-                val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
-                qMapChScaling.insert(FIFF_UNIT_T_M, val);
-            }
+        if(availabeChannelTypes.contains(FIFF_UNIT_T_M)) {
+            val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
+            qMapChScaling.insert(FIFF_UNIT_T_M, val);
+        }
 
-            if(availabeChannelTypes.contains(FIFFV_EEG_CH)) {
-                val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
-                qMapChScaling.insert(FIFFV_EEG_CH, val);
-            }
+        if(availabeChannelTypes.contains(FIFFV_EEG_CH)) {
+            val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
+            qMapChScaling.insert(FIFFV_EEG_CH, val);
+        }
 
-            if(availabeChannelTypes.contains(FIFFV_EOG_CH)) {
-                val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_EOG_CH, val);
-            }
+        if(availabeChannelTypes.contains(FIFFV_EOG_CH)) {
+            val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
+            qMapChScaling.insert(FIFFV_EOG_CH, val);
+        }
 
-            if(availabeChannelTypes.contains(FIFFV_STIM_CH)) {
-                val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_STIM_CH, val);
-            }
+        if(availabeChannelTypes.contains(FIFFV_STIM_CH)) {
+            val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
+            qMapChScaling.insert(FIFFV_STIM_CH, val);
+        }
 
-            if(availabeChannelTypes.contains(FIFFV_MISC_CH)) {
-                val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_MISC_CH, val);
-            }
+        if(availabeChannelTypes.contains(FIFFV_MISC_CH)) {
+            val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
+            qMapChScaling.insert(FIFFV_MISC_CH, val);
+        }
 
-            m_pChannelDataView->setScaling(qMapChScaling);
-//        }
+        m_pChannelDataView->setScalingMap(qMapChScaling);
 
         //-------- Init filter window --------
         m_pFilterWindow = FilterView::SPtr::create(this, Qt::Window);
@@ -315,13 +301,13 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterWindow.data(),static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pRTMSAModel.data(),static_cast<void (ChannelDataModel::*)(QString)>(&ChannelDataModel::setFilterChannelType));
+                m_pChannelDataView,static_cast<void (ChannelDataView::*)(QString)>(&ChannelDataView::setFilterChannelType));
 
         connect(m_pFilterWindow.data(), &FilterView::filterChanged,
-                m_pRTMSAModel.data(), &ChannelDataModel::filterChanged);
+                m_pChannelDataView, &ChannelDataView::filterChanged);
 
         connect(m_pFilterWindow.data(), &FilterView::filterActivated,
-                m_pRTMSAModel.data(), &ChannelDataModel::filterActivated);
+                m_pChannelDataView, &ChannelDataView::filterActivated);
 
         //Set stored filter settings from last session
         m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
@@ -392,25 +378,25 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                this->m_pRTMSAModel.data(), &ChannelDataModel::updateProjection);
+                m_pChannelDataView, &ChannelDataView::updateProjection);
 
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                this->m_pRTMSAModel.data(), &ChannelDataModel::updateCompensator);
+                m_pChannelDataView, &ChannelDataView::updateCompensator);
 
         //Handle SPHARA
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
-                this->m_pRTMSAModel.data(), &ChannelDataModel::updateSpharaActivation);
+                m_pChannelDataView, &ChannelDataView::updateSpharaActivation);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
-                this->m_pRTMSAModel.data(), &ChannelDataModel::updateSpharaOptions);
+                m_pChannelDataView, &ChannelDataView::updateSpharaOptions);
 
         //Handle view changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
-                m_pChannelDataView, &ChannelDataView::zoomChanged);
+                m_pChannelDataView, &ChannelDataView::setZoom);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
-                m_pChannelDataView, &ChannelDataView::timeWindowChanged);
+                m_pChannelDataView, &ChannelDataView::setWindowSize);
 
         //Handle Filtering
         connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
@@ -421,17 +407,17 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Handle trigger detection
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
-                this->m_pRTMSAModel.data(), &ChannelDataModel::triggerInfoChanged);
+                m_pChannelDataView, &ChannelDataView::triggerInfoChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
-                this->m_pRTMSAModel.data(), &ChannelDataModel::resetTriggerCounter);
+                m_pChannelDataView, &ChannelDataView::resetTriggerCounter);
 
-        connect(this->m_pRTMSAModel.data(), &ChannelDataModel::triggerDetected,
+        connect(m_pChannelDataView, &ChannelDataView::triggerDetected,
                 m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggersAndTypes);
 
         //Handle time spacer distance
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
-                this->m_pRTMSAModel.data(), &ChannelDataModel::distanceTimeSpacerChanged);
+                m_pChannelDataView, &ChannelDataView::distanceTimeSpacerChanged);
 
         m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
@@ -445,10 +431,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //If projections are wanted activate projections as default
         if(slFlags.contains("projections")) {
-            m_pRTMSAModel->updateProjection();
+            m_pChannelDataView->updateProjection();
         }
-
-        m_pToolBox->show();
 
         //Initialized
         m_bInitialized = true;
@@ -507,16 +491,15 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
     if(!QDir("./Screenshots").exists()) {
         QDir().mkdir("./Screenshots");
     }
+    QString fileName;
 
-    if(imageType.contains("SVG"))
-    {
-        QString fileName = QString("./Screenshots/%1-%2-DataView.svg").arg(sDate).arg(sTime);
-        m_pChannelDataView->takeScreenshot(fileName);
+    if(imageType.contains("SVG")) {
+        fileName = QString("./Screenshots/%1-%2-DataView.svg").arg(sDate).arg(sTime);
     }
 
-    if(imageType.contains("PNG"))
-    {
-        QString fileName = QString("./Screenshots/%1-%2-DataView.png").arg(sDate).arg(sTime);
-        m_pChannelDataView->takeScreenshot(fileName);
+    if(imageType.contains("PNG")) {
+        fileName = QString("./Screenshots/%1-%2-DataView.png").arg(sDate).arg(sTime);
     }
+
+    m_pChannelDataView->takeScreenshot(fileName);
 }

@@ -43,6 +43,8 @@
 #include "helpers/channeldatadelegate.h"
 #include "helpers/channeldatamodel.h"
 
+#include <utils/filterTools/filterdata.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,6 +64,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace UTILSLIB;
 using namespace FIFFLIB;
 
 
@@ -84,7 +87,6 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
     m_pTableView->viewport()->installEventFilter(this);
     m_pTableView->setMouseTracking(true);
 
-
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
 
@@ -97,7 +99,7 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
 
 //*************************************************************************************************************
 
-void ChannelDataView::init(FiffInfo::SPtr &info)
+void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 {    
     m_pFiffInfo = info;
     m_fSamplingRate = m_pFiffInfo->sfreq;
@@ -106,6 +108,8 @@ void ChannelDataView::init(FiffInfo::SPtr &info)
     m_pModel = new ChannelDataModel(this);
     m_pModel->setFiffInfo(m_pFiffInfo);
     m_pModel->setSamplingInfo(m_fSamplingRate, m_iT, true);
+    connect(m_pModel, &ChannelDataModel::triggerDetected,
+            this, &ChannelDataView::triggerDetected);
 
     //-------- Init bad channel list --------
     m_qListBadChannels.clear();
@@ -135,24 +139,18 @@ void ChannelDataView::init(FiffInfo::SPtr &info)
 
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
     m_pTableView->setShowGrid(false);
-
     m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
     m_pTableView->horizontalHeader()->hide();
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
-
     m_pTableView->setAutoScroll(false);
     m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
     m_pTableView->setColumnHidden(2,true);
-
     m_pTableView->resizeColumnsToContents();
-
     m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 //        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
 //                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
-
 }
 
 
@@ -244,6 +242,14 @@ void ChannelDataView::hideBadChannels()
 
 //*************************************************************************************************************
 
+bool ChannelDataView::getBadChannelHideStatus()
+{
+    return m_bHideBadChannels;
+}
+
+
+//*************************************************************************************************************
+
 void ChannelDataView::showSelectedChannelsOnly(QStringList selectedChannels)
 {
     m_slSelectedChannels = selectedChannels;
@@ -266,7 +272,7 @@ void ChannelDataView::showSelectedChannelsOnly(QStringList selectedChannels)
 
 //*************************************************************************************************************
 
-void ChannelDataView::zoomChanged(double zoomFac)
+void ChannelDataView::setZoom(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
 
@@ -276,11 +282,27 @@ void ChannelDataView::zoomChanged(double zoomFac)
 
 //*************************************************************************************************************
 
-void ChannelDataView::timeWindowChanged(int T)
+double ChannelDataView::getZoom()
+{
+    return m_fZoomFactor;
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::setWindowSize(int T)
 {
     m_iT = T;
 
     m_pModel->setSamplingInfo(m_fSamplingRate, T);
+}
+
+
+//*************************************************************************************************************
+
+int ChannelDataView::getWindowSize()
+{
+    return m_iT;
 }
 
 
@@ -302,6 +324,85 @@ void ChannelDataView::takeScreenshot(const QString& fileName)
         QPixmap pixMap = QPixmap::grabWidget(m_pTableView);
         pixMap.save(fileName);
     }
+}
+
+//*************************************************************************************************************
+
+void ChannelDataView::updateProjection()
+{
+    m_pModel->updateProjection();
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::updateCompensator(int to)
+{
+    m_pModel->updateCompensator(to);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::updateSpharaActivation(bool state)
+{
+    m_pModel->updateSpharaActivation(state);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
+{
+    m_pModel->updateSpharaOptions(sSytemType, nBaseFctsFirst, nBaseFctsSecond);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::filterChanged(QList<FilterData> filterData)
+{
+    m_pModel->filterChanged(filterData);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::filterActivated(bool state)
+{
+    m_pModel->filterActivated(state);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::setFilterChannelType(QString channelType)
+{
+    m_pModel->setFilterChannelType(channelType);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
+{
+    m_pModel->triggerInfoChanged(colorMap, active, triggerCh, threshold);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::distanceTimeSpacerChanged(int value)
+{
+    m_pModel->distanceTimeSpacerChanged(value);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::resetTriggerCounter()
+{
+    m_pModel->resetTriggerCounter();
 }
 
 
