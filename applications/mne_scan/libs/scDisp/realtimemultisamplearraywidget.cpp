@@ -98,7 +98,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
     m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
     connect(m_pActionHideBad, &QAction::triggered,
-            m_pChannelDataView, &ChannelDataView::hideBadChannels);
+            this, &RealTimeMultiSampleArrayWidget::onHideBadChannels);
     addDisplayAction(m_pActionHideBad);
     m_pActionHideBad->setVisible(true);
 
@@ -124,34 +124,42 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 
 RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 {
-    //
     // Store Settings
-    //
     if(!m_pRTMSA->getName().isEmpty()) {
         QString t_sRTMSAWName = m_pRTMSA->getName();
 
         QSettings settings;
 
-        //Store scaling
-        QMap<qint32, float> qMapChScaling = m_pChannelDataView->getScalingMap();
+        //Store view
+        if(m_pChannelDataView) {
+            //Scaling
+            QMap<qint32, float> qMapChScaling = m_pChannelDataView->getScalingMap();
 
-        if(qMapChScaling.contains(FIFF_UNIT_T))
-            settings.setValue(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T]);
+            if(qMapChScaling.contains(FIFF_UNIT_T))
+                settings.setValue(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T]);
 
-        if(qMapChScaling.contains(FIFF_UNIT_T_M))
-            settings.setValue(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T_M]);
+            if(qMapChScaling.contains(FIFF_UNIT_T_M))
+                settings.setValue(QString("t_sRTMSAWName/%1/scaleGRAD").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T_M]);
 
-        if(qMapChScaling.contains(FIFFV_EEG_CH))
-            settings.setValue(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EEG_CH]);
+            if(qMapChScaling.contains(FIFFV_EEG_CH))
+                settings.setValue(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EEG_CH]);
 
-        if(qMapChScaling.contains(FIFFV_EOG_CH))
-            settings.setValue(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EOG_CH]);
+            if(qMapChScaling.contains(FIFFV_EOG_CH))
+                settings.setValue(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EOG_CH]);
 
-        if(qMapChScaling.contains(FIFFV_STIM_CH))
-            settings.setValue(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), qMapChScaling[FIFFV_STIM_CH]);
+            if(qMapChScaling.contains(FIFFV_STIM_CH))
+                settings.setValue(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), qMapChScaling[FIFFV_STIM_CH]);
 
-        if(qMapChScaling.contains(FIFFV_MISC_CH))
-            settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), qMapChScaling[FIFFV_MISC_CH]);
+            if(qMapChScaling.contains(FIFFV_MISC_CH))
+                settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), qMapChScaling[FIFFV_MISC_CH]);
+
+            //Zoom and window size
+            settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_pChannelDataView->getZoom());
+            settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_pChannelDataView->getWindowSize());
+
+            //Store show/hide bad channel flag
+            settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_pChannelDataView->getBadChannelHideStatus());
+        }
 
         //Store filter
         if(m_pFilterWindow) {
@@ -167,30 +175,17 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
             settings.setValue(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), m_pFilterWindow->getChannelType());
         }
 
-        //Store view
-        settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_pChannelDataView->getZoom());
-        settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_pChannelDataView->getWindowSize());
+        //Store QuickControlWidget
         if(m_pQuickControlWidget) {
-            settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlWidget->getOpacityValue());
+            settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlWidget->getOpacityValue());            
+            settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getSignalColor());
+            settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getBackgroundColor());
+            settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlWidget->getDistanceTimeSpacerIndex());
         }
-
-        //Store show/hide bad channel flag
-        settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_pChannelDataView->getBadChannelHideStatus());
 
         //Store selected layout file
         if(m_pChannelSelectionView) {
             settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), m_pChannelSelectionView->getCurrentLayoutFile());
-        }
-
-        //Store show/hide bad channel flag
-        if(m_pQuickControlWidget) {
-            settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlWidget->getDistanceTimeSpacerIndex());
-        }
-
-        //Store signal and background colors
-        if(m_pQuickControlWidget) {
-            settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getSignalColor());
-            settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getBackgroundColor());
         }
     }
 }
@@ -243,52 +238,44 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         //-------- Init scaling --------
         //
-        //Show only spin boxes and labels which type are present in the current loaded fiffinfo
-        QList<FiffChInfo> channelList = m_pFiffInfo->chs;
-        QList<int> availabeChannelTypes;
+        bool hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
+        float val = 1e-11f;
+        QMap<qint32, float> qMapChScaling;
 
-        for(int i = 0; i<channelList.size(); i++) {
-            int unit = channelList.at(i).unit;
-            int type = channelList.at(i).kind;
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH) {
+                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T) {
+                    val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
+                    qMapChScaling.insert(FIFF_UNIT_T, val);
 
-            if(!availabeChannelTypes.contains(unit))
-                availabeChannelTypes.append(unit);
+                    hasMag = true;
+                } else if(!hasGrad && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M) {
+                    val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
+                    qMapChScaling.insert(FIFF_UNIT_T_M, val);
 
-            if(!availabeChannelTypes.contains(type))
-                availabeChannelTypes.append(type);
-        }
+                    hasGrad = true;
+                }
+            } else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH) {
+                val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
+                qMapChScaling.insert(FIFFV_EEG_CH, val);
 
-        QMap<qint32,float> qMapChScaling;
+                hasEEG = true;
+            } else if(!hasEog && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH) {
+                val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
+                qMapChScaling.insert(FIFFV_EOG_CH, val);
 
-        float val = 0.0f;
-        if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
-            val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
-            qMapChScaling.insert(FIFF_UNIT_T, val);
-        }
+                hasEog = true;
+            } else if(!hasStim && m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+                val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
+                qMapChScaling.insert(FIFFV_STIM_CH, val);
 
-        if(availabeChannelTypes.contains(FIFF_UNIT_T_M)) {
-            val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
-            qMapChScaling.insert(FIFF_UNIT_T_M, val);
-        }
+                hasStim = true;
+            } else if(!hasMisc && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH) {
+                val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
+                qMapChScaling.insert(FIFFV_MISC_CH, val);
 
-        if(availabeChannelTypes.contains(FIFFV_EEG_CH)) {
-            val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
-            qMapChScaling.insert(FIFFV_EEG_CH, val);
-        }
-
-        if(availabeChannelTypes.contains(FIFFV_EOG_CH)) {
-            val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
-            qMapChScaling.insert(FIFFV_EOG_CH, val);
-        }
-
-        if(availabeChannelTypes.contains(FIFFV_STIM_CH)) {
-            val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
-            qMapChScaling.insert(FIFFV_STIM_CH, val);
-        }
-
-        if(availabeChannelTypes.contains(FIFFV_MISC_CH)) {
-            val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
-            qMapChScaling.insert(FIFFV_MISC_CH, val);
+                hasMisc = true;
+            }
         }
 
         m_pChannelDataView->setScalingMap(qMapChScaling);
@@ -329,7 +316,6 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 m_pChannelDataView, &ChannelDataView::showSelectedChannelsOnly);
 
-        //Connect channel info model
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
 
@@ -446,9 +432,9 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget(bool state)
 {
     if(m_pFilterWindow) {
         if(state) {
-            if(m_pFilterWindow->isActiveWindow())
+            if(m_pFilterWindow->isActiveWindow()) {
                 m_pFilterWindow->hide();
-            else {
+            } else {
                 m_pFilterWindow->activateWindow();
                 m_pFilterWindow->show();
             }
@@ -491,15 +477,34 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
     if(!QDir("./Screenshots").exists()) {
         QDir().mkdir("./Screenshots");
     }
+
     QString fileName;
 
     if(imageType.contains("SVG")) {
         fileName = QString("./Screenshots/%1-%2-DataView.svg").arg(sDate).arg(sTime);
-    }
-
-    if(imageType.contains("PNG")) {
+    } else if(imageType.contains("PNG")) {
         fileName = QString("./Screenshots/%1-%2-DataView.png").arg(sDate).arg(sTime);
     }
 
     m_pChannelDataView->takeScreenshot(fileName);
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::onHideBadChannels()
+{
+    m_pChannelDataView->hideBadChannels();
+
+    if(m_pActionHideBad->toolTip() == "Show all bad channels") {
+        m_pActionHideBad->setIcon(QIcon(":/images/hideBad.png"));
+        m_pActionHideBad->setToolTip("Hide all bad channels");
+        m_pActionHideBad->setStatusTip(tr("Hide all bad channels"));
+    } else {
+        m_pActionHideBad->setIcon(QIcon(":/images/showBad.png"));
+        m_pActionHideBad->setToolTip("Show all bad channels");
+        m_pActionHideBad->setStatusTip(tr("Show all bad channels"));
+    }
+}
+
+
