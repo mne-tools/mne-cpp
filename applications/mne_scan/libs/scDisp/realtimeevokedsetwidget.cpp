@@ -65,11 +65,8 @@
 //=============================================================================================================
 
 #include <QAction>
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QToolBox>
-#include <QGraphicsView>
-#include <QGraphicsItem>
 
 
 //*************************************************************************************************************
@@ -189,23 +186,27 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
             if(qMapChScaling.contains(FIFF_UNIT_T)) {
                 settings.setValue(QString("RTESW/%1/scaleMAG").arg(t_sRTESName), qMapChScaling[FIFF_UNIT_T]);
-                qDebug()<<"qMapChScaling[FIFF_UNIT_T]: "<<qMapChScaling[FIFF_UNIT_T];
             }
 
-            if(qMapChScaling.contains(FIFF_UNIT_T_M))
+            if(qMapChScaling.contains(FIFF_UNIT_T_M)) {
                 settings.setValue(QString("RTESW/%1/scaleGRAD").arg(t_sRTESName), qMapChScaling[FIFF_UNIT_T_M]);
+            }
 
-            if(qMapChScaling.contains(FIFFV_EEG_CH))
+            if(qMapChScaling.contains(FIFFV_EEG_CH)) {
                 settings.setValue(QString("RTESW/%1/scaleEEG").arg(t_sRTESName), qMapChScaling[FIFFV_EEG_CH]);
+            }
 
-            if(qMapChScaling.contains(FIFFV_EOG_CH))
+            if(qMapChScaling.contains(FIFFV_EOG_CH)) {
                 settings.setValue(QString("RTESW/%1/scaleEOG").arg(t_sRTESName), qMapChScaling[FIFFV_EOG_CH]);
+            }
 
-            if(qMapChScaling.contains(FIFFV_STIM_CH))
+            if(qMapChScaling.contains(FIFFV_STIM_CH)) {
                 settings.setValue(QString("RTESW/%1/scaleSTIM").arg(t_sRTESName), qMapChScaling[FIFFV_STIM_CH]);
+            }
 
-            if(qMapChScaling.contains(FIFFV_MISC_CH))
+            if(qMapChScaling.contains(FIFFV_MISC_CH)) {
                 settings.setValue(QString("RTESW/%1/scaleMISC").arg(t_sRTESName), qMapChScaling[FIFFV_MISC_CH]);
+            }
         }
 
         //Store selected layout file
@@ -609,33 +610,25 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
     }
 
     //Handle the butterfly plot and 2d layout plot differently
-    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        if(imageType.contains("SVG"))
-        {
-            QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
-            m_pAverageLayoutView->takeScreenshot(fileName);
-        }
+    QString fileName;
 
-        if(imageType.contains("PNG"))
-        {
-            QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
-            m_pAverageLayoutView->takeScreenshot(fileName);
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
+        if(imageType.contains("SVG")) {
+            fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
+        } else if(imageType.contains("PNG")) {
+            fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
         }
     }
 
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
-        if(imageType.contains("SVG"))
-        {
-            QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
-            m_pButterflyView->takeScreenshot(fileName);
-        }
-
-        if(imageType.contains("PNG"))
-        {
-            QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
-            m_pButterflyView->takeScreenshot(fileName);
+        if(imageType.contains("SVG")) {
+            fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
+        } else if(imageType.contains("PNG")) {
+            fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
         }
     }
+
+    m_pButterflyView->takeScreenshot(fileName);
 }
 
 

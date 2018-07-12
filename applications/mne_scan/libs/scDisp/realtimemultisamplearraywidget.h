@@ -171,6 +171,8 @@ private slots:
     */
     void onMakeScreenshot(const QString& imageType);
 
+    void onHideBadChannels();
+
 private:
     QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;          /**< quick control widget. */
     QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
