@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3d_global.h"
+#include "../disp3D_global.h"
 
 #include <fiff/fiff_coord_trans.h>
 

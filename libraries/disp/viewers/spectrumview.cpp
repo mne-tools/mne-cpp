@@ -101,12 +101,12 @@ void SpectrumView::init(FiffInfo::SPtr &info, int iScaleType)
     m_pFSDelegate = new FrequencySpectrumDelegate(m_pTableView, this);
     m_pFSDelegate->setScaleType(iScaleType);
 
-    connect(m_pTableView, &QTableView::doubleClicked,
-            m_pFSModel, &FrequencySpectrumModel::toggleFreeze);
+    connect(m_pTableView.data(), &QTableView::doubleClicked,
+            m_pFSModel.data(), &FrequencySpectrumModel::toggleFreeze);
 
     // add a connection for sending mouse location to the delegate;
     connect(this, &SpectrumView::sendMouseLoc,
-            m_pFSDelegate, &FrequencySpectrumDelegate::rcvMouseLoc);
+            m_pFSDelegate.data(), &FrequencySpectrumDelegate::rcvMouseLoc);
 
     m_pTableView->setModel(m_pFSModel);
     m_pTableView->setItemDelegate(m_pFSDelegate);

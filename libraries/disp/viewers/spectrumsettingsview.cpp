@@ -81,9 +81,9 @@ SpectrumSettingsView::SpectrumSettingsView(QWidget *parent, Qt::WindowFlags f)
     m_pSliderUpperBound->setMinimum(0);
     m_pSliderUpperBound->setMaximum(100);
 
-    connect(m_pSliderLowerBound, &QSlider::valueChanged,
+    connect(m_pSliderLowerBound.data(), &QSlider::valueChanged,
             this, &SpectrumSettingsView::updateValue);
-    connect(m_pSliderUpperBound, &QSlider::valueChanged,
+    connect(m_pSliderUpperBound.data(), &QSlider::valueChanged,
             this, &SpectrumSettingsView::updateValue);
 
     t_pGridLayout->addWidget(t_pLabelLower,0,0);

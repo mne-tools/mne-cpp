@@ -101,7 +101,7 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
 //*************************************************************************************************************
 
 void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
-{    
+{
     m_pFiffInfo = info;
     m_fSamplingRate = m_pFiffInfo->sfreq;
 
@@ -109,7 +109,7 @@ void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pModel = new ChannelDataModel(this);
     m_pModel->setFiffInfo(m_pFiffInfo);
     m_pModel->setSamplingInfo(m_fSamplingRate, m_iT, true);
-    connect(m_pModel, &ChannelDataModel::triggerDetected,
+    connect(m_pModel.data(), &ChannelDataModel::triggerDetected,
             this, &ChannelDataView::triggerDetected);
 
     //-------- Init bad channel list --------
@@ -125,17 +125,17 @@ void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pDelegate->initPainterPaths(m_pModel);
 
     connect(this, &ChannelDataView::markerMoved,
-            m_pDelegate, &ChannelDataDelegate::markerMoved);
+            m_pDelegate.data(), &ChannelDataDelegate::markerMoved);
 
     //Init the view
     m_pTableView->setModel(m_pModel);
     m_pTableView->setItemDelegate(m_pDelegate);
     m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    connect(m_pTableView, &QTableView::doubleClicked,
+    connect(m_pTableView.data(), &QTableView::doubleClicked,
             m_pModel.data(), &ChannelDataModel::toggleFreeze);
 
-    connect(m_pTableView, &QTableView::customContextMenuRequested,
+    connect(m_pTableView.data(), &QTableView::customContextMenuRequested,
             this, &ChannelDataView::channelContextMenu);
 
     //set some size settings for m_pTableView
