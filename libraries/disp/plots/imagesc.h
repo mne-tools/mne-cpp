@@ -50,12 +50,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QImage>
-#include <QString>
-#include <QPen>
-#include <QSharedPointer>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,23 +61,22 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -96,9 +89,10 @@ using namespace Eigen;
 class DISPSHARED_EXPORT ImageSc : public Graph
 {
     Q_OBJECT
+
 public:
-    typedef QSharedPointer<ImageSc> SPtr;            /**< Shared pointer type for MatrixView class. */
-    typedef QSharedPointer<const ImageSc> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
+    typedef QSharedPointer<ImageSc> SPtr;            /**< Shared pointer type for ImageSc class. */
+    typedef QSharedPointer<const ImageSc> ConstSPtr; /**< Const shared pointer type for ImageSc class. */
 
     //=========================================================================================================
     /**
@@ -115,7 +109,8 @@ public:
     * @param[in] p_dMat     The double data matrix
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit ImageSc(MatrixXd &p_dMat, QWidget *parent = 0);
+    explicit ImageSc(Eigen::MatrixXd &p_dMat,
+                     QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -124,7 +119,8 @@ public:
     * @param[in] p_fMat     The float data matrix
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit ImageSc(MatrixXf &p_fMat, QWidget *parent = 0);
+    explicit ImageSc(Eigen::MatrixXf &p_fMat,
+                     QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -133,7 +129,8 @@ public:
     * @param[in] p_iMat     The integer data matrix
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit ImageSc(MatrixXi &p_iMat, QWidget *parent = 0);
+    explicit ImageSc(Eigen::MatrixXi &p_iMat,
+                     QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -153,21 +150,22 @@ public:
     *
     * @param[in] p_dMat     The double data matrix
     */
-    void updateData(MatrixXd &p_dMat);
+    void updateData(Eigen::MatrixXd &p_dMat);
+
     //=========================================================================================================
     /**
     * Updates the scaled image view with a given float matrix.
     *
     * @param[in] p_fMat     The float data matrix
     */
-    void updateData(MatrixXf &p_fMat);
+    void updateData(Eigen::MatrixXf &p_fMat);
     //=========================================================================================================
     /**
     * Updates the scaled image view with a given integer matrix.
     *
     * @param[in] p_dMat     The integer data matrix
     */
-    void updateData(MatrixXi &p_iMat);
+    void updateData(Eigen::MatrixXi &p_iMat);
 
     //=========================================================================================================
     /**
@@ -184,25 +182,32 @@ protected:
     */
     void updateMaps();
 
-    void paintEvent(QPaintEvent*);
+    //=========================================================================================================
+    /**
+    * The reimplemented paintEvent
+    *
+    * @param[in] event    The event.
+    */
+    void paintEvent(QPaintEvent* event);
 
-    QPixmap* m_pPixmapData;         /**< data pixmap */
-    QPixmap* m_pPixmapColorbar;     /**< colorbar pixmap */
+    QPixmap*            m_pPixmapData;              /**< data pixmap */
+    QPixmap*            m_pPixmapColorbar;          /**< colorbar pixmap */
 
-    MatrixXd m_matCentNormData;     /**< centralized and normalized data */
+    Eigen::MatrixXd     m_matCentNormData;          /**< centralized and normalized data */
 
-    double m_dMinValue;             /**< Minimal data value */
-    double m_dMaxValue;             /**< Maximal data value */
+    double              m_dMinValue;                /**< Minimal data value */
+    double              m_dMaxValue;                /**< Maximal data value */
 
-    QRgb (*pColorMapper)(double);   /**< Function pointer to current colormap */
+    bool                m_bColorbar;                /**< If colorbar is visible */
+    QVector<double>     m_qVecScaleValues;          /**< Scale values */
+    qint32              m_iColorbarWidth;           /**< Colorbar width */
+    qint32              m_iColorbarSteps;           /**< Number of colorbar vaues to display */
+    qint32              m_iColorbarGradSteps;       /**< Gradient steps of the colorbar */
+    QFont               m_qFontColorbar;            /**< Colorbar font */
+    QPen                m_qPenColorbar;             /**< Colorbar pen */
 
-    bool m_bColorbar;                   /**< If colorbar is visible */
-    QVector<double> m_qVecScaleValues;  /**< Scale values */
-    qint32 m_iColorbarWidth;            /**< Colorbar width */
-    qint32 m_iColorbarSteps;            /**< Number of colorbar vaues to display */
-    qint32 m_iColorbarGradSteps;        /**< Gradient steps of the colorbar */
-    QFont m_qFontColorbar;              /**< Colorbar font */
-    QPen m_qPenColorbar;                /**< Colorbar pen */
+    QRgb                (*pColorMapper)(double);    /**< Function pointer to current colormap */
+
 };
 
 //*************************************************************************************************************

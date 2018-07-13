@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -278,8 +279,10 @@ void ImageSc::setColorMap(const QString &p_sColorMap)
 
 //*************************************************************************************************************
 
-void ImageSc::paintEvent(QPaintEvent *)
+void ImageSc::paintEvent(QPaintEvent * event)
 {
+    Q_UNUSED(event);
+
     QPainter painter(this);
     if (m_pPixmapData)
     {

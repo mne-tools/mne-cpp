@@ -32,6 +32,7 @@
 * @brief    Plot class declaration
 *
 */
+
 #ifndef PLOT_H
 #define PLOT_H
 
@@ -49,13 +50,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QString>
-#include <QList>
-#include <QVector>
-#include <QPointF>
-#include <QSharedPointer>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,25 +61,23 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 
 //=============================================================================================================
@@ -97,9 +89,10 @@ using namespace Eigen;
 class DISPSHARED_EXPORT Plot : public Graph
 {
     Q_OBJECT
+
 public:
-    typedef QSharedPointer<Plot> SPtr;            /**< Shared pointer type for MatrixView class. */
-    typedef QSharedPointer<const Plot> ConstSPtr; /**< Const shared pointer type for MatrixView class. */
+    typedef QSharedPointer<Plot> SPtr;            /**< Shared pointer type for Plot class. */
+    typedef QSharedPointer<const Plot> ConstSPtr; /**< Const shared pointer type for Plot class. */
 
     //=========================================================================================================
     /**
@@ -116,7 +109,8 @@ public:
     * @param[in] p_dVec     The double data vector
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit Plot(VectorXd &p_dVec, QWidget *parent = 0);
+    explicit Plot(Eigen::VectorXd &p_dVec,
+                  QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -136,19 +130,24 @@ public:
     *
     * @param[in] p_dVec     The double data vector
     */
-    void updateData(VectorXd &p_dVec);
+    void updateData(Eigen::VectorXd &p_dVec);
 
 protected:
-    void paintEvent(QPaintEvent*);
-
-    bool m_bHoldOn;             /**< If multiple plots */
+    //=========================================================================================================
+    /**
+    * The reimplemented paintEvent
+    *
+    * @param[in] event    The event.
+    */
+    void paintEvent(QPaintEvent* event);
 
     QList<QVector<QPointF> > m_qListVecPointFPaths;     /**< List of point series */
 
-    double m_dMinX;             /**< Minimal X value */
-    double m_dMaxX;             /**< Maximal X value */
-    double m_dMinY;             /**< Minimal Y value */
-    double m_dMaxY;             /**< Maximal Y value */
+    bool    m_bHoldOn;          /**< If multiple plots */
+    double  m_dMinX;            /**< Minimal X value */
+    double  m_dMaxX;            /**< Maximal X value */
+    double  m_dMinY;            /**< Minimal Y value */
+    double  m_dMaxY;            /**< Maximal Y value */
 };
 
 //*************************************************************************************************************

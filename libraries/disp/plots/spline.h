@@ -49,11 +49,9 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QString>
 #include <QtCharts/QChart>
 #include <QtCharts/QSplineSeries>
 #include <QVector3D>
-#include <QList>
 
 
 //*************************************************************************************************************
@@ -87,26 +85,31 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-/** histogram display using Qtcharts/QSpline
+
+//=============================================================================================================
+/** Histogram display using Qtcharts/QSpline
 *
 * @brief Spline class for histogram display using Qtcharts/QSpline
 */
-
 class DISPSHARED_EXPORT Spline: public QWidget
 {
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<Spline> SPtr;            /**< Shared pointer type for Spline class. */
+    typedef QSharedPointer<const Spline> ConstSPtr; /**< Const shared pointer type for Spline class. */
+
     //=========================================================================================================
     /**
     * The constructor for Spline
     * @param[in]  title     string to specify the title displayed on the histogram, defaults to "Spline Histogram"
     * @param[in]  parent    sets the behaviour of Spline as an object, defaults to no parent QWidget
     */
-    Spline(const QString& title = "Spline Histogram", QWidget* parent = 0);
+    Spline(const QString& title = "Spline Histogram",
+           QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -116,9 +119,11 @@ public:
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
     */
     template<typename T>
-    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData);
+    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
+                 const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData);
     template<typename T>
-    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData);
+    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData,
+                 const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData);
 
     //=========================================================================================================
     /**
@@ -128,7 +133,8 @@ public:
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
     */
     template<typename T>
-    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData);
+    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                    const Eigen::VectorXi& matClassFrequencyData);
 
     //=========================================================================================================
     /**
@@ -148,7 +154,10 @@ public:
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
     template<typename T>
-    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
+    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                                     int iClassAmount,
+                                     Eigen::VectorXd& vecCoefficientResults,
+                                     Eigen::VectorXi& vecExponentValues);
 
     //=========================================================================================================
     /**
@@ -174,7 +183,8 @@ public:
     * @param[in]  functionName          Choice between getThreshold or setThreshold
     * @return     returns QVector3D after necessary adjustment
     */
-    QVector3D correctionDisplayTrueValue(QVector3D vecOriginalValues, QString functionName);
+    QVector3D correctionDisplayTrueValue(QVector3D vecOriginalValues,
+                                         QString functionName);
 
     //=========================================================================================================
     /**
@@ -184,12 +194,11 @@ public:
     */
     void setColorMap (QString colorMap);
 
-    //=========================================================================================================
     Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
     double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis */
     double          m_dMaxAxisX;               /**< Display value of the largest point on the series in x-axis */
 
-private:
+protected:
     //=========================================================================================================
     /**
     * updateThreshold takes in string name of threshold and its corresponding Qlineseries and creates the line in the QChart
@@ -228,7 +237,8 @@ signals:
 //=============================================================================================================
 
 template <typename T>
-void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData)
+void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
+                     const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0) = matClassLimitData;
@@ -239,7 +249,8 @@ void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitDat
 //=========================================================================================================
 
 template <typename T>
-void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData)
+void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData,
+                     const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0) = matClassLimitData;
@@ -250,7 +261,8 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
 //=========================================================================================================
 
 template<typename T>
-void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData)
+void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                        const Eigen::VectorXi& matClassFrequencyData)
 {
     Eigen::VectorXd resultDisplayValues;
     int iClassAmount = matClassFrequencyData.rows();
@@ -299,7 +311,10 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 //*************************************************************************************************************
 
 template <typename T>
-void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                                          int iClassAmount,
+                                          Eigen::VectorXd& vecCoefficientResults,
+                                          Eigen::VectorXi& vecExponentValues)
 {
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
@@ -365,8 +380,7 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
         }
     }
 }
-}
 
-// NAMESPACE
+} // NAMESPACE
 
 #endif // SPLINE_H

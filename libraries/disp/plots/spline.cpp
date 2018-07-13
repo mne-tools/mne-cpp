@@ -49,11 +49,8 @@
 //=============================================================================================================
 
 #include <QGridLayout>
-#include <QSharedPointer>
 #include <QtCharts/QLegendMarker>
-#include <QtCharts/QLineSeries>
 #include <QtCharts/QChartView>
-#include <QtGui/QMouseEvent>
 #include <QDebug>
 
 
@@ -68,7 +65,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
 using namespace DISPLIB;
 using namespace QtCharts;
 

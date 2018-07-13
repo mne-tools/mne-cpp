@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of time-frequency plot class.
+* @brief    TFplot class declaration.
 */
 
 #ifndef TFPLOT_H
@@ -48,11 +48,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QImage>
-#include <QGridLayout>
-#include <QGraphicsView>
-#include <QGraphicsPixmapItem>
-#include <QGraphicsSceneResizeEvent>
+#include <QWidget>
 
 
 //*************************************************************************************************************
@@ -65,19 +61,26 @@
 #include <unsupported/Eigen/FFT>
 
 
-namespace DISPLIB
-{
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-using namespace Eigen;
-
-enum ColorMaps
+namespace DISPLIB
 {
+
+
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+enum ColorMaps {
     Hot,
     HotNeg1,
     HotNeg2,
@@ -86,69 +89,72 @@ enum ColorMaps
     RedBlue
 };
 
+
+//=============================================================================================================
+/**
+* Plots vector data, similiar to MATLABs plot
+*
+* @brief Vector plot
+*/
 class DISPSHARED_EXPORT TFplot : public QWidget
-{
+{    
+    Q_OBJECT
 
 public:
+    typedef QSharedPointer<TFplot> SPtr;            /**< Shared pointer type for TFplot class. */
+    typedef QSharedPointer<const TFplot> ConstSPtr; /**< Const shared pointer type for TFplot class. */
 
     //=========================================================================================================
     /**
-    * TFplot_TFplot
+    * Constructs TFplot class
     *
-    * ### display tf-plot function ###
-    *
-    * Constructor
-    *
-    * constructs TFplot class
-    *
-    *  @param[in] tf_matrix         given spectrogram
-    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
-    *  @param[in] lower_frq         lower bound frequency, that should be plotted
-    *  @param[in] upper_frq         upper bound frequency, that should be plotted
-    *  @param[in] cmap              colormap used to plot the spectrogram
+    * @param[in] tf_matrix         given spectrogram
+    * @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    * @param[in] lower_frq         lower bound frequency, that should be plotted
+    * @param[in] upper_frq         upper bound frequency, that should be plotted
+    * @param[in] cmap              colormap used to plot the spectrogram
     *
     */
-    TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
+    TFplot(Eigen::MatrixXd tf_matrix,
+           qreal sample_rate,
+           qreal lower_frq,
+           qreal upper_frq,
+           ColorMaps cmap);
 
     //=========================================================================================================
     /**
-    * TFplot_TFplot
+    * Constructs TFplot class
     *
-    * ### display tf-plot function ###
-    *
-    * Constructor
-    *
-    * constructs TFplot class
-    *
-    *  @param[in] tf_matrix         given spectrogram
-    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
-    *  @param[in] cmap              colormap used to plot the spectrogram
+    * @param[in] tf_matrix         given spectrogram
+    * @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    * @param[in] cmap              colormap used to plot the spectrogram
     *
     */
-    TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap);
-
-private:
-    //=========================================================================================================
-    /**
-    * TFplot_calc_plot
-    *
-    * ### display tf-plot function ###
-    *
-    * calculates a image to plot the tf_matrix
-    *
-    *  @param[in] tf_matrix         given spectrogram
-    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
-    *  @param[in] cmap              colormap used to plot the spectrogram
-    *  @param[in] lower_frq         lower bound frequency, that should be plotted
-    *  @param[in] upper_frq         upper bound frequency, that should be plotted
-    *
-    */
-    void calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
+    TFplot(Eigen::MatrixXd tf_matrix,
+           qreal sample_rate,
+           ColorMaps cmap);
 
 protected:
-     virtual void resizeEvent(QResizeEvent *event);
+    //=========================================================================================================
+    /**
+    * Calculates a image to plot the tf_matrix
+    *
+    * @param[in] tf_matrix         given spectrogram
+    * @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    * @param[in] cmap              colormap used to plot the spectrogram
+    * @param[in] lower_frq         lower bound frequency, that should be plotted
+    * @param[in] upper_frq         upper bound frequency, that should be plotted
+    *
+    */
+    void calc_plot(Eigen::MatrixXd tf_matrix,
+                   qreal sample_rate,
+                   ColorMaps cmap,
+                   qreal lower_frq,
+                   qreal upper_frq);
+
+    virtual void resizeEvent(QResizeEvent *event);
 };
 
-}
+} // NAMESPACE
 
 #endif // TFPLOT_H

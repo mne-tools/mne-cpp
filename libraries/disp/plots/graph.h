@@ -50,9 +50,7 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QString>
 #include <QPen>
-#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -65,25 +63,23 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 
 //=============================================================================================================
@@ -95,9 +91,23 @@ using namespace Eigen;
 class DISPSHARED_EXPORT Graph : public QWidget
 {
     Q_OBJECT
+
 public:
+    typedef QSharedPointer<Graph> SPtr;            /**< Shared pointer type for Graph class. */
+    typedef QSharedPointer<const Graph> ConstSPtr; /**< Const shared pointer type for Graph class. */
+
+    //=========================================================================================================
+    /**
+    * The constructor.
+    *
+    * @param[in] parent   The parent widget.
+    */
     explicit Graph(QWidget *parent = 0);
-    
+
+    //=========================================================================================================
+    /**
+    * Init this class.
+    */
     void init();
 
     //=========================================================================================================
@@ -107,6 +117,7 @@ public:
     * @param[in] p_sTitle   The title
     */
     void setTitle(const QString &p_sTitle);
+
     //=========================================================================================================
     /**
     * Sets the label of the y axes
@@ -114,6 +125,7 @@ public:
     * @param[in] p_sXLabel   The x axes label
     */
     void setXLabel(const QString &p_sXLabel);
+
     //=========================================================================================================
     /**
     * Sets the label of the y axes
@@ -124,23 +136,37 @@ public:
 
 protected:
 //    void paintEvent(QPaintEvent*);
-    void resizeEvent(QResizeEvent*);
+    //=========================================================================================================
+    /**
+    * Reimplemented resizeEvent
+    *
+    * @param[in] event   The resize event.
+    */
+    void resizeEvent(QResizeEvent* event);
 
-    void drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight);
+    //=========================================================================================================
+    /**
+    * Draw the labels.
+    *
+    * @param[in] p_iContentWidth    The contents width.
+    * @param[in] p_iContentHeight   The contents height.
+    */
+    void drawLabels(qint32 p_iContentWidth,
+                    qint32 p_iContentHeight);
 
-    QSize m_qSizeWidget;            /**< current widget size */
+    QSize       m_qSizeWidget;          /**< current widget size */
 
-    QString m_sTitle;               /**< Title */
-    QFont m_qFontTitle;             /**< Title font */
-    QPen m_qPenTitle;               /**< Title pen */
+    QString     m_sTitle;               /**< Title */
+    QFont       m_qFontTitle;           /**< Title font */
+    QPen        m_qPenTitle;            /**< Title pen */
 
-    qint32 m_iBorderTopBottom;      /**< distance to top and bottom */
-    qint32 m_iBorderLeftRight;      /**< distance to left and right */
+    qint32      m_iBorderTopBottom;     /**< distance to top and bottom */
+    qint32      m_iBorderLeftRight;     /**< distance to left and right */
 
-    QString m_sXLabel;              /**< X axes label */
-    QString m_sYLabel;              /**< Y axes label */
-    QFont m_qFontAxes;              /**< Axes font */
-    QPen m_qPenAxes;                /**< Axes pen */
+    QString     m_sXLabel;              /**< X axes label */
+    QString     m_sYLabel;              /**< Y axes label */
+    QFont       m_qFontAxes;            /**< Axes font */
+    QPen        m_qPenAxes;             /**< Axes pen */
 };
 
 //*************************************************************************************************************

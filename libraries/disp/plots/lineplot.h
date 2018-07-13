@@ -36,6 +36,7 @@
 #ifndef LINEPLOT_H
 #define LINEPLOT_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -79,8 +80,9 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISPLIBFORWARD DECLARATIONS
 //=============================================================================================================
+
 
 //=============================================================================================================
 /**
@@ -92,8 +94,8 @@ class DISPSHARED_EXPORT LinePlot : public QtCharts::QChartView
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<LinePlot> SPtr;            /**< Shared pointer type for DeepViewer. */
-    typedef QSharedPointer<const LinePlot> ConstSPtr; /**< Const shared pointer type for DeepViewer. */
+    typedef QSharedPointer<LinePlot> SPtr;            /**< Shared pointer type for LinePlot. */
+    typedef QSharedPointer<const LinePlot> ConstSPtr; /**< Const shared pointer type for LinePlot. */
 
     //=========================================================================================================
     /**
@@ -111,7 +113,9 @@ public:
     * @param [in] title     Plot title
     * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
     */
-    LinePlot(const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
+    LinePlot(const QVector<double>& y,
+             const QString& title = "",
+             QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -122,7 +126,10 @@ public:
     * @param [in] title     Plot title
     * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
     */
-    LinePlot(const QVector<double>& x, const QVector<double>& y, const QString& title = "", QWidget *parent = Q_NULLPTR);
+    LinePlot(const QVector<double>& x,
+             const QVector<double>& y,
+             const QString& title = "",
+             QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -169,7 +176,8 @@ public:
     * @param [in] x         X-Axis data to plot
     * @param [in] y         Y-Axis data to plot
     */
-    void updateData(const QVector<double>& x, const QVector<double>& y);
+    void updateData(const QVector<double>& x,
+                    const QVector<double>& y);
 
 private:
     //=========================================================================================================
@@ -179,12 +187,12 @@ private:
     void update();
 
 private:
-    QString m_sTitle;                       /**< Title */
-    QString m_sXLabel;                      /**< X axes label */
-    QString m_sYLabel;                      /**< Y axes label */
+    QString                 m_sTitle;           /**< Title */
+    QString                 m_sXLabel;          /**< X axes label */
+    QString                 m_sYLabel;          /**< Y axes label */
 
-    QtCharts::QLineSeries*  m_pLineSeries;  /**< Line series */
-    QtCharts::QChart*       m_pChart;       /**< The chart */
+    QtCharts::QLineSeries*  m_pLineSeries;      /**< Line series */
+    QtCharts::QChart*       m_pChart;           /**< The chart */
 };
 
 //*************************************************************************************************************

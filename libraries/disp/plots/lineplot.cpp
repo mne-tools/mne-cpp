@@ -43,18 +43,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// SYSTEM INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
-
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -83,7 +79,9 @@ LinePlot::LinePlot(QWidget *parent)
 
 //*************************************************************************************************************
 
-LinePlot::LinePlot(const QVector<double> &y, const QString& title, QWidget *parent)
+LinePlot::LinePlot(const QVector<double> &y,
+                   const QString& title,
+                   QWidget *parent)
 : QChartView(parent)
 , m_sTitle(title)
 , m_pLineSeries(Q_NULLPTR)
@@ -95,7 +93,10 @@ LinePlot::LinePlot(const QVector<double> &y, const QString& title, QWidget *pare
 
 //*************************************************************************************************************
 
-LinePlot::LinePlot(const QVector<double> &x, const QVector<double> &y, const QString& title, QWidget *parent)
+LinePlot::LinePlot(const QVector<double> &x,
+                   const QVector<double> &y,
+                   const QString& title,
+                   QWidget *parent)
 : QChartView(parent)
 , m_sTitle(title)
 , m_pLineSeries(Q_NULLPTR)
@@ -156,7 +157,8 @@ void LinePlot::updateData(const QVector<double> &y)
 
 //*************************************************************************************************************
 
-void LinePlot::updateData(const QVector<double> &x, const QVector<double> &y)
+void LinePlot::updateData(const QVector<double> &x,
+                          const QVector<double> &y)
 {
     if(!m_pLineSeries) {
         m_pLineSeries = new QLineSeries;
