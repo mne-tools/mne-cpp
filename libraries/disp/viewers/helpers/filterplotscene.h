@@ -142,7 +142,7 @@ protected:
 
     QGraphicsPathItem*      m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
 
-    double          m_dMaxMagnitude;                /**< the maximum magnirutde shown in the diagram. */
+    int             m_iMaxMagnitude;                /**< the maximum magnitude shown in the diagram. */
     int             m_iScalingFactor;               /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
     int             m_iNumberHorizontalLines;       /**< number of plotted horizontal ()lines. */
     int             m_iNumberVerticalLines;         /**< number of plotted vertical lines. */

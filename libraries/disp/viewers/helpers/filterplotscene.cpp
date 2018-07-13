@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <QGraphicsPathItem>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -75,7 +76,6 @@ FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
 : LayoutScene(view, parent)
 , m_pGraphicsItemPath(new QGraphicsPathItem())
 , m_iScalingFactor(5)
-, m_dMaxMagnitude(100*m_iScalingFactor)
 , m_iNumberHorizontalLines(4)
 , m_iNumberVerticalLines(3)
 , m_iAxisTextSize(24)
@@ -86,6 +86,7 @@ FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
 , m_iCutOffMarkerWidth(3)
 , m_iPlotLength(0)
 {
+    m_iMaxMagnitude = 100*m_iScalingFactor;
 }
 
 
@@ -133,7 +134,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
     addRect(-m_iDiagramMarginsHoriz,
             -m_iDiagramMarginsVert,
             numberCoeff+(m_iDiagramMarginsHoriz*2),
-            m_dMaxMagnitude+(m_iDiagramMarginsVert*2));
+            m_iMaxMagnitude+(m_iDiagramMarginsVert*2));
 
     //Plot filter name on top
     QGraphicsTextItem * text = addText(filtername, QFont("Times", m_iAxisTextSize));
@@ -143,17 +144,17 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
     //Draw horizontal lines
     for(int i = 1; i <= m_iNumberHorizontalLines; i++)
         addLine(-m_iDiagramMarginsHoriz,
-                (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
+                (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
                 numberCoeff + m_iDiagramMarginsHoriz,
-                (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
+                (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
                 QPen(Qt::DotLine));
 
     //Draw vertical axis texts - db magnitude
     for(int i = 0; i <= m_iNumberHorizontalLines+1; i++) {
-        QGraphicsTextItem * text = addText(QString("-%1 db").arg(QString().number(i * m_dMaxMagnitude/(m_iScalingFactor*(m_iNumberHorizontalLines+1)),'g',3)),
+        QGraphicsTextItem * text = addText(QString("-%1 db").arg(QString().number(i * m_iMaxMagnitude/(m_iScalingFactor*(m_iNumberHorizontalLines+1)),'g',3)),
                                            QFont("Times", m_iAxisTextSize));
         text->setPos(-text->boundingRect().width() - m_iAxisTextSize/2,
-                     (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2) - m_iDiagramMarginsVert);
+                     (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2) - m_iDiagramMarginsVert);
     }
 
     //VERTICAL
@@ -163,7 +164,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
         addLine(i*length - m_iDiagramMarginsHoriz,
                 -m_iDiagramMarginsVert,
                 i*length - m_iDiagramMarginsHoriz,
-                m_dMaxMagnitude + m_iDiagramMarginsVert,
+                m_iMaxMagnitude + m_iDiagramMarginsVert,
                 QPen(Qt::DotLine));
 
     //Draw horizontal axis texts - Hz frequency
@@ -171,7 +172,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
         QGraphicsTextItem * text = addText(QString("%1 Hz").arg(i*(fMax/(m_iNumberVerticalLines+1))),
                                            QFont("Times", m_iAxisTextSize));
         text->setPos(i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
-                     m_dMaxMagnitude + (text->boundingRect().height()/2));
+                     m_iMaxMagnitude + (text->boundingRect().height()/2));
     }
 
     //Plot lower higher cut off frequency
@@ -182,7 +183,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
+                    m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
         break;
 
@@ -191,7 +192,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
+                    m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
         break;
 
@@ -200,14 +201,14 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
+                    m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
 
             pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
+                    m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
         break;
     }
@@ -234,16 +235,16 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     //Create painter path
     QPainterPath path;
     double y = -20 * log10(std::abs(coefficientsAFreq(0))) * m_iScalingFactor; //-1 because we want to plot upwards
-    if(y > m_dMaxMagnitude)
-        y = m_dMaxMagnitude;
+    if(y > m_iMaxMagnitude)
+        y = m_iMaxMagnitude;
     y -= m_iDiagramMarginsVert;
 
     path.moveTo(-m_iDiagramMarginsVert, y); //convert to db
 
     for(int i = 0; i<numberCoeff; i+=1+dsFactor) {
         y = -20 * log10(std::abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
-        if(y > m_dMaxMagnitude)
-            y = m_dMaxMagnitude;
+        if(y > m_iMaxMagnitude)
+            y = m_iMaxMagnitude;
 
         y -= m_iDiagramMarginsVert;
         if(dsFactor<1)
