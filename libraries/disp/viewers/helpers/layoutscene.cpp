@@ -67,7 +67,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
+LayoutScene::LayoutScene(QGraphicsView* view,
+                         QObject* parent)
 : QGraphicsScene(parent)
 , m_qvView(view)
 , m_bDragMode(false)
@@ -248,8 +249,8 @@ bool LayoutScene::gestureEvent(QGestureEvent *event)
     return true;
 }
 
-//*************************************************************************************************************
 
+//*************************************************************************************************************
 
 void LayoutScene::panTriggered(QPanGesture *gesture)
 {
@@ -261,6 +262,7 @@ void LayoutScene::panTriggered(QPanGesture *gesture)
     m_qvView->horizontalScrollBar()->setValue(m_qvView->horizontalScrollBar()->value() + delta.x());
 }
 
+
 //*************************************************************************************************************
 
 void LayoutScene::pinchTriggered(QPinchGesture *gesture)
@@ -270,6 +272,7 @@ void LayoutScene::pinchTriggered(QPinchGesture *gesture)
     m_qvView->setTransformationAnchor(QGraphicsView::NoAnchor);
     m_qvView->scale(gesture->scaleFactor(), gesture->scaleFactor());
 }
+
 
 //*************************************************************************************************************
 
