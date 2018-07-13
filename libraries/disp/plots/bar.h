@@ -53,6 +53,8 @@
 #include <QPointer>
 #include <QtCharts/QChart>
 #include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarSeries>
 
 
 //*************************************************************************************************************
