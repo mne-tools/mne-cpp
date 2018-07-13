@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -140,8 +141,10 @@ void Plot::updateData(VectorXd &p_dVec)
 
 //*************************************************************************************************************
 
-void Plot::paintEvent(QPaintEvent *)
+void Plot::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
+
     QPainter painter(this);
     if (m_qListVecPointFPaths.size() > 0)
     {

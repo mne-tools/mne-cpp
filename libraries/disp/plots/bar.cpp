@@ -50,6 +50,7 @@
 #include <QSharedPointer>
 #include <QtCharts/QChartView>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -70,7 +71,8 @@ using namespace QtCharts;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Bar::Bar(const QString& title, QWidget* parent)
+Bar::Bar(const QString& title,
+         QWidget* parent)
 : QWidget(parent)
 {
     m_pChart = new QChart();

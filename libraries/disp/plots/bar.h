@@ -50,13 +50,9 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QPointer>
 #include <QtCharts/QChart>
-#include <QtCharts/QBarSeries>
-#include <QtCharts/QBarSet>
 #include <QtCharts/QBarCategoryAxis>
-
-//includes below used for debugging purposes
-//#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -84,7 +80,7 @@ namespace DISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -99,6 +95,9 @@ class DISPSHARED_EXPORT Bar : public QWidget
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<Bar> SPtr;            /**< Shared pointer type for Bar class. */
+    typedef QSharedPointer<const Bar> ConstSPtr; /**< Const shared pointer type for Bar class. */
+
     //=========================================================================================================
     /**
     * The constructor for Bar.
@@ -114,9 +113,13 @@ public:
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
     template<typename T>
-    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
+    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
+                 const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData,
+                 int iPrecisionValue);
     template<typename T>
-    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
+    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData,
+                 const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData,
+                 int iPrecisionValue);
 
     //=========================================================================================================
     /**
@@ -127,7 +130,9 @@ public:
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
     template<typename T>
-    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
+    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                    const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData,
+                    int iPrecisionValue);
 
     //=========================================================================================================
     /**
@@ -139,11 +144,14 @@ public:
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
     template<typename T>
-    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
+    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                                     int iClassAmount,
+                                     Eigen::VectorXd& vecCoefficientResults,
+                                     Eigen::VectorXi& vecExponentValues);
 
 private:
-    QtCharts::QChart*             m_pChart; /**< QChart object that will be shown in the widget */
-    QtCharts::QBarCategoryAxis*   m_pAxis;  /**< Customized axis for bar histogram*/
+    QPointer<QtCharts::QChart>             m_pChart;    /**< QChart object that will be shown in the widget */
+    QPointer<QtCharts::QBarCategoryAxis>   m_pAxis;     /**< Customized axis for bar histogram*/
 };
 
 
@@ -153,7 +161,9 @@ private:
 //=============================================================================================================
 
 template<typename T>
-void Bar::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
+void Bar::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
+                  const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData,
+                  int iPrecisionValue)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0) = matClassLimitData;
@@ -164,7 +174,9 @@ void Bar::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, 
 //*************************************************************************************************************
 
 template<typename T>
-void Bar::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
+void Bar::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData,
+                  const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData,
+                  int iPrecisionValue)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0) = matClassLimitData;
@@ -175,7 +187,9 @@ void Bar::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, 
 //*************************************************************************************************************
 
 template<typename T>
-void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
+void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                     const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData,
+                     int iPrecisionValue)
 {
     Eigen::VectorXd resultDisplayValues;
     Eigen::VectorXi resultExponentValues;
@@ -216,7 +230,9 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
 //*************************************************************************************************************
 
 template <typename T>
-void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+                                       int iClassAmount,
+                                       Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
@@ -281,10 +297,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
         }
     }
 }
-}
 
-
-//=========================================================================================================
-// NAMESPACE
+} // NAMESPACE
 
 #endif // BAR_H

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of time-frequency plot class.
+* @brief    TFplot class definition.
 */
 
 //*************************************************************************************************************
@@ -39,8 +39,23 @@
 
 #include "tfplot.h"
 
-#include "math.h"
 #include "helpers/colormap.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QGridLayout>
+#include <QGraphicsView>
+#include <QGraphicsPixmapItem>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -56,7 +71,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap = Jet)
+TFplot::TFplot(Eigen::MatrixXd tf_matrix,
+               qreal sample_rate,
+               qreal lower_frq,
+               qreal upper_frq,
+               ColorMaps cmap = Jet)
 {
     qreal max_frq = sample_rate/2.0;
     qreal frq_per_px = max_frq/tf_matrix.rows();
@@ -73,7 +92,7 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upp
     qint32 lower_px = floor(lower_frq / frq_per_px);
     qint32 upper_px = floor(upper_frq / frq_per_px);
 
-    MatrixXd zoomed_tf_matrix = MatrixXd::Zero(upper_px-lower_px, tf_matrix.cols());
+    Eigen::MatrixXd zoomed_tf_matrix = Eigen::MatrixXd::Zero(upper_px-lower_px, tf_matrix.cols());
     //How to print to console here
     //printf(("fff   "+QString::number(zoomed_tf_matrix(12,12))).toUtf8().data());// << ";  " << zoomed_tf_matrix.rows(2) << ";   ";
 
@@ -93,7 +112,9 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upp
 
 //*************************************************************************************************************
 
-TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap = Jet)
+TFplot::TFplot(Eigen::MatrixXd tf_matrix,
+               qreal sample_rate,
+               ColorMaps cmap = Jet)
 {   
     calc_plot(tf_matrix, sample_rate, cmap, 0, 0);
 }
@@ -101,7 +122,11 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap = Jet)
 
 //*************************************************************************************************************
 
-void TFplot::calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qreal lower_frq = 0, qreal upper_frq = 0)
+void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
+                       qreal sample_rate,
+                       ColorMaps cmap,
+                       qreal lower_frq = 0,
+                       qreal upper_frq = 0)
 {
     //normalisation of the tf-matrix
     qreal norm1 = tf_matrix.maxCoeff();
