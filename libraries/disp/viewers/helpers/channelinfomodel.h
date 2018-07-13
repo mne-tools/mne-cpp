@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     chinfomodel.h
+* @file     channelinfomodel.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -35,8 +35,8 @@
 *
 */
 
-#ifndef CHINFOMODEL_H
-#define CHINFOMODEL_H
+#ifndef CHANNELINFOMODEL_H
+#define CHANNELINFOMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,7 +90,7 @@ namespace DISPLIB
 
 class MNEOperator;
 
-namespace ChInfoModelRoles
+namespace ChannelInfoModelRoles
 {
     enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
                   GetMappedLayoutChName = Qt::UserRole + 1010,
@@ -109,17 +109,17 @@ namespace ChInfoModelRoles
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ChInfoModel
+* DECLARE CLASS ChannelInfoModel
 */
-class DISPSHARED_EXPORT ChInfoModel : public QAbstractTableModel
+class DISPSHARED_EXPORT ChannelInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<ChInfoModel> SPtr;              /**< Shared pointer type for ChInfoModel. */
-    typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
+    typedef QSharedPointer<ChannelInfoModel> SPtr;              /**< Shared pointer type for ChannelInfoModel. */
+    typedef QSharedPointer<const ChannelInfoModel> ConstSPtr;   /**< Const shared pointer type for ChannelInfoModel. */
 
-    ChInfoModel(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo, QObject *parent = 0);
-    ChInfoModel(QObject *parent = 0);
+    ChannelInfoModel(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo, QObject *parent = 0);
+    ChannelInfoModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -224,4 +224,4 @@ signals:
 
 } // NAMESPACE DISPLIB
 
-#endif // CHINFOMODEL_H
+#endif // CHANNELINFOMODEL_H

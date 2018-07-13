@@ -77,7 +77,7 @@ namespace DISPLIB {
     class ButterflyView;
     class AverageScene;
     class ChannelSelectionView;
-    class ChInfoModel;
+    class ChannelInfoModel;
     class FilterView;
     class AverageLayoutView;
 }
@@ -212,7 +212,7 @@ private:
     QSharedPointer<SCMEASLIB::RealTimeEvokedSet>        m_pRTESet;                  /**< The real-time evoked measurement. */
     QSharedPointer<QuickControlWidget>                  m_pQuickControlWidget;      /**< Quick control widget. */
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
-    QSharedPointer<DISPLIB::ChInfoModel>                m_pChInfoModel;             /**< Channel info model. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>                m_pChannelInfoModel;             /**< Channel info model. */
     QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/

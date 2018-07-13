@@ -42,7 +42,7 @@
 
 #include "helpers/averagescene.h"
 #include "helpers/evokedsetmodel.h"
-#include "helpers/chinfomodel.h"
+#include "helpers/channelinfomodel.h"
 #include "helpers/averagesceneitem.h"
 
 #include <fiff/fiff_info.h>
@@ -104,9 +104,9 @@ void AverageLayoutView::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &pFiffInfo
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setChInfoModel(QSharedPointer<ChInfoModel> &pChInfoModel)
+void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
-    m_pChInfoModel = pChInfoModel;
+    m_pChannelInfoModel = pChannelInfoModel;
 }
 
 
@@ -192,8 +192,8 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
 
 void AverageLayoutView::updateData()
 {
-    if(!m_pEvokedSetModel || !m_pChInfoModel || !m_pFiffInfo) {
-        qDebug() << "AverageLayoutView::updateData - m_pEvokedSetModel, m_pChInfoModel or m_pFiffInfo are NULL. Returning. ";
+    if(!m_pEvokedSetModel || !m_pChannelInfoModel || !m_pFiffInfo) {
+        qDebug() << "AverageLayoutView::updateData - m_pEvokedSetModel, m_pChannelInfoModel or m_pFiffInfo are NULL. Returning. ";
         return;
     }
 
@@ -210,7 +210,7 @@ void AverageLayoutView::updateData()
         QList<QPair<double, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, DISPLIB::RowVectorPair> > >();
 
         //Get the averageScenItem specific data row
-        int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
+        int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
 
         if(channelNumber != -1) {
             //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;

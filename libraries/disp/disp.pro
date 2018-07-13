@@ -116,7 +116,7 @@ SOURCES += \
     viewers/helpers/filterplotscene.cpp \
     viewers/helpers/selectionscene.cpp \
     viewers/helpers/selectionsceneitem.cpp \
-    viewers/helpers/chinfomodel.cpp \
+    viewers/helpers/channelinfomodel.cpp \
     viewers/helpers/mneoperator.cpp \
     viewers/helpers/draggableframelesswidget.cpp \
     viewers/helpers/frequencyspectrumdelegate.cpp \
@@ -148,7 +148,7 @@ HEADERS += \
     viewers/helpers/filterplotscene.h \
     viewers/helpers/selectionscene.h \
     viewers/helpers/selectionsceneitem.h \
-    viewers/helpers/chinfomodel.h \
+    viewers/helpers/channelinfomodel.h \
     viewers/helpers/mneoperator.h \
     viewers/helpers/draggableframelesswidget.h \
     viewers/helpers/frequencyspectrumdelegate.h \

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     chinfomodel.cpp
+* @file     channelinfomodel.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "chinfomodel.h"
+#include "channelinfomodel.h"
 #include "mneoperator.h"
 
 #include <fiff/fiff_info.h>
@@ -75,7 +75,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChInfoModel::ChInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent)
+ChannelInfoModel::ChannelInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(pFiffInfo)
 {
@@ -84,7 +84,7 @@ ChInfoModel::ChInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent)
 
 //*************************************************************************************************************
 
-ChInfoModel::ChInfoModel(QObject *parent)
+ChannelInfoModel::ChannelInfoModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
 {
@@ -93,7 +93,7 @@ ChInfoModel::ChInfoModel(QObject *parent)
 
 //*************************************************************************************************************
 
-int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
+int ChannelInfoModel::rowCount(const QModelIndex & /*parent*/) const
 {
     //Return number of stored evoked sets
     if(!m_pFiffInfo->chs.size()==0)
@@ -105,7 +105,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
+int ChannelInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 13;
 }
@@ -113,7 +113,7 @@ int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
@@ -193,7 +193,7 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
 //*************************************************************************************************************
 
-QVariant ChInfoModel::data(const QModelIndex &index, int role) const
+QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
 {
     if(index.row() >= m_pFiffInfo->chs.size())
         return QVariant();
@@ -208,7 +208,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(index.row());
                     return v;
 
-                case ChInfoModelRoles::GetChNumber:
+                case ChannelInfoModelRoles::GetChNumber:
                     v.setValue(index.row());
                     return v;
 
@@ -226,7 +226,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).ch_name));
                     return v;
 
-                case ChInfoModelRoles::GetOrigChName:
+                case ChannelInfoModelRoles::GetOrigChName:
                     v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).ch_name));
                     return v;
 
@@ -245,7 +245,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                         v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
                     return v;
 
-                case ChInfoModelRoles::GetChAlias:
+                case ChannelInfoModelRoles::GetChAlias:
                     if(index.row()<m_aliasNames.size())
                         v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
                     return v;
@@ -265,7 +265,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                         v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
                     return v;
 
-                case ChInfoModelRoles::GetMappedLayoutChName:
+                case ChannelInfoModelRoles::GetMappedLayoutChName:
                     if(index.row()<m_mappedLayoutChNames.size())
                         v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
                     return v;
@@ -284,7 +284,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).kind));
                     return v;
 
-                case ChInfoModelRoles::GetChKind:
+                case ChannelInfoModelRoles::GetChKind:
                     v.setValue(m_pFiffInfo->chs.at(index.row()).kind);
                     return v;
 
@@ -311,7 +311,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                 case Qt::DisplayRole:
                     return v;
 
-                case ChInfoModelRoles::GetMEGType:
+                case ChannelInfoModelRoles::GetMEGType:
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -328,7 +328,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).unit));
                     return v;
 
-                case ChInfoModelRoles::GetChUnit:
+                case ChannelInfoModelRoles::GetChUnit:
                     v.setValue(m_pFiffInfo->chs.at(index.row()).unit);
                     return v;
 
@@ -348,7 +348,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("(%1|%2)").arg(point.x()).arg(point.y()));
                     return v;
 
-                case ChInfoModelRoles::GetChPosition:
+                case ChannelInfoModelRoles::GetChPosition:
                     v.setValue(point);
                     return v;
 
@@ -370,7 +370,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("(%1|%2|%3)").arg(point3D.x()).arg(point3D.y()).arg(point3D.z()));
                     return v;
 
-                case ChInfoModelRoles::GetChDigitizer:
+                case ChannelInfoModelRoles::GetChDigitizer:
                     v.setValue(point3D);
                     return v;
 
@@ -428,7 +428,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 //                    }
 //                }
 
-//                case ChInfoModelRoles::GetChActiveFilter: {
+//                case ChannelInfoModelRoles::GetChActiveFilter: {
 //                    if(operatorPtr->m_OperatorType == MNEOperator::FILTER) {
 //                        filterOperator = operatorPtr.staticCast<FilterOperator>();
 //                    }
@@ -455,7 +455,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).chpos.coil_type));
                     return v;
 
-                case ChInfoModelRoles::GetChCoilType:
+                case ChannelInfoModelRoles::GetChCoilType:
                     v.setValue(m_pFiffInfo->chs.at(index.row()).chpos.coil_type);
                     return v;
 
@@ -476,7 +476,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(isBad);
                     return v;
 
-                case ChInfoModelRoles::GetIsBad:
+                case ChannelInfoModelRoles::GetIsBad:
                     isBad = m_pFiffInfo->bads.contains(chName);
                     v.setValue(isBad);
                     return v;
@@ -507,7 +507,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-bool ChInfoModel::insertRows(int position, int span, const QModelIndex & parent)
+bool ChannelInfoModel::insertRows(int position, int span, const QModelIndex & parent)
 {
     Q_UNUSED(position);
     Q_UNUSED(span);
@@ -519,7 +519,7 @@ bool ChInfoModel::insertRows(int position, int span, const QModelIndex & parent)
 
 //*************************************************************************************************************
 
-bool ChInfoModel::removeRows(int position, int span, const QModelIndex & parent)
+bool ChannelInfoModel::removeRows(int position, int span, const QModelIndex & parent)
 {
     Q_UNUSED(position);
     Q_UNUSED(span);
@@ -531,7 +531,7 @@ bool ChInfoModel::removeRows(int position, int span, const QModelIndex & parent)
 
 //*************************************************************************************************************
 
-Qt::ItemFlags ChInfoModel::flags(const QModelIndex & index) const
+Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex & index) const
 {
     Q_UNUSED(index);
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable /*| Qt::ItemIsEditable*/;
@@ -540,7 +540,7 @@ Qt::ItemFlags ChInfoModel::flags(const QModelIndex & index) const
 
 //*************************************************************************************************************
 
-bool ChInfoModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     Q_UNUSED(index);
     Q_UNUSED(value);
@@ -552,7 +552,7 @@ bool ChInfoModel::setData(const QModelIndex &index, const QVariant &value, int r
 
 //*************************************************************************************************************
 
-void ChInfoModel::fiffInfoChanged(FiffInfo::SPtr& pFiffInfo)
+void ChannelInfoModel::fiffInfoChanged(FiffInfo::SPtr& pFiffInfo)
 {
     beginResetModel();
 
@@ -570,7 +570,7 @@ void ChInfoModel::fiffInfoChanged(FiffInfo::SPtr& pFiffInfo)
 
 //*************************************************************************************************************
 
-void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
+void ChannelInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
 {
     beginResetModel();
 
@@ -584,7 +584,7 @@ void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOper
 
 //*************************************************************************************************************
 
-void ChInfoModel::layoutChanged(const QMap<QString,QPointF> &layoutMap)
+void ChannelInfoModel::layoutChanged(const QMap<QString,QPointF> &layoutMap)
 {
     beginResetModel();
 
@@ -602,7 +602,7 @@ void ChInfoModel::layoutChanged(const QMap<QString,QPointF> &layoutMap)
 
 //*************************************************************************************************************
 
-const QStringList & ChInfoModel::getMappedChannelsList()
+const QStringList & ChannelInfoModel::getMappedChannelsList()
 {
 
     return m_mappedLayoutChNames;
@@ -611,7 +611,7 @@ const QStringList & ChInfoModel::getMappedChannelsList()
 
 //*************************************************************************************************************
 
-int ChInfoModel::getIndexFromOrigChName(QString chName)
+int ChannelInfoModel::getIndexFromOrigChName(QString chName)
 {
     return m_pFiffInfo->ch_names.indexOf(chName);
 }
@@ -619,7 +619,7 @@ int ChInfoModel::getIndexFromOrigChName(QString chName)
 
 //*************************************************************************************************************
 
-int ChInfoModel::getIndexFromMappedChName(QString chName)
+int ChannelInfoModel::getIndexFromMappedChName(QString chName)
 {
     return m_mappedLayoutChNames.indexOf(chName);
 }
@@ -627,7 +627,7 @@ int ChInfoModel::getIndexFromMappedChName(QString chName)
 
 //*************************************************************************************************************
 
-QStringList ChInfoModel::getBadChannelList()
+QStringList ChannelInfoModel::getBadChannelList()
 {
     return m_pFiffInfo->bads;
 }
@@ -635,7 +635,7 @@ QStringList ChInfoModel::getBadChannelList()
 
 //*************************************************************************************************************
 
-void ChInfoModel::mapLayoutToChannels()
+void ChannelInfoModel::mapLayoutToChannels()
 {
     //TODO: Move this to layout loader in MNE-CPP Utils?
     //Map channels to layout
@@ -679,7 +679,7 @@ void ChInfoModel::mapLayoutToChannels()
 
 //*************************************************************************************************************
 
-void ChInfoModel::clearModel()
+void ChannelInfoModel::clearModel()
 {
     beginResetModel();
 
@@ -690,5 +690,5 @@ void ChInfoModel::clearModel()
 
     endResetModel();
 
-    qDebug("ChInfoModel cleared.");
+    qDebug("ChannelInfoModel cleared.");
 }

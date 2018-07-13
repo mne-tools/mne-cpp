@@ -42,7 +42,7 @@
 #include "helpers/quickcontrolwidget.h"
 
 #include <disp/viewers/channelselectionview.h>
-#include <disp/viewers/helpers/chinfomodel.h>
+#include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/filterview.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/butterflyview.h>
@@ -73,6 +73,7 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <QGraphicsItem>
+#include <QDir>
 
 
 //*************************************************************************************************************
@@ -425,17 +426,17 @@ void RealTimeEvokedSetWidget::init()
         //
         //-------- Init channel selection manager --------
         //
-        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
-        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(this, m_pChInfoModel, Qt::Window);
+        m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
+        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(this, m_pChannelInfoModel, Qt::Window);
 
         //Connect channel info model
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
-                m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
+                m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);
 
-        connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
+        connect(m_pChannelInfoModel.data(), &ChannelInfoModel::channelsMappedToLayout,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
-        m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
+        m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
         //
@@ -527,11 +528,11 @@ void RealTimeEvokedSetWidget::init()
                 m_pAverageLayoutView, &AverageLayoutView::updateData);
 
         m_pButterflyView->setModel(m_pEvokedSetModel);
-        m_pButterflyView->setChInfoModel(m_pChInfoModel);
+        m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
         m_pButterflyView->setModalities(m_pButterflyView->getModalities());
 
         m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
-        m_pAverageLayoutView->setChInfoModel(m_pChInfoModel);
+        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
         m_pAverageLayoutView->setScaleMap(m_pEvokedSetModel->getScaling());
 

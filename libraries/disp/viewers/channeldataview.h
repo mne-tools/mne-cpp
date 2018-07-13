@@ -115,15 +115,33 @@ public:
     /**
     * Constructs a ChannelDataView which is a child of parent.
     *
-    * @param [in] parent    parent of widget
+    * @param [in] parent    The parent of widget.
     */
     ChannelDataView(QWidget* parent = 0,
-                 Qt::WindowFlags f = Qt::Widget);
+                    Qt::WindowFlags f = Qt::Widget);
 
+    //=========================================================================================================
+    /**
+    * Initilaizes the ChannelDataView based on a FiffInfo.
+    *
+    * @param [in] info    The FiffInfo.
+    */
     void init(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
+    //=========================================================================================================
+    /**
+    * Add data to the view.
+    *
+    * @param [in] data    The new data.
+    */
     void addData(const QList<Eigen::MatrixXd>& data);
 
+    //=========================================================================================================
+    /**
+    * Get the latest data block from the underlying model.
+    *
+    * @return    The last data block.
+    */
     Eigen::MatrixXd getLastBlock();
 
     //=========================================================================================================
@@ -132,7 +150,7 @@ public:
     * Function is selecting the tool (freezing/annotation);
     *
     * @param object
-    * @param event o
+    * @param event
     *
     * @return
     */
@@ -146,6 +164,12 @@ public:
     */
     void setBackgroundColorChanged(const QColor& backgroundColor);
 
+    //=========================================================================================================
+    /**
+    * Get the current scaling map.
+    *
+    * @return    The current scaling map.
+    */
     QMap<qint32, float> getScalingMap();
 
     //=========================================================================================================
@@ -154,7 +178,7 @@ public:
     *
     * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
     */
-    void setScalingMap(QMap<qint32, float> scaleMap);
+    void setScalingMap(const QMap<qint32, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -170,6 +194,12 @@ public:
     */
     void hideBadChannels();
 
+    //=========================================================================================================
+    /**
+    * Get whether the bad channels are currently hidden or not.
+    *
+    * @return    The current bad channel hidden status.
+    */
     bool getBadChannelHideStatus();
 
     //=========================================================================================================
@@ -178,7 +208,7 @@ public:
     *
     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
     */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
+    void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
     //=========================================================================================================
     /**
@@ -188,6 +218,12 @@ public:
     */
     void setZoom(double zoomFac);
 
+    //=========================================================================================================
+    /**
+    * Get the current zoom.
+    *
+    * @return    The current zoom.
+    */
     double getZoom();
 
     //=========================================================================================================
@@ -198,8 +234,20 @@ public:
     */
     void setWindowSize(int T);
 
+    //=========================================================================================================
+    /**
+    * Get the current window size.
+    *
+    * @return    The current window size.
+    */
     int getWindowSize();
 
+    //=========================================================================================================
+    /**
+    * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
+    *
+    * @param [in] fileName     The file name and path where to store the screenshot.
+    */
     void takeScreenshot(const QString& fileName);
 
     //=========================================================================================================
@@ -232,7 +280,9 @@ public:
     * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
     * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
     */
-    void updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
+    void updateSpharaOptions(const QString& sSytemType,
+                             int nBaseFctsFirst,
+                             int nBaseFctsSecond);
 
     //=========================================================================================================
     /**
@@ -256,7 +306,7 @@ public:
     *
     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
     */
-    void setFilterChannelType(QString channelType);
+    void setFilterChannelType(const QString& channelType);
 
     //=========================================================================================================
     /**
@@ -267,7 +317,10 @@ public:
     * @param triggerCh      current trigger channel to scan
     * @param threshold      threshold for the detection process
     */
-    void triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold);
+    void triggerInfoChanged(const QMap<double, QColor>& colorMap,
+                            bool active,
+                            const QString& triggerCh,
+                            double threshold);
 
     //=========================================================================================================
     /**
@@ -348,13 +401,15 @@ signals:
     * @param position   the current mouse position
     * @param activeRow  the current row which the mouse is moved over
     */
-    void markerMoved(QPoint position, int activeRow);
+    void markerMoved(QPoint position,
+                     int activeRow);
 
     //=========================================================================================================
     /**
     * Emmited when trigger detection was performed
     */
-    void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
+    void triggerDetected(int numberDetectedTriggers,
+                         const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
     void channelMarkingChanged();
 };

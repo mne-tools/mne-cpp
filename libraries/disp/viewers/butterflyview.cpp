@@ -42,7 +42,7 @@
 #include "butterflyview.h"
 
 #include "helpers/evokedsetmodel.h"
-#include "helpers/chinfomodel.h"
+#include "helpers/channelinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -244,25 +244,25 @@ void ButterflyView::setAverageInformationMap(const QMap<double, QPair<QColor, QP
 
 //*************************************************************************************************************
 
-void ButterflyView::setChInfoModel(QSharedPointer<ChInfoModel> &pChInfoModel)
+void ButterflyView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
-    m_pChInfoModel = pChInfoModel;
+    m_pChannelInfoModel = pChannelInfoModel;
 }
 
 
 //*************************************************************************************************************
 
-void ButterflyView::showSelectedChannelsOnly(QStringList selectedChannels)
+void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels)
 {
-    if(!m_pChInfoModel) {
-        qDebug() << "ButterflyView::showSelectedChannelsOnly - m_pChInfoModel is NULL. Returning. ";
+    if(!m_pChannelInfoModel) {
+        qDebug() << "ButterflyView::showSelectedChannelsOnly - m_pChannelInfoModel is NULL. Returning. ";
         return;
     }
 
     QList<int> selectedChannelsIndexes;
 
     for(int i = 0; i<selectedChannels.size(); i++)
-        selectedChannelsIndexes<<m_pChInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
+        selectedChannelsIndexes<<m_pChannelInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
 
     setSelectedChannels(selectedChannelsIndexes);
 }

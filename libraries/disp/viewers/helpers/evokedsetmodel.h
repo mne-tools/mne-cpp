@@ -130,9 +130,21 @@ public:
     EvokedSetModel(QObject *parent = 0);
     ~EvokedSetModel();
 
-    inline bool isInit() const;
+    //=========================================================================================================
+    /**
+    * Returns whether this class is initalized.
+    *
+    * @return Flag specifying whether this class is initalized.
+    */
+    bool isInit() const;
 
-    inline qint32 getNumSamples() const;
+    //=========================================================================================================
+    /**
+    * Returns the number of samples.
+    *
+    * @return The number of samples.
+    */
+    qint32 getNumSamples() const;
 
     //=========================================================================================================
     /**
@@ -164,7 +176,8 @@ public:
     *
     * @return the accessed data
     */
-    inline QVariant data(int row, int column,
+    QVariant data(int row,
+                         int column,
                          int role = Qt::DisplayRole) const;
 
     //=========================================================================================================

@@ -42,6 +42,14 @@
 #include "channelselectionview.h"
 #include "ui_channelselectionview.h"
 #include "helpers/selectionsceneitem.h"
+#include "helpers/channelinfomodel.h"
+#include "helpers/selectionscene.h"
+
+#include <utils/layoutloader.h>
+#include <utils/selectionio.h>
+#include <utils/layoutmaker.h>
+
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +59,9 @@
 
 #include <QDate>
 #include <QVector3D>
+#include <QFileDialog>
+#include <QListWidgetItem>
+#include <QGraphicsItem>
 
 
 //*************************************************************************************************************
@@ -75,11 +86,11 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 ChannelSelectionView::ChannelSelectionView(QWidget *parent,
-                                           ChInfoModel::SPtr pChInfoModel,
+                                           ChannelInfoModel::SPtr pChannelInfoModel,
                                            Qt::WindowType f)
 : QWidget(parent, f)
 , ui(new Ui::ChannelSelectionViewWidget)
-, m_pChInfoModel(pChInfoModel)
+, m_pChannelInfoModel(pChannelInfoModel)
 {
     ui->setupUi(this);
 
@@ -224,8 +235,8 @@ void ChannelSelectionView::highlightChannels(QModelIndexList channelIndexList)
 {
     QStringList channelList;
     for(int i = 0; i < channelIndexList.size(); i++) {
-        QModelIndex nameIndex = m_pChInfoModel->index(channelIndexList.at(i).row(),3);
-        channelList<<m_pChInfoModel->data(nameIndex, ChInfoModelRoles::GetMappedLayoutChName).toString();
+        QModelIndex nameIndex = m_pChannelInfoModel->index(channelIndexList.at(i).row(),3);
+        channelList<<m_pChannelInfoModel->data(nameIndex, ChannelInfoModelRoles::GetMappedLayoutChName).toString();
     }
 
     QList<QGraphicsItem *> allSceneItems = m_pSelectionScene->items();
@@ -285,7 +296,8 @@ QStringList ChannelSelectionView::getSelectedChannels()
 
 //*************************************************************************************************************
 
-QListWidgetItem* ChannelSelectionView::getItemForChName(QListWidget* listWidget, QString channelName)
+QListWidgetItem* ChannelSelectionView::getItemForChName(QListWidget* listWidget,
+                                                        const QString &channelName)
 {
     for(int i=0; i < listWidget->count(); i++)
         if(listWidget->item(i)->text() == channelName)
@@ -336,15 +348,15 @@ void ChannelSelectionView::setCurrentLayoutFile(QString currentLayoutFile)
 void ChannelSelectionView::updateBadChannels()
 {
     QStringList badChannelMappedNames;
-    QStringList badChannelList = m_pChInfoModel->getBadChannelList();
+    QStringList badChannelList = m_pChannelInfoModel->getBadChannelList();
 
     if(ui->m_checkBox_showBadChannelsAsRed->isChecked()) {
-        for(int i = 0; i < m_pChInfoModel->rowCount(); i++) {
-            QModelIndex digIndex = m_pChInfoModel->index(i,3);
-            QString mappedChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetMappedLayoutChName).toString();
+        for(int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
+            QModelIndex digIndex = m_pChannelInfoModel->index(i,3);
+            QString mappedChName = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetMappedLayoutChName).toString();
 
-            digIndex = m_pChInfoModel->index(i,1);
-            QString origChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+            digIndex = m_pChannelInfoModel->index(i,1);
+            QString origChName = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetOrigChName).toString();
 
             if(badChannelList.contains(origChName))
                 badChannelMappedNames << mappedChName;
@@ -374,11 +386,11 @@ void ChannelSelectionView::updateDataView()
 
     for(int i = 0; i < targetListWidget->count(); i++) {
         QListWidgetItem* item = targetListWidget->item(i);
-        int indexTemp = m_pChInfoModel->getIndexFromMappedChName(item->text());
+        int indexTemp = m_pChannelInfoModel->getIndexFromMappedChName(item->text());
 
         if(indexTemp != -1) {
-            QModelIndex mappedNameIndex = m_pChInfoModel->index(indexTemp,1);
-            QString origChName = m_pChInfoModel->data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();
+            QModelIndex mappedNameIndex = m_pChannelInfoModel->index(indexTemp,1);
+            QString origChName = m_pChannelInfoModel->data(mappedNameIndex,ChannelInfoModelRoles::GetOrigChName).toString();
 
             selectedChannels << origChName;
         }
@@ -417,15 +429,15 @@ bool ChannelSelectionView::loadLayout(QString path)
     QStringList names;
     QFile out("manualLayout.lout");
 
-    for(int i = 0; i < m_pChInfoModel->rowCount(); i++) {
-        QModelIndex digIndex = m_pChInfoModel->index(i,1);
-        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+    for(int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
+        QModelIndex digIndex = m_pChannelInfoModel->index(i,1);
+        QString chName = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetOrigChName).toString();
 
-        digIndex = m_pChInfoModel->index(i,8);
-        QVector3D channelDig = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChDigitizer).value<QVector3D>();
+        digIndex = m_pChannelInfoModel->index(i,8);
+        QVector3D channelDig = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetChDigitizer).value<QVector3D>();
 
-        digIndex = m_pChInfoModel->index(i,4);
-        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
+        digIndex = m_pChannelInfoModel->index(i,4);
+        int kind = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetChKind).toInt();
 
         if(kind == FIFFV_EEG_CH) { //FIFFV_MEG_CH
             QVector<float> temp;
@@ -513,12 +525,12 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     QStringList names;
-    for(int i = 0; i < m_pChInfoModel->rowCount(); i++) {
-        QModelIndex digIndex = m_pChInfoModel->index(i,1);
-        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+    for(int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
+        QModelIndex digIndex = m_pChannelInfoModel->index(i,1);
+        QString chName = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetOrigChName).toString();
 
-        digIndex = m_pChInfoModel->index(i,4);
-        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
+        digIndex = m_pChannelInfoModel->index(i,4);
+        int kind = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetChKind).toInt();
 
         if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
             names<<chName;
