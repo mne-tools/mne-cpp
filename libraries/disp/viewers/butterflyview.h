@@ -51,12 +51,7 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QPolygonF>
-#include <QSharedPointer>
 #include <QMap>
-#include <QColor>
-#include <QPair>
-#include <QString>
 
 
 //*************************************************************************************************************
@@ -118,25 +113,85 @@ public:
     typedef QSharedPointer<ButterflyView> SPtr;              /**< Shared pointer type for ButterflyView. */
     typedef QSharedPointer<const ButterflyView> ConstSPtr;   /**< Const shared pointer type for ButterflyView. */
 
-    explicit ButterflyView(QWidget *parent = 0, Qt::WindowFlags f = Qt::Widget);
+    //=========================================================================================================
+    /**
+    * The constructor.
+    */
+    explicit ButterflyView(QWidget *parent = 0,
+                           Qt::WindowFlags f = Qt::Widget);
 
+    //=========================================================================================================
+    /**
+    * Set the evoked set model.
+    *
+    * @param [in] model     The new evoked set model.
+    */
     void setModel(QSharedPointer<EvokedSetModel> model);
 
+    //=========================================================================================================
+    /**
+    * Perform a data update.
+    *
+    * @param [in] topLeft       The new top left index.
+    * @param [in] bottomRight   The new bottom right index.
+    * @param [in] roles         The new roles.
+    */
     void dataUpdate(const QModelIndex& topLeft,
                     const QModelIndex& bottomRight,
                     const QVector<int>& roles = QVector<int>());
 
+    //=========================================================================================================
+    /**
+    * Returns the modality list.
+    *
+    * @return A list with all currently selected modalities.
+    */
     QList<Modality> getModalities();
+
+    //=========================================================================================================
+    /**
+    * Set the modalities.
+    *
+    * @param [in] p_qListModalities     The new modalities.
+    */
     void setModalities(const QList<Modality>& p_qListModalities);
 
+    //=========================================================================================================
+    /**
+    * Set the selected channels.
+    *
+    * @param [in] selectedChannels     The new selected channels.
+    */
     void setSelectedChannels(const QList<int> &selectedChannels);
 
+    //=========================================================================================================
+    /**
+    * Perform a view update.
+    */
     void updateView();
 
+    //=========================================================================================================
+    /**
+    * Set the background color.
+    *
+    * @param [in] backgroundColor     The new background color.
+    */
     void setBackgroundColor(const QColor& backgroundColor);
 
+    //=========================================================================================================
+    /**
+    * Returns the background color.
+    *
+    * @return The current background color.
+    */
     const QColor& getBackgroundColor();
 
+    //=========================================================================================================
+    /**
+    * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
+    *
+    * @param [in] fileName     The file name and path where to store the screenshot.
+    */
     void takeScreenshot(const QString& fileName);
 
     //=========================================================================================================
@@ -147,6 +202,12 @@ public:
     */
     void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
 
+    //=========================================================================================================
+    /**
+    * Set the channel info model.
+    *
+    * @param [in] pChInfoModel     The new channel info model.
+    */
     void setChInfoModel(QSharedPointer<ChInfoModel> &pChInfoModel);
 
     //=========================================================================================================
@@ -176,30 +237,31 @@ private:
     */
     void createPlotPath(qint32 row, QPainter& painter) const;
 
-    bool                    m_bShowMAG;                         /**< Show Magnetometers channels */
-    bool                    m_bShowGRAD;                        /**< Show Gradiometers channels */
-    bool                    m_bShowEEG;                         /**< Show EEG channels */
-    bool                    m_bShowEOG;                         /**< Show EEG channels */
-    bool                    m_bShowMISC;                        /**< Show Miscellaneous channels */
-    bool                    m_bIsInit;
+    bool        m_bShowMAG;                     /**< Show Magnetometers channels */
+    bool        m_bShowGRAD;                    /**< Show Gradiometers channels */
+    bool        m_bShowEEG;                     /**< Show EEG channels */
+    bool        m_bShowEOG;                     /**< Show EEG channels */
+    bool        m_bShowMISC;                    /**< Show Miscellaneous channels */
+    bool        m_bIsInit;                      /**< Whether this class has been initialized */
 
-    float                   m_fMaxMAG;                          /**< Scale for Magnetometers channels */
-    float                   m_fMaxGRAD;                         /**< Scale for Gradiometers channels */
-    float                   m_fMaxEEG;                          /**< Scale for EEG channels */
-    float                   m_fMaxEOG;                          /**< Scale for EEG channels */
-    float                   m_fMaxMISC;                         /**< Scale for Miscellaneous channels */
+    float       m_fMaxMAG;                      /**< Scale for Magnetometers channels */
+    float       m_fMaxGRAD;                     /**< Scale for Gradiometers channels */
+    float       m_fMaxEEG;                      /**< Scale for EEG channels */
+    float       m_fMaxEOG;                      /**< Scale for EEG channels */
+    float       m_fMaxMISC;                     /**< Scale for Miscellaneous channels */
 
-    qint32                  m_iNumChannels;
+    qint32      m_iNumChannels;                 /**< Number of channels */
 
-    QColor                  m_colCurrentBackgroundColor;
+    QColor      m_colCurrentBackgroundColor;    /**< The current background color */
 
-    QList<int>              m_lSelectedChannels;
-    QList<DISPLIB::Modality>m_qListModalities;
+    QList<int>  m_lSelectedChannels;            /**< The currently selected channels */
 
-    QSharedPointer<EvokedSetModel>          m_pEvokedModel;
-    QSharedPointer<ChInfoModel>             m_pChInfoModel;             /**< Channel info model. */
+    QList<DISPLIB::Modality>            m_qListModalities;                          /**< The list of currently selected modalities */
 
-    QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;             /**< Average colors and names. */
+    QSharedPointer<EvokedSetModel>      m_pEvokedModel;                             /**< The evoked model */
+    QSharedPointer<ChInfoModel>         m_pChInfoModel;                             /**< The channel info model */
+
+    QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;     /**< The current average color information. */
 };
 
 
