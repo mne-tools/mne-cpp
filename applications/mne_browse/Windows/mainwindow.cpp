@@ -173,18 +173,18 @@ void MainWindow::setupWindowWidgets()
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::fiffInfoChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::fiffInfoChanged);
 
     connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
-            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::assignedOperatorsChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::assignedOperatorsChanged);
 
     connect(m_pChannelSelectionView, &ChannelSelectionView::loadedLayoutMap,
-            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::layoutChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::layoutChanged);
 
-    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
+    connect(m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::channelsMappedToLayout,
             m_pChannelSelectionView, &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
-    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
+    connect(m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::channelsMappedToLayout,
             m_pAverageWindow, &AverageWindow::setMappedChannelNames);
 
     //Connect selection manager with a new file loaded signal

@@ -81,7 +81,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class EvokedSetModel;
-class ChInfoModel;
+class ChannelInfoModel;
 
 
 //*************************************************************************************************************
@@ -206,9 +206,9 @@ public:
     /**
     * Set the channel info model.
     *
-    * @param [in] pChInfoModel     The new channel info model.
+    * @param [in] pChannelInfoModel     The new channel info model.
     */
-    void setChInfoModel(QSharedPointer<ChInfoModel> &pChInfoModel);
+    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
     //=========================================================================================================
     /**
@@ -216,7 +216,7 @@ public:
     *
     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
     */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
+    void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
 protected:
     //=========================================================================================================
@@ -259,7 +259,7 @@ private:
     QList<DISPLIB::Modality>            m_qListModalities;                          /**< The list of currently selected modalities */
 
     QSharedPointer<EvokedSetModel>      m_pEvokedModel;                             /**< The evoked model */
-    QSharedPointer<ChInfoModel>         m_pChInfoModel;                             /**< The channel info model */
+    QSharedPointer<ChannelInfoModel>         m_pChannelInfoModel;                             /**< The channel info model */
 
     QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;     /**< The current average color information. */
 };

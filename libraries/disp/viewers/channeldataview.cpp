@@ -203,7 +203,7 @@ QMap<qint32, float> ChannelDataView::getScalingMap()
 
 //*************************************************************************************************************
 
-void ChannelDataView::setScalingMap(QMap<qint32,float> scaleMap)
+void ChannelDataView::setScalingMap(const QMap<qint32, float>& scaleMap)
 {
     m_qMapChScaling = scaleMap;
     m_pModel->setScaling(scaleMap);
@@ -251,7 +251,7 @@ bool ChannelDataView::getBadChannelHideStatus()
 
 //*************************************************************************************************************
 
-void ChannelDataView::showSelectedChannelsOnly(QStringList selectedChannels)
+void ChannelDataView::showSelectedChannelsOnly(const QStringList &selectedChannels)
 {
     m_slSelectedChannels = selectedChannels;
 
@@ -377,7 +377,7 @@ void ChannelDataView::filterActivated(bool state)
 
 //*************************************************************************************************************
 
-void ChannelDataView::setFilterChannelType(QString channelType)
+void ChannelDataView::setFilterChannelType(const QString &channelType)
 {
     m_pModel->setFilterChannelType(channelType);
 }
@@ -385,7 +385,10 @@ void ChannelDataView::setFilterChannelType(QString channelType)
 
 //*************************************************************************************************************
 
-void ChannelDataView::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
+void ChannelDataView::triggerInfoChanged(const QMap<double, QColor>& colorMap,
+                                         bool active,
+                                         const QString &triggerCh,
+                                         double threshold)
 {
     m_pModel->triggerInfoChanged(colorMap, active, triggerCh, threshold);
 }

@@ -43,15 +43,8 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
-#include "helpers/filterdatamodel.h"
-#include "helpers/filterdatadelegate.h"
-#include "helpers/filterplotscene.h"
 
-#include "utils/mnemath.h"
-#include "utils/filterTools/filterdata.h"
-#include "utils/filterTools/filterio.h"
-
-#include <fiff/fiff_info.h>
+#include <utils/filterTools/filterdata.h>
 
 
 //*************************************************************************************************************
@@ -60,7 +53,6 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -73,6 +65,8 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class QCheckBox;
 
 namespace Ui {
     class FilterViewWidget;
@@ -92,6 +86,10 @@ namespace DISPLIB
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class FilterDataModel;
+class FilterDataDelegate;
+class FilterPlotScene;
 
 
 /**
@@ -279,9 +277,11 @@ private:
 
     Ui::FilterViewWidget*       ui;                         /**< Pointer to the qt designer generated ui class.*/
 
+    QSharedPointer<FilterDataModel>       m_pFilterDataModel;         /**< The model to hold current filters.*/
+    QSharedPointer<FilterDataDelegate>    m_pFilterDataDelegate;      /**< The delegate to plot the activation check boxes in column one.*/
+    QSharedPointer<FilterPlotScene>       m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+
     UTILSLIB::FilterData        m_filterData;               /**< The current filter operator.*/
-    FilterDataModel::SPtr       m_pFilterDataModel;         /**< The model to hold current filters.*/
-    FilterDataDelegate::SPtr    m_pFilterDataDelegate;      /**< The delegate to plot the activation check boxes in column one.*/
 
     QList<QCheckBox*>           m_lActivationCheckBoxList;  /**< List of all filter check boxes.*/
     QStringList                 m_lDefaultFilters;          /**< List with the names of all default filters.*/
@@ -290,17 +290,37 @@ private:
     int                         m_iFilterTaps;              /**< The current number of filter taps.*/
     double                      m_dSFreq;                   /**< The current sampling frequency.*/
 
-    QSettings                   m_qSettings;                /**< QSettings variable used to write or read from independent application sessions.*/
-
-    FilterPlotScene::SPtr       m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
-
 signals:
+    //=========================================================================================================
+    /**
+    * Emitted when the filter changes.
+    *
+    * @param activeFilter  The currently active filters.
+    */
     void filterChanged(QList<UTILSLIB::FilterData> activeFilter);
 
+    //=========================================================================================================
+    /**
+    * Emitted when the filter should be applied.
+    *
+    * @param channelType  The channel type on which the filter should be performed on.
+    */
     void applyFilter(QString channelType);
 
+    //=========================================================================================================
+    /**
+    * Emitted when the filters are activated.
+    *
+    * @param state  The activation state.
+    */
     void filterActivated(bool state);
 
+    //=========================================================================================================
+    /**
+    * Emitted when one of the filters is activated via its check box.
+    *
+    * @param list  A list of the filter check boxes and their state.
+    */
     void activationCheckBoxListChanged(QList<QCheckBox*> list);
 
 protected slots:

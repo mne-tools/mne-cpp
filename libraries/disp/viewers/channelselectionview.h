@@ -44,14 +44,6 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
-#include "helpers/chinfomodel.h"
-#include "helpers/selectionscene.h"
-
-#include <utils/layoutloader.h>             //MNE-CPP utils
-#include <utils/selectionio.h>              //MNE-CPP utils
-#include <utils/layoutmaker.h>              //MNE-CPP utils
-
-#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -59,16 +51,24 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMutableStringListIterator>
-#include <QFileDialog>
-#include <QStandardPaths>
+#include <QWidget>
+#include <QWidget>
 #include <QListWidget>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class QListWidgetItem;
+class QGraphicsItem;
 
 namespace Ui {
     class ChannelSelectionViewWidget;
@@ -93,6 +93,9 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class ChannelInfoModel;
+class SelectionScene;
+
 
 /**
 * DECLARE CLASS ChannelSelectionView
@@ -112,10 +115,10 @@ public:
     * Constructs a ChannelSelectionView which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new ChannelSelectionView becomes a window. If parent is another widget, ChannelSelectionView becomes a child window inside parent. ChannelSelectionView is deleted when its parent is deleted.
-    * @param [in] pChInfoModel pointer to the channel info model.
+    * @param [in] pChannelInfoModel pointer to the channel info model.
     */
     ChannelSelectionView(QWidget *parent = 0,
-                         ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0),
+                         QSharedPointer<ChannelInfoModel> pChannelInfoModel = QSharedPointer<ChannelInfoModel>(0),
                          Qt::WindowType f = Qt::Widget);
 
     //=========================================================================================================
@@ -165,7 +168,8 @@ public:
     * @param [in] listWidget QListWidget which inhibits the needed item
     * @param [in] channelName the corresponding channel name
     */
-    QListWidgetItem* getItemForChName(QListWidget *listWidget, QString channelName);
+    QListWidgetItem* getItemForChName(QListWidget *listWidget,
+                                      const QString& channelName);
 
     //=========================================================================================================
     /**
@@ -274,7 +278,8 @@ private:
     * @param [in] current the current selection group list item
     * @param [in] previous the previous selection group list item
     */
-    void updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous);
+    void updateSelectionGroupsList(QListWidgetItem* current,
+                                   QListWidgetItem* previous);
 
     //=========================================================================================================
     /**
@@ -334,7 +339,7 @@ private:
 
     Ui::ChannelSelectionViewWidget*     ui;                                 /**< Pointer to the qt designer generated ui class. */
 
-    ChInfoModel::SPtr                   m_pChInfoModel;                     /**< Pointer to the channel info model. */
+    QSharedPointer<ChannelInfoModel>    m_pChannelInfoModel;                /**< Pointer to the channel info model. */
 
     QMap<QString,QPointF>               m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
     QMap<QString,QStringList>           m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/

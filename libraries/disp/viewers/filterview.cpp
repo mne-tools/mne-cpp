@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     FilterView.cpp
+* @file     filterview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -39,8 +39,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_filterview.h"
 #include "filterview.h"
+#include "ui_filterview.h"
+
+#include "helpers/filterdatamodel.h"
+#include "helpers/filterdatadelegate.h"
+#include "helpers/filterplotscene.h"
+
+#include "utils/mnemath.h"
+#include "utils/filterTools/filterio.h"
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -55,6 +64,7 @@
 #include <QKeyEvent>
 #include <QSvgGenerator>
 #include <QCheckBox>
+#include <QSettings>
 
 
 //*************************************************************************************************************

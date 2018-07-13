@@ -45,7 +45,7 @@
 
 #include <disp/viewers/filterview.h>
 #include <disp/viewers/channelselectionview.h>
-#include <disp/viewers/helpers/chinfomodel.h>
+#include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/channeldataview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
@@ -63,6 +63,7 @@
 #include <QDate>
 #include <QVBoxLayout>
 #include <QCheckBox>
+#include <QDir>
 
 
 //*************************************************************************************************************
@@ -293,7 +294,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterWindow.data(),static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pChannelDataView,static_cast<void (ChannelDataView::*)(QString)>(&ChannelDataView::setFilterChannelType));
+                m_pChannelDataView,static_cast<void (ChannelDataView::*)(const QString &)>(&ChannelDataView::setFilterChannelType));
 
         connect(m_pFilterWindow.data(), &FilterView::filterChanged,
                 m_pChannelDataView, &ChannelDataView::filterChanged);
@@ -314,15 +315,15 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         //-------- Init channel selection manager --------
         //
-        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
+        m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
 
-        m_pChannelSelectionView = ChannelSelectionView::SPtr(new ChannelSelectionView(this, m_pChInfoModel, Qt::Window));
+        m_pChannelSelectionView = ChannelSelectionView::SPtr(new ChannelSelectionView(this, m_pChannelInfoModel, Qt::Window));
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 m_pChannelDataView, &ChannelDataView::showSelectedChannelsOnly);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
-                m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
+                m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
@@ -330,10 +331,10 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pChannelDataView.data(), &ChannelDataView::channelMarkingChanged,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
 
-        connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
+        connect(m_pChannelInfoModel.data(), &ChannelInfoModel::channelsMappedToLayout,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
-        m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
+        m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
 
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName),
                                                                        "babymeg-mag-inner-layer.lout").toString());
