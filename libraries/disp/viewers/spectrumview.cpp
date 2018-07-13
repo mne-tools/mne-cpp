@@ -70,7 +70,8 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SpectrumView::SpectrumView(QWidget *parent, Qt::WindowFlags f)
+SpectrumView::SpectrumView(QWidget *parent,
+                           Qt::WindowFlags f)
 : QWidget(parent, f)
 {
     m_pTableView = new QTableView;
@@ -91,7 +92,8 @@ SpectrumView::SpectrumView(QWidget *parent, Qt::WindowFlags f)
 
 //*************************************************************************************************************
 
-void SpectrumView::init(FiffInfo::SPtr &info, int iScaleType)
+void SpectrumView::init(FiffInfo::SPtr &info,
+                        int iScaleType)
 {
     m_pFSModel = new FrequencySpectrumModel(this);
 
@@ -143,7 +145,8 @@ void SpectrumView::addData(const MatrixXd &data)
 
 //*************************************************************************************************************
 
-void SpectrumView::setBoundaries(int iLower, int iUpper)
+void SpectrumView::setBoundaries(int iLower,
+                                 int iUpper)
 {
     m_pFSModel->setBoundaries(iLower, iUpper);
 }
@@ -151,7 +154,8 @@ void SpectrumView::setBoundaries(int iLower, int iUpper)
 
 //*************************************************************************************************************
 
-bool SpectrumView::eventFilter(QObject * watched, QEvent * event)
+bool SpectrumView::eventFilter(QObject * watched,
+                               QEvent * event)
 {
     if(event->type() == QEvent::MouseMove){
         QMouseEvent *mouseEvent = static_cast <QMouseEvent*>( event );

@@ -108,6 +108,10 @@ public:
     void updateValue(qint32 value);
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emitted whenever the settings changed and are ready to be retreived.
+    */
     void settingsChanged();
 
 public:

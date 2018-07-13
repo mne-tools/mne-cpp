@@ -64,6 +64,7 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <QDir>
+#include <QSettings>
 
 
 //*************************************************************************************************************

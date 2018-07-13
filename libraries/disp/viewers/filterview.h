@@ -208,7 +208,7 @@ public:
     */
     bool userDesignedFiltersIsActive();
 
-private:
+protected:
     //=========================================================================================================
     /**
     * inits all check boxes.
@@ -275,55 +275,6 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterViewWidget*       ui;                         /**< Pointer to the qt designer generated ui class.*/
-
-    QSharedPointer<FilterDataModel>       m_pFilterDataModel;         /**< The model to hold current filters.*/
-    QSharedPointer<FilterDataDelegate>    m_pFilterDataDelegate;      /**< The delegate to plot the activation check boxes in column one.*/
-    QSharedPointer<FilterPlotScene>       m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
-
-    UTILSLIB::FilterData        m_filterData;               /**< The current filter operator.*/
-
-    QList<QCheckBox*>           m_lActivationCheckBoxList;  /**< List of all filter check boxes.*/
-    QStringList                 m_lDefaultFilters;          /**< List with the names of all default filters.*/
-
-    int                         m_iWindowSize;              /**< The current window size of the loaded fiff data in the DataWindow class.*/
-    int                         m_iFilterTaps;              /**< The current number of filter taps.*/
-    double                      m_dSFreq;                   /**< The current sampling frequency.*/
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when the filter changes.
-    *
-    * @param activeFilter  The currently active filters.
-    */
-    void filterChanged(QList<UTILSLIB::FilterData> activeFilter);
-
-    //=========================================================================================================
-    /**
-    * Emitted when the filter should be applied.
-    *
-    * @param channelType  The channel type on which the filter should be performed on.
-    */
-    void applyFilter(QString channelType);
-
-    //=========================================================================================================
-    /**
-    * Emitted when the filters are activated.
-    *
-    * @param state  The activation state.
-    */
-    void filterActivated(bool state);
-
-    //=========================================================================================================
-    /**
-    * Emitted when one of the filters is activated via its check box.
-    *
-    * @param list  A list of the filter check boxes and their state.
-    */
-    void activationCheckBoxListChanged(QList<QCheckBox*> list);
-
-protected slots:
     //=========================================================================================================
     /**
     * updates the filter activation layout
@@ -387,6 +338,53 @@ protected slots:
     */
     void filterSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
+    Ui::FilterViewWidget*       ui;                         /**< Pointer to the qt designer generated ui class.*/
+
+    QSharedPointer<FilterDataModel>       m_pFilterDataModel;         /**< The model to hold current filters.*/
+    QSharedPointer<FilterDataDelegate>    m_pFilterDataDelegate;      /**< The delegate to plot the activation check boxes in column one.*/
+    QSharedPointer<FilterPlotScene>       m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+
+    UTILSLIB::FilterData        m_filterData;               /**< The current filter operator.*/
+
+    QList<QCheckBox*>           m_lActivationCheckBoxList;  /**< List of all filter check boxes.*/
+    QStringList                 m_lDefaultFilters;          /**< List with the names of all default filters.*/
+
+    int                         m_iWindowSize;              /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                         m_iFilterTaps;              /**< The current number of filter taps.*/
+    double                      m_dSFreq;                   /**< The current sampling frequency.*/   
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when the filter changes.
+    *
+    * @param activeFilter  The currently active filters.
+    */
+    void filterChanged(QList<UTILSLIB::FilterData> activeFilter);
+
+    //=========================================================================================================
+    /**
+    * Emitted when the filter should be applied.
+    *
+    * @param channelType  The channel type on which the filter should be performed on.
+    */
+    void applyFilter(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Emitted when the filters are activated.
+    *
+    * @param state  The activation state.
+    */
+    void filterActivated(bool state);
+
+    //=========================================================================================================
+    /**
+    * Emitted when one of the filters is activated via its check box.
+    *
+    * @param list  A list of the filter check boxes and their state.
+    */
+    void activationCheckBoxListChanged(QList<QCheckBox*> list);
 };
 
 } // NAMESPACE DISPLIB

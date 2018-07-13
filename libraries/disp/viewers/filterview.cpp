@@ -57,14 +57,11 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
 #include <QDate>
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QKeyEvent>
 #include <QSvgGenerator>
 #include <QCheckBox>
-#include <QSettings>
 
 
 //*************************************************************************************************************
