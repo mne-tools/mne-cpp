@@ -107,7 +107,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the region selection widget (F11)"),this);
     m_pActionSelectSensors->setShortcut(tr("F11"));
     m_pActionSelectSensors->setStatusTip(tr("Show the region selection widget (F11)"));
-    connect(m_pActionSelectSensors, &QAction::triggered,
+    connect(m_pActionSelectSensors.data(), &QAction::triggered,
             this, &RealTimeEvokedSetWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(false);
@@ -115,7 +115,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
     m_pActionQuickControl->setShortcut(tr("F9"));
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget (F9)"));
-    connect(m_pActionQuickControl, &QAction::triggered,
+    connect(m_pActionQuickControl.data(), &QAction::triggered,
             this, &RealTimeEvokedSetWidget::showQuickControlWidget);
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(false);
@@ -471,7 +471,7 @@ void RealTimeEvokedSetWidget::init()
 
         //Handle modalities
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::modalitiesChanged,
-                m_pButterflyView, &ButterflyView::setModalities);
+                m_pButterflyView.data(), &ButterflyView::setModalities);
 
         //Handle filtering
         connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
@@ -503,10 +503,10 @@ void RealTimeEvokedSetWidget::init()
                 m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
-                m_pAverageLayoutView, &AverageLayoutView::updateData);
+                m_pAverageLayoutView.data(), &AverageLayoutView::updateData);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                m_pAverageLayoutView, &AverageLayoutView::setScaleMap);
+                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
 
         //Handle averages
         connect(this->m_pEvokedSetModel.data(), &EvokedSetModel::newAverageTypeReceived,
@@ -516,17 +516,17 @@ void RealTimeEvokedSetWidget::init()
                 m_pAverageLayoutView.data(), &AverageLayoutView::setAverageInformationMap);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
-                m_pButterflyView, &ButterflyView::setAverageInformationMap);
+                m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
 
         //Connect Quick Control Widget
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pButterflyView, &ButterflyView::updateView);
+                m_pButterflyView.data(), &ButterflyView::updateView);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pButterflyView, &ButterflyView::showSelectedChannelsOnly);
+                m_pButterflyView.data(), &ButterflyView::showSelectedChannelsOnly);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pAverageLayoutView, &AverageLayoutView::updateData);
+                m_pAverageLayoutView.data(), &AverageLayoutView::updateData);
 
         m_pButterflyView->setModel(m_pEvokedSetModel);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);

@@ -97,21 +97,21 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F9)"),this);
     m_pActionSelectSensors->setShortcut(tr("F9"));
     m_pActionSelectSensors->setToolTip(tr("Shows the region selection widget (F9)"));
-    connect(m_pActionSelectSensors, &QAction::triggered,
+    connect(m_pActionSelectSensors.data(), &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(true);
 
     m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
     m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
-    connect(m_pActionHideBad, &QAction::triggered,
+    connect(m_pActionHideBad.data(), &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::onHideBadChannels);
     addDisplayAction(m_pActionHideBad);
     m_pActionHideBad->setVisible(true);
 
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
-    connect(m_pActionQuickControl, &QAction::triggered,
+    connect(m_pActionQuickControl.data(), &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showQuickControlWidget);
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(true);
@@ -295,13 +295,13 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterWindow.data(),static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pChannelDataView,static_cast<void (ChannelDataView::*)(const QString &)>(&ChannelDataView::setFilterChannelType));
+                m_pChannelDataView.data(),static_cast<void (ChannelDataView::*)(const QString &)>(&ChannelDataView::setFilterChannelType));
 
         connect(m_pFilterWindow.data(), &FilterView::filterChanged,
-                m_pChannelDataView, &ChannelDataView::filterChanged);
+                m_pChannelDataView.data(), &ChannelDataView::filterChanged);
 
         connect(m_pFilterWindow.data(), &FilterView::filterActivated,
-                m_pChannelDataView, &ChannelDataView::filterActivated);
+                m_pChannelDataView.data(), &ChannelDataView::filterActivated);
 
         //Set stored filter settings from last session
         m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
@@ -321,7 +321,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pChannelSelectionView = ChannelSelectionView::SPtr(new ChannelSelectionView(this, m_pChannelInfoModel, Qt::Window));
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pChannelDataView, &ChannelDataView::showSelectedChannelsOnly);
+                m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);
@@ -355,15 +355,15 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Handle scaling
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                m_pChannelDataView, &ChannelDataView::setScalingMap);
+                m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
 
         //Handle signal color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
-                m_pChannelDataView, &ChannelDataView::setSignalColor);
+                m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
 
         //Handle background color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
-                m_pChannelDataView, &ChannelDataView::setBackgroundColorChanged);
+                m_pChannelDataView.data(), &ChannelDataView::setBackgroundColorChanged);
 
         //Handle screenshot signals
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
@@ -371,25 +371,25 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                m_pChannelDataView, &ChannelDataView::updateProjection);
+                m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                m_pChannelDataView, &ChannelDataView::updateCompensator);
+                m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
 
         //Handle SPHARA
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
-                m_pChannelDataView, &ChannelDataView::updateSpharaActivation);
+                m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
-                m_pChannelDataView, &ChannelDataView::updateSpharaOptions);
+                m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
 
         //Handle view changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
-                m_pChannelDataView, &ChannelDataView::setZoom);
+                m_pChannelDataView.data(), &ChannelDataView::setZoom);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
-                m_pChannelDataView, &ChannelDataView::setWindowSize);
+                m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
 
         //Handle Filtering
         connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
@@ -400,17 +400,17 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Handle trigger detection
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
-                m_pChannelDataView, &ChannelDataView::triggerInfoChanged);
+                m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
-                m_pChannelDataView, &ChannelDataView::resetTriggerCounter);
+                m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
 
-        connect(m_pChannelDataView, &ChannelDataView::triggerDetected,
+        connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
                 m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggersAndTypes);
 
         //Handle time spacer distance
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
-                m_pChannelDataView, &ChannelDataView::distanceTimeSpacerChanged);
+                m_pChannelDataView.data(), &ChannelDataView::distanceTimeSpacerChanged);
 
         m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
