@@ -114,13 +114,43 @@ public:
     SpectrumView(QWidget* parent = 0,
                  Qt::WindowFlags f = Qt::Widget);
 
-    void init(QSharedPointer<FIFFLIB::FiffInfo> &info, int iScaleType);
+    //=========================================================================================================
+    /**
+    * Initializes the view based on the FiffInfo and scale type.
+    *
+    * @param [in] info          The FiffInfo.
+    * @param [in] iScaleType    The scale type.
+    */
+    void init(QSharedPointer<FIFFLIB::FiffInfo> &info,
+              int iScaleType);
 
+    //=========================================================================================================
+    /**
+    * Adds data to the underlying model.
+    *
+    * @param [in] data          The new data.
+    */
     void addData(const Eigen::MatrixXd &data);
 
-    void setBoundaries(int iLower, int iUpper);
+    //=========================================================================================================
+    /**
+    * Sets the boundaries.
+    *
+    * @param [in] iLower    The lower boundary.
+    * @param [in] iUpper    The upper boundary.
+    */
+    void setBoundaries(int iLower,
+                       int iUpper);
 
-    virtual bool eventFilter(QObject* watched, QEvent* event);
+    //=========================================================================================================
+    /**
+    * The event filter
+    *
+    * @param [in] watched
+    * @param [in] event
+    */
+    virtual bool eventFilter(QObject* watched,
+                             QEvent* event);
 
 protected:
     QPointer<QTableView>                                m_pTableView;           /**< The QTableView being part of the model/view framework of Qt */
@@ -132,7 +162,10 @@ signals:
     /**
     * Signals for sending the mouse location to the delegate
     */
-    void sendMouseLoc(int row, int x, int y, QRect visRect);
+    void sendMouseLoc(int row,
+                      int x,
+                      int y,
+                      QRect visRect);
 };
 
 } // NAMESPACE

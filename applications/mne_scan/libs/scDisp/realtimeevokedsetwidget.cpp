@@ -74,6 +74,7 @@
 #include <QCheckBox>
 #include <QGraphicsItem>
 #include <QDir>
+#include <QSettings>
 
 
 //*************************************************************************************************************
