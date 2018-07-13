@@ -94,7 +94,7 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
     m_pActionSelectModality = new QAction(QIcon(":/images/covarianceSelection.png"), tr("Shows the covariance modality selection widget (F12)"),this);
     m_pActionSelectModality->setShortcut(tr("F12"));
     m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
-    connect(m_pActionSelectModality, &QAction::triggered,
+    connect(m_pActionSelectModality.data(), &QAction::triggered,
             this, &RealTimeCovWidget::showModalitySelectionWidget);
     addDisplayAction(m_pActionSelectModality);
 

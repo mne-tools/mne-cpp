@@ -96,7 +96,7 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
     m_pActionFrequencySettings = new QAction(QIcon(":/images/frqResolution.png"), tr("Shows the frequency spectrum settings widget (F12)"),this);
     m_pActionFrequencySettings->setShortcut(tr("F12"));
     m_pActionFrequencySettings->setStatusTip(tr("Shows the frequency spectrum settings widget (F12)"));
-    connect(m_pActionFrequencySettings, &QAction::triggered,
+    connect(m_pActionFrequencySettings.data(), &QAction::triggered,
             this, &RealTimeSpectrumWidget::showSpectrumSettingsView);
     addDisplayAction(m_pActionFrequencySettings);
 
