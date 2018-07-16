@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 
 
 //*************************************************************************************************************
@@ -96,7 +96,7 @@ namespace SCMEASLIB
 *
 * @brief Real-time source estimate measurement.
 */
-class SCMEASSHARED_EXPORT RealTimeConnectivityEstimate : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeConnectivityEstimate : public Measurement
 {
 public:
     typedef QSharedPointer<RealTimeConnectivityEstimate> SPtr;               /**< Shared pointer type for RealTimeConnectivityEstimate. */

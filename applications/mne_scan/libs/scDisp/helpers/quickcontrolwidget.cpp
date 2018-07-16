@@ -752,7 +752,7 @@ void QuickControlWidget::onUpdateModalityCheckbox(qint32 state)
             m_qListModalities[i].m_bActive = false;
     }
 
-    emit settingsChanged(m_qListModalities);
+    emit modalitiesChanged(m_qListModalities);
 
     emit updateConnectedView();
 }

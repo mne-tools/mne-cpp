@@ -43,7 +43,7 @@
 #include "FormFiles/natussetup.h"
 
 #include <fiff/fiff.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -83,7 +83,7 @@ Natus::Natus()
 , m_bIsRunning(false)
 , m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
-, m_pRMTSA_Natus(PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
+, m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/natus/")
 {
     qDebug() << m_qStringResourcePath;

@@ -78,4 +78,4 @@ realtime.depends = utils fiff mne fwd inverse
 deep.depends = utils fs fiff mne
 connectivity.depends = utils
 disp.depends = utils fs fiff mne fwd inverse
-disp3D.depends = utils fs fiff mne fwd inverse disp
+disp3D.depends = utils fs fiff mne fwd inverse realtime disp

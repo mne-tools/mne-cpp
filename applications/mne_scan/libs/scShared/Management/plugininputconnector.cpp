@@ -79,7 +79,7 @@ bool PluginInputConnector::isOutputConnector() const
 
 //*************************************************************************************************************
 
-void PluginInputConnector::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void PluginInputConnector::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     emit notify(pMeasurement);
 }

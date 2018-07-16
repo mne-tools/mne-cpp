@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "rtsensordataworker.h"
-#include <disp/helpers/colormap.h>
+#include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
 
 
@@ -82,7 +82,7 @@ RtSensorDataWorker::RtSensorDataWorker()
 , m_iAverageSamples(1)
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(true)
-, m_itCurrentSample(0)
+, m_iCurrentSample(0)
 , m_iSampleCtr(0)
 , m_pMatInterpolationMatrix(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 {
@@ -95,6 +95,7 @@ RtSensorDataWorker::RtSensorDataWorker()
 void RtSensorDataWorker::addData(const MatrixXd& data)
 {
     if(data.rows() == 0) {
+        qDebug() <<"RtSensorDataWorker::addData - Passed data is epmpty!";
         return;
     }
 
@@ -103,7 +104,7 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
         if(m_lDataQ.size() < m_dSFreq) {
             m_lDataQ.push_back(data.col(i));
         } else {
-            qDebug() <<"RtSensorDataWorker::addData - worker is full!";
+            qDebug() <<"RtSensorDataWorker::addData - worker is full ("<<m_lDataQ.size()<<")";
             break;
         }
     }
@@ -189,37 +190,32 @@ void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<floa
 void RtSensorDataWorker::streamData()
 {
     if(m_lDataQ.size() > 0) {
-        if(m_itCurrentSample == 0) {
-            m_itCurrentSample = m_lDataQ.cbegin();
-        }
-
         if(m_bIsLooping) {
             //Down sampling in loop mode
             if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-                m_vecAverage = *m_itCurrentSample;
-            } else {
-                m_vecAverage += *m_itCurrentSample;
+                m_vecAverage = m_lDataQ.front();
+            } else if (m_iCurrentSample < m_lDataQ.size()){
+                m_vecAverage += m_lDataQ.at(m_iCurrentSample);
             }
         } else {
             //Down sampling in stream mode
             if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-                m_vecAverage = m_lDataQ.front();
+                m_vecAverage = m_lDataQ.takeFirst();
             } else {
-                m_vecAverage += m_lDataQ.front();
+                m_vecAverage += m_lDataQ.takeFirst();
             }
-
-            m_lDataQ.pop_front();
         }
 
-        m_itCurrentSample++;
+        m_iCurrentSample++;
         m_iSampleCtr++;
 
         //Set iterator back to the front if needed
-        if(m_itCurrentSample == m_lDataQ.cend()) {
-            m_itCurrentSample = m_lDataQ.cbegin();
+        if(m_iCurrentSample == m_lDataQ.size()) {
+            m_iCurrentSample = 0;
         }
 
-        if(m_iSampleCtr % m_iAverageSamples == 0) {
+        if(m_iSampleCtr % m_iAverageSamples == 0
+            && m_iAverageSamples != 0) {
             //Perform the actual interpolation and send signal
             m_vecAverage /= (double)m_iAverageSamples;
             if(m_bStreamSmoothedData) {

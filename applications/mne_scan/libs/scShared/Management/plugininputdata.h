@@ -97,7 +97,7 @@ public:
     //=========================================================================================================
     /**
     * Convinience function - this can be used to register a function which should be called when new data are available.
-    * The signal void notify(SCMEASLIB::NewMeasurement::SPtr) can be used instead of registering a function.
+    * The signal void notify(SCMEASLIB::Measurement::SPtr) can be used instead of registering a function.
     *
     * @param[in] pFunc  callback function to register
     */
@@ -110,7 +110,7 @@ protected:
     *
     * @param[in] pMeasurement   the measurement data to downcast.
     */
-    void notifyCallbackFunction(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 private:
     callback_function m_pFunc;  /**< registered callback function */

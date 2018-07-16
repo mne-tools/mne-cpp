@@ -79,69 +79,35 @@ DESTDIR = $${MNE_LIBRARY_DIR}
 
 SOURCES += \
     measurementwidget.cpp \
-    newmeasurementwidget.cpp \
     realtimemultisamplearraywidget.cpp \
     realtimesamplearraywidget.cpp \
     realtimeevokedsetwidget.cpp \
-    realtimeevokedwidget.cpp \
     realtimecovwidget.cpp \
-    frequencyspectrumwidget.cpp \
-    helpers/realtimebutterflyplot.cpp \
-    helpers/realtimemultisamplearraymodel.cpp \
-    helpers/realtimemultisamplearraydelegate.cpp \
-    helpers/realtimeevokedmodel.cpp \
-    helpers/realtimeevokedsetmodel.cpp \
-    helpers/covmodalitywidget.cpp \
-    helpers/frequencyspectrummodel.cpp \
-    helpers/frequencyspectrumdelegate.cpp \
-    helpers/frequencyspectrumsettingswidget.cpp \
+    realtimespectrumwidget.cpp \
     helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
     realtimeconnectivityestimatewidget.cpp \
-    hpiwidget.cpp \
 
 HEADERS += \
     scdisp_global.h \
     measurementwidget.h \
-    newmeasurementwidget.h \
     realtimemultisamplearraywidget.h \
     realtimesamplearraywidget.h \
     realtimeevokedsetwidget.h \
-    realtimeevokedwidget.h \
     realtimecovwidget.h \
-    frequencyspectrumwidget.h \
-    helpers/realtimemultisamplearraymodel.h \
-    helpers/realtimemultisamplearraydelegate.h \
-    helpers/realtimeevokedmodel.h \
-    helpers/realtimeevokedsetmodel.h \
-    helpers/realtimebutterflyplot.h \
-    helpers/covmodalitywidget.h \
-    helpers/frequencyspectrumdelegate.h \
-    helpers/frequencyspectrummodel.h \
-    helpers/frequencyspectrumsettingswidget.h \
+    realtimespectrumwidget.h \
     helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \
-    hpiwidget.h \
 
 FORMS += \
-    FormFiles/realtimesamplearraywidget.ui \
     helpers/quickcontrolwidget.ui \
-    FormFiles/hpiwidget.ui
+    formfiles/realtimesamplearraywidget.ui \
 
 RESOURCES += \
     scDisp.qrc
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabyMEG.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-fiducials.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-head.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-inner_skull-bem.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-trans.fif \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt \
@@ -166,7 +132,6 @@ for(FILE, RESOURCE_FILES) {
 UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 

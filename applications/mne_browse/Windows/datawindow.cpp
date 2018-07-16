@@ -614,10 +614,10 @@ void DataWindow::updateMarkerPosition()
 
 void DataWindow::highlightChannelsInSelectionManager()
 {
-    if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
+    if(m_pMainWindow->m_pChannelSelectionView->isVisible()) {
         QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
 
-        m_pMainWindow->m_pSelectionManagerWindow->highlightChannels(selectedIndexes);
+        m_pMainWindow->m_pChannelSelectionView->highlightChannels(selectedIndexes);
     }
 }
 

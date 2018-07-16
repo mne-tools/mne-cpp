@@ -48,8 +48,8 @@
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularbuffer.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimesamplearray.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimesamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -172,13 +172,13 @@ public:
     /**
     * [...]
     */
-    void updateSingleChannel(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSingleChannel(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
     * [...]
     */
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -205,9 +205,9 @@ protected:
     void sendByteTo(int value, int channel);
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
-    PluginInputData<NewRealTimeSampleArray>::SPtr  m_pRTSAInput;
+    PluginOutputData<RealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeSampleArray>::SPtr  m_pRTSAInput;
 
     QVector<int> m_vTimes;
 

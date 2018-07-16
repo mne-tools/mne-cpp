@@ -54,8 +54,8 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <realtime/rtClient/rtcmdclient.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scDisp/hpiwidget.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <disp3D/viewers/hpiview.h>
 
 
 //*************************************************************************************************************
@@ -91,7 +91,7 @@ using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
-using namespace SCDISPLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -397,7 +397,7 @@ void BabyMEG::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
+        m_pRTMSABabyMEG = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
         m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
@@ -616,8 +616,8 @@ void BabyMEG::showHPIDialog()
     } else {
         qDebug()<<" Start to load Polhemus File";
         if (!m_pHPIWidget) {
-            m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-            connect(m_pHPIWidget.data(), &HPIWidget::continousHPIToggled,
+            m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
+            connect(m_pHPIWidget.data(), &HpiView::continousHPIToggled,
                     this, &BabyMEG::onContinousHPIToggled);
         }
 

@@ -44,10 +44,10 @@
 
 #include "scdisp_global.h"
 
-#include "newmeasurementwidget.h"
+#include "measurementwidget.h"
 
-#include "fs/annotationset.h"
-#include "fs/surfaceset.h"
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
 
 
 //*************************************************************************************************************
@@ -121,7 +121,7 @@ namespace SCDISPLIB
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
 
-class SCDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public MeasurementWidget
 {
     Q_OBJECT
 
@@ -156,7 +156,7 @@ public:
     *
     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    virtual void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -175,9 +175,6 @@ private:
     QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;            /**< The real-time source estimate measurement. */
 
     bool                                                m_bInitialized;     /**< Whether init was processed successfully. */
-
-    FSLIB::AnnotationSet                                m_annotationSet;    /**< The current annotation set. */
-    FSLIB::SurfaceSet                                   m_surfSet;          /**< The current surface set. */
 
     QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;          /**< The Disp3D view. */
     QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */

@@ -217,6 +217,9 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
 {   
     if(tForwardSolution.src.size() < 2 || tAnnotSet.size() < 2 || tSurfSet.size() < 2) {
         qDebug() << "MneEstimateTreeItem::initData - Two hemisphere were not found. Check input.";
+        qDebug() << "MneEstimateTreeItem::initData - tForwardSolution.src.size(): "<<tForwardSolution.src.size();
+        qDebug() << "MneEstimateTreeItem::initData - tSurfSet.size(): "<<tSurfSet.size();
+        qDebug() << "MneEstimateTreeItem::initData - tAnnotSet.size(): "<<tAnnotSet.size();
         return;
     }
 
