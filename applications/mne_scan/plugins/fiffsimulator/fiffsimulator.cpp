@@ -45,8 +45,8 @@
 
 #include <utils/ioutils.h>
 #include <fiff/fiff_info.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scDisp/hpiwidget.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <disp3D/viewers/hpiview.h>
 
 
 //*************************************************************************************************************
@@ -74,7 +74,7 @@ using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace REALTIMELIB;
-using namespace SCDISPLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -135,7 +135,7 @@ QSharedPointer<IPlugin> FiffSimulator::clone() const
 
 void FiffSimulator::init()
 {
-    m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
+    m_pRTMSA_FiffSimulator = PluginOutputData<RealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
     m_pRTMSA_FiffSimulator->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
@@ -440,8 +440,8 @@ void FiffSimulator::showHPIDialog()
         return;
     } else {
         if (!m_pHPIWidget) {
-            m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-            connect(m_pHPIWidget.data(), &HPIWidget::continousHPIToggled,
+            m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
+            connect(m_pHPIWidget.data(), &HpiView::continousHPIToggled,
                     this, &FiffSimulator::onContinousHPIToggled);
         }
 

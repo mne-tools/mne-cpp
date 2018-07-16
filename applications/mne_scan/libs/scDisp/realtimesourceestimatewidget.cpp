@@ -100,7 +100,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
@@ -119,13 +119,13 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     m_p3DView->setModel(m_pData3DModel);
 
     m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
-                                                                 QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
-                                                                 Qt::Window));
+                                                                 QStringList() << "Data" << "Window" << "View" << "Light"));
     m_pControl3DView->init(m_pData3DModel, m_p3DView);
 
     QGridLayout *mainLayoutView = new QGridLayout;
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    mainLayoutView->addWidget(pWidgetContainer);
+    mainLayoutView->addWidget(pWidgetContainer,0,0);
+    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
 
     this->setLayout(mainLayoutView);
 
@@ -148,7 +148,7 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }
@@ -168,8 +168,8 @@ void RealTimeSourceEstimateWidget::getData()
             m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data",
                                                       *m_pRTSE->getValue(),
                                                       *m_pRTSE->getFwdSolution(),
-                                                      m_surfSet,
-                                                      m_annotationSet);
+                                                      *m_pRTSE->getSurfSet(),
+                                                      *m_pRTSE->getAnnotSet());
 
             m_pRtItem->setLoopState(false);
             m_pRtItem->setTimeInterval(17);

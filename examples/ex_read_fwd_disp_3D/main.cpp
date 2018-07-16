@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/adapters/abstractview.h>
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <mne/mne_forwardsolution.h>

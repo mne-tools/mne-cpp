@@ -65,15 +65,15 @@
 //=============================================================================================================
 
 namespace SCMEASLIB {
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
 }
 
 namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace SCDISPLIB {
-    class HPIWidget;
+namespace DISP3DLIB {
+    class HpiView;
 }
 
 
@@ -227,13 +227,13 @@ protected:
     */
     void onContinousHPIToggled(bool bDoContinousHPI);
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<FiffSimulatorProducer>       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
     QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
     QSharedPointer<REALTIMELIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
-    QSharedPointer<SCDISPLIB::HPIWidget>        m_pHPIWidget;               /**< HPI widget. */
+    QSharedPointer<DISP3DLIB::HpiView>          m_pHPIWidget;               /**< HPI widget. */
 
     QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
 

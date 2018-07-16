@@ -106,13 +106,13 @@ QSharedPointer<IPlugin> Epidetect::clone() const
 void Epidetect::init()
 {
     // Input
-    m_pEpidetectInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "EpidetectIn", "Epidetect input data");
+    m_pEpidetectInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "EpidetectIn", "Epidetect input data");
     connect(m_pEpidetectInput.data(), &PluginInputConnector::notify, this, &Epidetect::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pEpidetectInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in  plugin
-    m_pEpidetectOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "EpidetectOut", "Epidetect output data");
+    m_pEpidetectOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "EpidetectOut", "Epidetect output data");
     m_outputConnectors.append(m_pEpidetectOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
@@ -192,9 +192,9 @@ QWidget* Epidetect::setupWidget()
 
 //*************************************************************************************************************
 
-void Epidetect::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Epidetect::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized

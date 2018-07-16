@@ -46,7 +46,7 @@
 #include <time.h>
 
 #include <scMeas/realtimeevokedset.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -261,9 +261,9 @@ QWidget* Averaging::setupWidget()
 
 //*************************************************************************************************************
 
-void Averaging::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized
@@ -354,7 +354,7 @@ void Averaging::init()
     m_bDoBaselineCorrection = settings.value(QString("Plugin/%1/doBaselineCorrection").arg(this->getName()), false).toBool();
 
     // Input
-    m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
+    m_pAveragingInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pAveragingInput);
 
@@ -639,7 +639,13 @@ void Averaging::run()
     //
     // Init Real-Time average
     //
-    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_iBaselineFromSeconds, m_iBaselineToSeconds, m_qListStimChs.at(m_iStimChan), m_pFiffInfo));
+    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages,
+                                     m_iPreStimSamples,
+                                     m_iPostStimSamples,
+                                     m_iBaselineFromSeconds,
+                                     m_iBaselineToSeconds,
+                                     m_qListStimChs.at(m_iStimChan),
+                                     m_pFiffInfo));
     m_pRtAve->setBaselineFrom(m_iBaselineFromSamples, m_iBaselineFromSeconds);
     m_pRtAve->setBaselineTo(m_iBaselineToSamples, m_iBaselineToSeconds);
     m_pRtAve->setBaselineActive(m_bDoBaselineCorrection);

@@ -36,12 +36,14 @@
 #ifndef QUICKCONTROLWIDGET_H
 #define QUICKCONTROLWIDGET_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp/helpers/draggableframelesswidget.h"
+#include <disp/viewers/helpers/draggableframelesswidget.h>
+#include <disp/viewers/butterflyview.h>
 
 
 //*************************************************************************************************************
@@ -92,27 +94,11 @@ namespace SCDISPLIB
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// STRUCTS
-//=============================================================================================================
-
-struct Modality {
-    QString m_sName;
-    bool m_bActive;
-    float m_fNorm;
-
-    Modality(QString name, bool active, double norm)
-    : m_sName(name), m_bActive(active), m_fNorm(norm)
-    {}
-};
-
-
 //=============================================================================================================
 /**
 * DECLARE CLASS QuickControlWidget
 *
-* @brief The ProjectorWidget class provides a quick control widget for scaling, filtering, projector and view options
+* @brief The QuickControlWidget class provides a quick control widget for scaling, filtering, projector and other control options.
 */
 class QuickControlWidget : public DISPLIB::DraggableFramelessWidget
 {
@@ -496,7 +482,7 @@ private:
     QColor                                              m_colCurrentSignalColor;        /**< Current color of the scene in all View3D's. */
     QColor                                              m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
 
-    QList<Modality>                                     m_qListModalities;              /**< List of different modalities. */
+    QList<DISPLIB::Modality>                            m_qListModalities;              /**< List of different modalities. */
     QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
     QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
     QList<QCheckBox*>                                   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
@@ -570,7 +556,7 @@ signals:
     /**
     * Emit this signal whenever the user changed the modality.
     */
-    void settingsChanged(const QList<Modality>& modalityList);
+    void modalitiesChanged(const QList<DISPLIB::Modality>& modalityList);
 
     //=========================================================================================================
     /**
@@ -626,7 +612,5 @@ signals:
 };
 
 } // NAMESPACE SCDISPLIB
-
-Q_DECLARE_METATYPE(QList<SCDISPLIB::Modality>);
 
 #endif // QUICKCONTROLWIDGET_H

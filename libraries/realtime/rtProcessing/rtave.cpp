@@ -120,7 +120,11 @@ RtAve::RtAve(quint32 numAverages,
 {
     qRegisterMetaType<FIFFLIB::FiffEvokedSet::SPtr>("FIFFLIB::FiffEvokedSet::SPtr");
 
-    init();
+    m_pStimEvokedSet->info = *m_pFiffInfo.data();
+
+    m_iNewPreStimSamples = m_iPreStimSamples;
+    m_iNewPostStimSamples = m_iPostStimSamples;
+    m_iNewNumAverages = m_iNumAverages;
 }
 
 
@@ -671,8 +675,10 @@ void RtAve::generateEvoked(double dTriggerType)
         evoked.baseline = m_pairBaselineSec;
         evoked.times.resize(m_iPreStimSamples + m_iPostStimSamples);
         evoked.times[0] = -T*m_iPreStimSamples;
-        for(int i = 1; i < evoked.times.size(); ++i)
+        for(int i = 1; i < evoked.times.size(); ++i) {
             evoked.times[i] = evoked.times[i-1] + T;
+        }
+        evoked.times[m_iPreStimSamples] = 0.0f;
         evoked.first = evoked.times[0];
         evoked.last = evoked.times[evoked.times.size()-1];
         evoked.comment = QString::number(dTriggerType);
@@ -800,16 +806,3 @@ void RtAve::reset()
 
 //    qDebug()<<"RtAve::reset() - END";
 }
-
-
-//*************************************************************************************************************
-
-void RtAve::init()
-{
-    QMutexLocker locker(&m_qMutex);
-
-    m_iNewPreStimSamples = m_iPreStimSamples;
-    m_iNewPostStimSamples = m_iPostStimSamples;
-    m_iNewNumAverages = m_iNumAverages;
-}
-

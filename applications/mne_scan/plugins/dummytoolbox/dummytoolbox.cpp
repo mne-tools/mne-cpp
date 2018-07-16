@@ -96,13 +96,13 @@ QSharedPointer<IPlugin> DummyToolbox::clone() const
 void DummyToolbox::init()
 {
     // Input
-    m_pDummyInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
+    m_pDummyInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
     connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pDummyInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pDummyOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
+    m_pDummyOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
     m_outputConnectors.append(m_pDummyOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
@@ -178,9 +178,9 @@ QWidget* DummyToolbox::setupWidget()
 
 //*************************************************************************************************************
 
-void DummyToolbox::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized

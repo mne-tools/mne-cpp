@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets svg
+QT  += core widgets svg concurrent
 
 # Deep Model Viewer
 qtHaveModule(printsupport): QT += printsupport
@@ -83,8 +83,6 @@ else {
     }
 }
 
-
-
 DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
@@ -96,79 +94,105 @@ else {
 }
 
 SOURCES += \
-    helpers/colormap.cpp \
-    imagesc.cpp \
-    plot.cpp \
-    graph.cpp \
-    tfplot.cpp \
-    filterwindow.cpp \
-    helpers/layoutscene.cpp \
-    helpers/averagescene.cpp \
-    helpers/averagesceneitem.cpp \
-    helpers/filterdatadelegate.cpp \
-    helpers/filterdatamodel.cpp \
-    helpers/filterplotscene.cpp \
-    helpers/selectionscene.cpp \
-    helpers/selectionsceneitem.cpp \
-    selectionmanagerwindow.cpp \
-    helpers/chinfomodel.cpp \
-    helpers/mneoperator.cpp \
-    helpers/draggableframelesswidget.cpp \
+    plots/imagesc.cpp \
+    plots/plot.cpp \
+    plots/graph.cpp \
+    plots/tfplot.cpp \
+    plots/helpers/colormap.cpp \
+    viewers/filterview.cpp \
+    viewers/averagelayoutview.cpp \
+    viewers/spectrumview.cpp \
+    viewers/modalityselectionview.cpp \
+    viewers/butterflyview.cpp \
+    viewers/channeldataview.cpp \
+    viewers/channelselectionview.cpp \
+    viewers/spectrumsettingsview.cpp \
+    viewers/helpers/evokedsetmodel.cpp \
+    viewers/helpers/layoutscene.cpp \
+    viewers/helpers/averagescene.cpp \
+    viewers/helpers/averagesceneitem.cpp \
+    viewers/helpers/filterdatadelegate.cpp \
+    viewers/helpers/filterdatamodel.cpp \
+    viewers/helpers/filterplotscene.cpp \
+    viewers/helpers/selectionscene.cpp \
+    viewers/helpers/selectionsceneitem.cpp \
+    viewers/helpers/channelinfomodel.cpp \
+    viewers/helpers/mneoperator.cpp \
+    viewers/helpers/draggableframelesswidget.cpp \
+    viewers/helpers/frequencyspectrumdelegate.cpp \
+    viewers/helpers/frequencyspectrummodel.cpp \
+    viewers/helpers/channeldatamodel.cpp \
+    viewers/helpers/channeldatadelegate.cpp \
 
 HEADERS += \
     disp_global.h \
-    helpers/colormap.h \
-    imagesc.h \
-    plot.h \
-    graph.h \
-    tfplot.h \
-    filterwindow.h \
-    selectionmanagerwindow.h \
-    helpers/layoutscene.h \
-    helpers/averagescene.h \
-    helpers/averagesceneitem.h \
-    helpers/filterdatadelegate.h \
-    helpers/filterdatamodel.h \
-    helpers/filterplotscene.h \
-    helpers/selectionscene.h \
-    helpers/selectionsceneitem.h \
-    helpers/chinfomodel.h \
-    helpers/mneoperator.h \
-    helpers/draggableframelesswidget.h \
+    plots/imagesc.h \
+    plots/plot.h \
+    plots/graph.h \
+    plots/tfplot.h \
+    plots/helpers/colormap.h \
+    viewers/filterview.h \
+    viewers/averagelayoutview.h \
+    viewers/spectrumview.h \
+    viewers/modalityselectionview.h \
+    viewers/butterflyview.h \
+    viewers/channeldataview.h \
+    viewers/channelselectionview.h \
+    viewers/spectrumsettingsview.h \
+    viewers/helpers/evokedsetmodel.h \
+    viewers/helpers/layoutscene.h \
+    viewers/helpers/averagescene.h \
+    viewers/helpers/averagesceneitem.h \
+    viewers/helpers/filterdatadelegate.h \
+    viewers/helpers/filterdatamodel.h \
+    viewers/helpers/filterplotscene.h \
+    viewers/helpers/selectionscene.h \
+    viewers/helpers/selectionsceneitem.h \
+    viewers/helpers/channelinfomodel.h \
+    viewers/helpers/mneoperator.h \
+    viewers/helpers/draggableframelesswidget.h \
+    viewers/helpers/frequencyspectrumdelegate.h \
+    viewers/helpers/frequencyspectrummodel.h \
+    viewers/helpers/channeldatamodel.h \
+    viewers/helpers/channeldatadelegate.h \
 
 qtHaveModule(charts) {
     SOURCES += \
-        bar.cpp \
-        spline.cpp \
-        lineplot.cpp \
+        plots/bar.cpp \
+        plots/spline.cpp \
+        plots/lineplot.cpp \
 
     HEADERS += \
-        bar.h \
-        spline.h \
-        lineplot.h \
+        plots/bar.h \
+        plots/spline.h \
+        plots/lineplot.h \
 }
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SOURCES += \
-        deepmodelviewer/controls.cpp \
-        deepmodelviewer/edge.cpp \
-        deepmodelviewer/node.cpp \
-        deepmodelviewer/view.cpp \
-        deepmodelviewer/network.cpp \
-        deepmodelviewer/deepviewer.cpp
+        viewers/deepmodelviewers/controls.cpp \
+        viewers/deepmodelviewers/edge.cpp \
+        viewers/deepmodelviewers/node.cpp \
+        viewers/deepmodelviewers/view.cpp \
+        viewers/deepmodelviewers/network.cpp \
+        viewers/deepmodelviewers/deepviewer.cpp
 
     HEADERS += \
-        deepmodelviewer/controls.h \
-        deepmodelviewer/edge.h \
-        deepmodelviewer/node.h \
-        deepmodelviewer/view.h \
-        deepmodelviewer/network.h \
-        deepmodelviewer/deepviewer.h
+        viewers/deepmodelviewers/controls.h \
+        viewers/deepmodelviewers/edge.h \
+        viewers/deepmodelviewers/node.h \
+        viewers/deepmodelviewers/view.h \
+        viewers/deepmodelviewers/network.h \
+        viewers/deepmodelviewers/deepviewer.h
 
     RESOURCES += \
-        deepmodelviewer/images.qrc
+        viewers/deepmodelviewers/images.qrc
 }
+
+FORMS += \
+    viewers/formfiles/filterview.ui \
+    viewers/formfiles/channelselectionview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
@@ -214,10 +238,6 @@ header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
-
-FORMS += \
-    filterwindowwidget.ui \
-    selectionmanagerwindow.ui
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 

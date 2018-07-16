@@ -64,7 +64,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 RealTimeEvokedSet::RealTimeEvokedSet(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeEvokedSet::SPtr"), parent)
+: Measurement(QMetaType::type("RealTimeEvokedSet::SPtr"), parent)
 , m_pFiffEvokedSet(new FiffEvokedSet)
 , m_bInitialized(false)
 , m_iPreStimSamples(0)

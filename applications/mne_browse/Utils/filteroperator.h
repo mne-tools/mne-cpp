@@ -53,7 +53,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp/helpers/mneoperator.h"
+#include <disp/viewers/helpers/mneoperator.h>
 #include "types.h"
 
 
@@ -66,7 +66,7 @@
 #include <mne/mne.h>
 #include <utils/filterTools/parksmcclellan.h>
 #include <utils/filterTools/cosinefilter.h>
-#include "disp/helpers/mneoperator.h"
+#include <disp/viewers/helpers/mneoperator.h>
 
 
 //*************************************************************************************************************

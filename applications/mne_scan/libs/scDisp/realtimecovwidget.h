@@ -43,9 +43,7 @@
 //=============================================================================================================
 
 #include "scdisp_global.h"
-#include "newmeasurementwidget.h"
-#include "helpers/covmodalitywidget.h"
-#include <disp/imagesc.h>
+#include "measurementwidget.h"
 
 
 //*************************************************************************************************************
@@ -53,10 +51,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVBoxLayout>
-#include <QSharedPointer>
-#include <QAction>
-#include <QLabel>
+#include <QPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -65,10 +68,16 @@
 //=============================================================================================================
 
 class QTime;
+class QVBoxLayout;
+class QLabel;
 
-namespace SCMEASLIB
-{
-class RealTimeCov;
+namespace SCMEASLIB {
+    class RealTimeCov;
+}
+
+namespace DISPLIB {
+    class ModalitySelectionView;
+    class ImageSc;
 }
 
 
@@ -80,48 +89,23 @@ class RealTimeCov;
 namespace SCDISPLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
+* DECLARE CLASS RealTimeCovWidget
 *
-* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
+* @brief The RealTimeCovWidget class provides a real-time covariance display.
 */
-class SCDISPSHARED_EXPORT RealTimeCovWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeCovWidget : public MeasurementWidget
 {
     Q_OBJECT
 
-    friend class CovModalityWidget;
 public:
     //=========================================================================================================
     /**
@@ -131,7 +115,9 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeCovWidget(QSharedPointer<SCMEASLIB::RealTimeCov> pRTC,
+                      QSharedPointer<QTime> &pTime,
+                      QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -145,7 +131,7 @@ public:
     *
     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    virtual void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -161,29 +147,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Show modal the RealTimeCovWidget.
+    * Show modality view.
     */
     void showModalitySelectionWidget();
 
+    //=========================================================================================================
+    /**
+    * Show modality view.
+    */
+    void onNewModalitySelection(QStringList lModalities);
+
 private:
-    QSharedPointer<RealTimeCov> m_pRTC;                     /**< The real-time covariance measurement. */
+    QSharedPointer<DISPLIB::ModalitySelectionView>   m_pModalitySelectionWidget;     /**< Modality selection widget */
 
-    QSharedPointer<CovModalityWidget>   m_pModalitySelectionWidget;     /**< Modality selection widget */
+    QSharedPointer<SCMEASLIB::RealTimeCov>  m_pRTC;                         /**< The real-time covariance measurement. */
 
-    QAction* m_pActionSelectModality;           /**< Modality selection action */
+    QPointer<QAction>                       m_pActionSelectModality;        /**< Modality selection action */
+    QPointer<QVBoxLayout>                   m_pRtcLayout;                   /**< Widget layout */
+    QPointer<QLabel>                        m_pLabelInit;                   /**< Initialization label */
 
-    bool m_bInitialized;                        /**< Is Initialized */
+    bool                                    m_bInitialized;                 /**< Is Initialized */
 
-    QStringList m_qListChNames;                 /**< Channel names */
+    QStringList                             m_qListChNames;                 /**< Channel names */
+    QStringList                             m_qListPickTypes;               /**< Channel Types to pick */
 
-    QStringList m_qListPickTypes;               /**< Channel Types to pick */
-    MatrixXd m_matSelector;                     /**< Selction matrix */
-    MatrixXd m_matSelectorT;                    /**< Transposed selction matrix */
+    Eigen::MatrixXd                         m_matSelector;                  /**< Selction matrix */
+    Eigen::MatrixXd                         m_matSelectorT;                 /**< Transposed selction matrix */
 
-    ImageSc* m_pImageSc;                        /**< The covariance colormap */
+    QPointer<DISPLIB::ImageSc>              m_pImageSc;                     /**< The covariance colormap */
 
-    QVBoxLayout*    m_pRtcLayout;               /**< Widget layout */
-    QLabel*         m_pLabelInit;               /**< Initialization label */
 };
 
 } // NAMESPACE

@@ -47,7 +47,7 @@
 #include <scShared/Interfaces/ISensor.h>
 #include <utils/generics/circularbuffer_old.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -229,7 +229,7 @@ private:
 //    float           m_fSamplingRate;                /**< The sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    PluginOutputData<RealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;   /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<RtCmdClient> m_pRtCmdClient; /**< The command client.*/
     bool m_bCmdClientIsConnected;               /**< If the command client is connected.*/

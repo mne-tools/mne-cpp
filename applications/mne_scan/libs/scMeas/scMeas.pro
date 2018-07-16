@@ -67,33 +67,29 @@ DESTDIR = $${MNE_LIBRARY_DIR}
 SOURCES += \
     realtimesourceestimate.cpp \
     realtimeconnectivityestimate.cpp \
-    newrealtimesamplearray.cpp \
-    newrealtimemultisamplearray.cpp \
+    realtimesamplearray.cpp \
+    realtimemultisamplearray.cpp \
     realtimesamplearraychinfo.cpp \
-    newnumeric.cpp \
-    newmeasurement.cpp \
+    numeric.cpp \
+    measurement.cpp \
     measurementtypes.cpp \
-    realtimeevoked.cpp \
     realtimeevokedset.cpp \
     realtimecov.cpp \
-    frequencyspectrum.cpp
-
+    realtimespectrum.cpp
 
 HEADERS += \
     scmeas_global.h \
     realtimesourceestimate.h \
     realtimeconnectivityestimate.h \
-    newrealtimesamplearray.h \
-    newrealtimemultisamplearray.h \
+    realtimesamplearray.h \
+    realtimemultisamplearray.h \
     realtimesamplearraychinfo.h \
-    newnumeric.h \
-    newmeasurement.h \
+    numeric.h \
+    measurement.h \
     measurementtypes.h \
-    realtimeevoked.h \
     realtimeevokedset.h \
     realtimecov.h \
-    frequencyspectrum.h
-
+    realtimespectrum.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
