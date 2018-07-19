@@ -85,7 +85,10 @@ RtFilter::~RtFilter()
 
 //*************************************************************************************************************
 
-MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn, int iMaxFilterLength, const QVector<int>& lFilterChannelList, const QList<FilterData>& lFilterData)
+MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
+                                              int iMaxFilterLength,
+                                              const QVector<int>& lFilterChannelList,
+                                              const QList<FilterData>& lFilterData)
 {
     //Initialise the overlay matrix
     if(m_matOverlap.cols() != iMaxFilterLength || m_matOverlap.rows() < matDataIn.rows()) {

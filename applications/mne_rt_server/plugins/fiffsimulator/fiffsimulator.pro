@@ -89,18 +89,9 @@ OTHER_FILES += fiffsimulator.json \
 
 RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/FiffSimulation.cfg
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}

@@ -113,7 +113,10 @@ public:
     * @param [out] matDataOut    data which is to be filtered
     * @param [in] iDataIndex    current position in the global data matrix
     */
-    Eigen::MatrixXd filterChannelsConcurrently(const Eigen::MatrixXd& matDataIn, int iMaxFilterLength, const QVector<int>& lFilterChannelList, const QList<UTILSLIB::FilterData> &lFilterData);
+    Eigen::MatrixXd filterChannelsConcurrently(const Eigen::MatrixXd& matDataIn,
+                                               int iMaxFilterLength,
+                                               const QVector<int>& lFilterChannelList,
+                                               const QList<UTILSLIB::FilterData> &lFilterData);
 
 protected:
     Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
