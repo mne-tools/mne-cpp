@@ -438,6 +438,8 @@ void SensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
 void SensorDataTreeItem::initItem()
 {
     this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
     this->setToolTip("Sensor Data item");
 
     //Add items

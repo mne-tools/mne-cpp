@@ -105,7 +105,9 @@ MneEstimateTreeItem::~MneEstimateTreeItem()
 //*************************************************************************************************************
 
 void MneEstimateTreeItem::initItem()
-{
+{    
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
     this->setEditable(false);
     this->setToolTip("MNE Estimate item");
 

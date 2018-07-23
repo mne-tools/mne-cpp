@@ -48,17 +48,15 @@
 
 #include <utils/generics/circularmatrixbuffer.h>
 
-#include "FormFiles/neuronalconnectivityyourwidget.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
+//#include <QtWidgets>
+//#include <QtCore/QtPlugin>
+//#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -96,8 +94,10 @@ namespace NEURONALCONNECTIVITYPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// NEURONALCONNECTIVITYPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
+
+class NeuronalConnectivityYourWidget;
 
 
 //=============================================================================================================
@@ -175,7 +175,7 @@ private:
     QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
@@ -184,13 +184,6 @@ private:
     Eigen::MatrixX3f        m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
 
     QVector<int>            m_chIdx;                    /**< The channel indeces to pick from the incoming data.*/
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
 };
 
 } // NAMESPACE

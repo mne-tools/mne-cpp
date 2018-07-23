@@ -88,7 +88,7 @@ AbstractPhongAlphaMaterial::AbstractPhongAlphaMaterial(bool bUseSortPolicy, QNod
     , m_pEffect(new QEffect())
     , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
     , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-    , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
+    , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 1.0f))
     , m_pAlphaParameter(new QParameter("alpha", 0.75f))
     , m_pDrawFilterKey(new QFilterKey)
     , m_bUseSortPolicy(bUseSortPolicy)
