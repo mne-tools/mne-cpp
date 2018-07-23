@@ -48,6 +48,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
+#include "FormFiles/neuronalconnectivityyourwidget.h"
 
 #include <mne/mne_epoch_data_list.h>
 
@@ -72,7 +73,7 @@ using namespace CONNECTIVITYLIB;
 
 NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
-, m_iDownSample(1)
+, m_iDownSample(3)
 , m_pRTSEInput(Q_NULLPTR)
 , m_pRTCEOutput(Q_NULLPTR)
 , m_pNeuronalConnectivityBuffer(CircularMatrixBuffer<double>::SPtr())
@@ -119,11 +120,9 @@ void NeuronalConnectivity::init()
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &NeuronalConnectivity::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
-    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-    // Also, this output stream will generate an online display in your plugin
     m_pRTCEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
     m_outputConnectors.append(m_pRTCEOutput);
-    m_pRTCEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTCEOutput->data()->setName(this->getName());
 
     //Delete Buffer - will be initialized with first incoming data
     if(!m_pNeuronalConnectivityBuffer.isNull()) {
@@ -217,7 +216,6 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
             m_pRTCEOutput->data()->setAnnotSet(pRTSE->getAnnotSet());
             m_pRTCEOutput->data()->setSurfSet(pRTSE->getSurfSet());
-            m_pRTCEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
             //Prepare network creation
@@ -349,7 +347,7 @@ void NeuronalConnectivity::run()
         //Do processing after skip count has reached limit
         if((skip_count % m_iDownSample) == 0)
         {
-            //ToDo: Implement your algorithm here
+            //Do connectivity estimation here
             QElapsedTimer time;
             time.start();
 
@@ -377,6 +375,6 @@ void NeuronalConnectivity::run()
 
 void NeuronalConnectivity::showYourWidget()
 {
-    m_pYourWidget = NeuronalConnectivityYourWidget::SPtr(new NeuronalConnectivityYourWidget());
+    m_pYourWidget = NeuronalConnectivityYourWidget::SPtr::create();
     m_pYourWidget->show();
 }
