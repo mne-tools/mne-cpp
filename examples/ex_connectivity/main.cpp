@@ -46,6 +46,8 @@
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 
+#include <disp3D/engine/model/items/network/networktreeitem.h>
+
 #include <fiff/fiff_raw_data.h>
 
 #include <fs/label.h>
@@ -443,7 +445,8 @@ int main(int argc, char *argv[])
     Connectivity tConnectivity(settings);
     Network tNetwork = tConnectivity.calculateConnectivity();
 
-    NetworkView tNetworkView(tNetwork);
+    NetworkView tNetworkView;
+    tNetworkView.addData(tNetwork);
     tNetworkView.show();
 
     return a.exec();

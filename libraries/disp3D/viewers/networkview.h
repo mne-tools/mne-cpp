@@ -58,11 +58,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace INVERSELIB {
-    class DipoleFitSettings;
-    class ECDSet;
-}
-
 namespace CONNECTIVITYLIB {
     class Network;
 }
@@ -81,6 +76,8 @@ namespace DISP3DLIB
 //=============================================================================================================
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class NetworkTreeItem;
 
 
 //=============================================================================================================
@@ -102,13 +99,19 @@ public:
     * Default constructor
     *
     */
-    explicit NetworkView(const CONNECTIVITYLIB::Network& tNetworkData, QWidget *parent = 0);
+    explicit NetworkView(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor
     */
     ~NetworkView();
+
+    //=========================================================================================================
+    /**
+    * Add data to the view
+    */
+    NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
 protected:
 };

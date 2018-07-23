@@ -33,8 +33,6 @@
 *
 */
 
-//ToDo Paint to render area
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -44,20 +42,12 @@
 
 #include <scMeas/realtimeconnectivityestimate.h>
 
+#include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
-
-#include <mne/mne_forwardsolution.h>
-#include <mne/mne_inverse_operator.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
-
-#include <inverse/minimumNorm/minimumnorm.h>
-
-#include <math.h>
 
 
 //*************************************************************************************************************
@@ -65,12 +55,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSlider>
-#include <QAction>
-#include <QLabel>
 #include <QGridLayout>
-#include <QSettings>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -78,7 +63,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+//#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -103,32 +88,12 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRTCE(pRTCE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
+, m_pNetworkView(NetworkView::SPtr::create())
 {
-    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
-    m_pAction3DControl->setShortcut(tr("F9"));
-    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
-    connect(m_pAction3DControl, &QAction::triggered,
-            this, &RealTimeConnectivityEstimateWidget::show3DControlWidget);
-    addDisplayAction(m_pAction3DControl);
-    m_pAction3DControl->setVisible(true);
-
-    m_p3DView = View3D::SPtr(new View3D());
-    m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-    m_p3DView->setModel(m_pData3DModel);
-
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
-                                                                 QStringList() << "Data" << "Window" << "View" << "Light"));
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
     QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    mainLayoutView->addWidget(pWidgetContainer,0,0);
-    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
+    mainLayoutView->addWidget(m_pNetworkView.data(),0,0);
 
     this->setLayout(mainLayoutView);
-
-    getData();
 }
 
 
@@ -136,9 +101,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 
 RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
 {
-    //
     // Store Settings
-    //
     if(!m_pRTCE->getName().isEmpty())
     {
     }
@@ -157,34 +120,20 @@ void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 
 void RealTimeConnectivityEstimateWidget::getData()
 {
-    if(m_bInitialized)
-    {
-        //
+    if(m_bInitialized) {
         // Add rt brain data
-        //
         if(!m_pRtItem) {
-            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
-            m_pRtItem = m_pData3DModel->addConnectivityData("Subject", "Data", *(m_pRTCE->getValue().data()));
+            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
+            m_pRtItem = m_pNetworkView->addData(*(m_pRTCE->getValue().data()));
         } else {
-            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
+            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
 
             if(m_pRtItem) {
                 m_pRtItem->addData(*(m_pRTCE->getValue().data()));
             }
         }
-    }
-    else
-    {
-        if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet())
-        {
-            m_pRTCE->m_bConnectivitySend = false;
-            init();
-
-            //
-            // Add brain data
-            //
-            m_pData3DModel->addSurfaceSet("Subject", "MRI", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
-        }
+    } else {
+        init();
     }
 }
 
@@ -193,25 +142,12 @@ void RealTimeConnectivityEstimateWidget::getData()
 
 void RealTimeConnectivityEstimateWidget::init()
 {
-    m_bInitialized = true;
-    m_pRTCE->m_bConnectivitySend = true;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeConnectivityEstimateWidget::show3DControlWidget()
-{
-    if(m_pControl3DView->isActiveWindow())
-        m_pControl3DView->hide();
-    else {
-        m_pControl3DView->activateWindow();
-        m_pControl3DView->show();
+    if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet()) {
+        // Add brain data
+        m_pNetworkView->getTreeModel()->addSurfaceSet("Subject", "MRI", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
+    } else {
+        qDebug()<<"RealTimeConnectivityEstimateWidget::init - Could not open 3D surface information.";
     }
+
+    m_bInitialized = true;
 }
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================

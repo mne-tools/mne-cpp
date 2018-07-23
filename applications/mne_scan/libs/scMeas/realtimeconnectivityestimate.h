@@ -206,8 +206,6 @@ public:
     */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
-    bool m_bConnectivitySend; /**< dirty hack */
-
 private:
     mutable QMutex                              m_qMutex;       /**< Mutex to ensure thread safety */
 
