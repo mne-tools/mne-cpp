@@ -77,6 +77,8 @@ class QSlider;
 class QPushButton;
 class QSignalMapper;
 class QTabWidget;
+class QGridLayout;
+class QGroupBox;
 
 
 //*************************************************************************************************************
@@ -112,14 +114,12 @@ public:
     /**
     * Constructs a QuickControlWidget which is a child of parent.
     *
-    * @param [in] qMapChScaling     The pointer to scaling information.
     * @param [in] name              The name to be displayed on the minimize button.
     * @param [in] pFiffInfo         The fiff info.
     * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] parent            The parent of widget.
     */
-    QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
-                       const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+    QuickControlWidget(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                        const QString& name = "",
                        const QStringList& slFlags = QStringList("Scaling"),
                        QWidget *parent = Q_NULLPTR);
@@ -129,6 +129,13 @@ public:
     * Destructs a QuickControlWidget
     */
     ~QuickControlWidget();
+
+    void addGroupBox(QWidget* pWidget,
+                        QString sGroupBoxName);
+
+    void addGroupBoxWithTabs(QWidget* pWidget,
+                                QString sGroupBoxName,
+                                QString sTabName);
 
     //=========================================================================================================
     /**
@@ -253,33 +260,9 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Slot called when the projector check state changes
-    */
-    void onCheckProjStatusChanged(bool state);
-
-    //=========================================================================================================
-    /**
-    * Slot called when user enables/disables all projectors
-    */
-    void onEnableDisableAllProj(bool status);
-
-    //=========================================================================================================
-    /**
     * Slot called when the compensator check state changes
     */
     void onCheckCompStatusChanged(const QString & compName);
-
-    //=========================================================================================================
-    /**
-    * Slot called when scaling spin boxes change
-    */
-    void onUpdateSpinBoxScaling(double value);
-
-    //=========================================================================================================
-    /**
-    * Slot called when slider scaling change
-    */
-    void onUpdateSliderScaling(int value);
 
     //=========================================================================================================
     /**
@@ -394,12 +377,6 @@ protected slots:
 protected:
     //=========================================================================================================
     /**
-    * Create the widgets used in the scaling group
-    */
-    void createScalingGroup();
-
-    //=========================================================================================================
-    /**
     * Create the widgets used in the projector group
     */
     void createProjectorGroup();
@@ -460,7 +437,6 @@ protected:
 private:
     QStringList                                         m_slFlags;                      /**< The list holding the current flags. */
 
-    bool                                                m_bScaling;                     /**< Flag for displaying the scaling group box. */
     bool                                                m_bProjections;                 /**< Flag for displaying the projection group box. */
     bool                                                m_bSphara;                      /**< Flag for displaying teh SPHARA group box. */
     bool                                                m_bView;                        /**< Flag for displaying the view group box. */
@@ -470,9 +446,6 @@ private:
     bool                                                m_bTriggerDetection;            /**< Flag for displaying the trigger detection tab in the view group box. */
     bool                                                m_bAverages;                    /**< Flag for displaying the averages group box. */
 
-    QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, QDoubleSpinBox*>                       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
-    QMap<qint32, QSlider*>                              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
     QMap<double, QColor>                                m_qMapTriggerColor;             /**< Trigger colors per detected type. */
     QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfo;              /**< Average colors and names. */
     QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfoOld;           /**< Old average colors and names. */
@@ -483,33 +456,26 @@ private:
     QColor                                              m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
 
     QList<DISPLIB::Modality>                            m_qListModalities;              /**< List of different modalities. */
-    QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
     QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
     QList<QCheckBox*>                                   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
     QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
-    QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
     QPushButton*                                        m_pShowFilterOptions;           /**< Holds the show filter options button. */
 
     QSignalMapper*                                      m_pCompSignalMapper;            /**< The signal mapper. */
 
     Ui::QuickControlWidget*                             ui;                             /**< The generated UI file. */
 
+    QGridLayout*    m_pMainLayout;
+    QGridLayout*    m_pGroupBoxLayout;
+    QGridLayout*    m_pButtonLayout;
+
+    QWidget*        m_pButtonWidget;
+    QWidget*        m_pGroupBoxWidget;
+
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the scaling sliders or spin boxes changed.
-    */
-    void scalingChanged(const QMap<qint32, float>& scalingMap);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the projections.
-    */
-    void projSelectionChanged();
-
     //=========================================================================================================
     /**
     * Emit this signal whenever the user changes the compensator.

@@ -47,6 +47,7 @@
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/averagelayoutview.h>
+#include <disp/viewers/scalingview.h>
 
 #include <scMeas/realtimeevokedset.h>
 
@@ -283,7 +284,7 @@ void RealTimeEvokedSetWidget::getData()
         }
 
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
-        pEvokedSet->info = *m_pFiffInfo.data();
+        pEvokedSet->info = *(m_pFiffInfo.data());
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
 
         m_pEvokedSetModel->updateData();
@@ -446,51 +447,59 @@ void RealTimeEvokedSetWidget::init()
         QStringList slFlags;
         slFlags <<  "projections" << "compensators" << "filter" << "scaling" << "modalities" << "colors" << "averages";
 
-        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>::create(m_pEvokedSetModel->getScaling(), m_pFiffInfo, "RT Averaging", slFlags);
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>::create(m_pFiffInfo, "RT Averaging", slFlags);
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-        //Handle scaling
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+        ScalingView* pScalingView = new ScalingView();
+        pScalingView->init(m_pEvokedSetModel->getScaling());
+        m_pQuickControlWidget->addGroupBox(pScalingView, "Scaling");
+
+        connect(pScalingView, &ScalingView::scalingChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
 
-        //Handle background color changes
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
-                this, &RealTimeEvokedSetWidget::onBackgroundColorChanged);
 
-        //Handle screenshot signals
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
-                this, &RealTimeEvokedSetWidget::onMakeScreenshot);
+//        //Handle scaling
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
 
-        //Handle compensators
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
+//        //Handle background color changes
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
+//                this, &RealTimeEvokedSetWidget::onBackgroundColorChanged);
 
-        //Handle projections
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
+//        //Handle screenshot signals
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
+//                this, &RealTimeEvokedSetWidget::onMakeScreenshot);
 
-        //Handle modalities
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::modalitiesChanged,
-                m_pButterflyView.data(), &ButterflyView::setModalities);
+//        //Handle compensators
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
 
-        //Handle filtering
-        connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
-                m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
+//        //Handle projections
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
-                this, &RealTimeEvokedSetWidget::showFilterWidget);
+//        //Handle modalities
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::modalitiesChanged,
+//                m_pButterflyView.data(), &ButterflyView::setModalities);
 
-        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTESW/%1/viewZoomFactor").arg(t_sRTESName), 1.0).toFloat(),
-                                                     settings.value(QString("RTESW/%1/viewWindowSize").arg(t_sRTESName), 10).toInt(),
-                                                     settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESName), 95).toInt());
+//        //Handle filtering
+//        connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
+//                m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
-        m_pQuickControlWidget->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
+//                this, &RealTimeEvokedSetWidget::showFilterWidget);
 
-        QColor signalDefault = Qt::darkBlue;
+//        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTESW/%1/viewZoomFactor").arg(t_sRTESName), 1.0).toFloat(),
+//                                                     settings.value(QString("RTESW/%1/viewWindowSize").arg(t_sRTESName), 10).toInt(),
+//                                                     settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESName), 95).toInt());
+
+//        m_pQuickControlWidget->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
+
+//        QColor signalDefault = Qt::darkBlue;
         QColor butterflyBackgroundDefault = Qt::white;
         QColor layoutBackgroundDefault = Qt::black;
-        m_pQuickControlWidget->setSignalBackgroundColors(settings.value(QString("RTESW/%1/signalColor").arg(t_sRTESName),signalDefault).value<QColor>(),
-                                                         settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName),butterflyBackgroundDefault).value<QColor>());
+//        m_pQuickControlWidget->setSignalBackgroundColors(settings.value(QString("RTESW/%1/signalColor").arg(t_sRTESName),signalDefault).value<QColor>(),
+//                                                         settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName),butterflyBackgroundDefault).value<QColor>());
 
         //Activate projections as default
         m_pEvokedSetModel->updateProjection();
@@ -505,7 +514,7 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::updateData);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+        connect(pScalingView, &ScalingView::scalingChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
 
         //Handle averages

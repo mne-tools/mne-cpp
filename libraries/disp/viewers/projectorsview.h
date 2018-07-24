@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimatewidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     projectorsview.h
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeSourceEstimateWidget Class.
+* @brief    Declaration of the ProjectorsView Class.
 *
 */
 
-#ifndef REALTIMESOURCEESTIMATEWIDGET_H
-#define REALTIMESOURCEESTIMATEWIDGET_H
+#ifndef PROJECTORSVIEW_H
+#define PROJECTORSVIEW_H
 
 
 //*************************************************************************************************************
@@ -42,9 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "scdisp_global.h"
-
-#include "measurementwidget.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -52,7 +50,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QPointer>
+#include <QWidget>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -66,89 +65,92 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB {
-    class MneEstimateTreeItem;
-    class SourceEstimateView;
-}
+class QCheckBox;
 
-namespace SCMEASLIB {
-    class RealTimeSourceEstimate;
+namespace FIFFLIB {
+    class FiffInfo;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCDISPLIB
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// SCDISPLIB FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeSourceEstimateWidget
+* DECLARE CLASS ProjectorsView
 *
-* @brief The RealTimeSourceEstimateWidget class provides a real-time 3D source estimate display.
+* @brief The ProjectorsView class provides a view to select between different modalities
 */
-
-class SCDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public MeasurementWidget
+class DISPSHARED_EXPORT ProjectorsView : public QWidget
 {
     Q_OBJECT
 
-public:
+public:    
+    typedef QSharedPointer<ProjectorsView> SPtr;              /**< Shared pointer type for ProjectorsView. */
+    typedef QSharedPointer<const ProjectorsView> ConstSPtr;   /**< Const shared pointer type for ProjectorsView. */
+
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSourceEstimateWidget which is a child of parent.
+    * Constructs a ProjectorsView which is a child of parent.
     *
-    * @param [in] pRTMSE        pointer to real-time multi sample array measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+    * @param [in] parent        parent of widget
     */
-    RealTimeSourceEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeSourceEstimate> &pRTSE, QWidget* parent = 0);
-
-//    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent = 0);
+    ProjectorsView(QWidget *parent = 0,
+                Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSourceEstimateWidget.
-    */
-    ~RealTimeSourceEstimateWidget();
-
-    //=========================================================================================================
-    /**
-    * Is called when new data are available.
-    */
-    virtual void getData();
-
-    //=========================================================================================================
-    /**
-    * Is called when new data are available.
+    * Update the selection.
     *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+    * @param [in] state    The state (unused).
     */
-    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Slot called when user enables/disables all projectors
+    */
+    void onEnableDisableAllProj(bool status);
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeSourceEstimateWidget.
+    * Slot called when the projector check state changes
     */
-    virtual void init();
+    void onCheckProjStatusChanged(bool state);
 
-private:
-    QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;                /**< The real-time source estimate measurement. */
-    QSharedPointer<DISP3DLIB::SourceEstimateView>       m_pSourceEstimateView;  /**< The 3D source estimate view. */
-    QPointer<DISP3DLIB::MneEstimateTreeItem>            m_pRtItem;              /**< The Disp3D real time items. */
+    QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
+    QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
 
-    bool                                                m_bInitialized;         /**< Whether init was processed successfully. */
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the projections.
+    */
+    void projSelectionChanged();
+
 };
 
 } // NAMESPACE
 
-#endif // REALTIMESOURCEESTIMATEWIDGET_H
+#endif // PROJECTORSVIEW_H

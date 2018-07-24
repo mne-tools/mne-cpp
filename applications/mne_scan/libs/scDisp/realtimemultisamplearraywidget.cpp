@@ -47,6 +47,8 @@
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/channeldataview.h>
+#include <disp/viewers/scalingview.h>
+#include <disp/viewers/projectorsview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -351,76 +353,94 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #endif
 
-        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(qMapChScaling, m_pFiffInfo, "RT Display", slFlags, this));
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_pFiffInfo, "RT Display", slFlags, this));
 
-        //Handle scaling
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+        ScalingView* pScalingView = new ScalingView();
+        pScalingView->init(qMapChScaling);
+        m_pQuickControlWidget->addGroupBox(pScalingView, "Scaling");
+
+        connect(pScalingView, &ScalingView::scalingChanged,
                 m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
 
-        //Handle signal color changes
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
+        ProjectorsView* pProjectorsView = new ProjectorsView();
+        pProjectorsView->init(m_pFiffInfo);
+        m_pQuickControlWidget->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
-        //Handle background color changes
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setBackgroundColorChanged);
+        ProjectorsView* pProjectorsViewa = new ProjectorsView();
+        pProjectorsViewa->init(m_pFiffInfo);
+        m_pQuickControlWidget->addGroupBoxWithTabs(pProjectorsViewa, "Noise", "SSP2");
 
-        //Handle screenshot signals
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
-                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
-
-        //Handle projections
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
+        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
-        //Handle compensators
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-                m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
+//        //Handle scaling
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
 
-        //Handle SPHARA
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
-                m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
+//        //Handle signal color changes
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
-                m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
+//        //Handle background color changes
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::setBackgroundColorChanged);
 
-        //Handle view changes
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setZoom);
+//        //Handle screenshot signals
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
+//                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
+//        //Handle projections
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
-        //Handle Filtering
-        connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
-                m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
+//        //Handle compensators
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
-                this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
+//        //Handle SPHARA
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
 
-        //Handle trigger detection
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
-                m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
-                m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
+//        //Handle view changes
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::setZoom);
 
-        connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
-                m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggersAndTypes);
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
 
-        //Handle time spacer distance
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
-                m_pChannelDataView.data(), &ChannelDataView::distanceTimeSpacerChanged);
+//        //Handle Filtering
+//        connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
+//                m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
-        m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
+//                this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
 
-        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
-                                                 settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt(),
-                                                 settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
+//        //Handle trigger detection
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
 
-        m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
+//                m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
 
-        m_pQuickControlWidget->setSignalBackgroundColors(signal, background);
+//        connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
+//                m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggersAndTypes);
+
+//        //Handle time spacer distance
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
+//                m_pChannelDataView.data(), &ChannelDataView::distanceTimeSpacerChanged);
+
+//        m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+
+//        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
+//                                                 settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt(),
+//                                                 settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
+
+//        m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
+
+//        m_pQuickControlWidget->setSignalBackgroundColors(signal, background);
 
         //If projections are wanted activate projections as default
         if(slFlags.contains("projections")) {
