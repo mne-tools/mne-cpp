@@ -82,7 +82,7 @@ class NetworkTreeItem;
 
 //=============================================================================================================
 /**
-* Adapter which provides visualization for ECD data and a control widget.
+* Adapter which provides visualization for network data and a control widget.
 *
 * @brief Visualizes ECD data.
 */
@@ -99,7 +99,8 @@ public:
     * Default constructor
     *
     */
-    explicit NetworkView(QWidget *parent = 0);
+    explicit NetworkView(QWidget *parent = 0,
+                         Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -114,6 +115,7 @@ public:
     NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
 protected:
+
 };
 
 } // NAMESPACE

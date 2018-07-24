@@ -45,19 +45,7 @@
 #include <scMeas/realtimesourceestimate.h>
 
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-
-#include <mne/mne_forwardsolution.h>
-#include <mne/mne_inverse_operator.h>
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
-#include <inverse/minimumNorm/minimumnorm.h>
-
-#include <math.h>
+#include <disp3D/viewers/sourceestimateview.h>
 
 
 //*************************************************************************************************************
@@ -65,13 +53,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSlider>
-#include <QAction>
-#include <QLabel>
 #include <QGridLayout>
-#include <QSettings>
-#include <QDebug>
-#include <QStringList>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -89,9 +72,7 @@
 
 using namespace SCDISPLIB;
 using namespace DISP3DLIB;
-using namespace MNELIB;
 using namespace SCMEASLIB;
-using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -104,28 +85,10 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
+, m_pSourceEstimateView(SourceEstimateView::SPtr::create())
 {
-    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
-    m_pAction3DControl->setShortcut(tr("F9"));
-    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
-    connect(m_pAction3DControl, &QAction::triggered,
-            this, &RealTimeSourceEstimateWidget::show3DControlWidget);
-    addDisplayAction(m_pAction3DControl);
-    m_pAction3DControl->setVisible(true);
-
-    m_p3DView = View3D::SPtr(new View3D());
-    m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-    m_p3DView->setModel(m_pData3DModel);
-
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
-                                                                 QStringList() << "Data" << "Window" << "View" << "Light"));
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
     QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    mainLayoutView->addWidget(pWidgetContainer,0,0);
-    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
+    mainLayoutView->addWidget(m_pSourceEstimateView.data(),0,0);
 
     this->setLayout(mainLayoutView);
 
@@ -137,11 +100,8 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
 RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 {
-    //
     // Store Settings
-    //
-    if(!m_pRTSE->getName().isEmpty())
-    {
+    if(!m_pRTSE->getName().isEmpty()) {
     }
 }
 
@@ -158,14 +118,11 @@ void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 
 void RealTimeSourceEstimateWidget::getData()
 {
-    if(m_bInitialized)
-    {
-        //
-        // Add rt brain data
-        //
-        if(!m_pRtItem) {
+    if(m_bInitialized) {
+        // Add source estimate data
+        if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
             //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data",
+            m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
                                                       *m_pRTSE->getValue(),
                                                       *m_pRTSE->getFwdSolution(),
                                                       *m_pRTSE->getSurfSet(),
@@ -186,19 +143,8 @@ void RealTimeSourceEstimateWidget::getData()
                 m_pRtItem->addData(*m_pRTSE->getValue());
             }
         }
-    }
-    else
-    {
-        if(m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet())
-        {
-            m_pRTSE->m_bStcSend = false;
-            init();
-
-            //
-            // Add brain data
-            //
-            m_pData3DModel->addSurfaceSet("Subject", "MRI", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
-        }
+    } else {
+        init();
     }
 }
 
@@ -208,24 +154,4 @@ void RealTimeSourceEstimateWidget::getData()
 void RealTimeSourceEstimateWidget::init()
 {
     m_bInitialized = true;
-    m_pRTSE->m_bStcSend = true;
 }
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::show3DControlWidget()
-{
-    if(m_pControl3DView->isActiveWindow())
-        m_pControl3DView->hide();
-    else {
-        m_pControl3DView->activateWindow();
-        m_pControl3DView->show();
-    }
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
