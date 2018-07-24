@@ -201,8 +201,6 @@ public:
     */
     FiffInfo::SPtr getFiffInfo();
 
-    bool m_bStcSend; /**< dirty hack */
-
 private:
     mutable QMutex              m_qMutex;       /**< Mutex to ensure thread safety */
 

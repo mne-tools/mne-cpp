@@ -53,7 +53,6 @@
 //=============================================================================================================
 
 using namespace SCMEASLIB;
-//using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -63,7 +62,6 @@ using namespace SCMEASLIB;
 
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 : Measurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
 , m_pMNEStc(new MNESourceEstimate)
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))

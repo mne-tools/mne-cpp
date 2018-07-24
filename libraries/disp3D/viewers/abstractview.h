@@ -96,7 +96,8 @@ public:
     /**
     * Default constructor.
     */
-    explicit AbstractView(QWidget *parent = 0);
+    explicit AbstractView(QWidget *parent = 0,
+                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**

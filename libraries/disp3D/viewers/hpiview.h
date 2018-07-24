@@ -119,7 +119,9 @@ public:
     * @param[in] pFiffInfo      The FiffInfo.
     * @param[in] parent         The parent widget.
     */
-    HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent = 0);
+    HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+            QWidget *parent = 0,
+            Qt::WindowFlags f = Qt::Widget);
     ~HpiView();
 
     //=========================================================================================================

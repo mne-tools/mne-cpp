@@ -72,8 +72,9 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AbstractView::AbstractView(QWidget* parent)
-: QWidget(parent)
+AbstractView::AbstractView(QWidget* parent,
+                           Qt::WindowFlags f)
+: QWidget(parent, f)
 , m_p3DView(View3D::SPtr(new View3D()))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
 {

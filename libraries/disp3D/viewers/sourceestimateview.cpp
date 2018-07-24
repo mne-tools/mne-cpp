@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimeconnectivityestimatewidget.cpp
+* @file     sourceestimateview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeConnectivityEstimateWidget Class.
+* @brief    SourceEstimateView class definition.
 *
 */
 
@@ -38,29 +38,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimeconnectivityestimatewidget.h"
+#include "sourceestimateview.h"
 
-#include <scMeas/realtimeconnectivityestimate.h>
-
-#include <disp3D/viewers/networkview.h>
-#include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
+#include "../engine/model/data3Dtreemodel.h"
+#include "../engine/model/items/sourcedata/mneestimatetreeitem.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
-//=============================================================================================================
-
-#include <QGridLayout>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
 //=============================================================================================================
 
 
@@ -69,9 +60,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
 using namespace DISP3DLIB;
-using namespace SCMEASLIB;
+using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -79,70 +70,34 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE, QWidget* parent)
-: MeasurementWidget(parent)
-, m_pRTCE(pRTCE)
-, m_bInitialized(false)
-, m_pRtItem(Q_NULLPTR)
-, m_pNetworkView(NetworkView::SPtr::create())
+SourceEstimateView::SourceEstimateView(QWidget* parent,
+                                       Qt::WindowFlags f)
+: AbstractView(parent, f)
 {
-    QGridLayout *mainLayoutView = new QGridLayout;
-    mainLayoutView->addWidget(m_pNetworkView.data(),0,0);
-
-    this->setLayout(mainLayoutView);
 }
 
 
 //*************************************************************************************************************
 
-RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
+SourceEstimateView::~SourceEstimateView()
 {
-    // Store Settings
-    if(!m_pRTCE->getName().isEmpty()) {
-    }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
+MneEstimateTreeItem* SourceEstimateView::addData(const QString& sSubject,
+                                                 const QString& sMeasurementSetName,
+                                                 const MNESourceEstimate& tSourceEstimate,
+                                                 const MNEForwardSolution& tForwardSolution,
+                                                 const SurfaceSet& tSurfSet,
+                                                 const AnnotationSet& tAnnotSet)
 {
-    getData();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeConnectivityEstimateWidget::getData()
-{
-    if(m_bInitialized) {
-        // Add rt brain data
-        if(!m_pRtItem) {
-            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
-            m_pRtItem = m_pNetworkView->addData(*(m_pRTCE->getValue().data()));
-        } else {
-            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
-
-            if(m_pRtItem) {
-                m_pRtItem->addData(*(m_pRTCE->getValue().data()));
-            }
-        }
-    } else {
-        init();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeConnectivityEstimateWidget::init()
-{
-    if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet()) {
-        // Add brain data
-        m_pNetworkView->getTreeModel()->addSurfaceSet("Subject", "MRI", *(m_pRTCE->getSurfSet()), *(m_pRTCE->getAnnotSet()));
-    } else {
-        qDebug()<<"RealTimeConnectivityEstimateWidget::init - Could not open 3D surface information.";
-    }
-
-    m_bInitialized = true;
+    //Add network data
+    return m_pData3DModel->addSourceData(sSubject,
+                                         sMeasurementSetName,
+                                         tSourceEstimate,
+                                         tForwardSolution,
+                                         tSurfSet,
+                                         tAnnotSet);
 }

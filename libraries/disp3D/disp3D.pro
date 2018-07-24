@@ -124,6 +124,7 @@ SOURCES += \
     viewers/abstractview.cpp \
     viewers/networkview.cpp \
     viewers/hpiview.cpp \
+    viewers/sourceestimateview.cpp \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
     helpers/interpolation/interpolation.cpp \
     helpers/geometryinfo/geometryinfo.cpp \
@@ -179,6 +180,7 @@ HEADERS += \
     viewers/abstractview.h \
     viewers/networkview.h \
     viewers/hpiview.h \
+    viewers/sourceestimateview.h \
     disp3D_global.h \
     engine/model/items/sensordata/sensordatatreeitem.h \
     helpers/interpolation/interpolation.h \
