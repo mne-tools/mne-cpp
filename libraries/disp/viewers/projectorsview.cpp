@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimatewidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     projectorsview.cpp
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeSourceEstimateWidget Class.
+* @brief    Definition of the ProjectorsView Class.
 *
 */
 
@@ -38,21 +38,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimatewidget.h"
+#include "projectorsview.h"
 
-#include <scMeas/realtimesourceestimate.h>
-
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
-#include <disp3D/viewers/sourceestimateview.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QCheckBox>
 #include <QGridLayout>
-#include <QVector3D>
+#include <QFrame>
 
 
 //*************************************************************************************************************
@@ -60,17 +58,14 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace DISP3DLIB;
-using namespace SCMEASLIB;
+using namespace DISPLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -78,78 +73,118 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
-: MeasurementWidget(parent)
-, m_pRTSE(pRTSE)
-, m_bInitialized(false)
-, m_pRtItem(Q_NULLPTR)
-, m_pSourceEstimateView(SourceEstimateView::SPtr::create())
+ProjectorsView::ProjectorsView(QWidget *parent,
+                         Qt::WindowFlags f)
+: QWidget(parent, f)
 {
-    QGridLayout *mainLayoutView = new QGridLayout;
-    mainLayoutView->addWidget(m_pSourceEstimateView.data(),0,0);
-
-    this->setLayout(mainLayoutView);
-
-    getData();
+    this->setWindowTitle("Projectors");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 }
 
 
 //*************************************************************************************************************
 
-RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
+void ProjectorsView::init(const FiffInfo::SPtr pFiffInfo)
 {
-    // Store Settings
-    if(!m_pRTSE->getName().isEmpty()) {
-    }
-}
+    if(pFiffInfo) {
+        m_pFiffInfo = pFiffInfo;
 
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
-{
-    getData();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::getData()
-{
-    if(m_bInitialized) {
-        // Add source estimate data
-        if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
-            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
-                                                      *m_pRTSE->getValue(),
-                                                      *m_pRTSE->getFwdSolution(),
-                                                      *m_pRTSE->getSurfSet(),
-                                                      *m_pRTSE->getAnnotSet());
-
-            m_pRtItem->setLoopState(false);
-            m_pRtItem->setTimeInterval(17);
-            m_pRtItem->setThresholds(QVector3D(0.0,5,10));
-            m_pRtItem->setColormapType("Hot");
-            m_pRtItem->setVisualizationType("Annotation based");
-            m_pRtItem->setNumberAverages(1);
-            m_pRtItem->setStreamingState(true);
-            m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
-        } else {
-            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
-
-            if(m_pRtItem) {
-                m_pRtItem->addData(*m_pRTSE->getValue());
-            }
+        //If no projectors are defined return here
+        if(pFiffInfo->projs.empty()) {
+            return;
         }
-    } else {
-        init();
+
+        m_qListProjCheckBox.clear();
+        // Projection Selection
+        QGridLayout *topLayout = new QGridLayout;
+
+        bool bAllActivated = true;
+
+        qint32 i=0;
+
+        for(i; i < pFiffInfo->projs.size(); ++i)
+        {
+            QCheckBox* checkBox = new QCheckBox(pFiffInfo->projs[i].desc);
+            checkBox->setChecked(pFiffInfo->projs[i].active);
+
+            if(pFiffInfo->projs[i].active == false)
+                bAllActivated = false;
+
+            m_qListProjCheckBox.append(checkBox);
+
+            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                    this, &ProjectorsView::onCheckProjStatusChanged);
+
+            topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+
+//            if(i>m_pFiffInfo->projs.size()/2)
+//                topLayout->addWidget(checkBox, i-rowCount, 1); //+2 because we already added two widgets before the first projector check box
+//            else {
+//                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+//                rowCount++;
+//            }
+        }
+
+        QFrame* line = new QFrame();
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        topLayout->addWidget(line, i+1, 0);
+
+        m_pEnableDisableProjectors = new QCheckBox("Enable all");
+        m_pEnableDisableProjectors->setChecked(bAllActivated);
+        topLayout->addWidget(m_pEnableDisableProjectors, i+2, 0);
+        connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &ProjectorsView::onEnableDisableAllProj);
+
+        //Find SSP tab and add current layout
+        this->setLayout(topLayout);
+
+        //Set default activation to true
+        onEnableDisableAllProj(true);
     }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::init()
+void ProjectorsView::onEnableDisableAllProj(bool status)
 {
-    m_bInitialized = true;
+    //Set all checkboxes to status
+    for(int i=0; i<m_qListProjCheckBox.size(); i++)
+        m_qListProjCheckBox.at(i)->setChecked(status);
+
+    //Set all projection activation states to status
+    for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
+        m_pFiffInfo->projs[i].active = status;
+
+    if(m_pEnableDisableProjectors) {
+        m_pEnableDisableProjectors->setChecked(status);
+    }
+
+    emit projSelectionChanged();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectorsView::onCheckProjStatusChanged(bool status)
+{
+    Q_UNUSED(status)
+
+    bool bAllActivated = true;
+
+    for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if(m_qListProjCheckBox[i]->isChecked() == false)
+            bAllActivated = false;
+
+        this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
+    }
+
+    if(m_pEnableDisableProjectors) {
+        m_pEnableDisableProjectors->setChecked(bAllActivated);
+    }
+
+    emit projSelectionChanged();
 }

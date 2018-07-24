@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimatewidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     scalingview.h
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,21 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeSourceEstimateWidget Class.
+* @brief    Declaration of the ScalingView Class.
 *
 */
+
+#ifndef SCALINGVIEW_H
+#define SCALINGVIEW_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimatewidget.h"
-
-#include <scMeas/realtimesourceestimate.h>
-
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
-#include <disp3D/viewers/sourceestimateview.h>
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -51,8 +50,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGridLayout>
-#include <QVector3D>
+#include <QWidget>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -60,96 +59,94 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QDoubleSpinBox;
+class QSlider;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace SCDISPLIB;
-using namespace DISP3DLIB;
-using namespace SCMEASLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
-: MeasurementWidget(parent)
-, m_pRTSE(pRTSE)
-, m_bInitialized(false)
-, m_pRtItem(Q_NULLPTR)
-, m_pSourceEstimateView(SourceEstimateView::SPtr::create())
+namespace DISPLIB
 {
-    QGridLayout *mainLayoutView = new QGridLayout;
-    mainLayoutView->addWidget(m_pSourceEstimateView.data(),0,0);
-
-    this->setLayout(mainLayoutView);
-
-    getData();
-}
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
-RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
+
+//=============================================================================================================
+/**
+* DECLARE CLASS ScalingView
+*
+* @brief The ScalingView class provides a view to select between different modalities
+*/
+class DISPSHARED_EXPORT ScalingView : public QWidget
 {
-    // Store Settings
-    if(!m_pRTSE->getName().isEmpty()) {
-    }
-}
+    Q_OBJECT
 
+public:    
+    typedef QSharedPointer<ScalingView> SPtr;              /**< Shared pointer type for ScalingView. */
+    typedef QSharedPointer<const ScalingView> ConstSPtr;   /**< Const shared pointer type for ScalingView. */
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Constructs a ScalingView which is a child of parent.
+    *
+    * @param [in] parent        parent of widget
+    */
+    ScalingView(QWidget *parent = 0,
+                Qt::WindowFlags f = Qt::Widget);
 
-void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
-{
-    getData();
-}
+    //=========================================================================================================
+    /**
+    * Update the selection.
+    *
+    * @param [in] state    The state (unused).
+    */
+    void init(const QMap<qint32, float> &qMapChScaling);
 
+protected:
+    //=========================================================================================================
+    /**
+    * Slot called when scaling spin boxes change
+    */
+    void onUpdateSpinBoxScaling(double value);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Slot called when slider scaling change
+    */
+    void onUpdateSliderScaling(int value);
 
-void RealTimeSourceEstimateWidget::getData()
-{
-    if(m_bInitialized) {
-        // Add source estimate data
-        if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
-            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
-                                                      *m_pRTSE->getValue(),
-                                                      *m_pRTSE->getFwdSolution(),
-                                                      *m_pRTSE->getSurfSet(),
-                                                      *m_pRTSE->getAnnotSet());
+    QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32, QDoubleSpinBox*>       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
+    QMap<qint32, QSlider*>              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
 
-            m_pRtItem->setLoopState(false);
-            m_pRtItem->setTimeInterval(17);
-            m_pRtItem->setThresholds(QVector3D(0.0,5,10));
-            m_pRtItem->setColormapType("Hot");
-            m_pRtItem->setVisualizationType("Annotation based");
-            m_pRtItem->setNumberAverages(1);
-            m_pRtItem->setStreamingState(true);
-            m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
-        } else {
-            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the scaling sliders or spin boxes changed.
+    */
+    void scalingChanged(const QMap<qint32, float>& scalingMap);
 
-            if(m_pRtItem) {
-                m_pRtItem->addData(*m_pRTSE->getValue());
-            }
-        }
-    } else {
-        init();
-    }
-}
+};
 
+} // NAMESPACE
 
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::init()
-{
-    m_bInitialized = true;
-}
+#endif // SCALINGVIEW_H

@@ -108,6 +108,7 @@ SOURCES += \
     viewers/channelselectionview.cpp \
     viewers/spectrumsettingsview.cpp \
     viewers/scalingview.cpp \
+    viewers/projectorsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -141,6 +142,7 @@ HEADERS += \
     viewers/channelselectionview.h \
     viewers/spectrumsettingsview.h \
     viewers/scalingview.h \
+    viewers/projectorsview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
