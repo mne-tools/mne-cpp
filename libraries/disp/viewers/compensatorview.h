@@ -98,7 +98,7 @@ namespace DISPLIB
 /**
 * DECLARE CLASS CompensatorView
 *
-* @brief The CompensatorView class provides a view to select between different modalities
+* @brief The CompensatorView class provides a view to select the compensators
 */
 class DISPSHARED_EXPORT CompensatorView : public QWidget
 {

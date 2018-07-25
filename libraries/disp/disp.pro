@@ -111,6 +111,7 @@ SOURCES += \
     viewers/projectorsview.cpp \
     viewers/compensatorview.cpp \
     viewers/filtersettingsview.cpp \
+    viewers/spharasettingsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -147,6 +148,7 @@ HEADERS += \
     viewers/projectorsview.h \
     viewers/compensatorview.h \
     viewers/filtersettingsview.h \
+    viewers/spharasettingsview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
@@ -201,6 +203,9 @@ qtHaveModule(charts) {
 FORMS += \
     viewers/formfiles/filterview.ui \
     viewers/formfiles/channelselectionview.ui \
+    viewers/formfiles/spharasettingsview.ui \
+    viewers/formfiles/channeldatasettingsview.ui \
+    viewers/formfiles/triggerdetectionview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \

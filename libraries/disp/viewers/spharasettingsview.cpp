@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     projectorsview.h
+* @file     spharasettingsview.cpp
 * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,29 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the ProjectorsView Class.
+* @brief    Definition of the SpharaSettingsView Class.
 *
 */
-
-#ifndef PROJECTORSVIEW_H
-#define PROJECTORSVIEW_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
+#include "spharasettingsview.h"
+
+#include "ui_spharasettingsview.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <QWidget>
-#include <QMap>
 
 
 //*************************************************************************************************************
@@ -62,95 +57,101 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class QCheckBox;
+using namespace DISPLIB;
 
-namespace FIFFLIB {
-    class FiffInfo;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+SpharaSettingsView::SpharaSettingsView(QWidget *parent,
+                         Qt::WindowFlags f)
+: QWidget(parent, f)
+, ui(new Ui::SpharaSettingsViewWidget)
+{
+    ui->setupUi(this);
+
+    this->setWindowTitle("SPHARA Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 }
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+
+SpharaSettingsView::~SpharaSettingsView()
+{
+    delete ui;
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
-//=============================================================================================================
 
-namespace DISPLIB
+void SpharaSettingsView::init()
 {
+    //Sphara activation changed
+    connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &SpharaSettingsView::onSpharaButtonClicked);
+
+    //Sphara options changed
+    connect(ui->m_comboBox_spharaSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &SpharaSettingsView::onSpharaOptionsChanged);
+
+    connect(ui->m_spinBox_spharaFirst, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &SpharaSettingsView::onSpharaOptionsChanged);
+
+    connect(ui->m_spinBox_spharaSecond, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &SpharaSettingsView::onSpharaOptionsChanged);
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS ProjectorsView
-*
-* @brief The ProjectorsView class provides a view to select projectors
-*/
-class DISPSHARED_EXPORT ProjectorsView : public QWidget
+void SpharaSettingsView::onSpharaButtonClicked(bool state)
 {
-    Q_OBJECT
+    emit spharaActivationChanged(state);
+}
 
-public:    
-    typedef QSharedPointer<ProjectorsView> SPtr;              /**< Shared pointer type for ProjectorsView. */
-    typedef QSharedPointer<const ProjectorsView> ConstSPtr;   /**< Const shared pointer type for ProjectorsView. */
 
-    //=========================================================================================================
-    /**
-    * Constructs a ProjectorsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
-    ProjectorsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Update the selection.
-    *
-    * @param [in] state    The state (unused).
-    */
-    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+void SpharaSettingsView::onSpharaOptionsChanged()
+{
+    ui->m_label_spharaFirst->show();
+    ui->m_spinBox_spharaFirst->show();
 
-protected:
-    //=========================================================================================================
-    /**
-    * Slot called when user enables/disables all projectors
-    */
-    void onEnableDisableAllProj(bool status);
+    ui->m_label_spharaSecond->show();
+    ui->m_spinBox_spharaSecond->show();
 
-    //=========================================================================================================
-    /**
-    * Slot called when the projector check state changes
-    */
-    void onCheckProjStatusChanged(bool state);
+    if(ui->m_comboBox_spharaSystem->currentText() == "VectorView") {
+        ui->m_label_spharaFirst->setText("Mag");
+        ui->m_spinBox_spharaFirst->setMaximum(102);
 
-    QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
-    QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
+        ui->m_label_spharaSecond->setText("Grad");
+        ui->m_spinBox_spharaSecond->setMaximum(102);
+    }
 
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
+    if(ui->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
+        ui->m_label_spharaFirst->setText("Inner layer");
+        ui->m_spinBox_spharaFirst->setMaximum(270);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the projections.
-    */
-    void projSelectionChanged();
+        ui->m_label_spharaSecond->setText("Outer layer");
+        ui->m_spinBox_spharaSecond->setMaximum(105);
+    }
 
-};
+    if(ui->m_comboBox_spharaSystem->currentText() == "EEG") {
+        ui->m_label_spharaFirst->setText("EEG");
+        ui->m_spinBox_spharaFirst->setMaximum(256);
 
-} // NAMESPACE
+        ui->m_label_spharaSecond->hide();
+        ui->m_spinBox_spharaSecond->hide();
+    }
 
-#endif // PROJECTORSVIEW_H
+    emit spharaOptionsChanged(ui->m_comboBox_spharaSystem->currentText(),
+                              ui->m_spinBox_spharaFirst->value(),
+                              ui->m_spinBox_spharaSecond->value());
+}
