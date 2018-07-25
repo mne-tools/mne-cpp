@@ -48,6 +48,7 @@
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/scalingview.h>
+#include <disp/viewers/projectorsview.h>
 
 #include <scMeas/realtimeevokedset.h>
 
@@ -457,10 +458,12 @@ void RealTimeEvokedSetWidget::init()
         connect(pScalingView, &ScalingView::scalingChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
 
+        ProjectorsView* pProjectorsView = new ProjectorsView();
+        pProjectorsView->init(m_pFiffInfo);
+        m_pQuickControlWidget->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
-//        //Handle scaling
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
+        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
 //        //Handle background color changes
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
@@ -473,10 +476,6 @@ void RealTimeEvokedSetWidget::init()
 //        //Handle compensators
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
 //                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
-
-//        //Handle projections
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
 //        //Handle modalities
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::modalitiesChanged,
@@ -527,15 +526,15 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::averageInformationChanged,
                 m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
 
-        //Connect Quick Control Widget
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pButterflyView.data(), &ButterflyView::updateView);
+//        //Connect Quick Control Widget
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
+//                m_pButterflyView.data(), &ButterflyView::updateView);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 m_pButterflyView.data(), &ButterflyView::showSelectedChannelsOnly);
 
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
-                m_pAverageLayoutView.data(), &AverageLayoutView::updateData);
+//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
+//                m_pAverageLayoutView.data(), &AverageLayoutView::updateData);
 
         m_pButterflyView->setModel(m_pEvokedSetModel);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
