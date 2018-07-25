@@ -137,13 +137,7 @@ public:
                                 QString sGroupBoxName,
                                 QString sTabName);
 
-    //=========================================================================================================
-    /**
-    * Call this whenever the current filters have changed.
-    *
-    * @param [in] list    list of QCheckBoxes which are to be added to the filter group
-    */
-    void filterGroupChanged(QList<QCheckBox*> list);
+
 
     //=========================================================================================================
     /**
@@ -298,14 +292,6 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Show the filter option screen to the user.
-    *
-    * @param [in] state toggle state.
-    */
-    void onShowFilterOptions(bool state);
-
-    //=========================================================================================================
-    /**
     * Slot called when modality check boxes were changed
     */
     void onUpdateModalityCheckbox(qint32 state);
@@ -331,12 +317,6 @@ protected slots:
     * Slot called when reset number of detected triggers was pressed
     */
     void onResetTriggerNumbers();
-
-    //=========================================================================================================
-    /**
-    * Slot called when the user designed filter was toggled
-    */
-    void onUserFilterToggled(bool state);
 
     //=========================================================================================================
     /**
@@ -438,13 +418,10 @@ private:
     QColor                                              m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
 
     QList<DISPLIB::Modality>                            m_qListModalities;              /**< List of different modalities. */
-    QList<QCheckBox*>                                   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
     QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
-    QPushButton*                                        m_pShowFilterOptions;           /**< Holds the show filter options button. */
-
     Ui::QuickControlWidget*                             ui;                             /**< The generated UI file. */
 
     QGridLayout*    m_pMainLayout;
@@ -484,12 +461,6 @@ signals:
     * Emit this signal whenever the trigger infomration changed.
     */
     void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user is supposed to see the filter option window.
-    */
-    void showFilterOptions(bool state);
 
     //=========================================================================================================
     /**

@@ -87,7 +87,6 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 , m_pFiffInfo(pFiffInfo)
 , m_slFlags(slFlags)
 , m_sName(name)
-, m_pShowFilterOptions(Q_NULLPTR)
 , m_pMainLayout(new QGridLayout())
 , m_pGroupBoxLayout(new QGridLayout())
 , m_pButtonLayout(new QGridLayout())
@@ -126,14 +125,6 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
     //    //Connect screenshot button
     //    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
     //            this, &QuickControlWidget::onMakeScreenshot);
-
-//    if(m_slFlags.contains("compensators", Qt::CaseInsensitive)) {
-//        createCompensatorGroup();
-//        m_bCompensator = true;
-//    } else {
-//        ui->m_tabWidget_noiseReduction->removeTab(ui->m_tabWidget_noiseReduction->indexOf(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Comp")));
-//        m_bCompensator = false;
-//    }
 
 //    if(m_slFlags.contains("sphara", Qt::CaseInsensitive)) {
 //        m_bSphara = true;
@@ -265,66 +256,6 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
     }
 }
 
-
-//*************************************************************************************************************
-
-void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
-{
-    if(m_bFilter) {
-        m_qFilterListCheckBox.clear();
-
-        for(int u = 0; u < list.size(); ++u) {
-            QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
-            tempCheckBox->setChecked(list[u]->isChecked());
-
-            connect(tempCheckBox, &QCheckBox::toggled,
-                    list[u], &QCheckBox::setChecked);
-
-            if(tempCheckBox->text() == "Activate user designed filter")
-                connect(tempCheckBox, &QCheckBox::toggled,
-                        this, &QuickControlWidget::onUserFilterToggled);
-
-            connect(list[u], &QCheckBox::toggled,
-                    tempCheckBox, &QCheckBox::setChecked);
-
-            m_qFilterListCheckBox.append(tempCheckBox);
-        }
-
-        //Delete all widgets in the filter layout
-        QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")->layout());
-        if(!topLayout) {
-           topLayout = new QGridLayout();
-        }
-
-        QLayoutItem *child;
-        while ((child = topLayout->takeAt(0)) != 0) {
-            delete child->widget();
-            delete child;
-        }
-
-        //Add filters
-        int u = 0;
-
-        for(u; u < m_qFilterListCheckBox.size(); ++u) {
-            topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
-        }
-
-        //Add push button for filter options
-        m_pShowFilterOptions = new QPushButton();
-//        m_pShowFilterOptions->setText("Open Filter options");
-        m_pShowFilterOptions->setText("Filter options");
-        m_pShowFilterOptions->setCheckable(false);
-        connect(m_pShowFilterOptions, &QPushButton::clicked,
-                this, &QuickControlWidget::onShowFilterOptions);
-
-        topLayout->addWidget(m_pShowFilterOptions, u+1, 0);
-
-        //Find Filter tab and add current layout
-        this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")->setLayout(topLayout);
-
-        //createViewGroup();
-    }
-}
 
 
 //*************************************************************************************************************
@@ -551,24 +482,6 @@ void QuickControlWidget::onToggleHideAll(bool state)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onShowFilterOptions(bool state)
-{
-//    if(state)
-//        m_pShowFilterOptions->setText("Close filter options");
-//    else
-//        m_pShowFilterOptions->setText("Open filter options");
-
-//    m_pShowFilterOptions->setChecked(state);
-
-//    emit showFilterOptions(state);
-
-    Q_UNUSED(state);
-    emit showFilterOptions(true);
-}
-
-
-//*************************************************************************************************************
-
 void QuickControlWidget::onUpdateModalityCheckbox(qint32 state)
 {
     Q_UNUSED(state)
@@ -629,16 +542,6 @@ void QuickControlWidget::onResetTriggerNumbers()
 
     emit resetTriggerCounter();
 
-    emit updateConnectedView();
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onUserFilterToggled(bool state)
-{
-    Q_UNUSED(state);
-    //qDebug()<<"onUserFilterToggled";
     emit updateConnectedView();
 }
 

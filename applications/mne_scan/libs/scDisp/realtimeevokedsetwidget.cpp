@@ -49,6 +49,7 @@
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
+#include <disp/viewers/compensatorview.h>
 
 #include <scMeas/realtimeevokedset.h>
 
@@ -465,6 +466,13 @@ void RealTimeEvokedSetWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
+        CompensatorView* pCompensatorView = new CompensatorView();
+        pCompensatorView->init(m_pFiffInfo);
+        m_pQuickControlWidget->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
+
+        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
+
 //        //Handle background color changes
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
 //                this, &RealTimeEvokedSetWidget::onBackgroundColorChanged);
@@ -472,10 +480,6 @@ void RealTimeEvokedSetWidget::init()
 //        //Handle screenshot signals
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
 //                this, &RealTimeEvokedSetWidget::onMakeScreenshot);
-
-//        //Handle compensators
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
 
 //        //Handle modalities
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::modalitiesChanged,
