@@ -49,6 +49,7 @@
 #include <disp/viewers/channeldataview.h>
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
+#include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/compensatorview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
@@ -359,6 +360,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_pFiffInfo, "RT Display", slFlags, this));
 
+        // Quick control scaling
         ScalingView* pScalingView = new ScalingView();
         pScalingView->init(qMapChScaling);
         m_pQuickControlWidget->addGroupBox(pScalingView, "Scaling");
@@ -366,6 +368,7 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(pScalingView, &ScalingView::scalingChanged,
                 m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
 
+        // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView();
         pProjectorsView->init(m_pFiffInfo);
         m_pQuickControlWidget->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
@@ -373,6 +376,7 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
+        // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView();
         pCompensatorView->init(m_pFiffInfo);
         m_pQuickControlWidget->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
@@ -380,6 +384,17 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
 
+        // Quick control filter settings
+        FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
+        m_pQuickControlWidget->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
+
+        connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
+                pFilterSettingsView, &FilterSettingsView::filterGroupChanged);
+
+        connect(pFilterSettingsView, &FilterSettingsView::showFilterOptions,
+                this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
+
+        pFilterSettingsView->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
 //        //Handle signal color changes
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
@@ -407,12 +422,6 @@ void RealTimeMultiSampleArrayWidget::init()
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
 //                m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
 
-//        //Handle Filtering
-//        connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
-//                m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
-
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
-//                this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
 
 //        //Handle trigger detection
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
@@ -428,7 +437,6 @@ void RealTimeMultiSampleArrayWidget::init()
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
 //                m_pChannelDataView.data(), &ChannelDataView::distanceTimeSpacerChanged);
 
-//        m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
 //        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
 //                                                 settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt(),

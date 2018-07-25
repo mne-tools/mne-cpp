@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     projectorsview.cpp
+* @file     filtersettingsview.cpp
 * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the ProjectorsView Class.
+* @brief    Definition of the FilterSettingsView Class.
 *
 */
 
@@ -38,9 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "projectorsview.h"
-
-#include <fiff/fiff_info.h>
+#include "filtersettingsview.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +48,7 @@
 
 #include <QCheckBox>
 #include <QGridLayout>
-#include <QFrame>
+#include <QPushButton>
 
 
 //*************************************************************************************************************
@@ -65,20 +63,18 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
-using namespace FIFFLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProjectorsView::ProjectorsView(QWidget *parent,
+FilterSettingsView::FilterSettingsView(QWidget *parent,
                          Qt::WindowFlags f)
 : QWidget(parent, f)
-, m_pEnableDisableProjectors(Q_NULLPTR)
+, m_pShowFilterOptions(Q_NULLPTR)
 {
-    this->setWindowTitle("Projectors");
+    this->setWindowTitle("Compensators");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 }
@@ -86,106 +82,84 @@ ProjectorsView::ProjectorsView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void ProjectorsView::init(const FiffInfo::SPtr pFiffInfo)
+void FilterSettingsView::filterGroupChanged(QList<QCheckBox*> list)
 {
-    if(pFiffInfo) {
-        m_pFiffInfo = pFiffInfo;
+    m_qFilterListCheckBox.clear();
 
-        //If no projectors are defined return here
-        if(pFiffInfo->projs.empty()) {
-            return;
-        }
+    for(int u = 0; u < list.size(); ++u) {
+        QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
+        tempCheckBox->setChecked(list[u]->isChecked());
 
-        m_qListProjCheckBox.clear();
-        // Projection Selection
-        QGridLayout *topLayout = new QGridLayout;
+        connect(tempCheckBox, &QCheckBox::toggled,
+                list[u], &QCheckBox::setChecked);
 
-        bool bAllActivated = true;
+        if(tempCheckBox->text() == "Activate user designed filter")
+            connect(tempCheckBox, &QCheckBox::toggled,
+                    this, &FilterSettingsView::onUserFilterToggled);
 
-        qint32 i=0;
+        connect(list[u], &QCheckBox::toggled,
+                tempCheckBox, &QCheckBox::setChecked);
 
-        for(i; i < pFiffInfo->projs.size(); ++i)
-        {
-            QCheckBox* checkBox = new QCheckBox(pFiffInfo->projs[i].desc);
-            checkBox->setChecked(pFiffInfo->projs[i].active);
-
-            if(pFiffInfo->projs[i].active == false)
-                bAllActivated = false;
-
-            m_qListProjCheckBox.append(checkBox);
-
-            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                    this, &ProjectorsView::onCheckProjStatusChanged);
-
-            topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
-
-//            if(i>m_pFiffInfo->projs.size()/2)
-//                topLayout->addWidget(checkBox, i-rowCount, 1); //+2 because we already added two widgets before the first projector check box
-//            else {
-//                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
-//                rowCount++;
-//            }
-        }
-
-        QFrame* line = new QFrame();
-        line->setFrameShape(QFrame::HLine);
-        line->setFrameShadow(QFrame::Sunken);
-
-        topLayout->addWidget(line, i+1, 0);
-
-        m_pEnableDisableProjectors = new QCheckBox("Enable all");
-        m_pEnableDisableProjectors->setChecked(bAllActivated);
-        topLayout->addWidget(m_pEnableDisableProjectors, i+2, 0);
-        connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &ProjectorsView::onEnableDisableAllProj);
-
-        //Find SSP tab and add current layout
-        this->setLayout(topLayout);
-
-        //Set default activation to true
-        onEnableDisableAllProj(true);
+        m_qFilterListCheckBox.append(tempCheckBox);
     }
+
+    //Delete all widgets in the filter layout
+    QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
+    if(!topLayout) {
+       topLayout = new QGridLayout();
+    }
+
+    QLayoutItem *child;
+    while ((child = topLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
+    }
+
+    //Add filters
+    int u = 0;
+
+    for(u; u < m_qFilterListCheckBox.size(); ++u) {
+        topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
+    }
+
+    //Add push button for filter options
+    m_pShowFilterOptions = new QPushButton();
+//        m_pShowFilterOptions->setText("Open Filter options");
+    m_pShowFilterOptions->setText("Filter options");
+    m_pShowFilterOptions->setCheckable(false);
+    connect(m_pShowFilterOptions, &QPushButton::clicked,
+            this, &FilterSettingsView::onShowFilterOptions);
+
+    topLayout->addWidget(m_pShowFilterOptions, u+1, 0);
+
+    //Find Filter tab and add current layout
+    this->setLayout(topLayout);
 }
 
 
 //*************************************************************************************************************
 
-void ProjectorsView::onEnableDisableAllProj(bool status)
+void FilterSettingsView::onUserFilterToggled(bool state)
 {
-    //Set all checkboxes to status
-    for(int i=0; i<m_qListProjCheckBox.size(); i++)
-        m_qListProjCheckBox.at(i)->setChecked(status);
-
-    //Set all projection activation states to status
-    for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
-        m_pFiffInfo->projs[i].active = status;
-
-    if(m_pEnableDisableProjectors) {
-        m_pEnableDisableProjectors->setChecked(status);
-    }
-
-    emit projSelectionChanged();
+    Q_UNUSED(state);
+    //qDebug()<<"onUserFilterToggled";
+    //emit updateConnectedView();
 }
 
 
 //*************************************************************************************************************
 
-void ProjectorsView::onCheckProjStatusChanged(bool status)
+void FilterSettingsView::onShowFilterOptions(bool state)
 {
-    Q_UNUSED(status)
+//    if(state)
+//        m_pShowFilterOptions->setText("Close filter options");
+//    else
+//        m_pShowFilterOptions->setText("Open filter options");
 
-    bool bAllActivated = true;
+//    m_pShowFilterOptions->setChecked(state);
 
-    for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
-        if(m_qListProjCheckBox[i]->isChecked() == false)
-            bAllActivated = false;
+//    emit showFilterOptions(state);
 
-        this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
-    }
-
-    if(m_pEnableDisableProjectors) {
-        m_pEnableDisableProjectors->setChecked(bAllActivated);
-    }
-
-    emit projSelectionChanged();
+    Q_UNUSED(state);
+    emit showFilterOptions(true);
 }
