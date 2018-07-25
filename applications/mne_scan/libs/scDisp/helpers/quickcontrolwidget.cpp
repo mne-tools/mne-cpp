@@ -122,24 +122,9 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 
     this->setLayout(m_pMainLayout);
 
-    //    //Connect screenshot button
-    //    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-    //            this, &QuickControlWidget::onMakeScreenshot);
-
-//    if(m_slFlags.contains("sphara", Qt::CaseInsensitive)) {
-//        m_bSphara = true;
-//        createSpharaGroup();
-//    } else {
-//        ui->m_tabWidget_noiseReduction->removeTab(ui->m_tabWidget_noiseReduction->indexOf(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "SPHARA")));
-//        m_bSphara = false;
-//    }
-
-//    if(m_slFlags.contains("filter", Qt::CaseInsensitive)) {
-//        m_bFilter = true;
-//    } else {
-//        ui->m_tabWidget_noiseReduction->removeTab(ui->m_tabWidget_noiseReduction->indexOf(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")));
-//        m_bFilter = false;
-//    }
+//    //Connect screenshot button
+//    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+//            this, &QuickControlWidget::onMakeScreenshot);
 
 //    if(m_slFlags.contains("view", Qt::CaseInsensitive)) {
 //        createViewGroup();
@@ -548,52 +533,6 @@ void QuickControlWidget::onResetTriggerNumbers()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onSpharaButtonClicked(bool state)
-{
-    emit spharaActivationChanged(state);
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onSpharaOptionsChanged()
-{
-    ui->m_label_spharaFirst->show();
-    ui->m_spinBox_spharaFirst->show();
-
-    ui->m_label_spharaSecond->show();
-    ui->m_spinBox_spharaSecond->show();
-
-    if(ui->m_comboBox_spharaSystem->currentText() == "VectorView") {
-        ui->m_label_spharaFirst->setText("Mag");
-        ui->m_spinBox_spharaFirst->setMaximum(102);
-
-        ui->m_label_spharaSecond->setText("Grad");
-        ui->m_spinBox_spharaSecond->setMaximum(102);
-    }
-
-    if(ui->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
-        ui->m_label_spharaFirst->setText("Inner layer");
-        ui->m_spinBox_spharaFirst->setMaximum(270);
-
-        ui->m_label_spharaSecond->setText("Outer layer");
-        ui->m_spinBox_spharaSecond->setMaximum(105);
-    }
-
-    if(ui->m_comboBox_spharaSystem->currentText() == "EEG") {
-        ui->m_label_spharaFirst->setText("EEG");
-        ui->m_spinBox_spharaFirst->setMaximum(256);
-
-        ui->m_label_spharaSecond->hide();
-        ui->m_spinBox_spharaSecond->hide();
-    }
-
-    emit spharaOptionsChanged(ui->m_comboBox_spharaSystem->currentText(), ui->m_spinBox_spharaFirst->value(), ui->m_spinBox_spharaSecond->value());
-}
-
-
-//*************************************************************************************************************
-
 void QuickControlWidget::onViewColorButtonClicked()
 {
     QColorDialog* pDialog = new QColorDialog(this);
@@ -666,26 +605,6 @@ void QuickControlWidget::onAveragesChanged()
 
         emit averageInformationChanged(m_qMapAverageInfo);
     }
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::createSpharaGroup()
-{
-    //Sphara activation changed
-    connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &QuickControlWidget::onSpharaButtonClicked);
-
-    //Sphara options changed
-    connect(ui->m_comboBox_spharaSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &QuickControlWidget::onSpharaOptionsChanged);
-
-    connect(ui->m_spinBox_spharaFirst, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &QuickControlWidget::onSpharaOptionsChanged);
-
-    connect(ui->m_spinBox_spharaSecond, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &QuickControlWidget::onSpharaOptionsChanged);
 }
 
 

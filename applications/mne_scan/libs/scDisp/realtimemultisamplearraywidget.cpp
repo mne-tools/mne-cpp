@@ -51,6 +51,7 @@
 #include <disp/viewers/projectorsview.h>
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/compensatorview.h>
+#include <disp/viewers/spharasettingsview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -396,6 +397,17 @@ void RealTimeMultiSampleArrayWidget::init()
 
         pFilterSettingsView->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
+        // Quick control SPHARA settings
+        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
+        m_pQuickControlWidget->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
+
+        //Handle SPHARA
+        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
+                m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
+
+        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
+                m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
+
 //        //Handle signal color changes
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
 //                m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
@@ -407,13 +419,6 @@ void RealTimeMultiSampleArrayWidget::init()
 //        //Handle screenshot signals
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
 //                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
-
-//        //Handle SPHARA
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
-//                m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
-
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
-//                m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
 
 //        //Handle view changes
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,

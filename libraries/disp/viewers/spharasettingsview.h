@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     projectorsview.h
+* @file     spharasettingsview.h
 * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the ProjectorsView Class.
+* @brief    Declaration of the SpharaSettingsView Class.
 *
 */
 
-#ifndef PROJECTORSVIEW_H
-#define PROJECTORSVIEW_H
+#ifndef SPHARASETTINGSVIEW_H
+#define SPHARASETTINGSVIEW_H
 
 
 //*************************************************************************************************************
@@ -51,7 +51,6 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QMap>
 
 
 //*************************************************************************************************************
@@ -65,10 +64,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QCheckBox;
-
-namespace FIFFLIB {
-    class FiffInfo;
+namespace Ui {
+    class SpharaSettingsViewWidget;
 }
 
 
@@ -95,62 +92,70 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ProjectorsView
+* DECLARE CLASS SpharaSettingsView
 *
-* @brief The ProjectorsView class provides a view to select projectors
+* @brief The SpharaSettingsView class provides a view to select the SPHARA settings
 */
-class DISPSHARED_EXPORT ProjectorsView : public QWidget
+class DISPSHARED_EXPORT SpharaSettingsView : public QWidget
 {
     Q_OBJECT
 
 public:    
-    typedef QSharedPointer<ProjectorsView> SPtr;              /**< Shared pointer type for ProjectorsView. */
-    typedef QSharedPointer<const ProjectorsView> ConstSPtr;   /**< Const shared pointer type for ProjectorsView. */
+    typedef QSharedPointer<SpharaSettingsView> SPtr;              /**< Shared pointer type for SpharaSettingsView. */
+    typedef QSharedPointer<const SpharaSettingsView> ConstSPtr;   /**< Const shared pointer type for SpharaSettingsView. */
 
     //=========================================================================================================
     /**
-    * Constructs a ProjectorsView which is a child of parent.
+    * Constructs a SpharaSettingsView which is a child of parent.
     *
     * @param [in] parent        parent of widget
     */
-    ProjectorsView(QWidget *parent = 0,
+    SpharaSettingsView(QWidget *parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+    * Destroys the SpharaSettingsView.
+    */
+    ~SpharaSettingsView();
 
     //=========================================================================================================
     /**
     * Update the selection.
     *
-    * @param [in] state    The state (unused).
     */
-    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    void init();
 
 protected:
     //=========================================================================================================
     /**
-    * Slot called when user enables/disables all projectors
+    * Slot called when the sphara tool was toggled
     */
-    void onEnableDisableAllProj(bool status);
+    void onSpharaButtonClicked(bool state);
 
     //=========================================================================================================
     /**
-    * Slot called when the projector check state changes
+    * Slot called when the user changes the sphara options
     */
-    void onCheckProjStatusChanged(bool state);
+    void onSpharaOptionsChanged();
 
-    QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
-    QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
-
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
+    Ui::SpharaSettingsViewWidget* ui;
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the projections.
+    * Emit this signal whenever the user toggled the SPHARA operator.
     */
-    void projSelectionChanged();
+    void spharaActivationChanged(bool state);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the SPHARA operator.
+    */
+    void spharaOptionsChanged(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
 
 };
 
 } // NAMESPACE
 
-#endif // PROJECTORSVIEW_H
+#endif // SPHARASETTINGSVIEW_H

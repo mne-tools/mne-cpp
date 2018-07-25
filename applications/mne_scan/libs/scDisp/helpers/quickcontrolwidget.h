@@ -320,18 +320,6 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Slot called when the sphara tool was toggled
-    */
-    void onSpharaButtonClicked(bool state);
-
-    //=========================================================================================================
-    /**
-    * Slot called when the user changes the sphara options
-    */
-    void onSpharaOptionsChanged();
-
-    //=========================================================================================================
-    /**
     * Slot called when the user changes the signal or background color.
     */
     void onViewColorButtonClicked();
@@ -349,12 +337,6 @@ protected slots:
     void onAveragesChanged();
 
 protected:
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the sphara group
-    */
-    void createSpharaGroup();
-
     //=========================================================================================================
     /**
     * Create the widgets used in the view group
@@ -432,18 +414,6 @@ private:
     QWidget*        m_pGroupBoxWidget;
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user toggled the SPHARA operator.
-    */
-    void spharaActivationChanged(bool state);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the SPHARA operator.
-    */
-    void spharaOptionsChanged(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
-
     //=========================================================================================================
     /**
     * Emit this signal whenever the user changes the window size.

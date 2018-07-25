@@ -94,7 +94,7 @@ namespace DISPLIB
 /**
 * DECLARE CLASS ScalingView
 *
-* @brief The ScalingView class provides a view to select between different modalities
+* @brief The ScalingView class provides a view to select the scaling for different channels modalities
 */
 class DISPSHARED_EXPORT ScalingView : public QWidget
 {
