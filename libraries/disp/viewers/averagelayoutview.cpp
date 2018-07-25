@@ -165,6 +165,7 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
 {
     m_pAverageScene->setScaleMap(scaleMap);
+    updateData();
 }
 
 

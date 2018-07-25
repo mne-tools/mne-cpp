@@ -260,12 +260,6 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Slot called when the compensator check state changes
-    */
-    void onCheckCompStatusChanged(const QString & compName);
-
-    //=========================================================================================================
-    /**
     * Slot called when trigger detection check box was toggled
     */
     void onRealTimeTriggerActiveChanged(int state);
@@ -377,12 +371,6 @@ protected slots:
 protected:
     //=========================================================================================================
     /**
-    * Create the widgets used in the projector group
-    */
-    void createProjectorGroup();
-
-    //=========================================================================================================
-    /**
     * Create the widgets used in the sphara group
     */
     void createSpharaGroup();
@@ -410,12 +398,6 @@ protected:
     * Create the widgets used in the modality group
     */
     void createModalityGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the compensator group
-    */
-    void createCompensatorGroup();
 
     //=========================================================================================================
     /**
@@ -456,15 +438,12 @@ private:
     QColor                                              m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
 
     QList<DISPLIB::Modality>                            m_qListModalities;              /**< List of different modalities. */
-    QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
     QList<QCheckBox*>                                   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
     QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     QPushButton*                                        m_pShowFilterOptions;           /**< Holds the show filter options button. */
-
-    QSignalMapper*                                      m_pCompSignalMapper;            /**< The signal mapper. */
 
     Ui::QuickControlWidget*                             ui;                             /**< The generated UI file. */
 
@@ -476,12 +455,6 @@ private:
     QWidget*        m_pGroupBoxWidget;
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the compensator.
-    */
-    void compSelectionChanged(int to);
-
     //=========================================================================================================
     /**
     * Emit this signal whenever the user toggled the SPHARA operator.
@@ -541,12 +514,6 @@ signals:
     * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
     */
     void updateConnectedView();
-
-    //=========================================================================================================
-    /**
-    * Signal mapper signal for compensator changes.
-    */
-    void compClicked(const QString& text);
 
     //=========================================================================================================
     /**

@@ -176,7 +176,7 @@ private slots:
 private:
     QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;          /**< quick control widget. */
     QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
-    QSharedPointer<DISPLIB::ChannelInfoModel>                    m_pChannelInfoModel;                 /**< channel info model. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;            /**< channel info model. */
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::FilterView>                     m_pFilterWindow;                /**< Filter window. */
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/

@@ -88,7 +88,6 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 , m_slFlags(slFlags)
 , m_sName(name)
 , m_pShowFilterOptions(Q_NULLPTR)
-, m_pCompSignalMapper(Q_NULLPTR)
 , m_pMainLayout(new QGridLayout())
 , m_pGroupBoxLayout(new QGridLayout())
 , m_pButtonLayout(new QGridLayout())
@@ -127,14 +126,6 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
     //    //Connect screenshot button
     //    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
     //            this, &QuickControlWidget::onMakeScreenshot);
-
-//    if(m_slFlags.contains("projections", Qt::CaseInsensitive)) {
-//        createProjectorGroup();
-//        m_bProjections = true;
-//    } else {
-//        ui->m_tabWidget_noiseReduction->removeTab(ui->m_tabWidget_noiseReduction->indexOf(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "SSP")));
-//        m_bProjections = false;
-//    }
 
 //    if(m_slFlags.contains("compensators", Qt::CaseInsensitive)) {
 //        createCompensatorGroup();
@@ -266,8 +257,11 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
         pVBox->addWidget(pTabWidget);
         pGroupBox->setLayout(pVBox);
     } else {
+        qDebug()<<" QuickControlWidget::addGroupBoxWithTabs - Adding to exisiting group";
         QTabWidget* pTabWidget = pGroupBox->findChild<QTabWidget *>(sGroupBoxName + "TabWidget");
-        pTabWidget->addTab(pWidget, sTabName);
+        if(pTabWidget) {
+            pTabWidget->addTab(pWidget, sTabName);
+        }
     }
 }
 
@@ -483,32 +477,6 @@ void QuickControlWidget::onTimeWindowChanged(int value)
 void QuickControlWidget::onZoomChanged(double value)
 {
     emit zoomChanged(value);
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onCheckCompStatusChanged(const QString & compName)
-{
-    //qDebug()<<compName;
-
-    bool currentState = false;
-
-    for(int i = 0; i < m_qListCompCheckBox.size(); ++i) {
-        if(m_qListCompCheckBox[i]->text() != compName) {
-            m_qListCompCheckBox[i]->setChecked(false);
-        } else {
-            currentState = m_qListCompCheckBox[i]->isChecked();
-        }
-    }
-
-    if(currentState) {
-        emit compSelectionChanged(compName.toInt());
-    } else { //If none selected
-        emit compSelectionChanged(0);
-    }
-
-    emit updateConnectedView();
 }
 
 
@@ -955,49 +923,6 @@ void QuickControlWidget::createModalityGroup()
 
     //Find Modalities tab and add current layout
     this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")->setLayout(t_pGridLayout);
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::createCompensatorGroup()
-{
-    if(m_pFiffInfo)
-    {
-        m_pCompSignalMapper = new QSignalMapper(this);
-
-        m_qListCompCheckBox.clear();
-
-        // Compensation Selection
-        QGridLayout *topLayout = new QGridLayout;
-
-        qint32 i=0;
-
-        for(i; i < m_pFiffInfo->comps.size(); ++i)
-        {
-            QString numStr;
-            QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
-
-            m_qListCompCheckBox.append(checkBox);
-
-            connect(checkBox, SIGNAL(clicked()),
-                        m_pCompSignalMapper, SLOT(map()));
-
-            m_pCompSignalMapper->setMapping(checkBox, numStr);
-
-            topLayout->addWidget(checkBox, i, 0);
-
-        }
-
-        connect(m_pCompSignalMapper, SIGNAL(mapped(const QString &)),
-                    this, SIGNAL(compClicked(const QString &)));
-
-        connect(this, &QuickControlWidget::compClicked,
-                this, &QuickControlWidget::onCheckCompStatusChanged);
-
-        //Find Comp tab and add current layout
-        this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Comp")->setLayout(topLayout);
-    }
 }
 
 

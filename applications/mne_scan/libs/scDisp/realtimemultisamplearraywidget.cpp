@@ -49,6 +49,7 @@
 #include <disp/viewers/channeldataview.h>
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
+#include <disp/viewers/compensatorview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -232,8 +233,11 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         QColor signalDefault = Qt::darkBlue;
         QColor backgroundDefault = Qt::white;
-        QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
-        QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
+        QColor signal = signalDefault;
+        QColor background = backgroundDefault;
+
+//        QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
+//        QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
 
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
@@ -366,16 +370,16 @@ void RealTimeMultiSampleArrayWidget::init()
         pProjectorsView->init(m_pFiffInfo);
         m_pQuickControlWidget->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
-        ProjectorsView* pProjectorsViewa = new ProjectorsView();
-        pProjectorsViewa->init(m_pFiffInfo);
-        m_pQuickControlWidget->addGroupBoxWithTabs(pProjectorsViewa, "Noise", "SSP2");
-
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
-//        //Handle scaling
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-//                m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
+        CompensatorView* pCompensatorView = new CompensatorView();
+        pCompensatorView->init(m_pFiffInfo);
+        m_pQuickControlWidget->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
+
+        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+                m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
+
 
 //        //Handle signal color changes
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
@@ -388,14 +392,6 @@ void RealTimeMultiSampleArrayWidget::init()
 //        //Handle screenshot signals
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
 //                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
-
-//        //Handle projections
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-//                m_pChannelDataView.data(), &ChannelDataView::updateProjection);
-
-//        //Handle compensators
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
-//                m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
 
 //        //Handle SPHARA
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
@@ -441,6 +437,9 @@ void RealTimeMultiSampleArrayWidget::init()
 //        m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
 
 //        m_pQuickControlWidget->setSignalBackgroundColors(signal, background);
+
+        m_pChannelDataView->setSignalColor(signal);
+        m_pChannelDataView->setBackgroundColorChanged(background);
 
         //If projections are wanted activate projections as default
         if(slFlags.contains("projections")) {
