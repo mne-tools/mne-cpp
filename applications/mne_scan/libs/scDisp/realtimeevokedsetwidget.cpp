@@ -39,17 +39,20 @@
 //=============================================================================================================
 
 #include "realtimeevokedsetwidget.h"
-#include <disp/viewers/quickcontrolview.h>
 
+#include <disp/viewers/quickcontrolview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/filterview.h>
+#include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
 #include <disp/viewers/compensatorview.h>
+#include <disp/viewers/modalityselectionview.h>
+#include <disp/viewers/channeldatasettingsview.h>
 
 #include <scMeas/realtimeevokedset.h>
 
@@ -241,9 +244,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         //Store signal and background colors
         if(m_pQuickControlView) {
-            //settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESName), m_pQuickControlView->getSignalColor());
-            settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName), m_pButterflyView->getBackgroundColor());
-            settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESName), m_pAverageLayoutView->getBackgroundColor());
+            settings.setValue(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), m_pButterflyView->getBackgroundColor());
         }
     }
 }
@@ -300,11 +301,10 @@ void RealTimeEvokedSetWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
-        qDebug()<<"RealTimeEvokedSetWidget::init() - "<<m_pRTESet->getName();
         QSettings settings;
         QString t_sRTESName = m_pRTESet->getName();
 
-        //Remove temporary label andshow actual average display
+        //Remove temporary label and show actual average display
         m_pRTESetLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
         m_pToolBox->show();
@@ -322,9 +322,7 @@ void RealTimeEvokedSetWidget::init()
         pEvokedSet->info = *m_pFiffInfo.data();
         m_pEvokedSetModel->setEvokedSet(pEvokedSet, true);
 
-        //
-        //-------- Init modalities and scaling --------
-        //
+        //Init modalities and scaling
         bool sel, hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
         float val = 1e-11f;
         QMap<qint32, float> qMapChScaling;
@@ -400,11 +398,8 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setModalities(qListModalities);
         m_pEvokedSetModel->setScaling(qMapChScaling);
 
-        //
-        //-------- Init filter window --------
-        //
+        //Init filter window
         m_pFilterView = FilterView::SPtr::create(this, Qt::Window);
-        //m_pFilterView->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
                 m_pEvokedSetModel.data(),static_cast<void (EvokedSetModel::*)(QString)>(&EvokedSetModel::setFilterChannelType));
@@ -427,9 +422,7 @@ void RealTimeEvokedSetWidget::init()
                                                 settings.value(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESName), false).toBool(),
                                                 settings.value(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), "MEG").toString());
 
-        //
-        //-------- Init channel selection manager --------
-        //
+        //Init channel selection manager
         m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
         m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(this, m_pChannelInfoModel, Qt::Window);
 
@@ -443,15 +436,11 @@ void RealTimeEvokedSetWidget::init()
         m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
-        //
-        //-------- Init quick control widget --------
-        //
-        QStringList slFlags;
-        slFlags <<  "projections" << "compensators" << "filter" << "scaling" << "modalities" << "colors" << "averages";
-
+        //Init quick control widget
         m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", this);
-        m_pQuickControlView->setWindowFlags(Qt::WindowStaysOnTopHint);
+        m_pQuickControlView->setOpacityValue(settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESName), 95).toInt());
 
+        // Quick control scaling
         ScalingView* pScalingView = new ScalingView();
         pScalingView->init(m_pEvokedSetModel->getScaling());
         m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
@@ -459,6 +448,7 @@ void RealTimeEvokedSetWidget::init()
         connect(pScalingView, &ScalingView::scalingChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
 
+        // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView();
         pProjectorsView->init(m_pFiffInfo);
         m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
@@ -466,6 +456,10 @@ void RealTimeEvokedSetWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
+        //Activate projectors by default
+        m_pEvokedSetModel->updateProjection();
+
+        // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView();
         pCompensatorView->init(m_pFiffInfo);
         m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
@@ -473,43 +467,46 @@ void RealTimeEvokedSetWidget::init()
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
 
-//        //Handle background color changes
-//        connect(m_pQuickControlView.data(), &QuickControlView::backgroundColorChanged,
-//                this, &RealTimeEvokedSetWidget::onBackgroundColorChanged);
+        // Quick control filter settings
+        FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
+        m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
-//        //Handle screenshot signals
-//        connect(m_pQuickControlView.data(), &QuickControlView::makeScreenshot,
-//                this, &RealTimeEvokedSetWidget::onMakeScreenshot);
+        connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
+                pFilterSettingsView, &FilterSettingsView::filterGroupChanged);
 
-//        //Handle modalities
-//        connect(m_pQuickControlView.data(), &QuickControlView::modalitiesChanged,
-//                m_pButterflyView.data(), &ButterflyView::setModalities);
+        connect(pFilterSettingsView, &FilterSettingsView::showFilterOptions,
+                this, &RealTimeEvokedSetWidget::showFilterWidget);
 
-//        //Handle filtering
-//        connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
-//                m_pQuickControlView.data(), &QuickControlView::filterGroupChanged);
+        pFilterSettingsView->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
 
-//        connect(m_pQuickControlView.data(), &QuickControlView::showFilterOptions,
-//                this, &RealTimeEvokedSetWidget::showFilterWidget);
+        // Quick control channel data settings
+        ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
+        pChannelDataSettingsView->init(QStringList() << "screenshot" << "backgroundColor");
+        m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
-//        m_pQuickControlView->setViewParameters(settings.value(QString("RTESW/%1/viewZoomFactor").arg(t_sRTESName), 1.0).toFloat(),
-//                                                     settings.value(QString("RTESW/%1/viewWindowSize").arg(t_sRTESName), 10).toInt(),
-//                                                     settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESName), 95).toInt());
+        connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
+                m_pAverageLayoutView.data(), &AverageLayoutView::setBackgroundColor);
 
-//        m_pQuickControlView->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
+        connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
+                m_pButterflyView.data(), &ButterflyView::setBackgroundColor);
 
-//        QColor signalDefault = Qt::darkBlue;
-        QColor butterflyBackgroundDefault = Qt::white;
-        QColor layoutBackgroundDefault = Qt::black;
-//        m_pQuickControlView->setSignalBackgroundColors(settings.value(QString("RTESW/%1/signalColor").arg(t_sRTESName),signalDefault).value<QColor>(),
-//                                                         settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName),butterflyBackgroundDefault).value<QColor>());
+        connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
+                this, &RealTimeEvokedSetWidget::onMakeScreenshot);
 
-        //Activate projections as default
-        m_pEvokedSetModel->updateProjection();
+        QColor backgroundDefault = Qt::black;
+        pChannelDataSettingsView->setSignalBackgroundColors(QColor(),
+                                                            settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
-        //
-        //-------- Init butterfly and layout plot --------
-        //
+        // Quick control channel data settings
+        ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView();
+        pModalitySelectionView->init(m_pFiffInfo);
+        //pModalitySelectionView->setModalities(qListModalities);
+        m_pQuickControlView->addGroupBoxWithTabs(pModalitySelectionView, "Other", "Modalities");
+
+        connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
+                m_pButterflyView.data(), &ButterflyView::setModalities);
+
+        //Init butterfly and layout plot
         //Connect selection manager with average manager
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
@@ -530,19 +527,12 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pQuickControlView.data(), &QuickControlView::averageInformationChanged,
                 m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
 
-//        //Connect Quick Control Widget
-//        connect(m_pQuickControlView.data(), &QuickControlView::updateConnectedView,
-//                m_pButterflyView.data(), &ButterflyView::updateView);
-
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 m_pButterflyView.data(), &ButterflyView::showSelectedChannelsOnly);
 
-//        connect(m_pQuickControlView.data(), &QuickControlView::updateConnectedView,
-//                m_pAverageLayoutView.data(), &AverageLayoutView::updateData);
-
         m_pButterflyView->setModel(m_pEvokedSetModel);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-        m_pButterflyView->setModalities(m_pButterflyView->getModalities());
+        m_pButterflyView->setModalities(qListModalities);
 
         m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
         m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
@@ -555,10 +545,12 @@ void RealTimeEvokedSetWidget::init()
         SCDISPLIB::AverageInfoMap map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data).value<SCDISPLIB::AverageInfoMap>();
         m_pQuickControlView->setAverageInformationMapOld(map);
 
-        m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESName), layoutBackgroundDefault).value<QColor>());
-        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName), butterflyBackgroundDefault).value<QColor>());
+        m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
+        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
         m_pChannelSelectionView->updateDataView();
+        m_pButterflyView->update();
+        m_pAverageLayoutView->update();
 
         //Initialized
         m_bInitialized = true;
@@ -605,21 +597,6 @@ void RealTimeEvokedSetWidget::showFilterWidget(bool state)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSetWidget::onBackgroundColorChanged(const QColor& backgroundColor)
-{
-    //Handle the butterfly plot and 2d layout plot differently
-    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        m_pAverageLayoutView->setBackgroundColor(backgroundColor);
-    }
-
-    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
-        m_pButterflyView->setBackgroundColor(backgroundColor);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
 {
     // Create file name
@@ -630,7 +607,7 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
         QDir().mkdir("./Screenshots");
     }
 
-    //Handle the butterfly plot and 2d layout plot differently
+    //Handle the butterfly plot and 2D layout plot differently
     QString fileName;
 
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {

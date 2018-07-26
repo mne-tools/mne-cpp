@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -115,10 +116,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Update the selection.
+    * Init the view.
     *
+    * @param [in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,
+    *                                   backgroundcolor, signalColor, screenshot
     */
-    void init();
+    void init(const QStringList &lVisibleWidgets = QStringList());
 
     //=========================================================================================================
     /**

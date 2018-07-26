@@ -118,9 +118,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Update the selection.
+    * Init the view.
     *
-    * @param [in] state    The state (unused).
+    * @param [in] pFiffInfo    The fiff info.
     */
     void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 

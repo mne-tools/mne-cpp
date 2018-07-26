@@ -186,14 +186,6 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Broadcast the background color changes made in the QuickControl widget
-    *
-    * @param [in] backgroundColor  The new background color.
-    */
-    void onBackgroundColorChanged(const QColor& backgroundColor);
-
-    //=========================================================================================================
-    /**
     * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
     *
     * @param[out] imageType     The current iamge type: png, svg.

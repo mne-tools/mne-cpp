@@ -66,6 +66,10 @@
 
 class QCheckBox;
 
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,6 +92,22 @@ namespace DISPLIB
 //=============================================================================================================
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// STRUCTS
+//=============================================================================================================
+
+struct Modality {
+    QString m_sName;
+    bool m_bActive;
+    float m_fNorm;
+
+    Modality(QString name, bool active, double norm)
+    : m_sName(name), m_bActive(active), m_fNorm(norm)
+    {}
+};
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS ModalitySelectionView
@@ -106,34 +126,53 @@ public:
     /**
     * Constructs a ModalitySelectionView which is a child of parent.
     *
-    * @param [in] lModalities   the modalities which should be made available for selection
     * @param [in] parent        parent of widget
     */
-    ModalitySelectionView(QStringList lModalities,
-                          QWidget *parent = 0,
+    ModalitySelectionView(QWidget *parent = 0,
                           Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Update the selection.
+    * Init the view.
     *
-    * @param [in] state    The state (unused).
+    * @param [in] pFiffInfo    The fiff info.
     */
-    void updateSelection(qint32 state);
+    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-private:
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
+    //=========================================================================================================
+    /**
+    * Init the view.
+    *
+    * @param [in] modalityList    The modality info.
+    */
+    void init(const QList<DISPLIB::Modality>& modalityList);
 
-    QStringList         m_qListModalities;          /**< List of modalities */
+    //=========================================================================================================
+    /**
+    * Set the activation of the already created modality check boxes.
+    *
+    * @param [in] modalityList    The modality info.
+    */
+    void setModalities(const QList<Modality> &lModalities);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Slot called when modality check boxes were changed
+    */
+    void onUpdateModalityCheckbox(qint32 state);
+
+    QList<Modality>                     m_qListModalities;              /**< List of different modalities. */
+    QList<QCheckBox*>                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
+
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                    /**< Connected fiff info. */
 
 signals:
     //=========================================================================================================
     /**
-    * Emmited whenver a new selection was made.
-    *
-    * @param [in] lModalitySelection    The selected modalities.
+    * Emit this signal whenever the user changed the modality.
     */
-    void newModalitySelection(const QStringList& lModalitySelection);
+    void modalitiesChanged(const QList<Modality>& modalityList);
 
 };
 
