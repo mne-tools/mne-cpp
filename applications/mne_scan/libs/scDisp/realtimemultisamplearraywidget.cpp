@@ -41,7 +41,7 @@
 
 #include "realtimemultisamplearraywidget.h"
 
-#include "helpers/quickcontrolwidget.h"
+#include <disp/viewers/quickcontrolview.h>
 
 #include <disp/viewers/filterview.h>
 #include <disp/viewers/channelselectionview.h>
@@ -190,12 +190,12 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
             settings.setValue(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), m_pFilterWindow->getChannelType());
         }
 
-        //Store QuickControlWidget
-        if(m_pQuickControlWidget) {
-            settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlWidget->getOpacityValue());            
-            //settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getSignalColor());
-            //settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getBackgroundColor());
-            //settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlWidget->getDistanceTimeSpacerIndex());
+        //Store QuickControlView
+        if(m_pQuickControlView) {
+            settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlView->getOpacityValue());
+            //settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlView->getSignalColor());
+            //settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlView->getBackgroundColor());
+            //settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlView->getDistanceTimeSpacerIndex());
         }
 
         //Store selected layout file
@@ -359,14 +359,14 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #endif
 
-        m_pQuickControlWidget = QuickControlWidget::SPtr::create("RT Display", slFlags, this);
-        m_pQuickControlWidget->setOpacityValue(100);
-        //m_pQuickControlWidget->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
+        m_pQuickControlView = QuickControlView::SPtr::create("RT Display", this);
+        m_pQuickControlView->setOpacityValue(100);
+        //m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView();
         pScalingView->init(qMapChScaling);
-        m_pQuickControlWidget->addGroupBox(pScalingView, "Scaling");
+        m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
         connect(pScalingView, &ScalingView::scalingChanged,
                 m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
@@ -374,7 +374,7 @@ void RealTimeMultiSampleArrayWidget::init()
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView();
         pProjectorsView->init(m_pFiffInfo);
-        m_pQuickControlWidget->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
+        m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateProjection);
@@ -382,14 +382,14 @@ void RealTimeMultiSampleArrayWidget::init()
         // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView();
         pCompensatorView->init(m_pFiffInfo);
-        m_pQuickControlWidget->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
+        m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
 
         // Quick control filter settings
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
-        m_pQuickControlWidget->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
+        m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
         connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
                 pFilterSettingsView, &FilterSettingsView::filterGroupChanged);
@@ -402,7 +402,7 @@ void RealTimeMultiSampleArrayWidget::init()
         // Quick control SPHARA settings
         SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
         pSpharaSettingsView->init();
-        m_pQuickControlWidget->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
+        m_pQuickControlView->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
 
         connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
@@ -413,7 +413,7 @@ void RealTimeMultiSampleArrayWidget::init()
         // Quick control channel data settings
         ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
         pChannelDataSettingsView->init();
-        m_pQuickControlWidget->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
+        m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::signalColorChanged,
                 m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
@@ -441,7 +441,7 @@ void RealTimeMultiSampleArrayWidget::init()
         // Quick control trigger detection settings
         TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView();
         pTriggerDetectionView->init(m_pFiffInfo);
-        m_pQuickControlWidget->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
+        m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
 
         connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
                 m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
@@ -502,11 +502,11 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 
 void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
 {
-    if(m_pQuickControlWidget->isActiveWindow()) {
-        m_pQuickControlWidget->hide();
+    if(m_pQuickControlView->isActiveWindow()) {
+        m_pQuickControlView->hide();
     } else {
-        m_pQuickControlWidget->activateWindow();
-        m_pQuickControlWidget->show();
+        m_pQuickControlView->activateWindow();
+        m_pQuickControlView->show();
     }
 }
 

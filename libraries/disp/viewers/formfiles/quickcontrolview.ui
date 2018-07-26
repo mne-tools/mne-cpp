@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QuickControlWidget</class>
- <widget class="QWidget" name="QuickControlWidget">
+ <class>QuickControlViewWidget</class>
+ <widget class="QWidget" name="QuickControlViewWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

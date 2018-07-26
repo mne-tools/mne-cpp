@@ -84,7 +84,6 @@ SOURCES += \
     realtimeevokedsetwidget.cpp \
     realtimecovwidget.cpp \
     realtimespectrumwidget.cpp \
-    helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
     realtimeconnectivityestimatewidget.cpp \
 
@@ -96,12 +95,10 @@ HEADERS += \
     realtimeevokedsetwidget.h \
     realtimecovwidget.h \
     realtimespectrumwidget.h \
-    helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \
 
 FORMS += \
-    helpers/quickcontrolwidget.ui \
     formfiles/realtimesamplearraywidget.ui \
 
 RESOURCES += \
