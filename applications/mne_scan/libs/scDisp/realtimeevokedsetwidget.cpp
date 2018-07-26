@@ -449,7 +449,7 @@ void RealTimeEvokedSetWidget::init()
         QStringList slFlags;
         slFlags <<  "projections" << "compensators" << "filter" << "scaling" << "modalities" << "colors" << "averages";
 
-        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>::create(m_pFiffInfo, "RT Averaging", slFlags);
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>::create("RT Averaging", slFlags);
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         ScalingView* pScalingView = new ScalingView();

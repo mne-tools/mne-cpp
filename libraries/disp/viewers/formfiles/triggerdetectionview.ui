@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QuickControlWidget</class>
- <widget class="QWidget" name="QuickControlWidget">
+ <class>TriggerDetectionViewWidget</class>
+ <widget class="QWidget" name="TriggerDetectionViewWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
-    <height>503</height>
+    <width>305</width>
+    <height>170</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,462 +29,110 @@
    <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0" colspan="2">
-    <layout class="QGridLayout" name="m_gridLayout_masterLayout">
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_groupBox_scaling">
-       <property name="title">
-        <string>Scaling</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="m_groupBox_noise">
-       <property name="title">
-        <string>Noise</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QTabWidget" name="m_tabWidget_noiseReduction">
-          <property name="currentIndex">
-           <number>2</number>
-          </property>
-          <widget class="QWidget" name="SSP">
-           <attribute name="title">
-            <string>SSP</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="Comp">
-           <attribute name="title">
-            <string>Comp</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="Filter">
-           <attribute name="title">
-            <string>Filter</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="SPHARA">
-           <attribute name="title">
-            <string>SPHARA</string>
-           </attribute>
-           <layout class="QFormLayout" name="formLayout_2">
-            <item row="0" column="0">
-             <widget class="QCheckBox" name="m_checkBox_activateSphara">
-              <property name="text">
-               <string>Activate SPHARA</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="m_comboBox_spharaSystem">
-              <item>
-               <property name="text">
-                <string>BabyMEG</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>VectorView</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>EEG</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="m_label_spharaSecond">
-              <property name="text">
-               <string>Outer layer:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QSpinBox" name="m_spinBox_spharaSecond">
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>105</number>
-              </property>
-              <property name="value">
-               <number>105</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="m_label_spharaFirst">
-              <property name="text">
-               <string>Inner layer:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QSpinBox" name="m_spinBox_spharaFirst">
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>270</number>
-              </property>
-              <property name="value">
-               <number>270</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QGroupBox" name="m_groupBox_other">
-       <property name="title">
-        <string>Other</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="2" column="0">
-         <widget class="QPushButton" name="m_pushButton_makeScreenshot">
-          <property name="text">
-           <string>Make screenshot</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="m_comboBox_imageType">
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>PNG</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>SVG</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QTabWidget" name="m_tabWidget_viewOptions">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="View">
-           <attribute name="title">
-            <string>View</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Window size:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Number of channels:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_8">
-              <property name="text">
-               <string>Time spacer every</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>Opcaity:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1" colspan="2">
-             <widget class="QSlider" name="m_horizontalSlider_opacity">
-              <property name="minimum">
-               <number>25</number>
-              </property>
-              <property name="maximum">
-               <number>100</number>
-              </property>
-              <property name="pageStep">
-               <number>1</number>
-              </property>
-              <property name="value">
-               <number>95</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1" colspan="2">
-             <widget class="QComboBox" name="m_comboBox_distaceTimeSpacer">
-              <property name="currentIndex">
-               <number>3</number>
-              </property>
-              <item>
-               <property name="text">
-                <string>100ms</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>200ms</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>500ms</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>1000ms</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item row="1" column="1" colspan="2">
-             <widget class="QSpinBox" name="m_spinBox_windowSize">
-              <property name="suffix">
-               <string> s</string>
-              </property>
-              <property name="prefix">
-               <string/>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>30</number>
-              </property>
-              <property name="value">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1" colspan="2">
-             <widget class="QDoubleSpinBox" name="m_doubleSpinBox_numberVisibleChannels">
-              <property name="suffix">
-               <string> x</string>
-              </property>
-              <property name="minimum">
-               <double>0.100000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>20.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="TriggerDetection">
-           <attribute name="title">
-            <string>Trigger detection</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="3" column="4">
-             <widget class="QSpinBox" name="m_spinBox_detectionThresholdSecond">
-              <property name="minimum">
-               <number>-100</number>
-              </property>
-              <property name="maximum">
-               <number>100</number>
-              </property>
-              <property name="value">
-               <number>-1</number>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="QDoubleSpinBox" name="m_doubleSpinBox_detectionThresholdFirst">
-              <property name="minimum">
-               <double>-1000.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>1000.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-              <property name="value">
-               <double>0.100000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="3">
-             <widget class="QLabel" name="label_6">
-              <property name="maximumSize">
-               <size>
-                <width>15</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>e^</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Type color:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>Trigger channel:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="5">
-             <widget class="QCheckBox" name="m_checkBox_activateTriggerDetection">
-              <property name="text">
-               <string>Activate trigger detection</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Threshold:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="3" colspan="2">
-             <widget class="QPushButton" name="m_pushButton_resetNumberTriggers">
-              <property name="text">
-               <string>Reset</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_9">
-              <property name="text">
-               <string>Detected trigger:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QLabel" name="m_label_numberDetectedTriggers">
-              <property name="text">
-               <string>0</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2" colspan="3">
-             <widget class="QComboBox" name="m_comboBox_triggerChannels"/>
-            </item>
-            <item row="2" column="3" colspan="2">
-             <widget class="QPushButton" name="m_pushButton_triggerColor">
-              <property name="text">
-               <string>Click to change</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QComboBox" name="m_comboBox_triggerColorType"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="Modalities">
-           <attribute name="title">
-            <string>Modalities</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="tab">
-           <attribute name="title">
-            <string>Colors</string>
-           </attribute>
-           <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Change background color:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>Change signal color:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="m_pushButton_backgroundColor">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="m_pushButton_signalColor">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="Averages">
-           <attribute name="title">
-            <string>Averages</string>
-           </attribute>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+   <item row="4" column="1">
+    <widget class="QLabel" name="m_label_numberDetectedTriggers">
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="m_pushButton_close">
+   <item row="3" column="1">
+    <widget class="QDoubleSpinBox" name="m_doubleSpinBox_detectionThresholdFirst">
+     <property name="minimum">
+      <double>-1000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QLabel" name="label_6">
      <property name="maximumSize">
       <size>
-       <width>40</width>
+       <width>15</width>
        <height>16777215</height>
       </size>
      </property>
      <property name="text">
-      <string>Close</string>
+      <string>e^</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="m_pushButton_hideAll">
+   <item row="3" column="3">
+    <widget class="QSpinBox" name="m_spinBox_detectionThresholdSecond">
+     <property name="minimum">
+      <number>-100</number>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>-1</number>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Minimize - Quick Control</string>
+      <string>Type color:</string>
      </property>
-     <property name="checkable">
-      <bool>true</bool>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Trigger channel:</string>
      </property>
-     <property name="checked">
-      <bool>true</bool>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="m_comboBox_triggerChannels"/>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="m_comboBox_triggerColorType"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Threshold:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Detected trigger:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QPushButton" name="m_pushButton_triggerColor">
+     <property name="text">
+      <string>Click to change</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="2">
+    <widget class="QPushButton" name="m_pushButton_resetNumberTriggers">
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="m_checkBox_activateTriggerDetection">
+     <property name="text">
+      <string>Activate trigger detection</string>
      </property>
     </widget>
    </item>
