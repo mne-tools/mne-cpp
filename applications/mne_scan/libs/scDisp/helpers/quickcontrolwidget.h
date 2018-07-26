@@ -139,14 +139,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Slot called when opacity slider was changed
-    *
-    * @param [in] value opacity value.
-    */
-    void onOpacityChange(qint32 value);
-
-    //=========================================================================================================
-    /**
     * Sets the values of the opacity slider
     *
     * @param [in] opactiy       the new opacity value
@@ -202,7 +194,15 @@ public:
     */
     QMap<double, QPair<QColor, QPair<QString,bool> > > getAverageInformationMap();
 
-protected slots:
+protected:
+    //=========================================================================================================
+    /**
+    * Slot called when opacity slider was changed
+    *
+    * @param [in] value opacity value.
+    */
+    void onOpacityChange(qint32 value);
+
     //=========================================================================================================
     /**
     * Slot called when trigger detection check box was toggled
@@ -252,12 +252,6 @@ protected slots:
     * Slot called when reset number of detected triggers was pressed
     */
     void onResetTriggerNumbers();
-
-    //=========================================================================================================
-    /**
-    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
-    */
-    void onMakeScreenshot();
 
     //=========================================================================================================
     /**
@@ -332,13 +326,6 @@ private:
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlWidget*                             ui;                             /**< The generated UI file. */
 
-    QGridLayout*    m_pMainLayout;
-    QGridLayout*    m_pGroupBoxLayout;
-    QGridLayout*    m_pButtonLayout;
-
-    QWidget*        m_pButtonWidget;
-    QWidget*        m_pGroupBoxWidget;
-
 signals:
     //=========================================================================================================
     /**
@@ -363,14 +350,6 @@ signals:
     * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
     */
     void updateConnectedView();
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user wants to make a screenshot.
-    *
-    * @param[out] imageType     The current image type: png, svg.
-    */
-    void makeScreenshot(const QString& imageType);
 
     //=========================================================================================================
     /**

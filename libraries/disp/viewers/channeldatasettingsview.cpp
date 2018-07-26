@@ -105,6 +105,9 @@ void ChannelDataSettingsView::init()
 
     connect(ui->m_pushButton_signalColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &ChannelDataSettingsView::onViewColorButtonClicked);
+
+    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &ChannelDataSettingsView::onMakeScreenshot);
 }
 
 
@@ -239,3 +242,12 @@ void ChannelDataSettingsView::onZoomChanged(double value)
 {
     emit zoomChanged(value);
 }
+
+
+//*************************************************************************************************************
+
+void ChannelDataSettingsView::onMakeScreenshot()
+{
+    emit makeScreenshot(ui->m_comboBox_imageType->currentText());
+}
+

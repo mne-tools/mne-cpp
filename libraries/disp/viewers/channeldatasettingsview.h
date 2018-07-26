@@ -197,6 +197,12 @@ protected:
     */
     void onViewColorButtonClicked();
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+    */
+    void onMakeScreenshot();
+
     Ui::ChannelDataSettingsViewWidget* ui;
 
     QColor  m_colCurrentSignalColor;        /**< Current color of the signal. */
@@ -232,6 +238,14 @@ signals:
     * Emit this signal whenever the user changed the background color.
     */
     void backgroundColorChanged(const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user wants to make a screenshot.
+    *
+    * @param[out] imageType     The current image type: png, svg.
+    */
+    void makeScreenshot(const QString& imageType);
 
 };
 
