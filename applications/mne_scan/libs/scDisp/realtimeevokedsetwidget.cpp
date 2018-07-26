@@ -241,7 +241,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         //Store signal and background colors
         if(m_pQuickControlWidget) {
-            settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESName), m_pQuickControlWidget->getSignalColor());
+            //settings.setValue(QString("RTESW/%1/signalColor").arg(t_sRTESName), m_pQuickControlWidget->getSignalColor());
             settings.setValue(QString("RTESW/%1/butterflyBackgroundColor").arg(t_sRTESName), m_pButterflyView->getBackgroundColor());
             settings.setValue(QString("RTESW/%1/layoutBackgroundColor").arg(t_sRTESName), m_pAverageLayoutView->getBackgroundColor());
         }

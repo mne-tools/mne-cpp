@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     spharasettingsview.h
+* @file     channeldatasettingsview.h
 * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the SpharaSettingsView Class.
+* @brief    Declaration of the ChannelDataSettingsView Class.
 *
 */
 
-#ifndef SPHARASETTINGSVIEW_H
-#define SPHARASETTINGSVIEW_H
+#ifndef CHANNELDATASETTINGSVIEW_H
+#define CHANNELDATASETTINGSVIEW_H
 
 
 //*************************************************************************************************************
@@ -64,15 +64,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class SpharaSettingsViewWidget;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace Ui {
+    class ChannelDataSettingsViewWidget;
+}
 
 
 //*************************************************************************************************************
@@ -92,69 +92,149 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SpharaSettingsView
+* DECLARE CLASS ChannelDataSettingsView
 *
-* @brief The SpharaSettingsView class provides a view to select the SPHARA settings
+* @brief The ChannelDataSettingsView class provides a view to select different channel data view dependent settings
 */
-class DISPSHARED_EXPORT SpharaSettingsView : public QWidget
+class DISPSHARED_EXPORT ChannelDataSettingsView : public QWidget
 {
     Q_OBJECT
 
 public:    
-    typedef QSharedPointer<SpharaSettingsView> SPtr;              /**< Shared pointer type for SpharaSettingsView. */
-    typedef QSharedPointer<const SpharaSettingsView> ConstSPtr;   /**< Const shared pointer type for SpharaSettingsView. */
+    typedef QSharedPointer<ChannelDataSettingsView> SPtr;              /**< Shared pointer type for ChannelDataSettingsView. */
+    typedef QSharedPointer<const ChannelDataSettingsView> ConstSPtr;   /**< Const shared pointer type for ChannelDataSettingsView. */
 
     //=========================================================================================================
     /**
-    * Constructs a SpharaSettingsView which is a child of parent.
+    * Constructs a ChannelDataSettingsView which is a child of parent.
     *
     * @param [in] parent        parent of widget
     */
-    SpharaSettingsView(QWidget *parent = 0,
+    ChannelDataSettingsView(QWidget *parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the SpharaSettingsView.
+    * Update the selection.
+    *
     */
-    ~SpharaSettingsView();
+    void init();
 
     //=========================================================================================================
     /**
-    * Init the view.
+    * Sets the values of the zoomFactor and windowSize spin boxes
+    *
+    * @param [in] zoomFactor    new zoomFactor value
+    * @param [in] windowSize    new window size value
     */
-    void init();
+    void setViewParameters(double zoomFactor, int windowSize);
+
+    //=========================================================================================================
+    /**
+    * Get current distance time spacer combo box index.
+    *
+    * @return the current index of the distance time spacer combo box.
+    */
+    int getDistanceTimeSpacerIndex();
+
+    //=========================================================================================================
+    /**
+    * Set current distance time spacer combo box index.
+    *
+    * @param [in] index     the new index value of the combo box
+    */
+    void setDistanceTimeSpacerIndex(int index);
+
+    //=========================================================================================================
+    /**
+    * Set current signal and background colors.
+    *
+    * @param [in] signalColor       The new signal color.
+    * @param [in] backgroundColor   The new background color.
+    */
+    void setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
+    * Returns the current signal color.
+    *
+    * @return The current signal color.
+    */
+    const QColor& getSignalColor();
+
+    //=========================================================================================================
+    /**
+    * Returns the current background color.
+    *
+    * @return The current background color.
+    */
+    const QColor& getBackgroundColor();
 
 protected:
     //=========================================================================================================
     /**
-    * Slot called when the sphara tool was toggled
+    * Slot called when time window size changes
     */
-    void onSpharaButtonClicked(bool state);
+    void onTimeWindowChanged(int value);
 
     //=========================================================================================================
     /**
-    * Slot called when the user changes the sphara options
+    * Slot called when zoome changes
     */
-    void onSpharaOptionsChanged();
+    void onZoomChanged(double value);
 
-    Ui::SpharaSettingsViewWidget* ui;
+    //=========================================================================================================
+    /**
+    * Slot called when time spacer distance changes
+    *
+    * @param [in] value for time spacer distance.
+    */
+    void onDistanceTimeSpacerChanged(qint32 value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user changes the signal or background color.
+    */
+    void onViewColorButtonClicked();
+
+    Ui::ChannelDataSettingsViewWidget* ui;
+
+    QColor  m_colCurrentSignalColor;        /**< Current color of the signal. */
+    QColor  m_colCurrentBackgroundColor;    /**< Current color of the background. */
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user toggled the SPHARA operator.
+    * Emit this signal whenever the user changes the window size.
     */
-    void spharaActivationChanged(bool state);
+    void timeWindowChanged(int value);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the SPHARA operator.
+    * Emit this signal whenever the user changes the row height (zoom) of the channels.
     */
-    void spharaOptionsChanged(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
+    void zoomChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the time spacer distance.
+    */
+    void distanceTimeSpacerChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the signal color.
+    */
+    void signalColorChanged(const QColor& signalColor);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the background color.
+    */
+    void backgroundColorChanged(const QColor& backgroundColor);
 
 };
 
 } // NAMESPACE
 
-#endif // SPHARASETTINGSVIEW_H
+#endif // CHANNELDATASETTINGSVIEW_H

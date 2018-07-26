@@ -137,17 +137,21 @@ public:
                                 QString sGroupBoxName,
                                 QString sTabName);
 
-
+    //=========================================================================================================
+    /**
+    * Slot called when opacity slider was changed
+    *
+    * @param [in] value opacity value.
+    */
+    void onOpacityChange(qint32 value);
 
     //=========================================================================================================
     /**
-    * Sets the values of the zoomFactor and windowSize spin boxes
+    * Sets the values of the opacity slider
     *
-    * @param [in] zoomFactor    new zoomFactor value
-    * @param [in] windowSize    new window size value
     * @param [in] opactiy       the new opacity value
     */
-    void setViewParameters(double zoomFactor, int windowSize, int opactiy);
+    void setOpacityValue(int opactiy);
 
     //=========================================================================================================
     /**
@@ -156,31 +160,6 @@ public:
     * @return thecurrent set opacity value of this window.
     */
     int getOpacityValue();
-
-    //=========================================================================================================
-    /**
-    * Get current distance time spacer combo box index.
-    *
-    * @return the current index of the distance time spacer combo box.
-    */
-    int getDistanceTimeSpacerIndex();
-
-    //=========================================================================================================
-    /**
-    * Set current distance time spacer combo box index.
-    *
-    * @param [in] index     the new index value of the combo box
-    */
-    void setDistanceTimeSpacerIndex(int index);
-
-    //=========================================================================================================
-    /**
-    * Set current signal and background colors.
-    *
-    * @param [in] signalColor       The new signal color.
-    * @param [in] backgroundColor   The new background color.
-    */
-    void setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
@@ -198,22 +177,6 @@ public:
     * @param [in] lTriggerTypes     the trigger types.
     */
     void setTriggerTypes(const QList<double>& lTriggerTypes);
-
-    //=========================================================================================================
-    /**
-    * Returns the current signal color.
-    *
-    * @return The current signal color.
-    */
-    const QColor& getSignalColor();
-
-    //=========================================================================================================
-    /**
-    * Returns the current background color.
-    *
-    * @return The current background color.
-    */
-    const QColor& getBackgroundColor();
 
     //=========================================================================================================
     /**
@@ -240,18 +203,6 @@ public:
     QMap<double, QPair<QColor, QPair<QString,bool> > > getAverageInformationMap();
 
 protected slots:
-    //=========================================================================================================
-    /**
-    * Slot called when time window size changes
-    */
-    void onTimeWindowChanged(int value);
-
-    //=========================================================================================================
-    /**
-    * Slot called when zoome changes
-    */
-    void onZoomChanged(double value);
-
     //=========================================================================================================
     /**
     * Slot called when trigger detection check box was toggled
@@ -298,31 +249,9 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Slot called when opacity slider was changed
-    *
-    * @param [in] value opacity value.
-    */
-    void onOpacityChange(qint32 value);
-
-    //=========================================================================================================
-    /**
-    * Slot called when time spacer distance changes
-    *
-    * @param [in] value for time spacer distance.
-    */
-    void onDistanceTimeSpacerChanged(qint32 value);
-
-    //=========================================================================================================
-    /**
     * Slot called when reset number of detected triggers was pressed
     */
     void onResetTriggerNumbers();
-
-    //=========================================================================================================
-    /**
-    * Slot called when the user changes the signal or background color.
-    */
-    void onViewColorButtonClicked();
 
     //=========================================================================================================
     /**
@@ -396,9 +325,6 @@ private:
     QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
     QMap<QPushButton*, double>                          m_qMapButtonAverageType;        /**< Push button to average type map. */
 
-    QColor                                              m_colCurrentSignalColor;        /**< Current color of the scene in all View3D's. */
-    QColor                                              m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
-
     QList<DISPLIB::Modality>                            m_qListModalities;              /**< List of different modalities. */
     QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
@@ -416,18 +342,6 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the window size.
-    */
-    void timeWindowChanged(int value);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the row height (zoom) of the channels.
-    */
-    void zoomChanged(double value);
-
-    //=========================================================================================================
-    /**
     * Emit this signal whenever the trigger infomration changed.
     */
     void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
@@ -440,12 +354,6 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changed the time spacer distance.
-    */
-    void distanceTimeSpacerChanged(int value);
-
-    //=========================================================================================================
-    /**
     * Emit this signal whenever the user pressed the trigger counter.
     */
     void resetTriggerCounter();
@@ -455,18 +363,6 @@ signals:
     * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
     */
     void updateConnectedView();
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changed the signal color.
-    */
-    void signalColorChanged(const QColor& signalColor);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changed the background color.
-    */
-    void backgroundColorChanged(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**

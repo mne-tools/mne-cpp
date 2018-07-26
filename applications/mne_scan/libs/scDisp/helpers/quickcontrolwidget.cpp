@@ -95,6 +95,10 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 {
     //ui->setupUi(this);
 
+    //Init opacity slider
+//    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+//            this, &QuickControlWidget::onOpacityChange);
+
     //Create hide all and close buttons
     QPushButton* pPushButtonClose = new QPushButton("Close");
     QPushButton* pPushButtonHideAll = new QPushButton("Hide/Show Controls");
@@ -106,12 +110,12 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 
     m_pButtonWidget->setLayout(m_pButtonLayout);
 
-    //Init and connect hide all group (minimize) button
-    connect(pPushButtonHideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::onToggleHideAll);
+//    //Init and connect hide all group (minimize) button
+//    connect(pPushButtonHideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+//            this, &QuickControlWidget::onToggleHideAll);
 
-    connect(pPushButtonClose, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::hide);
+//    connect(pPushButtonClose, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+//            this, &QuickControlWidget::hide);
 
     m_pGroupBoxWidget->setLayout(m_pGroupBoxLayout);
     m_pGroupBoxWidget->setContentsMargins(0,0,0,0);
@@ -125,22 +129,6 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 //    //Connect screenshot button
 //    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
 //            this, &QuickControlWidget::onMakeScreenshot);
-
-//    if(m_slFlags.contains("view", Qt::CaseInsensitive)) {
-//        createViewGroup();
-//        m_bView = true;
-//    } else {
-//        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "View")));
-//        m_bView = false;
-//    }
-
-//    if(m_slFlags.contains("colors", Qt::CaseInsensitive)) {
-//        createColorsGroup();
-//        m_bView = true;
-//    } else {
-//        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Colors")));
-//        m_bView = false;
-//    }
 
 //    if(m_slFlags.contains("triggerdetection", Qt::CaseInsensitive)) {
 //        createTriggerDetectionGroup();
@@ -164,11 +152,6 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 //    } else {
 //        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")));
 //        m_bAverages = false;
-//    }
-
-//    //Decide whether to complete hide some groups
-//    if(!m_bFilter && !m_bProjections && !m_bCompensator && !m_bSphara) {
-//        ui->m_groupBox_noise->hide();
 //    }
 
 //    if(!m_bView && !m_bTriggerDetection) {
@@ -209,6 +192,13 @@ void QuickControlWidget::addGroupBox(QWidget* pWidget,
 
 //*************************************************************************************************************
 
+void QuickControlWidget::onOpacityChange(qint32 value)
+{
+    this->setWindowOpacity(1/(100.0/value));
+}
+
+//*************************************************************************************************************
+
 void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
                                              QString sGroupBoxName,
                                              QString sTabName)
@@ -216,7 +206,6 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
     QGroupBox* pGroupBox = m_pGroupBoxWidget->findChild<QGroupBox *>(sGroupBoxName);
 
     if(!pGroupBox) {
-        qDebug()<<" QuickControlWidget::addGroupBoxWithTabs - Creating new group";
         pGroupBox = new QGroupBox(sGroupBoxName);
         pGroupBox->setObjectName(sGroupBoxName);
 
@@ -233,7 +222,6 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
         pVBox->addWidget(pTabWidget);
         pGroupBox->setLayout(pVBox);
     } else {
-        qDebug()<<" QuickControlWidget::addGroupBoxWithTabs - Adding to exisiting group";
         QTabWidget* pTabWidget = pGroupBox->findChild<QTabWidget *>(sGroupBoxName + "TabWidget");
         if(pTabWidget) {
             pTabWidget->addTab(pWidget, sTabName);
@@ -242,17 +230,12 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
 }
 
 
-
 //*************************************************************************************************************
 
-void QuickControlWidget::setViewParameters(double zoomFactor, int windowSize, int opactiy)
+void QuickControlWidget::setOpacityValue(int opactiy)
 {
-    ui->m_doubleSpinBox_numberVisibleChannels->setValue(zoomFactor);
-    ui->m_spinBox_windowSize->setValue(windowSize);
-    ui->m_horizontalSlider_opacity->setValue(opactiy);
+    //ui->m_horizontalSlider_opacity->setValue(opactiy);
 
-    zoomChanged(zoomFactor);
-    timeWindowChanged(windowSize);
     onOpacityChange(opactiy);
 }
 
@@ -262,34 +245,6 @@ void QuickControlWidget::setViewParameters(double zoomFactor, int windowSize, in
 int QuickControlWidget::getOpacityValue()
 {
     return ui->m_horizontalSlider_opacity->value();
-}
-
-
-//*************************************************************************************************************
-
-int QuickControlWidget::getDistanceTimeSpacerIndex()
-{
-    return ui->m_comboBox_distaceTimeSpacer->currentIndex();
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::setDistanceTimeSpacerIndex(int index)
-{
-    ui->m_comboBox_distaceTimeSpacer->setCurrentIndex(index);
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor)
-{
-    ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
-    ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
-
-    m_colCurrentBackgroundColor = backgroundColor;
-    m_colCurrentSignalColor = signalColor;
 }
 
 
@@ -312,22 +267,6 @@ void QuickControlWidget::setNumberDetectedTriggersAndTypes(int numberDetections,
             }
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-const QColor& QuickControlWidget::getSignalColor()
-{
-    return m_colCurrentSignalColor;
-}
-
-
-//*************************************************************************************************************
-
-const QColor& QuickControlWidget::getBackgroundColor()
-{
-    return m_colCurrentBackgroundColor;
 }
 
 
@@ -377,22 +316,6 @@ void QuickControlWidget::setAverageInformationMap(const QMap<double, QPair<QColo
 QMap<double, QPair<QColor, QPair<QString,bool> > > QuickControlWidget::getAverageInformationMap()
 {
     return m_qMapAverageInfo;
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onTimeWindowChanged(int value)
-{
-    emit timeWindowChanged(value);
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onZoomChanged(double value)
-{
-    emit zoomChanged(value);
 }
 
 
@@ -487,40 +410,6 @@ void QuickControlWidget::onUpdateModalityCheckbox(qint32 state)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onOpacityChange(qint32 value)
-{
-    this->setWindowOpacity(1/(100.0/value));
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onDistanceTimeSpacerChanged(qint32 value)
-{
-    switch(value) {
-        case 0:
-            emit distanceTimeSpacerChanged(100);
-        break;
-
-        case 1:
-            emit distanceTimeSpacerChanged(200);
-        break;
-
-        case 2:
-            emit distanceTimeSpacerChanged(500);
-        break;
-
-        case 3:
-            emit distanceTimeSpacerChanged(1000);
-        break;
-    }
-
-    emit updateConnectedView();
-}
-
-
-//*************************************************************************************************************
-
 void QuickControlWidget::onResetTriggerNumbers()
 {
     ui->m_label_numberDetectedTriggers->setText(QString("0"));
@@ -528,41 +417,6 @@ void QuickControlWidget::onResetTriggerNumbers()
     emit resetTriggerCounter();
 
     emit updateConnectedView();
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onViewColorButtonClicked()
-{
-    QColorDialog* pDialog = new QColorDialog(this);
-
-    QObject* obj = sender();
-    if(obj == ui->m_pushButton_signalColor) {
-        pDialog->setCurrentColor(m_colCurrentSignalColor);
-        pDialog->setWindowTitle("Select Signal Color");
-
-        pDialog->exec();
-        m_colCurrentSignalColor = pDialog->currentColor();
-
-        //Set color of button new new scene color
-        ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSignalColor.red()).arg(m_colCurrentSignalColor.green()).arg(m_colCurrentSignalColor.blue()));
-
-        emit signalColorChanged(m_colCurrentSignalColor);
-    }
-
-    if( obj == ui->m_pushButton_backgroundColor ) {
-        pDialog->setCurrentColor(m_colCurrentBackgroundColor);
-        pDialog->setWindowTitle("Select Background Color");
-
-        pDialog->exec();
-        m_colCurrentBackgroundColor = pDialog->currentColor();
-
-        //Set color of button new new scene color
-        ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentBackgroundColor.red()).arg(m_colCurrentBackgroundColor.green()).arg(m_colCurrentBackgroundColor.blue()));
-
-        emit backgroundColorChanged(m_colCurrentBackgroundColor);
-    }
 }
 
 
@@ -605,41 +459,6 @@ void QuickControlWidget::onAveragesChanged()
 
         emit averageInformationChanged(m_qMapAverageInfo);
     }
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::createViewGroup()
-{
-    //Number of visible channels
-    connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &QuickControlWidget::zoomChanged);
-
-    //Window size
-    connect(ui->m_spinBox_windowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &QuickControlWidget::timeWindowChanged);
-
-    //opacity
-    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
-            this, &QuickControlWidget::onOpacityChange);
-
-    //Distance for timer spacer
-    connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &QuickControlWidget::onDistanceTimeSpacerChanged);
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::createColorsGroup()
-{
-    //Colors
-    connect(ui->m_pushButton_backgroundColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::onViewColorButtonClicked);
-
-    connect(ui->m_pushButton_signalColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::onViewColorButtonClicked);
 }
 
 
