@@ -118,12 +118,28 @@ public:
     */
     ~QuickControlView();
 
+    //=========================================================================================================
+    /**
+    * Add a new group box to this Widget. Takes ownership of the passed widget.
+    *
+    * @param [in] pWidget           The widgets which will be put into the new group box.
+    * @param [in] sGroupBoxName     The name of the new group box.
+    */
     void addGroupBox(QWidget* pWidget,
                         QString sGroupBoxName);
 
+    //=========================================================================================================
+    /**
+    * Add a new group box with tabs to this Widget. If the group box already exists, a new tab will be added to its QTabWidget.
+    * Takes ownership of the passed widget.
+    *
+    * @param [in] pWidget           The widgets which will be put into the new group box.
+    * @param [in] sGroupBoxName     The name of the new group box.
+    * @param [in] sTabName          The name of the new tab.
+    */
     void addGroupBoxWithTabs(QWidget* pWidget,
-                                QString sGroupBoxName,
-                                QString sTabName);
+                             QString sGroupBoxName,
+                             QString sTabName);
 
     //=========================================================================================================
     /**

@@ -234,9 +234,7 @@ void RealTimeMultiSampleArrayWidget::init()
         QSettings settings;
         QString t_sRTMSAWName = m_pRTMSA->getName();
 
-        //
-        //-------- Init signal and background colors --------
-        //
+        // Init channel view
         QColor signalDefault = Qt::darkBlue;
         QColor backgroundDefault = Qt::white;
         QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
@@ -251,9 +249,7 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pChannelDataView->hideBadChannels();
         }
 
-        //
-        //-------- Init scaling --------
-        //
+        //Init scaling
         bool hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
         float val = 1e-11f;
         QMap<qint32, float> qMapChScaling;
@@ -296,7 +292,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pChannelDataView->setScalingMap(qMapChScaling);
 
-        //-------- Init filter window --------
+        //Init filter window
         m_pFilterWindow = FilterView::SPtr::create(this, Qt::Window);
 
         m_pFilterWindow->init(m_pFiffInfo->sfreq);
@@ -322,12 +318,10 @@ void RealTimeMultiSampleArrayWidget::init()
                                                 settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool(),
                                                 settings.value(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), "MEG").toString());
 
-        //
-        //-------- Init channel selection manager --------
-        //
-        m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
+        //Init channel selection manager
+        m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo, this);
 
-        m_pChannelSelectionView = ChannelSelectionView::SPtr(new ChannelSelectionView(this, m_pChannelInfoModel, Qt::Window));
+        m_pChannelSelectionView = ChannelSelectionView::SPtr::create(this, m_pChannelInfoModel, Qt::Window);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
@@ -349,11 +343,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName),
                                                                        "babymeg-mag-inner-layer.lout").toString());
 
-        //
-        //-------- Init quick control widget --------
-        //
-        QStringList slFlags = m_pRTMSA->getDisplayFlags();
-
+        //Init quick control widget
         #ifdef BUILD_BASIC_MNESCAN_VERSION
             std::cout<<"BUILD_BASIC_MNESCAN_VERSION Defined"<<std::endl;
             slFlags.clear();
@@ -378,6 +368,9 @@ void RealTimeMultiSampleArrayWidget::init()
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pChannelDataView.data(), &ChannelDataView::updateProjection);
+
+        //Activate projectors by default
+        m_pChannelDataView->updateProjection();
 
         // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView();
@@ -451,14 +444,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
         connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
                 pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
-
-        m_pChannelDataView->setSignalColor(signal);
-        m_pChannelDataView->setBackgroundColor(background);
-
-        //If projections are wanted activate projections as default
-        if(slFlags.contains("projections")) {
-            m_pChannelDataView->updateProjection();
-        }
 
         //Initialized
         m_bInitialized = true;
