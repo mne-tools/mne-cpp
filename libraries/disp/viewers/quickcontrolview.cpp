@@ -85,14 +85,6 @@ QuickControlView::QuickControlView(const QString& name,
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlView::hide);
 
-//    if(m_slFlags.contains("modalities", Qt::CaseInsensitive)) {
-//        createModalityGroup();
-//        m_bModalitiy = true;
-//    } else {
-//        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")));
-//        m_bModalitiy = false;
-//    }
-
 //    if(m_slFlags.contains("averages", Qt::CaseInsensitive)) {
 //        createAveragesGroup();
 //        m_bAverages = true;
@@ -249,26 +241,6 @@ void QuickControlView::onToggleHideAll(bool state)
     ui->m_widget_groupBoxes->setVisible(state);
     ui->m_widget_opacity->setVisible(state);
     this->adjustSize();
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlView::onUpdateModalityCheckbox(qint32 state)
-{
-    Q_UNUSED(state)
-
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-    {
-        if(m_qListModalityCheckBox[i]->isChecked())
-            m_qListModalities[i].m_bActive = true;
-        else
-            m_qListModalities[i].m_bActive = false;
-    }
-
-    emit modalitiesChanged(m_qListModalities);
-
-    emit updateConnectedView();
 }
 
 

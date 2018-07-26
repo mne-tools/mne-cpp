@@ -85,29 +85,63 @@ ChannelDataSettingsView::ChannelDataSettingsView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::init()
+void ChannelDataSettingsView::init(const QStringList& lVisibleWidgets)
 {
-    //Number of visible channels
-    connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &ChannelDataSettingsView::zoomChanged);
+    if(lVisibleWidgets.contains("numberChannels", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+        //Number of visible channels
+        connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this, &ChannelDataSettingsView::zoomChanged);
+    } else {
+        ui->m_doubleSpinBox_numberVisibleChannels->hide();
+        ui->label_numberChannels->hide();
+    }
 
-    //Window size
-    connect(ui->m_spinBox_windowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &ChannelDataSettingsView::timeWindowChanged);
+    if(lVisibleWidgets.contains("windowSize", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+        //Window size
+        connect(ui->m_spinBox_windowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                this, &ChannelDataSettingsView::timeWindowChanged);
+    } else {
+        ui->m_spinBox_windowSize->hide();
+        ui->label_windowSize->hide();
+    }
 
-    //Distance for timer spacer
-    connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &ChannelDataSettingsView::onDistanceTimeSpacerChanged);
+    if(lVisibleWidgets.contains("distanceSpacers", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+        //Distance for timer spacer
+        connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                this, &ChannelDataSettingsView::onDistanceTimeSpacerChanged);
+    } else {
+        ui->m_comboBox_distaceTimeSpacer->hide();
+        ui->label_timeSpacers->hide();
+    }
 
-    //Colors
-    connect(ui->m_pushButton_backgroundColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &ChannelDataSettingsView::onViewColorButtonClicked);
+    if(lVisibleWidgets.contains("backgroundColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+        //Background Colors
+        connect(ui->m_pushButton_backgroundColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &ChannelDataSettingsView::onViewColorButtonClicked);
+    } else {
+        ui->m_pushButton_backgroundColor->hide();
+        ui->label_backgroundColor->hide();
+    }
 
-    connect(ui->m_pushButton_signalColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &ChannelDataSettingsView::onViewColorButtonClicked);
+    if(lVisibleWidgets.contains("signalColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+        //Signal Colors
+        connect(ui->m_pushButton_signalColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &ChannelDataSettingsView::onViewColorButtonClicked);
+    } else {
+        ui->m_pushButton_signalColor->hide();
+        ui->label_signalColor->hide();
+    }
 
-    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &ChannelDataSettingsView::onMakeScreenshot);
+    if(lVisibleWidgets.contains("screenshot", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+        //Signal Colors
+        connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &ChannelDataSettingsView::onMakeScreenshot);
+    } else {
+        ui->m_pushButton_makeScreenshot->hide();
+        ui->m_comboBox_imageType->hide();
+    }
+
+    this->adjustSize();
 }
 
 

@@ -200,12 +200,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Slot called when modality check boxes were changed
-    */
-    void onUpdateModalityCheckbox(qint32 state);
-
-    //=========================================================================================================
-    /**
     * Call this slot whenever the averages changed.
     */
     void onAveragesChanged();
@@ -224,7 +218,6 @@ protected:
     void createAveragesGroup();
 
 private:    
-    bool                                                m_bModalitiy;                   /**< Flag for displaying the modality group box. */
     bool                                                m_bCompensator;                 /**< Flag for displaying the compensator group box. */
     bool                                                m_bAverages;                    /**< Flag for displaying the averages group box. */
 
@@ -233,19 +226,10 @@ private:
     QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
     QMap<QPushButton*, double>                          m_qMapButtonAverageType;        /**< Push button to average type map. */
 
-    QList<DISPLIB::Modality>                            m_qListModalities;              /**< List of different modalities. */
-    QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
-
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlViewWidget*                         ui;                             /**< The generated UI file. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changed the modality.
-    */
-    void modalitiesChanged(const QList<DISPLIB::Modality>& modalityList);
-
     //=========================================================================================================
     /**
     * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.

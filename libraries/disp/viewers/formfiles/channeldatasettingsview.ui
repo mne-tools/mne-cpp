@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>256</width>
+    <width>286</width>
     <height>280</height>
    </rect>
   </property>
@@ -35,7 +35,7 @@
       <number>0</number>
      </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="label_numberChannels">
        <property name="text">
         <string>Number of channels:</string>
        </property>
@@ -58,7 +58,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="label_windowSize">
        <property name="text">
         <string>Window size:</string>
        </property>
@@ -91,21 +91,21 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_10">
+      <widget class="QLabel" name="label_backgroundColor">
        <property name="text">
         <string>Change background color:</string>
        </property>
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="label_11">
+      <widget class="QLabel" name="label_signalColor">
        <property name="text">
         <string>Change signal color:</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_8">
+      <widget class="QLabel" name="label_timeSpacers">
        <property name="text">
         <string>Time spacer every</string>
        </property>

@@ -45,6 +45,8 @@
 #include "scdisp_global.h"
 #include "measurementwidget.h"
 
+#include <disp/viewers/modalityselectionview.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -145,6 +147,7 @@ public:
     */
     virtual void init();
 
+protected:
     //=========================================================================================================
     /**
     * Show modality view.
@@ -155,9 +158,8 @@ public:
     /**
     * Show modality view.
     */
-    void onNewModalitySelection(QStringList lModalities);
+    void onNewModalitySelection(const QList<DISPLIB::Modality>& modalityList);
 
-private:
     QSharedPointer<DISPLIB::ModalitySelectionView>   m_pModalitySelectionWidget;     /**< Modality selection widget */
 
     QSharedPointer<SCMEASLIB::RealTimeCov>  m_pRTC;                         /**< The real-time covariance measurement. */
@@ -169,7 +171,7 @@ private:
     bool                                    m_bInitialized;                 /**< Is Initialized */
 
     QStringList                             m_qListChNames;                 /**< Channel names */
-    QStringList                             m_qListPickTypes;               /**< Channel Types to pick */
+    QList<DISPLIB::Modality>                m_qListPickTypes;               /**< Channel Types to pick */
 
     Eigen::MatrixXd                         m_matSelector;                  /**< Selction matrix */
     Eigen::MatrixXd                         m_matSelectorT;                 /**< Transposed selction matrix */

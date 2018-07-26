@@ -40,6 +40,8 @@
 
 #include "modalityselectionview.h"
 
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,6 +65,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -70,57 +73,168 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ModalitySelectionView::ModalitySelectionView(QStringList lModalities,
-                                             QWidget *parent,
+ModalitySelectionView::ModalitySelectionView(QWidget *parent,
                                              Qt::WindowFlags f)
 : QWidget(parent, f)
 {
     this->setWindowTitle("Modality Selection");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
-
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    qint32 count = 0;
-    foreach (const QString &mod, lModalities) {
-        //Add the label
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality,count,0,1,1);
-        m_qListModalities << mod;
-
-        //Add the check box
-        QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        connect(t_pCheckBoxModality, &QCheckBox::stateChanged,
-                this, &ModalitySelectionView::updateSelection);
-
-        t_pCheckBoxModality->setChecked(true);
-
-        m_qListModalityCheckBox << t_pCheckBoxModality;
-
-        t_pGridLayout->addWidget(t_pCheckBoxModality,count,1,1,1);
-
-        ++count;
-    }
-
-    this->setLayout(t_pGridLayout);
-
 }
 
 
 //*************************************************************************************************************
 
-void ModalitySelectionView::updateSelection(qint32 state)
+void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
+{
+    m_qListModalities.clear();
+    bool hasMEG = false;
+    bool hasEEG = false;
+    bool hasEOG = false;
+    bool hasMISC = false;
+    for(qint32 i = 0; i < modalityList.size(); ++i)
+    {
+        if(modalityList.at(i).m_sName.contains("MEG"))
+            hasMEG = true;
+        else if(modalityList.at(i).m_sName.contains("EEG"))
+            hasEEG = true;
+        else if(modalityList.at(i).m_sName.contains("EOG"))
+            hasEOG = true;
+        else if(modalityList.at(i).m_sName.contains("MISC"))
+            hasMISC = true;
+    }
+
+    bool sel = true;
+    float val = 1e-11f;
+
+    if(hasMEG)
+        m_qListModalities.append(Modality("MEG",sel,val));
+    if(hasEEG)
+        m_qListModalities.append(Modality("EEG",false,val));
+    if(hasEOG)
+        m_qListModalities.append(Modality("EOG",false,val));
+    if(hasMISC)
+        m_qListModalities.append(Modality("MISC",false,val));
+
+    QGridLayout* t_pGridLayout = new QGridLayout;
+
+    for(qint32 i = 0; i < m_qListModalities.size(); ++i)
+    {
+        QString mod = m_qListModalities[i].m_sName;
+
+        QLabel* t_pLabelModality = new QLabel;
+        t_pLabelModality->setText(mod);
+        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+
+        QCheckBox* t_pCheckBoxModality = new QCheckBox;
+        t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
+        m_qListModalityCheckBox << t_pCheckBoxModality;
+        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
+                this,&ModalitySelectionView::onUpdateModalityCheckbox);
+        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
+    }
+
+    //Find Modalities tab and add current layout
+    this->setLayout(t_pGridLayout);
+}
+
+
+//*************************************************************************************************************
+
+void ModalitySelectionView::init(const FiffInfo::SPtr pFiffInfo)
+{
+    if(pFiffInfo) {
+        m_pFiffInfo = pFiffInfo;
+
+        m_qListModalities.clear();
+        bool hasMag = false;
+        bool hasGrad = false;
+        bool hasEEG = false;
+        bool hasEOG = false;
+        bool hasMISC = false;
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+        {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+            {
+                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
+                    hasMag = true;
+                else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
+                    hasGrad = true;
+            }
+            else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
+                hasEEG = true;
+            else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
+                hasEOG = true;
+            else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
+                hasMISC = true;
+        }
+
+        bool sel = true;
+        float val = 1e-11f;
+
+        if(hasMag)
+            m_qListModalities.append(Modality("MAG",sel,val));
+        if(hasGrad)
+            m_qListModalities.append(Modality("GRAD",sel,val));
+        if(hasEEG)
+            m_qListModalities.append(Modality("EEG",false,val));
+        if(hasEOG)
+            m_qListModalities.append(Modality("EOG",false,val));
+        if(hasMISC)
+            m_qListModalities.append(Modality("MISC",false,val));
+
+        QGridLayout* t_pGridLayout = new QGridLayout;
+
+        for(qint32 i = 0; i < m_qListModalities.size(); ++i)
+        {
+            QString mod = m_qListModalities[i].m_sName;
+
+            QLabel* t_pLabelModality = new QLabel;
+            t_pLabelModality->setText(mod);
+            t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+
+            QCheckBox* t_pCheckBoxModality = new QCheckBox;
+            t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
+            m_qListModalityCheckBox << t_pCheckBoxModality;
+            connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
+                    this,&ModalitySelectionView::onUpdateModalityCheckbox);
+            t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
+        }
+
+        //Find Modalities tab and add current layout
+        this->setLayout(t_pGridLayout);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ModalitySelectionView::setModalities(const QList<Modality> &lModalities)
+{
+    for(int i = 0; i < m_qListModalityCheckBox.size(); i++) {
+        for(int j = 0; j < lModalities.size(); j++) {
+            if(m_qListModalityCheckBox.at(i)->text().contains(lModalities.at(j).m_sName)) {
+                m_qListModalityCheckBox.at(i)->setChecked(lModalities.at(j).m_bActive);
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ModalitySelectionView::onUpdateModalityCheckbox(qint32 state)
 {
     Q_UNUSED(state)
 
-    QStringList lModalitySelection;
-
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i) {
-        if(m_qListModalityCheckBox[i]->isChecked()) {
-            lModalitySelection << m_qListModalities[i];
-        }
+    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
+    {
+        if(m_qListModalityCheckBox[i]->isChecked())
+            m_qListModalities[i].m_bActive = true;
+        else
+            m_qListModalities[i].m_bActive = false;
     }
 
-    emit newModalitySelection(lModalitySelection);
+    emit modalitiesChanged(m_qListModalities);
 }
+
