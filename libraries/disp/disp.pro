@@ -112,6 +112,7 @@ SOURCES += \
     viewers/compensatorview.cpp \
     viewers/filtersettingsview.cpp \
     viewers/spharasettingsview.cpp \
+    viewers/channeldatasettingsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -149,6 +150,7 @@ HEADERS += \
     viewers/compensatorview.h \
     viewers/filtersettingsview.h \
     viewers/spharasettingsview.h \
+    viewers/channeldatasettingsview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
