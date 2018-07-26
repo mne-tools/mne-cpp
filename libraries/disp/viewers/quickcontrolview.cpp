@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     quickcontrolwidget.cpp
+* @file     quickcontrolview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the QuickControlWidget Class.
+* @brief    Definition of the QuickControlView Class.
 *
 */
 
@@ -38,13 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_quickcontrolwidget.h"
-#include "quickcontrolwidget.h"
+#include "ui_quickcontrolview.h"
 
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_constants.h>
-
-#include <iostream>
+#include "quickcontrolview.h"
 
 
 //*************************************************************************************************************
@@ -52,15 +48,9 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-#include <QCheckBox>
-#include <QDoubleSpinBox>
-#include <QSlider>
-#include <QPushButton>
-#include <QSignalMapper>
-#include <QColorDialog>
-#include <QTabWidget>
 #include <QGroupBox>
+#include <QCheckBox>
+#include <QColorDialog>
 
 
 //*************************************************************************************************************
@@ -68,8 +58,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace FIFFLIB;
 using namespace DISPLIB;
 
 
@@ -78,26 +66,24 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(const QString& name,
-                                       const QStringList& slFlags,
-                                       QWidget *parent)
+QuickControlView::QuickControlView(const QString& name,
+                                    QWidget *parent)
 : DraggableFramelessWidget(parent, Qt::Window | Qt::CustomizeWindowHint)
-, ui(new Ui::QuickControlWidget)
-, m_slFlags(slFlags)
+, ui(new Ui::QuickControlViewWidget)
 , m_sName(name)
 {
     ui->setupUi(this);
 
     //Init opacity slider
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
-            this, &QuickControlWidget::onOpacityChange);
+            this, &QuickControlView::onOpacityChange);
 
     //Init and connect hide all group (minimize) button
     connect(ui->m_pushButton_hideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::onToggleHideAll);
+            this, &QuickControlView::onToggleHideAll);
 
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::hide);
+            this, &QuickControlView::hide);
 
 //    if(m_slFlags.contains("modalities", Qt::CaseInsensitive)) {
 //        createModalityGroup();
@@ -121,7 +107,7 @@ QuickControlWidget::QuickControlWidget(const QString& name,
 
 //*************************************************************************************************************
 
-QuickControlWidget::~QuickControlWidget()
+QuickControlView::~QuickControlView()
 {
     delete ui;
 }
@@ -129,7 +115,7 @@ QuickControlWidget::~QuickControlWidget()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::addGroupBox(QWidget* pWidget,
+void QuickControlView::addGroupBox(QWidget* pWidget,
                                      QString sGroupBoxName)
 {
     QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName);
@@ -149,7 +135,7 @@ void QuickControlWidget::addGroupBox(QWidget* pWidget,
 
 //*************************************************************************************************************
 
-void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
+void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
                                              QString sGroupBoxName,
                                              QString sTabName)
 {
@@ -182,7 +168,7 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onOpacityChange(qint32 value)
+void QuickControlView::onOpacityChange(qint32 value)
 {
     this->setWindowOpacity(1/(100.0/value));
 }
@@ -190,9 +176,9 @@ void QuickControlWidget::onOpacityChange(qint32 value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setOpacityValue(int opactiy)
+void QuickControlView::setOpacityValue(int opactiy)
 {
-    //ui->m_horizontalSlider_opacity->setValue(opactiy);
+    ui->m_horizontalSlider_opacity->setValue(opactiy);
 
     onOpacityChange(opactiy);
 }
@@ -200,7 +186,7 @@ void QuickControlWidget::setOpacityValue(int opactiy)
 
 //*************************************************************************************************************
 
-int QuickControlWidget::getOpacityValue()
+int QuickControlView::getOpacityValue()
 {
     return ui->m_horizontalSlider_opacity->value();
 }
@@ -208,7 +194,7 @@ int QuickControlWidget::getOpacityValue()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld)
+void QuickControlView::setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld)
 {
     m_qMapAverageInfoOld = qMapAverageInfoOld;
 }
@@ -216,7 +202,7 @@ void QuickControlWidget::setAverageInformationMapOld(const QMap<double, QPair<QC
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
+void QuickControlView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
 {
     //Check if average type already exists in the map
     QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(qMapAverageColor);
@@ -249,7 +235,7 @@ void QuickControlWidget::setAverageInformationMap(const QMap<double, QPair<QColo
 
 //*************************************************************************************************************
 
-QMap<double, QPair<QColor, QPair<QString,bool> > > QuickControlWidget::getAverageInformationMap()
+QMap<double, QPair<QColor, QPair<QString,bool> > > QuickControlView::getAverageInformationMap()
 {
     return m_qMapAverageInfo;
 }
@@ -258,7 +244,7 @@ QMap<double, QPair<QColor, QPair<QString,bool> > > QuickControlWidget::getAverag
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onToggleHideAll(bool state)
+void QuickControlView::onToggleHideAll(bool state)
 {
     ui->m_widget_groupBoxes->setVisible(state);
     ui->m_widget_opacity->setVisible(state);
@@ -268,7 +254,7 @@ void QuickControlWidget::onToggleHideAll(bool state)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onUpdateModalityCheckbox(qint32 state)
+void QuickControlView::onUpdateModalityCheckbox(qint32 state)
 {
     Q_UNUSED(state)
 
@@ -288,7 +274,7 @@ void QuickControlWidget::onUpdateModalityCheckbox(qint32 state)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::onAveragesChanged()
+void QuickControlView::onAveragesChanged()
 {
     //Change color for average
     if(QPushButton* button = qobject_cast<QPushButton*>(sender()))
@@ -321,7 +307,7 @@ void QuickControlWidget::onAveragesChanged()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::createModalityGroup()
+void QuickControlView::createModalityGroup()
 {
 //    m_qListModalities.clear();
 //    bool hasMag = false;
@@ -374,7 +360,7 @@ void QuickControlWidget::createModalityGroup()
 //        t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
 //        m_qListModalityCheckBox << t_pCheckBoxModality;
 //        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
-//                this,&QuickControlWidget::onUpdateModalityCheckbox);
+//                this,&QuickControlView::onUpdateModalityCheckbox);
 //        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
 //    }
 
@@ -385,7 +371,7 @@ void QuickControlWidget::createModalityGroup()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::createAveragesGroup()
+void QuickControlView::createAveragesGroup()
 {
 //    //Delete all widgets in the averages layout
 //    QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->layout());
@@ -413,7 +399,7 @@ void QuickControlWidget::createAveragesGroup()
 //        pCheckBox->setChecked(i.value().second.second);
 //        topLayout->addWidget(pCheckBox, count, 0);
 //        connect(pCheckBox, &QCheckBox::clicked,
-//                this, &QuickControlWidget::onAveragesChanged);
+//                this, &QuickControlView::onAveragesChanged);
 //        m_qMapChkBoxAverageType.insert(pCheckBox, i.value().second.first.toDouble());
 
 //        //Create average color pushbutton
@@ -421,7 +407,7 @@ void QuickControlWidget::createAveragesGroup()
 //        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().first.red()).arg(i.value().first.green()).arg(i.value().first.blue()));
 //        topLayout->addWidget(pButton, count, 1);
 //        connect(pButton, &QPushButton::clicked,
-//                this, &QuickControlWidget::onAveragesChanged);
+//                this, &QuickControlView::onAveragesChanged);
 //        m_qMapButtonAverageType.insert(pButton, i.value().second.first.toDouble());
 
 //        ++count;
@@ -430,19 +416,3 @@ void QuickControlWidget::createAveragesGroup()
 //    //Find Filter tab and add current layout
 //    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->setLayout(topLayout);
 }
-
-
-//*************************************************************************************************************
-
-QWidget* QuickControlWidget::findTabWidgetByText(const QTabWidget* pTabWidget, const QString& sTabText)
-{
-    for(int i = 0; i<pTabWidget->count(); i++) {
-        if(pTabWidget->tabText(i) == sTabText) {
-            return pTabWidget->widget(i);
-        }
-    }
-
-    return new QWidget();
-}
-
-

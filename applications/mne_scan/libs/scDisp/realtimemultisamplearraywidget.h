@@ -75,6 +75,7 @@ namespace DISPLIB {
     class FilterView;
     class ChannelInfoModel;
     class ChannelDataView;
+    class QuickControlView;
 }
 
 namespace FIFFLIB {
@@ -99,8 +100,6 @@ namespace SCDISPLIB
 //=============================================================================================================
 // SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class QuickControlWidget;
 
 
 //=============================================================================================================
@@ -174,7 +173,7 @@ private slots:
     void onHideBadChannels();
 
 private:
-    QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;          /**< quick control widget. */
+    QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
     QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
     QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;            /**< channel info model. */
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */

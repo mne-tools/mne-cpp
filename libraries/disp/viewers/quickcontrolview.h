@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the QuickControlWidget Class.
+* @brief    Declaration of the QuickControlView Class.
 *
 */
 
-#ifndef QUICKCONTROLWIDGET_H
-#define QUICKCONTROLWIDGET_H
+#ifndef QUICKCONTROLVIEW_H
+#define QUICKCONTROLVIEW_H
 
 
 //*************************************************************************************************************
@@ -42,8 +42,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/viewers/helpers/draggableframelesswidget.h>
-#include <disp/viewers/butterflyview.h>
+#include "../disp_global.h"
+
+#include "helpers/draggableframelesswidget.h"
+#include "butterflyview.h"
 
 
 //*************************************************************************************************************
@@ -64,65 +66,57 @@
 //=============================================================================================================
 
 namespace Ui {
-    class QuickControlWidget;
+    class QuickControlViewWidget;
 }
 
 class QCheckBox;
-class QDoubleSpinBox;
-class QSlider;
 class QPushButton;
-class QSignalMapper;
-class QTabWidget;
-class QGridLayout;
-class QGroupBox;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// SCDISPLIB FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS QuickControlWidget
+* DECLARE CLASS QuickControlView
 *
-* @brief The QuickControlWidget class provides a quick control widget for scaling, filtering, projector and other control options.
+* @brief The QuickControlView class provides a quick control view for scaling, filtering, projector and other control options.
 */
-class QuickControlWidget : public DISPLIB::DraggableFramelessWidget
+class DISPSHARED_EXPORT QuickControlView : public DISPLIB::DraggableFramelessWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<QuickControlWidget> SPtr;              /**< Shared pointer type for QuickControlWidget. */
-    typedef QSharedPointer<const QuickControlWidget> ConstSPtr;   /**< Const shared pointer type for QuickControlWidget. */
+    typedef QSharedPointer<QuickControlView> SPtr;              /**< Shared pointer type for QuickControlView. */
+    typedef QSharedPointer<const QuickControlView> ConstSPtr;   /**< Const shared pointer type for QuickControlView. */
 
     //=========================================================================================================
     /**
-    * Constructs a QuickControlWidget which is a child of parent.
+    * Constructs a QuickControlView which is a child of parent.
     *
     * @param [in] name              The name to be displayed on the minimize button.
-    * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] parent            The parent of widget.
     */
-    QuickControlWidget(const QString& name = "",
-                       const QStringList& slFlags = QStringList("Scaling"),
+    QuickControlView(const QString& name = "",
                        QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destructs a QuickControlWidget
+    * Destructs a QuickControlView
     */
-    ~QuickControlWidget();
+    ~QuickControlView();
 
     void addGroupBox(QWidget* pWidget,
                         QString sGroupBoxName);
@@ -213,20 +207,7 @@ protected:
     */
     void createAveragesGroup();
 
-    //=========================================================================================================
-    /**
-    * Slot called when the user designed filter was toggled
-    *
-    * @param [in] pTabWidget    pointer to the tab widget of interest
-    * @param [in] sTabText      text of the tab to find
-    *
-    * @return The found tab widget.
-    */
-    QWidget* findTabWidgetByText(const QTabWidget *pTabWidget, const QString& sTabText);
-
-private:
-    QStringList                                         m_slFlags;                      /**< The list holding the current flags. */
-
+private:    
     bool                                                m_bModalitiy;                   /**< Flag for displaying the modality group box. */
     bool                                                m_bCompensator;                 /**< Flag for displaying the compensator group box. */
     bool                                                m_bAverages;                    /**< Flag for displaying the averages group box. */
@@ -240,7 +221,7 @@ private:
     QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
 
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
-    Ui::QuickControlWidget*                             ui;                             /**< The generated UI file. */
+    Ui::QuickControlViewWidget*                         ui;                             /**< The generated UI file. */
 
 signals:
     //=========================================================================================================
@@ -264,6 +245,6 @@ signals:
     void averageInformationChanged(const QMap<double, QPair<QColor, QPair<QString,bool> > >& map);
 };
 
-} // NAMESPACE SCDISPLIB
+} // NAMESPACE DISPLIB
 
-#endif // QUICKCONTROLWIDGET_H
+#endif // QUICKCONTROLVIEW_H

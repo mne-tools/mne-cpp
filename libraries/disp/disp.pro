@@ -114,6 +114,7 @@ SOURCES += \
     viewers/spharasettingsview.cpp \
     viewers/channeldatasettingsview.cpp \
     viewers/triggerdetectionview.cpp \
+    viewers/quickcontrolview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -153,6 +154,7 @@ HEADERS += \
     viewers/spharasettingsview.h \
     viewers/channeldatasettingsview.h \
     viewers/triggerdetectionview.h \
+    viewers/quickcontrolview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
@@ -210,6 +212,7 @@ FORMS += \
     viewers/formfiles/spharasettingsview.ui \
     viewers/formfiles/channeldatasettingsview.ui \
     viewers/formfiles/triggerdetectionview.ui \
+    viewers/formfiles/quickcontrolview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
