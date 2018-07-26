@@ -125,17 +125,17 @@ void ChannelDataSettingsView::setViewParameters(double zoomFactor, int windowSiz
 
 //*************************************************************************************************************
 
-int ChannelDataSettingsView::getDistanceTimeSpacerIndex()
+QString ChannelDataSettingsView::getDistanceTimeSpacer()
 {
-    return ui->m_comboBox_distaceTimeSpacer->currentIndex();
+    return ui->m_comboBox_distaceTimeSpacer->currentText();
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setDistanceTimeSpacerIndex(int index)
+void ChannelDataSettingsView::setDistanceTimeSpacer(int value)
 {
-    ui->m_comboBox_distaceTimeSpacer->setCurrentIndex(index);
+    ui->m_comboBox_distaceTimeSpacer->setCurrentText(QString::number(value));
 }
 
 

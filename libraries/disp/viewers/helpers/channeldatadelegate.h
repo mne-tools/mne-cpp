@@ -155,6 +155,14 @@ public:
     */
     void setSignalColor(const QColor& signalColor);
 
+    //=========================================================================================================
+    /**
+    * Returns the signal color.
+    *
+    * @return  The current signal color.
+    */
+    QColor getSignalColor();
+
 private:
     //=========================================================================================================
     /**

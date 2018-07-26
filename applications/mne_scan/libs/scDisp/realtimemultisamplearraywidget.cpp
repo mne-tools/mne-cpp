@@ -42,7 +42,6 @@
 #include "realtimemultisamplearraywidget.h"
 
 #include <disp/viewers/quickcontrolview.h>
-
 #include <disp/viewers/filterview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
@@ -65,7 +64,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QMenu>
 #include <QAction>
 #include <QDate>
 #include <QVBoxLayout>
@@ -174,6 +172,12 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
             //Store show/hide bad channel flag
             settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_pChannelDataView->getBadChannelHideStatus());
+
+            settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pChannelDataView->getSignalColor());
+
+            settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pChannelDataView->getBackgroundColor());
+
+            settings.setValue(QString("RTMSAW/%1/distanceTimeSpacer").arg(t_sRTMSAWName), m_pChannelDataView->getDistanceTimeSpacer());
         }
 
         //Store filter
@@ -193,9 +197,6 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         //Store QuickControlView
         if(m_pQuickControlView) {
             settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlView->getOpacityValue());
-            //settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlView->getSignalColor());
-            //settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlView->getBackgroundColor());
-            //settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlView->getDistanceTimeSpacerIndex());
         }
 
         //Store selected layout file
@@ -243,7 +244,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
-        m_pChannelDataView->setBackgroundColorChanged(background);
+        m_pChannelDataView->setBackgroundColor(background);
         m_pChannelDataView->setSignalColor(signal);
 
         if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool()) {
@@ -360,8 +361,7 @@ void RealTimeMultiSampleArrayWidget::init()
         #endif
 
         m_pQuickControlView = QuickControlView::SPtr::create("RT Display", this);
-        m_pQuickControlView->setOpacityValue(100);
-        //m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
+        m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView();
@@ -419,7 +419,7 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
 
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setBackgroundColorChanged);
+                m_pChannelDataView.data(), &ChannelDataView::setBackgroundColor);
 
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::zoomChanged,
                 m_pChannelDataView.data(), &ChannelDataView::setZoom);
@@ -428,14 +428,14 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
 
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::distanceTimeSpacerChanged,
-                m_pChannelDataView.data(), &ChannelDataView::distanceTimeSpacerChanged);
+                m_pChannelDataView.data(), &ChannelDataView::setDistanceTimeSpacer);
 
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
                 this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
         pChannelDataSettingsView->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
                                                     settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt());
-        pChannelDataSettingsView->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
+        pChannelDataSettingsView->setDistanceTimeSpacer(settings.value(QString("RTMSAW/%1/distanceTimeSpacer").arg(t_sRTMSAWName), 100).toInt());
         pChannelDataSettingsView->setSignalBackgroundColors(signal, background);
 
         // Quick control trigger detection settings
@@ -453,7 +453,7 @@ void RealTimeMultiSampleArrayWidget::init()
                 pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
 
         m_pChannelDataView->setSignalColor(signal);
-        m_pChannelDataView->setBackgroundColorChanged(background);
+        m_pChannelDataView->setBackgroundColor(background);
 
         //If projections are wanted activate projections as default
         if(slFlags.contains("projections")) {
