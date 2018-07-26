@@ -53,6 +53,7 @@
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/spharasettingsview.h>
 #include <disp/viewers/channeldatasettingsview.h>
+#include <disp/viewers/triggerdetectionview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -358,7 +359,7 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #endif
 
-        m_pQuickControlWidget = QuickControlWidget::SPtr::create(m_pFiffInfo, "RT Display", slFlags, this);
+        m_pQuickControlWidget = QuickControlWidget::SPtr::create("RT Display", slFlags, this);
         m_pQuickControlWidget->setOpacityValue(100);
         //m_pQuickControlWidget->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
@@ -437,15 +438,19 @@ void RealTimeMultiSampleArrayWidget::init()
         pChannelDataSettingsView->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
         pChannelDataSettingsView->setSignalBackgroundColors(signal, background);
 
-//        //Handle trigger detection
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
-//                m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
+        // Quick control trigger detection settings
+        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView();
+        pTriggerDetectionView->init(m_pFiffInfo);
+        m_pQuickControlWidget->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
 
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
-//                m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
+        connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
+                m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
 
-//        connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
-//                m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggersAndTypes);
+        connect(pTriggerDetectionView, &TriggerDetectionView::resetTriggerCounter,
+                m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
+
+        connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
+                pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
 
         m_pChannelDataView->setSignalColor(signal);
         m_pChannelDataView->setBackgroundColorChanged(background);

@@ -63,10 +63,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
-}
-
 namespace Ui {
     class QuickControlWidget;
 }
@@ -115,12 +111,10 @@ public:
     * Constructs a QuickControlWidget which is a child of parent.
     *
     * @param [in] name              The name to be displayed on the minimize button.
-    * @param [in] pFiffInfo         The fiff info.
     * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] parent            The parent of widget.
     */
-    QuickControlWidget(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                       const QString& name = "",
+    QuickControlWidget(const QString& name = "",
                        const QStringList& slFlags = QStringList("Scaling"),
                        QWidget *parent = Q_NULLPTR);
 
@@ -152,23 +146,6 @@ public:
     * @return thecurrent set opacity value of this window.
     */
     int getOpacityValue();
-
-    //=========================================================================================================
-    /**
-    * Set total number of detected triggers and trigger types.
-    *
-    * @param [in] totalNumberDetections     The numger of detected triggers
-    * @param [in] mapDetectedTriggers       The currently detected triggers
-    */
-    void setNumberDetectedTriggersAndTypes(int totalNumberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
-
-    //=========================================================================================================
-    /**
-    * Set number of detected triggers.
-    *
-    * @param [in] lTriggerTypes     the trigger types.
-    */
-    void setTriggerTypes(const QList<double>& lTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -205,36 +182,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Slot called when trigger detection check box was toggled
-    */
-    void onRealTimeTriggerActiveChanged(int state);
-
-    //=========================================================================================================
-    /**
-    * Slot called when trigger detection color button was clicked
-    */
-    void onRealTimeTriggerColorChanged(bool state);
-
-    //=========================================================================================================
-    /**
-    * Slot called when trigger detection threshold was changed
-    */
-    void onRealTimeTriggerThresholdChanged(double value);
-
-    //=========================================================================================================
-    /**
-    * Slot called when trigger type changed
-    */
-    void onRealTimeTriggerColorTypeChanged(const QString& value);
-
-    //=========================================================================================================
-    /**
-    * Slot called when trigger channel selection changed
-    */
-    void onRealTimeTriggerCurrentChChanged(const QString &value);
-
-    //=========================================================================================================
-    /**
     * Is called when the minimize or maximize button was pressed.
     *
     * @param [in] state toggle state.
@@ -249,35 +196,11 @@ protected:
 
     //=========================================================================================================
     /**
-    * Slot called when reset number of detected triggers was pressed
-    */
-    void onResetTriggerNumbers();
-
-    //=========================================================================================================
-    /**
     * Call this slot whenever the averages changed.
     */
     void onAveragesChanged();
 
 protected:
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the view group
-    */
-    void createViewGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the color group
-    */
-    void createColorsGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the trigger detection group
-    */
-    void createTriggerDetectionGroup();
-
     //=========================================================================================================
     /**
     * Create the widgets used in the modality group
@@ -304,16 +227,10 @@ protected:
 private:
     QStringList                                         m_slFlags;                      /**< The list holding the current flags. */
 
-    bool                                                m_bProjections;                 /**< Flag for displaying the projection group box. */
-    bool                                                m_bSphara;                      /**< Flag for displaying teh SPHARA group box. */
-    bool                                                m_bView;                        /**< Flag for displaying the view group box. */
-    bool                                                m_bFilter;                      /**< Flag for displaying the filter group box. */
     bool                                                m_bModalitiy;                   /**< Flag for displaying the modality group box. */
     bool                                                m_bCompensator;                 /**< Flag for displaying the compensator group box. */
-    bool                                                m_bTriggerDetection;            /**< Flag for displaying the trigger detection tab in the view group box. */
     bool                                                m_bAverages;                    /**< Flag for displaying the averages group box. */
 
-    QMap<double, QColor>                                m_qMapTriggerColor;             /**< Trigger colors per detected type. */
     QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfo;              /**< Average colors and names. */
     QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfoOld;           /**< Old average colors and names. */
     QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
@@ -321,7 +238,6 @@ private:
 
     QList<DISPLIB::Modality>                            m_qListModalities;              /**< List of different modalities. */
     QList<QCheckBox*>                                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlWidget*                             ui;                             /**< The generated UI file. */
@@ -329,21 +245,9 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the trigger infomration changed.
-    */
-    void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
-
-    //=========================================================================================================
-    /**
     * Emit this signal whenever the user changed the modality.
     */
     void modalitiesChanged(const QList<DISPLIB::Modality>& modalityList);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user pressed the trigger counter.
-    */
-    void resetTriggerCounter();
 
     //=========================================================================================================
     /**
