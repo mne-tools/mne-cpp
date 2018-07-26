@@ -429,14 +429,13 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::distanceTimeSpacerChanged,
                 m_pChannelDataView.data(), &ChannelDataView::distanceTimeSpacerChanged);
 
+        connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
+                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
+
         pChannelDataSettingsView->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
                                                     settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt());
         pChannelDataSettingsView->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
         pChannelDataSettingsView->setSignalBackgroundColors(signal, background);
-
-//        //Handle screenshot signals
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
-//                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
 //        //Handle trigger detection
 //        connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,

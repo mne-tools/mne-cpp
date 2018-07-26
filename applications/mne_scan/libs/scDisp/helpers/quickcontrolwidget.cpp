@@ -87,48 +87,19 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 , m_pFiffInfo(pFiffInfo)
 , m_slFlags(slFlags)
 , m_sName(name)
-, m_pMainLayout(new QGridLayout())
-, m_pGroupBoxLayout(new QGridLayout())
-, m_pButtonLayout(new QGridLayout())
-, m_pGroupBoxWidget(new QWidget())
-, m_pButtonWidget(new QWidget())
 {
-    //ui->setupUi(this);
+    ui->setupUi(this);
 
     //Init opacity slider
-//    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
-//            this, &QuickControlWidget::onOpacityChange);
+    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+            this, &QuickControlWidget::onOpacityChange);
 
-    //Create hide all and close buttons
-    QPushButton* pPushButtonClose = new QPushButton("Close");
-    QPushButton* pPushButtonHideAll = new QPushButton("Hide/Show Controls");
-    pPushButtonHideAll->setCheckable(true);
-    pPushButtonHideAll->setChecked(true);
+    //Init and connect hide all group (minimize) button
+    connect(ui->m_pushButton_hideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &QuickControlWidget::onToggleHideAll);
 
-    m_pButtonLayout->addWidget(pPushButtonClose, 0, 1, 1, 1);
-    m_pButtonLayout->addWidget(pPushButtonHideAll, 0, 0, 1, 1);
-
-    m_pButtonWidget->setLayout(m_pButtonLayout);
-
-//    //Init and connect hide all group (minimize) button
-//    connect(pPushButtonHideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-//            this, &QuickControlWidget::onToggleHideAll);
-
-//    connect(pPushButtonClose, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-//            this, &QuickControlWidget::hide);
-
-    m_pGroupBoxWidget->setLayout(m_pGroupBoxLayout);
-    m_pGroupBoxWidget->setContentsMargins(0,0,0,0);
-
-    m_pMainLayout->addWidget(m_pButtonWidget,0,0);
-    m_pMainLayout->addWidget(m_pGroupBoxWidget,1,0);
-    m_pMainLayout->setContentsMargins(0,0,0,0);
-
-    this->setLayout(m_pMainLayout);
-
-//    //Connect screenshot button
-//    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-//            this, &QuickControlWidget::onMakeScreenshot);
+    connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &QuickControlWidget::hide);
 
 //    if(m_slFlags.contains("triggerdetection", Qt::CaseInsensitive)) {
 //        createTriggerDetectionGroup();
@@ -158,7 +129,7 @@ QuickControlWidget::QuickControlWidget(const FiffInfo::SPtr pFiffInfo,
 //        ui->m_groupBox_other->hide();
 //    }
 
-//    this->adjustSize();
+    this->adjustSize();
 }
 
 
@@ -184,18 +155,11 @@ void QuickControlWidget::addGroupBox(QWidget* pWidget,
     pVBox->addWidget(pWidget);
     pGroupBox->setLayout(pVBox);
 
-    m_pGroupBoxLayout->addWidget(pGroupBox,
-                                 m_pGroupBoxLayout->rowCount(),
+    ui->m_gridLayout_groupBoxes->addWidget(pGroupBox,
+                                 ui->m_gridLayout_groupBoxes->rowCount(),
                                  0);
 }
 
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onOpacityChange(qint32 value)
-{
-    this->setWindowOpacity(1/(100.0/value));
-}
 
 //*************************************************************************************************************
 
@@ -203,14 +167,14 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
                                              QString sGroupBoxName,
                                              QString sTabName)
 {
-    QGroupBox* pGroupBox = m_pGroupBoxWidget->findChild<QGroupBox *>(sGroupBoxName);
+    QGroupBox* pGroupBox = ui->m_widget_groupBoxes->findChild<QGroupBox *>(sGroupBoxName);
 
     if(!pGroupBox) {
         pGroupBox = new QGroupBox(sGroupBoxName);
         pGroupBox->setObjectName(sGroupBoxName);
 
-        m_pGroupBoxLayout->addWidget(pGroupBox,
-                                     m_pGroupBoxLayout->rowCount(),
+        ui->m_gridLayout_groupBoxes->addWidget(pGroupBox,
+                                     ui->m_gridLayout_groupBoxes->rowCount(),
                                      0);
 
         QVBoxLayout *pVBox = new QVBoxLayout;
@@ -227,6 +191,14 @@ void QuickControlWidget::addGroupBoxWithTabs(QWidget* pWidget,
             pTabWidget->addTab(pWidget, sTabName);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onOpacityChange(qint32 value)
+{
+    this->setWindowOpacity(1/(100.0/value));
 }
 
 
@@ -252,21 +224,21 @@ int QuickControlWidget::getOpacityValue()
 
 void QuickControlWidget::setNumberDetectedTriggersAndTypes(int numberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers)
 {
-    if(m_bTriggerDetection) {
-        ui->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
-    }
+//    if(m_bTriggerDetection) {
+//        ui->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
+//    }
 
-    //Set trigger types
-    QMapIterator<int,QList<QPair<int,double> > > i(mapDetectedTriggers);
-    while (i.hasNext()) {
-        i.next();
+//    //Set trigger types
+//    QMapIterator<int,QList<QPair<int,double> > > i(mapDetectedTriggers);
+//    while (i.hasNext()) {
+//        i.next();
 
-        for(int j = 0; j < i.value().size(); ++j) {
-            if(ui->m_comboBox_triggerColorType->findText(QString::number(i.value().at(j).second)) == -1) {
-                ui->m_comboBox_triggerColorType->addItem(QString::number(i.value().at(j).second));
-            }
-        }
-    }
+//        for(int j = 0; j < i.value().size(); ++j) {
+//            if(ui->m_comboBox_triggerColorType->findText(QString::number(i.value().at(j).second)) == -1) {
+//                ui->m_comboBox_triggerColorType->addItem(QString::number(i.value().at(j).second));
+//            }
+//        }
+//    }
 }
 
 
@@ -323,9 +295,9 @@ QMap<double, QPair<QColor, QPair<QString,bool> > > QuickControlWidget::getAverag
 
 void QuickControlWidget::onRealTimeTriggerActiveChanged(int state)
 {
-    Q_UNUSED(state);
+//    Q_UNUSED(state);
 
-    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
+//    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -333,19 +305,19 @@ void QuickControlWidget::onRealTimeTriggerActiveChanged(int state)
 
 void QuickControlWidget::onRealTimeTriggerColorChanged(bool state)
 {
-    Q_UNUSED(state);
+//    Q_UNUSED(state);
 
-    QColor color = QColorDialog::getColor(m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()], this, "Set trigger color");
+//    QColor color = QColorDialog::getColor(m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()], this, "Set trigger color");
 
-    //Change color of pushbutton
-    QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,color);
-    ui->m_pushButton_triggerColor->setPalette(*palette1);
-    ui->m_pushButton_triggerColor->update();
+//    //Change color of pushbutton
+//    QPalette* palette1 = new QPalette();
+//    palette1->setColor(QPalette::Button,color);
+//    ui->m_pushButton_triggerColor->setPalette(*palette1);
+//    ui->m_pushButton_triggerColor->update();
 
-    m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()] = color;
+//    m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()] = color;
 
-    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
+//    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -353,9 +325,9 @@ void QuickControlWidget::onRealTimeTriggerColorChanged(bool state)
 
 void QuickControlWidget::onRealTimeTriggerThresholdChanged(double value)
 {
-    Q_UNUSED(value);
+//    Q_UNUSED(value);
 
-    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
+//    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -363,11 +335,11 @@ void QuickControlWidget::onRealTimeTriggerThresholdChanged(double value)
 
 void QuickControlWidget::onRealTimeTriggerColorTypeChanged(const QString &value)
 {
-    //Change color of pushbutton
-    QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value.toDouble()]);
-    ui->m_pushButton_triggerColor->setPalette(*palette1);
-    ui->m_pushButton_triggerColor->update();
+//    //Change color of pushbutton
+//    QPalette* palette1 = new QPalette();
+//    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value.toDouble()]);
+//    ui->m_pushButton_triggerColor->setPalette(*palette1);
+//    ui->m_pushButton_triggerColor->update();
 }
 
 
@@ -375,7 +347,7 @@ void QuickControlWidget::onRealTimeTriggerColorTypeChanged(const QString &value)
 
 void QuickControlWidget::onRealTimeTriggerCurrentChChanged(const QString &value)
 {
-    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
+//    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -383,7 +355,8 @@ void QuickControlWidget::onRealTimeTriggerCurrentChChanged(const QString &value)
 
 void QuickControlWidget::onToggleHideAll(bool state)
 {
-    m_pGroupBoxWidget->setVisible(state);
+    ui->m_widget_groupBoxes->setVisible(state);
+    ui->m_widget_opacity->setVisible(state);
     this->adjustSize();
 }
 
@@ -412,20 +385,11 @@ void QuickControlWidget::onUpdateModalityCheckbox(qint32 state)
 
 void QuickControlWidget::onResetTriggerNumbers()
 {
-    ui->m_label_numberDetectedTriggers->setText(QString("0"));
+//    ui->m_label_numberDetectedTriggers->setText(QString("0"));
 
-    emit resetTriggerCounter();
+//    emit resetTriggerCounter();
 
-    emit updateConnectedView();
-}
-
-
-//*************************************************************************************************************
-
-void QuickControlWidget::onMakeScreenshot()
-{
-    qDebug()<<ui->m_comboBox_imageType->currentText();
-    emit makeScreenshot(ui->m_comboBox_imageType->currentText());
+//    emit updateConnectedView();
 }
 
 
@@ -466,40 +430,40 @@ void QuickControlWidget::onAveragesChanged()
 
 void QuickControlWidget::createTriggerDetectionGroup()
 {
-    //Trigger detection
-    connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-            this, &QuickControlWidget::onRealTimeTriggerActiveChanged);
+//    //Trigger detection
+//    connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
+//            this, &QuickControlWidget::onRealTimeTriggerActiveChanged);
 
-    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
-            ui->m_comboBox_triggerChannels->addItem(m_pFiffInfo->chs[i].ch_name);
-        }
-    }
+//    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+//        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+//            ui->m_comboBox_triggerChannels->addItem(m_pFiffInfo->chs[i].ch_name);
+//        }
+//    }
 
-    connect(ui->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &QuickControlWidget::onRealTimeTriggerCurrentChChanged);
+//    connect(ui->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+//            this, &QuickControlWidget::onRealTimeTriggerCurrentChChanged);
 
-    connect(ui->m_comboBox_triggerColorType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &QuickControlWidget::onRealTimeTriggerColorTypeChanged);
+//    connect(ui->m_comboBox_triggerColorType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+//            this, &QuickControlWidget::onRealTimeTriggerColorTypeChanged);
 
-    connect(ui->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::onRealTimeTriggerColorChanged);
+//    connect(ui->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+//            this, &QuickControlWidget::onRealTimeTriggerColorChanged);
 
-    ui->m_pushButton_triggerColor->setAutoFillBackground(true);
-    ui->m_pushButton_triggerColor->setFlat(true);
-    QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,QColor(177,0,0));
-    ui->m_pushButton_triggerColor->setPalette(*palette1);
-    ui->m_pushButton_triggerColor->update();
+//    ui->m_pushButton_triggerColor->setAutoFillBackground(true);
+//    ui->m_pushButton_triggerColor->setFlat(true);
+//    QPalette* palette1 = new QPalette();
+//    palette1->setColor(QPalette::Button,QColor(177,0,0));
+//    ui->m_pushButton_triggerColor->setPalette(*palette1);
+//    ui->m_pushButton_triggerColor->update();
 
-    connect(ui->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &QuickControlWidget::onRealTimeTriggerThresholdChanged);
+//    connect(ui->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+//            this, &QuickControlWidget::onRealTimeTriggerThresholdChanged);
 
-    connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this, &QuickControlWidget::onRealTimeTriggerThresholdChanged);
+//    connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//                this, &QuickControlWidget::onRealTimeTriggerThresholdChanged);
 
-    connect(ui->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::onResetTriggerNumbers);
+//    connect(ui->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+//            this, &QuickControlWidget::onResetTriggerNumbers);
 }
 
 
@@ -507,63 +471,63 @@ void QuickControlWidget::createTriggerDetectionGroup()
 
 void QuickControlWidget::createModalityGroup()
 {
-    m_qListModalities.clear();
-    bool hasMag = false;
-    bool hasGrad = false;
-    bool hasEEG = false;
-    bool hasEOG = false;
-    bool hasMISC = false;
-    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
-    {
-        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
-        {
-            if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
-                hasMag = true;
-            else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
-                hasGrad = true;
-        }
-        else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
-            hasEEG = true;
-        else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
-            hasEOG = true;
-        else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
-            hasMISC = true;
-    }
+//    m_qListModalities.clear();
+//    bool hasMag = false;
+//    bool hasGrad = false;
+//    bool hasEEG = false;
+//    bool hasEOG = false;
+//    bool hasMISC = false;
+//    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+//    {
+//        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+//        {
+//            if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
+//                hasMag = true;
+//            else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
+//                hasGrad = true;
+//        }
+//        else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
+//            hasEEG = true;
+//        else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
+//            hasEOG = true;
+//        else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
+//            hasMISC = true;
+//    }
 
-    bool sel = true;
-    float val = 1e-11f;
+//    bool sel = true;
+//    float val = 1e-11f;
 
-    if(hasMag)
-        m_qListModalities.append(Modality("MAG",sel,val));
-    if(hasGrad)
-        m_qListModalities.append(Modality("GRAD",sel,val));
-    if(hasEEG)
-        m_qListModalities.append(Modality("EEG",false,val));
-    if(hasEOG)
-        m_qListModalities.append(Modality("EOG",false,val));
-    if(hasMISC)
-        m_qListModalities.append(Modality("MISC",false,val));
+//    if(hasMag)
+//        m_qListModalities.append(Modality("MAG",sel,val));
+//    if(hasGrad)
+//        m_qListModalities.append(Modality("GRAD",sel,val));
+//    if(hasEEG)
+//        m_qListModalities.append(Modality("EEG",false,val));
+//    if(hasEOG)
+//        m_qListModalities.append(Modality("EOG",false,val));
+//    if(hasMISC)
+//        m_qListModalities.append(Modality("MISC",false,val));
 
-    QGridLayout* t_pGridLayout = new QGridLayout;
+//    QGridLayout* t_pGridLayout = new QGridLayout;
 
-    for(qint32 i = 0; i < m_qListModalities.size(); ++i)
-    {
-        QString mod = m_qListModalities[i].m_sName;
+//    for(qint32 i = 0; i < m_qListModalities.size(); ++i)
+//    {
+//        QString mod = m_qListModalities[i].m_sName;
 
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+//        QLabel* t_pLabelModality = new QLabel;
+//        t_pLabelModality->setText(mod);
+//        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
-        QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
-        m_qListModalityCheckBox << t_pCheckBoxModality;
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
-                this,&QuickControlWidget::onUpdateModalityCheckbox);
-        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
-    }
+//        QCheckBox* t_pCheckBoxModality = new QCheckBox;
+//        t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
+//        m_qListModalityCheckBox << t_pCheckBoxModality;
+//        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
+//                this,&QuickControlWidget::onUpdateModalityCheckbox);
+//        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
+//    }
 
-    //Find Modalities tab and add current layout
-    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")->setLayout(t_pGridLayout);
+//    //Find Modalities tab and add current layout
+//    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Modalities")->setLayout(t_pGridLayout);
 }
 
 
@@ -571,48 +535,48 @@ void QuickControlWidget::createModalityGroup()
 
 void QuickControlWidget::createAveragesGroup()
 {
-    //Delete all widgets in the averages layout
-    QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->layout());
-    if(!topLayout) {
-       topLayout = new QGridLayout();
-    }
+//    //Delete all widgets in the averages layout
+//    QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->layout());
+//    if(!topLayout) {
+//       topLayout = new QGridLayout();
+//    }
 
-    QLayoutItem *child;
-    while ((child = topLayout->takeAt(0)) != 0) {
-        delete child->widget();
-        delete child;
-    }
+//    QLayoutItem *child;
+//    while ((child = topLayout->takeAt(0)) != 0) {
+//        delete child->widget();
+//        delete child;
+//    }
 
-    //Set trigger types
-    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageInfo);
-    int count = 0;
-    m_qMapButtonAverageType.clear();
-    m_qMapChkBoxAverageType.clear();
+//    //Set trigger types
+//    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageInfo);
+//    int count = 0;
+//    m_qMapButtonAverageType.clear();
+//    m_qMapChkBoxAverageType.clear();
 
-    while (i.hasNext()) {
-        i.next();
+//    while (i.hasNext()) {
+//        i.next();
 
-        //Create average checkbox
-        QCheckBox* pCheckBox = new QCheckBox(i.value().second.first);
-        pCheckBox->setChecked(i.value().second.second);
-        topLayout->addWidget(pCheckBox, count, 0);
-        connect(pCheckBox, &QCheckBox::clicked,
-                this, &QuickControlWidget::onAveragesChanged);
-        m_qMapChkBoxAverageType.insert(pCheckBox, i.value().second.first.toDouble());
+//        //Create average checkbox
+//        QCheckBox* pCheckBox = new QCheckBox(i.value().second.first);
+//        pCheckBox->setChecked(i.value().second.second);
+//        topLayout->addWidget(pCheckBox, count, 0);
+//        connect(pCheckBox, &QCheckBox::clicked,
+//                this, &QuickControlWidget::onAveragesChanged);
+//        m_qMapChkBoxAverageType.insert(pCheckBox, i.value().second.first.toDouble());
 
-        //Create average color pushbutton
-        QPushButton* pButton = new QPushButton();
-        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().first.red()).arg(i.value().first.green()).arg(i.value().first.blue()));
-        topLayout->addWidget(pButton, count, 1);
-        connect(pButton, &QPushButton::clicked,
-                this, &QuickControlWidget::onAveragesChanged);
-        m_qMapButtonAverageType.insert(pButton, i.value().second.first.toDouble());
+//        //Create average color pushbutton
+//        QPushButton* pButton = new QPushButton();
+//        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().first.red()).arg(i.value().first.green()).arg(i.value().first.blue()));
+//        topLayout->addWidget(pButton, count, 1);
+//        connect(pButton, &QPushButton::clicked,
+//                this, &QuickControlWidget::onAveragesChanged);
+//        m_qMapButtonAverageType.insert(pButton, i.value().second.first.toDouble());
 
-        ++count;
-    }
+//        ++count;
+//    }
 
-    //Find Filter tab and add current layout
-    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->setLayout(topLayout);
+//    //Find Filter tab and add current layout
+//    this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Averages")->setLayout(topLayout);
 }
 
 
