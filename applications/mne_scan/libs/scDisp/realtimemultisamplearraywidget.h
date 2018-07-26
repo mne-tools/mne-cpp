@@ -143,7 +143,7 @@ public:
     */
     virtual void init();
 
-private slots:
+private:
     //=========================================================================================================
     /**
     * Shows the filter widget
@@ -170,17 +170,23 @@ private slots:
     */
     void onMakeScreenshot(const QString& imageType);
 
+    //=========================================================================================================
+    /**
+    * Toggle bad channel visibility
+    */
     void onHideBadChannels();
 
 private:
-    QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
     QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
+
+    QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
     QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;            /**< channel info model. */
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::FilterView>                     m_pFilterWindow;                /**< Filter window. */
+    QPointer<DISPLIB::ChannelDataView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
+
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QPointer<DISPLIB::ChannelDataView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
     QPointer<QAction>                                       m_pActionSelectSensors;         /**< show roi select widget */
     QPointer<QAction>                                       m_pActionHideBad;               /**< Hide bad channels. */
     QPointer<QAction>                                       m_pActionQuickControl;          /**< Show quick control widget. */
