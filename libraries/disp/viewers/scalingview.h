@@ -115,9 +115,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Update the selection.
-    *
-    * @param [in] state    The state (unused).
+    * Init the view
     */
     void init(const QMap<qint32, float> &qMapChScaling);
 

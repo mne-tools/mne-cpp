@@ -55,7 +55,6 @@
 #include <disp/viewers/channeldatasettingsview.h>
 #include <disp/viewers/averageselectionview.h>
 
-
 #include <scMeas/realtimeevokedset.h>
 
 #include <utils/filterTools/filterdata.h>
