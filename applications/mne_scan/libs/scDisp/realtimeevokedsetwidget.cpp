@@ -452,7 +452,10 @@ void RealTimeEvokedSetWidget::init()
         m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
         connect(pScalingView, &ScalingView::scalingChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);        
+                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pButterflyView.data(), &ButterflyView::updateView);
 
         connect(pScalingView, &ScalingView::scalingChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
@@ -465,6 +468,9 @@ void RealTimeEvokedSetWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
+        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+                m_pButterflyView.data(), &ButterflyView::updateView);
+
         //Activate projectors by default
         m_pEvokedSetModel->updateProjection();
 
@@ -475,6 +481,9 @@ void RealTimeEvokedSetWidget::init()
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
+
+        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+                m_pButterflyView.data(), &ButterflyView::updateView);
 
         // Quick control filter settings
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
