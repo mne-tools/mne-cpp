@@ -113,6 +113,7 @@ SOURCES += \
     viewers/filtersettingsview.cpp \
     viewers/spharasettingsview.cpp \
     viewers/channeldatasettingsview.cpp \
+    viewers/averageselectionview.cpp \
     viewers/triggerdetectionview.cpp \
     viewers/quickcontrolview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
@@ -153,6 +154,7 @@ HEADERS += \
     viewers/filtersettingsview.h \
     viewers/spharasettingsview.h \
     viewers/channeldatasettingsview.h \
+    viewers/averageselectionview.h \
     viewers/triggerdetectionview.h \
     viewers/quickcontrolview.h \
     viewers/helpers/evokedsetmodel.h \

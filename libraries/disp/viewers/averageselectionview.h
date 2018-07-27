@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagelayoutview.cpp
+* @file     averageselectionview.h
 * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the AverageLayoutView Class.
+* @brief    Declaration of the AverageSelectionView Class.
 *
 */
 
-#ifndef AVERAGELAYOUTVIEW_H
-#define AVERAGELAYOUTVIEW_H
+#ifndef AVERAGESELECTIONVIEW_H
+#define AVERAGESELECTIONVIEW_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,8 +51,13 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QPointer>
 #include <QMap>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -59,12 +65,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QGraphicsView;
-class QGraphicsItem;
+class QPushButton;
+class QCheckBox;
 
-namespace FIFFLIB {
-    class FiffInfo;
-}
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -81,132 +89,83 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class AverageScene;
-class EvokedSetModel;
-class ChannelInfoModel;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS AverageLayoutView
+* DECLARE CLASS AverageSelectionView
 *
-* @brief The AverageLayoutView class provides a widget for a 2D average layout
+* @brief The AverageSelectionView class provides a view to select different averages
 */
-class DISPSHARED_EXPORT AverageLayoutView : public QWidget
+class DISPSHARED_EXPORT AverageSelectionView : public QWidget
 {
     Q_OBJECT
 
 public:    
-    typedef QSharedPointer<AverageLayoutView> SPtr;              /**< Shared pointer type for AverageLayoutView. */
-    typedef QSharedPointer<const AverageLayoutView> ConstSPtr;   /**< Const shared pointer type for AverageLayoutView. */
+    typedef QSharedPointer<AverageSelectionView> SPtr;              /**< Shared pointer type for AverageSelectionView. */
+    typedef QSharedPointer<const AverageSelectionView> ConstSPtr;   /**< Const shared pointer type for AverageSelectionView. */
 
     //=========================================================================================================
     /**
-    * Constructs a AverageLayoutView which is a child of parent.
+    * Constructs a AverageSelectionView which is a child of parent.
     *
-    * @param [in] parent    parent of widget
+    * @param [in] parent        parent of widget
     */
-    AverageLayoutView(QWidget *parent = 0,
-                      Qt::WindowFlags f = Qt::Widget);
+    AverageSelectionView(QWidget *parent = 0,
+                Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Sets the fiff info.
-    *
-    * @param [in] pFiffInfo     The new FiffInfo.
+    * Init the view
     */
-    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &pFiffInfo);
+    void init();
 
     //=========================================================================================================
     /**
-    * Sets the channel info model.
+    * Set the old average map which holds the inforamtion about the calcuated averages.
     *
-    * @param [in] pChannelInfoModel     The new channel info model.
+    * @param [in] qMapAverageInfoOld     the old average info map.
     */
-    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
+    void setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld);
 
     //=========================================================================================================
     /**
-    * Sets the evoked set model.
+    * Set the average map which holds the inforamtion about the currently calcuated averages.
     *
-    * @param [in] pEvokedSetModel     The new evoked set model.
+    * @param [in] qMapAverageColor     the average map.
     */
-    void setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel);
+    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor);
 
     //=========================================================================================================
     /**
-    * Sets the background color of the scene.
+    * Create list of channels which are to be filtered based on channel names
     *
-    * @param [in] backgroundColor     The new background color.
-    */
-    void setBackgroundColor(const QColor& backgroundColor);
-
-    //=========================================================================================================
-    /**
-    * Returns the background color of the scene.
-    *
-    * @return     The current background color.
-    */
-    QColor getBackgroundColor();
-
-    //=========================================================================================================
-    /**
-    * Renders a screenshot of the scene and saves it to the passed path. SVG and PNG supported.
-    *
-    * @param [in] fileName     The file name and path where to store the screenshot.
-    */
-    void takeScreenshot(const QString& fileName);
-
-    //=========================================================================================================
-    /**
-    * Sets the scale map to scaleMap.
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value.
-    */
-    void setScaleMap(const QMap<qint32, float> &scaleMap);
-
-    //=========================================================================================================
-    /**
-    * Set the average map information
-    *
-    * @param [in] mapAvr     The average data information including the color per average type.
-    */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
-
-    //=========================================================================================================
-    /**
-    * Returns the average map information
-    *
-    * @return     The current average data information including the color per average type.
+    * @return the average information map
     */
     QMap<double, QPair<QColor, QPair<QString,bool> > > getAverageInformationMap();
 
-    //=========================================================================================================
-    /**
-    * call this whenever the external channel selection manager changes
-    *
-    * * @param [in] selectedChannelItems list of selected graphic items
-    */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
-
-    //=========================================================================================================
-    /**
-    * call this function whenever the items' data needs to be updated
-    */
-    void updateData();
-
 protected:
-    QSharedPointer<AverageScene>                        m_pAverageScene;            /**< The pointer to the average scene. */
-    QPointer<QGraphicsView>                             m_pAverageLayoutView;       /**< View for 2D average layout scene */
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the averages changed.
+    */
+    void onAveragesChanged();
 
-    QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< The data model */
-    QSharedPointer<DISPLIB::ChannelInfoModel>                m_pChannelInfoModel;             /**< Channel info model. */
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfo;              /**< Average colors and names. */
+    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfoOld;           /**< Old average colors and names. */
+    QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
+    QMap<QPushButton*, double>                          m_qMapButtonAverageType;        /**< Push button to average type map. */
 
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_averageInfos;             /**< The average information */
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user wants to make a screenshot.
+    *
+    * @param[out] map     The current average map.
+    */
+    void averageInformationChanged(const QMap<double, QPair<QColor, QPair<QString,bool> > >& map);
 
 };
 
 } // NAMESPACE
 
-#endif // AVERAGELAYOUTVIEW_H
+#endif // AVERAGESELECTIONVIEW_H
