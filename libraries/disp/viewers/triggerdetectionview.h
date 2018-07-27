@@ -99,7 +99,7 @@ namespace DISPLIB
 /**
 * DECLARE CLASS TriggerDetectionView
 *
-* @brief The TriggerDetectionView class provides a view to select the SPHARA settings
+* @brief The TriggerDetectionView class provides a view to control the trigger detection
 */
 class DISPSHARED_EXPORT TriggerDetectionView : public QWidget
 {

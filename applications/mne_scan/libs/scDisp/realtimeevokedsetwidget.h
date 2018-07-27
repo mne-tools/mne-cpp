@@ -75,7 +75,6 @@ namespace FIFFLIB {
 namespace DISPLIB {
     class EvokedSetModel;
     class ButterflyView;
-    class AverageScene;
     class ChannelSelectionView;
     class ChannelInfoModel;
     class FilterView;
@@ -86,8 +85,6 @@ namespace DISPLIB {
 class QVBoxLayout;
 class QLabel;
 class QToolBox;
-class QGraphicsView;
-class QGraphicsItem;
 
 
 //*************************************************************************************************************
@@ -201,9 +198,9 @@ private:
 
     QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */
     QSharedPointer<SCMEASLIB::RealTimeEvokedSet>        m_pRTESet;                  /**< The real-time evoked measurement. */
-    QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;      /**< Quick control widget. */
+    QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;        /**< Quick control widget. */
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
-    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;             /**< Channel info model. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
