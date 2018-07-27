@@ -438,12 +438,12 @@ Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc)
 template<typename T>
 Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat, bool desc)
 {
-    VectorXi idx = MNEMath::sort<T>(v_prime, desc);
+    Eigen::VectorXi idx = MNEMath::sort<T>(v_prime, desc);
 
     if(v_prime.size() > 0)
     {
         //sort Matrix
-        Matrix<T, Dynamic, Dynamic> newMat(mat.rows(), mat.cols());
+        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> newMat(mat.rows(), mat.cols());
         for(qint32 i = 0; i < idx.size(); ++i)
             newMat.col(i) = mat.col(idx[i]);
         mat = newMat;
@@ -458,7 +458,7 @@ Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eige
 template<typename T>
 std::vector<Eigen::Triplet<T> > MNEMath::sortrows(const std::vector<Eigen::Triplet<T> > &A, qint32 column)
 {
-    std::vector<Triplet<T> > p_ASorted;
+    std::vector<Eigen::Triplet<T> > p_ASorted;
 
     for(quint32 i = 0; i < A.size(); ++i)
         p_ASorted.push_back(A[i]);
