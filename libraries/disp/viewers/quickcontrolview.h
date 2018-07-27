@@ -157,30 +157,6 @@ public:
     */
     int getOpacityValue();
 
-    //=========================================================================================================
-    /**
-    * Set the old average map which holds the inforamtion about the calcuated averages.
-    *
-    * @param [in] qMapAverageInfoOld     the old average info map.
-    */
-    void setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld);
-
-    //=========================================================================================================
-    /**
-    * Set the average map which holds the inforamtion about the currently calcuated averages.
-    *
-    * @param [in] qMapAverageColor     the average map.
-    */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor);
-
-    //=========================================================================================================
-    /**
-    * Create list of channels which are to be filtered based on channel names
-    *
-    * @return the average information map
-    */
-    QMap<double, QPair<QColor, QPair<QString,bool> > > getAverageInformationMap();
-
 protected:
     //=========================================================================================================
     /**
@@ -198,51 +174,12 @@ protected:
     */
     void onToggleHideAll(bool state);
 
-    //=========================================================================================================
-    /**
-    * Call this slot whenever the averages changed.
-    */
-    void onAveragesChanged();
-
-protected:
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the modality group
-    */
-    void createModalityGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the averages group
-    */
-    void createAveragesGroup();
-
-private:    
-    bool                                                m_bCompensator;                 /**< Flag for displaying the compensator group box. */
-    bool                                                m_bAverages;                    /**< Flag for displaying the averages group box. */
-
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfo;              /**< Average colors and names. */
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfoOld;           /**< Old average colors and names. */
-    QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
-    QMap<QPushButton*, double>                          m_qMapButtonAverageType;        /**< Push button to average type map. */
-
+private:       
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlViewWidget*                         ui;                             /**< The generated UI file. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
-    */
-    void updateConnectedView();
 
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user wants to make a screenshot.
-    *
-    * @param[out] map     The current average map.
-    */
-    void averageInformationChanged(const QMap<double, QPair<QColor, QPair<QString,bool> > >& map);
 };
 
 } // NAMESPACE DISPLIB

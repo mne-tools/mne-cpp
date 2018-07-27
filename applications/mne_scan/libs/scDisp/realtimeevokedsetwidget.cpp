@@ -53,6 +53,8 @@
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/modalityselectionview.h>
 #include <disp/viewers/channeldatasettingsview.h>
+#include <disp/viewers/averageselectionview.h>
+
 
 #include <scMeas/realtimeevokedset.h>
 
@@ -235,9 +237,9 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
         }
 
         //Store average colors per type
-        if(m_pEvokedSetModel) {
+        if(m_pAverageLayoutView) {
             QVariant data;
-            SCDISPLIB::AverageInfoMap avrMap = m_pQuickControlView->getAverageInformationMap();
+            SCDISPLIB::AverageInfoMap avrMap = m_pAverageLayoutView->getAverageInformationMap();
             data.setValue(avrMap);
             settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data);
         }
@@ -395,7 +397,6 @@ void RealTimeEvokedSetWidget::init()
             }
         }
 
-        m_pButterflyView->setModalities(qListModalities);
         m_pEvokedSetModel->setScaling(qMapChScaling);
 
         //Init filter window
@@ -433,6 +434,12 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pChannelInfoModel.data(), &ChannelInfoModel::channelsMappedToLayout,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
+                m_pButterflyView.data(), &ButterflyView::showSelectedChannelsOnly);
+
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
+                m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
+
         m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
@@ -446,7 +453,10 @@ void RealTimeEvokedSetWidget::init()
         m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
         connect(pScalingView, &ScalingView::scalingChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
+                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);        
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
 
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView();
@@ -500,35 +510,32 @@ void RealTimeEvokedSetWidget::init()
         // Quick control channel data settings
         ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView();
         pModalitySelectionView->init(m_pFiffInfo);
-        //pModalitySelectionView->setModalities(qListModalities);
+        pModalitySelectionView->setModalities(qListModalities);
         m_pQuickControlView->addGroupBoxWithTabs(pModalitySelectionView, "Other", "Modalities");
 
         connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
                 m_pButterflyView.data(), &ButterflyView::setModalities);
 
-        //Init butterfly and layout plot
-        //Connect selection manager with average manager
-        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
-
-        connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::updateData);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
+        // Quick control average selection
+        AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
+        pAverageSelectionView->init();
+        m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Other", "Averages");
 
         //Handle averages
         connect(this->m_pEvokedSetModel.data(), &EvokedSetModel::newAverageTypeReceived,
-                m_pQuickControlView.data(), &QuickControlView::setAverageInformationMap);
+                pAverageSelectionView, &AverageSelectionView::setAverageInformationMap);
 
-        connect(m_pQuickControlView.data(), &QuickControlView::averageInformationChanged,
+        connect(pAverageSelectionView, &AverageSelectionView::averageInformationChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setAverageInformationMap);
 
-        connect(m_pQuickControlView.data(), &QuickControlView::averageInformationChanged,
+        connect(pAverageSelectionView, &AverageSelectionView::averageInformationChanged,
                 m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
 
-        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pButterflyView.data(), &ButterflyView::showSelectedChannelsOnly);
+        QVariant data;
+        QMap<double, QPair<QColor, QPair<QString,bool> > > emptyMap;
+        data.setValue(emptyMap);
+        SCDISPLIB::AverageInfoMap map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data).value<SCDISPLIB::AverageInfoMap>();
+        pAverageSelectionView->setAverageInformationMapOld(map);
 
         m_pButterflyView->setModel(m_pEvokedSetModel);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
@@ -538,12 +545,6 @@ void RealTimeEvokedSetWidget::init()
         m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
         m_pAverageLayoutView->setScaleMap(m_pEvokedSetModel->getScaling());
-
-        QVariant data;
-        QMap<double, QPair<QColor, QPair<QString,bool> > > emptyMap;
-        data.setValue(emptyMap);
-        SCDISPLIB::AverageInfoMap map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data).value<SCDISPLIB::AverageInfoMap>();
-        m_pQuickControlView->setAverageInformationMapOld(map);
 
         m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
         m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());

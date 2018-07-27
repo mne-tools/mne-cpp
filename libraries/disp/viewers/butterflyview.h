@@ -242,10 +242,10 @@ private:
 
     QList<int>  m_lSelectedChannels;            /**< The currently selected channels */
 
-    QList<DISPLIB::Modality>            m_qListModalities;                          /**< The list of currently selected modalities */
+    QList<DISPLIB::Modality>                m_qListModalities;                      /**< The list of currently selected modalities */
 
-    QSharedPointer<EvokedSetModel>      m_pEvokedModel;                             /**< The evoked model */
-    QSharedPointer<ChannelInfoModel>         m_pChannelInfoModel;                             /**< The channel info model */
+    QSharedPointer<EvokedSetModel>          m_pEvokedModel;                         /**< The evoked model */
+    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;                    /**< The channel info model */
 
     QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;     /**< The current average color information. */
 };
