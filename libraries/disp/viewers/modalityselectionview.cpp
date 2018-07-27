@@ -48,7 +48,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
 #include <QGridLayout>
 #include <QCheckBox>
 
@@ -88,14 +87,17 @@ ModalitySelectionView::ModalitySelectionView(QWidget *parent,
 void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
 {
     m_qListModalities.clear();
-    bool hasMEG = false;
+    bool hasMAG = false;
+    bool hasGRAD = false;
     bool hasEEG = false;
     bool hasEOG = false;
     bool hasMISC = false;
     for(qint32 i = 0; i < modalityList.size(); ++i)
     {
-        if(modalityList.at(i).m_sName.contains("MEG"))
-            hasMEG = true;
+        if(modalityList.at(i).m_sName.contains("MAG"))
+            hasMAG = true;
+        if(modalityList.at(i).m_sName.contains("GRAD"))
+            hasGRAD = true;
         else if(modalityList.at(i).m_sName.contains("EEG"))
             hasEEG = true;
         else if(modalityList.at(i).m_sName.contains("EOG"))
@@ -107,8 +109,10 @@ void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
     bool sel = true;
     float val = 1e-11f;
 
-    if(hasMEG)
-        m_qListModalities.append(Modality("MEG",sel,val));
+    if(hasMAG)
+        m_qListModalities.append(Modality("MAG",sel,val));
+    if(hasGRAD)
+        m_qListModalities.append(Modality("GRAD",sel,val));
     if(hasEEG)
         m_qListModalities.append(Modality("EEG",false,val));
     if(hasEOG)
@@ -189,12 +193,9 @@ void ModalitySelectionView::init(const FiffInfo::SPtr pFiffInfo)
         {
             QString mod = m_qListModalities[i].m_sName;
 
-            QLabel* t_pLabelModality = new QLabel;
-            t_pLabelModality->setText(mod);
-            t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
-
-            QCheckBox* t_pCheckBoxModality = new QCheckBox;
+            QCheckBox* t_pCheckBoxModality = new QCheckBox();
             t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
+            t_pCheckBoxModality->setText(mod);
             m_qListModalityCheckBox << t_pCheckBoxModality;
             connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
                     this,&ModalitySelectionView::onUpdateModalityCheckbox);
@@ -214,6 +215,7 @@ void ModalitySelectionView::setModalities(const QList<Modality> &lModalities)
     for(int i = 0; i < m_qListModalityCheckBox.size(); i++) {
         for(int j = 0; j < lModalities.size(); j++) {
             if(m_qListModalityCheckBox.at(i)->text().contains(lModalities.at(j).m_sName)) {
+                qDebug()<<"ModalitySelectionView::setModalities - Set "<<lModalities.at(j).m_sName<<"to"<<lModalities.at(j).m_bActive;
                 m_qListModalityCheckBox.at(i)->setChecked(lModalities.at(j).m_bActive);
             }
         }
