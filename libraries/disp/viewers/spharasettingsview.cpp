@@ -75,24 +75,6 @@ SpharaSettingsView::SpharaSettingsView(QWidget *parent,
 {
     ui->setupUi(this);
 
-    this->setWindowTitle("SPHARA Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
-}
-
-
-//*************************************************************************************************************
-
-SpharaSettingsView::~SpharaSettingsView()
-{
-    delete ui;
-}
-
-
-//*************************************************************************************************************
-
-void SpharaSettingsView::init()
-{
     //Sphara activation changed
     connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &SpharaSettingsView::onSpharaButtonClicked);
@@ -106,6 +88,18 @@ void SpharaSettingsView::init()
 
     connect(ui->m_spinBox_spharaSecond, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &SpharaSettingsView::onSpharaOptionsChanged);
+
+    this->setWindowTitle("SPHARA Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
+}
+
+
+//*************************************************************************************************************
+
+SpharaSettingsView::~SpharaSettingsView()
+{
+    delete ui;
 }
 
 

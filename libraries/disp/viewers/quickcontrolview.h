@@ -122,6 +122,15 @@ public:
     * @param [in] pWidget           The widgets which will be put into the new group box.
     * @param [in] sGroupBoxName     The name of the new group box.
     */
+    void addWidget(QWidget* pWidget);
+
+    //=========================================================================================================
+    /**
+    * Add a new group box to this Widget. Takes ownership of the passed widget.
+    *
+    * @param [in] pWidget           The widgets which will be put into the new group box.
+    * @param [in] sGroupBoxName     The name of the new group box.
+    */
     void addGroupBox(QWidget* pWidget,
                         QString sGroupBoxName);
 

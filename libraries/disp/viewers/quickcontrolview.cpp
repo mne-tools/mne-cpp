@@ -98,6 +98,16 @@ QuickControlView::~QuickControlView()
 
 //*************************************************************************************************************
 
+void QuickControlView::addWidget(QWidget* pWidget)
+{
+    ui->m_gridLayout_groupBoxes->addWidget(pWidget,
+                                 ui->m_gridLayout_groupBoxes->rowCount(),
+                                 0);
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlView::addGroupBox(QWidget* pWidget,
                                      QString sGroupBoxName)
 {

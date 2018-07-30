@@ -76,6 +76,10 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
+namespace DISPLIB {
+    class ConnectivitySettingsView;
+}
+
 namespace SCMEASLIB {
     class RealTimeSourceEstimate;
     class RealTimeMultiSampleArray;
@@ -162,14 +166,15 @@ protected:
     */
     virtual void run();
 
-    void showYourWidget();
+    void onMetricChanged(const QString &sMetric);
 
 private:
-    bool                                                                            m_bIsRunning;                   /**< Flag whether thread is running.*/
-    qint32                                                                          m_iDownSample;                  /**< Sampling rate */
+    bool                m_bIsRunning;                   /**< Flag whether thread is running.*/
+    qint32              m_iDownSample;                  /**< Sampling rate */
+    QString             m_sMetric;                      /**< The current metric */
 
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<NeuronalConnectivityYourWidget>                                  m_pYourWidget;                  /**< flag whether thread is running.*/
+    QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view.*/
     QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
 
     QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/

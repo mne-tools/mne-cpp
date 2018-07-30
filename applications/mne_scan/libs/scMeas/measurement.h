@@ -125,6 +125,7 @@ public:
     */
     inline int type() const;
 
+    QList<QWidget*>   m_lControlWidgets;
 signals:
     void notify();
 
@@ -142,6 +143,7 @@ private:
     int     m_iMetaTypeId;      /**< QMetaType id of the Measurement */
     QString m_qString_Name;     /**< Name of the Measurement */
     bool    m_bVisibility;      /**< Visibility status */
+
 };
 
 
