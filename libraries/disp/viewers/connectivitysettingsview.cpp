@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     neuronalconnectivityyourwidget.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     connectivitysettingsview.cpp
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2016
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the NeuronalConnectivityYourWidget class.
+* @brief    Definition of the ConnectivitySettingsView Class.
 *
 */
 
@@ -38,7 +38,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "neuronalconnectivityyourwidget.h"
+#include "connectivitysettingsview.h"
+
+#include "ui_connectivitysettingsview.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -46,7 +60,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NEURONALCONNECTIVITYPLUGIN;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -54,17 +68,33 @@ using namespace NEURONALCONNECTIVITYPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NeuronalConnectivityYourWidget::NeuronalConnectivityYourWidget(QWidget *parent)
-: QWidget(parent)
-, ui(new Ui::NeuronalConnectivityYourToolbarWidget)
+ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
+                         Qt::WindowFlags f)
+: QWidget(parent, f)
+, ui(new Ui::ConnectivitySettingsViewWidget)
 {
     ui->setupUi(this);
+
+    connect(ui->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &ConnectivitySettingsView::onMetricChanged);
+
+    this->setWindowTitle("Connectivity Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 }
 
 
 //*************************************************************************************************************
 
-NeuronalConnectivityYourWidget::~NeuronalConnectivityYourWidget()
+ConnectivitySettingsView::~ConnectivitySettingsView()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::onMetricChanged(const QString& metric)
+{
+    emit connectivityMetricChanged(metric);
 }

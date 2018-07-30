@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     neuronalconnectivitytoolbox.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     connectivitysettingsview.h
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2016
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NeuronalConnectivityYourWidget class.
+* @brief    Declaration of the ConnectivitySettingsView Class.
 *
 */
 
-#ifndef NEURONALCONNECTIVITYYOURWIDGET_H
-#define NEURONALCONNECTIVITYYOURWIDGET_H
+#ifndef CONNECTIVITYSETTINGSVIEW_H
+#define CONNECTIVITYSETTINGSVIEW_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_neuronalconnectivityyourtoolbarwidget.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -54,11 +55,18 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NEURONALCONNECTIVITYPLUGIN
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace NEURONALCONNECTIVITYPLUGIN
-{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui {
+    class ConnectivitySettingsViewWidget;
+}
 
 
 //*************************************************************************************************************
@@ -67,35 +75,72 @@ namespace NEURONALCONNECTIVITYPLUGIN
 //=============================================================================================================
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS NeuronalConnectivityYourWidget
+* DECLARE CLASS ConnectivitySettingsView
 *
-* @brief The NeuronalConnectivityToolbox class provides a NeuronalConnectivity plugin widget structure.
+* @brief The ConnectivitySettingsView class provides a view to control settings for estiamting functional connectivity
 */
-class NeuronalConnectivityYourWidget : public QWidget
+class DISPSHARED_EXPORT ConnectivitySettingsView : public QWidget
 {
     Q_OBJECT
 
-public:
-    typedef QSharedPointer<NeuronalConnectivityYourWidget> SPtr;         /**< Shared pointer type for NeuronalConnectivityYourWidget. */
-    typedef QSharedPointer<NeuronalConnectivityYourWidget> ConstSPtr;    /**< Const shared pointer type for NeuronalConnectivityYourWidget. */
+public:    
+    typedef QSharedPointer<ConnectivitySettingsView> SPtr;              /**< Shared pointer type for ConnectivitySettingsView. */
+    typedef QSharedPointer<const ConnectivitySettingsView> ConstSPtr;   /**< Const shared pointer type for ConnectivitySettingsView. */
 
     //=========================================================================================================
     /**
-    * Constructs a NeuronalConnectivityToolbox.
+    * Constructs a ConnectivitySettingsView which is a child of parent.
+    *
+    * @param [in] parent        parent of widget
     */
-    NeuronalConnectivityYourWidget(QWidget *parent = 0);
+    ConnectivitySettingsView(QWidget *parent = 0,
+                Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the NeuronalConnectivityToolbox.
+    * Destroys the ConnectivitySettingsView.
     */
-    ~NeuronalConnectivityYourWidget();
+    ~ConnectivitySettingsView();
 
-private:
-    Ui::NeuronalConnectivityYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
+protected:
+    //=========================================================================================================
+    /**
+    * Slot called one the metric changed.
+    *
+    * @param [in] metric        The new metric
+    */
+    void onMetricChanged(const QString& metric);
+
+    Ui::ConnectivitySettingsViewWidget* ui;
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the connectivity metric changed
+    *
+    * @param [in] metric        The new metric
+    */
+    void connectivityMetricChanged(const QString& metric);
 
 };
-}
-#endif // NEURONALCONNECTIVITYYOURWIDGET_H
+
+} // NAMESPACE
+
+#endif // CONNECTIVITYSETTINGSVIEW_H

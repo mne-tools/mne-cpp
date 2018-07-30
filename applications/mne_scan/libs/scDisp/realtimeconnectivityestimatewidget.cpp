@@ -42,7 +42,12 @@
 
 #include <scMeas/realtimeconnectivityestimate.h>
 
-#include <disp3D/viewers/networkview.h>
+#include <connectivity/network/network.h>
+
+#include <disp/viewers/quickcontrolview.h>
+
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
@@ -72,6 +77,8 @@
 using namespace SCDISPLIB;
 using namespace DISP3DLIB;
 using namespace SCMEASLIB;
+using namespace DISPLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -84,10 +91,36 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRTCE(pRTCE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
-, m_pNetworkView(NetworkView::SPtr::create())
+, m_p3DView(View3D::SPtr(new View3D()))
+, m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
+, m_pQuickControlView(QuickControlView::SPtr::create("Connectivity Control", this))
 {
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
+    connect(m_pActionQuickControl.data(), &QAction::triggered,
+            this, &RealTimeConnectivityEstimateWidget::showQuickControlView);
+    addDisplayAction(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(true);
+
+    //Init 3D View
+    m_p3DView->setModel(m_pData3DModel);
+
+    //Add 3D control to Quick control widget
+    QStringList slControlFlags;
+    slControlFlags << "Data" << "View" << "Light";
+    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
+    m_pControl3DView->init(m_pData3DModel, m_p3DView);
+    m_pQuickControlView->addWidget(m_pControl3DView.data());
+
+    //Add other settings widgets
+    for(int i = 0; i < m_pRTCE->m_lControlWidgets.size(); i++) {
+        m_pQuickControlView->addGroupBox(m_pRTCE->m_lControlWidgets.at(i), "Connectivity");
+    }
+
     QGridLayout *mainLayoutView = new QGridLayout;
-    mainLayoutView->addWidget(m_pNetworkView.data(),0,0);
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+
+    mainLayoutView->addWidget(pWidgetContainer,0,0);
 
     this->setLayout(mainLayoutView);
 }
@@ -119,7 +152,10 @@ void RealTimeConnectivityEstimateWidget::getData()
         // Add rt brain data
         if(!m_pRtItem) {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
-            m_pRtItem = m_pNetworkView->addData(*(m_pRTCE->getValue().data()));
+            Network networkData = *(m_pRTCE->getValue().data());
+            m_pRtItem = m_pData3DModel->addConnectivityData("sample",
+                                                            networkData.getConnectivityMethod(),
+                                                            networkData);
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
 
@@ -139,10 +175,23 @@ void RealTimeConnectivityEstimateWidget::init()
 {
     if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet()) {
         // Add brain data
-        m_pNetworkView->getTreeModel()->addSurfaceSet("Subject", "MRI", *(m_pRTCE->getSurfSet()), *(m_pRTCE->getAnnotSet()));
+        m_pData3DModel->addSurfaceSet("Subject", "MRI", *(m_pRTCE->getSurfSet()), *(m_pRTCE->getAnnotSet()));
     } else {
         qDebug()<<"RealTimeConnectivityEstimateWidget::init - Could not open 3D surface information.";
     }
 
     m_bInitialized = true;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeConnectivityEstimateWidget::showQuickControlView()
+{
+    if(m_pQuickControlView->isActiveWindow()) {
+        m_pQuickControlView->hide();
+    } else {
+        m_pQuickControlView->activateWindow();
+        m_pQuickControlView->show();
+    }
 }

@@ -117,7 +117,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
     connect(m_pActionQuickControl.data(), &QAction::triggered,
-            this, &RealTimeMultiSampleArrayWidget::showQuickControlWidget);
+            this, &RealTimeMultiSampleArrayWidget::showQuickControlView);
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(true);
 
@@ -394,7 +394,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
         // Quick control SPHARA settings
         SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-        pSpharaSettingsView->init();
         m_pQuickControlView->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
 
         connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
@@ -485,7 +484,7 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
+void RealTimeMultiSampleArrayWidget::showQuickControlView()
 {
     if(m_pQuickControlView->isActiveWindow()) {
         m_pQuickControlView->hide();

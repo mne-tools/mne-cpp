@@ -55,6 +55,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QAction>
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -69,11 +72,17 @@
 
 namespace DISP3DLIB {
     class NetworkTreeItem;
-    class NetworkView;
+    class View3D;
+    class Control3DWidget;
+    class Data3DTreeModel;
 }
 
 namespace SCMEASLIB {
     class RealTimeConnectivityEstimate;
+}
+
+namespace DISPLIB {
+    class QuickControlView;
 }
 
 
@@ -144,16 +153,28 @@ public:
     virtual void init();
 
 protected:
-    QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;            /**< The real-time source estimate measurement. */
+    //=========================================================================================================
+    /**
+    * Shows quick control view
+    */
+    void showQuickControlView();
 
-    bool                                                        m_bInitialized;     /**< Whether init was processed successfully. */
 
-    FSLIB::AnnotationSet                                        m_annotationSet;    /**< The current annotation set. */
-    FSLIB::SurfaceSet                                           m_surfSet;          /**< The current surface set. */
+    QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;                /**< The real-time source estimate measurement. */
+    QSharedPointer<DISPLIB::QuickControlView>                   m_pQuickControlView;    /**< quick control widget. */
 
-    QSharedPointer<DISP3DLIB::NetworkView>                      m_pNetworkView;     /**< The network 3D view. */
+    bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 
-    DISP3DLIB::NetworkTreeItem*                                 m_pRtItem;          /**< The Disp3D real time item. */
+    FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
+    FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
+
+    QSharedPointer<DISP3DLIB::View3D>                           m_p3DView;              /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>                  m_pControl3DView;       /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;         /**< The Disp3D model. */
+
+    DISP3DLIB::NetworkTreeItem*                                 m_pRtItem;              /**< The Disp3D real time item. */
+
+    QPointer<QAction>                                           m_pActionQuickControl;  /**< Show quick control widget. */
 };
 
 } // NAMESPACE

@@ -253,8 +253,7 @@ private:
     QStringList                 m_slDisplayFlag;    /**< The flags to use in the displays quick control widget. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling, sphara. */
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
-//    MatrixXd                    m_vecValue;         /**< The current attached sample vector.*/
-    qint32                      m_iMultiArraySize; /**< Sample size of the multi sample array.*/
+    qint32                      m_iMultiArraySize;  /**< Sample size of the multi sample array.*/
     QList< MatrixXd >           m_matSamples;       /**< The multi sample array.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
