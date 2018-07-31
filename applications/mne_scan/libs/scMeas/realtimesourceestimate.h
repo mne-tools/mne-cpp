@@ -205,9 +205,9 @@ public:
     /**
     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @param [in] iMultiArraySize the number of values.
+    * @param [in] iSourceEstimateSize the number of values.
     */
-    inline void setMultiArraySize(qint32 iMultiArraySize);
+    inline void setSourceEstimateSize(qint32 iSourceEstimateSize);
 
     //=========================================================================================================
     /**
@@ -215,7 +215,7 @@ public:
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline qint32 getMultiArraySize() const;
+    inline qint32 getSourceEstimateSize() const;
 
 private:
     mutable QMutex                  m_qMutex;       /**< Mutex to ensure thread safety */
@@ -226,7 +226,7 @@ private:
     SurfaceSet::SPtr                m_pSurfSet;     /**< Surface set. */
     MNEForwardSolution::SPtr        m_pFwdSolution; /**< Forward solution. */
 
-    qint32                          m_iMultiArraySize;  /**< Sample size of the multi sample array.*/
+    qint32                          m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
 
     QList<MNESourceEstimate::SPtr>  m_pMNEStc;      /**< The source estimates. */
     bool                            m_bInitialized; /**< Is initialized */
@@ -319,23 +319,23 @@ inline FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setMultiArraySize(qint32 iMultiArraySize)
+inline void RealTimeSourceEstimate::setSourceEstimateSize(qint32 iSourceEstimateSize)
 {
     QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_iMultiArraySize = iMultiArraySize;
+        m_iSourceEstimateSize = iSourceEstimateSize;
 }
 
 
 //*************************************************************************************************************
 
-qint32 RealTimeSourceEstimate::getMultiArraySize() const
+qint32 RealTimeSourceEstimate::getSourceEstimateSize() const
 {
     QMutexLocker locker(&m_qMutex);
-    return m_iMultiArraySize;
+    return m_iSourceEstimateSize;
 }
 
 } // NAMESPACE
