@@ -137,7 +137,7 @@ void NeuronalConnectivity::init()
     ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
     connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
-    m_pRTCEOutput->data()->m_lControlWidgets << pConnectivitySettingsView;
+    m_pRTCEOutput->data()->addControlWidget(pConnectivitySettingsView);
 
     //Init connectivity settings
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COR";

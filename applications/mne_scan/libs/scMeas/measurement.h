@@ -127,7 +127,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Add a control widget to this measurement.
+    * Add a control widget to this measurement. Use this in order to obtain a connection of GUI elements between
+    * MNE Scan plugins and the corresponding real-time visualization widget.
     *
     * @param pWidget    The control widget, which should be added to the corresponding real-time visualization
     */
@@ -158,7 +159,7 @@ private:
     int                 m_iMetaTypeId;      /**< QMetaType id of the Measurement */
     QString             m_qString_Name;     /**< Name of the Measurement */
     bool                m_bVisibility;      /**< Visibility status */
-    QList<QWidget*>     m_lControlWidgets;  /**< The control widgets, which should be added to the corresponding real-time visualization */
+    QList<QWidget*>     m_lControlWidgets;  /**< The control widgets, which should be added to the corresponding real-time visualization. */
 
 };
 
