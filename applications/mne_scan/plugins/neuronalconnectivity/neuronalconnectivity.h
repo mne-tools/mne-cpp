@@ -49,6 +49,7 @@
 #include <utils/generics/circularmatrixbuffer.h>
 
 #include <connectivity/connectivitysettings.h>
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
@@ -76,6 +77,10 @@ namespace FIFFLIB {
 
 namespace DISPLIB {
     class ConnectivitySettingsView;
+}
+
+namespace REALTIMELIB {
+    class RtConnectivity;
 }
 
 namespace SCMEASLIB {
@@ -166,6 +171,14 @@ protected:
 
     //=========================================================================================================
     /**
+    * Slot called when a new real-time connectivity estimate is available.
+    *
+    * @param [in] connectivityResult        The new connectivity estimate
+    */
+    void onNewConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult);
+
+    //=========================================================================================================
+    /**
     * Slot called when the metric changed.
     *
     * @param [in] sMetric        The new metric
@@ -188,22 +201,22 @@ private:
 
     CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
+    QSharedPointer<REALTIMELIB::RtConnectivity>                                     m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view.*/
     QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
-
-    QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
-    Eigen::MatrixX3f        m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f        m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f        m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    CONNECTIVITYLIB::Network    m_connectivityEstimate;     /**< The current connectivity estimate.*/
+    Eigen::MatrixX3f            m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
 
-    QVector<int>            m_chIdx;                    /**< The channel indeces to pick from the incoming data.*/
+    QVector<int>                m_chIdx;                    /**< The channel indeces to pick from the incoming data.*/
 };
 
 } // NAMESPACE

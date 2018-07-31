@@ -81,6 +81,7 @@ using namespace UTILSLIB;
 Network::Network(const QString& sConnectivityMethod)
 : m_sConnectivityMethod(sConnectivityMethod)
 {
+    qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
 }
 
 
@@ -167,6 +168,18 @@ void Network::append(NetworkEdge::SPtr newEdge)
 void Network::append(NetworkNode::SPtr newNode)
 {
     m_lNodes << newNode;
+}
+
+
+//*************************************************************************************************************
+
+bool Network::isEmpty()
+{
+    if(m_lEdges.isEmpty() || m_lNodes.isEmpty()) {
+        return true;
+    }
+
+    return false;
 }
 
 

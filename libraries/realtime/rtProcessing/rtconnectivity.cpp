@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     connectivitysettings.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     rtconnectivity.cpp
+* @author   Lorenz Esch <Lorenz.Esch@ntu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*
 * @version  1.0
-* @date     March, 2017
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ConnectivitySettings class definition.
+* @brief     Definition of the RtConnectivity Class.
 *
 */
 
@@ -39,7 +40,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivitysettings.h"
+#include "rtconnectivity.h"
+
+#include <connectivity/connectivitysettings.h>
+#include <connectivity/connectivity.h>
+#include <connectivity/network/network.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -47,13 +58,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCommandLineParser>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
+#include <QElapsedTimer>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -61,23 +67,67 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace REALTIMELIB;
 using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
+// DEFINE MEMBER METHODS RtConnectivityWorker
 //=============================================================================================================
+
+void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettings)
+{
+    Connectivity tConnectivity(connectivitySettings);
+
+    emit resultReady(tConnectivity.calculateConnectivity());
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE MEMBER METHODS RtConnectivity
 //=============================================================================================================
 
-ConnectivitySettings::ConnectivitySettings()
+RtConnectivity::RtConnectivity(QObject *parent)
+: QObject(parent)
 {
-    qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
+    RtConnectivityWorker *worker = new RtConnectivityWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtConnectivity::operate,
+            worker, &RtConnectivityWorker::doWork);
+
+    connect(worker, &RtConnectivityWorker::resultReady,
+            this, &RtConnectivity::handleResults);
+
+    m_workerThread.start();
 }
 
 
+//*************************************************************************************************************
+
+RtConnectivity::~RtConnectivity()
+{
+    m_workerThread.quit();
+    m_workerThread.wait();
+}
+
+
+//*************************************************************************************************************
+
+void RtConnectivity::append(const ConnectivitySettings& connectivitySettings)
+{
+    emit operate(connectivitySettings);
+}
+
+
+//*************************************************************************************************************
+
+void RtConnectivity::handleResults(const Network& connectivityResult)
+{
+    emit newConnectivityResultAvailable(connectivityResult);
+}
