@@ -76,11 +76,11 @@
 using namespace NEURONALCONNECTIVITYPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBUFFER;
 using namespace MNELIB;
 using namespace CONNECTIVITYLIB;
 using namespace DISPLIB;
 using namespace REALTIMELIB;
+using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -143,6 +143,8 @@ void NeuronalConnectivity::init()
     m_pRtConnectivity = RtConnectivity::SPtr::create();
     connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
             this, &NeuronalConnectivity::onNewConnectivityResultAvailable);
+
+    m_pCircularNetworkBuffer = QSharedPointer<CircularBuffer<CONNECTIVITYLIB::Network> >(new CircularBuffer<CONNECTIVITYLIB::Network>(10));
 
     //Init connectivity settings
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COR";
@@ -358,23 +360,16 @@ void NeuronalConnectivity::run()
         //Do processing after skip count has reached limit
         if((skip_count % m_iDownSample) == 0)
         {
-//            //Do connectivity estimation here
-//            QElapsedTimer time;
-//            time.start();
-
-            //QMutexLocker locker(&m_mutex);
+            //Do connectivity estimation here
+            Network connectivityResult = m_pCircularNetworkBuffer->pop();
 
             //Send the data to the connected plugins and the online display
-            //Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
-            if(!m_connectivityEstimate.isEmpty()) {
-                m_pRTCEOutput->data()->setValue(m_connectivityEstimate);
+            //QMutexLocker locker(&m_mutex);
+            //m_mutex.lock();
+            if(!connectivityResult.isEmpty()) {
+                m_pRTCEOutput->data()->setValue(connectivityResult);
             }
-
-//            qDebug()<<"----------------------------------------";
-//            qDebug()<<"----------------------------------------";
-//            qDebug()<<"NeuronalConnectivity::run() - time.elapsed()" << time.elapsed();
-//            qDebug()<<"----------------------------------------";
-//            qDebug()<<"----------------------------------------";
+            //m_mutex.unlock();
         }
 
         ++skip_count;
@@ -386,9 +381,12 @@ void NeuronalConnectivity::run()
 
 void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult)
 {
-    QMutexLocker locker(&m_mutex);
+    //QMutexLocker locker(&m_mutex);
+//    m_mutex.lock();
+//    m_connectivityEstimate = connectivityResult;
+//    m_mutex.unlock();
 
-    m_connectivityEstimate = connectivityResult;
+    m_pCircularNetworkBuffer->push(connectivityResult);
 }
 
 

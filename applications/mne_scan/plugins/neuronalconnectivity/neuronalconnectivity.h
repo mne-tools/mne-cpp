@@ -46,7 +46,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
@@ -201,6 +201,7 @@ private:
 
     CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
+    QSharedPointer<IOBUFFER::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularNetworkBuffer;       /**< The circular buffer holding the connectivity estimates.*/
     QSharedPointer<REALTIMELIB::RtConnectivity>                                     m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view.*/
