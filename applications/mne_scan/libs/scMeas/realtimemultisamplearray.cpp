@@ -269,10 +269,3 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
     }
 }
 
-
-//*************************************************************************************************************
-
-//void RealTimeMultiSampleArray::setValue(MatrixXd& v)
-//{
-
-//}

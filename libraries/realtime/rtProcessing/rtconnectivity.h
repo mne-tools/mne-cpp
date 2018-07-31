@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     connectivitysettings.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     rtconnectivity.h
+* @author   Lorenz Esch <Lorenz.Esch@ntu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*
 * @version  1.0
-* @date     March, 2017
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,25 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ConnectivitySettings class definition.
+* @brief     RtConnectivity class declaration.
 *
 */
 
+#ifndef RTCONNECTIVITY_H
+#define RTCONNECTIVITY_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivitysettings.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineParser>
+#include "../realtime_global.h"
 
 
 //*************************************************************************************************************
@@ -58,26 +53,122 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+#include <QObject>
+#include <QThread>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FIFFLIB{
+    class FiffInfo;
+}
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-ConnectivitySettings::ConnectivitySettings()
-{
-    qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
+namespace CONNECTIVITYLIB{
+    class ConnectivitySettings;
+    class Network;
 }
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE REALTIMELIB
+//=============================================================================================================
+
+namespace REALTIMELIB
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// REALTIMELIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=============================================================================================================
+/**
+* Real-time connectivity worker.
+*
+* @brief Real-time connectivity worker.
+*/
+class RtConnectivityWorker : public QObject
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+    * Perform actual connectivity estimation.
+    *
+    * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
+    */
+    void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+
+signals:
+    void resultReady(const CONNECTIVITYLIB::Network& connectivityResult);
+};
+
+//=============================================================================================================
+/**
+* Real-time connectivity estimation.
+*
+* @brief Real-time connectivity estimation.
+*/
+class REALTIMESHARED_EXPORT RtConnectivity : public QObject
+{
+    Q_OBJECT
+
+public:
+    typedef QSharedPointer<RtConnectivity> SPtr;             /**< Shared pointer type for RtConnectivity. */
+    typedef QSharedPointer<const RtConnectivity> ConstSPtr;  /**< Const shared pointer type for RtConnectivity. */
+
+    //=========================================================================================================
+    /**
+    * Creates the real-time connectivity estimation object.
+    *
+    * @param[in] parent     Parent QObject (optional)
+    */
+    explicit RtConnectivity(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the real-time connectivity estimation object.
+    */
+    ~RtConnectivity();
+
+    //=========================================================================================================
+    /**
+    * Slot to receive incoming data.
+    *
+    * @param[in] data  Data to estimate the connectivity from
+    */
+    void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Handles the result
+    */
+    void handleResults(const CONNECTIVITYLIB::Network& connectivityResult);
+
+    QThread             m_workerThread;         /**< The worker thread. */
+
+signals:
+    void newConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult);
+
+    void operate(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+} // NAMESPACE
+
+#endif // RTCONNECTIVITY_H
