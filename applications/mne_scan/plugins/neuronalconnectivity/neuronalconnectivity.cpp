@@ -261,8 +261,16 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         }
 
         QList<MatrixXd> epochDataList;
-        epochDataList.append(pRTSE->getValue()->data);
+
+        for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
+             epochDataList.append(pRTSE->getValue()[i]->data);
+        }
+
         m_connectivitySettings.m_matDataList = epochDataList;
+
+//        QList<MatrixXd> epochDataList;
+//        epochDataList.append(pRTSE->getValue()->data);
+//        m_connectivitySettings.m_matDataList = epochDataList;
 
         m_pRtConnectivity->append(m_connectivitySettings);
     }

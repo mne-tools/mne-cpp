@@ -55,6 +55,7 @@
 //=============================================================================================================
 
 #include <QGridLayout>
+#include <QSizePolicy>
 
 
 //*************************************************************************************************************
@@ -129,6 +130,7 @@ void AbstractView::createGUI()
     //Create widget GUI
     QGridLayout *mainLayoutView = new QGridLayout;
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+    pWidgetContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pWidgetContainer->setMinimumSize(400,400);
     mainLayoutView->addWidget(pWidgetContainer,0,0);
     mainLayoutView->addWidget(m_pControl3DView.data(),0,1);

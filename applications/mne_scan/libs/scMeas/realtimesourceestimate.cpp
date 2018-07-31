@@ -66,7 +66,7 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
 , m_bInitialized(false)
-, m_iMultiArraySize(1)
+, m_iSourceEstimateSize(1)
 {
 
 }
@@ -96,15 +96,14 @@ void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
     m_qMutex.lock();
 
     //Store
-    MNESourceEstimate::SPtr pMNESourceEstimate;
-    *pMNESourceEstimate = v;
+    MNESourceEstimate::SPtr pMNESourceEstimate = MNESourceEstimate::SPtr::create(v);
     m_pMNEStc.append(pMNESourceEstimate);
 
     m_bInitialized = true;
 
     m_qMutex.unlock();
 
-    if(m_pMNEStc.size() >= m_iMultiArraySize)
+    if(m_pMNEStc.size() >= m_iSourceEstimateSize)
     {
         emit notify();
         m_qMutex.lock();
