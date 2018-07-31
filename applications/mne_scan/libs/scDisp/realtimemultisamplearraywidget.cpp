@@ -344,6 +344,7 @@ void RealTimeMultiSampleArrayWidget::init()
                                                                        "babymeg-mag-inner-layer.lout").toString());
 
         //Init quick control widget
+        QStringList slFlags = m_pRTMSA->getDisplayFlags();
         #ifdef BUILD_BASIC_MNESCAN_VERSION
             std::cout<<"BUILD_BASIC_MNESCAN_VERSION Defined"<<std::endl;
             slFlags.clear();
@@ -354,95 +355,107 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
         // Quick control scaling
-        ScalingView* pScalingView = new ScalingView();
-        pScalingView->init(qMapChScaling);
-        m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
+        if(slFlags.contains("scaling")) {
+            ScalingView* pScalingView = new ScalingView();
+            pScalingView->init(qMapChScaling);
+            m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
+            connect(pScalingView, &ScalingView::scalingChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
+        }
 
         // Quick control projectors
-        ProjectorsView* pProjectorsView = new ProjectorsView();
-        pProjectorsView->init(m_pFiffInfo);
-        m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
+        if(slFlags.contains("projections")) {
+            ProjectorsView* pProjectorsView = new ProjectorsView();
+            pProjectorsView->init(m_pFiffInfo);
+            m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
-        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-                m_pChannelDataView.data(), &ChannelDataView::updateProjection);
+            connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
-        //Activate projectors by default
-        m_pChannelDataView->updateProjection();
+            //Activate projectors by default
+            m_pChannelDataView->updateProjection();
+        }
 
         // Quick control compensators
-        CompensatorView* pCompensatorView = new CompensatorView();
-        pCompensatorView->init(m_pFiffInfo);
-        m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
+        if(slFlags.contains("filter")) {
+            CompensatorView* pCompensatorView = new CompensatorView();
+            pCompensatorView->init(m_pFiffInfo);
+            m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
 
-        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-                m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
+            connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
 
-        // Quick control filter settings
-        FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
-        m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
+            // Quick control filter settings
+            FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
+            m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
-        connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
-                pFilterSettingsView, &FilterSettingsView::filterGroupChanged);
+            connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
+                    pFilterSettingsView, &FilterSettingsView::filterGroupChanged);
 
-        connect(pFilterSettingsView, &FilterSettingsView::showFilterOptions,
-                this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
+            connect(pFilterSettingsView, &FilterSettingsView::showFilterOptions,
+                    this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
 
-        pFilterSettingsView->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+            pFilterSettingsView->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+        }
 
         // Quick control SPHARA settings
-        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-        m_pQuickControlView->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
+        if(slFlags.contains("sphara")) {
+            SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
+            m_pQuickControlView->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
 
-        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-                m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
+            connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
 
-        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-                m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
+            connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
+        }
 
         // Quick control channel data settings
-        ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
-        pChannelDataSettingsView->init();
-        m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
+        if(slFlags.contains("view")) {
+            ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
+            pChannelDataSettingsView->init();
+            m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::signalColorChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
+            connect(pChannelDataSettingsView, &ChannelDataSettingsView::signalColorChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setBackgroundColor);
+            connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setBackgroundColor);
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::zoomChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setZoom);
+            connect(pChannelDataSettingsView, &ChannelDataSettingsView::zoomChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setZoom);
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::timeWindowChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
+            connect(pChannelDataSettingsView, &ChannelDataSettingsView::timeWindowChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::distanceTimeSpacerChanged,
-                m_pChannelDataView.data(), &ChannelDataView::setDistanceTimeSpacer);
+            connect(pChannelDataSettingsView, &ChannelDataSettingsView::distanceTimeSpacerChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setDistanceTimeSpacer);
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
-                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
+            connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
+                    this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
-        pChannelDataSettingsView->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
-                                                    settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt());
-        pChannelDataSettingsView->setDistanceTimeSpacer(settings.value(QString("RTMSAW/%1/distanceTimeSpacer").arg(t_sRTMSAWName), 100).toInt());
-        pChannelDataSettingsView->setSignalBackgroundColors(signal, background);
+            pChannelDataSettingsView->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
+                                                        settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt());
+            pChannelDataSettingsView->setDistanceTimeSpacer(settings.value(QString("RTMSAW/%1/distanceTimeSpacer").arg(t_sRTMSAWName), 100).toInt());
+            pChannelDataSettingsView->setSignalBackgroundColors(signal, background);
+        }
 
         // Quick control trigger detection settings
-        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView();
-        pTriggerDetectionView->init(m_pFiffInfo);
-        m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
+        if(slFlags.contains("triggerdetection")) {
+            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView();
+            pTriggerDetectionView->init(m_pFiffInfo);
+            m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
 
-        connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
-                m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
+            connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
 
-        connect(pTriggerDetectionView, &TriggerDetectionView::resetTriggerCounter,
-                m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
+            connect(pTriggerDetectionView, &TriggerDetectionView::resetTriggerCounter,
+                    m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
 
-        connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
-                pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
+            connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
+                    pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
+        }
 
         //Initialized
         m_bInitialized = true;
