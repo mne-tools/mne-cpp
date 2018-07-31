@@ -364,12 +364,9 @@ void NeuronalConnectivity::run()
             Network connectivityResult = m_pCircularNetworkBuffer->pop();
 
             //Send the data to the connected plugins and the online display
-            //QMutexLocker locker(&m_mutex);
-            //m_mutex.lock();
             if(!connectivityResult.isEmpty()) {
                 m_pRTCEOutput->data()->setValue(connectivityResult);
             }
-            //m_mutex.unlock();
         }
 
         ++skip_count;
@@ -381,11 +378,6 @@ void NeuronalConnectivity::run()
 
 void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult)
 {
-    //QMutexLocker locker(&m_mutex);
-//    m_mutex.lock();
-//    m_connectivityEstimate = connectivityResult;
-//    m_mutex.unlock();
-
     m_pCircularNetworkBuffer->push(connectivityResult);
 }
 

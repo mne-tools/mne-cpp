@@ -197,8 +197,6 @@ private:
     bool                m_bIsRunning;                   /**< Flag whether thread is running.*/
     qint32              m_iDownSample;                  /**< Sampling rate. */
 
-    QMutex              m_mutex;                        /**< The mutex for handling thread safety. */
-
     CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
     QSharedPointer<IOBUFFER::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularNetworkBuffer;       /**< The circular buffer holding the connectivity estimates.*/
