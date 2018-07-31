@@ -110,11 +110,12 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     slControlFlags << "Data" << "View" << "Light";
     m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
     m_pControl3DView->init(m_pData3DModel, m_p3DView);
-    m_pQuickControlView->addWidget(m_pControl3DView.data());
+    m_pQuickControlView->addGroupBox(m_pControl3DView.data(), "3D View");
 
     //Add other settings widgets
-    for(int i = 0; i < m_pRTCE->m_lControlWidgets.size(); i++) {
-        m_pQuickControlView->addGroupBox(m_pRTCE->m_lControlWidgets.at(i), "Connectivity");
+    QList<QWidget*> lControlWidgets = m_pRTCE->getControlWidgets();
+    for(int i = 0; i < lControlWidgets.size(); i++) {
+        m_pQuickControlView->addGroupBox(lControlWidgets.at(i), "Connectivity");
     }
 
     QGridLayout *mainLayoutView = new QGridLayout;

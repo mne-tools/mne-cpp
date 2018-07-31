@@ -125,7 +125,22 @@ public:
     */
     inline int type() const;
 
-    QList<QWidget*>   m_lControlWidgets;
+    //=========================================================================================================
+    /**
+    * Add a control widget to this measurement.
+    *
+    * @param pWidget    The control widget, which should be added to the corresponding real-time visualization
+    */
+    inline void addControlWidget(QWidget* pWidget);
+
+    //=========================================================================================================
+    /**
+    * Returns a list containing the control widgets, which should be added to the corresponding real-time visualization.
+    *
+    * @return A list containting the control widgets
+    */
+    inline QList<QWidget*> getControlWidgets();
+
 signals:
     void notify();
 
@@ -139,10 +154,11 @@ protected:
     inline void setType(int type);
 
 private:
-    mutable QMutex  m_qMutex;   /**< Mutex to ensure thread safety */
-    int     m_iMetaTypeId;      /**< QMetaType id of the Measurement */
-    QString m_qString_Name;     /**< Name of the Measurement */
-    bool    m_bVisibility;      /**< Visibility status */
+    mutable QMutex      m_qMutex;           /**< Mutex to ensure thread safety */
+    int                 m_iMetaTypeId;      /**< QMetaType id of the Measurement */
+    QString             m_qString_Name;     /**< Name of the Measurement */
+    bool                m_bVisibility;      /**< Visibility status */
+    QList<QWidget*>     m_lControlWidgets;  /**< The control widgets, which should be added to the corresponding real-time visualization */
 
 };
 
@@ -201,6 +217,24 @@ inline int Measurement::type() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_iMetaTypeId;
+}
+
+
+//*************************************************************************************************************
+
+inline void Measurement::addControlWidget(QWidget* pWidget)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_lControlWidgets << pWidget;
+}
+
+
+//*************************************************************************************************************
+
+inline QList<QWidget*> Measurement::getControlWidgets()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_lControlWidgets;
 }
 
 } //NAMESPACE

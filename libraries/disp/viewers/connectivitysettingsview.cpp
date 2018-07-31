@@ -78,6 +78,9 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onMetricChanged);
 
+    connect(ui->m_comboBox_windowType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &ConnectivitySettingsView::onWindowTypeChanged);
+
     this->setWindowTitle("Connectivity Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -97,4 +100,12 @@ ConnectivitySettingsView::~ConnectivitySettingsView()
 void ConnectivitySettingsView::onMetricChanged(const QString& metric)
 {
     emit connectivityMetricChanged(metric);
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::onWindowTypeChanged(const QString& windowType)
+{
+    emit windowTypeChanged(windowType);
 }
