@@ -143,7 +143,8 @@ void FiffSimulator::init()
     m_pFiffSimulatorProducer->start();
 
     //init channels when fiff info is available
-    connect(this, &FiffSimulator::fiffInfoAvailable, this, &FiffSimulator::initConnector);
+    connect(this, &FiffSimulator::fiffInfoAvailable,
+            this, &FiffSimulator::initConnector);
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
