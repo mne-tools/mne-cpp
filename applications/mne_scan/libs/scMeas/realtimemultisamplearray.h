@@ -246,9 +246,10 @@ private:
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     qint32                      m_iMultiArraySize;  /**< Sample size of the multi sample array.*/
-    QList< MatrixXd >           m_matSamples;       /**< The multi sample array.*/
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+    QList<MatrixXd>             m_matSamples;       /**< The multi sample array.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
+
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 };
 
 
