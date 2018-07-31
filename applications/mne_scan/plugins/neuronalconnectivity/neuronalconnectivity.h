@@ -48,15 +48,13 @@
 
 #include <utils/generics/circularmatrixbuffer.h>
 
+#include <connectivity/connectivitysettings.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-//#include <QtWidgets>
-//#include <QtCore/QtPlugin>
-//#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -166,12 +164,29 @@ protected:
     */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * Slot called when the metric changed.
+    *
+    * @param [in] sMetric        The new metric
+    */
     void onMetricChanged(const QString &sMetric);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the window type changed.
+    *
+    * @param [in] windowType        The new window type
+    */
+    void onWindowTypeChanged(const QString& windowType);
 
 private:
     bool                m_bIsRunning;                   /**< Flag whether thread is running.*/
-    qint32              m_iDownSample;                  /**< Sampling rate */
-    QString             m_sMetric;                      /**< The current metric */
+    qint32              m_iDownSample;                  /**< Sampling rate. */
+
+    QMutex              m_mutex;                        /**< The mutex for handling thread safety. */
+
+    CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view.*/

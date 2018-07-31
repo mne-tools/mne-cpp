@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
-    <height>43</height>
+    <width>327</width>
+    <height>72</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -37,10 +37,24 @@
      <property name="topMargin">
       <number>0</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="m_label_method">
+     <item row="1" column="1">
+      <widget class="QComboBox" name="m_comboBox_windowType">
+       <item>
+        <property name="text">
+         <string>Hanning</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Ones</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="m_label_windowType">
        <property name="text">
-        <string>Metric:</string>
+        <string>Window Type:</string>
        </property>
       </widget>
      </item>
@@ -54,54 +68,56 @@
        </property>
        <item>
         <property name="text">
-         <string>Coherence</string>
+         <string>COH</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Imaginary Coherence</string>
+         <string>IMAGCOH</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Coherency</string>
+         <string>COR</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Correlation</string>
+         <string>XCOR</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Cross Correlation</string>
+         <string>PLI</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Phase Lag Index (PLI)</string>
+         <string>DSWPLI</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Debiased Squared Weighted PLI</string>
+         <string>USPLI</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Unbiased Squared PLI</string>
+         <string>WPLI</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Weighted PLI</string>
+         <string>PLV</string>
         </property>
        </item>
-       <item>
-        <property name="text">
-         <string>Phase Locking Value</string>
-        </property>
-       </item>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="m_label_method">
+       <property name="text">
+        <string>Metric:</string>
+       </property>
       </widget>
      </item>
     </layout>

@@ -140,7 +140,8 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList, int iNfft,
+QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList,
+                                            int iNfft,
                                             const QString &sWindowType)
 {
     // Check that iNfft >= signal length

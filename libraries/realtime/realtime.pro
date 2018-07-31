@@ -88,7 +88,8 @@ SOURCES += \
     rtProcessing/rtave.cpp \
     rtProcessing/rtnoise.cpp \
     rtProcessing/rthpis.cpp \
-    rtProcessing/rtfilter.cpp
+    rtProcessing/rtfilter.cpp \
+    rtProcessing/rtconnectivity.cpp
 
 HEADERS +=  \
     realtime_global.h \
@@ -104,7 +105,8 @@ HEADERS +=  \
     rtProcessing/rtave.h \
     rtProcessing/rtnoise.h \
     rtProcessing/rthpis.h \
-    rtProcessing/rtfilter.h
+    rtProcessing/rtfilter.h \
+    rtProcessing/rtconnectivity.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

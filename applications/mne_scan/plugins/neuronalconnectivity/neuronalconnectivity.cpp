@@ -40,7 +40,7 @@
 
 #include "neuronalconnectivity.h"
 
-#include <connectivity/metrics/crosscorrelation.h>
+#include <connectivity/connectivity.h>
 #include <connectivity/network/network.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
@@ -54,6 +54,18 @@
 #include <mne/mne_epoch_data_list.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -126,6 +138,10 @@ void NeuronalConnectivity::init()
     connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
     m_pRTCEOutput->data()->m_lControlWidgets << pConnectivitySettingsView;
+
+    //Init connectivity settings
+    m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COR";
+    m_connectivitySettings.m_sWindowType = "Hanning";
 
     //Delete Buffer - will be initialized with first incoming data
     if(!m_pNeuronalConnectivityBuffer.isNull()) {
@@ -221,7 +237,6 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_pRTCEOutput->data()->setSurfSet(pRTSE->getSurfSet());
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
-            //Prepare network creation
             //Generate node vertices
             if(pRTSE->getFwdSolution()->isClustered()) {
                 m_matNodeVertLeft.resize(pRTSE->getFwdSolution()->src[0].cluster_info.centroidVertno.size(),3);
@@ -248,6 +263,9 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
             m_matNodeVertComb.resize(m_matNodeVertLeft.rows() + m_matNodeVertRight.rows(),3);
             m_matNodeVertComb << m_matNodeVertLeft, m_matNodeVertRight;
+
+            //Set node 3D positions to connectivity settings
+            m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
         }
 
         MatrixXd t_mat = pRTSE->getValue()->data;
@@ -270,7 +288,6 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
-            //Prepare network creation
             //Generate node vertices
             bool bPick = false;
             qint32 unit;
@@ -304,6 +321,9 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
                 bPick = false;
             }
+
+            //Set node 3D positions to connectivity settings
+            m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
 
             //Check if buffer initialized
             if(!m_pNeuronalConnectivityBuffer) {
@@ -350,23 +370,28 @@ void NeuronalConnectivity::run()
         //Do processing after skip count has reached limit
         if((skip_count % m_iDownSample) == 0)
         {
-            //Do connectivity estimation here
-            QElapsedTimer time;
-            time.start();
+//            //Do connectivity estimation here
+//            QElapsedTimer time;
+//            time.start();
 
             QList<MatrixXd> epochDataList;
             epochDataList.append(t_mat);
 
-            Network tNetwork = CrossCorrelation::crossCorrelation(epochDataList, m_matNodeVertComb);
+            QMutexLocker locker(&m_mutex);
+
+            m_connectivitySettings.m_matDataList = epochDataList;
+
+            Connectivity tConnectivity(m_connectivitySettings);
+
+            //Send the data to the connected plugins and the online display
+            //Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            m_pRTCEOutput->data()->setValue(tConnectivity.calculateConnectivity());
+
 //            qDebug()<<"----------------------------------------";
 //            qDebug()<<"----------------------------------------";
 //            qDebug()<<"NeuronalConnectivity::run() - time.elapsed()" << time.elapsed();
 //            qDebug()<<"----------------------------------------";
 //            qDebug()<<"----------------------------------------";
-
-            //Send the data to the connected plugins and the online display
-            //Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
-            m_pRTCEOutput->data()->setValue(tNetwork);
         }
 
         ++skip_count;
@@ -378,5 +403,17 @@ void NeuronalConnectivity::run()
 
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
-    m_sMetric = sMetric;
+    QMutexLocker locker(&m_mutex);
+
+    m_connectivitySettings.m_sConnectivityMethods = QStringList() << sMetric;
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
+{
+    QMutexLocker locker(&m_mutex);
+
+    m_connectivitySettings.m_sWindowType = windowType;
 }

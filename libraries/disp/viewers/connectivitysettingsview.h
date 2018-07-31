@@ -122,11 +122,19 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Slot called one the metric changed.
+    * Slot called when the metric changed.
     *
     * @param [in] metric        The new metric
     */
     void onMetricChanged(const QString& metric);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the window type changed.
+    *
+    * @param [in] windowType        The new window type
+    */
+    void onWindowTypeChanged(const QString& windowType);
 
     Ui::ConnectivitySettingsViewWidget* ui;
 
@@ -138,6 +146,14 @@ signals:
     * @param [in] metric        The new metric
     */
     void connectivityMetricChanged(const QString& metric);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the window type changed
+    *
+    * @param [in] windowType        The new window type
+    */
+    void windowTypeChanged(const QString& windowType);
 
 };
 
