@@ -322,6 +322,8 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
         }
 
         MatrixXd data;
+        QList<MatrixXd> epochDataList;
+
         for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
         {
             const MatrixXd& t_mat = pRTMSA->getMultiSampleArray()[i];
@@ -332,12 +334,12 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
                 data.row(j) = t_mat.row(m_chIdx.at(j));
             }
 
-            QList<MatrixXd> epochDataList;
             epochDataList.append(data);
-            m_connectivitySettings.m_matDataList = epochDataList;
-
-            m_pRtConnectivity->append(m_connectivitySettings);
         }
+
+        m_connectivitySettings.m_matDataList = epochDataList;
+
+        m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
 

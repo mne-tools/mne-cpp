@@ -117,28 +117,32 @@ void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 void RealTimeSourceEstimateWidget::getData()
 {
     if(m_bInitialized) {
+        QList<MNESourceEstimate::SPtr> lMNEData = m_pRTSE->getValue();
+
         // Add source estimate data
-        if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
-            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
-                                                      *m_pRTSE->getValue(),
-                                                      *m_pRTSE->getFwdSolution(),
-                                                      *m_pRTSE->getSurfSet(),
-                                                      *m_pRTSE->getAnnotSet());
+        if(!lMNEData.isEmpty()) {
+            if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
+                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
+                m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
+                                                          *lMNEData.first(),
+                                                          *m_pRTSE->getFwdSolution(),
+                                                          *m_pRTSE->getSurfSet(),
+                                                          *m_pRTSE->getAnnotSet());
 
-            m_pRtItem->setLoopState(false);
-            m_pRtItem->setTimeInterval(17);
-            m_pRtItem->setThresholds(QVector3D(0.0,5,10));
-            m_pRtItem->setColormapType("Hot");
-            m_pRtItem->setVisualizationType("Annotation based");
-            m_pRtItem->setNumberAverages(1);
-            m_pRtItem->setStreamingState(true);
-            m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
-        } else {
-            //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
+                m_pRtItem->setLoopState(false);
+                m_pRtItem->setTimeInterval(17);
+                m_pRtItem->setThresholds(QVector3D(0.0,5,10));
+                m_pRtItem->setColormapType("Hot");
+                m_pRtItem->setVisualizationType("Annotation based");
+                m_pRtItem->setNumberAverages(1);
+                m_pRtItem->setStreamingState(true);
+                m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
+            } else {
+                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
 
-            if(m_pRtItem) {
-                m_pRtItem->addData(*m_pRTSE->getValue());
+                if(m_pRtItem) {
+                    m_pRtItem->addData(*lMNEData.first());
+                }
             }
         }
     } else {

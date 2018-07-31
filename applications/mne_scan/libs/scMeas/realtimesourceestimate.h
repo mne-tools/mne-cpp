@@ -175,7 +175,7 @@ public:
     *
     * @return the last attached value.
     */
-    virtual MNESourceEstimate::SPtr& getValue();
+    virtual QList<MNESourceEstimate::SPtr>& getValue();
 
     //=========================================================================================================
     /**
@@ -201,17 +201,35 @@ public:
     */
     FiffInfo::SPtr getFiffInfo();
 
+    //=========================================================================================================
+    /**
+    * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
+    *
+    * @param [in] iMultiArraySize the number of values.
+    */
+    inline void setMultiArraySize(qint32 iMultiArraySize);
+
+    //=========================================================================================================
+    /**
+    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
+    *
+    * @return the number of values which are gathered before a notify() is called.
+    */
+    inline qint32 getMultiArraySize() const;
+
 private:
-    mutable QMutex              m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex                  m_qMutex;       /**< Mutex to ensure thread safety */
 
-    FiffInfo::SPtr              m_pFiffInfo;    /**< The Fiff info. */
+    FiffInfo::SPtr                  m_pFiffInfo;    /**< The Fiff info. */
 
-    AnnotationSet::SPtr         m_pAnnotSet;    /**< Annotation set. */
-    SurfaceSet::SPtr            m_pSurfSet;     /**< Surface set. */
-    MNEForwardSolution::SPtr    m_pFwdSolution; /**< Forward solution. */
+    AnnotationSet::SPtr             m_pAnnotSet;    /**< Annotation set. */
+    SurfaceSet::SPtr                m_pSurfSet;     /**< Surface set. */
+    MNEForwardSolution::SPtr        m_pFwdSolution; /**< Forward solution. */
 
-    MNESourceEstimate::SPtr     m_pMNEStc;      /**< The source estimate. */
-    bool                        m_bInitialized; /**< Is initialized */
+    qint32                          m_iMultiArraySize;  /**< Sample size of the multi sample array.*/
+
+    QList<MNESourceEstimate::SPtr>  m_pMNEStc;      /**< The source estimates. */
+    bool                            m_bInitialized; /**< Is initialized */
 };
 
 
@@ -298,6 +316,27 @@ inline FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
     return m_pFiffInfo;
 }
 
+
+//*************************************************************************************************************
+
+inline void RealTimeSourceEstimate::setMultiArraySize(qint32 iMultiArraySize)
+{
+    QMutexLocker locker(&m_qMutex);
+    //Obsolete unsigned char can't be bigger
+//    if(ucArraySize > 255)
+//        m_ucArraySize = 255;
+//    else
+        m_iMultiArraySize = iMultiArraySize;
+}
+
+
+//*************************************************************************************************************
+
+qint32 RealTimeSourceEstimate::getMultiArraySize() const
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_iMultiArraySize;
+}
 
 } // NAMESPACE
 
