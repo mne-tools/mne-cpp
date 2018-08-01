@@ -131,8 +131,8 @@ qint16 Network::getDistribution() const
 {
     qint16 distribution = 0;
 
-    for(NetworkNode::SPtr node : m_lNodes) {
-        distribution += node->getDegree();
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        distribution += m_lNodes.at(i)->getDegree();
     }
 
     return distribution;

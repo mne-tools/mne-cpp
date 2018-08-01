@@ -154,20 +154,20 @@ MatrixXd NetworkNode::getStrength() const
 {
     MatrixXd matStrength;
 
-    for(NetworkEdge::SPtr node : m_lEdgesIn) {
+    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
         if(matStrength.size() == 0) {
-            matStrength = node->getWeight().setZero();
+            matStrength = m_lEdgesIn.at(i)->getWeight().setZero();
         }
 
-        matStrength += node->getWeight();
+        matStrength += m_lEdgesIn.at(i)->getWeight();
     }
 
-    for(NetworkEdge::SPtr node : m_lEdgesOut) {
+    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
         if(matStrength.size() == 0) {
-            matStrength = node->getWeight().setZero();
+            matStrength = m_lEdgesOut.at(i)->getWeight().setZero();
         }
 
-        matStrength += node->getWeight();
+        matStrength += m_lEdgesOut.at(i)->getWeight();
     }
 
     return matStrength;
@@ -180,12 +180,12 @@ MatrixXd NetworkNode::getInstrength() const
 {
     MatrixXd matStrength;
 
-    for(NetworkEdge::SPtr node : m_lEdgesIn) {
+    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
         if(matStrength.size() == 0) {
-            matStrength = node->getWeight().setZero();
+            matStrength = m_lEdgesIn.at(i)->getWeight().setZero();
         }
 
-        matStrength += node->getWeight();
+        matStrength += m_lEdgesIn.at(i)->getWeight();
     }
 
     return matStrength;
@@ -198,12 +198,12 @@ MatrixXd NetworkNode::getOutstrength() const
 {
     MatrixXd matStrength;
 
-    for(NetworkEdge::SPtr node : m_lEdgesOut) {
+    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
         if(matStrength.size() == 0) {
-            matStrength = node->getWeight().setZero();
+            matStrength = m_lEdgesOut.at(i)->getWeight().setZero();
         }
 
-        matStrength += node->getWeight();
+        matStrength += m_lEdgesOut.at(i)->getWeight();
     }
 
     return matStrength;
