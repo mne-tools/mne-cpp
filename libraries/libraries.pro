@@ -38,9 +38,9 @@ include(../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-# TBD change the dependency order - forward before inverse
 SUBDIRS += \
     utils \
+    connectivity \
     fs \
     fiff \
     mne \
@@ -56,7 +56,6 @@ SUBDIRS += \
     }
 
     SUBDIRS += \
-        connectivity \
         disp
 
     qtHaveModule(charts) {
