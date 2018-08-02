@@ -77,6 +77,7 @@ using namespace CONNECTIVITYLIB;
 
 ConnectivitySettings::ConnectivitySettings()
 {
+    qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
 }
 
 

@@ -107,6 +107,16 @@ SOURCES += \
     viewers/channeldataview.cpp \
     viewers/channelselectionview.cpp \
     viewers/spectrumsettingsview.cpp \
+    viewers/scalingview.cpp \
+    viewers/projectorsview.cpp \
+    viewers/compensatorview.cpp \
+    viewers/filtersettingsview.cpp \
+    viewers/spharasettingsview.cpp \
+    viewers/channeldatasettingsview.cpp \
+    viewers/averageselectionview.cpp \
+    viewers/triggerdetectionview.cpp \
+    viewers/quickcontrolview.cpp \
+    viewers/connectivitysettingsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -139,6 +149,16 @@ HEADERS += \
     viewers/channeldataview.h \
     viewers/channelselectionview.h \
     viewers/spectrumsettingsview.h \
+    viewers/scalingview.h \
+    viewers/projectorsview.h \
+    viewers/compensatorview.h \
+    viewers/filtersettingsview.h \
+    viewers/spharasettingsview.h \
+    viewers/channeldatasettingsview.h \
+    viewers/averageselectionview.h \
+    viewers/triggerdetectionview.h \
+    viewers/quickcontrolview.h \
+    viewers/connectivitysettingsview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
@@ -193,6 +213,11 @@ qtHaveModule(charts) {
 FORMS += \
     viewers/formfiles/filterview.ui \
     viewers/formfiles/channelselectionview.ui \
+    viewers/formfiles/spharasettingsview.ui \
+    viewers/formfiles/channeldatasettingsview.ui \
+    viewers/formfiles/triggerdetectionview.ui \
+    viewers/formfiles/quickcontrolview.ui \
+    viewers/formfiles/connectivitysettingsview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
@@ -216,18 +241,9 @@ RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv.sel \
     $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv_new.sel \
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

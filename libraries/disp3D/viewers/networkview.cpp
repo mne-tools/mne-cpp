@@ -41,6 +41,7 @@
 #include "networkview.h"
 
 #include "../engine/model/data3Dtreemodel.h"
+#include "../engine/model/items/network/networktreeitem.h"
 
 #include <connectivity/network/network.h>
 
@@ -65,11 +66,10 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkView::NetworkView(const Network& tNetworkData, QWidget* parent)
-: AbstractView(parent)
+NetworkView::NetworkView(QWidget* parent,
+                         Qt::WindowFlags f)
+: AbstractView(parent, f)
 {
-    //Add network data
-    m_pData3DModel->addConnectivityData("sample", tNetworkData.getConnectivityMethod(), tNetworkData);
 }
 
 
@@ -77,4 +77,13 @@ NetworkView::NetworkView(const Network& tNetworkData, QWidget* parent)
 
 NetworkView::~NetworkView()
 {
+}
+
+
+//*************************************************************************************************************
+
+NetworkTreeItem* NetworkView::addData(const Network& tNetworkData)
+{
+    //Add network data
+    return m_pData3DModel->addConnectivityData("sample", tNetworkData.getConnectivityMethod(), tNetworkData);
 }

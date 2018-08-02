@@ -133,9 +133,9 @@ void View3D::initLight()
     const QColor lightColor(255,255,255);
     const float lightIntensity = 0.2f;
 
-    lLightPositions << QVector3D(-0.5,0,0) << QVector3D(0,0,-0.5)
+    lLightPositions << QVector3D(-0.5,0,0) << QVector3D(0.5,0,0); /*<< QVector3D(0,0,-0.5)
                     << QVector3D(0.5,0,0) << QVector3D(0,0,0.5)
-                    << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0);
+                    << QVector3D(0,0.5,0) << QVector3D(0,-0.5,0);*/
 
     //Create all the lights - make it shine
     for(int i = 0; i < lLightPositions.size(); ++i) {

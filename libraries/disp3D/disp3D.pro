@@ -124,6 +124,7 @@ SOURCES += \
     viewers/abstractview.cpp \
     viewers/networkview.cpp \
     viewers/hpiview.cpp \
+    viewers/sourceestimateview.cpp \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
     helpers/interpolation/interpolation.cpp \
     helpers/geometryinfo/geometryinfo.cpp \
@@ -179,6 +180,7 @@ HEADERS += \
     viewers/abstractview.h \
     viewers/networkview.h \
     viewers/hpiview.h \
+    viewers/sourceestimateview.h \
     disp3D_global.h \
     engine/model/items/sensordata/sensordatatreeitem.h \
     helpers/interpolation/interpolation.h \
@@ -207,19 +209,9 @@ RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-inner_skull-bem.fif \
     $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-trans.fif \
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

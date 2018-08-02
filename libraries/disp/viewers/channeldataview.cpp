@@ -187,9 +187,18 @@ bool ChannelDataView::eventFilter(QObject *object, QEvent *event)
 
 //*************************************************************************************************************
 
-void ChannelDataView::setBackgroundColorChanged(const QColor& backgroundColor)
+void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
 {
+    m_backgroundColor = backgroundColor;
     m_pTableView->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
+}
+
+
+//*************************************************************************************************************
+
+QColor ChannelDataView::getBackgroundColor()
+{
+    return m_backgroundColor;
 }
 
 
@@ -215,6 +224,14 @@ void ChannelDataView::setScalingMap(const QMap<qint32, float>& scaleMap)
 void ChannelDataView::setSignalColor(const QColor& signalColor)
 {
     m_pDelegate->setSignalColor(signalColor);
+}
+
+
+//*************************************************************************************************************
+
+QColor ChannelDataView::getSignalColor()
+{
+    return m_pDelegate->getSignalColor();
 }
 
 
@@ -396,9 +413,18 @@ void ChannelDataView::triggerInfoChanged(const QMap<double, QColor>& colorMap,
 
 //*************************************************************************************************************
 
-void ChannelDataView::distanceTimeSpacerChanged(int value)
+void ChannelDataView::setDistanceTimeSpacer(int value)
 {
+    m_iDistanceTimeSpacer = value;
     m_pModel->distanceTimeSpacerChanged(value);
+}
+
+
+//*************************************************************************************************************
+
+int ChannelDataView::getDistanceTimeSpacer()
+{
+    return m_iDistanceTimeSpacer;
 }
 
 

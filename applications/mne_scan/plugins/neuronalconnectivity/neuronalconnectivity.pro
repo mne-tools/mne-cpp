@@ -56,7 +56,9 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Realtimed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
@@ -68,7 +70,9 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Realtime \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -80,19 +84,16 @@ SOURCES += \
         neuronalconnectivity.cpp \
         FormFiles/neuronalconnectivitysetupwidget.cpp \
         FormFiles/neuronalconnectivityaboutwidget.cpp \
-        FormFiles/neuronalconnectivityyourwidget.cpp
 
 HEADERS += \
         neuronalconnectivity.h\
         neuronalconnectivity_global.h \
         FormFiles/neuronalconnectivitysetupwidget.h \
         FormFiles/neuronalconnectivityaboutwidget.h \
-        FormFiles/neuronalconnectivityyourwidget.h
 
 FORMS += \
         FormFiles/neuronalconnectivitysetup.ui \
         FormFiles/neuronalconnectivityabout.ui \
-        FormFiles/neuronalconnectivityyourtoolbarwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

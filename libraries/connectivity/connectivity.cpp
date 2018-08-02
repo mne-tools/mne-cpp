@@ -95,25 +95,36 @@ Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
 Network Connectivity::calculateConnectivity() const
 {
     if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COR")) {
-        return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
+        return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList,
+                                             m_pConnectivitySettings->m_matNodePositions);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("XCOR")) {
-        return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions);
+        return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList,
+                                                  m_pConnectivitySettings->m_matNodePositions);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLI")) {
-        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
-                                            m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList,
+                                            m_pConnectivitySettings->m_matNodePositions,
+                                            m_pConnectivitySettings->m_iNfft,
+                                            m_pConnectivitySettings->m_sWindowType);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COH")) {
-        return Coherence::coherence(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
-                                    m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+        return Coherence::coherence(m_pConnectivitySettings->m_matDataList,
+                                    m_pConnectivitySettings->m_matNodePositions,
+                                    m_pConnectivitySettings->m_iNfft,
+                                    m_pConnectivitySettings->m_sWindowType);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("IMAGCOH")) {
-        return ImagCoherence::imagCoherence(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
-                                    m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+        return ImagCoherence::imagCoherence(m_pConnectivitySettings->m_matDataList,
+                                            m_pConnectivitySettings->m_matNodePositions,
+                                            m_pConnectivitySettings->m_iNfft,
+                                            m_pConnectivitySettings->m_sWindowType);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLV")) {
-        return PhaseLockingValue::phaseLockingValue(m_pConnectivitySettings->m_matDataList, m_pConnectivitySettings->m_matNodePositions,
-                                                    m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+        return PhaseLockingValue::phaseLockingValue(m_pConnectivitySettings->m_matDataList,
+                                                    m_pConnectivitySettings->m_matNodePositions,
+                                                    m_pConnectivitySettings->m_iNfft,
+                                                    m_pConnectivitySettings->m_sWindowType);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("WPLI")) {
         return WeightedPhaseLagIndex::weightedPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
                                                             m_pConnectivitySettings->m_matNodePositions,
-                                                            m_pConnectivitySettings->m_iNfft, m_pConnectivitySettings->m_sWindowType);
+                                                            m_pConnectivitySettings->m_iNfft,
+                                                            m_pConnectivitySettings->m_sWindowType);
     } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("USPLI")) {
         return UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
                                                                           m_pConnectivitySettings->m_matNodePositions,

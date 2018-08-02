@@ -476,6 +476,14 @@ void ChannelDataDelegate::setSignalColor(const QColor& signalColor)
 
 //*************************************************************************************************************
 
+QColor ChannelDataDelegate::getSignalColor()
+{
+    return m_penNormal.color();
+}
+
+
+//*************************************************************************************************************
+
 void ChannelDataDelegate::createPlotPath(const QModelIndex &index,
                                                       const QStyleOptionViewItem &option,
                                                       QPainterPath& path,

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConnectivitySettingsViewWidget</class>
+ <widget class="QWidget" name="ConnectivitySettingsViewWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>327</width>
+    <height>72</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="windowOpacity">
+   <double>0.950000000000000</double>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="topMargin">
+    <number>8</number>
+   </property>
+   <item row="0" column="0">
+    <layout class="QFormLayout" name="formLayout">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="m_comboBox_windowType">
+       <item>
+        <property name="text">
+         <string>Hanning</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Ones</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="m_label_windowType">
+       <property name="text">
+        <string>Window Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="m_comboBox_method">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string>COH</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>IMAGCOH</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>COR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>XCOR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>PLI</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>DSWPLI</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>USPLI</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>WPLI</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>PLV</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="m_label_method">
+       <property name="text">
+        <string>Metric:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

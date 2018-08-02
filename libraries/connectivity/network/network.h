@@ -190,6 +190,14 @@ public:
     */
     void append(QSharedPointer<NetworkNode> newNode);
 
+    //=========================================================================================================
+    /**
+    * Returns whether the Network is empty by checking the number of nodes and edges.
+    *
+    * @return   The flag identifying whether the Network is empty.
+    */
+    bool isEmpty();
+
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/
     QList<QSharedPointer<NetworkNode> >     m_lNodes;                   /**< List with all nodes of the network.*/

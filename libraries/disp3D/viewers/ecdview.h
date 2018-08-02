@@ -99,7 +99,8 @@ public:
     */
     explicit ECDView(const INVERSELIB::DipoleFitSettings& dipFitSettings,
                      const INVERSELIB::ECDSet& ecdSet,
-                     QWidget *parent = 0);
+                     QWidget *parent = 0,
+                     Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**

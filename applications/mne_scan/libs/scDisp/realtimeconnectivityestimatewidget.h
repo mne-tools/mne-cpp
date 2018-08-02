@@ -55,6 +55,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QAction>
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,8 +70,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QTime;
-
 namespace DISP3DLIB {
     class NetworkTreeItem;
     class View3D;
@@ -78,6 +79,10 @@ namespace DISP3DLIB {
 
 namespace SCMEASLIB {
     class RealTimeConnectivityEstimate;
+}
+
+namespace DISPLIB {
+    class QuickControlView;
 }
 
 
@@ -96,27 +101,11 @@ namespace SCDISPLIB
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
+* DECLARE CLASS RealTimeConnectivityEstimateWidget
 *
-* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
+* @brief The RealTimeConnectivityEstimateWidget class provides a real-time network display.
 */
 
 class SCDISPSHARED_EXPORT RealTimeConnectivityEstimateWidget : public MeasurementWidget
@@ -124,15 +113,18 @@ class SCDISPSHARED_EXPORT RealTimeConnectivityEstimateWidget : public Measuremen
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<RealTimeConnectivityEstimateWidget> SPtr;             /**< Shared pointer type for RealTimeConnectivityEstimateWidget class. */
+    typedef QSharedPointer<const RealTimeConnectivityEstimateWidget> ConstSPtr;  /**< Const shared pointer type for RealTimeConnectivityEstimateWidget class. */
+
     //=========================================================================================================
     /**
     * Constructs a RealTimeConnectivityEstimateWidget which is a child of parent.
     *
-    * @param [in] pRTMSE        pointer to real-time multi sample array measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+    * @param [in] pRTCE     pointer to real-time connectivity estimate.
+    * @param [in] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE, QWidget* parent = 0);
+    RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE,
+                                       QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -160,32 +152,29 @@ public:
     */
     virtual void init();
 
-protected slots:
+protected:
     //=========================================================================================================
     /**
-    * Shows the 3D control widget
+    * Shows quick control view
     */
-    void show3DControlWidget();
-
-private:
-    QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;            /**< The real-time source estimate measurement. */
-
-    bool                                                        m_bInitialized;     /**< Whether init was processed successfully. */
-
-    FSLIB::AnnotationSet                                        m_annotationSet;    /**< The current annotation set. */
-    FSLIB::SurfaceSet                                           m_surfSet;          /**< The current surface set. */
+    void showQuickControlView();
 
 
-    QSharedPointer<DISP3DLIB::View3D>                           m_p3DView;          /**< The Disp3D view. */
-    QSharedPointer<DISP3DLIB::Control3DWidget>                  m_pControl3DView;   /**< The Disp3D control. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;     /**< The Disp3D model. */
+    QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;                /**< The real-time source estimate measurement. */
+    QSharedPointer<DISPLIB::QuickControlView>                   m_pQuickControlView;    /**< quick control widget. */
 
-    DISP3DLIB::NetworkTreeItem*                                 m_pRtItem;          /**< The Disp3D real time items. */
+    bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 
-    QAction*                                                    m_pAction3DControl; /**< Show 3D View control widget */
+    FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
+    FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
-signals:
-    void startInit();
+    QSharedPointer<DISP3DLIB::View3D>                           m_p3DView;              /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>                  m_pControl3DView;       /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;         /**< The Disp3D model. */
+
+    DISP3DLIB::NetworkTreeItem*                                 m_pRtItem;              /**< The Disp3D real time item. */
+
+    QPointer<QAction>                                           m_pActionQuickControl;  /**< Show quick control widget. */
 };
 
 } // NAMESPACE

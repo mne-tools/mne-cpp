@@ -195,7 +195,7 @@ protected:
     QSharedPointer<NATUSPLUGIN::NatusProducer>      m_pNatusProducer;           /**< The producer object.*/
     QSharedPointer<QList<Eigen::MatrixXd> >         m_pListReceivedSamples;     /**< List with alle the received samples in form of differentley sized matrices. Use QSharedPointer so it is thread safe. */
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pRMTSA_Natus;     /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Natus;     /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;        /**< Fiff measurement info.*/
 
 };

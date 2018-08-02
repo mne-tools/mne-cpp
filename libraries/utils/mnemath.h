@@ -44,7 +44,6 @@
 //=============================================================================================================
 
 #include "utils_global.h"
-#include <cmath>
 
 
 //*************************************************************************************************************
@@ -67,6 +66,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
@@ -76,15 +81,7 @@ namespace UTILSLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// UTILSLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -121,7 +118,7 @@ public:
     *
     * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
     */
-    static VectorXd* combine_xyz(const VectorXd& vec);
+    static Eigen::VectorXd* combine_xyz(const Eigen::VectorXd& vec);
 
 //    //=========================================================================================================
 //    /**
@@ -137,7 +134,7 @@ public:
     *
     * @return the condition number
     */
-    static double getConditionNumber(const MatrixXd& A, VectorXd &s);
+    static double getConditionNumber(const Eigen::MatrixXd& A, Eigen::VectorXd &s);
 
     //=========================================================================================================
     /**
@@ -147,7 +144,7 @@ public:
     *
     * @return the condition slope
     */
-    static double getConditionSlope(const MatrixXd& A, VectorXd &s);
+    static double getConditionSlope(const Eigen::MatrixXd& A, Eigen::VectorXd &s);
 
     //=========================================================================================================
     /**
@@ -158,7 +155,7 @@ public:
     *
     * @return rank of matrix A
     */
-    static void get_whitener(MatrixXd& A, bool pca, QString ch_type, VectorXd& eig, MatrixXd& eigvec);
+    static void get_whitener(Eigen::MatrixXd& A, bool pca, QString ch_type, Eigen::VectorXd& eig, Eigen::MatrixXd& eigvec);
 
     //=========================================================================================================
     /**
@@ -170,7 +167,7 @@ public:
     *
     * @return the sorted, unique values that are in both of the input arrays.
     */
-    static VectorXi intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &idx_sel);
+    static Eigen::VectorXi intersect(const Eigen::VectorXi &v1, const Eigen::VectorXi &v2, Eigen::VectorXi &idx_sel);
 
     //=========================================================================================================
     /**
@@ -181,7 +178,7 @@ public:
     *
     * @return true if sparse false otherwise;
     */
-    static bool issparse(VectorXd &v);
+    static bool issparse(Eigen::VectorXd &v);
 
     //=========================================================================================================
     /**
@@ -194,7 +191,7 @@ public:
     *
     * @return associated Legendre functions
     */
-    static MatrixXd legendre(qint32 n, const VectorXd &X, QString normalize = QString("unnorm"));
+    static Eigen::MatrixXd legendre(qint32 n, const Eigen::VectorXd &X, QString normalize = QString("unnorm"));
 
     //=========================================================================================================
     /**
@@ -213,7 +210,7 @@ public:
     *
     * @return A sparse block diagonal, diagonalized from the elements in "A".
     */
-    static SparseMatrix<double>* make_block_diag(const MatrixXd &A, qint32 n);
+    static Eigen::SparseMatrix<double>* make_block_diag(const Eigen::MatrixXd &A, qint32 n);
 
     //=========================================================================================================
     /**
@@ -235,7 +232,7 @@ public:
     *
     * @return rank of matrix A
     */
-    static qint32 rank(const MatrixXd& A, double tol = 1e-8);
+    static qint32 rank(const Eigen::MatrixXd& A, double tol = 1e-8);
 
     //=========================================================================================================
     /**
@@ -255,7 +252,7 @@ public:
     *
     * @return   rescaled data matrix rescaling.
     */
-    static MatrixXd rescale(const MatrixXd &data, const RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode);
+    static Eigen::MatrixXd rescale(const Eigen::MatrixXd &data, const Eigen::RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode);
 
     //=========================================================================================================
     /**
@@ -267,7 +264,7 @@ public:
     * @return Vector of the original indeces in the new order
     */
     template<typename T>
-    static VectorXi sort(Matrix<T, Dynamic, 1> &v, bool desc = true);
+    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc = true);
 
     //=========================================================================================================
     /**
@@ -281,7 +278,7 @@ public:
     * @return Vector of the original indeces in the new order
     */
     template<typename T>
-    static VectorXi sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynamic> &mat, bool desc = true);
+    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat, bool desc = true);
 
     //=========================================================================================================
     /**
@@ -293,7 +290,7 @@ public:
     * @return Vector of the original indeces in the new order
     */
     template<typename T>
-    static std::vector<Triplet<T> > sortrows(const std::vector<Triplet<T> > &A, qint32 column = 0);
+    static std::vector<Eigen::Triplet<T> > sortrows(const std::vector<Eigen::Triplet<T> > &A, qint32 column = 0);
 
     //=========================================================================================================
     /**
@@ -305,7 +302,7 @@ public:
     * @return true if value of lhs is bigger than value of rhs
     */
     template<typename T>
-    static inline bool compareIdxValuePairBiggerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
+    static inline bool compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
 
     //=========================================================================================================
     /**
@@ -317,7 +314,7 @@ public:
     * @return true if value of lhs is smaller than value of rhs
     */
     template<typename T>
-    static inline bool compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
+    static inline bool compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
 
     //=========================================================================================================
     /**
@@ -329,7 +326,7 @@ public:
     * @return true if value of lhs is smaller than value of rhs
     */
     template<typename T>
-    static inline bool compareTripletFirstEntry( const Triplet<T>& lhs, const Triplet<T> & rhs);
+    static inline bool compareTripletFirstEntry(const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs);
 
     //=========================================================================================================
     /**
@@ -341,7 +338,7 @@ public:
     * @return true if value of lhs is smaller than value of rhs
     */
     template<typename T>
-    static inline bool compareTripletSecondEntry( const Triplet<T>& lhs, const Triplet<T> & rhs);
+    static inline bool compareTripletSecondEntry(const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs);
 
     //=========================================================================================================
     /**
@@ -352,7 +349,7 @@ public:
     * @return double result of log2 operation
     */
     template<typename T>
-    static inline double log2( const T d);
+    static inline double log2(const T d);
 
     //=========================================================================================================
     /**
@@ -367,11 +364,29 @@ public:
     * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
     */
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData,
+                           bool bMakeSymmetrical,
+                           int iClassAmount,
+                           Eigen::VectorXd& vecResultClassLimits,
+                           Eigen::VectorXi& vecResultFrequency,
+                           double dGlobalMin = 0.0,
+                           double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData,
+                           bool bMakeSymmetrical,
+                           int iClassAmount,
+                           Eigen::VectorXd& vecResultClassLimits,
+                           Eigen::VectorXi& vecResultFrequency,
+                           double dGlobalMin = 0.0,
+                           double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData,
+                           bool bMakeSymmetrical,
+                           int iClassAmount,
+                           Eigen::VectorXd& vecResultClassLimits,
+                           Eigen::VectorXi& vecResultFrequency,
+                           double dGlobalMin = 0.0,
+                           double dGlobalMax= 0.0);
 
     //=========================================================================================================
     /**
@@ -389,10 +404,10 @@ public:
 //=============================================================================================================
 
 template< typename T>
-VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v, bool desc)
+Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc)
 {
     std::vector< std::pair<int,T> > t_vecIdxValue;
-    VectorXi idx(v.size());
+    Eigen::VectorXi idx(v.size());
 
     if(v.size() > 0)
     {
@@ -421,14 +436,14 @@ VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v, bool desc)
 //*************************************************************************************************************
 
 template<typename T>
-VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynamic> &mat, bool desc)
+Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat, bool desc)
 {
-    VectorXi idx = MNEMath::sort<T>(v_prime, desc);
+    Eigen::VectorXi idx = MNEMath::sort<T>(v_prime, desc);
 
     if(v_prime.size() > 0)
     {
         //sort Matrix
-        Matrix<T, Dynamic, Dynamic> newMat(mat.rows(), mat.cols());
+        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> newMat(mat.rows(), mat.cols());
         for(qint32 i = 0; i < idx.size(); ++i)
             newMat.col(i) = mat.col(idx[i]);
         mat = newMat;
@@ -441,9 +456,9 @@ VectorXi MNEMath::sort(Matrix<T, Dynamic, 1> &v_prime, Matrix<T, Dynamic, Dynami
 //*************************************************************************************************************
 
 template<typename T>
-std::vector<Triplet<T> > MNEMath::sortrows(const std::vector<Triplet<T> > &A, qint32 column)
+std::vector<Eigen::Triplet<T> > MNEMath::sortrows(const std::vector<Eigen::Triplet<T> > &A, qint32 column)
 {
-    std::vector<Triplet<T> > p_ASorted;
+    std::vector<Eigen::Triplet<T> > p_ASorted;
 
     for(quint32 i = 0; i < A.size(); ++i)
         p_ASorted.push_back(A[i]);
@@ -460,7 +475,7 @@ std::vector<Triplet<T> > MNEMath::sortrows(const std::vector<Triplet<T> > &A, qi
 //*************************************************************************************************************
 
 template<typename T>
-inline bool MNEMath::compareIdxValuePairBiggerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
+inline bool MNEMath::compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
 {
     return lhs.second > rhs.second;
 }
@@ -478,7 +493,7 @@ inline bool MNEMath::compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs
 //*************************************************************************************************************
 
 template<typename T>
-inline bool MNEMath::compareTripletFirstEntry( const Triplet<T>& lhs, const Triplet<T> & rhs)
+inline bool MNEMath::compareTripletFirstEntry( const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs)
 {
     return lhs.row() < rhs.row();
 }
@@ -487,7 +502,7 @@ inline bool MNEMath::compareTripletFirstEntry( const Triplet<T>& lhs, const Trip
 //*************************************************************************************************************
 
 template<typename T>
-inline bool MNEMath::compareTripletSecondEntry( const Triplet<T>& lhs, const Triplet<T> & rhs)
+inline bool MNEMath::compareTripletSecondEntry( const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs)
 {
     return lhs.col() < rhs.col();
 }
@@ -505,7 +520,13 @@ inline double MNEMath::log2( const T d)
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData,
+                         bool bMakeSymmetrical,
+                         int iClassAmount,
+                         Eigen::VectorXd& vecResultClassLimits,
+                         Eigen::VectorXi& vecResultFrequency,
+                         double dGlobalMin,
+                         double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matRawData.rows(),1);
     matrixName.col(0)= matRawData;
@@ -516,7 +537,13 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData,
+                         bool bMakeSymmetrical,
+                         int iClassAmount,
+                         Eigen::VectorXd& vecResultClassLimits,
+                         Eigen::VectorXi& vecResultFrequency,
+                         double dGlobalMin,
+                         double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,matRawData.cols());
     matrixName.row(0)= matRawData;
@@ -527,7 +554,13 @@ void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData,
+                         bool bMakeSymmetrical,
+                         int iClassAmount,
+                         Eigen::VectorXd& vecResultClassLimits,
+                         Eigen::VectorXi& vecResultFrequency,
+                         double dGlobalMin,
+                         double dGlobalMax)
 {
    if(matRawData.rows() == 0 || matRawData.cols() == 0) {
        return;

@@ -237,14 +237,6 @@ public:
     */
     virtual void setValue(const MatrixXd& mat);
 
-    //=========================================================================================================
-    /**
-    * Attaches a value to the sample array vector.
-    *
-    * @param [in] v the value which is attached to the sample array vector.
-    */
-//    virtual void setValue(MatrixXd& v);
-
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
 
@@ -253,11 +245,11 @@ private:
     QStringList                 m_slDisplayFlag;    /**< The flags to use in the displays quick control widget. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling, sphara. */
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
-//    MatrixXd                    m_vecValue;         /**< The current attached sample vector.*/
-    qint32                      m_iMultiArraySize; /**< Sample size of the multi sample array.*/
-    QList< MatrixXd >           m_matSamples;       /**< The multi sample array.*/
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+    qint32                      m_iMultiArraySize;  /**< Sample size of the multi sample array.*/
+    QList<MatrixXd>             m_matSamples;       /**< The multi sample array.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
+
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 };
 
 

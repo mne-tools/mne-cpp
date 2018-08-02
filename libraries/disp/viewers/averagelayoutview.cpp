@@ -113,7 +113,10 @@ void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pC
 //*************************************************************************************************************
 
 void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
-{
+{    
+    connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
+            this, &AverageLayoutView::updateData);
+
     m_pEvokedSetModel = pEvokedSetModel;
 }
 
@@ -165,6 +168,7 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
 {
     m_pAverageScene->setScaleMap(scaleMap);
+    updateData();
 }
 
 
@@ -174,6 +178,14 @@ void AverageLayoutView::setAverageInformationMap(const QMap<double, QPair<QColor
 {
     m_averageInfos = mapAvr;
     m_pAverageScene->setAverageInformationMap(mapAvr);
+}
+
+
+//*************************************************************************************************************
+
+QMap<double, QPair<QColor, QPair<QString,bool> > > AverageLayoutView::getAverageInformationMap()
+{
+    return m_averageInfos;
 }
 
 

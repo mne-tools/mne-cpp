@@ -75,18 +75,16 @@ namespace FIFFLIB {
 namespace DISPLIB {
     class EvokedSetModel;
     class ButterflyView;
-    class AverageScene;
     class ChannelSelectionView;
     class ChannelInfoModel;
     class FilterView;
     class AverageLayoutView;
+    class QuickControlView;
 }
 
 class QVBoxLayout;
 class QLabel;
 class QToolBox;
-class QGraphicsView;
-class QGraphicsItem;
 
 
 //*************************************************************************************************************
@@ -102,8 +100,6 @@ namespace SCDISPLIB
 //=============================================================================================================
 // SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class QuickControlWidget;
 
 
 //*************************************************************************************************************
@@ -187,14 +183,6 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Broadcast the background color changes made in the QuickControl widget
-    *
-    * @param [in] backgroundColor  The new background color.
-    */
-    void onBackgroundColorChanged(const QColor& backgroundColor);
-
-    //=========================================================================================================
-    /**
     * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
     *
     * @param[out] imageType     The current iamge type: png, svg.
@@ -210,9 +198,9 @@ private:
 
     QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */
     QSharedPointer<SCMEASLIB::RealTimeEvokedSet>        m_pRTESet;                  /**< The real-time evoked measurement. */
-    QSharedPointer<QuickControlWidget>                  m_pQuickControlWidget;      /**< Quick control widget. */
+    QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;        /**< Quick control widget. */
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
-    QSharedPointer<DISPLIB::ChannelInfoModel>                m_pChannelInfoModel;             /**< Channel info model. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/

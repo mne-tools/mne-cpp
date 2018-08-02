@@ -150,14 +150,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the forward solution.
-    *
-    * @param[in] fwdSolution   the forward solution to set
-    */
-    inline void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
-
-    //=========================================================================================================
-    /**
     * Returns the forward solution.
     *
     * @return the forward solution
@@ -205,8 +197,6 @@ public:
     * @return the current FiffInfo.
     */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
-
-    bool m_bConnectivitySend; /**< dirty hack */
 
 private:
     mutable QMutex                              m_qMutex;       /**< Mutex to ensure thread safety */
@@ -258,24 +248,6 @@ inline QSharedPointer<FSLIB::SurfaceSet>& RealTimeConnectivityEstimate::getSurfS
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
-}
-
-
-//*************************************************************************************************************
-
-inline void RealTimeConnectivityEstimate::setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> &fwdSolution)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_pFwdSolution = fwdSolution;
-}
-
-
-//*************************************************************************************************************
-
-inline QSharedPointer<MNELIB::MNEForwardSolution>& RealTimeConnectivityEstimate::getFwdSolution()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pFwdSolution;
 }
 
 

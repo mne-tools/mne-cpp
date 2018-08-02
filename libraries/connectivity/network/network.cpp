@@ -81,6 +81,7 @@ using namespace UTILSLIB;
 Network::Network(const QString& sConnectivityMethod)
 : m_sConnectivityMethod(sConnectivityMethod)
 {
+    qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
 }
 
 
@@ -130,8 +131,8 @@ qint16 Network::getDistribution() const
 {
     qint16 distribution = 0;
 
-    for(NetworkNode::SPtr node : m_lNodes) {
-        distribution += node->getDegree();
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        distribution += m_lNodes.at(i)->getDegree();
     }
 
     return distribution;
@@ -167,6 +168,18 @@ void Network::append(NetworkEdge::SPtr newEdge)
 void Network::append(NetworkNode::SPtr newNode)
 {
     m_lNodes << newNode;
+}
+
+
+//*************************************************************************************************************
+
+bool Network::isEmpty()
+{
+    if(m_lEdges.isEmpty() || m_lNodes.isEmpty()) {
+        return true;
+    }
+
+    return false;
 }
 
 

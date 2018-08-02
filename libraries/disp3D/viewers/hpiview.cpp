@@ -99,8 +99,10 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, QWidget *parent)
-: QWidget(parent)
+HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                 QWidget *parent,
+                 Qt::WindowFlags f)
+: QWidget(parent, f)
 , ui(new Ui::HpiViewWidget)
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
