@@ -68,8 +68,11 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ECDView::ECDView(const DipoleFitSettings& dipFitSettings, const ECDSet& ecdSet, QWidget* parent)
-: AbstractView(parent)
+ECDView::ECDView(const DipoleFitSettings& dipFitSettings,
+                 const ECDSet& ecdSet,
+                 QWidget* parent,
+                 Qt::WindowFlags f)
+: AbstractView(parent, f)
 {
     //Read mri transform
     QFile file(dipFitSettings.mriname);

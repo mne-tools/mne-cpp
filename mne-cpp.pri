@@ -91,6 +91,23 @@ defineReplace(winDeployAppArgs) {
     return($${final_deploy_command})
 }
 
+defineReplace(copyResources) {
+    resource_files = $$1
+
+    for(FILE, resource_files) {
+        FILEDIR = $$dirname(FILE)
+        FILEDIR ~= s,/resources,/bin/resources,g
+        FILEDIR = $$shell_path($${FILEDIR})
+        TRGTDIR = $${FILEDIR}
+
+        final_copy_command += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+
+        FILE = $$shell_path($${FILE})
+        final_copy_command += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+    }
+
+    return($${final_copy_command})
+}
 
 ############################################### GLOBAL DEFINES ################################################
 

@@ -162,7 +162,15 @@ public:
     *
     * @param [in] backgroundColor  The new background color.
     */
-    void setBackgroundColorChanged(const QColor& backgroundColor);
+    void setBackgroundColor(const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
+    * Returns the current background color.
+    *
+    * @return  The current background color.
+    */
+    QColor getBackgroundColor();
 
     //=========================================================================================================
     /**
@@ -187,6 +195,14 @@ public:
     * @param [in] signalColor  The new signal color.
     */
     void setSignalColor(const QColor& signalColor);
+
+    //=========================================================================================================
+    /**
+    * Returns the signal color.
+    *
+    * @return  The current signal color.
+    */
+    QColor getSignalColor();
 
     //=========================================================================================================
     /**
@@ -328,7 +344,15 @@ public:
     *
     * @param value the new distance for the time spacers
     */
-    void distanceTimeSpacerChanged(int value);
+    void setDistanceTimeSpacer(int value);
+
+    //=========================================================================================================
+    /**
+    * Returns teh current distance between time spacers.
+    *
+    * @return The current distance between the time spacers
+    */
+    int getDistanceTimeSpacer();
 
     //=========================================================================================================
     /**
@@ -392,6 +416,8 @@ protected:
     QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda  */
     bool                                        m_bHideBadChannels;             /**< hide bad channels flag. */
     QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
+    QColor                                      m_backgroundColor;              /**< Current background color. */
+    int                                         m_iDistanceTimeSpacer;          /**< Current distance between time spacer. */
 
 signals:    
     //=========================================================================================================

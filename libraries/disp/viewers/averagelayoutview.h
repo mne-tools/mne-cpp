@@ -175,6 +175,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the average map information
+    *
+    * @return     The current average data information including the color per average type.
+    */
+    QMap<double, QPair<QColor, QPair<QString,bool> > > getAverageInformationMap();
+
+    //=========================================================================================================
+    /**
     * call this whenever the external channel selection manager changes
     *
     * * @param [in] selectedChannelItems list of selected graphic items

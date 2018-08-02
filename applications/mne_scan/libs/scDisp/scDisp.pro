@@ -84,7 +84,6 @@ SOURCES += \
     realtimeevokedsetwidget.cpp \
     realtimecovwidget.cpp \
     realtimespectrumwidget.cpp \
-    helpers/quickcontrolwidget.cpp \
     realtimesourceestimatewidget.cpp \
     realtimeconnectivityestimatewidget.cpp \
 
@@ -96,12 +95,10 @@ HEADERS += \
     realtimeevokedsetwidget.h \
     realtimecovwidget.h \
     realtimespectrumwidget.h \
-    helpers/quickcontrolwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \
 
 FORMS += \
-    helpers/quickcontrolwidget.ui \
     formfiles/realtimesamplearraywidget.ui \
 
 RESOURCES += \
@@ -115,19 +112,9 @@ RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt \
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 UI_DIR = $${PWD}
 

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     neuronalconnectivitytoolbox.h
+* @file     sourceestimateview.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2016
+* @date     March, 2017
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NeuronalConnectivityYourWidget class.
+* @brief    SourceEstimateView class definition.
 *
 */
-
-#ifndef NEURONALCONNECTIVITYYOURWIDGET_H
-#define NEURONALCONNECTIVITYYOURWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_neuronalconnectivityyourtoolbarwidget.h"
+#include "sourceestimateview.h"
+
+#include "../engine/model/data3Dtreemodel.h"
+#include "../engine/model/items/sourcedata/mneestimatetreeitem.h"
+
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
@@ -49,53 +54,50 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DISP3DLIB;
+using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NEURONALCONNECTIVITYPLUGIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace NEURONALCONNECTIVITYPLUGIN
+SourceEstimateView::SourceEstimateView(QWidget* parent,
+                                       Qt::WindowFlags f)
+: AbstractView(parent, f)
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS NeuronalConnectivityYourWidget
-*
-* @brief The NeuronalConnectivityToolbox class provides a NeuronalConnectivity plugin widget structure.
-*/
-class NeuronalConnectivityYourWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    typedef QSharedPointer<NeuronalConnectivityYourWidget> SPtr;         /**< Shared pointer type for NeuronalConnectivityYourWidget. */
-    typedef QSharedPointer<NeuronalConnectivityYourWidget> ConstSPtr;    /**< Const shared pointer type for NeuronalConnectivityYourWidget. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a NeuronalConnectivityToolbox.
-    */
-    NeuronalConnectivityYourWidget(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the NeuronalConnectivityToolbox.
-    */
-    ~NeuronalConnectivityYourWidget();
-
-private:
-    Ui::NeuronalConnectivityYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
-
-};
 }
-#endif // NEURONALCONNECTIVITYYOURWIDGET_H
+
+
+//*************************************************************************************************************
+
+SourceEstimateView::~SourceEstimateView()
+{
+}
+
+
+//*************************************************************************************************************
+
+MneEstimateTreeItem* SourceEstimateView::addData(const QString& sSubject,
+                                                 const QString& sMeasurementSetName,
+                                                 const MNESourceEstimate& tSourceEstimate,
+                                                 const MNEForwardSolution& tForwardSolution,
+                                                 const SurfaceSet& tSurfSet,
+                                                 const AnnotationSet& tAnnotSet)
+{
+    //Add network data
+    return m_pData3DModel->addSourceData(sSubject,
+                                         sMeasurementSetName,
+                                         tSourceEstimate,
+                                         tForwardSolution,
+                                         tSurfSet,
+                                         tAnnotSet);
+}

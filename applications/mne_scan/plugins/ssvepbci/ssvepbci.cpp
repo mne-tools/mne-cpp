@@ -340,15 +340,17 @@ void SsvepBci::updateSource(SCMEASLIB::Measurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pBCIBuffer_Source){
-            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,  pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols()));
+            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,
+                                                                                                      pRTSE->getValue().first()->data.rows(),
+                                                                                                      pRTSE->getValue().first()->data.cols()));
         }
 
         if(m_bProcessData)
         {
-            MatrixXd t_mat(pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols());
+            MatrixXd t_mat(pRTSE->getValue().first()->data.rows(), pRTSE->getValue().first()->data.cols());
 
-            for(unsigned char i = 0; i < pRTSE->getValue()->data.cols(); ++i)
-                t_mat.col(i) = pRTSE->getValue()->data.col(i);
+            for(unsigned char i = 0; i < pRTSE->getValue().first()->data.cols(); ++i)
+                t_mat.col(i) = pRTSE->getValue().first()->data.col(i);
 
             m_pBCIBuffer_Source->push(&t_mat);
         }
