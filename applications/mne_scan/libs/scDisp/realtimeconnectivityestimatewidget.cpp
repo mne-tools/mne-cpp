@@ -54,6 +54,8 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,6 +81,7 @@ using namespace DISP3DLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -174,9 +177,10 @@ void RealTimeConnectivityEstimateWidget::getData()
 
 void RealTimeConnectivityEstimateWidget::init()
 {
-    if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet()) {
+    if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet() && m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
         // Add brain data
         m_pData3DModel->addSurfaceSet("Subject", "MRI", *(m_pRTCE->getSurfSet()), *(m_pRTCE->getAnnotSet()));
+        m_pData3DModel->addMegSensorInfo("Sensors", "VectorView", m_pRTCE->getFiffInfo()->chs, *(m_pRTCE->getSensorSurface()));
     } else {
         qDebug()<<"RealTimeConnectivityEstimateWidget::init - Could not open 3D surface information.";
     }
