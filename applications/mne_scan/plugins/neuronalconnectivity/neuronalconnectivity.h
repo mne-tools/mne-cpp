@@ -57,6 +57,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMutex>
+#include <QElapsedTimer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -194,8 +197,14 @@ protected:
     void onWindowTypeChanged(const QString& windowType);
 
 private:
-    bool                m_bIsRunning;                   /**< Flag whether thread is running.*/
-    qint32              m_iDownSample;                  /**< Sampling rate. */
+    bool                m_bIsRunning;       /**< Flag whether thread is running.*/
+    qint32              m_iDownSample;      /**< Sampling rate. */
+    QString             m_sAtlasDir;        /**< File to Atlas. */
+    QString             m_sSurfaceDir;      /**< File to Surface. */
+
+    QMutex              m_mutex;
+
+    QElapsedTimer       m_timer;
 
     CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 

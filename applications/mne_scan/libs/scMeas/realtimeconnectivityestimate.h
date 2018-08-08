@@ -73,6 +73,7 @@ namespace FIFFLIB {
 
 namespace MNELIB {
     class MNEForwardSolution;
+    class MNEBem;
 }
 
 namespace FSLIB {
@@ -134,7 +135,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the surface set.
+    * Sets the sensor surface.
+    *
+    * @param[in] sensorSurface   the sensor surface
+    */
+    inline void setSensorSurface(QSharedPointer<MNELIB::MNEBem>& sensorSurface);
+
+    //=========================================================================================================
+    /**
+    * Returns the sensor surface.
+    *
+    * @return the sensor surfac
+    */
+    inline QSharedPointer<MNELIB::MNEBem>& getSensorSurface();
+
+    //=========================================================================================================
+    /**
+    * Sets the sensor surface.
     *
     * @param[in] surfSet   the surface set to set
     */
@@ -199,16 +216,17 @@ public:
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
 private:
-    mutable QMutex                              m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex                              m_qMutex;           /**< Mutex to ensure thread safety */
 
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;    /**< The Fiff info. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff info. */
 
-    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;    /**< Annotation set. */
-    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;     /**< Surface set. */
-    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution; /**< Forward solution. */
+    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;        /**< Annotation set. */
+    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;         /**< Surface set. */
+    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution;     /**< Forward solution. */
+    QSharedPointer<MNELIB::MNEBem>              m_pSensorSurface;   /**< The sensor surface. */
 
-    QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;     /**< The network/connectivity estimate. */
-    bool                                        m_bInitialized; /**< Is initialized */
+    QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;         /**< The network/connectivity estimate. */
+    bool                                        m_bInitialized;     /**< Is initialized */
 };
 
 
@@ -230,6 +248,24 @@ inline QSharedPointer<FSLIB::AnnotationSet>& RealTimeConnectivityEstimate::getAn
 {
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeConnectivityEstimate::setSensorSurface(QSharedPointer<MNELIB::MNEBem> &annotSet)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_pSensorSurface = annotSet;
+}
+
+
+//*************************************************************************************************************
+
+inline QSharedPointer<MNELIB::MNEBem>& RealTimeConnectivityEstimate::getSensorSurface()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pSensorSurface;
 }
 
 

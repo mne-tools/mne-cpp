@@ -87,7 +87,6 @@ RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
 
 RealTimeConnectivityEstimate::~RealTimeConnectivityEstimate()
 {
-
 }
 
 
@@ -114,6 +113,5 @@ void RealTimeConnectivityEstimate::setValue(Network& v)
     m_qMutex.unlock();
 
     emit notify();
-
 }
 

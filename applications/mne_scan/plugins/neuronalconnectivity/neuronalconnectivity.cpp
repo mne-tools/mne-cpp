@@ -50,6 +50,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 
 #include <mne/mne_epoch_data_list.h>
+#include <mne/mne_bem.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -91,6 +92,8 @@ using namespace IOBUFFER;
 NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
 , m_iDownSample(3)
+, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
+, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 {
 }
 
@@ -149,6 +152,17 @@ void NeuronalConnectivity::init()
     //Init connectivity settings
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COR";
     m_connectivitySettings.m_sWindowType = "Hanning";
+
+    //Set 3D brain data for visualization
+    AnnotationSet::SPtr pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    SurfaceSet::SPtr pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
+    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+    MNEBem sensorSurfaceVV(t_filesensorSurfaceVV);
+    MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(sensorSurfaceVV);
+
+    m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
+    m_pRTCEOutput->data()->setAnnotSet(pAnnotationSet);
+    m_pRTCEOutput->data()->setSurfSet(pSurfaceSet);
 }
 
 
@@ -268,10 +282,6 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
         m_connectivitySettings.m_matDataList = epochDataList;
 
-//        QList<MatrixXd> epochDataList;
-//        epochDataList.append(pRTSE->getValue()->data);
-//        m_connectivitySettings.m_matDataList = epochDataList;
-
         m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
@@ -347,6 +357,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
         m_connectivitySettings.m_matDataList = epochDataList;
 
+        m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
@@ -370,11 +381,13 @@ void NeuronalConnectivity::run()
         //Do processing after skip count has reached limit
         if((skip_count % m_iDownSample) == 0)
         {
+            //QMutexLocker locker(&m_mutex);
             //Do connectivity estimation here
             Network connectivityResult = m_pCircularNetworkBuffer->pop();
 
             //Send the data to the connected plugins and the online display
             if(!connectivityResult.isEmpty()) {
+                qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
                 m_pRTCEOutput->data()->setValue(connectivityResult);
             }
         }
@@ -388,6 +401,7 @@ void NeuronalConnectivity::run()
 
 void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult)
 {
+    //QMutexLocker locker(&m_mutex);
     m_pCircularNetworkBuffer->push(connectivityResult);
 }
 

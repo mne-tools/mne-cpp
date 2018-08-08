@@ -78,16 +78,16 @@ using namespace CONNECTIVITYLIB;
 
 void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettings)
 {
-    QElapsedTimer time;
-    time.start();
+//    QElapsedTimer time;
+//    time.start();
     Connectivity tConnectivity(connectivitySettings);
 
     emit resultReady(tConnectivity.calculateConnectivity());
-    qDebug()<<"----------------------------------------";
-    qDebug()<<"----------------------------------------";
-    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed()" << time.elapsed();
-    qDebug()<<"----------------------------------------";
-    qDebug()<<"----------------------------------------";
+//    qDebug()<<"----------------------------------------";
+//    qDebug()<<"----------------------------------------";
+//    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed()" << time.elapsed();
+//    qDebug()<<"----------------------------------------";
+//    qDebug()<<"----------------------------------------";
 }
 
 
