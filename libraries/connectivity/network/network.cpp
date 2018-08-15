@@ -173,7 +173,7 @@ void Network::append(NetworkNode::SPtr newNode)
 
 //*************************************************************************************************************
 
-bool Network::isEmpty()
+bool Network::isEmpty() const
 {
     if(m_lEdges.isEmpty() || m_lNodes.isEmpty()) {
         return true;

@@ -84,12 +84,12 @@ using namespace Qt3DRender;
 
 GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
                                          Qt3DCore::QNode *tParent)
-    : QGeometryRenderer(tParent)
-    , m_pGeometry(tGeometry)
-    , m_pTransformBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-    , m_pColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-    , m_pTransformAttribute(new QAttribute())
-    , m_pColorAttribute(new QAttribute())
+: QGeometryRenderer(tParent)
+, m_pGeometry(tGeometry)
+, m_pTransformBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pTransformAttribute(new QAttribute())
+, m_pColorAttribute(new QAttribute())
 {
     init();
 }
@@ -163,11 +163,13 @@ void GeometryMultiplier::init()
     m_pTransformAttribute->setDivisor(1);
     m_pTransformAttribute->setByteOffset(0);
     m_pTransformAttribute->setBuffer(m_pTransformBuffer);
+
     //Set color attribute parameters
     m_pColorAttribute->setName(QStringLiteral("instanceColor"));
     m_pColorAttribute->setAttributeType(QAttribute::VertexAttribute);
     m_pColorAttribute->setVertexBaseType(QAttribute::Float);
     m_pColorAttribute->setVertexSize(3);
+
     //Set divisor 0 to enable empty color buffer
     m_pColorAttribute->setDivisor(0);
     m_pColorAttribute->setByteOffset(0);
@@ -175,7 +177,7 @@ void GeometryMultiplier::init()
 
     //Set default instance color
     QVector<QColor> tempColors;
-    tempColors.push_back(QColor(0, 0, 0));
+    tempColors.push_back(QColor(0, 0, 255));
     setColors(tempColors);
 
     //set default transforms

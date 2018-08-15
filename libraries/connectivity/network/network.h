@@ -196,7 +196,7 @@ public:
     *
     * @return   The flag identifying whether the Network is empty.
     */
-    bool isEmpty();
+    bool isEmpty() const;
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/
