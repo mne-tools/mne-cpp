@@ -61,6 +61,7 @@
 //=============================================================================================================
 
 #include <Qt3DExtras/QSphereGeometry>
+#include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DCore/QTransform>
 
 
@@ -173,7 +174,73 @@ void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 
 void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& vecThreshold)
 {
-    //Create network vertices and normals
+//    MatrixX3f tMatNorm(lNetworkNodes.size(), 3);
+//    tMatNorm.setZero();
+
+    //Draw network nodes
+    //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
+    if(!m_bNodesPlotted) {
+        plotNodes(tNetworkData);
+    }
+
+    plotEdges(tNetworkData, vecThreshold);
+
+//    //Generate connection indices for Qt3D buffer
+//    MatrixXi tMatLines;
+//    int count = 0;
+//    int start, end;
+
+//    for(int i = 0; i < lNetworkNodes.size(); ++i) {
+//        //Plot in edges
+//        for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
+//            start = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
+//            end = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
+
+//            if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()(0,0)) > vecThreshold.x() &&
+//                    start != end) {
+//                tMatLines.conservativeResize(count+1,2);
+//                tMatLines(count,0) = start;
+//                tMatLines(count,1) = end;
+//                ++count;
+//            }
+//        }
+
+//        //Plot out edges
+//        for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
+//            start = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
+//            end = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
+
+//            if(std::fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0)) > vecThreshold.x() &&
+//                    start != end) {
+//                tMatLines.conservativeResize(count+1,2);
+//                tMatLines(count,0) = start;
+//                tMatLines(count,1) = end;
+//                ++count;
+//            }
+//        }
+//    }
+
+//    //Generate colors for Qt3D buffer
+//    MatrixX3f matLineColor(tMatVert.rows(),3);
+
+//    for(int i = 0; i < matLineColor.rows(); ++i) {
+//        matLineColor(i,0) = 0.0f;
+//        matLineColor(i,1) = 0.0f;
+//        matLineColor(i,2) = 1.0f;
+//    }
+
+//    m_pCustomMesh->setMeshData(tMatVert,
+//                                tMatNorm,
+//                                tMatLines,
+//                                matLineColor,
+//                                Qt3DRender::QGeometryRenderer::Lines);
+}
+
+
+//*************************************************************************************************************
+
+void NetworkTreeItem::plotNodes(const Network& tNetworkData)
+{
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
     MatrixX3f tMatVert(lNetworkNodes.size(), 3);
@@ -184,101 +251,135 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
         tMatVert(i,2) = lNetworkNodes.at(i)->getVert()(2);
     }
 
-    MatrixX3f tMatNorm(lNetworkNodes.size(), 3);
-    tMatNorm.setZero();
+    QEntity* pSourceSphereEntity = new QEntity(this);
 
-    //Draw network nodes
-    //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
-    if(!m_bNodesPlotted) {
+    //create geometry
+    QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+    pSourceSphereGeometry->setRadius(0.001f);
 
-        //use QEntity instead of Renderable3DEntity to avoid a double transformation of digitizers
-        //from Abstract3DMeshTree and the child Renderable3DEntity
-        QEntity* pSourceSphereEntity = new QEntity(this);
-        //create geometry
-        QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
-        pSourceSphereGeometry->setRadius(0.001f);
-        //create instanced renderer
-        GeometryMultiplier *pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
+    //create instanced renderer
+    GeometryMultiplier *pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
 
-        //Create transform matrix for each sphere instance
-        QVector<QMatrix4x4> vTransforms;
-        vTransforms.reserve(tMatVert.rows());
-        QVector3D tempPos;
+    //Create transform matrix for each sphere instance
+    QVector<QMatrix4x4> vTransforms;
+    vTransforms.reserve(tMatVert.rows());
+    QVector3D tempPos;
 
-        for(int i = 0; i < tMatVert.rows(); ++i) {
-            QMatrix4x4 tempTransform;
+    for(int i = 0; i < tMatVert.rows(); ++i) {
+        QMatrix4x4 tempTransform;
 
-            tempPos.setX(tMatVert(i, 0));
-            tempPos.setY(tMatVert(i, 1));
-            tempPos.setZ(tMatVert(i, 2));
-            //Set position
-            tempTransform.translate(tempPos);
-            vTransforms.push_back(tempTransform);
-        }
-
-        //Set instance Transform
-        pSphereMesh->setTransforms(vTransforms);
-
-        pSourceSphereEntity->addComponent(pSphereMesh);
-
-        //Add material
-        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-        pMaterial->setAmbient(Qt::blue);
-        pMaterial->setAlpha(1.0f);
-        pSourceSphereEntity->addComponent(pMaterial);
-
-        m_bNodesPlotted = true;
+        tempPos.setX(tMatVert(i, 0));
+        tempPos.setY(tMatVert(i, 1));
+        tempPos.setZ(tMatVert(i, 2));
+        //Set position
+        tempTransform.translate(tempPos);
+        vTransforms.push_back(tempTransform);
     }
 
-    //Generate connection indices for Qt3D buffer
-    MatrixXi tMatLines;
-    int count = 0;
-    int start, end;
+    //Set instance Transform
+    pSphereMesh->setTransforms(vTransforms);
+
+    pSourceSphereEntity->addComponent(pSphereMesh);
+
+    //Add material
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
+    pMaterial->setAmbient(Qt::blue);
+    pMaterial->setAlpha(1.0f);
+    pSourceSphereEntity->addComponent(pMaterial);
+
+    m_bNodesPlotted = true;
+}
+
+
+//*************************************************************************************************************
+
+void NetworkTreeItem::plotEdges(const Network &tNetworkData,
+                                const QVector3D& vecThreshold)
+{
+    if(tNetworkData.isEmpty()) {
+        qDebug() << "NetworkTreeItem::plotEdges - Network data is empty. Returning.";
+        return;
+    }
+
+    QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
+
+    QEntity* pEdgeEntity = new QEntity(this);
+
+    //create geometry
+    QSharedPointer<Qt3DExtras::QCylinderGeometry> pEdgesGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
+    pEdgesGeometry->setRadius(0.001f);
+    pEdgesGeometry->setLength(1.0f);
+    GeometryMultiplier *pEdgesMesh = new GeometryMultiplier(pEdgesGeometry);
+
+    //Create transform matrix for each cylinder instance
+    QVector<QMatrix4x4> vTransformsEdges;
+    QVector3D startPos, endPos, edgePos, diff;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         //Plot in edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
-            start = lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getId();
-            end = lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getId();
+            startPos = QVector3D(lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(0),
+                              lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(1),
+                              lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(2));
 
-            if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()(0,0)) >= vecThreshold.x() &&
-                    start != end) {
-                tMatLines.conservativeResize(count+1,2);
-                tMatLines(count,0) = start;
-                tMatLines(count,1) = end;
-                ++count;
+            endPos = QVector3D(lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(0),
+                            lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(1),
+                            lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(2));
+
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()(0,0)) > vecThreshold.x() &&
+                    startPos != endPos) {
+                diff = endPos - startPos;
+                edgePos = endPos - diff/2;
+
+                QMatrix4x4 tempTransform;
+                tempTransform.scale(diff.length());
+                tempTransform.translate(edgePos);
+                //tempTransform.rotate(QQuaternion::fromDirection(diff,diff));
+                //tempTransform.lookAt(endPos,edgePos,QVector3D::crossProduct(endPos,diff));
+                vTransformsEdges.push_back(tempTransform);
             }
         }
 
         //Plot out edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
-            start = lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getId();
-            end = lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getId();
+            startPos = QVector3D(lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getVert()(0),
+                              lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getVert()(1),
+                              lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNode()->getVert()(2));
 
-            if(std::fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0)) >= vecThreshold.x() &&
-                    start != end) {
-                tMatLines.conservativeResize(count+1,2);
-                tMatLines(count,0) = start;
-                tMatLines(count,1) = end;
-                ++count;
+            endPos = QVector3D(lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getVert()(0),
+                            lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getVert()(1),
+                            lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNode()->getVert()(2));
+
+//            qDebug() << "NetworkTreeItem::plotEdges weight " << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0);
+//            qDebug() << "NetworkTreeItem::plotEdges threshold " << vecThreshold.x();
+
+            if(std::fabs(lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0)) > vecThreshold.x() &&
+                    startPos != endPos) {
+                diff = endPos - startPos;
+                edgePos = endPos - diff/2;
+
+                //qDebug() << "NetworkTreeItem::plotEdges diff.length() " <<diff.length();
+
+                QMatrix4x4 tempTransform;
+                tempTransform.scale(diff.length());
+                tempTransform.translate(edgePos);
+                //tempTransform.rotate(QQuaternion::fromDirection(diff,diff));
+                //tempTransform.lookAt(endPos,edgePos,QVector3D::crossProduct(endPos,diff));
+                vTransformsEdges.push_back(tempTransform);
             }
         }
     }
 
-    //Generate colors for Qt3D buffer
-    MatrixX3f matLineColor(tMatVert.rows(),3);
+    //Set instance Transform
+    //qDebug() << "NetworkTreeItem::plotEdges vTransformsEdges.size()" << vTransformsEdges.size() ;
+    pEdgesMesh->setTransforms(vTransformsEdges);
+    pEdgeEntity->addComponent(pEdgesMesh);
 
-    for(int i = 0; i < matLineColor.rows(); ++i) {
-        matLineColor(i,0) = 0.0f;
-        matLineColor(i,1) = 0.0f;
-        matLineColor(i,2) = 1.0f;
-    }
-
-    m_pCustomMesh->setMeshData(tMatVert,
-                                tMatNorm,
-                                tMatLines,
-                                matLineColor,
-                                Qt3DRender::QGeometryRenderer::Lines);
+    //Add material
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
+    pMaterial->setAmbient(Qt::darkYellow);
+    pMaterial->setAlpha(1.0f);
+    pEdgeEntity->addComponent(pMaterial);
 }
 
 

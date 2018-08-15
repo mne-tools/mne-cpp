@@ -156,6 +156,24 @@ private:
     */
     void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData, const QVector3D& vecThreshold);
 
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want plot the network nodes.
+    *
+    * @param[in] tNetworkData     The network data.
+    */
+    void plotNodes(const CONNECTIVITYLIB::Network &tNetworkData);
+
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want plot the network edges.
+    *
+    * @param[in] tNetworkData     The network data.
+    * @param[in] vecThreshold     The threshold data.
+    */
+    void plotEdges(const CONNECTIVITYLIB::Network& tNetworkData,
+                   const QVector3D& vecThreshold);
+
     bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
     QPointer<MetaTreeItem>                      m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
