@@ -49,6 +49,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,8 +83,13 @@ NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
                          MatrixXd& matWeight)
 : m_pStartNode(pStartNode)
 , m_pEndNode(pEndNode)
-, m_matWeight(matWeight)
 {
+    if(matWeight.rows() == 0 || matWeight.cols() == 0) {
+        m_matWeight = MatrixXd::Zero(1,1);
+        qDebug() << "NetworkEdge::NetworkEdge - Matrix weights number of rows and/or columns are zero. Setting to 1x1 zero matrix.";
+    } else {
+        m_matWeight = matWeight;
+    }
 }
 
 

@@ -80,6 +80,7 @@ using namespace UTILSLIB;
 
 Network::Network(const QString& sConnectivityMethod)
 : m_sConnectivityMethod(sConnectivityMethod)
+, m_minMaxWeights(QPair<float,float>(0.0f,0.0f))
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
 }
@@ -157,8 +158,24 @@ QString Network::getConnectivityMethod() const
 
 //*************************************************************************************************************
 
+QPair<float,float> Network::getMinMaxWeights() const
+{
+    return m_minMaxWeights;
+}
+
+
+//*************************************************************************************************************
+
 void Network::append(NetworkEdge::SPtr newEdge)
 {
+    if(newEdge->getWeight()(0,0) < m_minMaxWeights.first) {
+        m_minMaxWeights.first = newEdge->getWeight()(0,0);
+    }
+
+    if(newEdge->getWeight()(0,0) > m_minMaxWeights.second) {
+        m_minMaxWeights.second = newEdge->getWeight()(0,0);
+    }
+
     m_lEdges << newEdge;
 }
 

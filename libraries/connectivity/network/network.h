@@ -176,6 +176,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the minimum and maximum weight strength of the entire network.
+    *
+    * @return   The minimum and maximum weight strength of the entire network.
+    */
+    QPair<float, float> getMinMaxWeights() const;
+
+    //=========================================================================================================
+    /**
     * Appends a network edge to this network node.
     *
     * @param[in] newEdge    The new edge item.
@@ -205,6 +213,8 @@ protected:
     Eigen::MatrixXd                         m_matDistMatrix;            /**< The distance matrix.*/
 
     QString                                 m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
+
+    QPair<float,float>                      m_minMaxWeights;            /**< The minimum and maximum weight strength of the entire network.*/
 
     //=========================================================================================================
     /**
