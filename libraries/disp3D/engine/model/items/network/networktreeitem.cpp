@@ -241,6 +241,11 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& 
 
 void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 {
+    if(tNetworkData.isEmpty()) {
+        qDebug() << "NetworkTreeItem::plotNodes - Network data is empty. Returning.";
+        return;
+    }
+
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
     MatrixX3f tMatVert(lNetworkNodes.size(), 3);
@@ -306,25 +311,56 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
     QEntity* pEdgeEntity = new QEntity(this);
 
     //create geometry
-    QSharedPointer<Qt3DExtras::QCylinderGeometry> pEdgesGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
-    pEdgesGeometry->setRadius(0.001f);
-    pEdgesGeometry->setLength(1.0f);
-    GeometryMultiplier *pEdgesMesh = new GeometryMultiplier(pEdgesGeometry);
+    if(!m_pEdgesIn) {
+        if(!m_pEdgesInGeometry) {
+            m_pEdgesInGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
+            m_pEdgesInGeometry->setRadius(0.0001f);
+            m_pEdgesInGeometry->setLength(1.0f);
+        }
+
+        m_pEdgesIn = new GeometryMultiplier(m_pEdgesInGeometry);
+
+        pEdgeEntity->addComponent(m_pEdgesIn);
+
+        //Add material
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
+        pMaterial->setAmbient(Qt::red);
+        pMaterial->setAlpha(1.0f);
+        pEdgeEntity->addComponent(pMaterial);
+    }
+
+    if(!m_pEdgesOut) {
+        if(!m_pEdgesOutGeometry) {
+            m_pEdgesOutGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
+            m_pEdgesOutGeometry->setRadius(0.0001f);
+            m_pEdgesOutGeometry->setLength(1.0f);
+        }
+
+        m_pEdgesOut = new GeometryMultiplier(m_pEdgesOutGeometry);
+
+        pEdgeEntity->addComponent(m_pEdgesOut);
+
+        //Add material
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
+        pMaterial->setAmbient(Qt::blue);
+        pMaterial->setAlpha(1.0f);
+        pEdgeEntity->addComponent(pMaterial);
+    }
 
     //Create transform matrix for each cylinder instance
-    QVector<QMatrix4x4> vTransformsEdges;
+    QVector<QMatrix4x4> vTransformsEdgesIn, vTransformsEdgesOut;
     QVector3D startPos, endPos, edgePos, diff;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         //Plot in edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
             startPos = QVector3D(lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(0),
-                              lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(1),
-                              lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(2));
+                                 lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(1),
+                                 lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNode()->getVert()(2));
 
             endPos = QVector3D(lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(0),
-                            lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(1),
-                            lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(2));
+                               lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(1),
+                               lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNode()->getVert()(2));
 
             if(std::fabs(lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()(0,0)) > vecThreshold.x() &&
                     startPos != endPos) {
@@ -332,11 +368,10 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
                 edgePos = endPos - diff/2;
 
                 QMatrix4x4 tempTransform;
-                tempTransform.scale(diff.length());
                 tempTransform.translate(edgePos);
-                //tempTransform.rotate(QQuaternion::fromDirection(diff,diff));
-                //tempTransform.lookAt(endPos,edgePos,QVector3D::crossProduct(endPos,diff));
-                vTransformsEdges.push_back(tempTransform);
+                tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
+                tempTransform.scale(1.0,diff.length(),1.0);
+                vTransformsEdgesIn.push_back(tempTransform);
             }
         }
 
@@ -358,28 +393,18 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
                 diff = endPos - startPos;
                 edgePos = endPos - diff/2;
 
-                //qDebug() << "NetworkTreeItem::plotEdges diff.length() " <<diff.length();
-
                 QMatrix4x4 tempTransform;
-                tempTransform.scale(diff.length());
                 tempTransform.translate(edgePos);
-                //tempTransform.rotate(QQuaternion::fromDirection(diff,diff));
-                //tempTransform.lookAt(endPos,edgePos,QVector3D::crossProduct(endPos,diff));
-                vTransformsEdges.push_back(tempTransform);
+                tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
+                tempTransform.scale(1.0,diff.length(),1.0);
+                vTransformsEdgesOut.push_back(tempTransform);
             }
         }
     }
 
     //Set instance Transform
-    //qDebug() << "NetworkTreeItem::plotEdges vTransformsEdges.size()" << vTransformsEdges.size() ;
-    pEdgesMesh->setTransforms(vTransformsEdges);
-    pEdgeEntity->addComponent(pEdgesMesh);
-
-    //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-    pMaterial->setAmbient(Qt::darkYellow);
-    pMaterial->setAlpha(1.0f);
-    pEdgeEntity->addComponent(pMaterial);
+    m_pEdgesIn->setTransforms(vTransformsEdgesIn);
+    m_pEdgesOut->setTransforms(vTransformsEdgesOut);
 }
 
 
