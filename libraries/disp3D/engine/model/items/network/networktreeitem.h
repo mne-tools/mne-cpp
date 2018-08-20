@@ -137,6 +137,14 @@ public:
     */
     void addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
+    //=========================================================================================================
+    /**
+    * This function set the threshold values.
+    *
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
+    */
+    void setThresholds(const QVector3D& vecThresholds);
+
 private:
     //=========================================================================================================
     /**
