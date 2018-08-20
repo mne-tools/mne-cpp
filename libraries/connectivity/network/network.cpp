@@ -80,7 +80,7 @@ using namespace UTILSLIB;
 
 Network::Network(const QString& sConnectivityMethod)
 : m_sConnectivityMethod(sConnectivityMethod)
-, m_minMaxWeights(QPair<float,float>(0.0f,0.0f))
+, m_minMaxWeights(QPair<float,float>(100000000.0f,0.0f))
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
 }
@@ -161,6 +161,69 @@ QString Network::getConnectivityMethod() const
 QPair<float,float> Network::getMinMaxWeights() const
 {
     return m_minMaxWeights;
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxDegrees(double dThresold) const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getDegree(dThresold) > maxDegree){
+            maxDegree = m_lNodes.at(i)->getDegree(dThresold);
+        }
+
+        if(m_lNodes.at(i)->getDegree(dThresold) < minDegree){
+            minDegree = m_lNodes.at(i)->getDegree(dThresold);
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxIndegrees(double dThresold) const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getIndegree(dThresold) > maxDegree){
+            maxDegree = m_lNodes.at(i)->getIndegree(dThresold);
+        }
+
+        if(m_lNodes.at(i)->getIndegree(dThresold) < minDegree){
+            minDegree = m_lNodes.at(i)->getIndegree(dThresold);
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxOutdegrees(double dThresold) const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getOutdegree(dThresold) > maxDegree){
+            maxDegree = m_lNodes.at(i)->getOutdegree(dThresold);
+        }
+
+        if(m_lNodes.at(i)->getOutdegree(dThresold) < minDegree){
+            minDegree = m_lNodes.at(i)->getOutdegree(dThresold);
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
 }
 
 

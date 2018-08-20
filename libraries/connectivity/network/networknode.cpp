@@ -126,25 +126,67 @@ qint16 NetworkNode::getId() const
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getDegree() const
+qint16 NetworkNode::getDegree(double dThresold) const
 {
-    return m_lEdgesIn.size() + m_lEdgesOut.size();
+    if(dThresold == 0.0) {
+        return m_lEdgesIn.size() + m_lEdgesOut.size();
+    }
+
+    int degree = 0;
+
+    for(int i = 0; i< m_lEdgesIn.size(); i++) {
+        if(m_lEdgesIn.at(i)->getWeight()(0,0) >= dThresold) {
+            degree++;
+        }
+    }
+
+    for(int i = 0; i< m_lEdgesOut.size(); i++) {
+        if(m_lEdgesOut.at(i)->getWeight()(0,0) >= dThresold) {
+            degree++;
+        }
+    }
+
+    return degree;
 }
 
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getIndegree() const
+qint16 NetworkNode::getIndegree(double dThresold) const
 {
-    return m_lEdgesIn.size();
+    if(dThresold == 0.0) {
+        return m_lEdgesIn.size();
+    }
+
+    int degree = 0;
+
+    for(int i = 0; i< m_lEdgesIn.size(); i++) {
+        if(m_lEdgesIn.at(i)->getWeight()(0,0) >= dThresold) {
+            degree++;
+        }
+    }
+
+    return degree;
 }
 
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getOutdegree() const
+qint16 NetworkNode::getOutdegree(double dThresold) const
 {
-    return m_lEdgesOut.size();
+    if(dThresold == 0.0) {
+        return m_lEdgesOut.size();
+    }
+
+    int degree = 0;
+
+    for(int i = 0; i< m_lEdgesOut.size(); i++) {
+        if(m_lEdgesOut.at(i)->getWeight()(0,0) >= dThresold) {
+            degree++;
+        }
+    }
+
+    return degree;
 }
 
 

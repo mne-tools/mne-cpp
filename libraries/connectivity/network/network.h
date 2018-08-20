@@ -184,6 +184,36 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the minimum and maximum degree (in and out) of the entire network.
+    *
+    * @param[in] dThresold        The threshold for which the degree should be returned. Default 0.0 (meaning all).
+    *
+    * @return   The minimum and maximum degree of the entire network.
+    */
+    QPair<int,int> getMinMaxDegrees(double dThresold = 0.0) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum indegree of the entire network.
+    *
+    * @param[in] dThresold        The threshold for which the indegree should be returned. Default 0.0 (meaning all).
+    *
+    * @return   The minimum and maximum indegree of the entire network.
+    */
+    QPair<int,int> getMinMaxIndegrees(double dThresold = 0.0) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum outdegree of the entire network.
+    *
+    * @param[in] dThresold        The threshold for which the outdegree should be returned. Default 0.0 (meaning all).
+    *
+    * @return   The minimum and maximum outdegree of the entire network.
+    */
+    QPair<int,int> getMinMaxOutdegrees(double dThresold = 0.0) const;
+
+    //=========================================================================================================
+    /**
     * Appends a network edge to this network node.
     *
     * @param[in] newEdge    The new edge item.
