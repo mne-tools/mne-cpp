@@ -80,6 +80,10 @@ namespace Qt3DCore {
     class QEntity;
 }
 
+namespace Qt3DExtras {
+    class QCylinderGeometry;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,6 +100,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MetaTreeItem;
+class GeometryMultiplier;
 
 
 //=============================================================================================================
@@ -174,9 +179,14 @@ private:
     void plotEdges(const CONNECTIVITYLIB::Network& tNetworkData,
                    const QVector3D& vecThreshold);
 
-    bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
+    bool                                            m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
 
-    QPointer<MetaTreeItem>                      m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+    QPointer<MetaTreeItem>                          m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+
+    QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesInGeometry;             /**< The network geomtries for incoming edges. */
+    QPointer<GeometryMultiplier>                    m_pEdgesIn;                     /**< The geometry multiplier for incoming edges. */
+    QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesOutGeometry;            /**< The network geomtries for outgoing edges. */
+    QPointer<GeometryMultiplier>                    m_pEdgesOut;                    /**< The geometry multiplier for outgoing edges. */
 
 };
 
