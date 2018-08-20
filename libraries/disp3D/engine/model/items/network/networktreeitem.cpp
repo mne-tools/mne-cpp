@@ -94,7 +94,6 @@ using namespace DISPLIB;
 
 NetworkTreeItem::NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
 : AbstractMeshTreeItem(p3DEntityParent, iType, text)
-, m_bNodesPlotted(false)
 {
     initItem();
 }
@@ -191,19 +190,16 @@ void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 
 void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& vecThreshold)
 {
-    //Draw network nodes
-    //TODO: Dirty hack using m_bNodesPlotted flag to get rid of memory leakage problem when putting parent to the nodes entities. Internal Qt3D problem?
-    if(!m_bNodesPlotted) {
-        plotNodes(tNetworkData);
-    }
-
+    //Draw network nodes and edges
+    plotNodes(tNetworkData, vecThreshold);
     plotEdges(tNetworkData, vecThreshold);
 }
 
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::plotNodes(const Network& tNetworkData)
+void NetworkTreeItem::plotNodes(const Network& tNetworkData,
+                                const QVector3D& vecThreshold)
 {
     if(tNetworkData.isEmpty()) {
         qDebug() << "NetworkTreeItem::plotNodes - Network data is empty. Returning.";
@@ -211,52 +207,53 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
     }
 
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
+    int iMaxDegree = tNetworkData.getMinMaxDegrees(vecThreshold.x()).second;
 
-    MatrixX3f tMatVert(lNetworkNodes.size(), 3);
-
-    for(int i = 0; i < lNetworkNodes.size(); ++i) {
-        tMatVert(i,0) = lNetworkNodes.at(i)->getVert()(0);
-        tMatVert(i,1) = lNetworkNodes.at(i)->getVert()(1);
-        tMatVert(i,2) = lNetworkNodes.at(i)->getVert()(2);
+    if(!m_pNodesEntity) {
+        m_pNodesEntity = new QEntity(this);
     }
 
-    QEntity* pSourceSphereEntity = new QEntity(this);
-
     //create geometry
-    QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
-    pSourceSphereGeometry->setRadius(0.001f);
+    if(!m_pEdgesIn) {
+        if(!m_pNodesGeometry) {
+            m_pNodesGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+            m_pNodesGeometry->setRadius(0.006f);
+        }
 
-    //create instanced renderer
-    GeometryMultiplier *pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
+        m_pNodes = new GeometryMultiplier(m_pNodesGeometry);
+
+        m_pNodesEntity->addComponent(m_pNodes);
+
+        //Add material
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
+        pMaterial->setAmbient(Qt::blue);
+        pMaterial->setAlpha(1.0f);
+        m_pNodesEntity->addComponent(pMaterial);
+    }
 
     //Create transform matrix for each sphere instance
     QVector<QMatrix4x4> vTransforms;
-    vTransforms.reserve(tMatVert.rows());
+    vTransforms.reserve(lNetworkNodes.size());
     QVector3D tempPos;
+    int dDegree = 0;
 
-    for(int i = 0; i < tMatVert.rows(); ++i) {
+    for(int i = 0; i < lNetworkNodes.size(); ++i) {
+        dDegree = lNetworkNodes.at(i)->getDegree(vecThreshold.x());
+
+        tempPos = QVector3D(lNetworkNodes.at(i)->getVert()(0),
+                            lNetworkNodes.at(i)->getVert()(1),
+                            lNetworkNodes.at(i)->getVert()(2));
+
+        //Set position and scale
         QMatrix4x4 tempTransform;
 
-        tempPos.setX(tMatVert(i, 0));
-        tempPos.setY(tMatVert(i, 1));
-        tempPos.setZ(tMatVert(i, 2));
-        //Set position
         tempTransform.translate(tempPos);
+        tempTransform.scale((float)dDegree/(float)iMaxDegree);
         vTransforms.push_back(tempTransform);
     }
 
     //Set instance Transform
-    pSphereMesh->setTransforms(vTransforms);
-
-    pSourceSphereEntity->addComponent(pSphereMesh);
-
-    //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-    pMaterial->setAmbient(Qt::blue);
-    pMaterial->setAlpha(1.0f);
-    pSourceSphereEntity->addComponent(pMaterial);
-
-    m_bNodesPlotted = true;
+    m_pNodes->setTransforms(vTransforms);
 }
 
 
@@ -274,7 +271,9 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
 
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
-    QEntity* pEdgeEntity = new QEntity(this);
+    if(!m_pEdgeEntity) {
+        m_pEdgeEntity = new QEntity(this);
+    }
 
     //create geometry
     if(!m_pEdgesIn) {
@@ -286,13 +285,13 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
 
         m_pEdgesIn = new GeometryMultiplier(m_pEdgesInGeometry);
 
-        pEdgeEntity->addComponent(m_pEdgesIn);
+        m_pEdgeEntity->addComponent(m_pEdgesIn);
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
         pMaterial->setAmbient(Qt::red);
         pMaterial->setAlpha(0.8f);
-        pEdgeEntity->addComponent(pMaterial);
+        m_pEdgeEntity->addComponent(pMaterial);
     }
 
     if(!m_pEdgesOut) {
@@ -304,13 +303,13 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
 
         m_pEdgesOut = new GeometryMultiplier(m_pEdgesOutGeometry);
 
-        pEdgeEntity->addComponent(m_pEdgesOut);
+        m_pEdgeEntity->addComponent(m_pEdgesOut);
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
         pMaterial->setAmbient(Qt::blue);
         pMaterial->setAlpha(0.8f);
-        pEdgeEntity->addComponent(pMaterial);
+        m_pEdgeEntity->addComponent(pMaterial);
     }
 
     //Create transform matrix for each cylinder instance

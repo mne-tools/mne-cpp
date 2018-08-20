@@ -82,6 +82,7 @@ namespace Qt3DCore {
 
 namespace Qt3DExtras {
     class QCylinderGeometry;
+    class QSphereGeometry;
 }
 
 
@@ -174,8 +175,10 @@ private:
     * Call this function whenever you want plot the network nodes.
     *
     * @param[in] tNetworkData     The network data.
+    * @param[in] vecThreshold     The threshold data.
     */
-    void plotNodes(const CONNECTIVITYLIB::Network &tNetworkData);
+    void plotNodes(const CONNECTIVITYLIB::Network &tNetworkData,
+                   const QVector3D& vecThreshold);
 
     //=========================================================================================================
     /**
@@ -187,10 +190,13 @@ private:
     void plotEdges(const CONNECTIVITYLIB::Network& tNetworkData,
                    const QVector3D& vecThreshold);
 
-    bool                                            m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
-
     QPointer<MetaTreeItem>                          m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
 
+    QPointer<QEntity>                               m_pNodesEntity;
+    QSharedPointer<Qt3DExtras::QSphereGeometry>     m_pNodesGeometry;               /**< The network geomtries for incoming edges. */
+    QPointer<GeometryMultiplier>                    m_pNodes;                       /**< The geometry multiplier for incoming edges. */
+
+    QPointer<QEntity>                               m_pEdgeEntity;
     QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesInGeometry;             /**< The network geomtries for incoming edges. */
     QPointer<GeometryMultiplier>                    m_pEdgesIn;                     /**< The geometry multiplier for incoming edges. */
     QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesOutGeometry;            /**< The network geomtries for outgoing edges. */

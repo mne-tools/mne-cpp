@@ -151,25 +151,31 @@ public:
     /**
     * Returns node degree.
     *
+    * @param[in] dThresold        The threshold for which the degree should be returned. Default 0.0 (meaning all).
+    *
     * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
     */
-    qint16 getDegree() const;
+    qint16 getDegree(double dThresold = 0.0) const;
 
     //=========================================================================================================
     /**
     * Returns node indegree.
     *
+    * @param[in] dThresold        The threshold for which the degree should be returned. Default 0.0 (meaning all).
+    *
     * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
     */
-    qint16 getIndegree() const;
+    qint16 getIndegree(double dThresold = 0.0) const;
 
     //=========================================================================================================
     /**
     * Returns node outdegree.
     *
+    * @param[in] dThresold        The threshold for which the degree should be returned. Default 0.0 (meaning all).
+    *
     * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
     */
-    qint16 getOutdegree() const;
+    qint16 getOutdegree(double dThresold = 0.0) const;
 
     //=========================================================================================================
     /**
