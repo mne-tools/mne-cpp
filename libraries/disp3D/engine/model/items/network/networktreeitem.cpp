@@ -233,6 +233,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData,
 
     //Create transform matrix for each sphere instance
     QVector<QMatrix4x4> vTransforms;
+    QVector<QColor> vColorsNodes;
     vTransforms.reserve(lNetworkNodes.size());
     QVector3D tempPos;
     int dDegree = 0;
@@ -250,10 +251,19 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData,
         tempTransform.translate(tempPos);
         tempTransform.scale((float)dDegree/(float)iMaxDegree);
         vTransforms.push_back(tempTransform);
+
+        if(dDegree != 0.0f) {
+            vColorsNodes.push_back(QColor(ColorMap::valueToJet((float)dDegree/(float)iMaxDegree)));
+        } else {
+            vColorsNodes.push_back(QColor(ColorMap::valueToJet(0.0f)));
+        }
     }
 
-    //Set instance Transform
-    m_pNodes->setTransforms(vTransforms);
+    //Set instance Transform and colors
+    if(!vTransforms.isEmpty() && !vColorsNodes.isEmpty()) {
+        m_pNodes->setTransforms(vTransforms);
+        m_pNodes->setColors(vColorsNodes);
+    }
 }
 
 
