@@ -166,6 +166,29 @@ QPair<float,float> Network::getMinMaxWeights() const
 
 //*************************************************************************************************************
 
+QPair<float,float> Network::getMinMaxWeights(double dThresold) const
+{
+    float maxWeight = 0;
+    float minWeight = 1000000000;
+
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        double weight = m_lEdges.at(i)->getWeight()(0,0);
+
+        if(weight > maxWeight && weight > dThresold){
+            maxWeight = weight;
+        }
+
+        if(weight < minWeight && weight > dThresold){
+            minWeight = weight;
+        }
+    }
+
+    return QPair<float,float>(minWeight,maxWeight);
+}
+
+
+//*************************************************************************************************************
+
 QPair<int,int> Network::getMinMaxDegrees(double dThresold) const
 {
     int maxDegree = 0;
