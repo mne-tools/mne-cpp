@@ -184,6 +184,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the minimum and maximum weight strength of the thresholded network.
+    *
+    * @param[in] dThresold        The threshold for which the min max weight should be returned. Choose 0.0 for the entire network.
+    *
+    * @return   The minimum and maximum weight strength of the thresholded network.
+    */
+    QPair<float, float> getMinMaxWeights(double dThresold) const;
+
+    //=========================================================================================================
+    /**
     * Returns the minimum and maximum degree (in and out) of the entire network.
     *
     * @param[in] dThresold        The threshold for which the degree should be returned. Default 0.0 (meaning all).

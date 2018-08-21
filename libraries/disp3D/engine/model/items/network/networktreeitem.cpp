@@ -267,7 +267,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
         return;
     }
 
-    float fMaxWeight = tNetworkData.getMinMaxWeights().second;
+    float fMaxWeight = tNetworkData.getMinMaxWeights(vecThreshold.x()).second;
 
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
