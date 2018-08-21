@@ -272,8 +272,8 @@ MatrixXd Network::generateConnectMat(int idxRow, int idxCol) const
 
     for(int i = 0; i < m_lEdges.size(); ++i)
     {
-        int row = m_lEdges.at(i)->getStartNode()->getId();
-        int col = m_lEdges.at(i)->getEndNode()->getId();
+        int row = m_lEdges.at(i)->getStartNodeID();
+        int col = m_lEdges.at(i)->getEndNodeID();
 
         if(row < matDist.rows() && col < matDist.cols())
         {

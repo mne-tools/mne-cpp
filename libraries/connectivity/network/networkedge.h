@@ -101,12 +101,14 @@ public:
     /**
     * Constructs a NetworkEdge object.
     *
-    * @param[in]  pStartNode        The start node of the edge.
-    * @param[in]  pEndNode          The end node of the edge.
+    * @param[in]  pStartNode        The start node id of the edge.
+    * @param[in]  pEndNode          The end node id of the edge.
+    * @param[in]  vecVertStartNode  The start node vert of the edge.
+    * @param[in]  vecVertEndNode    The end node vert of the edge.
     * @param[in]  matWeight         The edge weight.
     */
-    explicit NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
-                         QSharedPointer<NetworkNode> pEndNode,
+    explicit NetworkEdge(int iStartNodeID,
+                         int iEndNodeID,
                          Eigen::MatrixXd& matWeight);
 
     //=========================================================================================================
@@ -115,7 +117,7 @@ public:
     *
     * @return The start node of the edge.
     */
-    QSharedPointer<NetworkNode> getStartNode();
+    int getStartNodeID();
 
     //=========================================================================================================
     /**
@@ -123,7 +125,7 @@ public:
     *
     * @return The end node of the edge.
     */
-    QSharedPointer<NetworkNode> getEndNode();
+    int getEndNodeID();
 
     //=========================================================================================================
     /**
@@ -132,8 +134,8 @@ public:
     Eigen::MatrixXd getWeight() const;
 
 protected:
-    QSharedPointer<NetworkNode>     m_pStartNode;       /**< The start node of the edge.*/
-    QSharedPointer<NetworkNode>     m_pEndNode;         /**< The end node of the edge.*/
+    int     m_iStartNodeID;       /**< The start node of the edge.*/
+    int     m_iEndNodeID;         /**< The end node of the edge.*/
 
     Eigen::MatrixXd                 m_matWeight;        /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
 

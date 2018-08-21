@@ -78,11 +78,11 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
-                         QSharedPointer<NetworkNode> pEndNode,
+NetworkEdge::NetworkEdge(int iStartNodeID,
+                         int iEndNodeID,
                          MatrixXd& matWeight)
-: m_pStartNode(pStartNode)
-, m_pEndNode(pEndNode)
+: m_iStartNodeID(iStartNodeID)
+, m_iEndNodeID(iEndNodeID)
 {
     if(matWeight.rows() == 0 || matWeight.cols() == 0) {
         m_matWeight = MatrixXd::Zero(1,1);
@@ -95,17 +95,17 @@ NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
 
 //*************************************************************************************************************
 
-QSharedPointer<NetworkNode> NetworkEdge::getStartNode()
+int NetworkEdge::getStartNodeID()
 {
-    return m_pStartNode;
+    return m_iStartNodeID;
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<NetworkNode> NetworkEdge::getEndNode()
+int NetworkEdge::getEndNodeID()
 {
-    return m_pEndNode;
+    return m_iEndNodeID;
 }
 
 
