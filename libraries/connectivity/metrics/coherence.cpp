@@ -92,7 +92,9 @@ Coherence::Coherence()
 
 //*******************************************************************************************************
 
-Network Coherence::coherence(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert, int iNfft,
+Network Coherence::coherence(const QList<MatrixXd> &matDataList,
+                             const MatrixX3f& matVert,
+                             int iNfft,
                              const QString &sWindowType)
 {
     Network finalNetwork("Coherence");
@@ -138,7 +140,8 @@ Network Coherence::coherence(const QList<MatrixXd> &matDataList, const MatrixX3f
 //*************************************************************************************************************
 
 QVector<MatrixXd> Coherence::computeCoherence(const QList<MatrixXd> &matDataList,
-                                              int iNfft, const QString &sWindowType)
+                                              int iNfft,
+                                              const QString &sWindowType)
 {
     QVector<MatrixXcd> vecCoherency = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
     QVector<MatrixXd> vecCoherence;

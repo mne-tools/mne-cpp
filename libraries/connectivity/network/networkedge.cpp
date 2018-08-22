@@ -111,9 +111,27 @@ int NetworkEdge::getEndNodeID()
 
 //*************************************************************************************************************
 
-MatrixXd NetworkEdge::getWeight() const
+double NetworkEdge::getWeight(int startBin, int endBin) const
 {
-    return m_matWeight;
+    if(endBin < startBin || startBin < -1 || endBin < -1 ) {
+        qDebug() << "Network::generateConnectMat - end bin index is larger than start bin index or one of them is negative. Returning zero matrix.";
+        return 0.0;
+    }
+
+    int rows = m_matWeight.rows();
+    int cols = m_matWeight.cols();
+    double dWeight = 0.0;
+
+    if(endBin-startBin+1 < cols
+       && startBin < cols) {
+        qDebug() << "spanning";
+        dWeight = m_matWeight.block(0,startBin,rows,endBin-startBin+1).mean();
+    } else if (endBin == -1
+               && startBin == -1) {
+        dWeight = m_matWeight.mean();
+    }
+
+    return dWeight;
 }
 
 
