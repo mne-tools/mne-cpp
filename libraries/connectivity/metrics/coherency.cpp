@@ -96,7 +96,8 @@ Coherency::Coherency()
 //*************************************************************************************************************
 
 QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType)
+                                               int iNfft,
+                                               const QString &sWindowType)
 {
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
@@ -128,14 +129,18 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
         // This part could be parallelized with QtConcurrent::mapped
         QVector<MatrixXcd> vecTapSpectra;
         for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
+            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j),
+                                                                      tapers.first,
+                                                                      iNfft);
             vecTapSpectra.append(matTmpSpectra);
         }
 
         // This part could be parallelized with QtConcurrent::mappedReduced
         for (int j = 0; j < iNRows; ++j) {
-            RowVectorXd vecTmpPsd = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j), tapers.second,
-                                                                    iNfft, 1.0);
+            RowVectorXd vecTmpPsd = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j),
+                                                                    tapers.second,
+                                                                    iNfft,
+                                                                    1.0);
             matPsdAvg.row(j) += vecTmpPsd;
         }
 
@@ -143,8 +148,12 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
         for (int j = 0; j < iNRows; ++j) {
             MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
             for (int k = 0; k < iNRows; ++k) {
-                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
-                                                                tapers.second, tapers.second, iNfft, 1.0);
+                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j),
+                                                                vecTapSpectra.at(k),
+                                                                tapers.second,
+                                                                tapers.second,
+                                                                iNfft,
+                                                                1.0);
             }
             vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd);
         }
@@ -159,5 +168,6 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
         }
         vecCoherency.append(vecCsdAvg.at(i).cwiseQuotient(matPSDtmp));
     }
+
     return vecCoherency;
 }

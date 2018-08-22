@@ -59,6 +59,8 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
+#include <realtime/rtProcessing/rtconnectivity.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,6 +72,7 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -82,6 +85,7 @@ using namespace INVERSELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace CONNECTIVITYLIB;
+using namespace REALTIMELIB;
 
 
 //*************************************************************************************************************
@@ -111,12 +115,12 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "./MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "mag");
@@ -442,12 +446,14 @@ int main(int argc, char *argv[])
     settings.m_iNfft = -1;
     settings.m_sWindowType = "hanning";
 
-    Connectivity tConnectivity(settings);
-    Network tNetwork = tConnectivity.calculateConnectivity();
-
     NetworkView tNetworkView;
-    NetworkTreeItem* pNetowrkTreeItem = tNetworkView.addData(tNetwork);
-    pNetowrkTreeItem->setThresholds(QVector3D(2.8f,5.0f,10.0f));
+
+    RtConnectivity::SPtr pRtConnectivity = RtConnectivity::SPtr::create();
+    QObject::connect(pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
+                     &tNetworkView, &NetworkView::addData);
+
+    pRtConnectivity->append(settings);
+
     tNetworkView.show();
 
     return a.exec();

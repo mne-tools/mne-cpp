@@ -341,7 +341,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
                                  vectorEnd(1),
                                  vectorEnd(2));
 
-            fWeight = lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight()(0,0);
+            fWeight = lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight();
             if(std::fabs(fWeight) > vecThreshold.x() &&
                     startPos != endPos) {
                 diff = endPos - startPos;
@@ -374,8 +374,10 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
 
 //            qDebug() << "NetworkTreeItem::plotEdges weight " << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0);
 //            qDebug() << "NetworkTreeItem::plotEdges threshold " << vecThreshold.x();
+//            qDebug() << "rows" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().rows();
+//            qDebug() << "cols" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().cols();
 
-            fWeight = lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0);
+            fWeight = lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight();
             if(std::fabs(fWeight) > vecThreshold.x() &&
                     startPos != endPos) {
                 diff = endPos - startPos;

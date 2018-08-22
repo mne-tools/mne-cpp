@@ -129,9 +129,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the edge weight.
+    * Returns the edge weight. The weights are averaged between the specified bin indeces and their corresponding tapers.
+    *
+    * @param[in] startBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
+    * @param[in] endBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
+    *
+    * @return    The weight.
     */
-    Eigen::MatrixXd getWeight() const;
+    double getWeight(int startBin = -1, int endBin = -1) const;
 
 protected:
     int     m_iStartNodeID;       /**< The start node of the edge.*/
