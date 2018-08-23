@@ -216,7 +216,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
     }
 
     //create geometry
-    if(!m_pEdgesIn) {
+    if(!m_pEdges) {
         if(!m_pNodesGeometry) {
             m_pNodesGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
             m_pNodesGeometry->setRadius(0.006f);
@@ -281,6 +281,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
     double dMinWeight = tNetworkData.getMinMaxWeights().first;
     double dMaxWeight = tNetworkData.getMinMaxWeights().second;
 
+    QList<NetworkEdge::SPtr> lNetworkEdges = tNetworkData.getEdges();
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
     if(!m_pEdgeEntity) {
@@ -288,16 +289,16 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
     }
 
     //create geometry
-    if(!m_pEdgesIn) {
-        if(!m_pEdgesInGeometry) {
-            m_pEdgesInGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
-            m_pEdgesInGeometry->setRadius(0.0005f);
-            m_pEdgesInGeometry->setLength(1.0f);
+    if(!m_pEdges) {
+        if(!m_pEdgesGeometry) {
+            m_pEdgesGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
+            m_pEdgesGeometry->setRadius(0.0005f);
+            m_pEdgesGeometry->setLength(1.0f);
         }
 
-        m_pEdgesIn = new GeometryMultiplier(m_pEdgesInGeometry);
+        m_pEdges = new GeometryMultiplier(m_pEdgesGeometry);
 
-        m_pEdgeEntity->addComponent(m_pEdgesIn);
+        m_pEdgeEntity->addComponent(m_pEdges);
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
@@ -306,110 +307,54 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
         m_pEdgeEntity->addComponent(pMaterial);
     }
 
-    if(!m_pEdgesOut) {
-        if(!m_pEdgesOutGeometry) {
-            m_pEdgesOutGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
-            m_pEdgesOutGeometry->setRadius(0.0005f);
-            m_pEdgesOutGeometry->setLength(1.0f);
-        }
-
-        m_pEdgesOut = new GeometryMultiplier(m_pEdgesOutGeometry);
-
-        m_pEdgeEntity->addComponent(m_pEdgesOut);
-
-        //Add material
-        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-        pMaterial->setAmbient(Qt::blue);
-        pMaterial->setAlpha(0.8f);
-        m_pEdgeEntity->addComponent(pMaterial);
-    }
-
     //Create transform matrix for each cylinder instance
-    QVector<QMatrix4x4> vTransformsEdgesIn, vTransformsEdgesOut;
-    QVector<QColor> vColorsEdgesIn, vColorsEdgesOut;
+    QVector<QMatrix4x4> vTransformsEdges;
+    QVector<QColor> vColorsEdges;
     QVector3D startPos, endPos, edgePos, diff;
     double dWeight = 0.0f;
+    int iStartID, iEndID;
 
-    for(int i = 0; i < lNetworkNodes.size(); ++i) {
+    for(int i = 0; i < lNetworkEdges.size(); ++i) {
         //Plot in edges
-        for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
-            if(lNetworkNodes.at(i)->getEdgesIn().at(j)->isActive()) {
-                RowVectorXf vectorStart = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNodeID())->getVert();
-                startPos = QVector3D(vectorStart(0),
-                                     vectorStart(1),
-                                     vectorStart(2));
+        NetworkEdge::SPtr pNetworkEdge = lNetworkEdges.at(i);
 
-                RowVectorXf vectorEnd = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNodeID())->getVert();
-                endPos = QVector3D(vectorEnd(0),
-                                     vectorEnd(1),
-                                     vectorEnd(2));
+        if(pNetworkEdge->isActive()) {
+            iStartID = pNetworkEdge->getStartNodeID();
+            iEndID = pNetworkEdge->getEndNodeID();
 
-                if(startPos != endPos) {
-                    dWeight = lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight();
-                    diff = endPos - startPos;
-                    edgePos = endPos - diff/2;
+            RowVectorXf vectorStart = lNetworkNodes.at(iStartID)->getVert();
+            startPos = QVector3D(vectorStart(0),
+                                 vectorStart(1),
+                                 vectorStart(2));
 
-                    QMatrix4x4 tempTransform;
-                    tempTransform.translate(edgePos);
-                    tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
-                    tempTransform.scale(1.0,diff.length(),1.0);
-                    vTransformsEdgesIn.push_back(tempTransform);
-                    if(dMaxWeight != 0.0f) {
-                        vColorsEdgesIn.push_back(QColor(ColorMap::valueToJet((dWeight-dMinWeight)/(dMaxWeight))));
-                    } else {
-                        vColorsEdgesIn.push_back(QColor(ColorMap::valueToJet(0.0f)));
-                    }
-                }
-            }
-        }
+            RowVectorXf vectorEnd = lNetworkNodes.at(iEndID)->getVert();
+            endPos = QVector3D(vectorEnd(0),
+                                 vectorEnd(1),
+                                 vectorEnd(2));
 
-        //Plot out edges
-        for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
-            if(lNetworkNodes.at(i)->getEdgesOut().at(j)->isActive()) {
-                RowVectorXf vectorStart = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNodeID())->getVert();
-                startPos = QVector3D(vectorStart(0),
-                                     vectorStart(1),
-                                     vectorStart(2));
+            if(startPos != endPos) {
+                dWeight = pNetworkEdge->getWeight();
+                diff = endPos - startPos;
+                edgePos = endPos - diff/2;
 
-                RowVectorXf vectorEnd = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNodeID())->getVert();
-                endPos = QVector3D(vectorEnd(0),
-                                     vectorEnd(1),
-                                     vectorEnd(2));
-
-    //            qDebug() << "NetworkTreeItem::plotEdges weight " << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0);
-    //            qDebug() << "NetworkTreeItem::plotEdges threshold " << vecThreshold.x();
-    //            qDebug() << "rows" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().rows();
-    //            qDebug() << "cols" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().cols();
-
-                if(startPos != endPos) {
-                    dWeight = lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight();
-                    diff = endPos - startPos;
-                    edgePos = endPos - diff/2;
-
-                    QMatrix4x4 tempTransform;
-                    tempTransform.translate(edgePos);
-                    tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
-                    tempTransform.scale(1.0,diff.length(),1.0);
-                    vTransformsEdgesOut.push_back(tempTransform);
-                    if(dMaxWeight != 0.0f) {
-                        vColorsEdgesOut.push_back(QColor(ColorMap::valueToJet((dWeight-dMinWeight)/(dMaxWeight))));
-                    } else {
-                        vColorsEdgesOut.push_back(QColor(ColorMap::valueToJet(0.0f)));
-                    }
+                QMatrix4x4 tempTransform;
+                tempTransform.translate(edgePos);
+                tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
+                tempTransform.scale(1.0,diff.length(),1.0);
+                vTransformsEdges.push_back(tempTransform);
+                if(dMaxWeight != 0.0f) {
+                    vColorsEdges.push_back(QColor(ColorMap::valueToJet((dWeight)/(dMaxWeight))));
+                } else {
+                    vColorsEdges.push_back(QColor(ColorMap::valueToJet(0.0f)));
                 }
             }
         }
     }
 
     //Set instance transforms and colors
-    if(!vTransformsEdgesIn.isEmpty() && !vColorsEdgesIn.isEmpty()) {
-        m_pEdgesIn->setTransforms(vTransformsEdgesIn);
-        m_pEdgesIn->setColors(vColorsEdgesIn);
-    }
-
-    if(!vTransformsEdgesOut.isEmpty() && !vColorsEdgesOut.isEmpty()) {
-        m_pEdgesOut->setTransforms(vTransformsEdgesOut);
-        m_pEdgesOut->setColors(vColorsEdgesOut);
+    if(!vTransformsEdges.isEmpty() && !vColorsEdges.isEmpty()) {
+        m_pEdges->setTransforms(vTransformsEdges);
+        m_pEdges->setColors(vColorsEdges);
     }
 }
 

@@ -192,10 +192,8 @@ private:
     QPointer<GeometryMultiplier>                    m_pNodes;                       /**< The geometry multiplier for incoming edges. */
 
     QPointer<QEntity>                               m_pEdgeEntity;
-    QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesInGeometry;             /**< The network geomtries for incoming edges. */
-    QPointer<GeometryMultiplier>                    m_pEdgesIn;                     /**< The geometry multiplier for incoming edges. */
-    QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesOutGeometry;            /**< The network geomtries for outgoing edges. */
-    QPointer<GeometryMultiplier>                    m_pEdgesOut;                    /**< The geometry multiplier for outgoing edges. */
+    QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesGeometry;               /**< The network geomtries for edges. */
+    QPointer<GeometryMultiplier>                    m_pEdges;                       /**< The geometry multiplier for edges. */
 
 };
 

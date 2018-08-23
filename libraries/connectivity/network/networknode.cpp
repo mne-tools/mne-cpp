@@ -102,14 +102,6 @@ const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesOut() const
 
 //*************************************************************************************************************
 
-int NetworkNode::getNumberEdges() const
-{
-    return m_lEdgesIn.size() + m_lEdgesOut.size();
-}
-
-
-//*************************************************************************************************************
-
 const RowVectorXf& NetworkNode::getVert() const
 {
     return m_vecVert;
@@ -130,13 +122,13 @@ qint16 NetworkNode::getDegree() const
 {
     qint16 degree = 0;
 
-    for(int i = 0; i< m_lEdgesIn.size(); i++) {
+    for(int i = 0; i < m_lEdgesIn.size(); i++) {
         if(m_lEdgesIn.at(i)->isActive()) {
             degree++;
         }
     }
 
-    for(int i = 0; i< m_lEdgesOut.size(); i++) {
+    for(int i = 0; i < m_lEdgesOut.size(); i++) {
         if(m_lEdgesOut.at(i)->isActive()) {
             degree++;
         }
@@ -258,9 +250,7 @@ void NetworkNode::append(QSharedPointer<NetworkEdge> newEdge)
 
     if(newEdge->getEndNodeID() == this->getId()) {
         m_lEdgesIn << newEdge;
-    }
-
-    if(newEdge->getStartNodeID() == this->getId()) {
+    } else if(newEdge->getStartNodeID() == this->getId()) {
         m_lEdgesOut << newEdge;
     }
 }
