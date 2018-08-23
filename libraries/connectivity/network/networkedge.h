@@ -129,6 +129,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the activity flag of this edge.
+    *
+    * @param[in]  bActiveFlag        The new activity flag of this edge.
+    */
+    void setActive(bool bActiveFlag);
+
+    //=========================================================================================================
+    /**
+    * Returns the activity flag of this edge.
+    *
+    * @return The current activity flag of this edge.
+    */
+    bool isActive();
+
+    //=========================================================================================================
+    /**
     * Returns the edge weight. The weights are averaged between the specified bin indeces and their corresponding tapers.
     *
     * @param[in] startBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
@@ -139,8 +155,10 @@ public:
     double getWeight(int startBin = -1, int endBin = -1) const;
 
 protected:
-    int     m_iStartNodeID;       /**< The start node of the edge.*/
-    int     m_iEndNodeID;         /**< The end node of the edge.*/
+    int     m_iStartNodeID;         /**< The start node of the edge.*/
+    int     m_iEndNodeID;           /**< The end node of the edge.*/
+
+    bool    m_bIsActive;            /**< The activity flag indicating whether this edge is part of a thresholded network.*/
 
     Eigen::MatrixXd                 m_matWeight;        /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
 

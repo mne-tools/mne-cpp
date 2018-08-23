@@ -67,6 +67,7 @@ using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -78,9 +79,12 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Network::Network(const QString& sConnectivityMethod)
+Network::Network(const QString& sConnectivityMethod,
+                 double dThreshold)
 : m_sConnectivityMethod(sConnectivityMethod)
-, m_minMaxWeights(QPair<float,float>(100000000.0f,0.0f))
+, m_minMaxWeightsAllEdges(QPair<double,double>(100000000000.0,0.0))
+, m_minMaxWeightsActiveEdges(QPair<double,double>(100000000000.0,0.0))
+, m_dThreshold(dThreshold)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
 }
@@ -90,7 +94,20 @@ Network::Network(const QString& sConnectivityMethod)
 
 MatrixXd Network::getConnectivityMatrix() const
 {
-    return generateConnectMat();
+    MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
+    matDist.setZero();
+
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        int row = m_lEdges.at(i)->getStartNodeID();
+        int col = m_lEdges.at(i)->getEndNodeID();
+
+        if(row < matDist.rows() && col < matDist.cols()) {
+            matDist(row,col) = m_lEdges.at(i)->getWeight();
+        }
+    }
+
+    //IOUtils::write_eigen_matrix(matDist,"eigen.txt");
+    return matDist;
 }
 
 
@@ -98,7 +115,7 @@ MatrixXd Network::getConnectivityMatrix() const
 
 const QList<NetworkEdge::SPtr>& Network::getEdges() const
 {
-    return m_lEdges;
+    return m_lActiveEdges;
 }
 
 
@@ -114,7 +131,7 @@ const QList<NetworkNode::SPtr>& Network::getNodes() const
 
 NetworkEdge::SPtr Network::getEdgeAt(int i)
 {
-    return m_lEdges.at(i);
+    return m_lActiveEdges.at(i);
 }
 
 
@@ -158,95 +175,93 @@ QString Network::getConnectivityMethod() const
 
 //*************************************************************************************************************
 
-QPair<float,float> Network::getMinMaxWeights() const
+QPair<double, double> Network::getMinMaxWeights() const
 {
-    return m_minMaxWeights;
+    return m_minMaxWeightsActiveEdges;
 }
 
 
 //*************************************************************************************************************
 
-QPair<float,float> Network::getMinMaxWeights(double dThresold) const
+QPair<int,int> Network::getMinMaxDegrees() const
 {
-    float maxWeight = 0;
-    float minWeight = 1000000000;
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getDegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getDegree();
+        }
+
+        if(m_lNodes.at(i)->getDegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getDegree();
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxIndegrees() const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getIndegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getIndegree();
+        }
+
+        if(m_lNodes.at(i)->getIndegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getIndegree();
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxOutdegrees() const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getOutdegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getOutdegree();
+        }
+
+        if(m_lNodes.at(i)->getOutdegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getOutdegree();
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+void Network::setThreshold(double dThreshold)
+{
+    m_dThreshold = dThreshold;
+    m_lActiveEdges.clear();
 
     for(int i = 0; i < m_lEdges.size(); ++i) {
-        double weight = m_lEdges.at(i)->getWeight()(0,0);
-
-        if(weight > maxWeight && weight > dThresold){
-            maxWeight = weight;
-        }
-
-        if(weight < minWeight && weight > dThresold){
-            minWeight = weight;
+        if(m_lEdges.at(i)->getWeight() >= m_dThreshold) {
+            m_lEdges.at(i)->setActive(true);
+            m_lActiveEdges.append(m_lEdges.at(i));
+        } else {
+            m_lEdges.at(i)->setActive(false);
         }
     }
 
-    return QPair<float,float>(minWeight,maxWeight);
-}
-
-
-//*************************************************************************************************************
-
-QPair<int,int> Network::getMinMaxDegrees(double dThresold) const
-{
-    int maxDegree = 0;
-    int minDegree = 1000000;
-
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        if(m_lNodes.at(i)->getDegree(dThresold) > maxDegree){
-            maxDegree = m_lNodes.at(i)->getDegree(dThresold);
-        }
-
-        if(m_lNodes.at(i)->getDegree(dThresold) < minDegree){
-            minDegree = m_lNodes.at(i)->getDegree(dThresold);
-        }
-    }
-
-    return QPair<int,int>(minDegree,maxDegree);
-}
-
-
-//*************************************************************************************************************
-
-QPair<int,int> Network::getMinMaxIndegrees(double dThresold) const
-{
-    int maxDegree = 0;
-    int minDegree = 1000000;
-
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        if(m_lNodes.at(i)->getIndegree(dThresold) > maxDegree){
-            maxDegree = m_lNodes.at(i)->getIndegree(dThresold);
-        }
-
-        if(m_lNodes.at(i)->getIndegree(dThresold) < minDegree){
-            minDegree = m_lNodes.at(i)->getIndegree(dThresold);
-        }
-    }
-
-    return QPair<int,int>(minDegree,maxDegree);
-}
-
-
-//*************************************************************************************************************
-
-QPair<int,int> Network::getMinMaxOutdegrees(double dThresold) const
-{
-    int maxDegree = 0;
-    int minDegree = 1000000;
-
-    for(int i = 0; i < m_lNodes.size(); ++i) {
-        if(m_lNodes.at(i)->getOutdegree(dThresold) > maxDegree){
-            maxDegree = m_lNodes.at(i)->getOutdegree(dThresold);
-        }
-
-        if(m_lNodes.at(i)->getOutdegree(dThresold) < minDegree){
-            minDegree = m_lNodes.at(i)->getOutdegree(dThresold);
-        }
-    }
-
-    return QPair<int,int>(minDegree,maxDegree);
+    m_minMaxWeightsActiveEdges.first = m_dThreshold;
+    m_minMaxWeightsActiveEdges.second = m_minMaxWeightsAllEdges.second;
 }
 
 
@@ -254,12 +269,10 @@ QPair<int,int> Network::getMinMaxOutdegrees(double dThresold) const
 
 void Network::append(NetworkEdge::SPtr newEdge)
 {
-    if(newEdge->getWeight()(0,0) < m_minMaxWeights.first) {
-        m_minMaxWeights.first = newEdge->getWeight()(0,0);
-    }
-
-    if(newEdge->getWeight()(0,0) > m_minMaxWeights.second) {
-        m_minMaxWeights.second = newEdge->getWeight()(0,0);
+    if(newEdge->getWeight() < m_minMaxWeightsAllEdges.first) {
+        m_minMaxWeightsAllEdges.first = newEdge->getWeight();
+    } else if(newEdge->getWeight() >= m_minMaxWeightsAllEdges.second) {
+        m_minMaxWeightsAllEdges.second = newEdge->getWeight();
     }
 
     m_lEdges << newEdge;
@@ -284,31 +297,4 @@ bool Network::isEmpty() const
 
     return false;
 }
-
-
-//*************************************************************************************************************
-
-MatrixXd Network::generateConnectMat(int idxRow, int idxCol) const
-{
-    MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setZero();
-
-    for(int i = 0; i < m_lEdges.size(); ++i)
-    {
-        int row = m_lEdges.at(i)->getStartNodeID();
-        int col = m_lEdges.at(i)->getEndNodeID();
-
-        if(row < matDist.rows() && col < matDist.cols())
-        {
-            matDist(row,col) = m_lEdges.at(i)->getWeight()(idxRow, idxCol);
-        }
-    }
-
-    //IOUtils::write_eigen_matrix(matDist,"eigen.txt");
-    return matDist;
-}
-
-
-
-
 

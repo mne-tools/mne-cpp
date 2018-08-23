@@ -103,12 +103,14 @@ public:
     * Constructs a Network object.
     *
     * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
+    * @param[in] dThreshold             The threshold of the network. Default is 0.0.
     */
-    explicit Network(const QString& sConnectivityMethod = "Unknown");
+    explicit Network(const QString& sConnectivityMethod = "Unknown",
+                     double dThreshold = 0.0);
 
     //=========================================================================================================
     /**
-    * Returns the connectivity matrix for this network structure.
+    * Returns the connectivity matrix for this network structure. Always returns the matrix for the whole network.
     *
     * @return    The connectivity matrix generated from the current network information.
     */
@@ -180,47 +182,39 @@ public:
     *
     * @return   The minimum and maximum weight strength of the entire network.
     */
-    QPair<float, float> getMinMaxWeights() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the minimum and maximum weight strength of the thresholded network.
-    *
-    * @param[in] dThresold        The threshold for which the min max weight should be returned. Choose 0.0 for the entire network.
-    *
-    * @return   The minimum and maximum weight strength of the thresholded network.
-    */
-    QPair<float, float> getMinMaxWeights(double dThresold) const;
+    QPair<double, double> getMinMaxWeights() const;
 
     //=========================================================================================================
     /**
     * Returns the minimum and maximum degree (in and out) of the entire network.
     *
-    * @param[in] dThresold        The threshold for which the degree should be returned. Default 0.0 (meaning all).
-    *
     * @return   The minimum and maximum degree of the entire network.
     */
-    QPair<int,int> getMinMaxDegrees(double dThresold = 0.0) const;
+    QPair<int,int> getMinMaxDegrees() const;
 
     //=========================================================================================================
     /**
     * Returns the minimum and maximum indegree of the entire network.
     *
-    * @param[in] dThresold        The threshold for which the indegree should be returned. Default 0.0 (meaning all).
-    *
     * @return   The minimum and maximum indegree of the entire network.
     */
-    QPair<int,int> getMinMaxIndegrees(double dThresold = 0.0) const;
+    QPair<int,int> getMinMaxIndegrees() const;
 
     //=========================================================================================================
     /**
     * Returns the minimum and maximum outdegree of the entire network.
     *
-    * @param[in] dThresold        The threshold for which the outdegree should be returned. Default 0.0 (meaning all).
-    *
     * @return   The minimum and maximum outdegree of the entire network.
     */
-    QPair<int,int> getMinMaxOutdegrees(double dThresold = 0.0) const;
+    QPair<int,int> getMinMaxOutdegrees() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the threshold of the network and updates the resulting active edges.
+    *
+    * @param[in] dThreshold        The new threshold.
+    */
+    void setThreshold(double dThreshold = 0.0);
 
     //=========================================================================================================
     /**
@@ -248,24 +242,18 @@ public:
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/
+    QList<QSharedPointer<NetworkEdge> >     m_lActiveEdges;             /**< List with all the active (thresholded) edges of the network.*/
+
     QList<QSharedPointer<NetworkNode> >     m_lNodes;                   /**< List with all nodes of the network.*/
 
     Eigen::MatrixXd                         m_matDistMatrix;            /**< The distance matrix.*/
 
     QString                                 m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
 
-    QPair<float,float>                      m_minMaxWeights;            /**< The minimum and maximum weight strength of the entire network.*/
+    QPair<double,double>                    m_minMaxWeightsAllEdges;    /**< The minimum and maximum weight strength of the entire network.*/
+    QPair<double,double>                    m_minMaxWeightsActiveEdges; /**< The minimum and maximum weight strength of the active edges.*/
 
-    //=========================================================================================================
-    /**
-    * Returns the connectivity matrix for this network structure.
-    *
-    * @param[in] idxRow    The row for which the connection matrix is to be produced. E.g. for the first frequency bin/band. Default is 0.
-    * @param[in] idxCol    The column for which the connection matrix is to be produced. E.g. for the first instance in time. Default is 0.
-    *
-    * @return    The connectivity matrix generated from the current network information.
-    */
-    Eigen::MatrixXd generateConnectMat(int idxRow = 0, int idxCol = 0) const;
+    double                                  m_dThreshold;               /**< The current threshold value.*/
 
 };
 

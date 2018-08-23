@@ -59,6 +59,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -136,6 +138,8 @@ Network Connectivity::calculateConnectivity() const
                                                                                           m_pConnectivitySettings->m_iNfft,
                                                                                           m_pConnectivitySettings->m_sWindowType);
     }
+
+    qDebug() << "Connectivity::calculateConnectivity - Connectivity method or abbreviation unknown.";
 
     return Network();
 }
