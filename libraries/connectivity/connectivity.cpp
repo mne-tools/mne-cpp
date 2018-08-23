@@ -139,7 +139,7 @@ Network Connectivity::calculateConnectivity() const
                                                                                           m_pConnectivitySettings->m_sWindowType);
     }
 
-    qDebug() << "Connectivity::calculateConnectivity - Connectivity method or abbreviation unknown.";
+    qDebug() << "Connectivity::calculateConnectivity - Connectivity method unknown.";
 
     return Network();
 }

@@ -125,14 +125,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the number of all edges.
-    *
-    * @return   Returns the number of all edges.
-    */
-    int getNumberEdges() const;
-
-    //=========================================================================================================
-    /**
     * Returns the vertex (position) of the node.
     *
     * @return   Returns the 3D position of the node.
