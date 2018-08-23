@@ -145,16 +145,18 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     //Add data which is held by this NetworkTreeItem
     QVariant data;
 
-    data.setValue(tNetworkData);
+    Network tNetwork = tNetworkData;
+    tNetwork.setThreshold(m_pItemNetworkThreshold->data(MetaTreeItemRoles::DataThreshold).value<QVector3D>().x());
+
+    data.setValue(tNetwork);
     this->setData(data, Data3DTreeModelItemRoles::Data);
 
-    MatrixXd matDist = tNetworkData.getConnectivityMatrix();
+    MatrixXd matDist = tNetwork.getConnectivityMatrix();
     data.setValue(matDist);
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
     //Plot network
-    plotNetwork(tNetworkData,
-                    m_pItemNetworkThreshold->data(MetaTreeItemRoles::DataThreshold).value<QVector3D>());
+    plotNetwork(tNetwork);
 }
 
 
@@ -179,27 +181,27 @@ void NetworkTreeItem::setThresholds(const QVector3D& vecThresholds)
 void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
+        this->data(Data3DTreeModelItemRoles::Data).value<Network>().setThreshold(vecThresholds.value<QVector3D>().x());
         Network tNetwork = this->data(Data3DTreeModelItemRoles::Data).value<Network>();
 
-        plotNetwork(tNetwork, vecThresholds.value<QVector3D>());
+        plotNetwork(tNetwork);
     }
 }
 
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::plotNetwork(const Network& tNetworkData, const QVector3D& vecThreshold)
+void NetworkTreeItem::plotNetwork(const Network& tNetworkData)
 {
     //Draw network nodes and edges
-    plotNodes(tNetworkData, vecThreshold);
-    plotEdges(tNetworkData, vecThreshold);
+    plotNodes(tNetworkData);
+    plotEdges(tNetworkData);
 }
 
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::plotNodes(const Network& tNetworkData,
-                                const QVector3D& vecThreshold)
+void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 {
     if(tNetworkData.isEmpty()) {
         qDebug() << "NetworkTreeItem::plotNodes - Network data is empty. Returning.";
@@ -207,7 +209,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData,
     }
 
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
-    int iMaxDegree = tNetworkData.getMinMaxDegrees(vecThreshold.x()).second;
+    qint16 iMaxDegree = tNetworkData.getMinMaxDegrees().second;
 
     if(!m_pNodesEntity) {
         m_pNodesEntity = new QEntity(this);
@@ -236,10 +238,10 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData,
     QVector<QColor> vColorsNodes;
     vTransforms.reserve(lNetworkNodes.size());
     QVector3D tempPos;
-    int dDegree = 0;
+    qint16 iDegree = 0;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
-        dDegree = lNetworkNodes.at(i)->getDegree(vecThreshold.x());
+        iDegree = lNetworkNodes.at(i)->getDegree();
 
         tempPos = QVector3D(lNetworkNodes.at(i)->getVert()(0),
                             lNetworkNodes.at(i)->getVert()(1),
@@ -249,11 +251,11 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData,
         QMatrix4x4 tempTransform;
 
         tempTransform.translate(tempPos);
-        tempTransform.scale((float)dDegree/(float)iMaxDegree);
+        tempTransform.scale((float)iDegree/(float)iMaxDegree);
         vTransforms.push_back(tempTransform);
 
-        if(dDegree != 0.0f) {
-            vColorsNodes.push_back(QColor(ColorMap::valueToJet((float)dDegree/(float)iMaxDegree)));
+        if(iMaxDegree != 0.0f) {
+            vColorsNodes.push_back(QColor(ColorMap::valueToJet((float)iDegree/(float)iMaxDegree)));
         } else {
             vColorsNodes.push_back(QColor(ColorMap::valueToJet(0.0f)));
         }
@@ -269,15 +271,15 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData,
 
 //*************************************************************************************************************
 
-void NetworkTreeItem::plotEdges(const Network &tNetworkData,
-                                const QVector3D& vecThreshold)
+void NetworkTreeItem::plotEdges(const Network &tNetworkData)
 {
     if(tNetworkData.isEmpty()) {
         qDebug() << "NetworkTreeItem::plotEdges - Network data is empty. Returning.";
         return;
     }
 
-    float fMaxWeight = tNetworkData.getMinMaxWeights(vecThreshold.x()).second;
+    double dMinWeight = tNetworkData.getMinMaxWeights().first;
+    double dMaxWeight = tNetworkData.getMinMaxWeights().second;
 
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
@@ -326,72 +328,74 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData,
     QVector<QMatrix4x4> vTransformsEdgesIn, vTransformsEdgesOut;
     QVector<QColor> vColorsEdgesIn, vColorsEdgesOut;
     QVector3D startPos, endPos, edgePos, diff;
-    float fWeight = 0.0f;
+    double dWeight = 0.0f;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         //Plot in edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesIn().size(); ++j) {
-            RowVectorXf vectorStart = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNodeID())->getVert();
-            startPos = QVector3D(vectorStart(0),
-                                 vectorStart(1),
-                                 vectorStart(2));
+            if(lNetworkNodes.at(i)->getEdgesIn().at(j)->isActive()) {
+                RowVectorXf vectorStart = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesIn().at(j)->getStartNodeID())->getVert();
+                startPos = QVector3D(vectorStart(0),
+                                     vectorStart(1),
+                                     vectorStart(2));
 
-            RowVectorXf vectorEnd = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNodeID())->getVert();
-            endPos = QVector3D(vectorEnd(0),
-                                 vectorEnd(1),
-                                 vectorEnd(2));
+                RowVectorXf vectorEnd = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesIn().at(j)->getEndNodeID())->getVert();
+                endPos = QVector3D(vectorEnd(0),
+                                     vectorEnd(1),
+                                     vectorEnd(2));
 
-            fWeight = lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight();
-            if(std::fabs(fWeight) > vecThreshold.x() &&
-                    startPos != endPos) {
-                diff = endPos - startPos;
-                edgePos = endPos - diff/2;
+                if(startPos != endPos) {
+                    dWeight = lNetworkNodes.at(i)->getEdgesIn().at(j)->getWeight();
+                    diff = endPos - startPos;
+                    edgePos = endPos - diff/2;
 
-                QMatrix4x4 tempTransform;
-                tempTransform.translate(edgePos);
-                tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
-                tempTransform.scale(1.0,diff.length(),1.0);
-                vTransformsEdgesIn.push_back(tempTransform);
-                if(fMaxWeight != 0.0f) {
-                    vColorsEdgesIn.push_back(QColor(ColorMap::valueToJet(fWeight/fMaxWeight)));
-                } else {
-                    vColorsEdgesIn.push_back(QColor(ColorMap::valueToJet(0.0f)));
+                    QMatrix4x4 tempTransform;
+                    tempTransform.translate(edgePos);
+                    tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
+                    tempTransform.scale(1.0,diff.length(),1.0);
+                    vTransformsEdgesIn.push_back(tempTransform);
+                    if(dMaxWeight != 0.0f) {
+                        vColorsEdgesIn.push_back(QColor(ColorMap::valueToJet((dWeight-dMinWeight)/(dMaxWeight))));
+                    } else {
+                        vColorsEdgesIn.push_back(QColor(ColorMap::valueToJet(0.0f)));
+                    }
                 }
             }
         }
 
         //Plot out edges
         for(int j = 0; j < lNetworkNodes.at(i)->getEdgesOut().size(); ++j) {
-            RowVectorXf vectorStart = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNodeID())->getVert();
-            startPos = QVector3D(vectorStart(0),
-                                 vectorStart(1),
-                                 vectorStart(2));
+            if(lNetworkNodes.at(i)->getEdgesOut().at(j)->isActive()) {
+                RowVectorXf vectorStart = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesOut().at(j)->getStartNodeID())->getVert();
+                startPos = QVector3D(vectorStart(0),
+                                     vectorStart(1),
+                                     vectorStart(2));
 
-            RowVectorXf vectorEnd = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNodeID())->getVert();
-            endPos = QVector3D(vectorEnd(0),
-                                 vectorEnd(1),
-                                 vectorEnd(2));
+                RowVectorXf vectorEnd = lNetworkNodes.at(lNetworkNodes.at(i)->getEdgesOut().at(j)->getEndNodeID())->getVert();
+                endPos = QVector3D(vectorEnd(0),
+                                     vectorEnd(1),
+                                     vectorEnd(2));
 
-//            qDebug() << "NetworkTreeItem::plotEdges weight " << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0);
-//            qDebug() << "NetworkTreeItem::plotEdges threshold " << vecThreshold.x();
-//            qDebug() << "rows" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().rows();
-//            qDebug() << "cols" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().cols();
+    //            qDebug() << "NetworkTreeItem::plotEdges weight " << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight()(0,0);
+    //            qDebug() << "NetworkTreeItem::plotEdges threshold " << vecThreshold.x();
+    //            qDebug() << "rows" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().rows();
+    //            qDebug() << "cols" << lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight().cols();
 
-            fWeight = lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight();
-            if(std::fabs(fWeight) > vecThreshold.x() &&
-                    startPos != endPos) {
-                diff = endPos - startPos;
-                edgePos = endPos - diff/2;
+                if(startPos != endPos) {
+                    dWeight = lNetworkNodes.at(i)->getEdgesOut().at(j)->getWeight();
+                    diff = endPos - startPos;
+                    edgePos = endPos - diff/2;
 
-                QMatrix4x4 tempTransform;
-                tempTransform.translate(edgePos);
-                tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
-                tempTransform.scale(1.0,diff.length(),1.0);
-                vTransformsEdgesOut.push_back(tempTransform);
-                if(fMaxWeight != 0.0f) {
-                    vColorsEdgesOut.push_back(QColor(ColorMap::valueToJet(fWeight/fMaxWeight)));
-                } else {
-                    vColorsEdgesOut.push_back(QColor(ColorMap::valueToJet(0.0f)));
+                    QMatrix4x4 tempTransform;
+                    tempTransform.translate(edgePos);
+                    tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
+                    tempTransform.scale(1.0,diff.length(),1.0);
+                    vTransformsEdgesOut.push_back(tempTransform);
+                    if(dMaxWeight != 0.0f) {
+                        vColorsEdgesOut.push_back(QColor(ColorMap::valueToJet((dWeight-dMinWeight)/(dMaxWeight))));
+                    } else {
+                        vColorsEdgesOut.push_back(QColor(ColorMap::valueToJet(0.0f)));
+                    }
                 }
             }
         }

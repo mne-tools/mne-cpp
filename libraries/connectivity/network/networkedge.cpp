@@ -83,6 +83,7 @@ NetworkEdge::NetworkEdge(int iStartNodeID,
                          MatrixXd& matWeight)
 : m_iStartNodeID(iStartNodeID)
 , m_iEndNodeID(iEndNodeID)
+, m_bIsActive(true)
 {
     if(matWeight.rows() == 0 || matWeight.cols() == 0) {
         m_matWeight = MatrixXd::Zero(1,1);
@@ -111,10 +112,26 @@ int NetworkEdge::getEndNodeID()
 
 //*************************************************************************************************************
 
+void NetworkEdge::setActive(bool bActiveFlag)
+{
+    m_bIsActive = bActiveFlag;
+}
+
+
+//*************************************************************************************************************
+
+bool NetworkEdge::isActive()
+{
+    return m_bIsActive;
+}
+
+
+//*************************************************************************************************************
+
 double NetworkEdge::getWeight(int startBin, int endBin) const
 {
     if(endBin < startBin || startBin < -1 || endBin < -1 ) {
-        qDebug() << "Network::generateConnectMat - end bin index is larger than start bin index or one of them is negative. Returning zero matrix.";
+        qDebug() << "Network::getWeight - end bin index is larger than start bin index or one of them is negative. Returning zero matrix.";
         return 0.0;
     }
 

@@ -126,22 +126,18 @@ qint16 NetworkNode::getId() const
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getDegree(double dThresold) const
+qint16 NetworkNode::getDegree() const
 {
-    if(dThresold == 0.0) {
-        return m_lEdgesIn.size() + m_lEdgesOut.size();
-    }
-
-    int degree = 0;
+    qint16 degree = 0;
 
     for(int i = 0; i< m_lEdgesIn.size(); i++) {
-        if(m_lEdgesIn.at(i)->getWeight()(0,0) >= dThresold) {
+        if(m_lEdgesIn.at(i)->isActive()) {
             degree++;
         }
     }
 
     for(int i = 0; i< m_lEdgesOut.size(); i++) {
-        if(m_lEdgesOut.at(i)->getWeight()(0,0) >= dThresold) {
+        if(m_lEdgesOut.at(i)->isActive()) {
             degree++;
         }
     }
@@ -152,16 +148,12 @@ qint16 NetworkNode::getDegree(double dThresold) const
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getIndegree(double dThresold) const
+qint16 NetworkNode::getIndegree() const
 {
-    if(dThresold == 0.0) {
-        return m_lEdgesIn.size();
-    }
-
-    int degree = 0;
+    qint16 degree = 0;
 
     for(int i = 0; i< m_lEdgesIn.size(); i++) {
-        if(m_lEdgesIn.at(i)->getWeight()(0,0) >= dThresold) {
+        if(m_lEdgesIn.at(i)->isActive()) {
             degree++;
         }
     }
@@ -172,16 +164,12 @@ qint16 NetworkNode::getIndegree(double dThresold) const
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getOutdegree(double dThresold) const
+qint16 NetworkNode::getOutdegree() const
 {
-    if(dThresold == 0.0) {
-        return m_lEdgesOut.size();
-    }
-
-    int degree = 0;
+    qint16 degree = 0;
 
     for(int i = 0; i< m_lEdgesOut.size(); i++) {
-        if(m_lEdgesOut.at(i)->getWeight()(0,0) >= dThresold) {
+        if(m_lEdgesOut.at(i)->isActive()) {
             degree++;
         }
     }
@@ -192,63 +180,55 @@ qint16 NetworkNode::getOutdegree(double dThresold) const
 
 //*************************************************************************************************************
 
-MatrixXd NetworkNode::getStrength() const
+double NetworkNode::getStrength() const
 {
-    MatrixXd matStrength;
+    double dStrength = 0.0;
 
     for(int i = 0; i < m_lEdgesIn.size(); ++i) {
-        if(matStrength.size() == 0) {
-            matStrength = m_lEdgesIn.at(i)->getWeight().setZero();
+        if(m_lEdgesIn.at(i)->isActive()) {
+            dStrength += m_lEdgesIn.at(i)->getWeight();
         }
-
-        matStrength += m_lEdgesIn.at(i)->getWeight();
     }
 
     for(int i = 0; i < m_lEdgesOut.size(); ++i) {
-        if(matStrength.size() == 0) {
-            matStrength = m_lEdgesOut.at(i)->getWeight().setZero();
+        if(m_lEdgesOut.at(i)->isActive()) {
+            dStrength += m_lEdgesOut.at(i)->getWeight();
         }
-
-        matStrength += m_lEdgesOut.at(i)->getWeight();
     }
 
-    return matStrength;
+    return dStrength;
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd NetworkNode::getInstrength() const
+double NetworkNode::getInstrength() const
 {
-    MatrixXd matStrength;
+    double dStrength = 0.0;
 
     for(int i = 0; i < m_lEdgesIn.size(); ++i) {
-        if(matStrength.size() == 0) {
-            matStrength = m_lEdgesIn.at(i)->getWeight().setZero();
+        if(m_lEdgesIn.at(i)->isActive()) {
+            dStrength += m_lEdgesIn.at(i)->getWeight();
         }
-
-        matStrength += m_lEdgesIn.at(i)->getWeight();
     }
 
-    return matStrength;
+    return dStrength;
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd NetworkNode::getOutstrength() const
+double NetworkNode::getOutstrength() const
 {
-    MatrixXd matStrength;
+    double dStrength = 0.0;
 
     for(int i = 0; i < m_lEdgesOut.size(); ++i) {
-        if(matStrength.size() == 0) {
-            matStrength = m_lEdgesOut.at(i)->getWeight().setZero();
+        if(m_lEdgesOut.at(i)->isActive()) {
+            dStrength += m_lEdgesOut.at(i)->getWeight();
         }
-
-        matStrength += m_lEdgesOut.at(i)->getWeight();
     }
 
-    return matStrength;
+    return dStrength;
 }
 
 
