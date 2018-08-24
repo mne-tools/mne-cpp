@@ -52,6 +52,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,7 +98,7 @@ Network::Network(const QString& sConnectivityMethod,
 MatrixXd Network::getFullConnectivityMatrix() const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setIdentity();
+    matDist.setZero();
 
     for(int i = 0; i < m_lFullEdges.size(); ++i) {
         int row = m_lFullEdges.at(i)->getStartNodeID();
@@ -117,7 +119,7 @@ MatrixXd Network::getFullConnectivityMatrix() const
 MatrixXd Network::getThresholdedConnectivityMatrix() const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setIdentity();
+    matDist.setZero();
 
     for(int i = 0; i < m_lThresholdedEdges.size(); ++i) {
         int row = m_lThresholdedEdges.at(i)->getStartNodeID();

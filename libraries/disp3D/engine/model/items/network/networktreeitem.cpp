@@ -262,11 +262,8 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
         }
     }
 
-    //Set instance Transform and colors
-    if(!vTransforms.isEmpty() && !vColorsNodes.isEmpty()) {
-        m_pNodes->setTransforms(vTransforms);
-        m_pNodes->setColors(vColorsNodes);
-    }
+    m_pNodes->setTransforms(vTransforms);
+    m_pNodes->setColors(vColorsNodes);
 }
 
 
@@ -353,11 +350,8 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
         }
     }
 
-    //Set instance transforms and colors
-    if(!vTransformsEdges.isEmpty() && !vColorsEdges.isEmpty()) {
-        m_pEdges->setTransforms(vTransformsEdges);
-        m_pEdges->setColors(vColorsEdges);
-    }
+    m_pEdges->setTransforms(vTransformsEdges);
+    m_pEdges->setColors(vColorsEdges);
 }
 
 

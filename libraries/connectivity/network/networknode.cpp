@@ -192,13 +192,7 @@ qint16 NetworkNode::getId() const
 
 qint16 NetworkNode::getFullDegree() const
 {
-    qint16 degree = 0;
-
-    for(int i = 0; i < m_lEdges.size(); i++) {
-        degree++;
-    }
-
-    return degree;
+    return m_lEdges.size();
 }
 
 
