@@ -348,7 +348,7 @@ void Network::setThreshold(double dThreshold)
     m_lThresholdedEdges.clear();
 
     for(int i = 0; i < m_lFullEdges.size(); ++i) {
-        if(m_lFullEdges.at(i)->getWeight() >= m_dThreshold) {
+        if(fabs(m_lFullEdges.at(i)->getWeight()) >= m_dThreshold) {
             m_lFullEdges.at(i)->setActive(true);
             m_lThresholdedEdges.append(m_lFullEdges.at(i));
         } else {
@@ -403,6 +403,10 @@ void Network::append(NetworkEdge::SPtr newEdge)
         }
 
         m_lFullEdges << newEdge;
+
+        if(fabs(newEdge->getWeight()) >= m_dThreshold) {
+            m_lThresholdedEdges << newEdge;
+        }
     }
 }
 

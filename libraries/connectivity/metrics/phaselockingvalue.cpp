@@ -100,7 +100,7 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
                                              int iNfft,
                                              const QString &sWindowType)
 {
-    Network finalNetwork("New Phase Locking Value");
+    Network finalNetwork("Phase Locking Value");
 
     if(matDataList.empty()) {
         qDebug() << "PhaseLockingValue::phaseLockingValue - Input data is empty";
