@@ -241,7 +241,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         iDegree = lNetworkNodes.at(i)->getThresholdedDegree();
-        qDebug()<<"iDegree"<<iDegree;
+
         if(iDegree != 0) {
             tempPos = QVector3D(lNetworkNodes.at(i)->getVert()(0),
                                 lNetworkNodes.at(i)->getVert()(1),

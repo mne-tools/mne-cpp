@@ -96,7 +96,7 @@ Network::Network(const QString& sConnectivityMethod,
 MatrixXd Network::getFullConnectivityMatrix() const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setZero();
+    matDist.setIdentity();
 
     for(int i = 0; i < m_lFullEdges.size(); ++i) {
         int row = m_lFullEdges.at(i)->getStartNodeID();
@@ -117,7 +117,7 @@ MatrixXd Network::getFullConnectivityMatrix() const
 MatrixXd Network::getThresholdedConnectivityMatrix() const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
-    matDist.setZero();
+    matDist.setIdentity();
 
     for(int i = 0; i < m_lThresholdedEdges.size(); ++i) {
         int row = m_lThresholdedEdges.at(i)->getStartNodeID();
@@ -392,14 +392,16 @@ const QPair<int,int>& Network::getFrequencyBins()
 
 void Network::append(NetworkEdge::SPtr newEdge)
 {
-    double dEdgeWeight = newEdge->getWeight();
-    if(dEdgeWeight < m_minMaxFullWeights.first) {
-        m_minMaxFullWeights.first = dEdgeWeight;
-    } else if(dEdgeWeight >= m_minMaxFullWeights.second) {
-        m_minMaxFullWeights.second = dEdgeWeight;
-    }
+    if(newEdge->getEndNodeID() != newEdge->getStartNodeID()) {
+        double dEdgeWeight = newEdge->getWeight();
+        if(dEdgeWeight < m_minMaxFullWeights.first) {
+            m_minMaxFullWeights.first = dEdgeWeight;
+        } else if(dEdgeWeight >= m_minMaxFullWeights.second) {
+            m_minMaxFullWeights.second = dEdgeWeight;
+        }
 
-    m_lFullEdges << newEdge;
+        m_lFullEdges << newEdge;
+    }
 }
 
 
