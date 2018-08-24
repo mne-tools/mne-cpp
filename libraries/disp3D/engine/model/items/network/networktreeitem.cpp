@@ -228,7 +228,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
-        pMaterial->setAmbient(Qt::blue);
+        pMaterial->setAmbient(ColorMap::valueToJet(0.0));
         pMaterial->setAlpha(1.0f);
         m_pNodesEntity->addComponent(pMaterial);
     }
@@ -242,6 +242,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         iDegree = lNetworkNodes.at(i)->getThresholdedDegree();
+
         if(iDegree != 0) {
             tempPos = QVector3D(lNetworkNodes.at(i)->getVert()(0),
                                 lNetworkNodes.at(i)->getVert()(1),
@@ -249,15 +250,15 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 
             //Set position and scale
             QMatrix4x4 tempTransform;
-\
             tempTransform.translate(tempPos);
             tempTransform.scale(((float)iDegree/(float)iMaxDegree)*(0.005f-0.0006f)+0.0006f);
+
             vTransforms.push_back(tempTransform);
 
             if(iMaxDegree != 0.0f) {
-                vColorsNodes.push_back(QColor(ColorMap::valueToHot((float)iDegree/(float)iMaxDegree)));
+                vColorsNodes.push_back(QColor(ColorMap::valueToJet((float)iDegree/(float)iMaxDegree)));
             } else {
-                vColorsNodes.push_back(QColor(ColorMap::valueToHot(0.0f)));
+                vColorsNodes.push_back(QColor(ColorMap::valueToJet(0.0f)));
             }
         }
     }
@@ -302,7 +303,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
-        pMaterial->setAmbient(Qt::red);
+        pMaterial->setAmbient(ColorMap::valueToJet(0.0));
         pMaterial->setAlpha(1.0f);
         m_pEdgeEntity->addComponent(pMaterial);
     }
@@ -341,11 +342,13 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
                 tempTransform.translate(edgePos);
                 tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
                 tempTransform.scale(1.0,diff.length(),1.0);
+
                 vTransformsEdges.push_back(tempTransform);
+
                 if(dMaxWeight != 0.0f) {
-                    vColorsEdges.push_back(QColor(ColorMap::valueToHot(dWeight/dMaxWeight)));
+                    vColorsEdges.push_back(QColor(ColorMap::valueToJet(dWeight/dMaxWeight)));
                 } else {
-                    vColorsEdges.push_back(QColor(ColorMap::valueToHot(0.0f)));
+                    vColorsEdges.push_back(QColor(ColorMap::valueToJet(0.0f)));
                 }
             }
         }
