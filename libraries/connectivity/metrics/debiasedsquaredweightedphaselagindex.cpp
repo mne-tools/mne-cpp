@@ -128,7 +128,7 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
 
     //Add edges to network
     for(int i = 0; i < vecDebiasedSquaredWPLI.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = j; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecDebiasedSquaredWPLI.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));

@@ -120,6 +120,13 @@ public:
     static QVector<Eigen::MatrixXcd> computeCoherency(const QList<Eigen::MatrixXd> &matDataList,
                                                       int iNfft=-1,
                                                       const QString &sWindowType="hanning");
+
+private:
+    static AbstractMetricResultData compute(const AbstractMetricInputData& data);
+
+    static void reduce(AbstractMetricResultData &finalData,
+                const AbstractMetricResultData& resultData);
+
 };
 
 

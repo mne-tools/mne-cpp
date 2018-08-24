@@ -92,7 +92,9 @@ ImagCoherence::ImagCoherence()
 
 //*******************************************************************************************************
 
-Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert, int iNfft,
+Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
+                                     const MatrixX3f& matVert,
+                                     int iNfft,
                                      const QString &sWindowType)
 {
     Network finalNetwork("ImagCoherence");
@@ -121,7 +123,7 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList, const M
 
     //Add edges to network
     for(int i = 0; i < vecCoh.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = i; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecCoh.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -139,7 +141,8 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList, const M
 //*************************************************************************************************************
 
 QVector<MatrixXd> ImagCoherence::computeImagCoherence(const QList<MatrixXd> &matDataList,
-                                                             int iNfft, const QString &sWindowType)
+                                                      int iNfft,
+                                                      const QString &sWindowType)
 {
     QVector<MatrixXcd> vecCoherency = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
     QVector<MatrixXd> vecImagCoherence;
