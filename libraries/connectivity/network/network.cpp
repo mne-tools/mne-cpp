@@ -82,8 +82,8 @@ using namespace UTILSLIB;
 Network::Network(const QString& sConnectivityMethod,
                  double dThreshold)
 : m_sConnectivityMethod(sConnectivityMethod)
-, m_minMaxWeightsAllEdges(QPair<double,double>(100000000000.0,0.0))
-, m_minMaxWeightsActiveEdges(QPair<double,double>(100000000000.0,0.0))
+, m_minMaxFullWeights(QPair<double,double>(100000000000.0,0.0))
+, m_minMaxThresholdedWeights(QPair<double,double>(100000000000.0,0.0))
 , m_dThreshold(dThreshold)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
@@ -92,17 +92,17 @@ Network::Network(const QString& sConnectivityMethod,
 
 //*************************************************************************************************************
 
-MatrixXd Network::getConnectivityMatrix() const
+MatrixXd Network::getFullConnectivityMatrix() const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();
 
-    for(int i = 0; i < m_lEdges.size(); ++i) {
-        int row = m_lEdges.at(i)->getStartNodeID();
-        int col = m_lEdges.at(i)->getEndNodeID();
+    for(int i = 0; i < m_lFullEdges.size(); ++i) {
+        int row = m_lFullEdges.at(i)->getStartNodeID();
+        int col = m_lFullEdges.at(i)->getEndNodeID();
 
         if(row < matDist.rows() && col < matDist.cols()) {
-            matDist(row,col) = m_lEdges.at(i)->getWeight();
+            matDist(row,col) = m_lFullEdges.at(i)->getWeight();
         }
     }
 
@@ -113,9 +113,37 @@ MatrixXd Network::getConnectivityMatrix() const
 
 //*************************************************************************************************************
 
-const QList<NetworkEdge::SPtr>& Network::getEdges() const
+MatrixXd Network::getThresholdedConnectivityMatrix() const
 {
-    return m_lActiveEdges;
+    MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
+    matDist.setZero();
+
+    for(int i = 0; i < m_lThresholdedEdges.size(); ++i) {
+        int row = m_lThresholdedEdges.at(i)->getStartNodeID();
+        int col = m_lThresholdedEdges.at(i)->getEndNodeID();
+
+        if(row < matDist.rows() && col < matDist.cols()) {
+            matDist(row,col) = m_lThresholdedEdges.at(i)->getWeight();
+        }
+    }
+
+    //IOUtils::write_eigen_matrix(matDist,"eigen.txt");
+    return matDist;
+}
+
+//*************************************************************************************************************
+
+const QList<NetworkEdge::SPtr>& Network::getFullEdges() const
+{
+    return m_lFullEdges;
+}
+
+
+//*************************************************************************************************************
+
+const QList<NetworkEdge::SPtr>& Network::getThresholdedEdges() const
+{
+    return m_lThresholdedEdges;
 }
 
 
@@ -129,14 +157,6 @@ const QList<NetworkNode::SPtr>& Network::getNodes() const
 
 //*************************************************************************************************************
 
-NetworkEdge::SPtr Network::getEdgeAt(int i)
-{
-    return m_lActiveEdges.at(i);
-}
-
-
-//*************************************************************************************************************
-
 NetworkNode::SPtr Network::getNodeAt(int i)
 {
     return m_lNodes.at(i);
@@ -145,12 +165,26 @@ NetworkNode::SPtr Network::getNodeAt(int i)
 
 //*************************************************************************************************************
 
-qint16 Network::getDistribution() const
+qint16 Network::getFullDistribution() const
 {
     qint16 distribution = 0;
 
     for(int i = 0; i < m_lNodes.size(); ++i) {
-        distribution += m_lNodes.at(i)->getDegree();
+        distribution += m_lNodes.at(i)->getFullDegree();
+    }
+
+    return distribution;
+}
+
+
+//*************************************************************************************************************
+
+qint16 Network::getThresholdedDistribution() const
+{
+    qint16 distribution = 0;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        distribution += m_lNodes.at(i)->getThresholdedDegree();
     }
 
     return distribution;
@@ -175,24 +209,32 @@ QString Network::getConnectivityMethod() const
 
 //*************************************************************************************************************
 
-QPair<double, double> Network::getMinMaxWeights() const
+QPair<double, double> Network::getMinMaxFullWeights() const
 {
-    return m_minMaxWeightsActiveEdges;
+    return m_minMaxFullWeights;
 }
 
 
 //*************************************************************************************************************
 
-QPair<int,int> Network::getMinMaxDegrees() const
+QPair<double, double> Network::getMinMaxThresholdedWeights() const
+{
+    return m_minMaxThresholdedWeights;
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxFullDegrees() const
 {
     int maxDegree = 0;
     int minDegree = 1000000;
 
     for(int i = 0; i < m_lNodes.size(); ++i) {
-        if(m_lNodes.at(i)->getDegree() > maxDegree){
-            maxDegree = m_lNodes.at(i)->getDegree();
-        } else if (m_lNodes.at(i)->getDegree() < minDegree){
-            minDegree = m_lNodes.at(i)->getDegree();
+        if(m_lNodes.at(i)->getFullDegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getFullDegree();
+        } else if (m_lNodes.at(i)->getFullDegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getFullDegree();
         }
     }
 
@@ -202,16 +244,16 @@ QPair<int,int> Network::getMinMaxDegrees() const
 
 //*************************************************************************************************************
 
-QPair<int,int> Network::getMinMaxIndegrees() const
+QPair<int,int> Network::getMinMaxThresholdedDegrees() const
 {
     int maxDegree = 0;
     int minDegree = 1000000;
 
     for(int i = 0; i < m_lNodes.size(); ++i) {
-        if(m_lNodes.at(i)->getIndegree() > maxDegree){
-            maxDegree = m_lNodes.at(i)->getIndegree();
-        } else if (m_lNodes.at(i)->getIndegree() < minDegree){
-            minDegree = m_lNodes.at(i)->getIndegree();
+        if(m_lNodes.at(i)->getThresholdedDegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getThresholdedDegree();
+        } else if (m_lNodes.at(i)->getThresholdedDegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getThresholdedDegree();
         }
     }
 
@@ -221,16 +263,73 @@ QPair<int,int> Network::getMinMaxIndegrees() const
 
 //*************************************************************************************************************
 
-QPair<int,int> Network::getMinMaxOutdegrees() const
+QPair<int,int> Network::getMinMaxFullIndegrees() const
 {
     int maxDegree = 0;
     int minDegree = 1000000;
 
     for(int i = 0; i < m_lNodes.size(); ++i) {
-        if(m_lNodes.at(i)->getOutdegree() > maxDegree){
-            maxDegree = m_lNodes.at(i)->getOutdegree();
-        } else if (m_lNodes.at(i)->getOutdegree() < minDegree){
-            minDegree = m_lNodes.at(i)->getOutdegree();
+        if(m_lNodes.at(i)->getFullIndegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getFullIndegree();
+        } else if (m_lNodes.at(i)->getFullIndegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getFullIndegree();
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxThresholdedIndegrees() const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getThresholdedIndegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getThresholdedIndegree();
+        } else if (m_lNodes.at(i)->getThresholdedIndegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getThresholdedIndegree();
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxFullOutdegrees() const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getFullOutdegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getFullOutdegree();
+        } else if (m_lNodes.at(i)->getFullOutdegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getFullOutdegree();
+        }
+    }
+
+    return QPair<int,int>(minDegree,maxDegree);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,int> Network::getMinMaxThresholdedOutdegrees() const
+{
+    int maxDegree = 0;
+    int minDegree = 1000000;
+
+    for(int i = 0; i < m_lNodes.size(); ++i) {
+        if(m_lNodes.at(i)->getThresholdedOutdegree() > maxDegree){
+            maxDegree = m_lNodes.at(i)->getThresholdedOutdegree();
+        } else if (m_lNodes.at(i)->getThresholdedOutdegree() < minDegree){
+            minDegree = m_lNodes.at(i)->getThresholdedOutdegree();
         }
     }
 
@@ -243,19 +342,19 @@ QPair<int,int> Network::getMinMaxOutdegrees() const
 void Network::setThreshold(double dThreshold)
 {
     m_dThreshold = dThreshold;
-    m_lActiveEdges.clear();
+    m_lThresholdedEdges.clear();
 
-    for(int i = 0; i < m_lEdges.size(); ++i) {
-        if(m_lEdges.at(i)->getWeight() >= m_dThreshold) {
-            m_lEdges.at(i)->setActive(true);
-            m_lActiveEdges.append(m_lEdges.at(i));
+    for(int i = 0; i < m_lFullEdges.size(); ++i) {
+        if(m_lFullEdges.at(i)->getWeight() >= m_dThreshold) {
+            m_lFullEdges.at(i)->setActive(true);
+            m_lThresholdedEdges.append(m_lFullEdges.at(i));
         } else {
-            m_lEdges.at(i)->setActive(false);
+            m_lFullEdges.at(i)->setActive(false);
         }
     }
 
-    m_minMaxWeightsActiveEdges.first = m_dThreshold;
-    m_minMaxWeightsActiveEdges.second = m_minMaxWeightsAllEdges.second;
+    m_minMaxThresholdedWeights.first = m_dThreshold;
+    m_minMaxThresholdedWeights.second = m_minMaxFullWeights.second;
 }
 
 
@@ -264,13 +363,13 @@ void Network::setThreshold(double dThreshold)
 void Network::append(NetworkEdge::SPtr newEdge)
 {
     double dEdgeWeight = newEdge->getWeight();
-    if(dEdgeWeight < m_minMaxWeightsAllEdges.first) {
-        m_minMaxWeightsAllEdges.first = dEdgeWeight;
-    } else if(dEdgeWeight >= m_minMaxWeightsAllEdges.second) {
-        m_minMaxWeightsAllEdges.second = dEdgeWeight;
+    if(dEdgeWeight < m_minMaxFullWeights.first) {
+        m_minMaxFullWeights.first = dEdgeWeight;
+    } else if(dEdgeWeight >= m_minMaxFullWeights.second) {
+        m_minMaxFullWeights.second = dEdgeWeight;
     }
 
-    m_lEdges << newEdge;
+    m_lFullEdges << newEdge;
 }
 
 
@@ -286,7 +385,7 @@ void Network::append(NetworkNode::SPtr newNode)
 
 bool Network::isEmpty() const
 {
-    if(m_lEdges.isEmpty() || m_lNodes.isEmpty()) {
+    if(m_lFullEdges.isEmpty() || m_lNodes.isEmpty()) {
         return true;
     }
 
