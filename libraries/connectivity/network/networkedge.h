@@ -112,8 +112,8 @@ public:
                          int iEndNodeID,
                          Eigen::MatrixXd& matWeight,
                          bool bIsActive = true,
-                         int iStartWeightBin = 0,
-                         int iEndWeightBin = 100);
+                         int iStartWeightBin = -1,
+                         int iEndWeightBin = -1);
 
     //=========================================================================================================
     /**
