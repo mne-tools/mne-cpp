@@ -396,7 +396,9 @@ bool NetworkNode::getHubStatus() const
 
 void NetworkNode::append(QSharedPointer<NetworkEdge> newEdge)
 {
-    m_lEdges << newEdge;
+    if(newEdge->getEndNodeID() != newEdge->getStartNodeID()) {
+        m_lEdges << newEdge;
+    }
 }
 
 
