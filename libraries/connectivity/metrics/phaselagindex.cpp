@@ -95,8 +95,10 @@ PhaseLagIndex::PhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert,
-                                     int iNfft, const QString &sWindowType)
+Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList,
+                                     const MatrixX3f& matVert,
+                                     int iNfft,
+                                     const QString &sWindowType)
 {
     Network finalNetwork("Phase Lag Index");
 
@@ -124,7 +126,7 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
 
     //Add edges to network
     for(int i = 0; i < vecPLI.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = i; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecPLI.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));

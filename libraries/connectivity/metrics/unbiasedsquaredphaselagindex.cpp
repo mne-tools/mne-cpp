@@ -92,7 +92,8 @@ UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
 
 Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<MatrixXd> &matDataList,
                                                                    const MatrixX3f& matVert,
-                                                                   int iNfft, const QString &sWindowType)
+                                                                   int iNfft,
+                                                                   const QString &sWindowType)
 {
     Network finalNetwork("Unbiased Squared Phase Lag Index");
 
@@ -120,7 +121,7 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<M
 
     //Add edges to network
     for(int i = 0; i < vecUnbiasedSquaredPLI.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = i; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecUnbiasedSquaredPLI.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -138,7 +139,8 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<M
 //*************************************************************************************************************
 
 QVector<MatrixXd> UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(const QList<MatrixXd> &matDataList,
-                                                                          int iNfft, const QString &sWindowType)
+                                                                          int iNfft,
+                                                                          const QString &sWindowType)
 {
     int iNRows = matDataList.at(0).rows();
     int iNTrials = matDataList.length();

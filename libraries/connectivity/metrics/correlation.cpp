@@ -90,7 +90,8 @@ Correlation::Correlation()
 
 //*************************************************************************************************************
 
-Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
+Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
+                                      const MatrixX3f& matVert)
 {
     Network finalNetwork("Correlation");
 
@@ -140,7 +141,8 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const 
 
 //*************************************************************************************************************
 
-double Correlation::calcCorrelationCoeff(const RowVectorXd &vecFirst, const RowVectorXd &vecSecond)
+double Correlation::calcCorrelationCoeff(const RowVectorXd &vecFirst,
+                                         const RowVectorXd &vecSecond)
 {
     if(vecFirst.cols() != vecSecond.cols()) {
         qDebug() << "Correlation::calcCorrelationCoeff - Vectors length do not match!";
@@ -169,7 +171,8 @@ MatrixXd Correlation::calculate(const MatrixXd &data)
 
 //*************************************************************************************************************
 
-void Correlation::sum(MatrixXd &resultData, const MatrixXd &data)
+void Correlation::sum(MatrixXd &resultData,
+                      const MatrixXd &data)
 {
     if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
         resultData.resize(data.rows(), data.cols());

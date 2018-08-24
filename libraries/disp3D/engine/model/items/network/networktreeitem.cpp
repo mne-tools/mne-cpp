@@ -236,13 +236,12 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
     //Create transform matrix for each sphere instance
     QVector<QMatrix4x4> vTransforms;
     QVector<QColor> vColorsNodes;
-    vTransforms.reserve(lNetworkNodes.size());
     QVector3D tempPos;
     qint16 iDegree = 0;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
         iDegree = lNetworkNodes.at(i)->getThresholdedDegree();
-
+        qDebug()<<"iDegree"<<iDegree;
         if(iDegree != 0) {
             tempPos = QVector3D(lNetworkNodes.at(i)->getVert()(0),
                                 lNetworkNodes.at(i)->getVert()(1),

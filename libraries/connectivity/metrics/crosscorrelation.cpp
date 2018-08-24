@@ -89,7 +89,8 @@ CrossCorrelation::CrossCorrelation()
 
 //*************************************************************************************************************
 
-Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
+Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
+                                           const MatrixX3f& matVert)
 {
     Network finalNetwork("Cross Correlation");
 
@@ -139,7 +140,8 @@ Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList, c
 
 //*************************************************************************************************************
 
-QPair<int,double> CrossCorrelation::calcCrossCorrelation(const RowVectorXd &vecFirst, const RowVectorXd &vecSecond)
+QPair<int,double> CrossCorrelation::calcCrossCorrelation(const RowVectorXd &vecFirst,
+                                                         const RowVectorXd &vecSecond)
 {
     Eigen::FFT<double> fft;
 
@@ -220,7 +222,8 @@ MatrixXd CrossCorrelation::calculate(const MatrixXd &data)
 
 //*************************************************************************************************************
 
-void CrossCorrelation::sum(MatrixXd &resultData, const MatrixXd &data)
+void CrossCorrelation::sum(MatrixXd &resultData,
+                           const MatrixXd &data)
 {
     if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
         resultData.resize(data.rows(), data.cols());

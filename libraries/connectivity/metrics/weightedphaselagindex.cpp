@@ -97,7 +97,8 @@ WeightedPhaseLagIndex::WeightedPhaseLagIndex()
 
 Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matDataList,
                                                      const MatrixX3f& matVert,
-                                                     int iNfft, const QString &sWindowType)
+                                                     int iNfft,
+                                                     const QString &sWindowType)
 {
     Network finalNetwork("Weighted Phase Lag Index");
 
@@ -125,7 +126,7 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
 
     //Add edges to network
     for(int i = 0; i < vecWPLI.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = i; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecWPLI.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -142,7 +143,8 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> WeightedPhaseLagIndex::computeWPLI(const QList<MatrixXd> &matDataList, int iNfft,
+QVector<MatrixXd> WeightedPhaseLagIndex::computeWPLI(const QList<MatrixXd> &matDataList,
+                                                     int iNfft,
                                                      const QString &sWindowType)
 {
     // Check that iNfft >= signal length

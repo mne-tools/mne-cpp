@@ -95,8 +95,10 @@ PhaseLockingValue::PhaseLockingValue()
 
 //*******************************************************************************************************
 
-Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert,
-                                           int iNfft, const QString &sWindowType)
+Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
+                                             const MatrixX3f& matVert,
+                                             int iNfft,
+                                             const QString &sWindowType)
 {
     Network finalNetwork("New Phase Locking Value");
 
@@ -124,7 +126,7 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
 
     //Add edges to network
     for(int i = 0; i < vecPLV.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = i; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecPLV.at(i).row(j).transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -141,7 +143,8 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataList, int iNfft,
+QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataList,
+                                                int iNfft,
                                                 const QString &sWindowType)
 {
     // Check that iNfft >= signal length
