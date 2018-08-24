@@ -141,51 +141,99 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns node degree.
+    * Returns node degree corresponding to the full network.
     *
     * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
     */
-    qint16 getDegree() const;
+    qint16 getFullDegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node indegree.
+    * Returns node degree corresponding to the thresholded network.
+    *
+    * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
+    */
+    qint16 getThresholdedDegree() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node indegree corresponding to the full network.
     *
     * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
     */
-    qint16 getIndegree() const;
+    qint16 getFullIndegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node outdegree.
+    * Returns node indegree corresponding to the thresholded network.
+    *
+    * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
+    */
+    qint16 getThresholdedIndegree() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node outdegree corresponding to the full network.
     *
     * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
     */
-    qint16 getOutdegree() const;
+    qint16 getFullOutdegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength.
+    * Returns node outdegree corresponding to the thresholded network.
+    *
+    * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
+    */
+    qint16 getThresholdedOutdegree() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength corresponding to the full network.
     *
     * @return   The node strength calculated as the sum of all weights of all edges of a node.
     */
-    double getStrength() const;
+    double getFullStrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all ingoing edges.
+    * Returns node strength corresponding to the thresholded network.
+    *
+    * @return   The node strength calculated as the sum of all weights of all edges of a node.
+    */
+    double getThresholdedStrength() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all ingoing edges corresponding to the full network.
     *
     * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
     */
-    double getInstrength() const;
+    double getFullInstrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all outgoing edges.
+    * Returns node strength of all ingoing edges corresponding to the thresholded network.
+    *
+    * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
+    */
+    double getThresholdedInstrength() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all outgoing edges corresponding to the full network.
     *
     * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
     */
-    double getOutstrength() const;
+    double getFullOutstrength() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all outgoing edges corresponding to the thresholded network.
+    *
+    * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
+    */
+    double getThresholdedOutstrength() const;
 
     //=========================================================================================================
     /**

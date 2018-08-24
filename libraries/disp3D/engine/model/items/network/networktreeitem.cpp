@@ -151,7 +151,7 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     data.setValue(tNetwork);
     this->setData(data, Data3DTreeModelItemRoles::Data);
 
-    MatrixXd matDist = tNetwork.getConnectivityMatrix();
+    MatrixXd matDist = tNetwork.getFullConnectivityMatrix();
     data.setValue(matDist);
     this->setData(data, Data3DTreeModelItemRoles::NetworkDataMatrix);
 
@@ -209,7 +209,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
     }
 
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
-    qint16 iMaxDegree = tNetworkData.getMinMaxDegrees().second;
+    qint16 iMaxDegree = tNetworkData.getMinMaxThresholdedDegrees().second;
 
     if(!m_pNodesEntity) {
         m_pNodesEntity = new QEntity(this);
@@ -241,7 +241,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
     qint16 iDegree = 0;
 
     for(int i = 0; i < lNetworkNodes.size(); ++i) {
-        iDegree = lNetworkNodes.at(i)->getDegree();
+        iDegree = lNetworkNodes.at(i)->getThresholdedDegree();
 
         tempPos = QVector3D(lNetworkNodes.at(i)->getVert()(0),
                             lNetworkNodes.at(i)->getVert()(1),
@@ -278,10 +278,10 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
         return;
     }
 
-    double dMinWeight = tNetworkData.getMinMaxWeights().first;
-    double dMaxWeight = tNetworkData.getMinMaxWeights().second;
+    double dMinWeight = tNetworkData.getMinMaxThresholdedWeights().first;
+    double dMaxWeight = tNetworkData.getMinMaxThresholdedWeights().second;
 
-    QList<NetworkEdge::SPtr> lNetworkEdges = tNetworkData.getEdges();
+    QList<NetworkEdge::SPtr> lNetworkEdges = tNetworkData.getThresholdedEdges();
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
     if(!m_pEdgeEntity) {

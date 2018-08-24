@@ -118,7 +118,25 @@ qint16 NetworkNode::getId() const
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getDegree() const
+qint16 NetworkNode::getFullDegree() const
+{
+    qint16 degree = 0;
+
+    for(int i = 0; i < m_lEdgesIn.size(); i++) {
+        degree++;
+    }
+
+    for(int i = 0; i < m_lEdgesOut.size(); i++) {
+        degree++;
+    }
+
+    return degree;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getThresholdedDegree() const
 {
     qint16 degree = 0;
 
@@ -140,7 +158,21 @@ qint16 NetworkNode::getDegree() const
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getIndegree() const
+qint16 NetworkNode::getFullIndegree() const
+{
+    qint16 degree = 0;
+
+    for(int i = 0; i< m_lEdgesIn.size(); i++) {
+        degree++;
+    }
+
+    return degree;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getThresholdedIndegree() const
 {
     qint16 degree = 0;
 
@@ -156,7 +188,21 @@ qint16 NetworkNode::getIndegree() const
 
 //*************************************************************************************************************
 
-qint16 NetworkNode::getOutdegree() const
+qint16 NetworkNode::getFullOutdegree() const
+{
+    qint16 degree = 0;
+
+    for(int i = 0; i< m_lEdgesOut.size(); i++) {
+        degree++;
+    }
+
+    return degree;
+}
+
+
+//*************************************************************************************************************
+
+qint16 NetworkNode::getThresholdedOutdegree() const
 {
     qint16 degree = 0;
 
@@ -172,7 +218,25 @@ qint16 NetworkNode::getOutdegree() const
 
 //*************************************************************************************************************
 
-double NetworkNode::getStrength() const
+double NetworkNode::getFullStrength() const
+{
+    double dStrength = 0.0;
+
+    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
+        dStrength += m_lEdgesIn.at(i)->getWeight();
+    }
+
+    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
+        dStrength += m_lEdgesOut.at(i)->getWeight();
+    }
+
+    return dStrength;
+}
+
+
+//*************************************************************************************************************
+
+double NetworkNode::getThresholdedStrength() const
 {
     double dStrength = 0.0;
 
@@ -194,7 +258,21 @@ double NetworkNode::getStrength() const
 
 //*************************************************************************************************************
 
-double NetworkNode::getInstrength() const
+double NetworkNode::getFullInstrength() const
+{
+    double dStrength = 0.0;
+
+    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
+        dStrength += m_lEdgesIn.at(i)->getWeight();
+    }
+
+    return dStrength;
+}
+
+
+//*************************************************************************************************************
+
+double NetworkNode::getThresholdedInstrength() const
 {
     double dStrength = 0.0;
 
@@ -210,7 +288,21 @@ double NetworkNode::getInstrength() const
 
 //*************************************************************************************************************
 
-double NetworkNode::getOutstrength() const
+double NetworkNode::getFullOutstrength() const
+{
+    double dStrength = 0.0;
+
+    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
+        dStrength += m_lEdgesOut.at(i)->getWeight();
+    }
+
+    return dStrength;
+}
+
+
+//*************************************************************************************************************
+
+double NetworkNode::getThresholdedOutstrength() const
 {
     double dStrength = 0.0;
 
