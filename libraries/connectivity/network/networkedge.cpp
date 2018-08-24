@@ -80,10 +80,15 @@ using namespace Eigen;
 
 NetworkEdge::NetworkEdge(int iStartNodeID,
                          int iEndNodeID,
-                         MatrixXd& matWeight)
+                         MatrixXd& matWeight,
+                         bool bIsActive,
+                         int iStartWeightBin,
+                         int iEndWeightBin)
 : m_iStartNodeID(iStartNodeID)
 , m_iEndNodeID(iEndNodeID)
-, m_bIsActive(true)
+, m_bIsActive(bIsActive)
+, m_iStartWeightBin(iStartWeightBin)
+, m_iEndWeightBin(iEndWeightBin)
 {
     if(matWeight.rows() == 0 || matWeight.cols() == 0) {
         m_matWeight = MatrixXd::Zero(1,1);
@@ -128,10 +133,10 @@ bool NetworkEdge::isActive()
 
 //*************************************************************************************************************
 
-double NetworkEdge::getWeight(int startBin, int endBin) const
+double NetworkEdge::getWeight() const
 {
-    if(endBin < startBin || startBin < -1 || endBin < -1 ) {
-        qDebug() << "Network::getWeight - end bin index is larger than start bin index or one of them is negative. Returning zero matrix.";
+    if(m_iEndWeightBin < m_iStartWeightBin || m_iStartWeightBin < -1 || m_iEndWeightBin < -1 ) {
+        qDebug() << "Network::getWeight - end bin index is larger than start bin index or one of them is < -1. Returning zero matrix.";
         return 0.0;
     }
 
@@ -139,17 +144,14 @@ double NetworkEdge::getWeight(int startBin, int endBin) const
     int cols = m_matWeight.cols();
     double dWeight = 0.0;
 
-    if(endBin-startBin+1 < cols
-       && startBin < cols) {
+    if(m_iEndWeightBin-m_iStartWeightBin+1 < cols
+       && m_iStartWeightBin < cols) {
         qDebug() << "spanning";
-        dWeight = m_matWeight.block(0,startBin,rows,endBin-startBin+1).mean();
-    } else if (endBin == -1
-               && startBin == -1) {
+        dWeight = m_matWeight.block(0,m_iStartWeightBin,rows,m_iEndWeightBin-m_iStartWeightBin+1).mean();
+    } else if (m_iEndWeightBin == -1
+               && m_iStartWeightBin == -1) {
         dWeight = m_matWeight.mean();
     }
 
     return dWeight;
 }
-
-
-

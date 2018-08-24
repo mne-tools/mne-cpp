@@ -101,15 +101,19 @@ public:
     /**
     * Constructs a NetworkEdge object.
     *
-    * @param[in]  pStartNode        The start node id of the edge.
-    * @param[in]  pEndNode          The end node id of the edge.
-    * @param[in]  vecVertStartNode  The start node vert of the edge.
-    * @param[in]  vecVertEndNode    The end node vert of the edge.
+    * @param[in]  iStartNodeID      The start node id of the edge.
+    * @param[in]  iEndNodeID        The end node id of the edge.
     * @param[in]  matWeight         The edge weight.
+    * @param[in]  bIsActive         The active flag of this edge. Default is true.
+    * @param[in]  iStartWeightBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
+    * @param[in]  iEndWeightBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
     */
     explicit NetworkEdge(int iStartNodeID,
                          int iEndNodeID,
-                         Eigen::MatrixXd& matWeight);
+                         Eigen::MatrixXd& matWeight,
+                         bool bIsActive = true,
+                         int iStartWeightBin = -1,
+                         int iEndWeightBin = -1);
 
     //=========================================================================================================
     /**
@@ -147,16 +151,16 @@ public:
     /**
     * Returns the edge weight. The weights are averaged between the specified bin indeces and their corresponding tapers.
     *
-    * @param[in] startBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
-    * @param[in] endBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
-    *
-    * @return    The weight.
+    * @return    The current edge weight.
     */
-    double getWeight(int startBin = -1, int endBin = -1) const;
+    double getWeight() const;
 
 protected:
     int     m_iStartNodeID;         /**< The start node of the edge.*/
     int     m_iEndNodeID;           /**< The end node of the edge.*/
+
+    int     m_iStartWeightBin;      /**< The bin index to start avergaing from. Default is -1 which means an average over all weights.*/
+    int     m_iEndWeightBin;        /**< The bin index to end avergaing to. Default is -1 which means an average over all weights.*/
 
     bool    m_bIsActive;            /**< The activity flag indicating whether this edge is part of a thresholded network.*/
 
