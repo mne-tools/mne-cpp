@@ -86,17 +86,89 @@ NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert)
 
 //*************************************************************************************************************
 
-const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesIn() const
+const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getFullEdges() const
 {
-    return m_lEdgesIn;
+    return m_lEdges;
 }
 
 
 //*************************************************************************************************************
 
-const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getEdgesOut() const
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getThresholdedEdges() const
 {
-    return m_lEdgesOut;
+    QList<QSharedPointer<NetworkEdge> > edgeList;
+
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->isActive()) {
+            edgeList << m_lEdges.at(i);
+        }
+    }
+
+    return edgeList;
+}
+
+
+//*************************************************************************************************************
+
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getFullEdgesIn() const
+{
+    QList<QSharedPointer<NetworkEdge> > edgeList;
+
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->getEndNodeID() == this->getId()) {
+            edgeList << m_lEdges.at(i);
+        }
+    }
+
+    return edgeList;
+}
+
+
+//*************************************************************************************************************
+
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getThresholdedEdgesIn() const
+{
+    QList<QSharedPointer<NetworkEdge> > edgeList;
+
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->isActive() && m_lEdges.at(i)->getEndNodeID() == this->getId()) {
+            edgeList << m_lEdges.at(i);
+        }
+    }
+
+    return edgeList;
+}
+
+
+//*************************************************************************************************************
+
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getFullEdgesOut() const
+{
+    QList<QSharedPointer<NetworkEdge> > edgeList;
+
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->getStartNodeID() == this->getId()) {
+            edgeList << m_lEdges.at(i);
+        }
+    }
+
+    return edgeList;
+}
+
+
+//*************************************************************************************************************
+
+QList<QSharedPointer<NetworkEdge> > NetworkNode::getThresholdedEdgesOut() const
+{
+    QList<QSharedPointer<NetworkEdge> > edgeList;
+
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->isActive() && m_lEdges.at(i)->getStartNodeID() == this->getId()) {
+            edgeList << m_lEdges.at(i);
+        }
+    }
+
+    return edgeList;
 }
 
 
@@ -122,11 +194,7 @@ qint16 NetworkNode::getFullDegree() const
 {
     qint16 degree = 0;
 
-    for(int i = 0; i < m_lEdgesIn.size(); i++) {
-        degree++;
-    }
-
-    for(int i = 0; i < m_lEdgesOut.size(); i++) {
+    for(int i = 0; i < m_lEdges.size(); i++) {
         degree++;
     }
 
@@ -140,14 +208,8 @@ qint16 NetworkNode::getThresholdedDegree() const
 {
     qint16 degree = 0;
 
-    for(int i = 0; i < m_lEdgesIn.size(); i++) {
-        if(m_lEdgesIn.at(i)->isActive()) {
-            degree++;
-        }
-    }
-
-    for(int i = 0; i < m_lEdgesOut.size(); i++) {
-        if(m_lEdgesOut.at(i)->isActive()) {
+    for(int i = 0; i < m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->isActive()) {
             degree++;
         }
     }
@@ -162,8 +224,10 @@ qint16 NetworkNode::getFullIndegree() const
 {
     qint16 degree = 0;
 
-    for(int i = 0; i< m_lEdgesIn.size(); i++) {
-        degree++;
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->getEndNodeID() == this->getId()) {
+            degree++;
+        }
     }
 
     return degree;
@@ -176,8 +240,8 @@ qint16 NetworkNode::getThresholdedIndegree() const
 {
     qint16 degree = 0;
 
-    for(int i = 0; i< m_lEdgesIn.size(); i++) {
-        if(m_lEdgesIn.at(i)->isActive()) {
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->isActive() && m_lEdges.at(i)->getEndNodeID() == this->getId()) {
             degree++;
         }
     }
@@ -192,8 +256,10 @@ qint16 NetworkNode::getFullOutdegree() const
 {
     qint16 degree = 0;
 
-    for(int i = 0; i< m_lEdgesOut.size(); i++) {
-        degree++;
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->getStartNodeID() == this->getId()) {
+            degree++;
+        }
     }
 
     return degree;
@@ -206,8 +272,8 @@ qint16 NetworkNode::getThresholdedOutdegree() const
 {
     qint16 degree = 0;
 
-    for(int i = 0; i< m_lEdgesOut.size(); i++) {
-        if(m_lEdgesOut.at(i)->isActive()) {
+    for(int i = 0; i< m_lEdges.size(); i++) {
+        if(m_lEdges.at(i)->isActive() && m_lEdges.at(i)->getStartNodeID() == this->getId()) {
             degree++;
         }
     }
@@ -222,12 +288,8 @@ double NetworkNode::getFullStrength() const
 {
     double dStrength = 0.0;
 
-    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
-        dStrength += m_lEdgesIn.at(i)->getWeight();
-    }
-
-    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
-        dStrength += m_lEdgesOut.at(i)->getWeight();
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        dStrength += m_lEdges.at(i)->getWeight();
     }
 
     return dStrength;
@@ -240,15 +302,9 @@ double NetworkNode::getThresholdedStrength() const
 {
     double dStrength = 0.0;
 
-    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
-        if(m_lEdgesIn.at(i)->isActive()) {
-            dStrength += m_lEdgesIn.at(i)->getWeight();
-        }
-    }
-
-    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
-        if(m_lEdgesOut.at(i)->isActive()) {
-            dStrength += m_lEdgesOut.at(i)->getWeight();
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        if(m_lEdges.at(i)->isActive()) {
+            dStrength += m_lEdges.at(i)->getWeight();
         }
     }
 
@@ -262,8 +318,10 @@ double NetworkNode::getFullInstrength() const
 {
     double dStrength = 0.0;
 
-    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
-        dStrength += m_lEdgesIn.at(i)->getWeight();
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        if(m_lEdges.at(i)->getEndNodeID() == this->getId()) {
+            dStrength += m_lEdges.at(i)->getWeight();
+        }
     }
 
     return dStrength;
@@ -276,9 +334,9 @@ double NetworkNode::getThresholdedInstrength() const
 {
     double dStrength = 0.0;
 
-    for(int i = 0; i < m_lEdgesIn.size(); ++i) {
-        if(m_lEdgesIn.at(i)->isActive()) {
-            dStrength += m_lEdgesIn.at(i)->getWeight();
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        if(m_lEdges.at(i)->isActive() && m_lEdges.at(i)->getEndNodeID() == this->getId()) {
+            dStrength += m_lEdges.at(i)->getWeight();
         }
     }
 
@@ -292,8 +350,10 @@ double NetworkNode::getFullOutstrength() const
 {
     double dStrength = 0.0;
 
-    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
-        dStrength += m_lEdgesOut.at(i)->getWeight();
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        if(m_lEdges.at(i)->getStartNodeID() == this->getId()) {
+            dStrength += m_lEdges.at(i)->getWeight();
+        }
     }
 
     return dStrength;
@@ -306,9 +366,9 @@ double NetworkNode::getThresholdedOutstrength() const
 {
     double dStrength = 0.0;
 
-    for(int i = 0; i < m_lEdgesOut.size(); ++i) {
-        if(m_lEdgesOut.at(i)->isActive()) {
-            dStrength += m_lEdgesOut.at(i)->getWeight();
+    for(int i = 0; i < m_lEdges.size(); ++i) {
+        if(m_lEdges.at(i)->isActive() && m_lEdges.at(i)->getStartNodeID() == this->getId()) {
+            dStrength += m_lEdges.at(i)->getWeight();
         }
     }
 
@@ -336,15 +396,7 @@ bool NetworkNode::getHubStatus() const
 
 void NetworkNode::append(QSharedPointer<NetworkEdge> newEdge)
 {
-    if(newEdge->getEndNodeID() == newEdge->getStartNodeID() ) {
-        return;
-    }
-
-    if(newEdge->getEndNodeID() == this->getId()) {
-        m_lEdgesIn << newEdge;
-    } else if(newEdge->getStartNodeID() == this->getId()) {
-        m_lEdgesOut << newEdge;
-    }
+    m_lEdges << newEdge;
 }
 
 
