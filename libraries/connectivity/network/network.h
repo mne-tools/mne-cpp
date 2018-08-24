@@ -274,6 +274,31 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current threshold of the network.
+    *
+    * @return The current threshold.
+    */
+    double getThreshold();
+
+    //=========================================================================================================
+    /**
+    * Sets the frequency bins to average from/to.
+    *
+    * @param[in] iLowerBin        The new lower bin to average from.
+    * @param[in] iUpperBin        The new upper bin to average to.
+    */
+    void setFrequencyBins(int iLowerBin, int iUpperBin);
+
+    //=========================================================================================================
+    /**
+    * Returns the current frequency bins to average from/to.
+    *
+    * @return The current upper/lower bin to average from/to.
+    */
+    const QPair<int,int>& getFrequencyBins();
+
+    //=========================================================================================================
+    /**
     * Appends a network edge to this network node.
     *
     * @param[in] newEdge    The new edge item.
@@ -308,9 +333,9 @@ protected:
 
     QPair<double,double>                    m_minMaxFullWeights;        /**< The minimum and maximum weight strength of the entire network.*/
     QPair<double,double>                    m_minMaxThresholdedWeights; /**< The minimum and maximum weight strength of the active edges.*/
+    QPair<int,int>                          m_minMaxFrequencyBins;      /**< The minimum and maximum frequency bins to average from/to.*/
 
     double                                  m_dThreshold;               /**< The current threshold value.*/
-
 };
 
 
