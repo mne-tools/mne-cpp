@@ -111,18 +111,10 @@ GeometryMultiplier::~GeometryMultiplier()
 
 void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansform)
 {
-    if(tInstanceTansform.isEmpty())
-    {
-        qDebug ("ERROR!: GeometryMultiplier::setTransforms: QVector is empty!");
-        return;
-    }
-
     //Update buffer content
-    m_pTransformBuffer->setData(buildTransformBuffer(tInstanceTansform));
+    m_pTransformBuffer->updateData(0,buildTransformBuffer(tInstanceTansform));
 
-    if(this->instanceCount() != tInstanceTansform.size()) {
-        updateInstanceCount(tInstanceTansform.size());
-    }
+    this->setInstanceCount(tInstanceTansform.size());
 }
 
 
@@ -130,14 +122,8 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
 
 void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
 {
-    if(tInstanceColors.isEmpty())
-    {
-        qDebug ("ERROR!: GeometryMultiplier::setColors: QVector is empty!");
-        return;
-    }
-
     //Update buffer content
-    m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
+    m_pColorBuffer->updateData(0,buildColorBuffer(tInstanceColors));
 
     if(tInstanceColors.size() > 1)
     {
@@ -149,9 +135,7 @@ void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
         m_pColorAttribute->setDivisor(0);
     }
 
-    if(this->instanceCount() != tInstanceColors.size()) {
-        updateInstanceCount(tInstanceColors.size());
-    }
+    this->setInstanceCount(tInstanceColors.size());
 }
 
 
@@ -247,12 +231,3 @@ QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstance
 
     return bufferData;
 }
-
-
-//*************************************************************************************************************
-
-void GeometryMultiplier::updateInstanceCount(const uint tCount)
-{
-    this->setInstanceCount(tCount);
-}
-

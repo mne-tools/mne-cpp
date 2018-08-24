@@ -358,10 +358,10 @@ public:
     * @param[in]  matRawData             raw data matrix that needs to be analyzed
     * @param[in]  bMakeSymmetrical       user input to turn the x-axis symmetric
     * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
-    * @param[in]  dGlobalMin             user input to determine the maximum value allowed in the histogram
-    * @param[in]  dGlobalMax             user input to determine the minimum value allowed in the histogram
     * @param[out] vecResultClassLimits   the upper limit of each individual class
     * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
+    * @param[in]  dGlobalMin             user input to determine the maximum value allowed in the histogram
+    * @param[in]  dGlobalMax             user input to determine the minimum value allowed in the histogram
     */
     template<typename T>
     static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData,
