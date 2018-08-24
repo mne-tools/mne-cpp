@@ -109,19 +109,51 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the ingoing edges.
+    * Returns the ingoing edges corresponding to the full network.
     *
     * @return   Returns the list with all ingoing edges.
     */
-    const QList<QSharedPointer<NetworkEdge> >& getEdgesIn() const;
+    const QList<QSharedPointer<NetworkEdge> >& getFullEdges() const;
 
     //=========================================================================================================
     /**
-    * Returns the outgoing edges.
+    * Returns the ingoing edges corresponding to the thresholded network.
+    *
+    * @return   Returns the list with all ingoing edges.
+    */
+    QList<QSharedPointer<NetworkEdge> > getThresholdedEdges() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the ingoing edges corresponding to the full network.
+    *
+    * @return   Returns the list with all ingoing edges.
+    */
+    QList<QSharedPointer<NetworkEdge> > getFullEdgesIn() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the ingoing edges corresponding to the thresholded network.
+    *
+    * @return   Returns the list with all ingoing edges.
+    */
+    QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesIn() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the outgoing edges corresponding to the full network.
     *
     * @return   Returns the list with all outgoing edges.
     */
-    const QList<QSharedPointer<NetworkEdge> >& getEdgesOut() const;
+    QList<QSharedPointer<NetworkEdge> > getFullEdgesOut() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the outgoing edges corresponding to the thresholded network.
+    *
+    * @return   Returns the list with all outgoing edges.
+    */
+    QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesOut() const;
 
     //=========================================================================================================
     /**
@@ -266,8 +298,7 @@ protected:
 
     Eigen::RowVectorXf                      m_vecVert;      /**< The 3D position of the node.*/
 
-    QList<QSharedPointer<NetworkEdge> >     m_lEdgesIn;     /**< List with all incoming edges of the node.*/
-    QList<QSharedPointer<NetworkEdge> >     m_lEdgesOut;    /**< List with all outgoing edges of the node.*/
+    QList<QSharedPointer<NetworkEdge> >     m_lEdges;     /**< List with all incoming edges of the node.*/
 };
 
 
