@@ -87,8 +87,8 @@ NetworkEdge::NetworkEdge(int iStartNodeID,
 : m_iStartNodeID(iStartNodeID)
 , m_iEndNodeID(iEndNodeID)
 , m_bIsActive(bIsActive)
-, m_iStartWeightBin(iStartWeightBin)
-, m_iEndWeightBin(iEndWeightBin)
+, m_iMinMaxFreqBins(QPair<int,int>(iStartWeightBin,iEndWeightBin))
+, m_dAveragedWeight(0.0)
 {
     if(matWeight.rows() == 0 || matWeight.cols() == 0) {
         m_matWeight = MatrixXd::Zero(1,1);
@@ -96,6 +96,8 @@ NetworkEdge::NetworkEdge(int iStartNodeID,
     } else {
         m_matWeight = matWeight;
     }
+
+    calculateAveragedWeight();
 }
 
 
@@ -135,23 +137,47 @@ bool NetworkEdge::isActive()
 
 double NetworkEdge::getWeight() const
 {
-    if(m_iEndWeightBin < m_iStartWeightBin || m_iStartWeightBin < -1 || m_iEndWeightBin < -1 ) {
-        qDebug() << "Network::getWeight - end bin index is larger than start bin index or one of them is < -1. Returning zero matrix.";
-        return 0.0;
+    return m_dAveragedWeight;
+}
+
+
+//*************************************************************************************************************
+
+void NetworkEdge::calculateAveragedWeight()
+{
+    int iStartWeightBin = m_iMinMaxFreqBins.first;
+    int iEndWeightBin = m_iMinMaxFreqBins.second;
+
+    if(iEndWeightBin < iStartWeightBin || iStartWeightBin < -1 || iEndWeightBin < -1 ) {
+        qDebug() << "NetworkEdge::calculateAveragedWeight - end bin index is larger than start bin index or one of them is < -1.";
+        return;
     }
 
     int rows = m_matWeight.rows();
     int cols = m_matWeight.cols();
-    double dWeight = 0.0;
 
-    if(m_iEndWeightBin-m_iStartWeightBin+1 < cols
-       && m_iStartWeightBin < cols) {
-        qDebug() << "spanning";
-        dWeight = m_matWeight.block(0,m_iStartWeightBin,rows,m_iEndWeightBin-m_iStartWeightBin+1).mean();
-    } else if (m_iEndWeightBin == -1
-               && m_iStartWeightBin == -1) {
-        dWeight = m_matWeight.mean();
+    if (iEndWeightBin == -1 && iStartWeightBin == -1) {
+        m_dAveragedWeight = m_matWeight.mean();
+    } else if(iEndWeightBin-iStartWeightBin+1 < rows && iStartWeightBin < rows) {
+        m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin+1,1).mean();
     }
-
-    return dWeight;
 }
+
+
+//*************************************************************************************************************
+
+void NetworkEdge::setFrequencyBins(const QPair<int,int>& minMaxFreqBins)
+{
+    m_iMinMaxFreqBins = minMaxFreqBins;
+
+    calculateAveragedWeight();
+}
+
+
+//*************************************************************************************************************
+
+const QPair<int,int>& NetworkEdge::getFrequencyBins()
+{
+    return m_iMinMaxFreqBins;
+}
+

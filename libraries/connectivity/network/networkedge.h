@@ -112,8 +112,8 @@ public:
                          int iEndNodeID,
                          Eigen::MatrixXd& matWeight,
                          bool bIsActive = true,
-                         int iStartWeightBin = -1,
-                         int iEndWeightBin = -1);
+                         int iStartWeightBin = 0,
+                         int iEndWeightBin = 100);
 
     //=========================================================================================================
     /**
@@ -155,17 +155,39 @@ public:
     */
     double getWeight() const;
 
+    //=========================================================================================================
+    /**
+    * Calculates the edge weight based on the currently set min/max frequency bins.
+    */
+    void calculateAveragedWeight();
+
+    //=========================================================================================================
+    /**
+    * Sets the frequency bins to average from/to.
+    *
+    * @param[in] minMaxFreqBins        The new lower/upper bin to average from/to.
+    */
+    void setFrequencyBins(const QPair<int, int> &minMaxFreqBins);
+
+    //=========================================================================================================
+    /**
+    * Returns the current frequency bins to average from/to.
+    *
+    * @return The current upper/lower bin to average from/to.
+    */
+    const QPair<int,int>& getFrequencyBins();
+
 protected:
-    int     m_iStartNodeID;         /**< The start node of the edge.*/
-    int     m_iEndNodeID;           /**< The end node of the edge.*/
+    int             m_iStartNodeID;         /**< The start node of the edge.*/
+    int             m_iEndNodeID;           /**< The end node of the edge.*/
 
-    int     m_iStartWeightBin;      /**< The bin index to start avergaing from. Default is -1 which means an average over all weights.*/
-    int     m_iEndWeightBin;        /**< The bin index to end avergaing to. Default is -1 which means an average over all weights.*/
+    bool            m_bIsActive;            /**< The activity flag indicating whether this edge is part of a thresholded network.*/
 
-    bool    m_bIsActive;            /**< The activity flag indicating whether this edge is part of a thresholded network.*/
+    QPair<int,int>  m_iMinMaxFreqBins;      /**< The lower/upper bin indeces to start avergaing from/to. Default is -1 which means an average over all weights.*/
 
-    Eigen::MatrixXd                 m_matWeight;        /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
+    Eigen::MatrixXd m_matWeight;            /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
 
+    double          m_dAveragedWeight;      /**< The current averaged edge weight.*/
 };
 
 

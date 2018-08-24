@@ -43,7 +43,8 @@
 
 #include "networkedge.h"
 #include "networknode.h"
-#include <utils/ioutils.h>
+
+#include <utils/spectral.h>
 
 
 //*************************************************************************************************************
@@ -355,6 +356,35 @@ void Network::setThreshold(double dThreshold)
 
     m_minMaxThresholdedWeights.first = m_dThreshold;
     m_minMaxThresholdedWeights.second = m_minMaxFullWeights.second;
+}
+
+
+//*************************************************************************************************************
+
+double Network::getThreshold()
+{
+    return m_dThreshold;
+}
+
+
+//*************************************************************************************************************
+
+void Network::setFrequencyBins(int iLowerBin, int iUpperBin)
+{
+    m_minMaxFrequencyBins.first = iLowerBin;
+    m_minMaxFrequencyBins.second = iUpperBin;
+
+    for(int i = 0; i < m_lFullEdges.size(); ++i) {
+        m_lFullEdges.at(i)->setFrequencyBins(QPair<int,int>(iLowerBin,iUpperBin));
+    }
+}
+
+
+//*************************************************************************************************************
+
+const QPair<int,int>& Network::getFrequencyBins()
+{
+    return m_minMaxFrequencyBins;
 }
 
 
