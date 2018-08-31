@@ -115,7 +115,7 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
     // Generate tapered spectra, PSD, and CSD and sum over epoch
     // This part could be parallelized with QtConcurrent::mappedReduced
     QList<AbstractMetricInputData> lData;
-    for (int i = 0; i < matDataList.length(); ++i) {
+    for (int i = 0; i < matDataList.size(); ++i) {
         AbstractMetricInputData dataTemp;
         dataTemp.matInputData = matDataList.at(i);
         dataTemp.iNRows = iNRows;
@@ -126,7 +126,17 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
         lData.append(dataTemp);
     }
 
-    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(lData, compute, reduce);
+//    // Sequential
+//    AbstractMetricResultData finalResult;
+
+//    for (int i = 0; i < lData.length(); ++i) {
+//        reduce(finalResult, compute(lData.at(i)));
+//    }
+
+    // Parallel
+    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(lData,
+                                                                           compute,
+                                                                           reduce);
     result.waitForFinished();
 
     AbstractMetricResultData finalResult = result.result();
@@ -156,21 +166,27 @@ AbstractMetricResultData Coherency::compute(const AbstractMetricInputData& input
 
     QVector<MatrixXcd> vecCsdAvg;
 
+    QElapsedTimer time;
+    int mSeconds;
+    time.start();
     //Remove mean
     for (int i = 0; i < data.rows(); ++i) {
         data.row(i).array() -= data.row(i).mean();
     }
+    mSeconds = time.elapsed();
+    //qDebug()<<"mean" << mSeconds;
 
     // This part could be parallelized with QtConcurrent::mapped
-    QVector<MatrixXcd> vecTapSpectra;
-    for (int j = 0; j < inputData.iNRows; ++j) {
-        MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(data.row(j),
-                                                                  inputData.tapers.first,
-                                                                  inputData.iNfft);
-        vecTapSpectra.append(matTmpSpectra);
-    }
+    time.restart();
+    QVector<Eigen::MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(data,
+                                                                                    inputData.tapers.first,
+                                                                                    inputData.iNfft,
+                                                                                    true);
+    mSeconds = time.elapsed();
+    //qDebug()<<"tapSpectra" << mSeconds;
 
     // This part could be parallelized with QtConcurrent::mappedReduced
+    time.restart();
     for (int j = 0; j < inputData.iNRows; ++j) {
         RowVectorXd vecTmpPsd = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j),
                                                                 inputData.tapers.second,
@@ -178,8 +194,11 @@ AbstractMetricResultData Coherency::compute(const AbstractMetricInputData& input
                                                                 1.0);
         matPsdAvg.row(j) = vecTmpPsd;
     }
+    mSeconds = time.elapsed();
+    //qDebug()<<"psd" << mSeconds;
 
     // This part could be parallelized with QtConcurrent::mappedReduced
+    time.restart();
     for (int j = 0; j < inputData.iNRows; ++j) {
         MatrixXcd matCsd = MatrixXcd(inputData.iNRows, inputData.iNFreqs);
         for (int k = 0; k < inputData.iNRows; ++k) {
@@ -193,6 +212,8 @@ AbstractMetricResultData Coherency::compute(const AbstractMetricInputData& input
 
         vecCsdAvg.append(matCsd);
     }
+    mSeconds = time.elapsed();
+    //qDebug()<<"csd" << mSeconds;
 
     AbstractMetricResultData resultData;
     resultData.iNFreqs = inputData.iNFreqs;
@@ -223,8 +244,3 @@ void Coherency::reduce(AbstractMetricResultData& finalData,
         }
     }
 }
-
-
-
-
-

@@ -180,11 +180,7 @@ QVector<MatrixXd> DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWP
         }
 
         // This part could be parallelized with QtConcurrent::mapped
-        QVector<MatrixXcd> vecTapSpectra;
-        for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
-            vecTapSpectra.append(matTmpSpectra);
-        }
+        QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData, tapers.first, iNfft);
 
         // This part could be parallelized with QtConcurrent::mappedReduced
         for (int j = 0; j < iNRows; ++j) {

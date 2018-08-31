@@ -115,7 +115,9 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
     }
 
     //Calculate connectivity matrix over epochs and average afterwards
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList,
+                                                              calculate,
+                                                              sum);
     resultMat.waitForFinished();
 
     MatrixXd matDist = resultMat.result();

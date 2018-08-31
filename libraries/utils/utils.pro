@@ -121,6 +121,14 @@ HEADERS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
+#Activate FFTW backend in Eigen
+#DEFINES += EIGEN_FFTW_DEFAULT
+#INCLUDEPATH += $$shell_path(C:/fftw)
+#LIBS += -L$$shell_path(C:/fftw)
+#LIBS += -llibfftw3-3 \
+#        -llibfftw3f-3 \
+#        -llibfftw3l-3 \
+
 # Install headers to include directory
 header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/utils

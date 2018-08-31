@@ -78,7 +78,7 @@ MNE::MNE()
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iNumAverages(1)
 , m_iDownSample(2)
-, m_sAvrType("1")
+, m_sAvrType("4")
 {
 
 }
@@ -426,6 +426,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
             for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
                 if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                     m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
+                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
                 }
             }
         }
@@ -438,6 +439,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
                     m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
+                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
                 }
             }
         }
@@ -569,8 +571,8 @@ void MNE::run()
             {
                 MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
 
-                float tmin = 1 / m_pFiffInfo->sfreq;
-                float tstep = 1 / m_pFiffInfo->sfreq;
+                float tmin = 1.0f / m_pFiffInfo->sfreq;
+                float tstep = 1.0f / m_pFiffInfo->sfreq;
 
                 m_qMutex.lock();
 

@@ -112,7 +112,7 @@ GeometryMultiplier::~GeometryMultiplier()
 void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansform)
 {
     //Update buffer content
-    m_pTransformBuffer->updateData(0,buildTransformBuffer(tInstanceTansform));
+    m_pTransformBuffer->setData(buildTransformBuffer(tInstanceTansform));
 
     this->setInstanceCount(tInstanceTansform.size());
 }
@@ -123,7 +123,7 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
 void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
 {
     //Update buffer content
-    m_pColorBuffer->updateData(0,buildColorBuffer(tInstanceColors));
+    m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
 
     if(tInstanceColors.size() > 1)
     {
