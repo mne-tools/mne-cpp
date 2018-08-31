@@ -316,33 +316,84 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
         return;
     }
 
+    QList<ColorComputationInfo> lData;
+    ColorComputationInfo tempData;
+    tempData.dThresholdX = dThresholdX;
+    tempData.dThresholdZ = dThreholdZ;
+    tempData.functionHandlerColorMap = functionHandlerColorMap;
+    tempData.iFinalMatSize = vecData.rows();
+
+    int iStepSize = vecData.rows()/QThread::idealThreadCount();
+    int iResidual = vecData.rows()%QThread::idealThreadCount();
+
+    for(int i = 0; i < QThread::idealThreadCount(); i++) {
+        tempData.vecData = vecData.segment(i*iStepSize, iStepSize);
+
+        lData << tempData;
+    }
+
+    tempData.vecData = vecData.segment(iStepSize*QThread::idealThreadCount(), iResidual);
+
+    lData << tempData;
+
+    QFuture<MatrixX3f> result = QtConcurrent::mappedReduced(lData,
+                                                            computeColors,
+                                                            reduceColors,
+                                                            QtConcurrent::OrderedReduce);
+    result.waitForFinished();
+
+    matFinalVertColor = result.result();
+}
+
+
+//*************************************************************************************************************
+
+MatrixX3f RtSourceDataWorker::computeColors(const ColorComputationInfo& inputData)
+{
+    qDebug() << "RtSourceDataWorker::computeColors";
+    MatrixX3f matFinalVertColor;
     float fSample;
     QRgb qRgb;
-    const double dTresholdDiff = dThreholdZ - dThresholdX;
+    const double dTresholdDiff = inputData.dThresholdZ - inputData.dThresholdX;
 
-    for(int r = 0; r < vecData.rows(); ++r) {
+    for(int r = 0; r < inputData.vecData.rows(); ++r) {
         //Take the absolute values because the histogram threshold is also calcualted using the absolute values
-        fSample = std::fabs(vecData(r));
+        fSample = std::fabs(inputData.vecData(r));
 
-        if(fSample >= dThresholdX) {
+        if(fSample >= inputData.dThresholdX) {
             //Check lower and upper thresholds and normalize to one
-            if(fSample >= dThreholdZ) {
+            if(fSample >= inputData.dThresholdZ) {
                 fSample = 1.0f;
             } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
-                    fSample = (fSample - dThresholdX) / (dTresholdDiff);
+                    fSample = (fSample - inputData.dThresholdX) / (dTresholdDiff);
                 } else {
                     fSample = 0.0f;
                 }
             }
 
-            qRgb = functionHandlerColorMap(fSample);
+            qRgb = inputData.functionHandlerColorMap(fSample);
 
             matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
             matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
             matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
         }
     }
+
+    qDebug() << "matFinalVertColor.rows()" << matFinalVertColor.rows();
+    return matFinalVertColor;
 }
 
+
 //*************************************************************************************************************
+
+void RtSourceDataWorker::reduceColors(MatrixX3f& finalData, const MatrixX3f& inputData)
+{
+    int iStartRow = finalData.rows();
+    finalData.conservativeResize(finalData.rows()+inputData.rows(), 3);
+
+    finalData.block(iStartRow, 0, inputData.rows(), 3) = inputData;
+
+    qDebug() << "finalData.rows()" << finalData.rows();
+    qDebug() << "finalData.cols()" << finalData.cols();
+}

@@ -78,6 +78,29 @@
 namespace DISP3DLIB
 {
 
+struct VisualizationInfo {
+    double                      dThresholdX;
+    double                      dThresholdZ;
+
+    Eigen::VectorXd             vecSensorValues;
+    Eigen::MatrixX3f            matOriginalVertColor;
+    Eigen::MatrixX3f            matFinalVertColor;
+
+    QSharedPointer<Eigen::SparseMatrix<float> >  pMatInterpolationMatrix;         /**< The interpolation matrix. */
+
+    QRgb (*functionHandlerColorMap)(double v);
+}; /**< The struct specifing visualization info. */
+
+struct ColorComputationInfo {
+    double                      dThresholdX;
+    double                      dThresholdZ;
+    int                         iFinalMatSize;
+
+    Eigen::VectorXf             vecData;
+
+    QRgb (*functionHandlerColorMap)(double v);
+};
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -202,23 +225,6 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * The struct specifing visualization info.
-    */
-    struct VisualizationInfo {
-        double                      dThresholdX;
-        double                      dThresholdZ;
-
-        Eigen::VectorXd             vecSensorValues;
-        Eigen::MatrixX3f            matOriginalVertColor;
-        Eigen::MatrixX3f            matFinalVertColor;
-
-        QSharedPointer<Eigen::SparseMatrix<float> >  pMatInterpolationMatrix;         /**< The interpolation matrix. */
-
-        QRgb (*functionHandlerColorMap)(double v);
-    };
-
-    //=========================================================================================================
-    /**
     * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
     *
     * @param[in] vecData                       The final values for each vertex of the surface
@@ -240,6 +246,10 @@ protected:
     * @param[in/out] visualizationInfoHemi      The needed visualization info
     */
     static void generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi);
+
+    static Eigen::MatrixX3f RtSourceDataWorker::computeColors(const ColorComputationInfo& inputData);
+
+    static void reduceColors(Eigen::MatrixX3f& finalData, const Eigen::MatrixX3f& inputData);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */
