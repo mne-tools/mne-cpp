@@ -122,8 +122,23 @@ public:
                                                       const QString &sWindowType="hanning");
 
 private:
+    //=========================================================================================================
+    /**
+    * Computes the coherency values. This function gets called in parallel.
+    *
+    * @param[in] data    The input data.
+    *
+    * @return            The coherency result in form of AbstractMetricResultData.
+    */
     static AbstractMetricResultData compute(const AbstractMetricInputData& data);
 
+    //=========================================================================================================
+    /**
+    * Reduces the coherency computation results to a final result. This function gets called in parallel.
+    *
+    * @param[out] finalData    The final data data.
+    * @param[in]  resultData   The resulting data from the computation step.
+    */
     static void reduce(AbstractMetricResultData &finalData,
                 const AbstractMetricResultData& resultData);
 

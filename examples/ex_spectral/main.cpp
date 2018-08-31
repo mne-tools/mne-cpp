@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 
     //Compute Spectrum of first row of input data
     int iNfft = iNSamples;
-    MatrixXcd matTapSpectrumSeed = Spectral::computeTaperedSpectra(inputData.row(0), matTaps, iNfft);
+    MatrixXcd matTapSpectrumSeed = Spectral::computeTaperedSpectraRow(inputData.row(0), matTaps, iNfft);
 
     //Compute PSD
     RowVectorXd vecPsd = Spectral::psdFromTaperedSpectra(matTapSpectrumSeed, vecTapWeights, iNfft, dSampFreq);
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     qDebug()<<data_hann.row(0).cwiseAbs2().sum() * double(iNSamples) / dSampFreq;
 
     //Compute Spectrum of second row of input data
-    MatrixXcd matTapSpectrumTarget = Spectral::computeTaperedSpectra(inputData.row(1), matTaps, iNfft);
+    MatrixXcd matTapSpectrumTarget = Spectral::computeTaperedSpectraRow(inputData.row(1), matTaps, iNfft);
 
     //Compute CSD between seed and target
     RowVectorXcd vecCsd = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumTarget, vecTapWeights, vecTapWeights, iNfft, dSampFreq);
