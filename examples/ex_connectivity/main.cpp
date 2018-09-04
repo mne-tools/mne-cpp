@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "mag");
@@ -165,10 +165,10 @@ int main(int argc, char *argv[])
     QString sChType = parser.value(chTypeOption);
     QString sEve = parser.value(eventsFileOption);
     QString sRaw = parser.value(rawFileOption);
-    double dTMin = parser.value(tMinOption).toDouble();
-    double dTMax = parser.value(tMaxOption).toDouble();
+    float fTMin = parser.value(tMinOption).toFloat();
+    float fTMax = parser.value(tMaxOption).toFloat();
 
-    bool bDoSourceLoc, bDoClust;
+    bool bDoSourceLoc, bDoClust = false;
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
         bDoSourceLoc =false;
     } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
@@ -196,8 +196,8 @@ int main(int argc, char *argv[])
         QFile t_fileRaw(sRaw);
         qint32 event = iAveIdx;
         QString t_sEventName =sEve ;
-        float tmin = dTMin;
-        float tmax = dTMax;
+        float tmin = fTMin;
+        float tmax = fTMax;
         bool keep_comp = false;
         fiff_int_t dest_comp = 0;
         bool pick_all = false;
