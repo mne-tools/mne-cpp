@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <disp3D/viewers/networkview.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
@@ -120,9 +121,9 @@ int main(int argc, char *argv[])
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "IMAGCOH");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "2");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "mag");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
@@ -186,6 +187,9 @@ int main(int argc, char *argv[])
     //Prepare the data
     QList<MatrixXd> matDataList;
     MatrixX3f matNodePositions;
+
+    MNEForwardSolution t_clusteredFwd;
+    MNEForwardSolution t_Fwd;
 
     if(!bDoSourceLoc) {
         // Create sensor level data
@@ -360,8 +364,7 @@ int main(int argc, char *argv[])
         AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
         QFile t_fileFwd(sFwd);
-        MNEForwardSolution t_Fwd(t_fileFwd);
-        MNEForwardSolution t_clusteredFwd;
+        t_Fwd = MNEForwardSolution(t_fileFwd);
 
         QFile t_fileCov(sCov);
         QFile t_fileEvoked(sAve);
@@ -447,6 +450,14 @@ int main(int argc, char *argv[])
     settings.m_sWindowType = "hanning";
 
     NetworkView tNetworkView;
+
+    if(bDoSourceLoc) {
+        if(bDoClust) {
+            tNetworkView.getTreeModel()->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
+        } else {
+            tNetworkView.getTreeModel()->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_Fwd);
+        }
+    }
 
     RtConnectivity::SPtr pRtConnectivity = RtConnectivity::SPtr::create();
     QObject::connect(pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
