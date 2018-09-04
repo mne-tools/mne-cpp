@@ -44,6 +44,8 @@
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/view/view3D.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -55,8 +57,6 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
-#include <disp3D/helpers/interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
