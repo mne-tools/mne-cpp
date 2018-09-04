@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
     //realtime interpolation (1 iteration)
     VectorXd signal = VectorXd::Random(megSensors.size());
     qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
-    Interpolation::interpolateSignal(interpolationMatrix, signal);
+    Interpolation::interpolateSignal(*interpolationMatrix, signal.cast<float>());
     std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
 
     return 0;
