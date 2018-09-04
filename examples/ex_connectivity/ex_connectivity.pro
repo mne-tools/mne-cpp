@@ -50,8 +50,8 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-QMAKE_CXXFLAGS+=-Zi
-QMAKE_LFLAGS+=/DEBUG
+#QMAKE_CXXFLAGS+=-Zi
+#QMAKE_LFLAGS+=/DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
