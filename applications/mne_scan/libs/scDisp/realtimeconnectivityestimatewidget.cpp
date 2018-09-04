@@ -44,6 +44,8 @@
 
 #include <connectivity/network/network.h>
 
+#include <mne/mne_forwardsolution.h>
+
 #include <disp/viewers/quickcontrolview.h>
 
 #include <disp3D/engine/view/view3D.h>
@@ -82,6 +84,7 @@ using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
 using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -160,6 +163,11 @@ void RealTimeConnectivityEstimateWidget::getData()
             m_pRtItem = m_pData3DModel->addConnectivityData("sample",
                                                             networkData.getConnectivityMethod(),
                                                             networkData);
+
+            m_pData3DModel->addSurfaceSet("sample",
+                                          "MRI",
+                                          *(m_pRTCE->getSurfSet().data()),
+                                          *(m_pRTCE->getAnnotSet().data()));
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
 
