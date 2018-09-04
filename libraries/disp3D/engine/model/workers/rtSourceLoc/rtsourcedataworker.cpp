@@ -213,8 +213,9 @@ void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::Spars
 
 void RtSourceDataWorker::streamData()
 {
-    QElapsedTimer time;
-    time.start();
+    //QElapsedTimer time;
+    //time.start();
+
     if(m_lDataQ.size() > 0) {
         if(m_bIsLooping) {
             //Down sampling in loop mode
@@ -269,7 +270,8 @@ void RtSourceDataWorker::streamData()
 
         //qDebug()<<"RtSourceDataWorker::streamData - this->thread() "<< this->thread();
     }
-     qDebug()<<"RtSourceDataWorker::streamData - time.elapsed()" << time.elapsed();
+
+    //qDebug()<<"RtSourceDataWorker::streamData - time.elapsed()" << time.elapsed();
 }
 
 
@@ -277,28 +279,23 @@ void RtSourceDataWorker::streamData()
 
 void RtSourceDataWorker::generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi)
 {
-    QElapsedTimer time;
-     time.start();
     if(visualizationInfoHemi.vecSensorValues.rows() != visualizationInfoHemi.pMatInterpolationMatrix->cols()) {
         qDebug() << "RtSourceDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << visualizationInfoHemi.vecSensorValues.rows() << ") do not match with previously set number of sensors (" << visualizationInfoHemi.pMatInterpolationMatrix->cols() << "). Returning...";
         return;
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(visualizationInfoHemi.pMatInterpolationMatrix, visualizationInfoHemi.vecSensorValues);
-    qDebug()<<"RtSourceDataWorker::generateColorsFromSensorValues - interpolateSignal" << time.elapsed();
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(*visualizationInfoHemi.pMatInterpolationMatrix, visualizationInfoHemi.vecSensorValues.cast<float>());
 
     // Reset to original color as default
     visualizationInfoHemi.matFinalVertColor = visualizationInfoHemi.matOriginalVertColor;
 
     //Generate color data for vertices
-    time.restart();
     normalizeAndTransformToColor(vecIntrpltdVals,
                                  visualizationInfoHemi.matFinalVertColor,
                                  visualizationInfoHemi.dThresholdX,
                                  visualizationInfoHemi.dThresholdZ,
                                  visualizationInfoHemi.functionHandlerColorMap);
-    qDebug()<<"RtSourceDataWorker::generateColorsFromSensorValues - normalizeAndTransformToColor" << time.elapsed();
 }
 
 
@@ -307,7 +304,7 @@ void RtSourceDataWorker::generateColorsFromSensorValues(VisualizationInfo &visua
 void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                                                       MatrixX3f& matFinalVertColor,
                                                       double dThresholdX,
-                                                      double dThreholdZ,
+                                                      double dThresholdZ,
                                                       QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremly efficient.
@@ -316,84 +313,31 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
         return;
     }
 
-    QList<ColorComputationInfo> lData;
-    ColorComputationInfo tempData;
-    tempData.dThresholdX = dThresholdX;
-    tempData.dThresholdZ = dThreholdZ;
-    tempData.functionHandlerColorMap = functionHandlerColorMap;
-    tempData.iFinalMatSize = vecData.rows();
-
-    int iStepSize = vecData.rows()/QThread::idealThreadCount();
-    int iResidual = vecData.rows()%QThread::idealThreadCount();
-
-    for(int i = 0; i < QThread::idealThreadCount(); i++) {
-        tempData.vecData = vecData.segment(i*iStepSize, iStepSize);
-
-        lData << tempData;
-    }
-
-    tempData.vecData = vecData.segment(iStepSize*QThread::idealThreadCount(), iResidual);
-
-    lData << tempData;
-
-    QFuture<MatrixX3f> result = QtConcurrent::mappedReduced(lData,
-                                                            computeColors,
-                                                            reduceColors,
-                                                            QtConcurrent::OrderedReduce);
-    result.waitForFinished();
-
-    matFinalVertColor = result.result();
-}
-
-
-//*************************************************************************************************************
-
-MatrixX3f RtSourceDataWorker::computeColors(const ColorComputationInfo& inputData)
-{
-    qDebug() << "RtSourceDataWorker::computeColors";
-    MatrixX3f matFinalVertColor;
     float fSample;
     QRgb qRgb;
-    const double dTresholdDiff = inputData.dThresholdZ - inputData.dThresholdX;
+    const double dTresholdDiff = dThresholdZ - dThresholdX;
 
-    for(int r = 0; r < inputData.vecData.rows(); ++r) {
+    for(int r = 0; r < vecData.rows(); ++r) {
         //Take the absolute values because the histogram threshold is also calcualted using the absolute values
-        fSample = std::fabs(inputData.vecData(r));
+        fSample = std::fabs(vecData(r));
 
-        if(fSample >= inputData.dThresholdX) {
+        if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
-            if(fSample >= inputData.dThresholdZ) {
+            if(fSample >= dThresholdZ) {
                 fSample = 1.0f;
             } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
-                    fSample = (fSample - inputData.dThresholdX) / (dTresholdDiff);
+                    fSample = (fSample - dThresholdX) / (dTresholdDiff);
                 } else {
                     fSample = 0.0f;
                 }
             }
 
-            qRgb = inputData.functionHandlerColorMap(fSample);
+            qRgb = functionHandlerColorMap(fSample);
 
             matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
             matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
             matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
         }
     }
-
-    qDebug() << "matFinalVertColor.rows()" << matFinalVertColor.rows();
-    return matFinalVertColor;
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceDataWorker::reduceColors(MatrixX3f& finalData, const MatrixX3f& inputData)
-{
-    int iStartRow = finalData.rows();
-    finalData.conservativeResize(finalData.rows()+inputData.rows(), 3);
-
-    finalData.block(iStartRow, 0, inputData.rows(), 3) = inputData;
-
-    qDebug() << "finalData.rows()" << finalData.rows();
-    qDebug() << "finalData.cols()" << finalData.cols();
 }

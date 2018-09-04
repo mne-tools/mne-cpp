@@ -230,13 +230,13 @@ protected:
     * @param[in] vecData                       The final values for each vertex of the surface
     * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
     * @param[in] dThresholdX                   Lower threshold for normalizing
-    * @param[in] dThreholdZ                    Upper threshold for normalizing
+    * @param[in] dThresholdZ                    Upper threshold for normalizing
     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
     */
     static void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
                                       Eigen::MatrixX3f& matFinalVertColor,
                                       double dThresholdX,
-                                      double dThreholdZ,
+                                      double dThresholdZ,
                                       QRgb (*functionHandlerColorMap)(double v));
 
     //=========================================================================================================
@@ -246,10 +246,6 @@ protected:
     * @param[in/out] visualizationInfoHemi      The needed visualization info
     */
     static void generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi);
-
-    static Eigen::MatrixX3f RtSourceDataWorker::computeColors(const ColorComputationInfo& inputData);
-
-    static void reduceColors(Eigen::MatrixX3f& finalData, const Eigen::MatrixX3f& inputData);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */

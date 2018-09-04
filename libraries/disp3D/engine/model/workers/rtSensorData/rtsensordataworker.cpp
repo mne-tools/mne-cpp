@@ -245,7 +245,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(m_pMatInterpolationMatrix, vecSensorValues);
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(*m_pMatInterpolationMatrix, vecSensorValues.cast<float>());
 
     // Reset to original color as default
     m_lVisualizationInfo.matFinalVertColor = m_lVisualizationInfo.matOriginalVertColor;
