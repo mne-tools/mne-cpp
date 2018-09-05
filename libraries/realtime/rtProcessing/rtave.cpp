@@ -493,15 +493,29 @@ void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
     }
 
     if(m_mapDataPre[dTriggerType].cols() <= data.cols()) {
-        m_mapDataPre[dTriggerType] = data.block(0,data.cols() - m_iPreStimSamples,data.rows(),m_iPreStimSamples);
+        if(m_iPreStimSamples > 0 && data.cols() > m_iPreStimSamples) {
+            m_mapDataPre[dTriggerType] = data.block(0,
+                                                    data.cols() - m_iPreStimSamples,
+                                                    data.rows(),
+                                                    m_iPreStimSamples);
+        }
     } else {
         int residual = m_mapDataPre[dTriggerType].cols() - data.cols();
 
         //Copy shift data
-        m_mapDataPre[dTriggerType].block(0,0,m_mapDataPre[dTriggerType].rows(),residual) = m_mapDataPre[dTriggerType].block(0,m_mapDataPre[dTriggerType].cols() - residual,m_mapDataPre[dTriggerType].rows(),residual);
+        m_mapDataPre[dTriggerType].block(0,
+                                         0,
+                                         m_mapDataPre[dTriggerType].rows(),
+                                         residual) = m_mapDataPre[dTriggerType].block(0,
+                                                                                      m_mapDataPre[dTriggerType].cols() - residual,
+                                                                                      m_mapDataPre[dTriggerType].rows(),
+                                                                                      residual);
 
         //Copy new data in
-        m_mapDataPre[dTriggerType].block(0,residual,m_mapDataPre[dTriggerType].rows(),data.cols()) = data;
+        m_mapDataPre[dTriggerType].block(0,
+                                         residual,
+                                         m_mapDataPre[dTriggerType].rows(),
+                                         data.cols()) = data;
     }
 }
 
@@ -511,6 +525,10 @@ void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
 void RtAve::mergeData(double dTriggerType)
 {
     QMutexLocker locker(&m_qMutex);
+
+    if(m_mapDataPre[dTriggerType].rows() != m_mapDataPost[dTriggerType].rows()) {
+        return;
+    }
 
     MatrixXd mergedData(m_mapDataPre[dTriggerType].rows(), m_mapDataPre[dTriggerType].cols() + m_mapDataPost[dTriggerType].cols());
 
@@ -739,7 +757,7 @@ void RtAve::reset()
 //    qDebug()<<"RtAve::reset()";
     QMutexLocker locker(&m_qMutex);
 
-    qDebug()<<"RtAve::reset() - 1";
+    //qDebug()<<"RtAve::reset() - 1";
 
     //Reset
     m_iPreStimSamples = m_iNewPreStimSamples;
@@ -748,12 +766,12 @@ void RtAve::reset()
     m_iAverageMode = m_iNewAverageMode;
     m_iNumAverages = m_iNewNumAverages;
 
-    qDebug()<<"RtAve::reset() - 2";
+    //qDebug()<<"RtAve::reset() - 2";
 
     //Clear all evoked data information
     m_pStimEvokedSet->evoked.clear();
 
-    qDebug()<<"RtAve::reset() - 3";
+   // qDebug()<<"RtAve::reset() - 3";
 
     //Clear all maps
 //    m_mapDataPre.clear();
@@ -770,7 +788,7 @@ void RtAve::reset()
     m_mapFillingBackBuffer.clear();
     m_mapNumberCalcAverages.clear();
 
-    qDebug()<<"RtAve::reset() - 4";
+ //   qDebug()<<"RtAve::reset() - 4";
 
 //    QMutableMapIterator<double,Eigen::MatrixXd> i0(m_mapDataPre);
 //    while (i0.hasNext()) {
