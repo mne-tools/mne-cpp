@@ -525,15 +525,18 @@ qint32 EvokedSetModel::numVLines() const
 qint32 EvokedSetModel::getNumPreStimSamples() const
 {
     int iPreSamples = 0;
-    RowVectorXf times = m_pEvokedSet->evoked.first().times;
 
-    // Search for stim onset via times
-    for(int i = 0; i < times.cols(); i++) {
-        if(times(i) == 0.0f) {
-            break;
+    if (!m_pEvokedSet->evoked.isEmpty()) {
+        RowVectorXf times = m_pEvokedSet->evoked.first().times;
+
+        // Search for stim onset via times
+        for(int i = 0; i < times.cols(); i++) {
+            if(times(i) == 0.0f) {
+                break;
+            }
+
+            iPreSamples++;
         }
-
-        iPreSamples++;
     }
 
     return iPreSamples;

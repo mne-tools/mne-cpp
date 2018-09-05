@@ -216,7 +216,7 @@ void ModalitySelectionView::setModalities(const QList<Modality> &lModalities)
     for(int i = 0; i < m_qListModalityCheckBox.size(); i++) {
         for(int j = 0; j < lModalities.size(); j++) {
             if(m_qListModalityCheckBox.at(i)->text().contains(lModalities.at(j).m_sName)) {
-                qDebug()<<"ModalitySelectionView::setModalities - Set "<<lModalities.at(j).m_sName<<"to"<<lModalities.at(j).m_bActive;
+                //qDebug()<<"ModalitySelectionView::setModalities - Set "<<lModalities.at(j).m_sName<<"to"<<lModalities.at(j).m_bActive;
                 m_qListModalityCheckBox.at(i)->setChecked(lModalities.at(j).m_bActive);
             }
         }
