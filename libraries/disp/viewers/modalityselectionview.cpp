@@ -88,6 +88,7 @@ ModalitySelectionView::ModalitySelectionView(QWidget *parent,
 void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
 {
     m_qListModalities.clear();
+    bool hasMEG = false;
     bool hasMAG = false;
     bool hasGRAD = false;
     bool hasEEG = false;
@@ -95,6 +96,8 @@ void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
     bool hasMISC = false;
     for(qint32 i = 0; i < modalityList.size(); ++i)
     {
+        if(modalityList.at(i).m_sName.contains("MEG"))
+            hasMEG = true;
         if(modalityList.at(i).m_sName.contains("MAG"))
             hasMAG = true;
         if(modalityList.at(i).m_sName.contains("GRAD"))
@@ -110,6 +113,8 @@ void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
     bool sel = true;
     float val = 1e-11f;
 
+    if(hasMEG)
+        m_qListModalities.append(Modality("MEG",sel,val));
     if(hasMAG)
         m_qListModalities.append(Modality("MAG",sel,val));
     if(hasGRAD)
