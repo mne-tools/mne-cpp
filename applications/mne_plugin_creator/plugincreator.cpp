@@ -5,13 +5,13 @@ PluginCreator::PluginCreator(QObject *parent) : QObject(parent), out(stdout) {}
 void PluginCreator::createPlugin(PluginParams &params) {
   out << "Creating plugin: " << params.m_name << "..." << endl;
   createFolderStructure(params.m_name);
-  copyTemplates();
+  copyTemplates(params.m_name);
 }
 
 QString PluginCreator::pluginsPath() { return QString("../mne_scan/plugins"); }
 
 QString PluginCreator::srcPath(QString pluginName) {
-  return pluginsPath() + pluginName;
+  return pluginsPath() + "/" + pluginName.toLower();
 }
 
 QString PluginCreator::formsPath(QString pluginName) {
@@ -23,7 +23,8 @@ QString PluginCreator::imagesPath(QString pluginName) {
 }
 
 void PluginCreator::createFolderStructure(QString pluginName) {
-  out << "Attempting to created folder structure for you new plugin..." << endl;
+  out << "Attempting to created folder structure for your new plugin at "
+      << QDir(srcPath(pluginName)).absolutePath() << "..." << endl;
 
   if (!QDir(pluginsPath()).exists()) {
     throw std::runtime_error(
@@ -50,9 +51,13 @@ void PluginCreator::createDirectory(QString path) {
   }
 }
 
-void PluginCreator::copyTemplates() {
+void PluginCreator::copyTemplates(QString pluginName) {
   out << "Copying templates into the new directories...";
-  QString headerTemplate = ".templates/headertemplate.h";
+
+  QString headerTemplate = "./templates/headertemplate.h";
+  QString headerDest = srcPath(pluginName) + "/" + pluginName.toLower() + ".h";
+  copyFile(headerTemplate, headerDest);
+  out << "Copied header teamplate to " << headerDest << endl;
 }
 
 void PluginCreator::copyFile(QString from, QString to) {
