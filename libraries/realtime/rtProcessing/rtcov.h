@@ -140,7 +140,7 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Wmit this signal whenver a new covariance was estimated.
+    * Emit this signal whenver a new covariance was estimated.
     *
     * @param[in] computedCov  The final covariance estimation.
     */
@@ -224,7 +224,7 @@ signals:
 
     //=========================================================================================================
     /**
-    * Wmit this signal whenver the worker should process a new batch of stored data blocks.
+    * Emit this signal whenver the worker should process a new batch of stored data blocks.
     *
     * @param[in] inputData  The new batch of stored data.
     */

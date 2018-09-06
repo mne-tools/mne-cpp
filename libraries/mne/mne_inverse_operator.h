@@ -431,4 +431,14 @@ inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOpera
 
 } // NAMESPACE
 
+#ifndef metatype_mneinverseoperatorsptr
+#define metatype_mneinverseoperatorsptr
+Q_DECLARE_METATYPE(QSharedPointer<MNELIB::MNEInverseOperator>); /**< Provides QT META type declaration of the QSharedPointer<MNELIB::MNEInverseOperator> type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_mneinverseoperators
+#define metatype_mneinverseoperators
+Q_DECLARE_METATYPE(MNELIB::MNEInverseOperator); /**< Provides QT META type declaration of the MNELIB::MNEInverseOperator type. For signal/slot usage.*/
+#endif
+
 #endif // MNE_INVERSE_OPERATOR_H

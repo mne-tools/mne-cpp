@@ -97,6 +97,8 @@ MNEInverseOperator::MNEInverseOperator()
 , fmri_prior(new FiffCov)
 , nave(-1)
 {
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 
@@ -105,6 +107,8 @@ MNEInverseOperator::MNEInverseOperator()
 MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 {
     MNEInverseOperator::read_inverse_operator(p_IODevice, *this);
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 
@@ -113,6 +117,8 @@ MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 MNEInverseOperator::MNEInverseOperator(const FiffInfo &info, const MNEForwardSolution& forward, const FiffCov& p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
 {
     *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 
@@ -144,7 +150,8 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOpe
 , reginv(p_MNEInverseOperator.reginv)
 , noisenorm(p_MNEInverseOperator.noisenorm)
 {
-
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 
