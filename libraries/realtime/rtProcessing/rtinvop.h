@@ -43,21 +43,7 @@
 
 #include "../realtime_global.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <mne/mne_forwardsolution.h>
-#include <mne/mne_inverse_operator.h>
+#include <fiff/fiff_cov.h>
 
 
 //*************************************************************************************************************
@@ -66,16 +52,22 @@
 //=============================================================================================================
 
 #include <QThread>
-#include <QMutex>
 #include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#include <Eigen/Core>
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace MNELIB {
+    class MNEForwardSolution;
+    class MNEInverseOperator;
+}
 
 
 //*************************************************************************************************************
@@ -89,13 +81,44 @@ namespace REALTIMELIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// REALTIMELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+struct RtInvOpInput {
+    QSharedPointer<FIFFLIB::FiffInfo>           pFiffInfo;
+    QSharedPointer<MNELIB::MNEForwardSolution>  pFwd;
+    FIFFLIB::FiffCov                            noiseCov;
+};
 
+
+//=============================================================================================================
+/**
+* Real-time inverse operator worker.
+*
+* @brief Real-time inverse operator worker.
+*/
+class RtInvOpWorker : public QObject
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+    * Perform actual inverse operator creation.
+    *
+    * @param[in] inputData  Data to estimate the inverser operator from.
+    */
+    void doWork(const RtInvOpInput &inputData);
+
+signals:
+    //=========================================================================================================
+    /**
+    * Wmit this signal whenver a new inverser operator was estimated.
+    *
+    * @param[in] invOp  The final inverser operator estimation.
+    */
+    void resultReady(const MNELIB::MNEInverseOperator& invOp);
+};
 
 //=============================================================================================================
 /**
@@ -103,7 +126,7 @@ using namespace MNELIB;
 *
 * @brief Real-time inverse operator estimation
 */
-class REALTIMESHARED_EXPORT RtInvOp : public QThread
+class REALTIMESHARED_EXPORT RtInvOp : public QObject
 {
     Q_OBJECT
 public:
@@ -118,7 +141,9 @@ public:
     * @param[in] p_pFwd         Forward solution
     * @param[in] parent         Parent QObject (optional)
     */
-    explicit RtInvOp(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent = 0);
+    explicit RtInvOp(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo,
+                     QSharedPointer<MNELIB::MNEForwardSolution> &p_pFwd,
+                     QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -130,52 +155,39 @@ public:
     /**
     * Slot to receive incoming noise covariance estimations.
     *
-    * @param[in] p_NoiseCov     Noise covariance estimation
+    * @param[in] noiseCov     Noise covariance estimation
     */
-    void appendNoiseCov(FiffCov &p_NoiseCov);
+    void append(const FIFFLIB::FiffCov &noiseCov);
 
+protected:
     //=========================================================================================================
     /**
-    * Stops the RtInv by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
+    * Handles the result
     */
-    virtual bool stop();
+    void handleResults(const MNELIB::MNEInverseOperator& invOp);
 
-    //=========================================================================================================
-    /**
-    * Returns true if is running, otherwise false.
-    *
-    * @return true if is running, false otherwise
-    */
-    inline bool isRunning();
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The fiff measurement information. */
+    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwd;             /**< The forward solution. */
+
+    QThread                                     m_workerThread;     /**< The worker thread. */
 
 signals:
     //=========================================================================================================
     /**
     * Signal which is emitted when a inverse operator is calculated.
     *
-    * @param[out] p_InvOp  The inverse operator
+    * @param[out] invOp  The inverse operator
     */
-    void invOperatorCalculated(MNELIB::MNEInverseOperator::SPtr p_pInvOp);
+    void invOperatorCalculated(const MNELIB::MNEInverseOperator& invOp);
 
-protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Emit this signal whenver the worker should create a new inverse operator estimation.
+    *
+    * @param[in] inputData  The new covariance estimation.
     */
-    virtual void run();
+    void operate(const RtInvOpInput &inputData);
 
-private:
-    QMutex      mutex;                  /**< Provides access serialization between threads. */
-    bool        m_bIsRunning;           /**< Whether RtInv is running. */
-
-    QVector<FiffCov> m_vecNoiseCov;     /**< Noise covariance matrices. */
-
-    FiffInfo::SPtr m_pFiffInfo;         /**< The fiff measurement information. */
-    MNEForwardSolution::SPtr m_pFwd;    /**< The forward solution. */
 };
 
 //*************************************************************************************************************
@@ -183,16 +195,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtInvOp::isRunning()
-{
-    return m_bIsRunning;
-}
 
 } // NAMESPACE
-
-#ifndef metatype_mneinverseoperatorsptr
-#define metatype_mneinverseoperatorsptr
-Q_DECLARE_METATYPE(MNELIB::MNEInverseOperator::SPtr); /**< Provides QT META type declaration of the MNELIB::MNEInverseOperator type. For signal/slot usage.*/
-#endif
 
 #endif // RTINV_H

@@ -355,7 +355,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
 
 #ifndef metatype_fiffcovsptr
 #define metatype_fiffcovsptr
-Q_DECLARE_METATYPE(QSharedPointer<FIFFLIB::FiffCov>); /**< Provides QT META type declaration of the FIFFLIB::FiffCov type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(QSharedPointer<FIFFLIB::FiffCov>); /**< Provides QT META type declaration of the QSharedPointer<FIFFLIB::FiffCov> type. For signal/slot usage.*/
 #endif
 
 #ifndef metatype_fiffcov

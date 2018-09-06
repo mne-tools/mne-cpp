@@ -305,13 +305,9 @@ bool MNE::stop()
 {
     m_bIsRunning = false;
 
-    if(m_pRtInvOp->isRunning())
-        m_pRtInvOp->stop();
-
-    if(m_bProcessData) // Only clear if buffers have been initialised
-    {
+    // Only clear if buffers have been initialised
+    if(m_bProcessData) {
         m_qVecFiffEvoked.clear();
-        m_qVecFiffCov.clear();
     }
 
     m_qListCovChNames.clear();
@@ -397,15 +393,20 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
     //MEG
     if(pRTC && m_bReceiveData)
     {
-        //Fiff Information of the covariance
-        if(m_qListCovChNames.size() != pRTC->getValue()->names.size())
-            m_qListCovChNames = pRTC->getValue()->names;
+        // Init Real-Time inverse estimator
+        if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
+            m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
+            connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
+                    this, &MNE::updateInvOp);
+        }
 
-        if(m_bProcessData)
-        {
-            m_qMutex.lock();
-            m_qVecFiffCov.push_back(pRTC->getValue()->pick_channels(m_qListPickChannels));
-            m_qMutex.unlock();
+        //Fiff Information of the covariance
+        if(m_qListCovChNames.size() != pRTC->getValue()->names.size()) {
+            m_qListCovChNames = pRTC->getValue()->names;
+        }
+
+        if(m_bProcessData && m_pRtInvOp){
+            m_pRtInvOp->append(pRTC->getValue()->pick_channels(m_qListPickChannels));
         }
     }
 }
@@ -449,23 +450,20 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
+void MNE::updateInvOp(const MNEInverseOperator& invOp)
 {
+    m_qMutex.lock();
     //qDebug() << "MNE::updateInvOp - START";
-    m_pInvOp = p_pInvOp;
+    m_invOp = invOp;
 
     double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
-    m_qMutex.lock();
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, method));
 
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
-
-    //
-    //   Set up the inverse according to the parameters
-    //
+    //Set up the inverse according to the parameters
     m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
     m_qMutex.unlock();
 }
@@ -500,19 +498,6 @@ void MNE::run()
     //qDebug() << "MNE::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
 
     //
-    // Init Real-Time inverse estimator
-    //
-    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
-            this, &MNE::updateInvOp);
-    m_pMinimumNorm.reset();
-
-    //
-    // Start the rt helpers
-    //
-    m_pRtInvOp->start();
-
-    //
     // start processing data
     //
     m_bProcessData = true;
@@ -534,7 +519,7 @@ void MNE::run()
 //    //
 //    MNEInverseOperator inverse_operator(*m_pFiffInfoInput.data(), *m_pClusteredFwd.data(), noise_cov, 0.2f, 0.8f, false);
 
-//    m_pInvOp = MNEInverseOperator::SPtr(&inverse_operator);
+//    m_invOp = MNEInverseOperator::SPtr(&inverse_operator);
 
 //    double snr = 1.0;
 //    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
@@ -548,17 +533,6 @@ void MNE::run()
 
     while(m_bIsRunning)
     {
-        m_qMutex.lock();
-        qint32 t_covSize = m_qVecFiffCov.size();
-        m_qMutex.unlock();
-        if(t_covSize > 0)
-        {
-            m_qMutex.lock();
-            m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);
-            m_qVecFiffCov.pop_front();
-            m_qMutex.unlock();
-        }
-
         m_qMutex.lock();
         qint32 t_evokedSize = m_qVecFiffEvoked.size();
         m_qMutex.unlock();
@@ -609,7 +583,7 @@ void MNE::run()
 
                 m_qMutex.lock();
 
-                t_fiffEvoked = t_fiffEvoked.pick_channels(m_pInvOp->noise_cov->names);
+                t_fiffEvoked = t_fiffEvoked.pick_channels(m_invOp.noise_cov->names);
 
                 MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
 
