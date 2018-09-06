@@ -3,12 +3,12 @@
 PluginCreator::PluginCreator(QObject *parent) : QObject(parent), out(stdout) {}
 
 void PluginCreator::createPlugin(PluginParams &params) {
-  out << QObject::tr("Creating plugin: ") << params.m_name << QObject::tr("...")
-      << endl;
+  out << "Creating plugin: " << params.m_name << "..." << endl;
   createFolderStructure(params.m_name);
 }
 
 void PluginCreator::createFolderStructure(QString &pluginName) {
+  out << "Attempting to created folder structure for you new plugin..." << endl;
   QString pluginsPath("../mne_scan/plugins");
   QString srcPath = pluginsPath + "/" + pluginName;
   QString formPath = srcPath + "/" + "FormFiles";
@@ -33,7 +33,8 @@ void PluginCreator::createFolderStructure(QString &pluginName) {
 void PluginCreator::createDirectory(QString &path) {
   bool success = QDir::current().mkdir(path);
   if (!success) {
-    throw std::invalid_argument("Unable to create directory named: " +
-                                path.toStdString());
+    throw std::invalid_argument(
+        "Unable to create directory named: " + path.toStdString() +
+        ".\n Does a folder with that name already exist?");
   }
 }
