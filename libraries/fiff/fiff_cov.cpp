@@ -83,7 +83,8 @@ FiffCov::FiffCov()
 , dim(-1)
 , nfree(-1)
 {
-
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 
@@ -105,6 +106,9 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
 
     if(!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
         printf("\tFiff covariance not found.\n");//ToDo Throw here
+
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 
@@ -123,7 +127,8 @@ FiffCov::FiffCov(const FiffCov &p_FiffCov)
 , eig(p_FiffCov.eig)
 , eigvec(p_FiffCov.eigvec)
 {
-
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 
@@ -377,6 +382,11 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
     }
 
     MatrixXd C(cov_good.data);
+
+    qDebug() << "FiffCov::regularize C.rows()" << C.rows();
+    qDebug() << "FiffCov::regularize idx_eeg.size()" << idx_eeg.size();
+    qDebug() << "FiffCov::regularize idx_mag.size()" << idx_mag.size();
+    qDebug() << "FiffCov::regularize idx_grad.size()" << idx_grad.size();
 
     if((unsigned) C.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size())
         printf("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw

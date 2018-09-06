@@ -110,7 +110,7 @@ public:
     *
     * @param [in] v     the covariance which should be distributed.
     */
-    virtual void setValue(FiffCov& v);
+    virtual void setValue(const FiffCov& v);
 
     //=========================================================================================================
     /**

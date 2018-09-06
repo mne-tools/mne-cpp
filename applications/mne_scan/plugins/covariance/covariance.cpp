@@ -39,8 +39,23 @@
 //=============================================================================================================
 
 #include "covariance.h"
+
 #include "FormFiles/covariancesetupwidget.h"
 #include "FormFiles/covariancesettingswidget.h"
+
+#include <utils/generics/circularmatrixbuffer.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimecov.h>
+#include <realtime/rtProcessing/rtcov.h>
+
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_cov.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -51,15 +66,20 @@
 #include <QtCore/QtPlugin>
 #include <QDebug>
 
+#include <QtWidgets>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CovariancePlugin;
+using namespace COVARIANCEPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
+using namespace IOBUFFER;
+using namespace REALTIMELIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -72,7 +92,6 @@ Covariance::Covariance()
 , m_bProcessData(false)
 , m_pCovarianceInput(NULL)
 , m_pCovarianceOutput(NULL)
-, m_pCovarianceBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_iEstimationSamples(5000)
 {
     m_pActionShowAdjustment = new QAction(QIcon(":/images/covadjustments.png"), tr("Covariance Adjustments"),this);
@@ -123,10 +142,6 @@ void Covariance::init()
     // Output
     m_pCovarianceOutput = PluginOutputData<RealTimeCov>::create(this, "CovarianceOut", "Covariance output data");
     m_outputConnectors.append(m_pCovarianceOutput);
-
-    //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pCovarianceBuffer.isNull())
-        m_pCovarianceBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
@@ -165,11 +180,6 @@ bool Covariance::stop()
 {
     //Wait until this thread is stopped
     m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pCovarianceBuffer->releaseFromPop();
-
-    m_pCovarianceBuffer->clear();
 
     return true;
 }
@@ -217,15 +227,16 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     if(pRTMSA)
     {
-        //Check if buffer initialized
-        if(!m_pCovarianceBuffer)
-            m_pCovarianceBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
-
         //Fiff information
         if(!m_pFiffInfo)
         {
             m_pFiffInfo = pRTMSA->info();
-            emit fiffInfoAvailable();
+
+            //Set m_iEstimationSamples so that we alwyas wait for 5 secs
+            m_iEstimationSamples = m_pFiffInfo->sfreq * 5;
+            m_pRtCov = RtCov::SPtr(new RtCov(m_iEstimationSamples, m_pFiffInfo));
+            connect(m_pRtCov.data(), &RtCov::covCalculated,
+                    this, &Covariance::appendCovariance);
         }
 
 
@@ -236,7 +247,7 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
             {
                 t_mat = pRTMSA->getMultiSampleArray()[i];
-                m_pCovarianceBuffer->push(&t_mat);
+                m_pRtCov->append(t_mat);
             }
         }
     }
@@ -245,7 +256,7 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void Covariance::appendCovariance(FiffCov::SPtr p_pCovariance)
+void Covariance::appendCovariance(const FiffCov& p_pCovariance)
 {
     mutex.lock();
     m_qVecCovData.push_back(p_pCovariance);
@@ -258,8 +269,9 @@ void Covariance::appendCovariance(FiffCov::SPtr p_pCovariance)
 void Covariance::changeSamples(qint32 samples)
 {
     m_iEstimationSamples = samples;
-    if(m_pRtCov)
+    if(m_pRtCov) {
         m_pRtCov->setSamples(m_iEstimationSamples);
+    }
 }
 
 
@@ -267,56 +279,29 @@ void Covariance::changeSamples(qint32 samples)
 
 void Covariance::run()
 {
-    //
     // Read Fiff Info
-    //
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-    //Set m_iEstimationSamples so that we alwyas wait for 5 secs
-    m_iEstimationSamples = m_pFiffInfo->sfreq * 5;
-
 //    m_pActionShowAdjustment->setVisible(true);
 
-    //
-    // Init Real-Time Covariance estimator
-    //
-    m_pRtCov = RtCov::SPtr(new RtCov(m_iEstimationSamples, m_pFiffInfo));
-    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &Covariance::appendCovariance);
-
-    //
-    // Start the rt helpers
-    //
-    m_pRtCov->start();
-
-    //
-    // start processing data
-    //
+    // Start processing data
     m_bProcessData = true;
 
     while (m_bIsRunning)
     {
         if(m_bProcessData)
         {
-            /* Dispatch the inputs */
-            MatrixXd t_mat = m_pCovarianceBuffer->pop();
-
             //Add to covariance estimation
-            m_pRtCov->append(t_mat);
-
-            if(m_qVecCovData.size() > 0)
+            mutex.lock();
+            if(!m_qVecCovData.isEmpty())
             {
-                mutex.lock();
-                m_pCovarianceOutput->data()->setValue(*m_qVecCovData[0]);
-
-                m_qVecCovData.pop_front();
-                mutex.unlock();
+                m_pCovarianceOutput->data()->setValue(m_qVecCovData.takeFirst());
             }
+            mutex.unlock();
         }
     }
 
 //    m_pActionShowAdjustment->setVisible(false);
-
-    m_pRtCov->stop();
 }
 

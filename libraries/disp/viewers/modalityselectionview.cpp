@@ -120,11 +120,11 @@ void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
     if(hasGRAD)
         m_qListModalities.append(Modality("GRAD",sel,val));
     if(hasEEG)
-        m_qListModalities.append(Modality("EEG",false,val));
+        m_qListModalities.append(Modality("EEG",sel,val));
     if(hasEOG)
-        m_qListModalities.append(Modality("EOG",false,val));
+        m_qListModalities.append(Modality("EOG",sel,val));
     if(hasMISC)
-        m_qListModalities.append(Modality("MISC",false,val));
+        m_qListModalities.append(Modality("MISC",sel,val));
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 

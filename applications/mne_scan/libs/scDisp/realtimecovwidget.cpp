@@ -148,6 +148,7 @@ void RealTimeCovWidget::getData()
     } else {
         if(m_matSelectorT.cols() == m_pRTC->getValue()->data.rows() && m_pImageSc) {
             MatrixXd data = (m_matSelectorT * m_pRTC->getValue()->data) * m_matSelector;
+
             m_pImageSc->updateData(data);
         }
     }
@@ -198,11 +199,11 @@ void RealTimeCovWidget::onNewModalitySelection(const QList<Modality>& modalityLi
 {
     if(m_pRTC) {
         QList<qint32> qListSelChannel;
-        for(qint32 i = 0; i < m_qListChNames.size(); ++i)
-        {
+        for(qint32 i = 0; i < m_qListChNames.size(); ++i) {
             foreach (const Modality &type, modalityList) {
-                if (m_qListChNames[i].contains(type.m_sName))
+                if (m_qListChNames[i].contains(type.m_sName) && type.m_bActive) {
                     qListSelChannel.append(i);
+                }
             }
         }
 
