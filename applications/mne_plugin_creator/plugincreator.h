@@ -2,6 +2,7 @@
 #define PLUGINCREATOR_H
 
 #include <QDir>
+#include <QFile>
 #include <QObject>
 #include <QTextStream>
 
@@ -16,9 +17,15 @@ public:
   void createPlugin(PluginParams &params);
 
 protected:
-  void createFolderStructure(QString &pluginName);
-  void createDirectory(QString &path);
+  void createFolderStructure(QString pluginName);
+  void createDirectory(QString path);
   void copyTemplates();
+  void copyFile(QString from, QString to);
+
+  QString pluginsPath();
+  QString srcPath(QString pluginName);
+  QString formsPath(QString pluginName);
+  QString imagesPath(QString pluginName);
 
   QTextStream out;
 };
