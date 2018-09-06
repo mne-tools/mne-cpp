@@ -114,17 +114,17 @@ void RtInvOp::run()
 
     while(m_bIsRunning)
     {
+        mutex.lock();
         if(m_vecNoiseCov.size() > 0)
         {
             // Restrict forward solution as necessary for MEG
             MNEForwardSolution t_forwardMeg = m_pFwd->pick_types(true, false);
 
-            mutex.lock();
             MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, m_vecNoiseCov[0], 0.2f, 0.8f));
             m_vecNoiseCov.pop_front();
-            mutex.unlock();
 
             emit invOperatorCalculated(t_invOpMeg);
         }
+        mutex.unlock();
     }
 }
