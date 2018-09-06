@@ -176,7 +176,7 @@ namespace Data3DTreeModelItemRoles
     enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
                     NumberVertices = Qt::UserRole + 101,
                     SurfaceCurv = Qt::UserRole + 102,
-                    NetworkDataMatrix = Qt::UserRole + 103,
+                    NetworkData = Qt::UserRole + 103,
                     SurfaceHemi = Qt::UserRole + 104,
                     AnnotColors = Qt::UserRole + 105,
                     FileName = Qt::UserRole + 106,
