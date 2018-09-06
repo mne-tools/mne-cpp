@@ -18,6 +18,7 @@ public:
 protected:
   void createFolderStructure(QString &pluginName);
   void createDirectory(QString &path);
+  void copyTemplates();
 
   QTextStream out;
 };

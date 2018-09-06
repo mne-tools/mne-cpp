@@ -5,6 +5,7 @@ PluginCreator::PluginCreator(QObject *parent) : QObject(parent), out(stdout) {}
 void PluginCreator::createPlugin(PluginParams &params) {
   out << "Creating plugin: " << params.m_name << "..." << endl;
   createFolderStructure(params.m_name);
+  copyTemplates();
 }
 
 void PluginCreator::createFolderStructure(QString &pluginName) {
@@ -37,4 +38,8 @@ void PluginCreator::createDirectory(QString &path) {
         "Unable to create directory named: " + path.toStdString() +
         ".\n Does a folder with that name already exist?");
   }
+}
+
+void PluginCreator::copyTemplates() {
+  out << "Copying templates into the new directories...";
 }
