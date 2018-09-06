@@ -39,7 +39,8 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     mne_rt_server \
-    mne_show_fiff
+    mne_show_fiff \
+    mne_plugin_creator
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
