@@ -17,6 +17,7 @@ public:
 
 protected:
   void createFolderStructure(QString &pluginName);
+  void createDirectory(QString &path);
 
   QTextStream out;
 };

@@ -9,12 +9,31 @@ void PluginCreator::createPlugin(PluginParams &params) {
 }
 
 void PluginCreator::createFolderStructure(QString &pluginName) {
-  QDir pluginsDir("../mne_scan/plugins");
-  if (!pluginsDir.exists()) {
+  QString pluginsPath("../mne_scan/plugins");
+  QString srcPath = pluginsPath + "/" + pluginName;
+  QString formPath = srcPath + "/" + "FormFiles";
+  QString imageFolder = srcPath + "/images";
+
+  if (!QDir(pluginsPath).exists()) {
     throw std::runtime_error(
         "Could not find mne_scan plugins folder. Make sure you ran the plugin "
         "creator from within the mne_plugin_creator folder");
   }
 
-  throw std::runtime_error("This is a test!");
+  createDirectory(srcPath);
+  out << "Created source folder at " << srcPath << endl;
+
+  createDirectory(formPath);
+  out << "Created form files folder at " << formPath << endl;
+
+  createDirectory(imageFolder);
+  out << "Created images folder at " << imageFolder << endl;
+}
+
+void PluginCreator::createDirectory(QString &path) {
+  bool success = QDir::current().mkdir(path);
+  if (!success) {
+    throw std::invalid_argument("Unable to create directory named: " +
+                                path.toStdString());
+  }
 }
