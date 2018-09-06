@@ -78,9 +78,9 @@ Spline::Spline(const QString& title, QWidget* parent)
 : QWidget(parent)
 , m_dMinAxisX(0)
 , m_dMaxAxisX(0)
-, m_pLeftThreshold(0)
-, m_pMiddleThreshold(0)
-, m_pRightThreshold(0)
+, m_pLeftThreshold(new QLineSeries())
+, m_pMiddleThreshold(new QLineSeries())
+, m_pRightThreshold(new QLineSeries())
 , m_iMaximumFrequency(0)
 {
     m_pChart = new QChart();
@@ -402,44 +402,48 @@ const QVector3D& Spline::getThreshold()
 QVector3D Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
 {
     QVector3D returnCorrectedVector;
-    int exponent;
-    if (upOrDown == "up")
-    {
-        if (m_vecResultExponentValues[0] < 0)
+
+    if(m_vecResultExponentValues.rows() > 0) {
+        int exponent;
+        if (upOrDown == "up")
         {
-            exponent = std::abs(m_vecResultExponentValues[0]);
+            if (m_vecResultExponentValues[0] < 0)
+            {
+                exponent = std::abs(m_vecResultExponentValues[0]);
+            }
+            else if (m_vecResultExponentValues[0] > 0)
+            {
+                exponent = -(std::abs(m_vecResultExponentValues[0]));
+            }
+            else
+            {
+                exponent = 0;
+            }
         }
-        else if (m_vecResultExponentValues[0] > 0)
+        else if (upOrDown == "down")
         {
-            exponent = -(std::abs(m_vecResultExponentValues[0]));
+            if (m_vecResultExponentValues[0] < 0)
+            {
+                exponent = -(std::abs(m_vecResultExponentValues[0]));
+            }
+            else if (m_vecResultExponentValues[0] > 0)
+            {
+                exponent = std::abs(m_vecResultExponentValues[0]);
+            }
+            else
+            {
+                exponent = 0;
+            }
         }
         else
         {
-            exponent = 0;
+            qDebug() << "Spline::correctionDisplayTrueValue error.";
         }
-    }
-    else if (upOrDown == "down")
-    {
-        if (m_vecResultExponentValues[0] < 0)
-        {
-            exponent = -(std::abs(m_vecResultExponentValues[0]));
-        }
-        else if (m_vecResultExponentValues[0] > 0)
-        {
-            exponent = std::abs(m_vecResultExponentValues[0]);
-        }
-        else
-        {
-            exponent = 0;
-        }
-    }
-    else
-    {
-        qDebug() << "Spline::correctionDisplayTrueValue error.";
+
+        returnCorrectedVector.setX(vecOriginalValues.x() * (pow(10, exponent)));
+        returnCorrectedVector.setY(vecOriginalValues.y() * (pow(10, exponent)));
+        returnCorrectedVector.setZ(vecOriginalValues.z() * (pow(10, exponent)));
     }
 
-    returnCorrectedVector.setX(vecOriginalValues.x() * (pow(10, exponent)));
-    returnCorrectedVector.setY(vecOriginalValues.y() * (pow(10, exponent)));
-    returnCorrectedVector.setZ(vecOriginalValues.z() * (pow(10, exponent)));
     return returnCorrectedVector;
 }
