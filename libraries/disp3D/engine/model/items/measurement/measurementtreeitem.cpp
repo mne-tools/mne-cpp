@@ -356,6 +356,8 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData,
                 m_pNetworkTreeItem = new NetworkTreeItem(p3DEntityParent);
             }
 
+            m_pNetworkTreeItem->setText(tNetworkData.getConnectivityMethod());
+
             QList<QStandardItem*> list;
             list << m_pNetworkTreeItem;
             list << new QStandardItem(m_pNetworkTreeItem->toolTip());
@@ -364,6 +366,7 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData,
             m_pNetworkTreeItem->addData(tNetworkData);
         } else {
             if(m_pNetworkTreeItem) {
+                m_pNetworkTreeItem->setText(tNetworkData.getConnectivityMethod());
                 m_pNetworkTreeItem->addData(tNetworkData);
             }
         }

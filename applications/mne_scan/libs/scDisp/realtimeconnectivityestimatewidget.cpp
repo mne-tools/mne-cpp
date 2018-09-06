@@ -52,6 +52,7 @@
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -161,14 +162,18 @@ void RealTimeConnectivityEstimateWidget::getData()
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
             Network networkData = *(m_pRTCE->getValue().data());
             m_pRtItem = m_pData3DModel->addConnectivityData("sample",
-                                                            networkData.getConnectivityMethod(),
+                                                            "Connectivity",
                                                             networkData);
 
             if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
-                m_pData3DModel->addSurfaceSet("sample",
-                                              "MRI",
-                                              *(m_pRTCE->getSurfSet().data()),
-                                              *(m_pRTCE->getAnnotSet().data()));
+                QList<FsSurfaceTreeItem*> lSurfaces = m_pData3DModel->addSurfaceSet("sample",
+                                                                                    "MRI",
+                                                                                    *(m_pRTCE->getSurfSet().data()),
+                                                                                    *(m_pRTCE->getAnnotSet().data()));
+
+                for(int i = 0; i < lSurfaces.size(); i++) {
+                    lSurfaces.at(i)->setAlpha(0.3f);
+                }
             }
 
             if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
@@ -176,7 +181,6 @@ void RealTimeConnectivityEstimateWidget::getData()
                                                  "Sensors",
                                                  m_pRTCE->getFiffInfo()->chs,
                                                  *(m_pRTCE->getSensorSurface()));
-
             }
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";

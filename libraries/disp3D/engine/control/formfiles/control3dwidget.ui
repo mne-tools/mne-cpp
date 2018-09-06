@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>504</height>
+    <height>644</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -105,7 +105,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>0</height>
+           <height>250</height>
           </size>
          </property>
          <property name="mouseTracking">

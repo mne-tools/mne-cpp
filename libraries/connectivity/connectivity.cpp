@@ -96,6 +96,7 @@ Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
 
 Network Connectivity::calculateConnectivity() const
 {
+    //TODO: Use multithreading to work on multiple connectivity methods at the same time
     if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COR")) {
         return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList,
                                              m_pConnectivitySettings->m_matNodePositions);

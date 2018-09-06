@@ -85,7 +85,7 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     emit resultReady(tConnectivity.calculateConnectivity());
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
-    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed()" << time.elapsed();
+    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed() for"<< connectivitySettings.m_sConnectivityMethods.first() <<":" << time.elapsed();
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
 }

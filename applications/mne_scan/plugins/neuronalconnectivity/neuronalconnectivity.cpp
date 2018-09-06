@@ -380,7 +380,7 @@ void NeuronalConnectivity::run()
 
             //Send the data to the connected plugins and the online display
             if(!connectivityResult.isEmpty()) {
-                qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
+                //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
                 m_pRTCEOutput->data()->setValue(connectivityResult);
             }
         }

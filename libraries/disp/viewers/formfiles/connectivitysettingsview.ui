@@ -68,17 +68,17 @@
        </property>
        <item>
         <property name="text">
+         <string>COR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>COH</string>
         </property>
        </item>
        <item>
         <property name="text">
          <string>IMAGCOH</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>COR</string>
         </property>
        </item>
        <item>
