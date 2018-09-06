@@ -152,17 +152,6 @@ void NeuronalConnectivity::init()
     //Init connectivity settings
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COR";
     m_connectivitySettings.m_sWindowType = "Hanning";
-
-    //Set 3D brain data for visualization
-    AnnotationSet::SPtr pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    SurfaceSet::SPtr pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
-    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
-    MNEBem sensorSurfaceVV(t_filesensorSurfaceVV);
-    MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(sensorSurfaceVV);
-
-    m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
-    m_pRTCEOutput->data()->setAnnotSet(pAnnotationSet);
-    m_pRTCEOutput->data()->setSurfSet(pSurfaceSet);
 }
 
 
@@ -299,7 +288,10 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            //Set 3D sensor surface for visualization
+            QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+            MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
+            m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
             //Generate node vertices

@@ -125,7 +125,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     }
 
     QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+    QWidget *pWidgetContainer = this->createWindowContainer(m_p3DView.data(), this, Qt::Widget);
 
     mainLayoutView->addWidget(pWidgetContainer,0,0);
 
@@ -164,10 +164,20 @@ void RealTimeConnectivityEstimateWidget::getData()
                                                             networkData.getConnectivityMethod(),
                                                             networkData);
 
-            m_pData3DModel->addSurfaceSet("sample",
-                                          "MRI",
-                                          *(m_pRTCE->getSurfSet().data()),
-                                          *(m_pRTCE->getAnnotSet().data()));
+            if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
+                m_pData3DModel->addSurfaceSet("sample",
+                                              "MRI",
+                                              *(m_pRTCE->getSurfSet().data()),
+                                              *(m_pRTCE->getAnnotSet().data()));
+            }
+
+            if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
+                m_pData3DModel->addMegSensorInfo("sample",
+                                                 "Sensors",
+                                                 m_pRTCE->getFiffInfo()->chs,
+                                                 *(m_pRTCE->getSensorSurface()));
+
+            }
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
 
