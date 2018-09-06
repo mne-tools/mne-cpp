@@ -90,7 +90,7 @@ FiffCov::SPtr& RealTimeCov::getValue()
 
 //*************************************************************************************************************
 
-void RealTimeCov::setValue(FiffCov& v)
+void RealTimeCov::setValue(const FiffCov& v)
 {
     m_qMutex.lock();
     //Store
