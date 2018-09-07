@@ -28,8 +28,8 @@ struct PluginParams {
   QString m_setupWidgetFormFileName;
 
   QString m_globalHeaderDefine;
-  QString m_defineLibraryName;
-  QString m_defineExportName;
+  QString m_libraryDefine;
+  QString m_exportDefine;
 
   PluginParams(QString name, QString author, QString nameSpace);
   QString baseFileName();
