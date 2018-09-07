@@ -90,6 +90,7 @@ namespace SCMEASLIB {
     class RealTimeSourceEstimate;
     class RealTimeMultiSampleArray;
     class RealTimeConnectivityEstimate;
+    class RealTimeEvokedSet;
 }
 
 
@@ -165,6 +166,14 @@ public:
     */
     void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
+    //=========================================================================================================
+    /**
+    * Slot to update the fiff evoked
+    *
+    * @param[in] pMeasurement   The evoked to be appended
+    */
+    void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
+
 protected:
     //=========================================================================================================
     /**
@@ -203,6 +212,8 @@ private:
     QString             m_sAtlasDir;            /**< File to Atlas. */
     QString             m_sSurfaceDir;          /**< File to Surface. */
 
+    QString             m_sAvrType;             /**< The average type */
+
     QMutex              m_mutex;
 
     QElapsedTimer       m_timer;
@@ -217,6 +228,7 @@ private:
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr                m_pRTEVSInput;                  /**< The RealTimeEvoked input.*/
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
