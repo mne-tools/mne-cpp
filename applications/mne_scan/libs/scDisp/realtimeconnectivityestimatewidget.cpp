@@ -100,7 +100,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRtItem(Q_NULLPTR)
 , m_p3DView(View3D::SPtr(new View3D()))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
-, m_pQuickControlView(QuickControlView::SPtr::create("Connectivity Control", this))
+, m_pQuickControlView(QuickControlView::SPtr::create("Connectivity Control", Qt::Window | Qt::CustomizeWindowHint, this))
 {
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));

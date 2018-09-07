@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     abstractview.h
+* @file     connectivitysettingsmanager.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     September, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    AbstractView class declaration.
+* @brief    Definition of the DraggableFramelessWidget Class.
 *
 */
 
-#ifndef DISP3DLIB_ABSTRACTVIEW_H
-#define DISP3DLIB_ABSTRACTVIEW_H
+#ifndef CONNECTIVITYSETTINGSMANAGER_H
+#define CONNECTIVITYSETTINGSMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include <realtime/rtProcessing/rtconnectivity.h>
+#include <connectivity/connectivitysettings.h>
 
 
 //*************************************************************************************************************
@@ -49,9 +50,23 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QWidget>
-#include <QPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace CONNECTIVITYLIB;
+using namespace REALTIMELIB;
 
 
 //*************************************************************************************************************
@@ -59,104 +74,31 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB {
-    class QuickControlView;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
-
-namespace DISP3DLIB
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DISP3DLIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-class View3D;
-class Control3DWidget;
-class Data3DTreeModel;
-
 
 //=============================================================================================================
 /**
-* Adapter which provides the abstract class for all adapter views.
+* DECLARE CLASS ConnectivitySettingsManager
 *
-* @brief Adapter which provides the abstract class for all adapter views.
+* @brief The ConnectivitySettingsManager class provides a manager to handle connectivty computation for the ex_connectivity example.
 */
-class DISP3DSHARED_EXPORT AbstractView : public QWidget
+class ConnectivitySettingsManager : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AbstractView> SPtr;             /**< Shared pointer type for AbstractView class. */
-    typedef QSharedPointer<const AbstractView> ConstSPtr;  /**< Const shared pointer type for AbstractView class. */
 
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    */
-    explicit AbstractView(QWidget *parent = 0,
-                          Qt::WindowFlags f = Qt::Widget);
+    ConnectivitySettingsManager(QObject *parent = 0) : QObject(parent){}
 
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~AbstractView();
+    ConnectivitySettings m_settings;
+    RtConnectivity::SPtr m_pRtConnectivity = RtConnectivity::SPtr::create();
 
-    //=========================================================================================================
-    /**
-    * Returns the View3D.
-    *
-    * @return The currently set View3D.
-    */
-    QSharedPointer<DISP3DLIB::View3D> getView();
+    void onConnectivityMetricChanged(const QString& sMetric)
+    {
+        m_settings.m_sConnectivityMethods = QStringList() << sMetric;
 
-    //=========================================================================================================
-    /**
-    * Returns the Control3D.
-    *
-    * @return The currently set Control3D.
-    */
-    QSharedPointer<DISP3DLIB::Control3DWidget> getControlView();
-
-    //=========================================================================================================
-    /**
-    * Returns the Data3DTreeModel.
-    *
-    * @return The currently set Data3DTreeModel.
-    */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel> getTreeModel();
-
-    //=========================================================================================================
-    /**
-    * Returns the quick control view.
-    *
-    * @return The currently set quick control view.
-    */
-    QPointer<DISPLIB::QuickControlView> getQuickControl();
-
-protected:
-    //=========================================================================================================
-    /**
-    * Creates the GUI.
-    */
-    void createGUI();
-
-    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;              /**< The Disp3D view. */
-    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;       /**< The Disp3D control. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;         /**< The Disp3D model. */
-
-    QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< The quick control widget. */
+        m_pRtConnectivity->append(m_settings);
+    }
 
 };
 
-} // NAMESPACE
-
-#endif // DISP3DLIB_ABSTRACTVIEW_H
+#endif // CONNECTIVITYSETTINGSMANAGER_H

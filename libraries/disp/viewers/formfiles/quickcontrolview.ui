@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
+    <width>350</width>
     <height>146</height>
    </rect>
   </property>
@@ -15,6 +15,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>350</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="mouseTracking">
    <bool>false</bool>
@@ -76,7 +82,7 @@
        <number>0</number>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_7">
+       <widget class="QLabel" name="m_label_opacity">
         <property name="text">
          <string>Opacity:</string>
         </property>

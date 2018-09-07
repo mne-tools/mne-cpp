@@ -171,7 +171,7 @@ AbstractMetricResultData Coherency::compute(const AbstractMetricInputData& input
         data.row(i).array() -= data.row(i).mean();
     }
 
-    // This part could be parallelized with QtConcurrent::mapped
+    // Compute tapered spectra. Note: Multithread option to false as default because nested multithreading is not permitted in qt.
     QVector<Eigen::MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(data,
                                                                                     inputData.tapers.first,
                                                                                     inputData.iNfft,

@@ -443,7 +443,7 @@ void RealTimeEvokedSetWidget::init()
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
         //Init quick control widget
-        m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", this);
+        m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", Qt::Window | Qt::CustomizeWindowHint, this);
         m_pQuickControlView->setOpacityValue(settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESName), 95).toInt());
 
         // Quick control scaling

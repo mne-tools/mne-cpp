@@ -100,8 +100,12 @@ public:
     * @param [in] parent        The parent of the widget.
     * @param [in] flags         The window flags.
     * @param [in] bRoundEdges   Flag specifying whether to round the edges.
+    * @param [in] bDraggable    Flag specifying whether this widget is draggable.
     */
-    DraggableFramelessWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0, bool bRoundEdges = false);
+    DraggableFramelessWidget(QWidget *parent = 0,
+                             Qt::WindowFlags flags = 0,
+                             bool bRoundEdges = false,
+                             bool bDraggable = true);
 
     //=========================================================================================================
     /**
@@ -141,6 +145,7 @@ protected:
 private:
     QPoint      m_dragPosition;     /**< The drag position of the window. */
     bool        m_bRoundEdges;      /**< Flag specifying whether to round the edges. */
+    bool        m_bDraggable;       /**< Flag specifying whether this widget is draggable. */
 };
 
 } // NAMESPACE DISPLIB
