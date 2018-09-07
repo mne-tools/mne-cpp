@@ -1,14 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     dummytoolbox.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     {{pro_filename}}
+# @author   {{author}} <{{author_email}}>
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     {{month}}, {{year}}
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the dummytoolbox plug-in.
+# @brief    This project file generates the makefile for the {{name}} plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,11 +40,11 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += DUMMYTOOLBOX_LIBRARY
+DEFINES += {{library_define}}
 
 QT += core widgets
 
-TARGET = dummytoolbox
+TARGET = {{target_name}}
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -65,28 +66,28 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
-        dummytoolbox.cpp \
-        FormFiles/dummysetupwidget.cpp \
-        FormFiles/dummyaboutwidget.cpp \
-    FormFiles/dummyyourwidget.cpp
+        {{source_filename}} \
+        FormFiles/{{setup_widget_source_filename}} \
+        FormFiles/{{about_widget_source_filename}} \
+    FormFiles/{{widget_source_filename}}
 
 HEADERS += \
-        dummytoolbox.h\
-        dummytoolbox_global.h \
-        FormFiles/dummysetupwidget.h \
-        FormFiles/dummyaboutwidget.h \
-    FormFiles/dummyyourwidget.h
+        {{header_filename}}\
+        {{global_header_filename}} \
+        FormFiles/{{setup_widget_header_filename}} \
+        FormFiles/{{about_widget_header_filename}} \
+    FormFiles/{{widget_header_filename}}
 
 FORMS += \
-        FormFiles/dummysetup.ui \
-        FormFiles/dummyabout.ui \
-    FormFiles/dummyyourtoolbarwidget.ui
+        FormFiles/{{setup_widget_form_filename}} \
+        FormFiles/{{about_widget_form_filename}} \
+    FormFiles/{{widget_form_filename}}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-OTHER_FILES += dummytoolbox.json
+OTHER_FILES += {{json_filename}}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD

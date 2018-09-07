@@ -11,6 +11,7 @@ struct PluginParams {
   QString m_author;
   QString m_email;
   QString m_namespace;
+  QString m_targetName;
 
   QString m_proFileName;
   QString m_jsonFileName;

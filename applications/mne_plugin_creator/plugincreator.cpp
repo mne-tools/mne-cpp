@@ -189,20 +189,36 @@ void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
     text.replace("{{author_email}}", params.m_email.toUtf8());
     text.replace("{{month}}", date.toString("MMMM").toUtf8());
     text.replace("{{year}}", date.toString("yyyy").toUtf8());
+    text.replace("{{namespace}}", params.m_namespace.toUtf8());
+    text.replace("{{target_name}}", params.m_targetName.toUtf8());
+
     text.replace("{{name}}", params.m_name.toUtf8());
     text.replace("{{widget_name}}", params.m_widgetName.toUtf8());
-    text.replace("{{namespace}}", params.m_namespace.toUtf8());
+    text.replace("{{setup_widget_name}}", params.m_setupWidgetName.toUtf8());
+    text.replace("{{about_widget_name}}", params.m_aboutWidgetName.toUtf8());
 
     text.replace("{{header_define}}", params.m_globalHeaderDefine.toUtf8());
     text.replace("{{library_define}}", params.m_libraryDefine.toUtf8());
     text.replace("{{export_define}}", params.m_exportDefine.toUtf8());
     text.replace("{{header_define}}", params.m_headerDefine.toUtf8());
 
-    text.replace("{{global_header_filename}}", params.m_globalsFileName.toUtf8());
+    text.replace("{{pro_filename}}", params.m_proFileName.toUtf8());
     text.replace("{{json_filename}}", params.m_jsonFileName.toUtf8());
+
+    text.replace("{{global_header_filename}}", params.m_globalsFileName.toUtf8());
     text.replace("{{header_filename}}", params.m_headerFileName.toUtf8());
     text.replace("{{widget_header_filename}}", params.m_widgetHeaderFileName.toUtf8());
     text.replace("{{setup_widget_header_filename}}", params.m_setupWidgetHeaderFileName.toUtf8());
+    text.replace("{{about_widget_header_filename}}", params.m_aboutWidgetHeaderFileName.toUtf8());
+
+    text.replace("{{source_filename}}", params.m_sourceFileName.toUtf8());
+    text.replace("{{widget_source_filename}}", params.m_widgetSourceFileName.toUtf8());
+    text.replace("{{setup_widget_source_filename}}", params.m_setupWidgetSourceFileName.toUtf8());
+    text.replace("{{about_widget_source_filename}}", params.m_aboutWidgetSourceFileName.toUtf8());
+
+    text.replace("{{widget_form_filename}}", params.m_widgetFormFileName.toUtf8());
+    text.replace("{{setup_widget_form_filename}}", params.m_setupWidgetFormFileName.toUtf8());
+    text.replace("{{about_widget_form_filename}}", params.m_aboutWidgetFormFileName.toUtf8());
 
     file.resize(0);
     file.write(text);

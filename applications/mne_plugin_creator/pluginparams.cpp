@@ -6,6 +6,7 @@
       m_email = email;
       m_author = author;
       m_namespace = nameSpace;
+      m_targetName = baseFileName();
       m_widgetName= name + "Widget";
       m_aboutWidgetName = name + "AboutWidget";
       m_setupWidgetName = name + "SetupWidget";
