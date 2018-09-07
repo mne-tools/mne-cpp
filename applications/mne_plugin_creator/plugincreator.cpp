@@ -68,7 +68,7 @@ void PluginCreator::copyTemplates(QString pluginName) {
   QString headerTemplate = templatesPath() + "headertemplate.h";
   QString headerDest = srcPath(pluginName) + pluginName.toLower() + ".h";
   copyFile(headerTemplate, headerDest);
-  out << "Copied header teamplate to " << headerDest << endl;
+  out << "Copied header template to " << headerDest << endl;
 }
 
 void PluginCreator::copyFile(QString from, QString to) {
