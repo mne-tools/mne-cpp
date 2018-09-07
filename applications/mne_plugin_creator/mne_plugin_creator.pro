@@ -16,7 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    plugincreator.cpp
+    plugincreator.cpp \
+    pluginparams.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
