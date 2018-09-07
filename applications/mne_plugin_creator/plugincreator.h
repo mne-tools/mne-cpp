@@ -1,6 +1,7 @@
 #ifndef PLUGINCREATOR_H
 #define PLUGINCREATOR_H
 
+#include <QDate>
 #include <QDir>
 #include <QFile>
 #include <QObject>

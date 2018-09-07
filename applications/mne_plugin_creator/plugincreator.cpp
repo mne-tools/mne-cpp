@@ -165,6 +165,7 @@ void PluginCreator::fillTemplates(PluginParams &params){
    for (QFileInfo info : formFiles + srcFiles) {
        QFile file(info.absoluteFilePath());
        fillSingleTemplate(file, params);
+       out << "Executed template for " << file.fileName() << endl;
    }
 }
 
@@ -181,8 +182,18 @@ void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
                                  "\nError: " + problem.toStdString());
     }
 
+    QDate date = QDate::currentDate();
     QByteArray templateText = file.readAll();
-    templateText.replace("{{author}}", "Erik D Mopperson");
+
+    templateText.replace("{{author}}", params.m_author.toUtf8());
+    templateText.replace("{{month}}", date.toString("MMMM").toUtf8());
+    templateText.replace("{{year}}", date.toString("yyyy").toUtf8());
+    templateText.replace("{{name}}", params.m_name.toUtf8());
+    templateText.replace("{{global_header_name}}", params.m_globalsFileName.toUtf8());
+    templateText.replace("{{header_define}}", params.m_globalHeaderDefine.toUtf8());
+    templateText.replace("{{library_define}}", params.m_defineLibraryName.toUtf8());
+    templateText.replace("{{export_define}}", params.m_defineExportName.toUtf8());
+
     file.resize(0);
     file.write(templateText);
     file.close();

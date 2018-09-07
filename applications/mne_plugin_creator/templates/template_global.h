@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox_global.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{global_header_name}}
+* @author   {{author}}
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the DummyToolbox library export/import macros.
+* @brief    Contains the {{name}} library export/import macros.
 *
 */
 
-#ifndef DUMMYTOOLBOX_GLOBAL_H
-#define DUMMYTOOLBOX_GLOBAL_H
+#ifndef {{header_define}}
+#define {{header_define}}
 
 
 //*************************************************************************************************************
@@ -50,10 +51,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(DUMMYTOOLBOX_LIBRARY)
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined({{library_define}})
+#  define {{export_define}} Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define {{export_define}} Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // DUMMYTOOLBOX_GLOBAL_H
+#endif // {{header_define}}
