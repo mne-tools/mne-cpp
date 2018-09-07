@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummyaboutwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{about_template_header_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -33,8 +34,8 @@
 *
 */
 
-#ifndef DUMMYABOUTWIDGET_H
-#define DUMMYABOUTWIDGET_H
+#ifndef {{about_widget_header_define}}
+#define {{about_widget_header_define}}
 
 
 //*************************************************************************************************************
@@ -42,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyabout.h"
+#include "../ui_{{about_widget_header_filename}}"
 
 
 //*************************************************************************************************************
@@ -55,20 +56,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE {{namespace}}
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+namespace {{namespace}}
 {
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyAboutWidget
+* DECLARE CLASS {{about_widget_name}}
 *
-* @brief The DummyAboutWidget class provides the about dialog for the DummyToolbox.
+* @brief The {{about_widget_name}} class provides the about dialog for the {{name}}.
 */
-class DummyAboutWidget : public QDialog
+class {{about_widget_name}} : public QDialog
 {
     Q_OBJECT
 
@@ -76,25 +77,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummyAboutWidget dialog which is a child of parent.
+    * Constructs a {{about_widget_name}} dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new {{about_widget_name}} becomes a window. If parent is another widget, {{about_widget_name}} becomes a child window inside parent. {{about_widget_name}} is deleted when its parent is deleted.
     */
-    DummyAboutWidget(QWidget *parent = 0);
+    {{about_widget_name}}(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
+    * Destroys the {{about_widget_name}}.
+    * All {{about_widget_name}}'s children are deleted first. The application exits if {{about_widget_name}} is the main widget.
     */
-    ~DummyAboutWidget();
+    ~{{about_widget_name}}();
 
 private:
 
-    Ui::DummyAboutWidgetClass ui;		/**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::{{about_widget_name}} ui;		/**< Holds the user interface for the {{about_widget_name}}.*/
 
 };
 
 } // NAMESPACE
 
-#endif // DUMMYABOUTWIDGET_H
+#endif // {{about_widget_header_define}}

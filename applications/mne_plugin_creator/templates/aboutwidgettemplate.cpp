@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummyaboutwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{about_widget_source_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the DummyAboutWidget class.
+* @brief    Definition of the {{about_widget_name}} class.
 *
 */
 
@@ -38,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummyaboutwidget.h"
+#include "{{about_widget_header_filename}}"
 
 
 //*************************************************************************************************************
@@ -46,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DUMMYTOOLBOXPLUGIN;
+using namespace {{namespace}};
 
 
 //*************************************************************************************************************
@@ -54,7 +55,7 @@ using namespace DUMMYTOOLBOXPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummyAboutWidget::DummyAboutWidget(QWidget *parent)
+{{about_widget_name}}::{{about_widget_name}}(QWidget *parent)
     : QDialog(parent)
 {
     ui.setupUi(this);
@@ -63,7 +64,7 @@ DummyAboutWidget::DummyAboutWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-DummyAboutWidget::~DummyAboutWidget()
+{{about_widget_name}}::~{{about_widget_name}}()
 {
 
 }

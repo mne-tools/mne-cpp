@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DummyAboutWidgetClass</class>
- <widget class="QDialog" name="DummyAboutWidgetClass">
+ <class>{{about_widget_name}}</class>
+ <widget class="QDialog" name="{{about_widget_name}}">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>About Dummy Toolbox</string>
+   <string>About {{name}}</string>
   </property>
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
