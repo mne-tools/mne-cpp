@@ -7,6 +7,8 @@ void PluginCreator::createPlugin(PluginParams &params) {
   createFolderStructure(params.m_name);
   copyTemplates(params);
   fillTemplates(params);
+  updateProjectFile(params);
+  out << "Successfully created new " << params.m_name << " plugin!" << endl;
 }
 
 QString PluginCreator::pluginsPath() {
@@ -226,4 +228,9 @@ void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
     file.resize(0);
     file.write(text);
     file.close();
+}
+
+void PluginCreator::updateProjectFile(PluginParams &params){
+    // TODO:
+    out << "Updated the .pro file to include your new plugin!" << endl;
 }
