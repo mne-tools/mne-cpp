@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox_global.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{header_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the DummyToolbox library export/import macros.
+* @brief    Contains the declaration of the {{name}} class.
 *
 */
 
-#ifndef DUMMYTOOLBOX_GLOBAL_H
-#define DUMMYTOOLBOX_GLOBAL_H
+#ifndef {{header_define}}
+#define {{header_define}}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "{{global_header_filename}}"
+
+#include <scShared/Interfaces/IAlgorithm.h>
+#include <utils/generics/circularmatrixbuffer.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include "FormFiles/{{setup_widget_header_filename}}"
+#include "FormFiles/{{widget_header_filename}}"
 
 
 //*************************************************************************************************************
@@ -42,19 +57,110 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QtWidgets>
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE NAMESPACE {{name}}
 //=============================================================================================================
 
-#if defined(DUMMYTOOLBOX_LIBRARY)
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+namespace {{namespace}}
+{
 
-#endif // DUMMYTOOLBOX_GLOBAL_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace SCSHAREDLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS {{name}}
+*
+* @brief The {{name}} class does...
+*/
+class {{export_define}} {{name}} : public IAlgorithm
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "{{json_filename}}") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
+
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a {{name}}.
+    */
+    {{name}}();
+
+    //=========================================================================================================
+    /**
+    * Destroys the {{name}}.
+    */
+    ~{{name}}();
+
+    //=========================================================================================================
+    /**
+    * IAlgorithm functions
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+    virtual void init();
+    virtual void unload();
+    virtual bool start();
+    virtual bool stop();
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+    virtual QWidget* setupWidget();
+
+    //=========================================================================================================
+    /**
+    * Udates the plugin with new (incoming) data.
+    *
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+    */
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+
+protected:
+    //=========================================================================================================
+    /**
+    * IAlgorithm function
+    */
+    virtual void run();
+
+    void showYourWidget();
+
+private:
+    bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
+
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
+    QSharedPointer<{{widget_name}}>                 m_pYourWidget;          /**< flag whether thread is running.*/
+    QAction*                                        m_pActionShowWidget;    /**< Action for showing the widget.*/
+
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pBuffer;              /**< Holds incoming data.*/
+
+    PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pInput;      /**< The RealTimeMultiSampleArray of the {{name}} input.*/
+    PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pOutput;     /**< The RealTimeMultiSampleArray of the {{name}} output.*/
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
+};
+
+} // NAMESPACE
+
+#endif // {{header_define}}

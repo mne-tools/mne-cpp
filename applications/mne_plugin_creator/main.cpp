@@ -11,7 +11,7 @@ using std::endl;
 int main() {
   cout << "Enter a name for your new plugin:" << endl;
 
-  PluginParams params("MoppyPlugin", "Erik H.", "SHI");
+  PluginParams params("MoppyPlugin", "SHI", "Erik Hornberger", "erik.hornberger@shi-g.com");
   PluginCreator creator(nullptr);
 
   try {

@@ -5,6 +5,9 @@
 
 struct PluginParams {
   QString m_name;
+  QString m_widgetName;
+  QString m_aboutWidgetName;
+  QString m_setupWidgetName;
   QString m_author;
   QString m_email;
   QString m_namespace;

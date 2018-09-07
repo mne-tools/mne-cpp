@@ -190,10 +190,19 @@ void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
     text.replace("{{month}}", date.toString("MMMM").toUtf8());
     text.replace("{{year}}", date.toString("yyyy").toUtf8());
     text.replace("{{name}}", params.m_name.toUtf8());
-    text.replace("{{global_header_filename}}", params.m_globalsFileName.toUtf8());
+    text.replace("{{widget_name}}", params.m_widgetName.toUtf8());
+    text.replace("{{namespace}}", params.m_namespace.toUtf8());
+
     text.replace("{{header_define}}", params.m_globalHeaderDefine.toUtf8());
     text.replace("{{library_define}}", params.m_libraryDefine.toUtf8());
     text.replace("{{export_define}}", params.m_exportDefine.toUtf8());
+    text.replace("{{header_define}}", params.m_headerDefine.toUtf8());
+
+    text.replace("{{global_header_filename}}", params.m_globalsFileName.toUtf8());
+    text.replace("{{json_filename}}", params.m_jsonFileName.toUtf8());
+    text.replace("{{header_filename}}", params.m_headerFileName.toUtf8());
+    text.replace("{{widget_header_filename}}", params.m_widgetHeaderFileName.toUtf8());
+    text.replace("{{setup_widget_header_filename}}", params.m_setupWidgetHeaderFileName.toUtf8());
 
     file.resize(0);
     file.write(text);

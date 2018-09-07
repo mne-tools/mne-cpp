@@ -6,6 +6,9 @@
       m_email = email;
       m_author = author;
       m_namespace = nameSpace;
+      m_widgetName= name + "Widget";
+      m_aboutWidgetName = name + "AboutWidget";
+      m_setupWidgetName = name + "SetupWidget";
       m_proFileName = baseFileName() + ".pro";
       m_jsonFileName = baseFileName() + ".json";
       m_globalsFileName = baseFileName() + "_global.h";
