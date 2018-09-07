@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{widget_source_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the DummyYourWidget class.
+* @brief    Definition of the {{widget_name}} class.
 *
 */
 
@@ -38,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummyyourwidget.h"
+#include "{{widget_header_filename}}"
 
 
 //*************************************************************************************************************
@@ -46,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DUMMYTOOLBOXPLUGIN;
+using namespace {{namespace}};
 
 
 //*************************************************************************************************************
@@ -54,9 +55,9 @@ using namespace DUMMYTOOLBOXPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummyYourWidget::DummyYourWidget(QWidget *parent)
+{{widget_name}}::{{widget_name}}(QWidget *parent)
 : QWidget(parent)
-, ui(new Ui::DummyYourToolbarWidget)
+, ui(new Ui::{{widget_name}})
 {
     ui->setupUi(this);
 }
@@ -64,7 +65,7 @@ DummyYourWidget::DummyYourWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-DummyYourWidget::~DummyYourWidget()
+{{widget_name}}::~{{widget_name}}()
 {
     delete ui;
 }
