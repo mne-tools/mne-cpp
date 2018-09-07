@@ -5,7 +5,8 @@ PluginCreator::PluginCreator(QObject *parent) : QObject(parent), out(stdout) {}
 void PluginCreator::createPlugin(PluginParams &params) {
   out << "Creating plugin: " << params.m_name << "..." << endl;
   createFolderStructure(params.m_name);
-  copyTemplates(params.m_name);
+  copyTemplates(params);
+  fillTemplates(params);
 }
 
 QString PluginCreator::pluginsPath() {
@@ -64,81 +65,81 @@ void PluginCreator::createDirectory(QString path) {
   }
 }
 
-void PluginCreator::copyTemplates(QString pluginName) {
+void PluginCreator::copyTemplates(PluginParams &params) {
   out << "Copying templates into the new directories..." << endl;
 
   QString proTemplate = templatesPath() + "template.pro";
-  QString proDestination = srcPath(pluginName) + pluginName.toLower() + ".pro";
+  QString proDestination = srcPath(params.m_name) + params.m_proFileName;
   copyFile(proTemplate, proDestination);
   out << "Copied project template to " << proDestination << endl;
 
   QString jsonTemplate = templatesPath() + "template.json";
-  QString jsonDest = srcPath(pluginName) + pluginName.toLower() + ".json";
+  QString jsonDest = srcPath(params.m_name) + params.m_jsonFileName;
   copyFile(jsonTemplate, jsonDest);
   out << "Copied json template to " << jsonDest << endl;
 
   QString optionsImage = templatesPath() + "options.png";
-  QString optionsDest = iconsPath(pluginName) + "options.png";
+  QString optionsDest = iconsPath(params.m_name) + "options.png";
   copyFile(optionsImage, optionsDest);
   out << "Copied options icon to " << optionsDest << endl;
 
   QString globalsTemplate = templatesPath() + "template_global.h";
-  QString globalsDest = srcPath(pluginName) + pluginName.toLower() + "_global.h";
+  QString globalsDest = srcPath(params.m_name) + params.m_globalsFileName;
   copyFile(globalsTemplate, globalsDest);
   out << "Copied globals header template to " << globalsDest << endl;
 
   QString headerTemplate = templatesPath() + "headertemplate.h";
-  QString headerDest = srcPath(pluginName) + pluginName.toLower() + ".h";
+  QString headerDest = srcPath(params.m_name) + params.m_headerFileName;
   copyFile(headerTemplate, headerDest);
   out << "Copied header template to " << headerDest << endl;
 
   QString sourceTemplate = templatesPath() + "sourcetemplate.cpp";
-  QString sourceDest = srcPath(pluginName) + pluginName.toLower() + ".cpp";
+  QString sourceDest = srcPath(params.m_name) + params.m_sourceFileName;
   copyFile(sourceTemplate, sourceDest);
   out << "Copied source template to " << sourceDest << endl;
 
   QString widgetHeaderTemplate = templatesPath() + "widgettemplate.h";
-  QString widgetHeaderDest = formsPath(pluginName) + pluginName.toLower() + "widget.h";
+  QString widgetHeaderDest = formsPath(params.m_name) + params.m_widgetHeaderFileName;
   copyFile(widgetHeaderTemplate, widgetHeaderDest);
   out << "Copied widget header template to " << widgetHeaderDest << endl;
 
   QString widgetSourceTemplate = templatesPath() + "widgettemplate.cpp";
-  QString widgetSourceDest = formsPath(pluginName) + pluginName.toLower() + "widget.cpp";
+  QString widgetSourceDest = formsPath(params.m_name) + params.m_widgetSourceFileName;
   copyFile(widgetSourceTemplate, widgetSourceDest);
   out << "Copied widget source template to " << widgetSourceDest << endl;
 
   QString widgetFormTemplate = templatesPath() + "widgettemplate.ui";
-  QString widgetFormDest = formsPath(pluginName) + pluginName.toLower() + "widget.ui";
+  QString widgetFormDest = formsPath(params.m_name) + params.m_widgetFormFileName;
   copyFile(widgetFormTemplate, widgetFormDest);
   out << "Copied widget form template to " << widgetFormDest << endl;
 
   QString aboutWidgetHeaderTemplate = templatesPath() + "aboutwidgettemplate.h";
-  QString aboutWidgetHeaderDest = formsPath(pluginName) + pluginName.toLower() + "aboutwidget.h";
+  QString aboutWidgetHeaderDest = formsPath(params.m_name) + params.m_aboutWidgetHeaderFileName;
   copyFile(aboutWidgetHeaderTemplate, aboutWidgetHeaderDest);
   out << "Copied about widget header template to " << aboutWidgetHeaderDest << endl;
 
   QString aboutWidgetSourceTemplate = templatesPath() + "aboutwidgettemplate.cpp";
-  QString aboutWidgetSourceDest = formsPath(pluginName) + pluginName.toLower() + "aboutwidget.cpp";
+  QString aboutWidgetSourceDest = formsPath(params.m_name) + params.m_aboutWidgetSourceFileName;
   copyFile(aboutWidgetSourceTemplate, aboutWidgetSourceDest);
   out << "Copied about widget source template to " << aboutWidgetSourceDest << endl;
 
   QString aboutWidgetFormTemplate = templatesPath() + "aboutwidgettemplate.ui";
-  QString aboutWidgetFormDest = formsPath(pluginName) + pluginName.toLower() + "aboutwidget.ui";
+  QString aboutWidgetFormDest = formsPath(params.m_name) + params.m_aboutWidgetFormFileName;
   copyFile(aboutWidgetFormTemplate, aboutWidgetFormDest);
   out << "Copied about widget form template to " << aboutWidgetFormDest << endl;
 
   QString setupWidgetHeaderTemplate = templatesPath() + "setupwidgettemplate.h";
-  QString setupWidgetHeaderDest = formsPath(pluginName) + pluginName.toLower() + "setupwidget.h";
+  QString setupWidgetHeaderDest = formsPath(params.m_name) + params.m_setupWidgetHeaderFileName;
   copyFile(setupWidgetHeaderTemplate, setupWidgetHeaderDest);
   out << "Copied setup widget header template to " << setupWidgetHeaderDest << endl;
 
   QString setupWidgetSourceTemplate = templatesPath() + "setupwidgettemplate.cpp";
-  QString setupWidgetSourceDest = formsPath(pluginName) + pluginName.toLower() + "setupwidget.cpp";
+  QString setupWidgetSourceDest = formsPath(params.m_name) + params.m_setupWidgetSourceFileName;
   copyFile(setupWidgetSourceTemplate, setupWidgetSourceDest);
   out << "Copied setup widget source template to " << setupWidgetSourceDest << endl;
 
   QString setupWidgetFormTemplate = templatesPath() + "setupwidgettemplate.ui";
-  QString setupWidgetFormDest = formsPath(pluginName) + pluginName.toLower() + "setupwidget.ui";
+  QString setupWidgetFormDest = formsPath(params.m_name) + params.m_setupWidgetFormFileName;
   copyFile(setupWidgetFormTemplate, setupWidgetFormDest);
   out << "Copied setup widget form template to " << setupWidgetFormDest << endl;
 }
@@ -150,4 +151,39 @@ void PluginCreator::copyFile(QString from, QString to) {
         "Unable to copy file " + from.toStdString() + " to " +
         to.toStdString() + ".\n Does a file with the same name already exist?");
   }
+}
+
+void PluginCreator::fillTemplates(PluginParams &params){
+   QStringList nameFilters;
+
+   QDir rootDir(srcPath(params.m_name));
+   QFileInfoList srcFiles = rootDir.entryInfoList(nameFilters, QDir::Files);
+
+   QDir formsDir(formsPath(params.m_name));
+   QFileInfoList formFiles = formsDir.entryInfoList(nameFilters, QDir::Files);
+
+   for (QFileInfo info : formFiles + srcFiles) {
+       QFile file(info.absoluteFilePath());
+       fillSingleTemplate(file, params);
+   }
+}
+
+void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
+    if (!file.exists()) {
+        throw std::invalid_argument("File named: " + file.fileName().toStdString() +
+                                    " could not be found!");
+    }
+    const bool success = file.open(QIODevice::ReadWrite | QIODevice::Text);
+    if (!success) {
+        QString filename = file.fileName();
+        QString problem = file.errorString();
+        throw std::runtime_error("Unable to open file: " + filename.toStdString() +
+                                 "\nError: " + problem.toStdString());
+    }
+
+    QByteArray templateText = file.readAll();
+    templateText.replace("{{author}}", "Erik D Mopperson");
+    file.resize(0);
+    file.write(templateText);
+    file.close();
 }

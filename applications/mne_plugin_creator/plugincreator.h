@@ -19,8 +19,10 @@ public:
 protected:
   void createFolderStructure(QString pluginName);
   void createDirectory(QString path);
-  void copyTemplates(QString pluginName);
+  void copyTemplates(PluginParams &params);
   void copyFile(QString from, QString to);
+  void fillTemplates(PluginParams &params);
+  void fillSingleTemplate(QFile &file, PluginParams &params);
 
   QString pluginsPath();
   QString srcPath(QString pluginName);
