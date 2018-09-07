@@ -70,6 +70,11 @@ void PluginCreator::copyTemplates(QString pluginName) {
   copyFile(headerTemplate, headerDest);
   out << "Copied header template to " << headerDest << endl;
 
+  QString sourceTemplate = templatesPath() + "sourcetemplate.cpp";
+  QString sourceDest = srcPath(pluginName) + pluginName.toLower() + ".cpp";
+  copyFile(sourceTemplate, sourceDest);
+  out << "Copied source template to " << sourceDest << endl;
+
   QString jsonTemplate = templatesPath() + "template.json";
   QString jsonDest = srcPath(pluginName) + pluginName.toLower() + ".json";
   copyFile(jsonTemplate, jsonDest);
