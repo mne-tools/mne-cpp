@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{setup_widget_header_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the {{setup_widget_name}} class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef {{setup_widget_header_define}}
+#define {{setup_widget_header_define}}
 
 
 //*************************************************************************************************************
@@ -42,9 +43,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummysetup.h"
-#include "dummyaboutwidget.h"
-#include "../dummytoolbox.h"
+#include "../ui_{{setup_widget_header_filename}}"
+#include "{{about_widget_header_filename}}"
+#include "../{{header_filename}}"
 
 
 //*************************************************************************************************************
@@ -57,10 +58,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE {{namespace}}
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+namespace {{namespace}}
 {
 
 
@@ -69,16 +70,16 @@ namespace DUMMYTOOLBOXPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DummyToolbox;
+class {{name}};
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS {{setup_widget_name}}
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The {{setup_widget_name}} class provides the {{name}} configuration window.
 */
-class DummySetupWidget : public QWidget
+class {{setup_widget_name}} : public QWidget
 {
     Q_OBJECT
 
@@ -86,19 +87,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Constructs a {{setup_widget_name}} which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] toolbox a pointer to the corresponding {{name}}.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, {{setup_widget_name}} becomes a child window inside parent. {{setup_widget_name}} is deleted when its parent is deleted.
     */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    {{setup_widget_name}}({{name}}* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the {{setup_widget_name}}.
+    * All {{setup_widget_name}}'s children are deleted first. The application exits if {{setup_widget_name}} is the main widget.
     */
-    ~DummySetupWidget();
+    ~{{setup_widget_name}}();
 
 
 private slots:
@@ -111,11 +112,11 @@ private slots:
 
 private:
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    {{name}}* m_pToolbox;	/**< Holds a pointer to corresponding {{name}}.*/
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    Ui::{{setup_widget_name}} ui;	/**< Holds the user interface for the {{setup_widget_name}}.*/
 };
 
 } // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // {{setup_widget_header_define}}

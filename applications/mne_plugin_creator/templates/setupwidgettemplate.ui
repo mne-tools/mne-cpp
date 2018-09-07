@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DummySetupWidgetClass</class>
- <widget class="QWidget" name="DummySetupWidgetClass">
+ <class>{{setup_widget_name}}</class>
+ <widget class="QWidget" name="{{setup_widget_name}}">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DummySetupWidget</string>
+   <string>{{setup_widget_name}}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Dummy Toolbox Configuration</string>
+      <string>{{name}} Configuration</string>
      </property>
     </widget>
    </item>

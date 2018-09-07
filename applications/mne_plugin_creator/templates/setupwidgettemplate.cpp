@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{setup_widget_source_filename}}
+* @author   {{author}}, <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the DummySetupWidget class.
+* @brief    Definition of the {{setup_widget_name}} class.
 *
 */
 
@@ -38,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummysetupwidget.h"
+#include "{{setup_widget_header_filename}}"
 
 
 //*************************************************************************************************************
@@ -54,7 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DUMMYTOOLBOXPLUGIN;
+using namespace {{namespace}};
 
 
 //*************************************************************************************************************
@@ -62,9 +63,9 @@ using namespace DUMMYTOOLBOXPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
+{{setup_widget_name}}::{{setup_widget_name}}({{name}}* toolbox, QWidget *parent)
 : QWidget(parent)
-, m_pDummyToolbox(toolbox)
+, m_pToolbox(toolbox)
 {
     ui.setupUi(this);
 
@@ -75,7 +76,7 @@ DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
 
 //*************************************************************************************************************
 
-DummySetupWidget::~DummySetupWidget()
+{{setup_widget_name}}::~{{setup_widget_name}}()
 {
 
 }
@@ -83,8 +84,8 @@ DummySetupWidget::~DummySetupWidget()
 
 //*************************************************************************************************************
 
-void DummySetupWidget::showAboutDialog()
+void {{setup_widget_name}}::showAboutDialog()
 {
-    DummyAboutWidget aboutDialog(this);
+    {{about_widget_name}} aboutDialog(this);
     aboutDialog.exec();
 }
