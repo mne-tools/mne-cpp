@@ -92,7 +92,7 @@ using namespace IOBUFFER;
 
 NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
-, m_iDownSample(3)
+, m_iDownSample(1)
 , m_iNumberAverages(10)
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
@@ -137,7 +137,7 @@ void NeuronalConnectivity::init()
 
     m_pRTEVSInput = PluginInputData<RealTimeEvokedSet>::create(this, "NeuronalConnectivityInSensorEvoked", "NeuronalConnectivity evoked input data");
     connect(m_pRTEVSInput.data(), &PluginInputConnector::notify, this,
-            &NeuronalConnectivity::updateRTE, Qt::DirectConnection);
+            &NeuronalConnectivity::updateRTEV, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTEVSInput);
 
     // Output
@@ -376,16 +376,22 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
 //*************************************************************************************************************
 
-void NeuronalConnectivity::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
+void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>();
+    QSharedPointer<RealTimeEvokedSet> pRTEV = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
-    if(pRTES) {
+    if(pRTEV) {
+        FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
+
+        if(!pFiffEvokedSet) {
+            return;
+        }
+
         //Fiff Information of the evoked
-        if(!m_pFiffInfo && pRTES->getValue()->evoked.size() > 0) {
-            for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
-                if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
-                    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
+        if(!m_pFiffInfo && pFiffEvokedSet->evoked.size() > 0) {
+            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->evoked.at(i).info));
 
                     //Set 3D sensor surface for visualization
                     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
@@ -431,33 +437,31 @@ void NeuronalConnectivity::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
                     m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
                 }
             }
-        }
+        } else if (m_pFiffInfo) {
+            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                qDebug()<<"NeuronalConnectivity::updateRTEV - pFiffEvokedSet->evoked.at(i).comment"<<pFiffEvokedSet->evoked.at(i).comment;
+                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                    MatrixXd data;
+                    QList<MatrixXd> epochDataList;
 
-        FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
+                    const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
+                    data.resize(m_chIdx.size(), t_mat.cols());
 
-        for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-            //qDebug()<<""<<m_sAvrType;
-            if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
-                MatrixXd data;
-                QList<MatrixXd> epochDataList;
+                    for(qint32 j = 0; j < m_chIdx.size(); ++j)
+                    {
+                        data.row(j) = t_mat.row(m_chIdx.at(j));
+                    }
 
-                const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
-                data.resize(m_chIdx.size(), t_mat.cols());
+                    epochDataList.append(data);
 
-                for(qint32 j = 0; j < m_chIdx.size(); ++j)
-                {
-                    data.row(j) = t_mat.row(m_chIdx.at(j));
-                }
+                    m_connectivitySettings.m_matDataList << epochDataList;
 
-                epochDataList.append(data);
+                    m_timer.restart();
+                    m_pRtConnectivity->append(m_connectivitySettings);
 
-                m_connectivitySettings.m_matDataList << epochDataList;
-
-                m_timer.restart();
-                m_pRtConnectivity->append(m_connectivitySettings);
-
-                if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
-                    m_connectivitySettings.m_matDataList.removeFirst();
+                    if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
+                        m_connectivitySettings.m_matDataList.removeFirst();
+                    }
                 }
             }
         }

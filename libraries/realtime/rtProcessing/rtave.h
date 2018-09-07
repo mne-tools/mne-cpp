@@ -348,14 +348,17 @@ private:
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;         /**< The Circular Raw Matrix Buffer. */
 
+    QStringList                                     m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
+
 signals:
     //=========================================================================================================
     /**
     * Signal which is emitted when new evoked stimulus data are available.
     *
-    * @param[out] p_pEvokedStimSet     The evoked stimulus data set
+    * @param[in] p_pEvokedStimSet          The evoked stimulus data set.
+    * @param[in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    void evokedStim(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedStimSet);
+    void evokedStim(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedStimSet, const QStringList& lResponsibleTriggerTypes);
 };
 
 //*************************************************************************************************************

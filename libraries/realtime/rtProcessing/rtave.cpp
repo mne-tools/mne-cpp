@@ -140,7 +140,7 @@ RtAve::~RtAve()
 //*************************************************************************************************************
 
 void RtAve::append(const MatrixXd &p_DataSegment)
-{    
+{
     // ToDo handle change buffersize
     if(!m_pRawMatrixBuffer) {
         QMutexLocker locker(&m_qMutex);
@@ -362,6 +362,8 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
     }
 
     //Do averaging for each trigger type
+    bool bEmitEvoked = false;
+
     QMutableMapIterator<double,bool> idx(m_mapFillingBackBuffer);
     while(idx.hasNext()) {
         idx.next();
@@ -389,9 +391,9 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                 //Calculate the final average/evoked data
                 generateEvoked(dTriggerType);
 
-                //If number of averages was reached emit new average
-                if(m_mapStimAve[dTriggerType].size() > 0) {
-                    emit evokedStim(m_pStimEvokedSet);
+                if(m_mapStimAve[dTriggerType].size() >= m_iNumAverages) {
+                    bEmitEvoked = true;
+                    m_lResponsibleTriggerTypes << QString::number(dTriggerType);
                 }
 
                 m_mapFillingBackBuffer[dTriggerType] = false;
@@ -452,6 +454,12 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                 }
             }
         }
+    }
+
+    //If one of the trigger types scheduled a new signal emit
+    if(bEmitEvoked) {
+        emit evokedStim(m_pStimEvokedSet, m_lResponsibleTriggerTypes);
+        m_lResponsibleTriggerTypes.clear();
     }
 
     //qDebug()<<"RtAve::doAveraging() - time for procesing"<<time.elapsed();
@@ -674,7 +682,7 @@ void RtAve::generateEvoked(double dTriggerType)
     }
 
     //Init evoked
-    FiffEvoked evoked;    
+    FiffEvoked evoked;
     int iEvokedIdx = -1;
 
     for(int i = 0; i < m_pStimEvokedSet->evoked.size(); ++i) {
