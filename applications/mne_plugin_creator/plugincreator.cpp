@@ -54,6 +54,11 @@ void PluginCreator::createDirectory(QString path) {
 void PluginCreator::copyTemplates(QString pluginName) {
   out << "Copying templates into the new directories...";
 
+  QString globalsTemplate = "./templates/template_global.h";
+  QString globalsDest = srcPath(pluginName) + "/" + pluginName.toLower() + "_global.h";
+  copyFile(globalsTemplate, globalsDest);
+  out << "Copied globals header template to " << globalsDest << endl;
+
   QString headerTemplate = "./templates/headertemplate.h";
   QString headerDest = srcPath(pluginName) + "/" + pluginName.toLower() + ".h";
   copyFile(headerTemplate, headerDest);
