@@ -126,6 +126,21 @@ void PluginCreator::copyTemplates(QString pluginName) {
   QString aboutWidgetFormDest = formsPath(pluginName) + pluginName.toLower() + "aboutwidget.ui";
   copyFile(aboutWidgetFormTemplate, aboutWidgetFormDest);
   out << "Copied about widget form template to " << aboutWidgetFormDest << endl;
+
+  QString setupWidgetHeaderTemplate = templatesPath() + "setupwidgettemplate.h";
+  QString setupWidgetHeaderDest = formsPath(pluginName) + pluginName.toLower() + "setupwidget.h";
+  copyFile(setupWidgetHeaderTemplate, setupWidgetHeaderDest);
+  out << "Copied setup widget header template to " << setupWidgetHeaderDest << endl;
+
+  QString setupWidgetSourceTemplate = templatesPath() + "setupwidgettemplate.cpp";
+  QString setupWidgetSourceDest = formsPath(pluginName) + pluginName.toLower() + "setupwidget.cpp";
+  copyFile(setupWidgetSourceTemplate, setupWidgetSourceDest);
+  out << "Copied setup widget source template to " << setupWidgetSourceDest << endl;
+
+  QString setupWidgetFormTemplate = templatesPath() + "setupwidgettemplate.ui";
+  QString setupWidgetFormDest = formsPath(pluginName) + pluginName.toLower() + "setupwidget.ui";
+  copyFile(setupWidgetFormTemplate, setupWidgetFormDest);
+  out << "Copied setup widget form template to " << setupWidgetFormDest << endl;
 }
 
 void PluginCreator::copyFile(QString from, QString to) {
