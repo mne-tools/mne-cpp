@@ -45,6 +45,8 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,35 +94,39 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
     }
     bool doProj = true;
 
-    finalResult.mu /= (float)inputData.iSamples;
-    computedCov.data.array() -= inputData.iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
-    computedCov.data.array() /= (inputData.iSamples - 1);
+    if(inputData.iSamples > 0) {
+        finalResult.mu /= (float)inputData.iSamples;
+        computedCov.data.array() -= inputData.iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
+        computedCov.data.array() /= (inputData.iSamples - 1);
 
-    computedCov.kind = FIFFV_MNE_NOISE_COV;
-    computedCov.diag = false;
-    computedCov.dim = computedCov.data.rows();
+        computedCov.kind = FIFFV_MNE_NOISE_COV;
+        computedCov.diag = false;
+        computedCov.dim = computedCov.data.rows();
 
-    //ToDo do picks
-    computedCov.names = inputData.pFiffInfo->ch_names;
-    computedCov.projs = inputData.pFiffInfo->projs;
-    computedCov.bads = inputData.pFiffInfo->bads;
-    computedCov.nfree = inputData.iSamples;
+        //ToDo do picks
+        computedCov.names = inputData.pFiffInfo->ch_names;
+        computedCov.projs = inputData.pFiffInfo->projs;
+        computedCov.bads = inputData.pFiffInfo->bads;
+        computedCov.nfree = inputData.iSamples;
 
-    // regularize noise covariance
-    computedCov = computedCov.regularize(*inputData.pFiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
+        // regularize noise covariance
+        computedCov = computedCov.regularize(*inputData.pFiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
 
-    //            qint32 samples = rawSegment.cols();
-    //            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
+        //            qint32 samples = rawSegment.cols();
+        //            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
 
-    //            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
-    //            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
-    //            noise_covariance.array() /= (samples - 1);
+        //            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
+        //            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
+        //            noise_covariance.array() /= (samples - 1);
 
-    //            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
+        //            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
 
-    //            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+        //            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+        emit resultReady(computedCov);
+    } else {
+        qDebug() << "RtCovWorker::doWork - Number of samples equals zero. Regularization not possible. Returning without result.";
+    }
 
-    emit resultReady(computedCov);
 }
 
 
@@ -208,6 +214,7 @@ void RtCov::append(const MatrixXd &matDataSegment)
         RtCovInput inputData;
         inputData.lData = m_lData;
         inputData.pFiffInfo = m_pFiffInfo;
+        inputData.iSamples = m_iSamples;
 
         emit operate(inputData);
 

@@ -195,7 +195,13 @@ public:
     * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
     * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
     */
-    MNEInverseOperator(const FiffInfo &info, const MNEForwardSolution& forward, const FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
+    MNEInverseOperator(const FiffInfo &info,
+                       const MNEForwardSolution& forward,
+                       const FiffCov& p_noise_cov,
+                       float loose = 0.2f,
+                       float depth = 0.8f,
+                       bool fixed = false,
+                       bool limit_depth_chs = true);
 
     //=========================================================================================================
     /**
