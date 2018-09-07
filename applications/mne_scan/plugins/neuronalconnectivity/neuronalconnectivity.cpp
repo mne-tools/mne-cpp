@@ -48,6 +48,7 @@
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimeevokedset.h>
 
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_bem.h>
@@ -95,6 +96,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_iNumberAverages(10)
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
+, m_sAvrType("4")
 {
 }
 
@@ -133,6 +135,12 @@ void NeuronalConnectivity::init()
             this, &NeuronalConnectivity::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
+    m_pRTEVSInput = PluginInputData<RealTimeEvokedSet>::create(this, "NeuronalConnectivityInSensorEvoked", "NeuronalConnectivity evoked input data");
+    connect(m_pRTEVSInput.data(), &PluginInputConnector::notify, this,
+            &NeuronalConnectivity::updateRTE, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTEVSInput);
+
+    // Output
     m_pRTCEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
     m_outputConnectors.append(m_pRTCEOutput);
     m_pRTCEOutput->data()->setName(this->getName());
@@ -361,6 +369,97 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
         if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
             m_connectivitySettings.m_matDataList.removeFirst();
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
+{
+    QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>();
+
+    if(pRTES) {
+        //Fiff Information of the evoked
+        if(!m_pFiffInfo && pRTES->getValue()->evoked.size() > 0) {
+            for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
+                if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
+                    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
+
+                    //Set 3D sensor surface for visualization
+                    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+                    MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
+                    m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
+                    m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
+
+                    //Generate node vertices
+                    bool bPick = false;
+                    qint32 unit;
+                    int counter = 0;
+                    QString sChType = "mag";
+
+                    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+                        unit = m_pFiffInfo->chs.at(i).unit;
+
+                        if(unit == FIFF_UNIT_T_M &&
+                            sChType == "grad") {
+                            bPick = true;
+                        } else if(unit == FIFF_UNIT_T &&
+                                    sChType == "mag") {
+                            bPick = true;
+                        } else if (unit == FIFF_UNIT_V &&
+                                    sChType == "eeg") {
+                            bPick = true;
+                        }
+
+                        if(bPick) {
+                            //Get the positions
+                            m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
+                            m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
+                            m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
+                            m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
+
+                            m_chIdx << i;
+                            counter++;
+                        }
+
+                        bPick = false;
+                    }
+
+                    //Set node 3D positions to connectivity settings
+                    m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
+                }
+            }
+        }
+
+        FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
+
+        for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+            //qDebug()<<""<<m_sAvrType;
+            if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                MatrixXd data;
+                QList<MatrixXd> epochDataList;
+
+                const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
+                data.resize(m_chIdx.size(), t_mat.cols());
+
+                for(qint32 j = 0; j < m_chIdx.size(); ++j)
+                {
+                    data.row(j) = t_mat.row(m_chIdx.at(j));
+                }
+
+                epochDataList.append(data);
+
+                m_connectivitySettings.m_matDataList << epochDataList;
+
+                m_timer.restart();
+                m_pRtConnectivity->append(m_connectivitySettings);
+
+                if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
+                    m_connectivitySettings.m_matDataList.removeFirst();
+                }
+            }
         }
     }
 }
