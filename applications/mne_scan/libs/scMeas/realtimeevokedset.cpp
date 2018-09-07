@@ -149,7 +149,6 @@ void RealTimeEvokedSet::setValue(FiffEvokedSet& v,
     m_qMutex.lock();
     *m_pFiffEvokedSet = v;
     m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
-    qDebug() << "m_lResponsibleTriggerTypes" << m_lResponsibleTriggerTypes;
     m_qMutex.unlock();
 
     if(!m_bInitialized)

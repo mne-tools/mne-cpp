@@ -382,8 +382,9 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     if(pRTEV) {
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
+        QStringList lResponsibleTriggerTypes = pRTEV->getResponsibleTriggerTypes();
 
-        if(!pFiffEvokedSet) {
+        if(!pFiffEvokedSet || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
             return;
         }
 
@@ -435,11 +436,12 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                     //Set node 3D positions to connectivity settings
                     m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
+
+                    break;
                 }
             }
         } else if (m_pFiffInfo) {
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-                qDebug()<<"NeuronalConnectivity::updateRTEV - pFiffEvokedSet->evoked.at(i).comment"<<pFiffEvokedSet->evoked.at(i).comment;
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     MatrixXd data;
                     QList<MatrixXd> epochDataList;
@@ -462,6 +464,8 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
                         m_connectivitySettings.m_matDataList.removeFirst();
                     }
+
+                    break;
                 }
             }
         }
