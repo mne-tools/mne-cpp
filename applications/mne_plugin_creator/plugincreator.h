@@ -26,6 +26,7 @@ protected:
   QString srcPath(QString pluginName);
   QString formsPath(QString pluginName);
   QString imagesPath(QString pluginName);
+  QString templatesPath();
 
   QTextStream out;
 };

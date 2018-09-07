@@ -8,22 +8,28 @@ void PluginCreator::createPlugin(PluginParams &params) {
   copyTemplates(params.m_name);
 }
 
-QString PluginCreator::pluginsPath() { return QString("../mne_scan/plugins"); }
+QString PluginCreator::pluginsPath() {
+  return "../../../mne-cpp/applications/mne_scan/plugins/";
+}
 
 QString PluginCreator::srcPath(QString pluginName) {
-  return pluginsPath() + "/" + pluginName.toLower();
+  return pluginsPath() + pluginName.toLower() + "/";
 }
 
 QString PluginCreator::formsPath(QString pluginName) {
-  return srcPath(pluginName) + "/FormFiles";
+  return srcPath(pluginName) + "FormFiles/";
 }
 
 QString PluginCreator::imagesPath(QString pluginName) {
-  return srcPath(pluginName) + "/images";
+  return srcPath(pluginName) + "images/";
+}
+
+QString PluginCreator::templatesPath(){
+  return "../../../mne-cpp/applications/mne_plugin_creator/templates/";
 }
 
 void PluginCreator::createFolderStructure(QString pluginName) {
-  out << "Attempting to created folder structure for your new plugin at "
+  out << "Attempting to create folder structure for your new plugin at "
       << QDir(srcPath(pluginName)).absolutePath() << "..." << endl;
 
   if (!QDir(pluginsPath()).exists()) {
@@ -54,13 +60,13 @@ void PluginCreator::createDirectory(QString path) {
 void PluginCreator::copyTemplates(QString pluginName) {
   out << "Copying templates into the new directories...";
 
-  QString globalsTemplate = "./templates/template_global.h";
-  QString globalsDest = srcPath(pluginName) + "/" + pluginName.toLower() + "_global.h";
+  QString globalsTemplate = templatesPath() + "template_global.h";
+  QString globalsDest = srcPath(pluginName) + pluginName.toLower() + "_global.h";
   copyFile(globalsTemplate, globalsDest);
   out << "Copied globals header template to " << globalsDest << endl;
 
-  QString headerTemplate = "./templates/headertemplate.h";
-  QString headerDest = srcPath(pluginName) + "/" + pluginName.toLower() + ".h";
+  QString headerTemplate = templatesPath() + "headertemplate.h";
+  QString headerDest = srcPath(pluginName) + pluginName.toLower() + ".h";
   copyFile(headerTemplate, headerDest);
   out << "Copied header teamplate to " << headerDest << endl;
 }
