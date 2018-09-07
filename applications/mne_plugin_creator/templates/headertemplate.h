@@ -145,7 +145,7 @@ private:
     bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
-    QSharedPointer<{{widget_name}}>                 m_pYourWidget;          /**< flag whether thread is running.*/
+    QSharedPointer<{{widget_name}}>                 m_pWidget;          /**< flag whether thread is running.*/
     QAction*                                        m_pActionShowWidget;    /**< Action for showing the widget.*/
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pBuffer;              /**< Holds incoming data.*/

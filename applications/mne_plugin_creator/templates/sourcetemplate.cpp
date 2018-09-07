@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{source_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the DummyToolbox class.
+* @brief    Definition of the {{name}} class.
 *
 */
 
@@ -38,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummytoolbox.h"
+#include "{{header_filename}}"
 
 
 //*************************************************************************************************************
@@ -46,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DUMMYTOOLBOXPLUGIN;
+using namespace {{namespace}};
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
@@ -57,25 +58,25 @@ using namespace IOBUFFER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummyToolbox::DummyToolbox()
+{{name}}::{{name}}()
 : m_bIsRunning(false)
-, m_pDummyInput(NULL)
-, m_pDummyOutput(NULL)
-, m_pDummyBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_pInput(NULL)
+, m_pOutput(NULL)
+, m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
-    m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("Your Toolbar Widget"),this);
-    m_pActionShowYourWidget->setShortcut(tr("F12"));
-    m_pActionShowYourWidget->setStatusTip(tr("Your Toolbar Widget"));
-    connect(m_pActionShowYourWidget, &QAction::triggered,
-            this, &DummyToolbox::showYourWidget);
-    addPluginAction(m_pActionShowYourWidget);
+    m_pActionShowWidget = new QAction(QIcon(":/images/options.png"), tr("{{name}} Toolbar Widget"),this);
+    m_pActionShowWidget->setShortcut(tr("F12"));
+    m_pActionShowWidget->setStatusTip(tr("{{name}} Toolbar Widget"));
+    connect(m_pActionShowWidget, &QAction::triggered,
+            this, &{{name}}::showWidget);
+    addPluginAction(m_pActionShowWidget);
 }
 
 
 //*************************************************************************************************************
 
-DummyToolbox::~DummyToolbox()
+{{name}}::~{{name}}()
 {
     if(this->isRunning())
         stop();
@@ -84,36 +85,36 @@ DummyToolbox::~DummyToolbox()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> DummyToolbox::clone() const
+QSharedPointer<IPlugin> {{name}}::clone() const
 {
-    QSharedPointer<DummyToolbox> pDummyToolboxClone(new DummyToolbox);
-    return pDummyToolboxClone;
+    QSharedPointer<{{name}}> pClone(new {{name}});
+    return pClone;
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::init()
+void {{name}}::init()
 {
     // Input
-    m_pDummyInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
-    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pDummyInput);
+    m_pInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "{{name}}In", "{{name}} input data");
+    connect(m_pInput.data(), &PluginInputConnector::notify, this, &{{name}}::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pDummyOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
-    m_outputConnectors.append(m_pDummyOutput);
+    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "{{name}}Out", "{{name}} output data");
+    m_outputConnectors.append(m_pOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pDummyBuffer.isNull())
-        m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr();
+    if(!m_pBuffer.isNull())
+        m_pBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::unload()
+void {{name}}::unload()
 {
 
 }
@@ -121,7 +122,7 @@ void DummyToolbox::unload()
 
 //*************************************************************************************************************
 
-bool DummyToolbox::start()
+bool {{name}}::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -138,14 +139,14 @@ bool DummyToolbox::start()
 
 //*************************************************************************************************************
 
-bool DummyToolbox::stop()
+bool {{name}}::stop()
 {
     m_bIsRunning = false;
 
-    m_pDummyBuffer->releaseFromPop();
-    m_pDummyBuffer->releaseFromPush();
+    m_pBuffer->releaseFromPop();
+    m_pBuffer->releaseFromPush();
 
-    m_pDummyBuffer->clear();
+    m_pBuffer->clear();
 
     return true;
 }
@@ -153,7 +154,7 @@ bool DummyToolbox::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType DummyToolbox::getType() const
+IPlugin::PluginType {{name}}::getType() const
 {
     return _IAlgorithm;
 }
@@ -161,7 +162,7 @@ IPlugin::PluginType DummyToolbox::getType() const
 
 //*************************************************************************************************************
 
-QString DummyToolbox::getName() const
+QString {{name}}::getName() const
 {
     return "Dummy Toolbox";
 }
@@ -169,40 +170,40 @@ QString DummyToolbox::getName() const
 
 //*************************************************************************************************************
 
-QWidget* DummyToolbox::setupWidget()
+QWidget* {{name}}::setupWidget()
 {
-    DummySetupWidget* setupWidget = new DummySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    {{setup_widget_name}}* setupWidget = new {{setup_widget_name}}(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void {{name}}::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized
-        if(!m_pDummyBuffer) {
-            m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        if(!m_pBuffer) {
+            m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
         }
 
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            //Init output - Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-            m_pDummyOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pDummyOutput->data()->setMultiArraySize(1);
-            m_pDummyOutput->data()->setVisibility(true);
+            //Init output - Unocmment this if you also uncommented the m_pOutput in the constructor above
+            m_pOutput->data()->initFromFiffInfo(m_pFiffInfo);
+            m_pOutput->data()->setMultiArraySize(1);
+            m_pOutput->data()->setVisibility(true);
         }
 
         MatrixXd t_mat;
 
         for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
             t_mat = pRTMSA->getMultiSampleArray()[i];
-            m_pDummyBuffer->push(&t_mat);
+            m_pBuffer->push(&t_mat);
         }
     }
 }
@@ -211,7 +212,7 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void DummyToolbox::run()
+void {{name}}::run()
 {
     //
     // Wait for Fiff Info
@@ -222,21 +223,21 @@ void DummyToolbox::run()
     while(m_bIsRunning)
     {
         //Dispatch the inputs
-        MatrixXd t_mat = m_pDummyBuffer->pop();
+        MatrixXd t_mat = m_pBuffer->pop();
 
         //ToDo: Implement your algorithm here
 
         //Send the data to the connected plugins and the online display
         //Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-        m_pDummyOutput->data()->setValue(t_mat);
+        m_pOutput->data()->setValue(t_mat);
     }
 }
 
 
 //*************************************************************************************************************
 
-void DummyToolbox::showYourWidget()
+void {{name}}::showWidget()
 {
-    m_pYourWidget = DummyYourWidget::SPtr(new DummyYourWidget());
-    m_pYourWidget->show();
+    m_pWidget = {{widget_name}}::SPtr(new {{widget_name}}());
+    m_pWidget->show();
 }
