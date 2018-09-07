@@ -115,7 +115,16 @@ public:
     NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
 protected:
+    //=========================================================================================================
+    /**
+    * Slot called when the metric changed.
+    *
+    * @param [in] sMetric        The new metric
+    */
+    void onMetricChanged(const QString &sMetric);
 
+signals:
+    void connectivityMetricChanged(const QString& sMetric);
 };
 
 } // NAMESPACE

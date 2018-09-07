@@ -40,6 +40,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "connectivitysettingsmanager.h"
+
 #include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
@@ -94,7 +96,6 @@ using namespace REALTIMELIB;
 // MAIN
 //=============================================================================================================
 
-
 //=============================================================================================================
 /**
 * The function main marks the entry point of the program.
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "./MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
@@ -442,14 +443,22 @@ int main(int argc, char *argv[])
     }
 
     //Do connectivity estimation and visualize results
-    ConnectivitySettings settings;
-    settings.m_sConnectivityMethods << sConnectivityMethod;
-    settings.m_matDataList = matDataList;
-    settings.m_matNodePositions = matNodePositions;
-    settings.m_iNfft = -1;
-    settings.m_sWindowType = "hanning";
+    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create();
+
+    pConnectivitySettingsManager->m_settings.m_sConnectivityMethods << sConnectivityMethod;
+    pConnectivitySettingsManager->m_settings.m_matDataList = matDataList;
+    pConnectivitySettingsManager->m_settings.m_matNodePositions = matNodePositions;
+    pConnectivitySettingsManager->m_settings.m_iNfft = -1;
+    pConnectivitySettingsManager->m_settings.m_sWindowType = "hanning";
 
     NetworkView tNetworkView;
+    tNetworkView.show();
+
+    QObject::connect(&tNetworkView, &NetworkView::connectivityMetricChanged,
+                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
+
+    QObject::connect(pConnectivitySettingsManager->m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
+                     &tNetworkView, &NetworkView::addData);
 
     if(bDoSourceLoc) {
         if(bDoClust) {
@@ -459,13 +468,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    RtConnectivity::SPtr pRtConnectivity = RtConnectivity::SPtr::create();
-    QObject::connect(pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
-                     &tNetworkView, &NetworkView::addData);
-
-    pRtConnectivity->append(settings);
-
-    tNetworkView.show();
+    pConnectivitySettingsManager->m_pRtConnectivity->append(pConnectivitySettingsManager->m_settings);
 
     return a.exec();
 }

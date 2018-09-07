@@ -85,6 +85,7 @@ SOURCES += \
         main.cpp \
 
 HEADERS += \
+    connectivitysettingsmanager.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

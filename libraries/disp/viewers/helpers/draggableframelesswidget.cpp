@@ -69,9 +69,13 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DraggableFramelessWidget::DraggableFramelessWidget(QWidget *parent, Qt::WindowFlags flags, bool bRoundEdges)
+DraggableFramelessWidget::DraggableFramelessWidget(QWidget *parent,
+                                                   Qt::WindowFlags flags,
+                                                   bool bRoundEdges,
+                                                   bool bDraggable)
 : QWidget(parent, flags)
 , m_bRoundEdges(bRoundEdges)
+, m_bDraggable(bDraggable)
 {
     this->adjustSize();
 }
@@ -88,6 +92,10 @@ DraggableFramelessWidget::~DraggableFramelessWidget()
 
 void DraggableFramelessWidget::mousePressEvent(QMouseEvent *event)
 {
+    if(!m_bDraggable) {
+        return QWidget::mousePressEvent(event);
+    }
+
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
         event->accept();
@@ -99,6 +107,10 @@ void DraggableFramelessWidget::mousePressEvent(QMouseEvent *event)
 
 void DraggableFramelessWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    if(!m_bDraggable) {
+        return QWidget::mouseMoveEvent(event);
+    }
+
     if (event->buttons() & Qt::LeftButton) {
         move(event->globalPos() - m_dragPosition);
         event->accept();
