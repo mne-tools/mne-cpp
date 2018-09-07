@@ -418,30 +418,41 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
+    if(!pRTES) {
+        return;
+    }
+
     QMutexLocker locker(&m_qMutex);
-    //MEG
-    if(pRTES && m_bReceiveData)
-    {
-        //Fiff Information of the evoked
-        if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
-            for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
-                if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
-                    m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
-                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
-                }
+
+    if(!m_bReceiveData || !pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
+        return;
+    }
+
+    QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+
+    //Fiff Information of the evoked
+    if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
+        for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
+            if(pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
+                m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
+                m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                break;
             }
         }
+    }
 
-        if(m_bProcessData) {
-            FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
+    if(m_bProcessData) {
+        FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
-            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-                //qDebug()<<""<<m_sAvrType;
-                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
-                    //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
-                    m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
-                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
-                }
+        for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+            //qDebug()<<""<<m_sAvrType;
+            if(pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
+                //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
+                m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
+                m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                break;
             }
         }
     }
