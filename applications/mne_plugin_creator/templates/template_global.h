@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
-* @file     {{global_header_name}}
-* @author   {{author}}
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     {{global_header_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     {{month}}, {{year}}
