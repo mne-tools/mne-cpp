@@ -1,8 +1,9 @@
 #include "pluginparams.h"
 
 
-  PluginParams::PluginParams(QString name, QString author, QString nameSpace) {
+  PluginParams::PluginParams(QString name, QString nameSpace, QString author, QString email) {
       m_name = name;
+      m_email = email;
       m_author = author;
       m_namespace = nameSpace;
       m_proFileName = baseFileName() + ".pro";
@@ -22,6 +23,7 @@
       m_globalHeaderDefine = baseDefine() + "_GLOBAL_H";
       m_libraryDefine = baseDefine() + "_LIBRARY";
       m_exportDefine = baseDefine() + "SHARED_EXPORT";
+      m_headerDefine = baseDefine() + "_H";
   }
 
  QString PluginParams::baseFileName() {

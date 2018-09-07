@@ -183,18 +183,19 @@ void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
     }
 
     QDate date = QDate::currentDate();
-    QByteArray templateText = file.readAll();
+    QByteArray text = file.readAll();
 
-    templateText.replace("{{author}}", params.m_author.toUtf8());
-    templateText.replace("{{month}}", date.toString("MMMM").toUtf8());
-    templateText.replace("{{year}}", date.toString("yyyy").toUtf8());
-    templateText.replace("{{name}}", params.m_name.toUtf8());
-    templateText.replace("{{global_header_name}}", params.m_globalsFileName.toUtf8());
-    templateText.replace("{{header_define}}", params.m_globalHeaderDefine.toUtf8());
-    templateText.replace("{{library_define}}", params.m_defineLibraryName.toUtf8());
-    templateText.replace("{{export_define}}", params.m_defineExportName.toUtf8());
+    text.replace("{{author}}", params.m_author.toUtf8());
+    text.replace("{{author_email}}", params.m_email.toUtf8());
+    text.replace("{{month}}", date.toString("MMMM").toUtf8());
+    text.replace("{{year}}", date.toString("yyyy").toUtf8());
+    text.replace("{{name}}", params.m_name.toUtf8());
+    text.replace("{{global_header_name}}", params.m_globalsFileName.toUtf8());
+    text.replace("{{header_define}}", params.m_globalHeaderDefine.toUtf8());
+    text.replace("{{library_define}}", params.m_libraryDefine.toUtf8());
+    text.replace("{{export_define}}", params.m_exportDefine.toUtf8());
 
     file.resize(0);
-    file.write(templateText);
+    file.write(text);
     file.close();
 }

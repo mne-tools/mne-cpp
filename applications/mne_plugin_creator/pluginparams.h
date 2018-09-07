@@ -6,6 +6,7 @@
 struct PluginParams {
   QString m_name;
   QString m_author;
+  QString m_email;
   QString m_namespace;
 
   QString m_proFileName;
@@ -30,8 +31,9 @@ struct PluginParams {
   QString m_globalHeaderDefine;
   QString m_libraryDefine;
   QString m_exportDefine;
+  QString m_headerDefine;
 
-  PluginParams(QString name, QString author, QString nameSpace);
+  PluginParams(QString name, QString nameSpace, QString author, QString email);
   QString baseFileName();
   QString baseDefine();
 };
