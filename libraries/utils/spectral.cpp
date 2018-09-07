@@ -78,8 +78,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 MatrixXcd Spectral::computeTaperedSpectraRow(const RowVectorXd &vecData,
-                                          const MatrixXd &matTaper,
-                                          int iNfft)
+                                             const MatrixXd &matTaper,
+                                             int iNfft)
 {
     //qDebug() << "Spectral::computeTaperedSpectra Matrixwise";
     FFT<double> fft;
@@ -107,30 +107,34 @@ MatrixXcd Spectral::computeTaperedSpectraRow(const RowVectorXd &vecData,
 //*************************************************************************************************************
 
 QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData,
-                                                   const MatrixXd &matTaper,
-                                                   int iNfft,
-                                                   bool bUseMultithread)
+                                                         const MatrixXd &matTaper,
+                                                         int iNfft,
+                                                         bool bUseMultithread)
 {
     //qDebug() << "Spectral::computeTaperedSpectra Rowise";
 
-    QList<TaperedSpectraInputData> lData;
-    for (int i = 0; i < matData.rows(); ++i) {
-        TaperedSpectraInputData dataTemp;
-        dataTemp.vecData = matData.row(i);
-        dataTemp.matTaper = matTaper;
-        dataTemp.iNfft = iNfft;
-
-        lData.append(dataTemp);
-    }
-
-    // Sequential
     QVector<MatrixXcd> finalResult;
 
     if(!bUseMultithread) {
-        for (int i = 0; i < lData.length(); ++i) {
-            reduce(finalResult, compute(lData.at(i)));
+        // Sequential
+        for (int i = 0; i < matData.rows(); ++i) {
+            finalResult.append(computeTaperedSpectraRow(matData.row(i),
+                                                        matTaper,
+                                                        iNfft));
         }
     } else {
+        // Parallel
+        QList<TaperedSpectraInputData> lData;
+        TaperedSpectraInputData dataTemp;
+        dataTemp.matTaper = matTaper;
+        dataTemp.iNfft = iNfft;
+
+        for (int i = 0; i < matData.rows(); ++i) {
+            dataTemp.vecData = matData.row(i);
+
+            lData.append(dataTemp);
+        }
+
         QFuture<QVector<MatrixXcd> > result = QtConcurrent::mappedReduced(lData,
                                                                           compute,
                                                                           reduce,
