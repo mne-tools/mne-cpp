@@ -19,8 +19,15 @@
       m_setupWidgetHeaderFileName = baseFileName() + "setupwidget.h";
       m_setupWidgetSourceFileName = baseFileName() + "setupwidget.cpp";
       m_setupWidgetFormFileName = baseFileName() + "setupwidget.ui";
+      m_globalHeaderDefine = baseDefine() + "_GLOBAL_H";
+      m_defineLibraryName = baseDefine() + "_LIBRARY";
+      m_defineExportName = baseDefine() + "SHARED_EXPORT";
   }
 
  QString PluginParams::baseFileName() {
     return m_name.toLower();
+ }
+
+ QString PluginParams::baseDefine() {
+     return m_name.toUpper();
  }
