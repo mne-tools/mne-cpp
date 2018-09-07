@@ -172,7 +172,7 @@ public:
     *
     * @param[in] pMeasurement   The evoked to be appended
     */
-    void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================

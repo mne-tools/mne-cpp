@@ -245,9 +245,11 @@ public:
     /**
     * Append new FiffEvokedSet to the buffer
     *
-    * @param[in] p_pEvokedSet     the new FiffEvokedSet
+    * @param[in] p_pEvokedSet               the new FiffEvokedSet
+    * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet);
+    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet,
+                      const QStringList &lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -273,7 +275,7 @@ private:
     */
     void initConnector();
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;                 /**< Holds incoming data.*/
@@ -287,7 +289,7 @@ private:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
     QList<qint32>                                   m_qListStimChs;                     /**< Stimulus channels.*/
 
-    REALTIMELIB::RtAve::SPtr                    m_pRtAve;                           /**< Real-time average. */
+    REALTIMELIB::RtAve::SPtr                    m_pRtAve;                               /**< Real-time average. */
 
     bool                                            m_bIsRunning;                       /**< If this thread is running. */
     bool                                            m_bProcessData;                     /**< If data should be received for processing. */
@@ -313,14 +315,7 @@ private:
 
     QAction*                                        m_pActionShowAdjustment;            /**< The action triggering the averaging settings window. */
 
-#ifdef DEBUG_AVERAGING
-    //
-    // TEST
-    //
-    qint32 m_iTestStimCh;
-    qint32 m_iTestCount;
-    qint32 m_iTestCount2;
-#endif
+    QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
 signals:
     //=========================================================================================================
