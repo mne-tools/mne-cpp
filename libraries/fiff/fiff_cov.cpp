@@ -83,7 +83,7 @@ FiffCov::FiffCov()
 , dim(-1)
 , nfree(-1)
 {
-    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
@@ -107,7 +107,7 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
     if(!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
         printf("\tFiff covariance not found.\n");//ToDo Throw here
 
-    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
@@ -127,7 +127,7 @@ FiffCov::FiffCov(const FiffCov &p_FiffCov)
 , eig(p_FiffCov.eig)
 , eigvec(p_FiffCov.eigvec)
 {
-    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 

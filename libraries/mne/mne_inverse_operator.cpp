@@ -114,7 +114,13 @@ MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 
 //*************************************************************************************************************
 
-MNEInverseOperator::MNEInverseOperator(const FiffInfo &info, const MNEForwardSolution& forward, const FiffCov& p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
+MNEInverseOperator::MNEInverseOperator(const FiffInfo &info,
+                                       const MNEForwardSolution& forward,
+                                       const FiffCov& p_noise_cov,
+                                       float loose,
+                                       float depth,
+                                       bool fixed,
+                                       bool limit_depth_chs)
 {
     *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
     qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
@@ -693,7 +699,13 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 
 //*************************************************************************************************************
 
-MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov &p_noise_cov, float loose, float depth, bool fixed, bool limit_depth_chs)
+MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info,
+                                                             MNEForwardSolution forward,
+                                                             const FiffCov &p_noise_cov,
+                                                             float loose,
+                                                             float depth,
+                                                             bool fixed,
+                                                             bool limit_depth_chs)
 {
     bool is_fixed_ori = forward.isFixedOrient();
     MNEInverseOperator p_MNEInverseOperator;
