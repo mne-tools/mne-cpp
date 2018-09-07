@@ -133,7 +133,6 @@ RtConnectivity::~RtConnectivity()
 
 void RtConnectivity::append(const ConnectivitySettings& connectivitySettings)
 {
-    qDebug() << "RtConnectivity::append - number trials" << connectivitySettings.m_matDataList.size();
     emit operate(connectivitySettings);
 }
 

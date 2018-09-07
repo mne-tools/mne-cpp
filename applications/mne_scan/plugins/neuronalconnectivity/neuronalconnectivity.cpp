@@ -92,6 +92,7 @@ using namespace IOBUFFER;
 NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
 , m_iDownSample(3)
+, m_iNumberAverages(10)
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 {
@@ -270,9 +271,14 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
              epochDataList.append(pRTSE->getValue()[i]->data);
         }
 
-        m_connectivitySettings.m_matDataList = epochDataList;
+        m_connectivitySettings.m_matDataList << epochDataList;
 
+        m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
+
+        if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
+            m_connectivitySettings.m_matDataList.removeFirst();
+        }
     }
 }
 
@@ -348,10 +354,14 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             epochDataList.append(data);
         }
 
-        m_connectivitySettings.m_matDataList = epochDataList;
+        m_connectivitySettings.m_matDataList << epochDataList;
 
         m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
+
+        if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
+            m_connectivitySettings.m_matDataList.removeFirst();
+        }
     }
 }
 

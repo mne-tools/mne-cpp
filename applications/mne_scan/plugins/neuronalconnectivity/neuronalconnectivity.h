@@ -197,10 +197,11 @@ protected:
     void onWindowTypeChanged(const QString& windowType);
 
 private:
-    bool                m_bIsRunning;       /**< Flag whether thread is running.*/
-    qint32              m_iDownSample;      /**< Sampling rate. */
-    QString             m_sAtlasDir;        /**< File to Atlas. */
-    QString             m_sSurfaceDir;      /**< File to Surface. */
+    bool                m_bIsRunning;           /**< Flag whether thread is running.*/
+    qint32              m_iDownSample;          /**< Sampling rate. */
+    qint32              m_iNumberAverages;      /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
+    QString             m_sAtlasDir;            /**< File to Atlas. */
+    QString             m_sSurfaceDir;          /**< File to Surface. */
 
     QMutex              m_mutex;
 
