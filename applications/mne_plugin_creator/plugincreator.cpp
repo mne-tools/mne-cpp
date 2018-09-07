@@ -24,6 +24,10 @@ QString PluginCreator::imagesPath(QString pluginName) {
   return srcPath(pluginName) + "images/";
 }
 
+QString PluginCreator::iconsPath(QString pluginName){
+  return imagesPath(pluginName) + "icons/";
+}
+
 QString PluginCreator::templatesPath(){
   return "../../../mne-cpp/applications/mne_plugin_creator/templates/";
 }
@@ -46,6 +50,9 @@ void PluginCreator::createFolderStructure(QString pluginName) {
 
   createDirectory(imagesPath(pluginName));
   out << "Created images folder at " << imagesPath(pluginName) << endl;
+
+  createDirectory(iconsPath(pluginName));
+  out << "Created icons folder at " << iconsPath(pluginName) << endl;
 }
 
 void PluginCreator::createDirectory(QString path) {
@@ -69,6 +76,11 @@ void PluginCreator::copyTemplates(QString pluginName) {
   QString jsonDest = srcPath(pluginName) + pluginName.toLower() + ".json";
   copyFile(jsonTemplate, jsonDest);
   out << "Copied json template to " << jsonDest << endl;
+
+  QString optionsImage = templatesPath() + "options.png";
+  QString optionsDest = iconsPath(pluginName) + "options.png";
+  copyFile(optionsImage, optionsDest);
+  out << "Copied options icon to " << optionsDest << endl;
 
   QString globalsTemplate = templatesPath() + "template_global.h";
   QString globalsDest = srcPath(pluginName) + pluginName.toLower() + "_global.h";
