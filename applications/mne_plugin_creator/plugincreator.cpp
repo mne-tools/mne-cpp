@@ -58,12 +58,17 @@ void PluginCreator::createDirectory(QString path) {
 }
 
 void PluginCreator::copyTemplates(QString pluginName) {
-  out << "Copying templates into the new directories...";
+  out << "Copying templates into the new directories..." << endl;
 
   QString proTemplate = templatesPath() + "template.pro";
   QString proDestination = srcPath(pluginName) + pluginName.toLower() + ".pro";
   copyFile(proTemplate, proDestination);
   out << "Copied project template to " << proDestination << endl;
+
+  QString jsonTemplate = templatesPath() + "template.json";
+  QString jsonDest = srcPath(pluginName) + pluginName.toLower() + ".json";
+  copyFile(jsonTemplate, jsonDest);
+  out << "Copied json template to " << jsonDest << endl;
 
   QString globalsTemplate = templatesPath() + "template_global.h";
   QString globalsDest = srcPath(pluginName) + pluginName.toLower() + "_global.h";
@@ -80,10 +85,20 @@ void PluginCreator::copyTemplates(QString pluginName) {
   copyFile(sourceTemplate, sourceDest);
   out << "Copied source template to " << sourceDest << endl;
 
-  QString jsonTemplate = templatesPath() + "template.json";
-  QString jsonDest = srcPath(pluginName) + pluginName.toLower() + ".json";
-  copyFile(jsonTemplate, jsonDest);
-  out << "Copied json template to " << jsonDest << endl;
+  QString widgetHeaderTemplate = templatesPath() + "widgettemplate.h";
+  QString widgetHeaderDest = templatesPath() + pluginName.toLower() + "widget.h";
+  copyFile(widgetHeaderTemplate, widgetHeaderDest);
+  out << "Copied widget header template to " << widgetHeaderDest << endl;
+
+  QString widgetSourceTemplate = templatesPath() + "widgettemplate.cpp";
+  QString widgetSourceDest = templatesPath() + pluginName.toLower() + "widget.cpp";
+  copyFile(widgetSourceTemplate, widgetSourceDest);
+  out << "Copied widget source template to " << widgetSourceDest << endl;
+
+  QString widgetFormTemplate = templatesPath() + "widgettemplate.ui";
+  QString widgetFormDest = templatesPath() + pluginName.toLower() + "widget.ui";
+  copyFile(widgetFormTemplate, widgetFormDest);
+  out << "Copied widget form template to " << widgetFormDest << endl;
 }
 
 void PluginCreator::copyFile(QString from, QString to) {
