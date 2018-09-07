@@ -90,7 +90,7 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     emit resultReady(finalNetwork);
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
-    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed() for"<< connectivitySettings.m_sConnectivityMethods.first() <<" and" << connectivitySettings.m_matDataList.size()<< " trials:" << iTime;
+    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed() for"<< connectivitySettings.m_sConnectivityMethods.first() <<"and" << connectivitySettings.m_matDataList.size()<< "trials was" << iTime << "ms";
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
 }
