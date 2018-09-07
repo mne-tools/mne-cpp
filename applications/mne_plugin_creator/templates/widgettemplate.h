@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     {{widget_header_filename}}
+* @author   {{author}} <{{author_email}}>
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2016
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -33,15 +34,15 @@
 *
 */
 
-#ifndef DUMMYYOURWIDGET_H
-#define DUMMYYOURWIDGET_H
+#ifndef {{widget_header_define}}
+#define {{widget_header_define}}
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyyourtoolbarwidget.h"
+#include "../ui_{{widget_header_filename}}"
 
 
 //*************************************************************************************************************
@@ -54,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE {{namespace}}
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+namespace {{namespace}}
 {
 
 
@@ -73,30 +74,30 @@ namespace DUMMYTOOLBOXPLUGIN
 *
 * @brief The DummyToolbox class provides a dummy toolbar widget structure.
 */
-class DummyYourWidget : public QWidget
+class {{widget_name}} : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DummyYourWidget> SPtr;         /**< Shared pointer type for DummyYourWidget. */
-    typedef QSharedPointer<DummyYourWidget> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<{{widget_name}}> SPtr;         /**< Shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<{{widget_name}}> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
 
     //=========================================================================================================
     /**
-    * Constructs a DummyToolbox.
+    * Constructs a {{widget_name}}.
     */
-    explicit DummyYourWidget(QWidget *parent = 0);
+    explicit {{widget_name}}(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyToolbox.
+    * Destroys the {{widget_name}}.
     */
-    ~DummyYourWidget();
+    ~{{widget_name}}();
 
 private:
-    Ui::DummyYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
+    Ui::{{widget_name}}* ui;        /**< The UI class specified in the designer. */
 };
 
 }   //namespace
 
-#endif // DUMMYYOURWIDGET_H
+#endif // {{widget_header_define}}

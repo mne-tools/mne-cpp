@@ -201,6 +201,9 @@ void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
     text.replace("{{library_define}}", params.m_libraryDefine.toUtf8());
     text.replace("{{export_define}}", params.m_exportDefine.toUtf8());
     text.replace("{{header_define}}", params.m_headerDefine.toUtf8());
+    text.replace("{{widget_header_define}}", params.m_widgetHeaderDefine.toUtf8());
+    text.replace("{{setup_widget_header_define}}", params.m_setupWidgetHeaderDefine.toUtf8());
+    text.replace("{{about_widget_header_define}}", params.m_aboutWidgetHeaderDefine.toUtf8());
 
     text.replace("{{pro_filename}}", params.m_proFileName.toUtf8());
     text.replace("{{json_filename}}", params.m_jsonFileName.toUtf8());

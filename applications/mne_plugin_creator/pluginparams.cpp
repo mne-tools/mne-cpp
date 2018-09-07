@@ -28,6 +28,9 @@
       m_libraryDefine = baseDefine() + "_LIBRARY";
       m_exportDefine = baseDefine() + "SHARED_EXPORT";
       m_headerDefine = baseDefine() + "_H";
+      m_widgetHeaderDefine = baseDefine() + "WIDGET_H";
+      m_setupWidgetHeaderDefine = baseDefine() + "SETUPWIDGET_H";
+      m_aboutWidgetHeaderDefine = baseDefine() + "ABOUTWIDGET_H";
   }
 
  QString PluginParams::baseFileName() {

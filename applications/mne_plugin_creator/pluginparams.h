@@ -36,6 +36,9 @@ struct PluginParams {
   QString m_libraryDefine;
   QString m_exportDefine;
   QString m_headerDefine;
+  QString m_widgetHeaderDefine;
+  QString m_setupWidgetHeaderDefine;
+  QString m_aboutWidgetHeaderDefine;
 
   PluginParams(QString name, QString nameSpace, QString author, QString email);
   QString baseFileName();
