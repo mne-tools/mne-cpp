@@ -60,6 +60,11 @@ void PluginCreator::createDirectory(QString path) {
 void PluginCreator::copyTemplates(QString pluginName) {
   out << "Copying templates into the new directories...";
 
+  QString proTemplate = templatesPath() + "template.pro";
+  QString proDestination = srcPath(pluginName) + pluginName.toLower() + ".pro";
+  copyFile(proTemplate, proDestination);
+  out << "Copied project template to " << proDestination << endl;
+
   QString globalsTemplate = templatesPath() + "template_global.h";
   QString globalsDest = srcPath(pluginName) + pluginName.toLower() + "_global.h";
   copyFile(globalsTemplate, globalsDest);
