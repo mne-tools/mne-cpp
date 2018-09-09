@@ -1,8 +1,8 @@
 #ifndef PLUGINCREATOR_H
 #define PLUGINCREATOR_H
 
-#include <QDate>
 #include <QDir>
+#include <QRegularExpression>
 #include <QTextStream>
 
 #include <stdexcept>
@@ -24,11 +24,13 @@ protected:
   void updateProjectFile(PluginParams &params);
 
   QString pluginsPath();
+  QString folderName(QString pluginName);
   QString srcPath(QString pluginName);
   QString formsPath(QString pluginName);
   QString imagesPath(QString pluginName);
   QString iconsPath(QString pluginName);
   QString templatesPath();
+  QString projectFileFilepath();
 
   QTextStream out;
 };
