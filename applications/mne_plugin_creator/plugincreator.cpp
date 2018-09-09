@@ -1,6 +1,6 @@
 #include "plugincreator.h"
 
-PluginCreator::PluginCreator(QObject *parent) : QObject(parent), out(stdout) {}
+PluginCreator::PluginCreator() : out(stdout) {}
 
 void PluginCreator::createPlugin(PluginParams &params) {
   out << "Creating plugin: " << params.m_name << "..." << endl;

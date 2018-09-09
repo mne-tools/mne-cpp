@@ -3,8 +3,6 @@
 
 #include <QDate>
 #include <QDir>
-#include <QFile>
-#include <QObject>
 #include <QTextStream>
 
 #include <stdexcept>
@@ -12,10 +10,9 @@
 #include "pluginparams.h"
 #include "templatefile.h"
 
-class PluginCreator : public QObject {
-  Q_OBJECT
+class PluginCreator {
 public:
-  explicit PluginCreator(QObject *parent);
+  explicit PluginCreator();
   void createPlugin(PluginParams &params);
 
 protected:
