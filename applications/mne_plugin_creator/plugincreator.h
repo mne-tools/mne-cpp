@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include "pluginparams.h"
+#include "templatefile.h"
 
 class PluginCreator : public QObject {
   Q_OBJECT
@@ -23,7 +24,6 @@ protected:
   void copyTemplates(PluginParams &params);
   void copyFile(QString from, QString to);
   void fillTemplates(PluginParams &params);
-  void fillSingleTemplate(QFile &file, PluginParams &params);
   void updateProjectFile(PluginParams &params);
 
   QString pluginsPath();

@@ -8,9 +8,9 @@
 
 #include "pluginparams.h"
 
-class Template {
+class TemplateFile {
 public:
-  Template(QString filepath);
+  TemplateFile(QString filepath);
   void fill(PluginParams &params);
 
 private:

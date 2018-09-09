@@ -11,38 +11,25 @@ void PluginCreator::createPlugin(PluginParams &params) {
   out << "Successfully created new " << params.m_name << " plugin!" << endl;
 }
 
-QString PluginCreator::pluginsPath() {
-  return "../../../mne-cpp/applications/mne_scan/plugins/";
-}
+QString PluginCreator::pluginsPath() { return "../../../mne-cpp/applications/mne_scan/plugins/"; }
 
-QString PluginCreator::srcPath(QString pluginName) {
-  return pluginsPath() + pluginName.toLower() + "/";
-}
+QString PluginCreator::srcPath(QString pluginName) { return pluginsPath() + pluginName.toLower() + "/"; }
 
-QString PluginCreator::formsPath(QString pluginName) {
-  return srcPath(pluginName) + "FormFiles/";
-}
+QString PluginCreator::formsPath(QString pluginName) { return srcPath(pluginName) + "FormFiles/"; }
 
-QString PluginCreator::imagesPath(QString pluginName) {
-  return srcPath(pluginName) + "images/";
-}
+QString PluginCreator::imagesPath(QString pluginName) { return srcPath(pluginName) + "images/"; }
 
-QString PluginCreator::iconsPath(QString pluginName){
-  return imagesPath(pluginName) + "icons/";
-}
+QString PluginCreator::iconsPath(QString pluginName) { return imagesPath(pluginName) + "icons/"; }
 
-QString PluginCreator::templatesPath(){
-  return "../../../mne-cpp/applications/mne_plugin_creator/templates/";
-}
+QString PluginCreator::templatesPath() { return "../../../mne-cpp/applications/mne_plugin_creator/templates/"; }
 
 void PluginCreator::createFolderStructure(QString pluginName) {
-  out << "Attempting to create folder structure for your new plugin at "
-      << QDir(srcPath(pluginName)).absolutePath() << "..." << endl;
+  out << "Attempting to create folder structure for your new plugin at " << QDir(srcPath(pluginName)).absolutePath()
+      << "..." << endl;
 
   if (!QDir(pluginsPath()).exists()) {
-    throw std::runtime_error(
-        "Could not find mne_scan plugins folder. Make sure you ran the plugin "
-        "creator from within the mne_plugin_creator folder");
+    throw std::runtime_error("Could not find mne_scan plugins folder. Make sure you ran the plugin "
+                             "creator from within the mne_plugin_creator folder");
   }
 
   createDirectory(srcPath(pluginName));
@@ -61,9 +48,8 @@ void PluginCreator::createFolderStructure(QString pluginName) {
 void PluginCreator::createDirectory(QString path) {
   bool success = QDir::current().mkdir(path);
   if (!success) {
-    throw std::invalid_argument(
-        "Unable to create directory named: " + path.toStdString() +
-        ".\n Does a folder with that name already exist?");
+    throw std::invalid_argument("Unable to create directory named: " + path.toStdString() +
+                                ".\n Does a folder with that name already exist?");
   }
 }
 
@@ -149,88 +135,28 @@ void PluginCreator::copyTemplates(PluginParams &params) {
 void PluginCreator::copyFile(QString from, QString to) {
   bool success = QFile::copy(from, to);
   if (!success) {
-    throw std::invalid_argument(
-        "Unable to copy file " + from.toStdString() + " to " +
-        to.toStdString() + ".\n Does a file with the same name already exist?");
+    throw std::invalid_argument("Unable to copy file " + from.toStdString() + " to " + to.toStdString() +
+                                ".\n Does a file with the same name already exist?");
   }
 }
 
-void PluginCreator::fillTemplates(PluginParams &params){
-   QStringList nameFilters;
+void PluginCreator::fillTemplates(PluginParams &params) {
+  QStringList nameFilters;
 
-   QDir rootDir(srcPath(params.m_name));
-   QFileInfoList srcFiles = rootDir.entryInfoList(nameFilters, QDir::Files);
+  QDir rootDir(srcPath(params.m_name));
+  QFileInfoList srcFiles = rootDir.entryInfoList(nameFilters, QDir::Files);
 
-   QDir formsDir(formsPath(params.m_name));
-   QFileInfoList formFiles = formsDir.entryInfoList(nameFilters, QDir::Files);
+  QDir formsDir(formsPath(params.m_name));
+  QFileInfoList formFiles = formsDir.entryInfoList(nameFilters, QDir::Files);
 
-   for (QFileInfo info : formFiles + srcFiles) {
-       QFile file(info.absoluteFilePath());
-       fillSingleTemplate(file, params);
-       out << "Executed template for " << file.fileName() << endl;
-   }
+  for (QFileInfo info : formFiles + srcFiles) {
+    TemplateFile templateFile(info.absoluteFilePath());
+    templateFile.fill(params);
+    out << "Executed template for " << info.fileName() << endl;
+  }
 }
 
-void PluginCreator::fillSingleTemplate(QFile &file, PluginParams &params) {
-    if (!file.exists()) {
-        throw std::invalid_argument("File named: " + file.fileName().toStdString() +
-                                    " could not be found!");
-    }
-    const bool success = file.open(QIODevice::ReadWrite | QIODevice::Text);
-    if (!success) {
-        QString filename = file.fileName();
-        QString problem = file.errorString();
-        throw std::runtime_error("Unable to open file: " + filename.toStdString() +
-                                 "\nError: " + problem.toStdString());
-    }
-
-    QDate date = QDate::currentDate();
-    QByteArray text = file.readAll();
-
-    text.replace("{{author}}", params.m_author.toUtf8());
-    text.replace("{{author_email}}", params.m_email.toUtf8());
-    text.replace("{{month}}", date.toString("MMMM").toUtf8());
-    text.replace("{{year}}", date.toString("yyyy").toUtf8());
-    text.replace("{{namespace}}", params.m_namespace.toUtf8());
-    text.replace("{{target_name}}", params.m_targetName.toUtf8());
-
-    text.replace("{{name}}", params.m_name.toUtf8());
-    text.replace("{{widget_name}}", params.m_widgetName.toUtf8());
-    text.replace("{{setup_widget_name}}", params.m_setupWidgetName.toUtf8());
-    text.replace("{{about_widget_name}}", params.m_aboutWidgetName.toUtf8());
-
-    text.replace("{{header_define}}", params.m_globalHeaderDefine.toUtf8());
-    text.replace("{{library_define}}", params.m_libraryDefine.toUtf8());
-    text.replace("{{export_define}}", params.m_exportDefine.toUtf8());
-    text.replace("{{header_define}}", params.m_headerDefine.toUtf8());
-    text.replace("{{widget_header_define}}", params.m_widgetHeaderDefine.toUtf8());
-    text.replace("{{setup_widget_header_define}}", params.m_setupWidgetHeaderDefine.toUtf8());
-    text.replace("{{about_widget_header_define}}", params.m_aboutWidgetHeaderDefine.toUtf8());
-
-    text.replace("{{pro_filename}}", params.m_proFileName.toUtf8());
-    text.replace("{{json_filename}}", params.m_jsonFileName.toUtf8());
-
-    text.replace("{{global_header_filename}}", params.m_globalsFileName.toUtf8());
-    text.replace("{{header_filename}}", params.m_headerFileName.toUtf8());
-    text.replace("{{widget_header_filename}}", params.m_widgetHeaderFileName.toUtf8());
-    text.replace("{{setup_widget_header_filename}}", params.m_setupWidgetHeaderFileName.toUtf8());
-    text.replace("{{about_widget_header_filename}}", params.m_aboutWidgetHeaderFileName.toUtf8());
-
-    text.replace("{{source_filename}}", params.m_sourceFileName.toUtf8());
-    text.replace("{{widget_source_filename}}", params.m_widgetSourceFileName.toUtf8());
-    text.replace("{{setup_widget_source_filename}}", params.m_setupWidgetSourceFileName.toUtf8());
-    text.replace("{{about_widget_source_filename}}", params.m_aboutWidgetSourceFileName.toUtf8());
-
-    text.replace("{{widget_form_filename}}", params.m_widgetFormFileName.toUtf8());
-    text.replace("{{setup_widget_form_filename}}", params.m_setupWidgetFormFileName.toUtf8());
-    text.replace("{{about_widget_form_filename}}", params.m_aboutWidgetFormFileName.toUtf8());
-
-    file.resize(0);
-    file.write(text);
-    file.close();
-}
-
-void PluginCreator::updateProjectFile(PluginParams &params){
-    // TODO:
-    out << "Updated the .pro file to include your new plugin!" << endl;
+void PluginCreator::updateProjectFile(PluginParams &params) {
+  // TODO:
+  out << "Updated the .pro file to include your new plugin!" << endl;
 }
