@@ -1,6 +1,6 @@
 #include "appinputparser.h"
 
-AppInputParser::AppInputParser()
+AppInputParser::AppInputParser(): IInputParser()
 {
 }
 

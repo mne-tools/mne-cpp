@@ -4,6 +4,7 @@
 #include <QTextStream>
 
 #include <stdexcept>
+#include <iostream>
 
 #include "pluginparams.h"
 
@@ -20,6 +21,7 @@ protected:
     QString getAuthorName();
     QString getAuthorEmail();
 
+    QString acceptArbitraryInput();
     QString validateArbitraryInput();
     QString validateFiniteOptionsInput(const QStringList &validInputs);
     void showOptions(const QStringList &validInputs);

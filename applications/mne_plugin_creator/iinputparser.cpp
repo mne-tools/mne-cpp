@@ -1,6 +1,6 @@
 #include "iinputparser.h"
 
-IInputParser::IInputParser()
+IInputParser::IInputParser(): in(stdin), out(stdout)
 {
 
 }
@@ -17,7 +17,7 @@ QString IInputParser::getNamespace() {
 
 QString IInputParser::getAuthorName() {
     out << "Enter your (the author's) name. It will be inserted into the license." << endl;
-    return in.readLine();
+    return acceptArbitraryInput();
 }
 
 QString IInputParser::getAuthorEmail() {
@@ -32,6 +32,7 @@ QString IInputParser::validateFiniteOptionsInput(const QStringList &validInputs)
       showOptions(validInputs);
       return validateFiniteOptionsInput(validInputs);
     }
+    out << endl << endl;
     return value;
 }
 
@@ -41,12 +42,20 @@ QString IInputParser::validateArbitraryInput() {
         out << "Value may not contain any spaces!";
         return validateArbitraryInput();
     }
+    out << endl << endl;
+    return value;
+}
+
+QString IInputParser::acceptArbitraryInput() {
+    QString value = in.readLine();
+    out << endl << endl;
     return value;
 }
 
 void IInputParser::showOptions(const QStringList &validInputs) {
     out << "Valid options:" <<  endl;
     for (QString val : validInputs) {
-        out << '\t' << val << endl;
+        out << "  " << val << endl;
     }
+    out << endl;
 }

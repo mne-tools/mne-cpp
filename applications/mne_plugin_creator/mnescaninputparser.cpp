@@ -1,6 +1,6 @@
 #include "mnescaninputparser.h"
 
-MNEScanInputParser::MNEScanInputParser()
+MNEScanInputParser::MNEScanInputParser(): IInputParser()
 {
 
 }
