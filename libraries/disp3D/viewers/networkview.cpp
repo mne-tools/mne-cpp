@@ -45,9 +45,6 @@
 
 #include <connectivity/network/network.h>
 
-#include <disp/viewers/connectivitysettingsview.h>
-#include <disp/viewers/quickcontrolview.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,12 +71,6 @@ NetworkView::NetworkView(QWidget* parent,
                          Qt::WindowFlags f)
 : AbstractView(parent, f)
 {
-    //Add control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
-    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
-            this, &NetworkView::onMetricChanged);
-
-    m_pQuickControlView->addGroupBox(pConnectivitySettingsView, "Connectivity");
 }
 
 
@@ -98,10 +89,3 @@ NetworkTreeItem* NetworkView::addData(const Network& tNetworkData)
     return m_pData3DModel->addConnectivityData("sample", "Connectivity", tNetworkData);
 }
 
-
-//*************************************************************************************************************
-
-void NetworkView::onMetricChanged(const QString& sMetric)
-{
-    emit connectivityMetricChanged(sMetric);
-}

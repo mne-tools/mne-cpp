@@ -65,6 +65,8 @@
 
 #include <realtime/rtProcessing/rtconnectivity.h>
 
+#include <disp/viewers/connectivitysettingsview.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,6 +87,7 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 using namespace INVERSELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
@@ -449,10 +452,15 @@ int main(int argc, char *argv[])
     pConnectivitySettingsManager->m_settings.m_iNfft = -1;
     pConnectivitySettingsManager->m_settings.m_sWindowType = "hanning";
 
+    //Create NetworkView and add extra control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
     NetworkView tNetworkView;
+    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
+    QList<QWidget*> lWidgets;
+    lWidgets << pConnectivitySettingsView;
+    tNetworkView.setQuickControlWidgets(lWidgets);
     tNetworkView.show();
 
-    QObject::connect(&tNetworkView, &NetworkView::connectivityMetricChanged,
+    QObject::connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
 
     QObject::connect(pConnectivitySettingsManager->m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,

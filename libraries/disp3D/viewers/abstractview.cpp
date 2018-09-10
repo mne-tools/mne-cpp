@@ -135,6 +135,18 @@ QPointer<QuickControlView> AbstractView::getQuickControl()
 
 //*************************************************************************************************************
 
+void AbstractView::setQuickControlWidgets(const QList<QWidget*>&lControlWidgets)
+{
+    if(m_pQuickControlView) {
+        for(int i = 0; i < lControlWidgets.size(); i++) {
+            m_pQuickControlView->addGroupBox(lControlWidgets.at(i), lControlWidgets.at(i)->windowTitle());
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void AbstractView::createGUI()
 {
     m_pQuickControlView = new QuickControlView("Network View", Qt::Widget, this, false);

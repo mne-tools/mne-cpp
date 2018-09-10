@@ -77,7 +77,7 @@ MNE::MNE()
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iNumAverages(1)
-, m_iDownSample(2)
+, m_iDownSample(1)
 , m_sAvrType("4")
 {
 
