@@ -94,6 +94,36 @@ private:
     QString formsPath(const QString& PluginName) const;
 
     /**
+     * @brief updateProjectFileForSensor updates the .pro file specifically for `ISensor` plugins.
+     * @param params contains information about the desired output location of the new plugin's files.
+     */
+    void updateProjectFileForSensor(const PluginParams& params) const;
+
+    /**
+     * @brief updateProjectFileForAlgorithm updates the .pro file specifically for `IAlgorithm` plugins.
+     * @param params contains information about the desired output location of the new plugin's files.
+     */
+    void updateProjectFileForAlgorithm(const PluginParams& params) const;
+
+    /**
+     * @brief openAndReadProfile opens and read the .pro file.
+     * @return The text from the .pro file
+     */
+    QString readProfile() const;
+
+    /**
+     * @brief openProFile attempts to open the .pro file.
+     * @note the .pro file will be left in an open state. You must remember to cloes it! An exception will
+     * be thrown if it cannot be opened for any reason.
+     */
+    QSharedPointer<QFile> openProFile() const;
+
+    /**
+     * @brief overwriteProfile opens and overwrites the .pro file with the given text.
+     */
+    void overwriteProfile(const QString& text) const;
+
+    /**
      * @brief m_templatesPath holds the path to the folder that templates are stored in.
      */
     const QString m_templatesPath;

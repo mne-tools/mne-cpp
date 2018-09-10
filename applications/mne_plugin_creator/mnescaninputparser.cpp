@@ -58,7 +58,7 @@ PluginParams MNEScanInputParser::parseUserInput()
 
 QString MNEScanInputParser::getSuperClassName()
 {
-    QStringList valid = { "algorithm", "sensor" };
+    QStringList valid = { "IAlgorithm", "ISensor" };
     out << "Which type of plugin would you like to create?" << endl;
     showOptions(valid);
     return validateFiniteOptionsInput(valid);

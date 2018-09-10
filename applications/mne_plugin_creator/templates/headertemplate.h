@@ -45,7 +45,7 @@
 
 #include "{{global_header_filename}}"
 
-#include <scShared/Interfaces/IAlgorithm.h>
+#include <scShared/Interfaces/{{superclass}}.h>
 #include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include "FormFiles/{{setup_widget_header_filename}}"
@@ -91,12 +91,12 @@ using namespace SCSHAREDLIB;
 *
 * @brief The {{name}} class does...
 */
-class {{export_define}} {{name}} : public IAlgorithm
+class {{export_define}} {{name}} : public {{superclass}}
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "{{json_filename}}") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
+    Q_INTERFACES(SCSHAREDLIB::{{superclass}})
 
 public:
     //=========================================================================================================
@@ -113,7 +113,7 @@ public:
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
+    * {{superclass}} functions
     */
     virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
@@ -135,7 +135,7 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * IAlgorithm function
+    * {{superclass}} function
     */
     virtual void run();
 
