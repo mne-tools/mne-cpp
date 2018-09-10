@@ -10,8 +10,8 @@
 
 class TemplateFile {
 public:
-  TemplateFile(QString filepath, QString destinationPath);
-  void fill(PluginParams &params);
+  TemplateFile(const QString &filepath, const QString &destinationPath);
+  void fill(const PluginParams &params);
 
 private:
   QFile m_outfile;

@@ -1,12 +1,11 @@
 #include "templatefile.h"
 
-TemplateFile::TemplateFile(QString filepath, QString destinationPath) :
+TemplateFile::TemplateFile(const QString &filepath, const QString &destinationPath) :
     m_outfile(destinationPath)
   , m_template(filepath)
 {}
 
-void
-TemplateFile::fill(PluginParams& params)
+void TemplateFile::fill(const PluginParams &params)
 {
   if (!m_template.exists()) {
     throw std::invalid_argument("File named: " + m_template.fileName().toStdString() + " could not be found!");

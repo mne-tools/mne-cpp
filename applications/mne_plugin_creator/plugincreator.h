@@ -19,7 +19,7 @@ protected:
   virtual void updateProjectFile(const PluginParams &params) const = 0;
 
 private:
-  void copyTemplates() const;
+  void copyTemplates(const PluginParams &params) const;
 };
 
 #endif // PLUGINCREATOR_H
