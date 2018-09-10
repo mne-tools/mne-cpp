@@ -17,7 +17,7 @@ QList<QPair<QString, QString>> MNEScanPluginCreator::templateInputOutputPairs(co
     // Config files, etc.
     pairs.append(QPair<QString, QString>(m_templatesPath + "template.pro", root + params.m_proFileName));
     pairs.append(QPair<QString, QString>(m_templatesPath + "template.json", root + params.m_jsonFileName));
-    pairs.append(QPair<QString, QString>(m_templatesPath + "options.json", icons + "options.png"));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "options.png", icons + "options.png"));
 
     // Header files
     pairs.append(QPair<QString, QString>(m_templatesPath + "template_global.h", root + params.m_globalsFileName));

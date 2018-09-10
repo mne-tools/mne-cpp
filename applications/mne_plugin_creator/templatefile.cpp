@@ -7,6 +7,7 @@ TemplateFile::TemplateFile(const QString &filepath, const QString &destinationPa
 
 void TemplateFile::fill(const PluginParams &params)
 {
+  // Make sure the template file exists and can be opened.
   if (!m_template.exists()) {
     throw std::invalid_argument("File named: " + m_template.fileName().toStdString() + " could not be found!");
   }
@@ -15,16 +16,26 @@ void TemplateFile::fill(const PluginParams &params)
   if (!templateSuccess) {
     QString filename = m_template.fileName();
     QString problem = m_template.errorString();
-    throw std::runtime_error("Unable to open file: " + filename.toStdString() + "\nError: " + problem.toStdString());
+    throw std::invalid_argument("Unable to open file: " + filename.toStdString() + "\nError: " + problem.toStdString());
   }
 
-  const bool outputSuccess = m_outfile.open(QIODevice::ReadWrite | QIODevice::Text);
+  // If the output destination does not exist yet, create it.
+  // Note that `QDir::mkpath` will return `true` if the folder already exists.
+  const QString folder = QFileInfo(m_outfile).absolutePath();
+  const bool mkdirSuccess = QDir::current().mkpath(folder);
+  if (!mkdirSuccess) {
+    throw new std::invalid_argument("Unable to create folder: " + folder.toStdString());
+  }
+
+  // Opening a non-existent file in `WriteOnly` mode will create a new file.
+  const bool outputSuccess = m_outfile.open(QIODevice::WriteOnly | QIODevice::Text);
   if (!outputSuccess) {
     QString filename = m_outfile.fileName();
     QString problem = m_outfile.errorString();
-    throw std::runtime_error("Unable to open file: " + filename.toStdString() + "\nError: " + problem.toStdString());
+    throw std::invalid_argument("Unable to open file: " + filename.toStdString() + "\nError: " + problem.toStdString());
   }
 
+  // The template files all have variable names surrounded by {{ }} that we can search for and replace.
   QDate date = QDate::currentDate();
   QByteArray text = m_template.readAll();
   m_template.close();

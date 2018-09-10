@@ -4,7 +4,9 @@
 #include <stdexcept>
 
 #include <QDate>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 
 #include "pluginparams.h"
 
