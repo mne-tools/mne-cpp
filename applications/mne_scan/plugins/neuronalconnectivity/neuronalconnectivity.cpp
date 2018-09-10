@@ -149,6 +149,9 @@ void NeuronalConnectivity::init()
     ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
     connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
+    connect(pConnectivitySettingsView, &ConnectivitySettingsView::numberTrialsChanged,
+            this, &NeuronalConnectivity::onNumberTrialsChanged);
+
     m_pRTCEOutput->data()->addControlWidget(pConnectivitySettingsView);
 
     //Init rt connectivity worker
@@ -284,8 +287,11 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
 
-        if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
-            m_connectivitySettings.m_matDataList.removeFirst();
+        //Pop data from buffer
+        if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+            for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
+                m_connectivitySettings.m_matDataList.removeFirst();
+            }
         }
     }
 }
@@ -367,8 +373,11 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
         m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
 
-        if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
-            m_connectivitySettings.m_matDataList.removeFirst();
+        //Pop data from buffer
+        if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+            for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
+                m_connectivitySettings.m_matDataList.removeFirst();
+            }
         }
     }
 }
@@ -521,6 +530,14 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << sMetric;
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
+{
+    m_iNumberAverages = iNumberTrials;
 }
 
 

@@ -199,6 +199,14 @@ protected:
 
     //=========================================================================================================
     /**
+    * Slot called when the number of trials changed.
+    *
+    * @param [in] iNumberTrials        The new number of trials.
+    */
+    void onNumberTrialsChanged(int iNumberTrials);
+
+    //=========================================================================================================
+    /**
     * Slot called when the window type changed.
     *
     * @param [in] windowType        The new window type

@@ -433,7 +433,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
     //Fiff Information of the evoked
     if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
         for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
-            if(pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
+            if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                 m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
                 m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
 
@@ -447,7 +447,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
             //qDebug()<<""<<m_sAvrType;
-            if(pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
+            if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
                 m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
@@ -566,7 +566,9 @@ void MNE::run()
 
                 m_qMutex.unlock();
 
-                m_pRTSEOutput->data()->setValue(sourceEstimate);
+                if(!sourceEstimate.isEmpty()) {
+                    m_pRTSEOutput->data()->setValue(sourceEstimate);
+                }
             }
             else
             {
@@ -584,9 +586,8 @@ void MNE::run()
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 m_qMutex.lock();
-                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
+                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked.takeFirst();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
-                m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();
 
                 float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
@@ -600,7 +601,9 @@ void MNE::run()
 
                 m_qMutex.unlock();
 
-                m_pRTSEOutput->data()->setValue(sourceEstimate);
+                if(!sourceEstimate.isEmpty()) {
+                    m_pRTSEOutput->data()->setValue(sourceEstimate);
+                }
             }
             else
             {
