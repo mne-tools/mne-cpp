@@ -48,6 +48,7 @@ void TemplateFile::fill(const PluginParams &params)
   text.replace("{{target_name}}", params.m_targetName.toUtf8());
 
   text.replace("{{name}}", params.m_name.toUtf8());
+  text.replace("{{superclass}}", params.m_superclass.toUtf8());
   text.replace("{{widget_name}}", params.m_widgetName.toUtf8());
   text.replace("{{setup_widget_name}}", params.m_setupWidgetName.toUtf8());
   text.replace("{{about_widget_name}}", params.m_aboutWidgetName.toUtf8());

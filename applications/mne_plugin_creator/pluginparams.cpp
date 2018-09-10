@@ -1,10 +1,11 @@
 #include "pluginparams.h"
 
 
-  PluginParams::PluginParams(QString name, QString nameSpace, QString author, QString email) {
+  PluginParams::PluginParams(QString name, QString superclass, QString nameSpace, QString author, QString email) {
 
       // Class names
       m_name = name;
+      m_superclass = superclass;
       m_widgetName= name + "Widget";
       m_aboutWidgetName = name + "AboutWidget";
       m_setupWidgetName = name + "SetupWidget";

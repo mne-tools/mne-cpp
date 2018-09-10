@@ -6,7 +6,7 @@
 
 int main() {
 
-  PluginParams params("MoppyPlugin", "SHI", "Erik Hornberger", "erik.hornberger@shi-g.com");
+  PluginParams params("MoppyPlugin", "IAlgorithm", "SHI", "Erik Hornberger", "erik.hornberger@shi-g.com");
   MNEScanPluginCreator creator;
 
   try {

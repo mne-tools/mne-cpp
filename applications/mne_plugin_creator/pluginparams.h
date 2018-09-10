@@ -5,6 +5,7 @@
 
 struct PluginParams {
   QString m_name;
+  QString m_superclass;
   QString m_widgetName;
   QString m_aboutWidgetName;
   QString m_setupWidgetName;
@@ -40,7 +41,7 @@ struct PluginParams {
   QString m_setupWidgetHeaderDefine;
   QString m_aboutWidgetHeaderDefine;
 
-  PluginParams(QString name, QString nameSpace, QString author, QString email);
+  PluginParams(QString name, QString superclass, QString nameSpace, QString author, QString email);
   QString baseFileName();
   QString baseDefine();
 };
