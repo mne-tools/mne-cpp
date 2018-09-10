@@ -3,17 +3,17 @@
 
   PluginParams::PluginParams(QString name, QString nameSpace, QString author, QString email) {
 
-      // Basic parameters
-      m_email = email;
-      m_author = author;
-      m_namespace = nameSpace;
-      m_targetName = baseFileName();
-
       // Class names
       m_name = name;
       m_widgetName= name + "Widget";
       m_aboutWidgetName = name + "AboutWidget";
       m_setupWidgetName = name + "SetupWidget";
+
+      // Basic parameters
+      m_email = email;
+      m_author = author;
+      m_namespace = nameSpace;
+      m_targetName = baseFileName();
 
       // File names
       m_proFileName = baseFileName() + ".pro";
