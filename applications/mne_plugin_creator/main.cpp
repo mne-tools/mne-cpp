@@ -1,15 +1,14 @@
 #include <iostream>
 
-#include "iplugincreator.h"
 #include "mnescanplugincreator.h"
+#include "appinputparser.h"
 #include "pluginparams.h"
 
 int main() {
-
-  PluginParams params("MoppyPlugin", "IAlgorithm", "SHI", "Erik Hornberger", "erik.hornberger@shi-g.com");
-  MNEScanPluginCreator creator;
-
   try {
+    AppInputParser parser;
+    PluginParams params = parser.parseUserInput();
+    MNEScanPluginCreator creator;
     creator.createPlugin(params);
     return 0;
   } catch (std::exception &e) {

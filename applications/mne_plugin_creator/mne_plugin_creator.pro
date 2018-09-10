@@ -19,7 +19,10 @@ SOURCES += \
     pluginparams.cpp \
     templatefile.cpp \
     mnescanplugincreator.cpp \
-    iplugincreator.cpp
+    iplugincreator.cpp \
+    mnescaninputparser.cpp \
+    iinputparser.cpp \
+    appinputparser.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -30,4 +33,7 @@ HEADERS += \
     pluginparams.h \
     templatefile.h \
     mnescanplugincreator.h \
-    iplugincreator.h
+    iplugincreator.h \
+    mnescaninputparser.h \
+    iinputparser.h \
+    appinputparser.h
