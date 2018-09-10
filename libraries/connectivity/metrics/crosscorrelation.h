@@ -118,24 +118,13 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Calculates the actual correlation coefficient between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return                The cross position where the maximum correlation was computed.
-    */
-    static QPair<int,double> calcCrossCorrelation(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
-
-    //=========================================================================================================
-    /**
     * Calculates the connectivity matrix for a given input data matrix based on the cross correlation coefficient.
     *
     * @param[in] data       The input data.
     *
     * @return               The connectivity matrix.
     */
-    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
+    static Eigen::MatrixXd calculate(const AbstractMetricInputData& inputData);
 
     //=========================================================================================================
     /**
@@ -145,6 +134,18 @@ protected:
     * @param[in]  data          The incoming and temporary result data.
     */
     static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Calculates the actual correlation coefficient between two data vectors.
+    *
+    * @param[in] vecFirst    The first input data row.
+    * @param[in] vecSecond   The second input data row.
+    *
+    * @return                The cross position where the maximum correlation was computed.
+    */
+    static QPair<int,double> calcCrossCorrelation(const Eigen::MatrixXcd &matDataFirst,
+                                                  const Eigen::MatrixXcd &matDataSecond);
 
 };
 
