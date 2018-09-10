@@ -38,7 +38,7 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 MNEScanPluginCreator::MNEScanPluginCreator()
-    : m_templatesPath("../../../mne-cpp/applications/mne_plugin_creator/templates/")
+    : m_templatesPath("../../../mne-cpp/applications/mne_plugin_creator/templates/mne_scan/")
     , m_pluginsPath("../../../mne-cpp/applications/mne_scan/plugins/")
     , m_profilePath(m_pluginsPath + "plugins.pro")
 {
