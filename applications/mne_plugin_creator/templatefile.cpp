@@ -8,8 +8,8 @@ TemplateFile::TemplateFile(QString filepath, QString destinationPath) :
 void
 TemplateFile::fill(PluginParams& params)
 {
-  if (!m_file.exists()) {
-    throw std::invalid_argument("File named: " + m_file.fileName().toStdString() + " could not be found!");
+  if (!m_template.exists()) {
+    throw std::invalid_argument("File named: " + m_template.fileName().toStdString() + " could not be found!");
   }
 
   const bool templateSuccess = m_template.open(QIODevice::ReadOnly | QIODevice::Text);

@@ -9,8 +9,16 @@ public:
   MNEScanPluginCreator();
 
 protected:
-  void copyTemplates(const PluginParams &params) override;
+  QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams &params) override;
   void updateProjectFile(const PluginParams &params) override;
+
+private:
+
+  QString folderName(const QString &pluginName) const;
+
+  const QString m_templatesPath;
+  const QString m_pluginsPath;
+  const QString m_profilePath;
 };
 
 #endif // MNESCANPLUGINCREATOR_H

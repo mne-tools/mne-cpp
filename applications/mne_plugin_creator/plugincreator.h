@@ -16,9 +16,12 @@ public:
   void createPlugin(PluginParams &params);
 
 protected:
-  virtual void copyTemplates(const PluginParams &params) = 0;
+  virtual QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams &params) = 0;
   virtual void updateProjectFile(const PluginParams &params) = 0;
   QTextStream out;
+
+private:
+  void copyTemplates(QList<TemplateFile> templates);
 };
 
 #endif // PLUGINCREATOR_H
