@@ -7,14 +7,14 @@ MNEScanPluginCreator::MNEScanPluginCreator():
 {
 }
 
-QList<QPair<QString, QString>> MNEScanPluginCreator::templateInputOutputPairs(const PluginParams &params) {
+QList<QPair<QString, QString>> MNEScanPluginCreator::templateInputOutputPairs(const PluginParams &params) const {
     QList<QPair<QString, QString>> pairs;
     pairs.append(QPair<QString, QString>("1", "2"));
 
     return pairs;
 }
 
-void MNEScanPluginCreator::updateProjectFile(const PluginParams &params)
+void MNEScanPluginCreator::updateProjectFile(const PluginParams &params) const
 {
     QFile proFile(m_profilePath);
     if (!proFile.exists()) {
@@ -42,7 +42,7 @@ void MNEScanPluginCreator::updateProjectFile(const PluginParams &params)
     proFile.write(text);
     proFile.close();
 
-    out << "Updated the .pro file to include your new plugin!" << endl;
+    qDebug() << "Updated the .pro file to include your new plugin!" << endl;
 }
 
 QString MNEScanPluginCreator::folderName(const QString &pluginName) const {

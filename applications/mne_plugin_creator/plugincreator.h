@@ -1,9 +1,8 @@
 #ifndef PLUGINCREATOR_H
 #define PLUGINCREATOR_H
 
-#include <QDir>
 #include <QRegularExpression>
-#include <QTextStream>
+#include <QDebug>
 
 #include <stdexcept>
 
@@ -16,12 +15,11 @@ public:
   void createPlugin(PluginParams &params);
 
 protected:
-  virtual QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams &params) = 0;
-  virtual void updateProjectFile(const PluginParams &params) = 0;
-  QTextStream out;
+  virtual QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams &params) const = 0;
+  virtual void updateProjectFile(const PluginParams &params) const = 0;
 
 private:
-  void copyTemplates(QList<TemplateFile> templates);
+  void copyTemplates() const;
 };
 
 #endif // PLUGINCREATOR_H

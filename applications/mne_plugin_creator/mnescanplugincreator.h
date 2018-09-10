@@ -9,8 +9,8 @@ public:
   MNEScanPluginCreator();
 
 protected:
-  QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams &params) override;
-  void updateProjectFile(const PluginParams &params) override;
+  QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams &params) const override;
+  void updateProjectFile(const PluginParams &params) const override;
 
 private:
 

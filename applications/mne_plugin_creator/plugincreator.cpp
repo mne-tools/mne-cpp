@@ -1,9 +1,15 @@
 #include "plugincreator.h"
 
-PluginCreator::PluginCreator() : out(stdout) {}
+PluginCreator::PluginCreator() {}
 
 void PluginCreator::createPlugin(PluginParams &params) {
-  out << "Creating plugin: " << params.m_name << "..." << endl;
+  qDebug() << "Creating plugin: " << params.m_name << "..." << endl;
+  copyTemplates();
   updateProjectFile(params);
-  out << "Successfully created new " << params.m_name << " plugin!" << endl;
+  qDebug() << "Successfully created new " << params.m_name << " plugin!" << endl;
+}
+
+void PluginCreator::copyTemplates() const
+{
+
 }
