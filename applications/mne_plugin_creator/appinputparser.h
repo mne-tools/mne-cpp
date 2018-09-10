@@ -6,20 +6,14 @@
 #include <stdexcept>
 
 #include "pluginparams.h"
+#include "iinputparser.h"
 #include "mnescaninputparser.h"
 
-class AppInputParser
+class AppInputParser : public IInputParser
 {
 public:
     AppInputParser();
     virtual PluginParams parseUserInput();
-
-protected:
-    QString checkInput(const QStringList &validInputs);
-    void showOptions(const QStringList &validInputs);
-
-    QTextStream in;
-    QTextStream out;
 
 private:
     QString getAppName();
