@@ -46,6 +46,8 @@
 
 #include <utils/spectral.h>
 
+#include <limits>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,8 +87,8 @@ using namespace UTILSLIB;
 Network::Network(const QString& sConnectivityMethod,
                  double dThreshold)
 : m_sConnectivityMethod(sConnectivityMethod)
-, m_minMaxFullWeights(QPair<double,double>(100000000000.0,0.0))
-, m_minMaxThresholdedWeights(QPair<double,double>(100000000000.0,0.0))
+, m_minMaxFullWeights(QPair<double,double>(std::numeric_limits<double>::max(),0.0))
+, m_minMaxThresholdedWeights(QPair<double,double>(std::numeric_limits<double>::max(),0.0))
 , m_dThreshold(dThreshold)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
