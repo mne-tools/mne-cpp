@@ -1,42 +1,50 @@
 #include "iinputparser.h"
 
-IInputParser::IInputParser(): in(stdin), out(stdout)
+IInputParser::IInputParser()
+    : in(stdin)
+    , out(stdout)
 {
-
 }
 
-QString IInputParser::getPluginName() {
+QString IInputParser::getPluginName()
+{
     out << "Enter a class name to be used for your new plugin (Use CamelCase):" << endl;
     return validateArbitraryInput();
 }
 
-QString IInputParser::getNamespace() {
+QString IInputParser::getNamespace()
+{
     out << "Enter a namespace for your new plugin to reside in:" << endl;
     return validateArbitraryInput();
 }
 
-QString IInputParser::getAuthorName() {
+QString IInputParser::getAuthorName()
+{
     out << "Enter your (the author's) name. It will be inserted into the license." << endl;
     return acceptArbitraryInput();
 }
 
-QString IInputParser::getAuthorEmail() {
+QString IInputParser::getAuthorEmail()
+{
     out << "Enter your (the author's) email address. It will be inserted into the license" << endl;
     return validateArbitraryInput();
 }
 
-QString IInputParser::validateFiniteOptionsInput(const QStringList &validInputs) {
+QString IInputParser::validateFiniteOptionsInput(const QStringList& validInputs)
+{
     QString value = in.readLine();
     if (!validInputs.contains(value)) {
-      out << "Your input, " << value << ", is invalid!" << endl;;
-      showOptions(validInputs);
-      return validateFiniteOptionsInput(validInputs);
+        out << "Your input, " << value << ", is invalid!" << endl;
+        ;
+        showOptions(validInputs);
+        return validateFiniteOptionsInput(validInputs);
     }
     out << endl << endl;
     return value;
 }
 
-QString IInputParser::validateArbitraryInput() {
+QString IInputParser::validateArbitraryInput()
+{
     QString value = in.readLine();
     if (value.contains(" ")) {
         out << "Value may not contain any spaces!";
@@ -46,14 +54,16 @@ QString IInputParser::validateArbitraryInput() {
     return value;
 }
 
-QString IInputParser::acceptArbitraryInput() {
+QString IInputParser::acceptArbitraryInput()
+{
     QString value = in.readLine();
     out << endl << endl;
     return value;
 }
 
-void IInputParser::showOptions(const QStringList &validInputs) {
-    out << "Valid options:" <<  endl;
+void IInputParser::showOptions(const QStringList& validInputs)
+{
+    out << "Valid options:" << endl;
     for (QString val : validInputs) {
         out << "  " << val << endl;
     }

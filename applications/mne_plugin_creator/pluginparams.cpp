@@ -1,57 +1,52 @@
 #include "pluginparams.h"
 
+PluginParams::PluginParams(QString name, QString superclass, QString nameSpace, QString author, QString email)
+{
+    // Class names
+    m_name = name;
+    m_superclass = superclass;
+    m_widgetName = name + "Widget";
+    m_aboutWidgetName = name + "AboutWidget";
+    m_setupWidgetName = name + "SetupWidget";
 
-  PluginParams::PluginParams(QString name, QString superclass, QString nameSpace, QString author, QString email) {
+    // Basic parameters
+    m_email = email;
+    m_author = author;
+    m_namespace = nameSpace;
+    m_targetName = baseFileName();
 
-      // Class names
-      m_name = name;
-      m_superclass = superclass;
-      m_widgetName= name + "Widget";
-      m_aboutWidgetName = name + "AboutWidget";
-      m_setupWidgetName = name + "SetupWidget";
+    // File names
+    m_proFileName = baseFileName() + ".pro";
+    m_jsonFileName = baseFileName() + ".json";
+    m_globalsFileName = baseFileName() + "_global.h";
 
-      // Basic parameters
-      m_email = email;
-      m_author = author;
-      m_namespace = nameSpace;
-      m_targetName = baseFileName();
+    // Header files
+    m_headerFileName = baseFileName() + ".h";
+    m_widgetHeaderFileName = baseFileName() + "widget.h";
+    m_aboutWidgetHeaderFileName = baseFileName() + "aboutwidget.h";
+    m_setupWidgetHeaderFileName = baseFileName() + "setupwidget.h";
 
-      // File names
-      m_proFileName = baseFileName() + ".pro";
-      m_jsonFileName = baseFileName() + ".json";
-      m_globalsFileName = baseFileName() + "_global.h";
+    // Source files
+    m_sourceFileName = baseFileName() + ".cpp";
+    m_widgetSourceFileName = baseFileName() + "widget.cpp";
+    m_aboutWidgetSourceFileName = baseFileName() + "aboutwidget.cpp";
+    m_setupWidgetSourceFileName = baseFileName() + "setupwidget.cpp";
 
-      // Header files
-      m_headerFileName = baseFileName() + ".h";
-      m_widgetHeaderFileName = baseFileName() + "widget.h";
-      m_aboutWidgetHeaderFileName = baseFileName()  + "aboutwidget.h";
-      m_setupWidgetHeaderFileName = baseFileName() + "setupwidget.h";
+    // Form files
+    m_widgetFormFileName = baseFileName() + "widget.ui";
+    m_aboutWidgetFormFileName = baseFileName() + "aboutwidget.ui";
+    m_setupWidgetFormFileName = baseFileName() + "setupwidget.ui";
 
-      // Source files
-      m_sourceFileName = baseFileName() + ".cpp";
-      m_widgetSourceFileName = baseFileName() + "widget.cpp";
-      m_aboutWidgetSourceFileName = baseFileName() + "aboutwidget.cpp";
-      m_setupWidgetSourceFileName = baseFileName() + "setupwidget.cpp";
+    // #define
+    m_globalHeaderDefine = baseDefine() + "_GLOBAL_H";
+    m_libraryDefine = baseDefine() + "_LIBRARY";
+    m_exportDefine = baseDefine() + "SHARED_EXPORT";
+    m_headerDefine = baseDefine() + "_H";
+    m_widgetHeaderDefine = baseDefine() + "WIDGET_H";
+    m_setupWidgetHeaderDefine = baseDefine() + "SETUPWIDGET_H";
+    m_aboutWidgetHeaderDefine = baseDefine() + "ABOUTWIDGET_H";
+}
 
-      // Form files
-      m_widgetFormFileName = baseFileName() + "widget.ui";
-      m_aboutWidgetFormFileName = baseFileName() + "aboutwidget.ui";
-      m_setupWidgetFormFileName = baseFileName() + "setupwidget.ui";
+QString PluginParams::baseFileName() { return m_name.toLower(); }
 
-      // #define
-      m_globalHeaderDefine = baseDefine() + "_GLOBAL_H";
-      m_libraryDefine = baseDefine() + "_LIBRARY";
-      m_exportDefine = baseDefine() + "SHARED_EXPORT";
-      m_headerDefine = baseDefine() + "_H";
-      m_widgetHeaderDefine = baseDefine() + "WIDGET_H";
-      m_setupWidgetHeaderDefine = baseDefine() + "SETUPWIDGET_H";
-      m_aboutWidgetHeaderDefine = baseDefine() + "ABOUTWIDGET_H";
-  }
-
- QString PluginParams::baseFileName() {
-    return m_name.toLower();
- }
-
- QString PluginParams::baseDefine() {
-     return m_name.toUpper();
- }
+QString PluginParams::baseDefine() { return m_name.toUpper(); }

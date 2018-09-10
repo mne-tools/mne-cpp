@@ -3,13 +3,12 @@
 
 #include <QTextStream>
 
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 
 #include "pluginparams.h"
 
-class IInputParser
-{
+class IInputParser {
 public:
     IInputParser();
 
@@ -23,8 +22,8 @@ protected:
 
     QString acceptArbitraryInput();
     QString validateArbitraryInput();
-    QString validateFiniteOptionsInput(const QStringList &validInputs);
-    void showOptions(const QStringList &validInputs);
+    QString validateFiniteOptionsInput(const QStringList& validInputs);
+    void showOptions(const QStringList& validInputs);
 
     QTextStream in;
     QTextStream out;

@@ -12,12 +12,12 @@
 
 class TemplateFile {
 public:
-  TemplateFile(const QString &filepath, const QString &destinationPath);
-  void fill(const PluginParams &params);
+    TemplateFile(const QString& filepath, const QString& destinationPath);
+    void fill(const PluginParams& params);
 
 private:
-  QFile m_outfile;
-  QFile m_template;
+    QFile m_outfile;
+    QFile m_template;
 };
 
 #endif // TEMPLATE_H

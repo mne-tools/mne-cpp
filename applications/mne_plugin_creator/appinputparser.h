@@ -5,12 +5,11 @@
 
 #include <stdexcept>
 
-#include "pluginparams.h"
 #include "iinputparser.h"
 #include "mnescaninputparser.h"
+#include "pluginparams.h"
 
-class AppInputParser : public IInputParser
-{
+class AppInputParser : public IInputParser {
 public:
     AppInputParser();
     virtual PluginParams parseUserInput();

@@ -1,13 +1,14 @@
 #include "mnescanplugincreator.h"
 
-MNEScanPluginCreator::MNEScanPluginCreator():
-    m_templatesPath("../../../mne-cpp/applications/mne_plugin_creator/templates/"),
-    m_pluginsPath("../../../mne-cpp/applications/mne_scan/plugins/"),
-    m_profilePath(m_pluginsPath + "plugins.pro")
+MNEScanPluginCreator::MNEScanPluginCreator()
+    : m_templatesPath("../../../mne-cpp/applications/mne_plugin_creator/templates/")
+    , m_pluginsPath("../../../mne-cpp/applications/mne_scan/plugins/")
+    , m_profilePath(m_pluginsPath + "plugins.pro")
 {
 }
 
-QList<QPair<QString, QString>> MNEScanPluginCreator::templateInputOutputPairs(const PluginParams &params) const {
+QList<QPair<QString, QString>> MNEScanPluginCreator::templateInputOutputPairs(const PluginParams& params) const
+{
     const QString name = params.m_name;
     const QString root = srcPath(name);
     const QString icons = iconsPath(name);
@@ -40,18 +41,18 @@ QList<QPair<QString, QString>> MNEScanPluginCreator::templateInputOutputPairs(co
     return pairs;
 }
 
-void MNEScanPluginCreator::updateProjectFile(const PluginParams &params) const
+void MNEScanPluginCreator::updateProjectFile(const PluginParams& params) const
 {
     QFile proFile(m_profilePath);
     if (!proFile.exists()) {
-      throw std::invalid_argument(m_profilePath.toStdString() + "could not be found!");
+        throw std::invalid_argument(m_profilePath.toStdString() + "could not be found!");
     }
 
     const bool success = proFile.open(QIODevice::ReadWrite | QIODevice::Text);
     if (!success) {
-     QString filename = proFile.fileName();
-      QString problem = proFile.errorString();
-      throw std::runtime_error("Unable to open profile: " + filename.toStdString() + "\nError: " + problem.toStdString());
+        QString filename = proFile.fileName();
+        QString problem = proFile.errorString();
+        throw std::runtime_error("Unable to open profile: " + filename.toStdString() + "\nError: " + problem.toStdString());
     }
 
     QByteArray text = proFile.readAll();
@@ -71,18 +72,10 @@ void MNEScanPluginCreator::updateProjectFile(const PluginParams &params) const
     qDebug() << "Updated the .pro file to include your new plugin!" << endl;
 }
 
-QString MNEScanPluginCreator::folderName(const QString &pluginName) const {
-    return pluginName.toLower();
-}
+QString MNEScanPluginCreator::folderName(const QString& pluginName) const { return pluginName.toLower(); }
 
-QString MNEScanPluginCreator::srcPath(const QString &pluginName) const {
-    return m_pluginsPath + folderName(pluginName) + "/";
-}
+QString MNEScanPluginCreator::srcPath(const QString& pluginName) const { return m_pluginsPath + folderName(pluginName) + "/"; }
 
-QString MNEScanPluginCreator::iconsPath(const QString &pluginName) const {
-    return srcPath(pluginName) + "images/icons/";
-}
+QString MNEScanPluginCreator::iconsPath(const QString& pluginName) const { return srcPath(pluginName) + "images/icons/"; }
 
-QString MNEScanPluginCreator::formsPath(const QString &pluginName) const {
-    return srcPath(pluginName) + "FormFiles/";
-}
+QString MNEScanPluginCreator::formsPath(const QString& pluginName) const { return srcPath(pluginName) + "FormFiles/"; }
