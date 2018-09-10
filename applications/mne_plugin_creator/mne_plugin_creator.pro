@@ -16,10 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    plugincreator.cpp \
     pluginparams.cpp \
     templatefile.cpp \
-    mnescanplugincreator.cpp
+    mnescanplugincreator.cpp \
+    iplugincreator.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -27,7 +27,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    plugincreator.h \
     pluginparams.h \
     templatefile.h \
-    mnescanplugincreator.h
+    mnescanplugincreator.h \
+    iplugincreator.h

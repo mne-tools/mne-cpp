@@ -1,9 +1,9 @@
 #ifndef MNESCANPLUGINCREATOR_H
 #define MNESCANPLUGINCREATOR_H
 
-#include "plugincreator.h"
+#include "iplugincreator.h"
 
-class MNEScanPluginCreator : public PluginCreator
+class MNEScanPluginCreator : public IPluginCreator
 {
 public:
   MNEScanPluginCreator();

@@ -9,9 +9,9 @@
 #include "pluginparams.h"
 #include "templatefile.h"
 
-class PluginCreator {
+class IPluginCreator {
 public:
-  PluginCreator();
+  IPluginCreator();
   void createPlugin(PluginParams &params);
 
 protected:

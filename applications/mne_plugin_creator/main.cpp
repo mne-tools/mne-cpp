@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "plugincreator.h"
+#include "iplugincreator.h"
 #include "mnescanplugincreator.h"
 #include "pluginparams.h"
 
