@@ -4,6 +4,8 @@
 #include <QString>
 
 struct PluginParams {
+    PluginParams(const QString& name, const QString& superclass, const QString& nameSpace, const QString author, const QString& email);
+
     QString m_name;
     QString m_superclass;
     QString m_widgetName;
@@ -40,10 +42,6 @@ struct PluginParams {
     QString m_widgetHeaderDefine;
     QString m_setupWidgetHeaderDefine;
     QString m_aboutWidgetHeaderDefine;
-
-    PluginParams(QString name, QString superclass, QString nameSpace, QString author, QString email);
-    QString baseFileName();
-    QString baseDefine();
 };
 
 #endif // PLUGINPARAMS_H
