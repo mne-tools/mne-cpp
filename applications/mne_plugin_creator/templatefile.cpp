@@ -1,7 +1,8 @@
 #include "templatefile.h"
 
-TemplateFile::TemplateFile(QString filepath)
-  : m_file(filepath)
+TemplateFile::TemplateFile(QString filepath, QString destinationPath) :
+    m_outfile(destinationPath)
+  , m_template(filepath)
 {}
 
 void
@@ -11,15 +12,23 @@ TemplateFile::fill(PluginParams& params)
     throw std::invalid_argument("File named: " + m_file.fileName().toStdString() + " could not be found!");
   }
 
-  const bool success = m_file.open(QIODevice::ReadWrite | QIODevice::Text);
-  if (!success) {
-    QString filename = m_file.fileName();
-    QString problem = m_file.errorString();
+  const bool templateSuccess = m_template.open(QIODevice::ReadOnly | QIODevice::Text);
+  if (!templateSuccess) {
+    QString filename = m_template.fileName();
+    QString problem = m_template.errorString();
+    throw std::runtime_error("Unable to open file: " + filename.toStdString() + "\nError: " + problem.toStdString());
+  }
+
+  const bool outputSuccess = m_outfile.open(QIODevice::ReadWrite | QIODevice::Text);
+  if (!outputSuccess) {
+    QString filename = m_outfile.fileName();
+    QString problem = m_outfile.errorString();
     throw std::runtime_error("Unable to open file: " + filename.toStdString() + "\nError: " + problem.toStdString());
   }
 
   QDate date = QDate::currentDate();
-  QByteArray text = m_file.readAll();
+  QByteArray text = m_template.readAll();
+  m_template.close();
 
   text.replace("{{author}}", params.m_author.toUtf8());
   text.replace("{{author_email}}", params.m_email.toUtf8());
@@ -59,7 +68,7 @@ TemplateFile::fill(PluginParams& params)
   text.replace("{{setup_widget_form_filename}}", params.m_setupWidgetFormFileName.toUtf8());
   text.replace("{{about_widget_form_filename}}", params.m_aboutWidgetFormFileName.toUtf8());
 
-  m_file.resize(0);
-  m_file.write(text);
-  m_file.close();
+  m_outfile.resize(0);
+  m_outfile.write(text);
+  m_outfile.close();
 }

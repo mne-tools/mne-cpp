@@ -10,11 +10,12 @@
 
 class TemplateFile {
 public:
-  TemplateFile(QString filepath);
+  TemplateFile(QString filepath, QString destinationPath);
   void fill(PluginParams &params);
 
 private:
-  QFile m_file;
+  QFile m_outfile;
+  QFile m_template;
 };
 
 #endif // TEMPLATE_H
