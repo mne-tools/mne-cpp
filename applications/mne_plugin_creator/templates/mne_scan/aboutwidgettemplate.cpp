@@ -2,6 +2,7 @@
 /**
 * @file     {{about_widget_source_filename}}
 * @author   {{author}} <{{author_email}}>
+*           Erik Hornberger <erik.hornberger@shi-g.com>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0

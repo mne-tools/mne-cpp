@@ -2,6 +2,7 @@
 /**
 * @file     {{widget_header_filename}}
 * @author   {{author}} <{{author_email}}>
+*           Erik Hornberger <erik.hornberger@shi-g.com>
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
