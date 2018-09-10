@@ -124,7 +124,6 @@ RtAve::RtAve(quint32 numAverages,
 
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
-    m_iNewNumAverages = m_iNumAverages;
 }
 
 
@@ -156,7 +155,7 @@ void RtAve::append(const MatrixXd &p_DataSegment)
 void RtAve::setAverages(qint32 numAve)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iNewNumAverages = numAve;
+    m_iNumAverages = numAve;
 }
 
 
@@ -551,7 +550,9 @@ void RtAve::mergeData(double dTriggerType)
 
         //Pop data from buffer
         if(m_mapStimAve[dTriggerType].size() > m_iNumAverages && m_iNumAverages >= 1) {
-            m_mapStimAve[dTriggerType].pop_front();
+            for(int i = 0; i < m_mapStimAve[dTriggerType].size()-m_iNumAverages; ++i) {
+                m_mapStimAve[dTriggerType].pop_front();
+            }
         }
 
         //Proceed a bit different if we use zero number of averages
@@ -772,7 +773,6 @@ void RtAve::reset()
     m_iPostStimSamples = m_iNewPostStimSamples;
     m_iTriggerChIndex = m_iNewTriggerIndex;
     m_iAverageMode = m_iNewAverageMode;
-    m_iNumAverages = m_iNewNumAverages;
 
     //qDebug()<<"RtAve::reset() - 2";
 
