@@ -8,8 +8,34 @@ MNEScanPluginCreator::MNEScanPluginCreator():
 }
 
 QList<QPair<QString, QString>> MNEScanPluginCreator::templateInputOutputPairs(const PluginParams &params) const {
+    const QString name = params.m_name;
+    const QString root = srcPath(name);
+    const QString icons = iconsPath(name);
+    const QString forms = formsPath(name);
     QList<QPair<QString, QString>> pairs;
-    pairs.append(QPair<QString, QString>("1", "2"));
+
+    // Config files, etc.
+    pairs.append(QPair<QString, QString>(m_templatesPath + "template.pro", root + params.m_proFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "template.json", root + params.m_jsonFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "options.json", icons + "options.png"));
+
+    // Header files
+    pairs.append(QPair<QString, QString>(m_templatesPath + "template_global.h", root + params.m_globalsFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "headertemplate.h", root + params.m_headerFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "widgettemplate.h", forms + params.m_widgetHeaderFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "setupwidgettemplate.h", forms + params.m_setupWidgetHeaderFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "aboutwidgettemplate.h", forms + params.m_aboutWidgetHeaderFileName));
+
+    // Source files
+    pairs.append(QPair<QString, QString>(m_templatesPath + "sourcetemplate.cpp", root + params.m_sourceFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "widgettemplate.cpp", forms + params.m_widgetSourceFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "setupwidgettemplate.cpp", forms + params.m_setupWidgetSourceFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "aboutwidgettemplate.cpp", forms + params.m_aboutWidgetSourceFileName));
+
+    // Form files
+    pairs.append(QPair<QString, QString>(m_templatesPath + "widgettemplate.ui", forms + params.m_widgetFormFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "setupwidgettemplate.ui", forms + params.m_setupWidgetFormFileName));
+    pairs.append(QPair<QString, QString>(m_templatesPath + "aboutwidgettemplate.ui", forms + params.m_aboutWidgetFormFileName));
 
     return pairs;
 }
@@ -47,4 +73,16 @@ void MNEScanPluginCreator::updateProjectFile(const PluginParams &params) const
 
 QString MNEScanPluginCreator::folderName(const QString &pluginName) const {
     return pluginName.toLower();
+}
+
+QString MNEScanPluginCreator::srcPath(const QString &pluginName) const {
+    return m_pluginsPath + folderName(pluginName) + "/";
+}
+
+QString MNEScanPluginCreator::iconsPath(const QString &pluginName) const {
+    return srcPath(pluginName) + "images/icons/";
+}
+
+QString MNEScanPluginCreator::formsPath(const QString &pluginName) const {
+    return srcPath(pluginName) + "FormFiles/";
 }

@@ -15,6 +15,9 @@ protected:
 private:
 
   QString folderName(const QString &pluginName) const;
+  QString srcPath(const QString &pluginName) const;
+  QString iconsPath(const QString &pluginName) const;
+  QString formsPath(const QString &PluginName) const;
 
   const QString m_templatesPath;
   const QString m_pluginsPath;
