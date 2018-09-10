@@ -87,7 +87,9 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-OTHER_FILES += {{json_filename}}
+OTHER_FILES += \
+	{{json_filename}} \
+	README.md
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD

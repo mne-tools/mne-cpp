@@ -134,6 +134,11 @@ void PluginCreator::copyTemplates(PluginParams &params) {
   QString setupWidgetFormDest = formsPath(params.m_name) + params.m_setupWidgetFormFileName;
   copyFile(setupWidgetFormTemplate, setupWidgetFormDest);
   out << "Copied setup widget form template to " << setupWidgetFormDest << endl;
+
+  QString readmeTemplate = templatesPath() + "README.md";
+  QString readmeDest = srcPath(params.m_name) + "README.md";
+  copyFile(readmeTemplate, readmeDest);
+  out << "Copied REAMDE template to " << readmeDest << endl;
 }
 
 void PluginCreator::copyFile(QString from, QString to) {
