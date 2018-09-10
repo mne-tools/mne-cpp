@@ -210,12 +210,12 @@ QPair<int,double> CrossCorrelation::calcCrossCorrelation(const MatrixXcd &matDat
                                                          const MatrixXcd &matDataSecond)
 {
     MatrixXcd matResultFreq = matDataSecond.array() * matDataFirst.conjugate().array();
-    matResultFreq = matResultFreq.colwise().sum();
-    matResultFreq /= matDataSecond.rows();
+    RowVectorXcd vecResultFreq = matResultFreq.colwise().sum();
+    vecResultFreq /= matDataSecond.rows();
     RowVectorXd vecResultTime;
 
     Eigen::FFT<double> fft;
-    fft.inv(vecResultTime, matResultFreq.row(0));
+    fft.inv(vecResultTime, vecResultFreq);
 
     QPair<int,int> minMaxRange;
     int idx = 0;
