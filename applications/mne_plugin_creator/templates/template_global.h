@@ -34,8 +34,8 @@
 *
 */
 
-#ifndef {{header_define}}
-#define {{header_define}}
+#ifndef {{global_header_define}}
+#define {{global_header_define}}
 
 
 //*************************************************************************************************************

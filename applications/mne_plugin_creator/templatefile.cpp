@@ -33,7 +33,7 @@ TemplateFile::fill(PluginParams& params)
   text.replace("{{setup_widget_name}}", params.m_setupWidgetName.toUtf8());
   text.replace("{{about_widget_name}}", params.m_aboutWidgetName.toUtf8());
 
-  text.replace("{{header_define}}", params.m_globalHeaderDefine.toUtf8());
+  text.replace("{{global_header_define}}", params.m_globalHeaderDefine.toUtf8());
   text.replace("{{library_define}}", params.m_libraryDefine.toUtf8());
   text.replace("{{export_define}}", params.m_exportDefine.toUtf8());
   text.replace("{{header_define}}", params.m_headerDefine.toUtf8());
