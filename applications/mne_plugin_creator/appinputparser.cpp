@@ -18,7 +18,7 @@ QString AppInputParser::getAppName() {
     QStringList valid = {"scan"};
     out << "What application would you like to create a plugin for?" << endl;
     showOptions(valid);
-    return checkInput(valid);
+    return validateFiniteOptionsInput(valid);
 }
 
 

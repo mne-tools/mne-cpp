@@ -15,7 +15,13 @@ public:
 protected:
     virtual PluginParams parseUserInput() = 0;
 
-    QString checkInput(const QStringList &validInputs);
+    QString getPluginName();
+    QString getNamespace();
+    QString getAuthorName();
+    QString getAuthorEmail();
+
+    QString validateArbitraryInput();
+    QString validateFiniteOptionsInput(const QStringList &validInputs);
     void showOptions(const QStringList &validInputs);
 
     QTextStream in;

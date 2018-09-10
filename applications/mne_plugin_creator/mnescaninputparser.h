@@ -8,9 +8,10 @@ class MNEScanInputParser : public IInputParser {
 
 public:
     MNEScanInputParser();
-
     PluginParams parseUserInput() override;
 
+private:
+    QString getSuperClassName();
 };
 
 #endif // MNESCANINPUTPARSER_H
