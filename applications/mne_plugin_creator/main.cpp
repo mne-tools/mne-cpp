@@ -1,12 +1,13 @@
 #include <iostream>
 
 #include "plugincreator.h"
+#include "mnescanplugincreator.h"
 #include "pluginparams.h"
 
 int main() {
 
   PluginParams params("MoppyPlugin", "SHI", "Erik Hornberger", "erik.hornberger@shi-g.com");
-  PluginCreator creator;
+  MNEScanPluginCreator creator;
 
   try {
     creator.createPlugin(params);

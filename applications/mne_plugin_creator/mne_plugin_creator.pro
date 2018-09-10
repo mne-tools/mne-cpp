@@ -18,7 +18,8 @@ SOURCES += \
         main.cpp \
     plugincreator.cpp \
     pluginparams.cpp \
-    templatefile.cpp
+    templatefile.cpp \
+    mnescanplugincreator.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -28,4 +29,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     plugincreator.h \
     pluginparams.h \
-    templatefile.h
+    templatefile.h \
+    mnescanplugincreator.h

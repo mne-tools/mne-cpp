@@ -12,26 +12,12 @@
 
 class PluginCreator {
 public:
-  explicit PluginCreator();
+  PluginCreator();
   void createPlugin(PluginParams &params);
 
 protected:
-  void createFolderStructure(QString pluginName);
-  void createDirectory(QString path);
-  void copyTemplates(PluginParams &params);
-  void copyFile(QString from, QString to);
-  void fillTemplates(PluginParams &params);
-  void updateProjectFile(PluginParams &params);
-
-  QString pluginsPath();
-  QString folderName(QString pluginName);
-  QString srcPath(QString pluginName);
-  QString formsPath(QString pluginName);
-  QString imagesPath(QString pluginName);
-  QString iconsPath(QString pluginName);
-  QString templatesPath();
-  QString projectFileFilepath();
-
+  virtual void copyTemplates(const PluginParams &params) = 0;
+  virtual void updateProjectFile(const PluginParams &params) = 0;
   QTextStream out;
 };
 
