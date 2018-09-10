@@ -60,16 +60,15 @@ using namespace IOBUFFER;
 
 {{name}}::{{name}}()
 : m_bIsRunning(false)
+, m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_pInput(NULL)
 , m_pOutput(NULL)
-, m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
     m_pActionShowWidget = new QAction(QIcon(":/images/options.png"), tr("{{name}} Toolbar Widget"),this);
     m_pActionShowWidget->setShortcut(tr("F12"));
     m_pActionShowWidget->setStatusTip(tr("{{name}} Toolbar Widget"));
-    connect(m_pActionShowWidget, &QAction::triggered,
-            this, &{{name}}::showWidget);
+    connect(m_pActionShowWidget, &QAction::triggered, this, &{{name}}::showWidget);
     addPluginAction(m_pActionShowWidget);
 }
 
@@ -124,15 +123,14 @@ void {{name}}::unload()
 
 bool {{name}}::start()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    // Check if the thread is already or still running. 
+    // This can happen if the start button is pressed immediately after the stop button was pressed. 
+    // In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
         QThread::wait();
 
     m_bIsRunning = true;
-
-    //Start thread
     QThread::start();
-
     return true;
 }
 
@@ -142,12 +140,9 @@ bool {{name}}::start()
 bool {{name}}::stop()
 {
     m_bIsRunning = false;
-
     m_pBuffer->releaseFromPop();
     m_pBuffer->releaseFromPush();
-
     m_pBuffer->clear();
-
     return true;
 }
 
@@ -214,11 +209,9 @@ void {{name}}::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void {{name}}::run()
 {
-    //
     // Wait for Fiff Info
-    //
     while(!m_pFiffInfo)
-        msleep(10);// Wait for fiff Info
+        msleep(10);
 
     while(m_bIsRunning)
     {
