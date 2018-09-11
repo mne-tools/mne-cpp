@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
-* @file     test_codecov.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     test_{{target}}.cpp
+* @author   {{author}} <{{author_email}}>
+*           Erik Hornberger <erik.hornberger@shi-g.com>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     {{month}}, {{year}}
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) {{year}}, {{author}}, Christoph Dinh, and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Test for codecov coverage analyser
+* @brief    Test for {{target}}
 *
 */
 
@@ -58,14 +60,14 @@
 // TEST CLASS
 //=============================================================================================================
 
-class TestQString: public QObject
+class Test{{name}}: public QObject
 {
     Q_OBJECT
 private slots:
-    void toUpper();
+    void create();
 };
 
-void TestQString::toUpper()
+void Test{{name}}::create()
 {
     QString str = "Hello";
     QCOMPARE(str.toUpper(), QString("HELLO"));
@@ -77,5 +79,5 @@ void TestQString::toUpper()
 // MAIN
 //=============================================================================================================
 
-QTEST_MAIN(TestQString)
-#include "test_codecov.moc"
+QTEST_MAIN(Test{{name}})
+#include "test_{{target}}.moc"

@@ -69,7 +69,7 @@ void IPluginCreator::copyTemplates(const PluginParams& params) const
 void IPluginCreator::copyTestTemplates(const PluginParams& params) const
 {
     const QString templateDir = "../../../mne-cpp/applications/mne_plugin_creator/templates/testframes/";
-    const QString testDirectory = "../../../mne-cpp/testframes/" + params.m_targetName + "/";
+    const QString testDirectory = "../../../mne-cpp/testframes/test_" + params.m_targetName + "/";
 
     const QString proFileTemplate = templateDir + "template.pro";
     const QString proFilePath = testDirectory + "test_" + params.m_targetName + ".pro";
@@ -90,7 +90,7 @@ void IPluginCreator::updateTestsProjectFile(const PluginParams& params) const
     QRegularExpressionMatchIterator matches = regex.globalMatch(text);
 
     // Only insert into the first match. The second match is for the minimal build.
-    text.insert(matches.next().capturedEnd(), "\n\t" + params.m_targetName + " \\");
+    text.insert(matches.next().capturedEnd(), "\n    test_" + params.m_targetName + " \\");
     overwriteFile(testsProFilePath, text);
 }
 

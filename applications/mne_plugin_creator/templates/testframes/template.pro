@@ -1,14 +1,16 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_codecov.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     test_{{target}}.pro
+# @author   {{author}} <{{author_email}}>
+#           Erik Hornberger <erik.hornberger@shi-g.com>
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     May, 2016
+# @date     {{month}}, {{year}}
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds test codecov
+# @brief    Builds test {{target}}
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +56,7 @@ CONFIG(debug, debug|release) {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-        test_codecov.cpp \
+        test_{{target}}.cpp \
 
 HEADERS += \
 
