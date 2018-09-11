@@ -215,7 +215,7 @@ IPlugin::PluginType NeuronalConnectivity::getType() const
 
 QString NeuronalConnectivity::getName() const
 {
-    return "Neuronal Connectivity";
+    return "Connectivity";
 }
 
 
@@ -276,13 +276,9 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
         }
 
-        QList<MatrixXd> epochDataList;
-
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
-             epochDataList.append(pRTSE->getValue()[i]->data);
+            m_connectivitySettings.m_matDataList << pRTSE->getValue()[i]->data;
         }
-
-        m_connectivitySettings.m_matDataList << epochDataList;
 
         m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
