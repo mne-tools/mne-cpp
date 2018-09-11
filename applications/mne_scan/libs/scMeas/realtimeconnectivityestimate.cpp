@@ -101,7 +101,7 @@ QSharedPointer<Network> &RealTimeConnectivityEstimate::getValue()
 
 //*************************************************************************************************************
 
-void RealTimeConnectivityEstimate::setValue(Network& v)
+void RealTimeConnectivityEstimate::setValue(const Network& v)
 {
     m_qMutex.lock();
 

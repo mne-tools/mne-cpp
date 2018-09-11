@@ -141,8 +141,8 @@ const QStringList& RealTimeEvokedSet::getResponsibleTriggerTypes()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSet::setValue(FiffEvokedSet& v,
-                                 FiffInfo::SPtr p_fiffinfo,
+void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
+                                 const FiffInfo::SPtr &p_fiffinfo,
                                  const QStringList &lResponsibleTriggerTypes)
 {
     //Store

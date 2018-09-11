@@ -463,7 +463,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void MNE::updateInvOp(const MNEInverseOperator& invOp)
 {
-    m_qMutex.lock();
+    QMutexLocker locker(&m_qMutex);
     //qDebug() << "MNE::updateInvOp - START";
     m_invOp = invOp;
 
@@ -476,7 +476,6 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
 
     //Set up the inverse according to the parameters
     m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
-    m_qMutex.unlock();
 }
 
 

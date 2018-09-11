@@ -110,7 +110,7 @@ public:
     */
     explicit NetworkEdge(int iStartNodeID,
                          int iEndNodeID,
-                         Eigen::MatrixXd& matWeight,
+                         const Eigen::MatrixXd& matWeight,
                          bool bIsActive = true,
                          int iStartWeightBin = -1,
                          int iEndWeightBin = -1);

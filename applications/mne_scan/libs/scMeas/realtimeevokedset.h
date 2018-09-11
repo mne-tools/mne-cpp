@@ -186,8 +186,8 @@ public:
     * @param [in] p_fiffinfo                the evoked fiff info as shared pointer.
     * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    virtual void setValue(FiffEvokedSet &v,
-                          FiffInfo::SPtr p_fiffinfo,
+    virtual void setValue(const FiffEvokedSet &v,
+                          const FiffInfo::SPtr& p_fiffinfo,
                           const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================

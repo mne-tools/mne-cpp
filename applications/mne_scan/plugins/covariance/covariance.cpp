@@ -65,7 +65,7 @@
 
 #include <QtCore/QtPlugin>
 #include <QDebug>
-
+#include <QMutexLocker>
 #include <QtWidgets>
 
 
@@ -258,9 +258,8 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void Covariance::appendCovariance(const FiffCov& p_pCovariance)
 {
-    mutex.lock();
+    QMutexLocker locker(&mutex);
     m_qVecCovData.push_back(p_pCovariance);
-    mutex.unlock();
 }
 
 
@@ -293,12 +292,11 @@ void Covariance::run()
         if(m_bProcessData)
         {
             //Add to covariance estimation
-            mutex.lock();
+            QMutexLocker locker(&mutex);
             if(!m_qVecCovData.isEmpty())
             {
                 m_pCovarianceOutput->data()->setValue(m_qVecCovData.takeFirst());
             }
-            mutex.unlock();
         }
     }
 

@@ -80,7 +80,7 @@ using namespace Eigen;
 
 NetworkEdge::NetworkEdge(int iStartNodeID,
                          int iEndNodeID,
-                         MatrixXd& matWeight,
+                         const MatrixXd& matWeight,
                          bool bIsActive,
                          int iStartWeightBin,
                          int iEndWeightBin)
