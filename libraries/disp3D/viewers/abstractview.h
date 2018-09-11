@@ -161,7 +161,7 @@ protected:
     QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;       /**< The Disp3D control. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;         /**< The Disp3D model. */
 
-    QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< The quick control widget. */
+    QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< The quick control view. */
 
 };
 

@@ -83,6 +83,7 @@ AbstractView::AbstractView(QWidget* parent,
 {
     //Init 3D View
     m_p3DView->setModel(m_pData3DModel);
+    m_p3DView->setFlag(Qt::FramelessWindowHint, true);
 
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
@@ -155,7 +156,7 @@ void AbstractView::createGUI()
     //Create widget GUI
     m_pQuickControlView->addGroupBox(m_pControl3DView.data(), "3D View");
 
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data(), this, Qt::Widget);
     pWidgetContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pWidgetContainer->setMinimumSize(400,400);
 
