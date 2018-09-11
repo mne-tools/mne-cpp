@@ -43,10 +43,17 @@ IPluginCreator::IPluginCreator() {}
 
 void IPluginCreator::createPlugin(PluginParams& params)
 {
-    qDebug() << "Creating plugin: " << params.m_name << "..." << endl;
+    cout << "Creating plugin: " << params.m_name.toStdString() << "..." << endl;
     copyTemplates(params);
+    cout << "Copied and filled templates!" << endl;
     updateProjectFile(params);
-    qDebug() << "Successfully created new " << params.m_name << " plugin!" << endl;
+    cout << "Finished creating new " << params.m_name.toStdString() << " plugin!" << endl;
+
+    cout << "Creating test suite for your new plugin..." << endl;
+    copyTestTemplates(params);
+    cout << "Copied and filled test suite templates!" << endl;
+    updateTestsProjectFile(params);
+    cout << "Finished creating test suite!" << endl;
 }
 
 //=============================================================================================================
@@ -59,6 +66,33 @@ void IPluginCreator::copyTemplates(const PluginParams& params) const
     }
 }
 
+void IPluginCreator::copyTestTemplates(const PluginParams& params) const
+{
+    const QString templateDir = "../../../mne-cpp/applications/mne_plugin_creator/templates/testframes/";
+    const QString testDirectory = "../../../mne-cpp/testframes/" + params.m_targetName + "/";
+
+    const QString proFileTemplate = templateDir + "template.pro";
+    const QString proFilePath = testDirectory + "test_" + params.m_targetName + ".pro";
+    TemplateFile(proFileTemplate, proFilePath).fill(params);
+
+    const QString sourceTemplate = templateDir + "template.cpp";
+    const QString sourcePath = testDirectory + "test_" + params.m_targetName + ".cpp";
+    TemplateFile(sourceTemplate, sourcePath).fill(params);
+}
+
+void IPluginCreator::updateTestsProjectFile(const PluginParams& params) const
+{
+    const QString testsProFilePath = "../../../mne-cpp/testframes/testframes.pro";
+    QByteArray text = readFile(testsProFilePath).toUtf8();
+    QRegularExpression regex;
+    regex.setPattern("\\s*(SUBDIRS\\s*\\+=\\s*\\\\)");
+    regex.setPatternOptions(QRegularExpression::MultilineOption);
+    QRegularExpressionMatchIterator matches = regex.globalMatch(text);
+
+    // Only insert into the first match. The second match is for the minimal build.
+    text.insert(matches.next().capturedEnd(), "\n\t" + params.m_targetName + " \\");
+    overwriteFile(testsProFilePath, text);
+}
 
 QSharedPointer<QFile> IPluginCreator::openFile(const QString& filepath) const
 {

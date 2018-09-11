@@ -38,17 +38,22 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include <iostream>
 #include <stdexcept>
 
 #include "pluginparams.h"
 #include "templatefile.h"
 
+using std::cout;
+using std::endl;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-#include <QDebug>
+#include <QFile>
 #include <QRegularExpression>
+#include <QSharedPointer>
 
 //=============================================================================================================
 /**
@@ -95,6 +100,10 @@ protected:
      * Perform that manipulation here. If anything goes wrong, you should throw a std::exception.
      */
     virtual void updateProjectFile(const PluginParams& params) const = 0;
+
+    virtual void copyTestTemplates(const PluginParams& params) const;
+
+    virtual void updateTestsProjectFile(const PluginParams& params) const;
 
     QString readFile(const QString& filepath) const;
 
