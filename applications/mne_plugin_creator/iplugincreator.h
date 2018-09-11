@@ -65,9 +65,15 @@ using std::endl;
 class IPluginCreator {
 public:
     /**
-     * @brief IPluginCreator creates a new IPluginCreator`.
+     * @brief IPluginCreator creates a new `IPluginCreator`.
      */
     IPluginCreator();
+
+    /**
+     * @brief ~IPluginCreator destroys a `IPluginCreator`
+     * @note It is important that this be a virtual destructor since we intend to treat subclasses polymorphically.
+     */
+    virtual ~IPluginCreator();
 
     /**
      * @brief createPlugin creates a new plugin.

@@ -54,7 +54,7 @@
  * @brief The IInputParser class is an abstract base class for all user input parsers.
  *
  * This class provides base functionality for all user input parsers. You should subclass
- * `IInputParser` and override `parseUnserInput`.
+ * `IInputParser` and override `parseUserInput`.
  */
 class IInputParser {
 public:
@@ -62,6 +62,12 @@ public:
      * @brief IInputParser creates a new instance of `IInputParser`.
      */
     IInputParser();
+
+    /**
+     * @brief ~IInputParser destroys a `IInputParser`.
+     * @note It is important that this destructor be virtual since we intend to use subclasses polymorphically.
+     */
+    virtual ~IInputParser();
 
 protected:
     /**
@@ -121,6 +127,14 @@ protected:
      * the user will be asked to input their response again until they give a valid response.
      */
     QString validateFiniteOptionsInput(const QStringList& validInputs);
+
+    /**
+     * @brief showOptions prints a set of valid options to the console
+     * @param validInputs a list of valid inputs
+     *
+     * Displays valid inputs on a single line, surrounded by square brackets and separated by commas.
+     * For examle: [Lorenz, Christoph, Matti, Erik]
+     */
     void showOptions(const QStringList& validInputs);
 
     /**

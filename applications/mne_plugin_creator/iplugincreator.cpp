@@ -39,6 +39,8 @@
 //=============================================================================================================
 IPluginCreator::IPluginCreator() {}
 
+IPluginCreator::~IPluginCreator() {}
+
 //=============================================================================================================
 
 void IPluginCreator::createPlugin(PluginParams& params)
@@ -68,6 +70,8 @@ void IPluginCreator::copyTemplates(const PluginParams& params) const
 
 void IPluginCreator::copyTestTemplates(const PluginParams& params) const
 {
+    // Note: We are assuming the plugin will be run from within the build-mne-cpp directories adjacent to the root directory.
+    // If the executable is run from anywhere else it will fail to find the templates and an exception will be thrown.
     const QString templateDir = "../../../mne-cpp/applications/mne_plugin_creator/templates/testframes/";
     const QString testDirectory = "../../../mne-cpp/testframes/test_" + params.m_targetName + "/";
 
@@ -90,6 +94,7 @@ void IPluginCreator::updateTestsProjectFile(const PluginParams& params) const
     QRegularExpressionMatchIterator matches = regex.globalMatch(text);
 
     // Only insert into the first match. The second match is for the minimal build.
+    // Take a look at `testframes.pro` if the above is unclear.
     text.insert(matches.next().capturedEnd(), "\n    test_" + params.m_targetName + " \\");
     overwriteFile(testsProFilePath, text);
 }

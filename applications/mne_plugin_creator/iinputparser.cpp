@@ -43,6 +43,8 @@ IInputParser::IInputParser()
 {
 }
 
+IInputParser::~IInputParser() {}
+
 //=============================================================================================================
 
 QString IInputParser::getPluginName()
