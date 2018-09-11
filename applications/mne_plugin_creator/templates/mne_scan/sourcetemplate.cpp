@@ -160,7 +160,7 @@ IPlugin::PluginType {{name}}::getType() const
 
 QString {{name}}::getName() const
 {
-    return "Dummy Toolbox";
+    return "{{name}}";
 }
 
 

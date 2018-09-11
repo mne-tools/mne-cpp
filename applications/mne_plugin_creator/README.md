@@ -35,6 +35,3 @@ Next you need to write an `IPluginCreator` subclass and implement its abstract m
 3.  We should update `mne_plugin_creator`'s .pro file to put the build output in the MNE binary folder. The challenge is ensuring that the correct relative path to the source code folders are provided to the plugin creator classes regardless of which directory the tool is run from. Presently we assume it will be run from the default build directory and have hard coded relative paths from that directory.
 
     * See `MNEScanPluginCreator`'s constructor.
-
-4.  Update the template files to have better styling
-    * Currently they are based on the DummyToolbox. Some modifications have been made, but we could make the generated starter plugins better by adding extra documentation.
