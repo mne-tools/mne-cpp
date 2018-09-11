@@ -101,12 +101,38 @@ protected:
      */
     virtual void updateProjectFile(const PluginParams& params) const = 0;
 
-    virtual void copyTestTemplates(const PluginParams& params) const;
-
+    /**
+     * @brief updateTestsProjectFile creates modifies the testframes project file to include your new plugin
+     * @param params contains information about the desired output location of the new plugin's files.
+     *
+     * Adds a the plugin testframe to the non-minimal build only. This should cover just about all use cases,
+     * but you may override and modify if you need any other kind of behavior.
+     */
     virtual void updateTestsProjectFile(const PluginParams& params) const;
 
+    /**
+     * @brief copyTestTemplates creates a minimal test suite for your plugin.
+     * @param params contains information about the desired output location of the new plugin's files.
+     *
+     * Creates a minimal test suite containing only the basic Qt libraries. If you want to import your
+     * plugin and run tests against, it you must either manually pudate the project file to include the
+     * librarries you need, or override this method in sucblassses of `IPluginCreator` and provide the
+     * logic to build a fully functional test suite there.
+     */
+    virtual void copyTestTemplates(const PluginParams& params) const;
+
+    /**
+     * @brief readFile loads the text from a file.
+     * @param filepath the file to read from.
+     * @return the raw text from the file.
+     */
     QString readFile(const QString& filepath) const;
 
+    /**
+     * @brief overwriteFile changes the content of a file on disk.
+     * @param filepath to the file you wish to overwrite.
+     * @param text is the new content of the file.
+     */
     void overwriteFile(const QString& filepath, const QString& text) const;
 
 private:
@@ -120,6 +146,14 @@ private:
      */
     void copyTemplates(const PluginParams& params) const;
 
+    /**
+     * @brief openFile opens a file for both reading and writing. Throws a descriptive error if there is problem.
+     * @param filepath is the file to open
+     * @return a pointer to the now opened file
+     *
+     * The file will be opened for reading and writing. If no file exists an exception will be thrown.
+     * The caller is responsible for closing the file when done with it!
+     */
     QSharedPointer<QFile> openFile(const QString& filepath) const;
 };
 
