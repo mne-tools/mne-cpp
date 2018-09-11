@@ -50,6 +50,9 @@ PluginParams AppInputParser::parseUserInput()
     const QString appName = getAppName();
     if (appName == "scan") {
         return MNEScanInputParser().parseUserInput();
+    } else if (appName == "analyze") {
+        out << "Sorry, this option is not supported yet! Post an issue on Github and we'll get right to it!" << endl;
+        parseUserInput();
     }
 
     throw std::invalid_argument("Fatal Error: Invalid MNE application type: " + appName.toStdString());
@@ -59,8 +62,9 @@ PluginParams AppInputParser::parseUserInput()
 
 QString AppInputParser::getAppName()
 {
-    QStringList valid = { "scan" };
-    out << "What application would you like to create a plugin for?" << endl;
+    QStringList valid = { "scan", "analyze" };
+    out << "What application would you like to create a plugin for? Options: ";
     showOptions(valid);
+    out << endl;
     return validateFiniteOptionsInput(valid);
 }

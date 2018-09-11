@@ -82,11 +82,12 @@ QString IInputParser::validateFiniteOptionsInput(const QStringList& validInputs)
     QString value = in.readLine();
     if (!validInputs.contains(value)) {
         out << "Your input, " << value << ", is invalid!" << endl;
-        ;
+        out << "Valid options are: ";
         showOptions(validInputs);
+        out << endl;
         return validateFiniteOptionsInput(validInputs);
     }
-    out << endl << endl;
+    out << endl;
     return value;
 }
 
@@ -99,7 +100,7 @@ QString IInputParser::validateArbitraryInput()
         out << "Value may not contain any spaces!";
         return validateArbitraryInput();
     }
-    out << endl << endl;
+    out << endl;
     return value;
 }
 
@@ -108,7 +109,7 @@ QString IInputParser::validateArbitraryInput()
 QString IInputParser::acceptArbitraryInput()
 {
     QString value = in.readLine();
-    out << endl << endl;
+    out << endl;
     return value;
 }
 
@@ -116,9 +117,12 @@ QString IInputParser::acceptArbitraryInput()
 
 void IInputParser::showOptions(const QStringList& validInputs)
 {
-    out << "Valid options:" << endl;
-    for (QString val : validInputs) {
-        out << "  " << val << endl;
+    out << "[";
+    for (int i = 0; i < validInputs.length(); i++) {
+        out << validInputs[i];
+        if (i < validInputs.length() - 1) {
+            out << ", ";
+        }
     }
-    out << endl;
+    out << "]";
 }
