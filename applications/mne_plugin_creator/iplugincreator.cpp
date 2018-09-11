@@ -58,3 +58,37 @@ void IPluginCreator::copyTemplates(const PluginParams& params) const
         templateFile.fill(params);
     }
 }
+
+
+QSharedPointer<QFile> IPluginCreator::openFile(const QString& filepath) const
+{
+    QSharedPointer<QFile> proFile = QSharedPointer<QFile>(new QFile(filepath));
+    if (!proFile->exists()) {
+        throw std::invalid_argument(filepath.toStdString() + "could not be found!");
+    }
+
+    const bool success = proFile->open(QIODevice::ReadWrite | QIODevice::Text);
+    if (!success) {
+        QString filename = proFile->fileName();
+        QString problem = proFile->errorString();
+        throw std::runtime_error("Unable to open profile: " + filename.toStdString() + "\nError: " + problem.toStdString());
+    }
+
+    return QSharedPointer<QFile>(proFile);
+}
+
+QString IPluginCreator::readFile(const QString& filepath) const
+{
+    QSharedPointer<QFile> proFile = openFile(filepath);
+    QByteArray text = proFile->readAll();
+    proFile->close();
+    return text;
+}
+
+void IPluginCreator::overwriteFile(const QString& filepath, const QString& text) const
+{
+    QSharedPointer<QFile> file = openFile(filepath);
+    file->resize(0);
+    file->write(text.toUtf8());
+    file->close();
+}

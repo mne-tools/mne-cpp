@@ -97,7 +97,7 @@ void MNEScanPluginCreator::updateProjectFile(const PluginParams& params) const
 
 void MNEScanPluginCreator::updateProjectFileForAlgorithm(const PluginParams& params) const
 {
-    QByteArray text = readProfile().toUtf8();
+    QByteArray text = readFile(m_profilePath).toUtf8();
     QRegularExpression regex;
     regex.setPattern("\\s*Algorithms\\s*(SUBDIRS\\s*\\+=\\s*\\\\)");
     regex.setPatternOptions(QRegularExpression::MultilineOption);
@@ -106,14 +106,14 @@ void MNEScanPluginCreator::updateProjectFileForAlgorithm(const PluginParams& par
     // We only want to operate on the second match. The first match is the minimal build. See plugins.pro
     matches.next();
     text.insert(matches.next().capturedEnd(), "\n\t" + folderName(params.m_name) + " \\");
-    overwriteProfile(text);
+    overwriteFile(m_profilePath, text);
 }
 
 //=============================================================================================================
 
 void MNEScanPluginCreator::updateProjectFileForSensor(const PluginParams& params) const
 {
-    QByteArray text = readProfile().toUtf8();
+    QByteArray text = readFile(m_profilePath).toUtf8();
     QRegularExpression regex;
     regex.setPattern("\\s*Sensors\\s*(SUBDIRS\\s*\\+=\\s*\\\\)");
     regex.setPatternOptions(QRegularExpression::MultilineOption);
@@ -123,51 +123,10 @@ void MNEScanPluginCreator::updateProjectFileForSensor(const PluginParams& params
 
     while (matches.hasNext()) {
         QRegularExpressionMatch match = matches.next();
-        QString capture = match.captured();
-        QStringList texsts = match.capturedTexts();
         text.insert(match.capturedEnd() + charsInserted, insertText);
         charsInserted += insertText.length();
     }
-    overwriteProfile(text);
-}
-
-//=============================================================================================================
-
-QSharedPointer<QFile> MNEScanPluginCreator::openProFile() const
-{
-    QSharedPointer<QFile> proFile = QSharedPointer<QFile>(new QFile(m_profilePath));
-    if (!proFile->exists()) {
-        throw std::invalid_argument(m_profilePath.toStdString() + "could not be found!");
-    }
-
-    const bool success = proFile->open(QIODevice::ReadWrite | QIODevice::Text);
-    if (!success) {
-        QString filename = proFile->fileName();
-        QString problem = proFile->errorString();
-        throw std::runtime_error("Unable to open profile: " + filename.toStdString() + "\nError: " + problem.toStdString());
-    }
-
-    return QSharedPointer<QFile>(proFile);
-}
-
-//=============================================================================================================
-
-QString MNEScanPluginCreator::readProfile() const
-{
-    QSharedPointer<QFile> proFile = openProFile();
-    QByteArray text = proFile->readAll();
-    proFile->close();
-    return text;
-}
-
-//=============================================================================================================
-
-void MNEScanPluginCreator::overwriteProfile(const QString& text) const
-{
-    QSharedPointer<QFile> proFile = openProFile();
-    proFile->resize(0);
-    proFile->write(text.toUtf8());
-    proFile->close();
+    overwriteFile(m_profilePath, text);
 }
 
 //=============================================================================================================

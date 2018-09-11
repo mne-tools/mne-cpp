@@ -96,6 +96,10 @@ protected:
      */
     virtual void updateProjectFile(const PluginParams& params) const = 0;
 
+    QString readFile(const QString& filepath) const;
+
+    void overwriteFile(const QString& filepath, const QString& text) const;
+
 private:
     /**
      * @brief copyTemplates performs the work of copying templates and filling them in.
@@ -106,6 +110,8 @@ private:
      * there is a naming conflict, it will throw exceptions.
      */
     void copyTemplates(const PluginParams& params) const;
+
+    QSharedPointer<QFile> openFile(const QString& filepath) const;
 };
 
 #endif // PLUGINCREATOR_H
