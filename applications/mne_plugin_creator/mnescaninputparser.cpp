@@ -51,7 +51,7 @@ PluginParams MNEScanInputParser::parseUserInput()
     const QString nameSpace = getNamespace();
     const QString author = getAuthorName();
     const QString email = getAuthorEmail();
-    return PluginParams(pluginName, superclass, nameSpace, author, email);
+    return PluginParams("scan", pluginName, superclass, nameSpace, author, email);
 }
 
 //*************************************************************************************************************

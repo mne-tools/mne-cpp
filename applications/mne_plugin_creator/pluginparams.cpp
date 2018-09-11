@@ -37,12 +37,14 @@
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
-PluginParams::PluginParams(const QString& name, const QString& superclass, const QString& nameSpace, const QString author, const QString& email)
+PluginParams::PluginParams(
+    const QString& app, const QString& name, const QString& superclass, const QString& nameSpace, const QString author, const QString& email)
 {
     const QString baseFileName = name.toLower();
     const QString baseDefine = name.toUpper();
 
     // Class names
+    m_app = app;
     m_name = name;
     m_superclass = superclass;
     m_widgetName = name + "Widget";

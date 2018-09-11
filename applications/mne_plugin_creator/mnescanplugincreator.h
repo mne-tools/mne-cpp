@@ -61,7 +61,7 @@ protected:
      * is the path to a template file and the second is the path to where it should be copied, including the
      * new filename.
      */
-    QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams& params) const override;
+    virtual QList<QPair<QString, QString>> templateInputOutputPairs(const PluginParams& params) const override;
 
     /**
      * @brief updateProjectFile inserts a new line into the .pro file for the new plugin.
@@ -70,7 +70,7 @@ protected:
      * For `IAlgorithm` plugins, a line will be inserted into the algorithms section of the non-minimal build.
      * For `ISensor` plugins, lines will be inserted into the sensors section for all builds.
      */
-    void updateProjectFile(const PluginParams& params) const override;
+    virtual void updateProjectFile(const PluginParams& params) const override;
 
 private:
     /**

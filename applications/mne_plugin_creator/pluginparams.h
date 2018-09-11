@@ -52,6 +52,7 @@
 struct PluginParams {
     /**
      * @brief PluginParams creates a new structure will recommended values based on basic inputs.
+     * @param app The name of the app the plugin will be created for.
      * @param name The (class) name of the plugin you wish to create.
      * @param superclass The class you want your plugin to inherit from.
      * @param nameSpace The namespace you wish for your new plugin to reside in.
@@ -61,9 +62,11 @@ struct PluginParams {
      * Given some basic inputs, the remainder of the fields will be automatically populated with sensible default
      * values. You are welcome to change any of the values after initialization.
      */
-    PluginParams(const QString& name, const QString& superclass, const QString& nameSpace, const QString author, const QString& email);
+    PluginParams(
+        const QString& app, const QString& name, const QString& superclass, const QString& nameSpace, const QString author, const QString& email);
 
     // Meta data
+    QString m_app;
     QString m_author;
     QString m_email;
     QString m_namespace;
