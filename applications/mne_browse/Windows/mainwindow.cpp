@@ -58,9 +58,9 @@ using namespace MNEBROWSE;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+//, m_qFileRaw(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qEventFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qEvokedFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -472,7 +472,7 @@ void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open fiff data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif data files (*.fif)"));
 
     if(filename.isEmpty())
@@ -555,7 +555,7 @@ void MainWindow::writeFile()
 {
     QString filename = QFileDialog::getSaveFileName(this,
                                                     QString("Write fiff data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif data files (*.fif)"));
 
     if(filename.isEmpty()) {
@@ -613,7 +613,7 @@ void MainWindow::loadEvents()
 {
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open fiff event data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
@@ -647,7 +647,7 @@ void MainWindow::saveEvents()
 {
     QString filename = QFileDialog::getSaveFileName(this,
                                                     QString("Save fiff event data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
     if(filename.isEmpty())
     {
@@ -671,7 +671,7 @@ void MainWindow::saveEvents()
 
 void MainWindow::loadEvoked()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {
