@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_{{target}}.pro
+# @file     test_{{target_name}}.pro
 # @author   {{author}} <{{author_email}}>
 #           Erik Hornberger <erik.hornberger@shi-g.com>
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -10,7 +10,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) {{year}}, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) {{year}}, {{author}}, Christoph Dinh, and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -31,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds test {{target}}
+# @brief    Builds test {{target_name}}
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_codecov
+TARGET = test_{{target_name}}
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -56,7 +56,7 @@ CONFIG(debug, debug|release) {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-        test_{{target}}.cpp \
+        test_{{target_name}}.cpp \
 
 HEADERS += \
 

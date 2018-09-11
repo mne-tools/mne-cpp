@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     test_{{target}}.cpp
+* @file     test_{{target_name}}.cpp
 * @author   {{author}} <{{author_email}}>
 *           Erik Hornberger <erik.hornberger@shi-g.com>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Test for {{target}}
+* @brief    Test for {{target_name}}
 *
 */
 
@@ -80,4 +80,4 @@ void Test{{name}}::create()
 //=============================================================================================================
 
 QTEST_MAIN(Test{{name}})
-#include "test_{{target}}.moc"
+#include "test_{{target_name}}.moc"
