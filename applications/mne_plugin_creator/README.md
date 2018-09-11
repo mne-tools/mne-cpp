@@ -6,6 +6,8 @@ MNE Plugin Creator is a tool to automate the creation of new MNE-CPP plugins. It
 
 Learning the Qt ecosystem is challenging and can be frustrating for new users who just want to implement a simple plugin. Even just copying the DummyPlugin and renaming it is non-trivial and surprisingly time consuming. Providing a CLI plugin creation tool the likes of Javascript's `npm` or Swift's `spm` will significantly lower MNE-CPP's barrier to entry for new users and increase its adoption.
 
+Likewise, a detailed explanation of how the plugin interface methods work has been added to the header files of the generated plugin with the goal of bringing new developers up to speed more quickly by helping them to grasp the big picture and avoid common pitfalls.
+
 ## Usage
 
 Presently `mne_plugin_creator` is intended to be run from within the Qt Creator IDE. Set it as the active project and run it to be presented with the CLI. You will be asked for basic information about the plugin you want to create.
@@ -22,9 +24,9 @@ The basic principle behind `mne_plugin_creator` is that there are a number of pl
 
 Modifying the details of the generated projects is as simple as modifying the template files.
 
-To extend `mne_plugin_creator`, you will need to start by writing a new parser class to collect information from the user. Subclass `IInputParser` and it's abstract methods. It has a number of utility function for performing common tasks like displaying options and validating input. `MNEScanInputParser` can serve as a reference. Once you've created your parser, add it to `AppInputParser`'s `parseUserInput` method.
+To extend `mne_plugin_creator`, you will need to start by writing a new parser class to collect information from the user. Subclass `IInputParser` and it's abstract methods. It has a number of utility functions for performing common tasks like displaying options and validating input. `MNEScanInputParser` can serve as a reference. Once you've created your parser, add it to `AppInputParser`'s `parseUserInput` method.
 
-Next you need to write an `IPluginCreator` subclass and implement its abstract methods to specify where the templates are and where to copy them to, as well as how Qt's .pro files need to be adjusted. Optionally, you can override the default implementation of the testframe creation method to provide a more detailed test frame boilerplate. `MNEScanPluginCreator` may be a valuable reference.
+Next you need to write an `IPluginCreator` subclass and implement its abstract methods to specify where the templates are and where to copy them to, as well as how Qt's .pro files need to be adjusted. Optionally, you can override the default implementation of the testframe creation method to provide more detailed test frame boilerplate. `MNEScanPluginCreator` may be a valuable reference.
 
 ## Future Work
 
