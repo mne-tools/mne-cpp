@@ -88,15 +88,13 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRtItem(Q_NULLPTR)
 , m_pNetworkView(NetworkView::SPtr::create())
 {
-    QGridLayout *mainLayoutView = new QGridLayout;
-    mainLayoutView->addWidget(m_pNetworkView.data(),0,0);
-
     QList<QWidget*> lControlWidgets = m_pRTCE->getControlWidgets();
     m_pNetworkView->setQuickControlWidgets(lControlWidgets);
 
-    this->setLayout(mainLayoutView);
+    QGridLayout *mainLayoutView = new QGridLayout();
+    mainLayoutView->addWidget(m_pNetworkView.data());
 
-    getData();
+    this->setLayout(mainLayoutView);
 }
 
 
@@ -122,22 +120,20 @@ void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 
 void RealTimeConnectivityEstimateWidget::getData()
 {
-    if(m_bInitialized) {
+    if(m_pRTCE) {
+        if(m_pRTCE->getValue().data()->isEmpty()) {
+            return;
+        }
+
         // Add rt brain data
         if(!m_pRtItem) {
-            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
+            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem";
             m_pRtItem = m_pNetworkView->addData(*(m_pRTCE->getValue().data()));
-
-
+            init();
         } else {
-            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
-
-            if(m_pRtItem) {
-                m_pRtItem->addData(*(m_pRTCE->getValue().data()));
-            }
+            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";
+            m_pRtItem->addData(*(m_pRTCE->getValue().data()));
         }
-    } else {
-        init();
     }
 }
 
@@ -162,8 +158,6 @@ void RealTimeConnectivityEstimateWidget::init()
                                                          "Sensors",
                                                          m_pRTCE->getFiffInfo()->chs,
                                                          *(m_pRTCE->getSensorSurface()));
-                    }
-
-    m_bInitialized = true;
+    }
 }
 
