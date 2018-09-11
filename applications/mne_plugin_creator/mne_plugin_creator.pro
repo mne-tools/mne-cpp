@@ -37,3 +37,6 @@ HEADERS += \
     mnescaninputparser.h \
     iinputparser.h \
     appinputparser.h
+
+OTHER_FILES += \
+    README.md
