@@ -43,7 +43,7 @@ IPluginCreator::~IPluginCreator() {}
 
 //=============================================================================================================
 
-void IPluginCreator::createPlugin(PluginParams& params)
+void IPluginCreator::createPlugin(const PluginParams& params) const
 {
     cout << "Creating plugin: " << params.m_name.toStdString() << "..." << endl;
     copyTemplates(params);

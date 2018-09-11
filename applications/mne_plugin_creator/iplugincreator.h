@@ -79,7 +79,7 @@ public:
      * @brief createPlugin creates a new plugin.
      * @param params contains information about the desired output location of the new plugin's files.
      */
-    void createPlugin(PluginParams& params);
+    void createPlugin(const PluginParams& params) const;
 
 protected:
     /**

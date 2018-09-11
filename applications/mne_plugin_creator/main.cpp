@@ -44,22 +44,15 @@
 #include "pluginparams.h"
 
 //=============================================================================================================
-
-QSharedPointer<IPluginCreator> selectPluginCreator(const PluginParams& params)
-{
-    const QString app = params.m_app;
-    if (app == "scan") {
-        return QSharedPointer<MNEScanPluginCreator>(new MNEScanPluginCreator());
-    } else {
-        throw std::invalid_argument(app.toStdString() + " is not a supported application!");
-    }
-}
-
 int main()
 {
     try {
-        PluginParams params = AppInputParser().parseUserInput();
-        selectPluginCreator(params)->createPlugin(params);
+        const PluginParams params = AppInputParser().parseUserInput();
+        if (params.m_app == "scan") {
+            MNEScanPluginCreator().createPlugin(params);
+        } else {
+            throw std::invalid_argument(params.m_app.toStdString() + " is not a supported application!");
+        }
         std::cout << "Congratulations! Your new plugin and its testframe are ready to go!" << std::endl;
         return 0;
     } catch (std::exception& e) {

@@ -1,5 +1,5 @@
 # {{name}}
-Write a brief description of what your plugin does here. Keep it to roughly 2 or three sentences.
+Write a brief description of what your plugin does here. Keep it to roughly 2 or 3 sentences.
 
 # Usage
 Describe in more detail how your plugin works and explain how to use it. Include an explanation of its inputs and outputs, its important settings, and a screenshot or two. A picture is worth a thousand words.
