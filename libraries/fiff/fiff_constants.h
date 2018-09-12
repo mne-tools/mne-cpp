@@ -131,8 +131,11 @@ namespace FIFFLIB
 /*
 * 4. Others we need
 */
-#define FIFF_UNIT_T_M 201   /* T/m */
-#define FIFF_UNIT_AM  202   /* Am  */
+#define FIFF_UNIT_T_M   201   /* T/m */
+#define FIFF_UNIT_AM    202   /* Am  */
+#define FIFF_UNIT_AM_M2 203   /* Am/m^2  */
+#define FIFF_UNIT_AM_M3 204   /* Am/m^3  */
+
 /*
 * 5. Multipliers
 */
@@ -190,20 +193,17 @@ namespace FIFFLIB
 
 
 /*
- * BabySQUID sensors
+ * BabySQUID/BabyMEG sensors
  */
-#define FIFFV_COIL_BABY_GRAD          7001  /**< BabySQUID gradiometers */
-#define FIFFV_COIL_BABY_MAG           7002  /**< BabyMEG inner layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG       7003  /**< BabyMEG outer layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG2      7004  /**< BabyMEG reference magnetometer */
-
-///*
-// * BabyMEG sensors --- added by Limin ---
-// */
-//#define FIFFV_COIL_BABY_INLAYER_MAG   7002  /**< babyMEG inlayer magnetometer */
-//#define FIFFV_COIL_BABY_OUTLAYER_MAG  7003  /**< babyMEG outlayer magnetometer */
-//#define FIFFV_COIL_BABY_REF_MAG       7004
-
+#define FIFFV_COIL_BABY_GRAD            7001  /**< BabySQUID gradiometers */
+#define FIFFV_COIL_BABY_MAG             7002  /**< BabyMEG inner layer magnetometers */
+#define FIFFV_COIL_BABY_REF_MAG         7003  /**< BabyMEG outer layer magnetometers */
+#define FIFFV_COIL_BABY_REF_MAG2        7004  /**< BabyMEG reference magnetometer */
+#define FIFFV_COIL_ARTEMIS123_GRAD      7501  /**< Artemis123 gradiometer */
+#define FIFFV_COIL_ARTEMIS123_REF_MAG   7502  /**< Artemis123 reference magnetometer */
+#define FIFFV_COIL_ARTEMIS123_REF_GRAD  7503  /**< Artemis123 reference gradiometer */
+#define FIFFV_COIL_KRISS_GRAD           8001  /**< KRISS gradiometer */
+#define FIFFV_COIL_SAMPLE_TMS_PLANAR    9001  /**< Sample TMS sensor */
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 
