@@ -156,7 +156,9 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     this->setData(data, Data3DTreeModelItemRoles::Data);
 
     //Plot network
-    plotNetwork(tNetwork);
+    if(this->checkState() == Qt::Checked) {
+        plotNetwork(tNetwork);
+    }
 }
 
 

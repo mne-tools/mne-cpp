@@ -361,23 +361,21 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     if(pRTMSA && m_bReceiveData) {
         //Check if buffer initialized
-        if(!m_pMatrixDataBuffer)
+        if(!m_pMatrixDataBuffer) {
             m_pMatrixDataBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        }
 
         //Fiff Information of the evoked
         if(!m_pFiffInfoInput) {
             //qDebug()<<"MNE::updateRTMSA - Creating m_pFiffInfoInput";
             //m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTMSA->info().data()));
             m_pFiffInfoInput = pRTMSA->info();
+            m_iNumAverages = 1;
         }
 
-        if(m_bProcessData)
-        {
-            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
-            {
-                MatrixXd t_mat = pRTMSA->getMultiSampleArray()[i];
-
-                m_pMatrixDataBuffer->push(&t_mat);
+        if(m_bProcessData) {
+            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+                m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
             }
         }
     }
@@ -555,13 +553,19 @@ void MNE::run()
             {
                 MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
 
-                float tmin = 1.0f / m_pFiffInfo->sfreq;
+                MatrixXd data(m_invOp.noise_cov->names.size(), rawSegment.cols());
+
+                for(qint32 j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
+                    data.row(j) = rawSegment.row(m_pFiffInfoInput->ch_names.indexOf(m_invOp.noise_cov->names.at(j)));
+                }
+
+                float tmin = 0.0f;
                 float tstep = 1.0f / m_pFiffInfo->sfreq;
 
                 m_qMutex.lock();
 
                 //TODO: Add picking here. See evoked part as input.
-                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(rawSegment, tmin, tstep);
+                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(data, tmin, tstep);
 
                 m_qMutex.unlock();
 
