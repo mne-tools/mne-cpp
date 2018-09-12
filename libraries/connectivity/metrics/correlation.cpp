@@ -90,7 +90,8 @@ Correlation::Correlation()
 
 //*************************************************************************************************************
 
-Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert)
+Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
+                                      const MatrixX3f& matVert)
 {
     Network finalNetwork("Correlation");
 
@@ -114,7 +115,9 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const 
     }
 
     //Calculate connectivity matrix over epochs and average afterwards
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList, calculate, sum);
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList,
+                                                              calculate,
+                                                              sum);
     resultMat.waitForFinished();
 
     MatrixXd matDist = resultMat.result();
@@ -126,9 +129,10 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const 
             MatrixXd matWeight(1,1);
             matWeight << matDist(i,j);
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.getNodeAt(j)->append(pEdge);
             finalNetwork.append(pEdge);
         }
     }
@@ -139,7 +143,8 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList, const 
 
 //*************************************************************************************************************
 
-double Correlation::calcCorrelationCoeff(const RowVectorXd &vecFirst, const RowVectorXd &vecSecond)
+double Correlation::calcCorrelationCoeff(const RowVectorXd &vecFirst,
+                                         const RowVectorXd &vecSecond)
 {
     if(vecFirst.cols() != vecSecond.cols()) {
         qDebug() << "Correlation::calcCorrelationCoeff - Vectors length do not match!";
@@ -168,7 +173,8 @@ MatrixXd Correlation::calculate(const MatrixXd &data)
 
 //*************************************************************************************************************
 
-void Correlation::sum(MatrixXd &resultData, const MatrixXd &data)
+void Correlation::sum(MatrixXd &resultData,
+                      const MatrixXd &data)
 {
     if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
         resultData.resize(data.rows(), data.cols());

@@ -182,10 +182,13 @@ public:
     /**
     * New devoked to distribute
     *
-    * @param [in] v             the evoked set which should be distributed.
-    * @param [in] p_fiffinfo    the evoked fiff info as shared pointer.
+    * @param [in] v                         the evoked set which should be distributed.
+    * @param [in] p_fiffinfo                the evoked fiff info as shared pointer.
+    * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    virtual void setValue(FiffEvokedSet &v, FiffInfo::SPtr p_fiffinfo);
+    virtual void setValue(const FiffEvokedSet &v,
+                          const FiffInfo::SPtr& p_fiffinfo,
+                          const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -195,6 +198,14 @@ public:
     * @return the last attached value.
     */
     virtual FiffEvokedSet::SPtr& getValue();
+
+    //=========================================================================================================
+    /**
+    * Returns the trigger types which lead to the emit of this evoked set.
+    *
+    * @return the trigger types which lead to the emit of this evoked set.
+    */
+    const QStringList& getResponsibleTriggerTypes();
 
     //=========================================================================================================
     /**
@@ -232,6 +243,8 @@ private:
     mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety */
 
     FIFFLIB::FiffEvokedSet::SPtr        m_pFiffEvokedSet;   /**< Evoked data set*/
+
+    QStringList                         m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
     FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;        /**< Fiff info */
 

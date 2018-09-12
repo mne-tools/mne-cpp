@@ -88,6 +88,7 @@ ModalitySelectionView::ModalitySelectionView(QWidget *parent,
 void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
 {
     m_qListModalities.clear();
+    bool hasMEG = false;
     bool hasMAG = false;
     bool hasGRAD = false;
     bool hasEEG = false;
@@ -95,6 +96,8 @@ void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
     bool hasMISC = false;
     for(qint32 i = 0; i < modalityList.size(); ++i)
     {
+        if(modalityList.at(i).m_sName.contains("MEG"))
+            hasMEG = true;
         if(modalityList.at(i).m_sName.contains("MAG"))
             hasMAG = true;
         if(modalityList.at(i).m_sName.contains("GRAD"))
@@ -110,16 +113,18 @@ void ModalitySelectionView::init(const QList<DISPLIB::Modality>& modalityList)
     bool sel = true;
     float val = 1e-11f;
 
+    if(hasMEG)
+        m_qListModalities.append(Modality("MEG",sel,val));
     if(hasMAG)
         m_qListModalities.append(Modality("MAG",sel,val));
     if(hasGRAD)
         m_qListModalities.append(Modality("GRAD",sel,val));
     if(hasEEG)
-        m_qListModalities.append(Modality("EEG",false,val));
+        m_qListModalities.append(Modality("EEG",sel,val));
     if(hasEOG)
-        m_qListModalities.append(Modality("EOG",false,val));
+        m_qListModalities.append(Modality("EOG",sel,val));
     if(hasMISC)
-        m_qListModalities.append(Modality("MISC",false,val));
+        m_qListModalities.append(Modality("MISC",sel,val));
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 
@@ -216,7 +221,7 @@ void ModalitySelectionView::setModalities(const QList<Modality> &lModalities)
     for(int i = 0; i < m_qListModalityCheckBox.size(); i++) {
         for(int j = 0; j < lModalities.size(); j++) {
             if(m_qListModalityCheckBox.at(i)->text().contains(lModalities.at(j).m_sName)) {
-                qDebug()<<"ModalitySelectionView::setModalities - Set "<<lModalities.at(j).m_sName<<"to"<<lModalities.at(j).m_bActive;
+                //qDebug()<<"ModalitySelectionView::setModalities - Set "<<lModalities.at(j).m_sName<<"to"<<lModalities.at(j).m_bActive;
                 m_qListModalityCheckBox.at(i)->setChecked(lModalities.at(j).m_bActive);
             }
         }

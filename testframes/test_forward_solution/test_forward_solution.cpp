@@ -123,12 +123,12 @@ void TestForwardSolution::computeForward()
 
     settings.include_meg = true;
     settings.accurate = true;
-    settings.srcname = QDir::currentPath()+"./MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
-    settings.measname = QDir::currentPath()+"./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
-    settings.mriname = QDir::currentPath()+"./MNE-sample-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
+    settings.srcname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    settings.measname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    settings.mriname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
     settings.mri_head_ident = false;
     settings.transname.clear();
-    settings.bemname = QDir::currentPath()+"./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
+    settings.bemname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
     settings.mindist = 5.0f/1000.0f;
     settings.solname = QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif";
 

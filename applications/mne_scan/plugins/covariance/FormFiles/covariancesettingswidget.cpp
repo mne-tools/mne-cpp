@@ -12,7 +12,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CovariancePlugin;
+using namespace COVARIANCEPLUGIN;
 
 
 CovarianceSettingsWidget::CovarianceSettingsWidget(Covariance *toolbox, QWidget *parent)
@@ -38,7 +38,8 @@ CovarianceSettingsWidget::CovarianceSettingsWidget(Covariance *toolbox, QWidget 
     m_pSpinBoxNumSamples->setMaximum(minSamples*60);
     m_pSpinBoxNumSamples->setSingleStep(minSamples);
     m_pSpinBoxNumSamples->setValue(toolbox->m_iEstimationSamples);
-    connect(m_pSpinBoxNumSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pCovarianceToolbox, &Covariance::changeSamples);
+    connect(m_pSpinBoxNumSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            m_pCovarianceToolbox, &Covariance::changeSamples);
     t_pGridLayout->addWidget(m_pSpinBoxNumSamples,0,1,1,1);
 //    }
     this->setLayout(t_pGridLayout);

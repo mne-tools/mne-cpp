@@ -73,12 +73,12 @@ MNE::MNE()
 , m_bReceiveData(false)
 , m_bProcessData(false)
 , m_bFinishedClustering(false)
-, m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
-, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
-, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
+, m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
+, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_iNumAverages(1)
-, m_iDownSample(2)
-, m_sAvrType("1")
+, m_iDownSample(1)
+, m_sAvrType("4")
 {
 
 }
@@ -305,13 +305,9 @@ bool MNE::stop()
 {
     m_bIsRunning = false;
 
-    if(m_pRtInvOp->isRunning())
-        m_pRtInvOp->stop();
-
-    if(m_bProcessData) // Only clear if buffers have been initialised
-    {
+    // Only clear if buffers have been initialised
+    if(m_bProcessData) {
         m_qVecFiffEvoked.clear();
-        m_qVecFiffCov.clear();
     }
 
     m_qListCovChNames.clear();
@@ -397,15 +393,20 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
     //MEG
     if(pRTC && m_bReceiveData)
     {
-        //Fiff Information of the covariance
-        if(m_qListCovChNames.size() != pRTC->getValue()->names.size())
-            m_qListCovChNames = pRTC->getValue()->names;
+        // Init Real-Time inverse estimator
+        if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
+            m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
+            connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
+                    this, &MNE::updateInvOp);
+        }
 
-        if(m_bProcessData)
-        {
-            m_qMutex.lock();
-            m_qVecFiffCov.push_back(pRTC->getValue()->pick_channels(m_qListPickChannels));
-            m_qMutex.unlock();
+        //Fiff Information of the covariance
+        if(m_qListCovChNames.size() != pRTC->getValue()->names.size()) {
+            m_qListCovChNames = pRTC->getValue()->names;
+        }
+
+        if(m_bProcessData && m_pRtInvOp){
+            m_pRtInvOp->append(pRTC->getValue()->pick_channels(m_qListPickChannels));
         }
     }
 }
@@ -417,28 +418,41 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
+    if(!pRTES) {
+        return;
+    }
+
     QMutexLocker locker(&m_qMutex);
-    //MEG
-    if(pRTES && m_bReceiveData)
-    {
-        //Fiff Information of the evoked
-        if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
-            for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
-                if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
-                    m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
-                }
+
+    if(!m_bReceiveData || !pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
+        return;
+    }
+
+    QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+
+    //Fiff Information of the evoked
+    if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
+        for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
+            if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
+                m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
+                m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                break;
             }
         }
+    }
 
-        if(m_bProcessData) {
-            FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
+    if(m_bProcessData) {
+        FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
-            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-                //qDebug()<<""<<m_sAvrType;
-                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
-                    //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
-                    m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
-                }
+        for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+            //qDebug()<<""<<m_sAvrType;
+            if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
+                //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
+                m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
+                m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                break;
             }
         }
     }
@@ -447,25 +461,21 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
+void MNE::updateInvOp(const MNEInverseOperator& invOp)
 {
+    QMutexLocker locker(&m_qMutex);
     //qDebug() << "MNE::updateInvOp - START";
-    m_pInvOp = p_pInvOp;
+    m_invOp = invOp;
 
     double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
-    m_qMutex.lock();
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, method));
 
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
-
-    //
-    //   Set up the inverse according to the parameters
-    //
+    //Set up the inverse according to the parameters
     m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
-    m_qMutex.unlock();
 }
 
 
@@ -498,19 +508,6 @@ void MNE::run()
     //qDebug() << "MNE::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
 
     //
-    // Init Real-Time inverse estimator
-    //
-    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
-            this, &MNE::updateInvOp);
-    m_pMinimumNorm.reset();
-
-    //
-    // Start the rt helpers
-    //
-    m_pRtInvOp->start();
-
-    //
     // start processing data
     //
     m_bProcessData = true;
@@ -521,7 +518,7 @@ void MNE::run()
 //    // TEMP INV LOADING START
 //    //
 
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+//    QFile t_fileCov(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    FiffCov noise_cov(t_fileCov);
 
 //    // regularize noise covariance
@@ -532,7 +529,7 @@ void MNE::run()
 //    //
 //    MNEInverseOperator inverse_operator(*m_pFiffInfoInput.data(), *m_pClusteredFwd.data(), noise_cov, 0.2f, 0.8f, false);
 
-//    m_pInvOp = MNEInverseOperator::SPtr(&inverse_operator);
+//    m_invOp = MNEInverseOperator::SPtr(&inverse_operator);
 
 //    double snr = 1.0;
 //    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
@@ -547,17 +544,6 @@ void MNE::run()
     while(m_bIsRunning)
     {
         m_qMutex.lock();
-        qint32 t_covSize = m_qVecFiffCov.size();
-        m_qMutex.unlock();
-        if(t_covSize > 0)
-        {
-            m_qMutex.lock();
-            m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);
-            m_qVecFiffCov.pop_front();
-            m_qMutex.unlock();
-        }
-
-        m_qMutex.lock();
         qint32 t_evokedSize = m_qVecFiffEvoked.size();
         m_qMutex.unlock();
 
@@ -569,8 +555,8 @@ void MNE::run()
             {
                 MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
 
-                float tmin = 1 / m_pFiffInfo->sfreq;
-                float tstep = 1 / m_pFiffInfo->sfreq;
+                float tmin = 1.0f / m_pFiffInfo->sfreq;
+                float tstep = 1.0f / m_pFiffInfo->sfreq;
 
                 m_qMutex.lock();
 
@@ -579,7 +565,9 @@ void MNE::run()
 
                 m_qMutex.unlock();
 
-                m_pRTSEOutput->data()->setValue(sourceEstimate);
+                if(!sourceEstimate.isEmpty()) {
+                    m_pRTSEOutput->data()->setValue(sourceEstimate);
+                }
             }
             else
             {
@@ -597,9 +585,8 @@ void MNE::run()
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 m_qMutex.lock();
-                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
+                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked.takeFirst();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
-                m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();
 
                 float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
@@ -607,13 +594,15 @@ void MNE::run()
 
                 m_qMutex.lock();
 
-                t_fiffEvoked = t_fiffEvoked.pick_channels(m_pInvOp->noise_cov->names);
+                t_fiffEvoked = t_fiffEvoked.pick_channels(m_invOp.noise_cov->names);
 
                 MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
 
                 m_qMutex.unlock();
 
-                m_pRTSEOutput->data()->setValue(sourceEstimate);
+                if(!sourceEstimate.isEmpty()) {
+                    m_pRTSEOutput->data()->setValue(sourceEstimate);
+                }
             }
             else
             {

@@ -51,12 +51,17 @@
 
 #include <QSharedPointer>
 #include <QWidget>
+#include <QPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace DISPLIB {
+    class QuickControlView;
+}
 
 
 //*************************************************************************************************************
@@ -129,6 +134,22 @@ public:
     */
     QSharedPointer<DISP3DLIB::Data3DTreeModel> getTreeModel();
 
+    //=========================================================================================================
+    /**
+    * Returns the quick control view.
+    *
+    * @return The currently set quick control view.
+    */
+    QPointer<DISPLIB::QuickControlView> getQuickControl();
+
+    //=========================================================================================================
+    /**
+    * Sets the extra control widgets in the quick control view.
+    *
+    * @param[in] lControlWidgets    The new extra control widgets.
+    */
+    void setQuickControlWidgets(const QList<QWidget*>& lControlWidgets);
+
 protected:
     //=========================================================================================================
     /**
@@ -136,9 +157,12 @@ protected:
     */
     void createGUI();
 
-    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;          /**< The Disp3D view. */
-    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;     /**< The Disp3D model. */
+    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;              /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;       /**< The Disp3D control. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;         /**< The Disp3D model. */
+
+    QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< The quick control view. */
+
 };
 
 } // NAMESPACE

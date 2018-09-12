@@ -66,8 +66,10 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 QuickControlView::QuickControlView(const QString& name,
-                                    QWidget *parent)
-: DraggableFramelessWidget(parent, Qt::Window | Qt::CustomizeWindowHint)
+                                   Qt::WindowFlags flags,
+                                   QWidget *parent,
+                                   bool bDraggable)
+: DraggableFramelessWidget(parent, flags, false, bDraggable)
 , ui(new Ui::QuickControlViewWidget)
 , m_sName(name)
 {
@@ -182,6 +184,17 @@ void QuickControlView::setOpacityValue(int opactiy)
 int QuickControlView::getOpacityValue()
 {
     return ui->m_horizontalSlider_opacity->value();
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
+{
+    ui->m_pushButton_close->setVisible(bVisibility);
+    ui->m_pushButton_hideAll->setVisible(bVisibility);
+    ui->m_horizontalSlider_opacity->setVisible(bVisibility);
+    ui->m_label_opacity->setVisible(bVisibility);
 }
 
 

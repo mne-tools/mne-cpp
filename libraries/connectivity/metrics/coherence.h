@@ -58,6 +58,7 @@
 #include <QSharedPointer>
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -118,8 +119,10 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network coherence(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-                             int iNfft=-1, const QString &sWindowType="hanning");
+    static Network coherence(const QList<Eigen::MatrixXd> &matDataList,
+                             const Eigen::MatrixX3f& matVert,
+                             int iNfft=-1,
+                             const QString &sWindowType="hanning");
 
     //=========================================================================================================
     /**

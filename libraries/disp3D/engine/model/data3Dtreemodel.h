@@ -202,9 +202,9 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addSourceSpace(const QString& sSubject,
-                                        const QString& sMeasurementSetName,
-                                        const MNELIB::MNESourceSpace& sourceSpace);
+    QList<SourceSpaceTreeItem*> addSourceSpace(const QString& sSubject,
+                                               const QString& sMeasurementSetName,
+                                               const MNELIB::MNESourceSpace& sourceSpace);
 
     //=========================================================================================================
     /**
@@ -216,7 +216,7 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addForwardSolution(const QString& sSubject,
+    QList<SourceSpaceTreeItem*> addForwardSolution(const QString& sSubject,
                                             const QString& sMeasurementSetName,
                                             const MNELIB::MNEForwardSolution& forwardSolution);
 

@@ -57,6 +57,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMutex>
+#include <QElapsedTimer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,6 +90,7 @@ namespace SCMEASLIB {
     class RealTimeSourceEstimate;
     class RealTimeMultiSampleArray;
     class RealTimeConnectivityEstimate;
+    class RealTimeEvokedSet;
 }
 
 
@@ -162,6 +166,14 @@ public:
     */
     void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
+    //=========================================================================================================
+    /**
+    * Slot to update the fiff evoked
+    *
+    * @param[in] pMeasurement   The evoked to be appended
+    */
+    void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
+
 protected:
     //=========================================================================================================
     /**
@@ -187,6 +199,14 @@ protected:
 
     //=========================================================================================================
     /**
+    * Slot called when the number of trials changed.
+    *
+    * @param [in] iNumberTrials        The new number of trials.
+    */
+    void onNumberTrialsChanged(int iNumberTrials);
+
+    //=========================================================================================================
+    /**
     * Slot called when the window type changed.
     *
     * @param [in] windowType        The new window type
@@ -194,8 +214,17 @@ protected:
     void onWindowTypeChanged(const QString& windowType);
 
 private:
-    bool                m_bIsRunning;                   /**< Flag whether thread is running.*/
-    qint32              m_iDownSample;                  /**< Sampling rate. */
+    bool                m_bIsRunning;           /**< Flag whether thread is running.*/
+    qint32              m_iDownSample;          /**< Sampling rate. */
+    qint32              m_iNumberAverages;      /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
+    QString             m_sAtlasDir;            /**< File to Atlas. */
+    QString             m_sSurfaceDir;          /**< File to Surface. */
+
+    QString             m_sAvrType;             /**< The average type */
+
+    QMutex              m_mutex;
+
+    QElapsedTimer       m_timer;
 
     CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
@@ -207,6 +236,7 @@ private:
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr                m_pRTEVSInput;                  /**< The RealTimeEvoked input.*/
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 

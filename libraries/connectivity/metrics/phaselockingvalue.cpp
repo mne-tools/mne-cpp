@@ -95,10 +95,12 @@ PhaseLockingValue::PhaseLockingValue()
 
 //*******************************************************************************************************
 
-Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert,
-                                           int iNfft, const QString &sWindowType)
+Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
+                                             const MatrixX3f& matVert,
+                                             int iNfft,
+                                             const QString &sWindowType)
 {
-    Network finalNetwork("New Phase Locking Value");
+    Network finalNetwork("Phase Locking Value");
 
     if(matDataList.empty()) {
         qDebug() << "PhaseLockingValue::phaseLockingValue - Input data is empty";
@@ -124,12 +126,13 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
 
     //Add edges to network
     for(int i = 0; i < vecPLV.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = i; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecPLV.at(i).row(j).transpose();
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.getNodeAt(j)->append(pEdge);
             finalNetwork.append(pEdge);
         }
     }
@@ -140,7 +143,8 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataList, int iNfft,
+QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataList,
+                                                int iNfft,
                                                 const QString &sWindowType)
 {
     // Check that iNfft >= signal length
@@ -170,11 +174,7 @@ QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataLi
         }
 
         // This part could be parallelized with QtConcurrent::mapped
-        QVector<MatrixXcd> vecTapSpectra;
-        for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
-            vecTapSpectra.append(matTmpSpectra);
-        }
+        QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData, tapers.first, iNfft);
 
         // This part could be parallelized with QtConcurrent::mappedReduced
         for (int j = 0; j < iNRows; ++j) {

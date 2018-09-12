@@ -213,11 +213,11 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject,
+QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubject,
                                                      const QString& sMeasurementSetName,
                                                      const MNESourceSpace& sourceSpace)
 {
-    SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
+    QList<SourceSpaceTreeItem*> pReturnItem;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(sSubject);
@@ -240,7 +240,7 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject,
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject,
+QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& sSubject,
                                                          const QString& sMeasurementSetName,
                                                          const MNEForwardSolution& forwardSolution)
 {

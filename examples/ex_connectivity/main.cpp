@@ -40,13 +40,17 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "connectivitysettingsmanager.h"
+
 #include <disp3D/viewers/networkview.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 
 #include <disp3D/engine/model/items/network/networktreeitem.h>
+#include <disp3D/engine/model/items/sourcespace/sourcespacetreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -59,6 +63,10 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
+#include <realtime/rtProcessing/rtconnectivity.h>
+
+#include <disp/viewers/connectivitysettingsview.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,6 +78,7 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -78,17 +87,18 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 using namespace INVERSELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace CONNECTIVITYLIB;
+using namespace REALTIMELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
 
 //=============================================================================================================
 /**
@@ -109,20 +119,20 @@ int main(int argc, char *argv[])
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
+    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "IMAGCOH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "mag");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.3");
     QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.6");
 
@@ -160,10 +170,10 @@ int main(int argc, char *argv[])
     QString sChType = parser.value(chTypeOption);
     QString sEve = parser.value(eventsFileOption);
     QString sRaw = parser.value(rawFileOption);
-    double dTMin = parser.value(tMinOption).toDouble();
-    double dTMax = parser.value(tMaxOption).toDouble();
+    float fTMin = parser.value(tMinOption).toFloat();
+    float fTMax = parser.value(tMaxOption).toFloat();
 
-    bool bDoSourceLoc, bDoClust;
+    bool bDoSourceLoc, bDoClust = false;
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
         bDoSourceLoc =false;
     } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
@@ -183,160 +193,169 @@ int main(int argc, char *argv[])
     QList<MatrixXd> matDataList;
     MatrixX3f matNodePositions;
 
-    if(!bDoSourceLoc) {
-        // Create sensor level data
-        QFile t_fileRaw(sRaw);
-        qint32 event = iAveIdx;
-        QString t_sEventName =sEve ;
-        float tmin = dTMin;
-        float tmax = dTMax;
-        bool keep_comp = false;
-        fiff_int_t dest_comp = 0;
-        bool pick_all = false;
-        qint32 k, p;
+    MNEForwardSolution t_clusteredFwd;
+    MNEForwardSolution t_Fwd;
 
-        // Setup for reading the raw data
-        FiffRawData raw(t_fileRaw);
+    QFile t_fileCov(sCov);
+    FiffCov noise_cov(t_fileCov);
 
-        RowVectorXi picks;
-        if (pick_all) {
-            // Pick all
-            picks.resize(raw.info.nchan);
+    // Create sensor level data
+    QFile t_fileRaw(sRaw);
+    qint32 event = iAveIdx;
+    QString t_sEventName =sEve ;
+    float tmin = fTMin;
+    float tmax = fTMax;
+    bool keep_comp = false;
+    fiff_int_t dest_comp = 0;
+    bool pick_all = false;
+    qint32 k, p;
 
-            for(k = 0; k < raw.info.nchan; ++k) {
-                picks(k) = k;
-            }
+    // Setup for reading the raw data
+    FiffRawData raw(t_fileRaw);
+
+    RowVectorXi picks;
+
+    if (pick_all) {
+        // Pick all
+        picks.resize(raw.info.nchan);
+
+        for(k = 0; k < raw.info.nchan; ++k) {
+            picks(k) = k;
+        }
+    } else if (!bDoSourceLoc) {
+        QStringList include;
+        bool want_meg, want_eeg, want_stim;
+
+        if(sChType == "meg") {
+            want_meg = true;
+            want_eeg = false;
+            want_stim = false;
+
+            picks = raw.info.pick_types(sCoilType, want_eeg, want_stim, include, raw.info.bads);
+        } else if (sChType == "eeg") {
+            want_meg = false;
+            want_eeg = true;
+            want_stim = false;
+
+            picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+        }
+    } else {
+        picks = raw.info.pick_channels(raw.info.ch_names, noise_cov.names, noise_cov.bads);
+    }
+
+    QStringList pickedChNames;
+    for(k = 0; k < picks.cols(); ++k) {
+        pickedChNames << raw.info.ch_names[picks(0,k)];
+    }
+
+    // Set up projection
+    if (raw.info.projs.size() == 0) {
+        printf("No projector specified for these data\n");
+    } else {
+        // Activate the projection items
+        for (k = 0; k < raw.info.projs.size(); ++k) {
+            raw.info.projs[k].active = true;
+        }
+
+        // Create the projector
+        fiff_int_t nproj = raw.info.make_projector(raw.proj);
+
+        if (nproj == 0) {
+            printf("The projection vectors do not apply to these channels\n");
         } else {
-            QStringList include;
-            bool want_meg, want_eeg, want_stim;
-
-            if(sChType == "meg") {
-                want_meg = true;
-                want_eeg = false;
-                want_stim = false;
-
-                picks = raw.info.pick_types(sCoilType, want_eeg, want_stim, include, raw.info.bads);
-            } else if (sChType == "eeg") {
-                want_meg = false;
-                want_eeg = true;
-                want_stim = false;
-
-                picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
-            }
+            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
         }
+    }
 
-        QStringList pickedChNames;
-        for(k = 0; k < picks.cols(); ++k) {
-            pickedChNames << raw.info.ch_names[picks(0,k)];
-        }
+    // Set up the CTF compensator
+    qint32 current_comp = raw.info.get_current_comp();
+    if(current_comp > 0) {
+        printf("Current compensation grade : %d\n",current_comp);
+    }
 
-        // Set up projection
-        if (raw.info.projs.size() == 0) {
-            printf("No projector specified for these data\n");
+    if(keep_comp) {
+        dest_comp = current_comp;
+    }
+
+    if (current_comp != dest_comp) {
+        qDebug() << "This part needs to be debugged";
+        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
+            raw.info.set_current_comp(dest_comp);
+            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         } else {
-            // Activate the projection items
-            for (k = 0; k < raw.info.projs.size(); ++k) {
-                raw.info.projs[k].active = true;
-            }
+            printf("Could not make the compensator\n");
+        }
+    }
 
-            // Create the projector
-            fiff_int_t nproj = raw.info.make_projector(raw.proj);
+    // Read the events
+    QFile t_EventFile;
+    MatrixXi events;
 
-            if (nproj == 0) {
-                printf("The projection vectors do not apply to these channels\n");
-            } else {
-                printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
-            }
+    if (t_sEventName.size() == 0) {
+        p = t_fileRaw.fileName().indexOf(".fif");
+
+        if (p > 0) {
+            t_sEventName = t_fileRaw.fileName().replace(p, 4, "-eve.fif");
+        } else {
+            printf("Raw file name does not end properly\n");
         }
 
-        // Set up the CTF compensator
-        qint32 current_comp = raw.info.get_current_comp();
-        if(current_comp > 0) {
-            printf("Current compensation grade : %d\n",current_comp);
-        }
-
-        if(keep_comp) {
-            dest_comp = current_comp;
-        }
-
-        if (current_comp != dest_comp) {
-            qDebug() << "This part needs to be debugged";
-            if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
-                raw.info.set_current_comp(dest_comp);
-                printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-            } else {
-                printf("Could not make the compensator\n");
-            }
-        }
-
-        // Read the events
-        QFile t_EventFile;
-        MatrixXi events;
-
-        if (t_sEventName.size() == 0) {
-            p = t_fileRaw.fileName().indexOf(".fif");
-
-            if (p > 0) {
-                t_sEventName = t_fileRaw.fileName().replace(p, 4, "-eve.fif");
-            } else {
-                printf("Raw file name does not end properly\n");
-            }
-
+        t_EventFile.setFileName(t_sEventName);
+        MNE::read_events(t_EventFile, events);
+        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
+    } else {
+        // Binary file
+        p = t_fileRaw.fileName().indexOf(".fif");
+        if (p > 0)
+        {
             t_EventFile.setFileName(t_sEventName);
-            MNE::read_events(t_EventFile, events);
-            printf("Events read from %s\n",t_sEventName.toUtf8().constData());
-        } else {
-            // Binary file
-            p = t_fileRaw.fileName().indexOf(".fif");
-            if (p > 0)
+            if(!MNE::read_events(t_EventFile, events))
             {
-                t_EventFile.setFileName(t_sEventName);
-                if(!MNE::read_events(t_EventFile, events))
-                {
-                    printf("Error while read events.\n");
-                }
-                printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
-            } else {
-                // Text file
-                printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
+                printf("Error while read events.\n");
             }
-        }
-
-        // Select the desired events
-        qint32 count = 0;
-        MatrixXi selected = MatrixXi::Zero(1, events.rows());
-        for (p = 0; p < events.rows(); ++p) {
-            if (events(p,1) == 0 && events(p,2) == event) {
-                selected(0,count) = p;
-                ++count;
-            }
-        }
-
-        selected.conservativeResize(1, count);
-        if (count > 0) {
-            printf("%d matching events found\n",count);
+            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
         } else {
-            printf("No desired events found.\n");
+            // Text file
+            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
         }
+    }
 
-        fiff_int_t event_samp, from, to;
-        MatrixXd timesDummy;
-
-        MatrixXd matData;
-
-        for (p = 0; p < count; ++p) {
-            // Read a data segment
-            event_samp = events(selected(p),0);
-            from = event_samp + tmin*raw.info.sfreq;
-            to = event_samp + floor(tmax*raw.info.sfreq + 0.5);
-
-            if(raw.read_raw_segment(matData, timesDummy, from, to, picks)) {
-                matDataList.append(matData);
-            } else  {
-                printf("Can't read the event data segments");
-            }
+    // Select the desired events
+    qint32 count = 0;
+    MatrixXi selected = MatrixXi::Zero(1, events.rows());
+    for (p = 0; p < events.rows(); ++p) {
+        if (events(p,1) == 0 && events(p,2) == event) {
+            selected(0,count) = p;
+            ++count;
         }
+    }
 
+    selected.conservativeResize(1, count);
+    if (count > 0) {
+        printf("%d matching events found\n",count);
+    } else {
+        printf("No desired events found.\n");
+    }
+
+    fiff_int_t event_samp, from, to;
+    MatrixXd timesDummy;
+
+    MatrixXd matData;
+
+    for (p = 0; p < count; ++p) {
+        // Read a data segment
+        event_samp = events(selected(p),0);
+        from = event_samp + tmin*raw.info.sfreq;
+        to = event_samp + floor(tmax*raw.info.sfreq + 0.5);
+
+        if(raw.read_raw_segment(matData, timesDummy, from, to, picks)) {
+            matDataList.append(matData);
+        } else  {
+            printf("Can't read the event data segments");
+        }
+    }
+
+    if(!bDoSourceLoc) {
         // Generate 3D node for 3D network visualization
         int counter = 0;
 
@@ -356,31 +375,18 @@ int main(int argc, char *argv[])
         AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
         QFile t_fileFwd(sFwd);
-        MNEForwardSolution t_Fwd(t_fileFwd);
-        MNEForwardSolution t_clusteredFwd;
-
-        QFile t_fileCov(sCov);
-        QFile t_fileEvoked(sAve);
+        t_Fwd = MNEForwardSolution(t_fileFwd);
 
         // Load data
         QPair<QVariant, QVariant> baseline(QVariant(), 0);
         MNESourceEstimate sourceEstimate;
-        FiffEvoked evoked(t_fileEvoked, iAveIdx, baseline);
 
-        double snr = dSnr;
-        double lambda2 = 1.0 / pow(snr, 2);
+        double lambda2 = 1.0 / pow(dSnr, 2);
         QString method(sSourceLocMethod);
 
-        t_fileEvoked.close();
-
-        if(evoked.isEmpty() || t_Fwd.isEmpty()) {
-            printf("Evoked or forward data is empty");
-        }
-
-        FiffCov noise_cov(t_fileCov);
 
         // regularize noise covariance
-        noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+        noise_cov = noise_cov.regularize(raw.info, 0.05, 0.05, 0.1, true);
 
         // Cluster forward solution;
         if(bDoClust) {
@@ -389,20 +395,23 @@ int main(int argc, char *argv[])
             t_clusteredFwd = t_Fwd;
         }
 
-        // make an inverse operators
-        FiffInfo info = evoked.info;
-
-        MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+        MNEInverseOperator inverse_operator(raw.info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
         // Compute inverse solution
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        sourceEstimate = minimumNorm.calculateInverse(evoked);
+        minimumNorm.doInverseSetup(1,false);
 
-        if(sourceEstimate.isEmpty()) {
-            printf("Source estimate is empty");
+        for(int i = 0; i < matDataList.size(); i++) {
+            sourceEstimate = minimumNorm.calculateInverse(matDataList.at(i),
+                                                          0.0f,
+                                                          1/raw.info.sfreq);
+
+            if(sourceEstimate.isEmpty()) {
+                printf("Source estimate is empty");
+            }
+
+            matDataList.replace(i, sourceEstimate.data);
         }
-
-        matDataList.append(sourceEstimate.data);
 
         //Generate node vertices
         MatrixX3f matNodeVertLeft, matNodeVertRight;
@@ -435,19 +444,43 @@ int main(int argc, char *argv[])
     }
 
     //Do connectivity estimation and visualize results
-    ConnectivitySettings settings;
-    settings.m_sConnectivityMethods << sConnectivityMethod;
-    settings.m_matDataList = matDataList;
-    settings.m_matNodePositions = matNodePositions;
-    settings.m_iNfft = -1;
-    settings.m_sWindowType = "hanning";
+    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create();
 
-    Connectivity tConnectivity(settings);
-    Network tNetwork = tConnectivity.calculateConnectivity();
+    pConnectivitySettingsManager->m_settings.m_sConnectivityMethods << sConnectivityMethod;
+    pConnectivitySettingsManager->m_settings.m_matDataList = matDataList;
+    pConnectivitySettingsManager->m_settings.m_matNodePositions = matNodePositions;
+    pConnectivitySettingsManager->m_settings.m_iNfft = -1;
+    pConnectivitySettingsManager->m_settings.m_sWindowType = "hanning";
 
+    //Create NetworkView and add extra control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
     NetworkView tNetworkView;
-    tNetworkView.addData(tNetwork);
+    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
+    QList<QWidget*> lWidgets;
+    lWidgets << pConnectivitySettingsView;
+    tNetworkView.setQuickControlWidgets(lWidgets);
     tNetworkView.show();
+
+    QObject::connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
+                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
+
+    QObject::connect(pConnectivitySettingsManager->m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
+                     &tNetworkView, &NetworkView::addData);
+
+    if(bDoSourceLoc) {
+        QList<SourceSpaceTreeItem*> pSourceSpaceTreeItem;
+
+        if(bDoClust) {
+            pSourceSpaceTreeItem = tNetworkView.getTreeModel()->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
+        } else {
+            pSourceSpaceTreeItem = tNetworkView.getTreeModel()->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_Fwd);
+        }
+
+        for(int i = 0; i < pSourceSpaceTreeItem.size(); i++) {
+            pSourceSpaceTreeItem.at(i)->setAlpha(0.3f);
+        }
+    }
+
+    pConnectivitySettingsManager->m_pRtConnectivity->append(pConnectivitySettingsManager->m_settings);
 
     return a.exec();
 }

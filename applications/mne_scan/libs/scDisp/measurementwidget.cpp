@@ -56,7 +56,6 @@ using namespace SCDISPLIB;
 
 MeasurementWidget::MeasurementWidget(QWidget* parent)
 : QWidget(parent)
-
 {
 
 }

@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
 
 
@@ -85,5 +86,6 @@ NetworkView::~NetworkView()
 NetworkTreeItem* NetworkView::addData(const Network& tNetworkData)
 {
     //Add network data
-    return m_pData3DModel->addConnectivityData("sample", tNetworkData.getConnectivityMethod(), tNetworkData);
+    return m_pData3DModel->addConnectivityData("sample", "Connectivity", tNetworkData);
 }
+

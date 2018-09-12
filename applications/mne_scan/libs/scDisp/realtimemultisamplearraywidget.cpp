@@ -351,7 +351,7 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #endif
 
-        m_pQuickControlView = QuickControlView::SPtr::create("RT Display", this);
+        m_pQuickControlView = QuickControlView::SPtr::create("RT Display", Qt::Window | Qt::CustomizeWindowHint, this);
         m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
         // Quick control scaling

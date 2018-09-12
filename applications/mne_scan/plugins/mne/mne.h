@@ -187,9 +187,9 @@ public:
     /**
     * Slot to update the inverse operator
     *
-    * @param[in] p_pInvOp    The inverse operator to update
+    * @param[in] invOp    The inverse operator to update
     */
-    void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
+    void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
 
 signals:
     //=========================================================================================================
@@ -208,8 +208,8 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<RealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
-    PluginInputData<RealTimeEvokedSet>::SPtr                m_pRTESInput;            /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeEvokedSet>::SPtr                m_pRTESInput;           /**< The RealTimeEvoked input.*/
     PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;            /**< The RealTimeCov input.*/
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr          m_pRTSEOutput;          /**< The RealTimeSourceEstimate output.*/
@@ -221,8 +221,6 @@ private:
 
     QVector<FiffEvoked> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
-
-    QVector<FiffCov>        m_qVecFiffCov;
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bReceiveData;    /**< If thread is ready to receive data */
@@ -248,7 +246,7 @@ private:
     QStringList                 m_qListPickChannels;        /**< Channels to pick */
 
     RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
-    MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */
+    MNEInverseOperator          m_invOp;            /**< The inverse operator. */
 
     MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
     qint32                      m_iDownSample;      /**< Sampling rate */

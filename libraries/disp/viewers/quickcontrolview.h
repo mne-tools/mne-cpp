@@ -103,11 +103,15 @@ public:
     /**
     * Constructs a QuickControlView which is a child of parent.
     *
-    * @param [in] name              The name to be displayed on the minimize button.
-    * @param [in] parent            The parent of widget.
+    * @param [in] name          The name to be displayed on the minimize button.
+    * @param [in] flags         The window flags.
+    * @param [in] parent        The parent of widget.
+    * @param [in] bDraggable    Flag specifying whether this widget is draggable.
     */
     QuickControlView(const QString& name = "",
-                       QWidget *parent = Q_NULLPTR);
+                     Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint,
+                     QWidget *parent = Q_NULLPTR,
+                     bool bDraggable = true);
 
     //=========================================================================================================
     /**
@@ -162,6 +166,14 @@ public:
     * @return thecurrent set opacity value of this window.
     */
     int getOpacityValue();
+
+    //=========================================================================================================
+    /**
+    * Sets the visibility of the hide/show and close button
+    *
+    * @param [in] bVisibility       the new visiblity state.
+    */
+    void setVisiblityHideOpacityClose(bool bVisibility);
 
 protected:
     //=========================================================================================================

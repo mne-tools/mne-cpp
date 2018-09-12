@@ -47,6 +47,7 @@
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/ecd_set.h>
 #include <mne/mne_bem.h>
+#include <disp/viewers/quickcontrolview.h>
 
 
 //*************************************************************************************************************
@@ -64,6 +65,7 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 using namespace INVERSELIB;
 using namespace MNELIB;
 
@@ -81,6 +83,7 @@ AbstractView::AbstractView(QWidget* parent,
 {
     //Init 3D View
     m_p3DView->setModel(m_pData3DModel);
+    m_p3DView->setFlag(Qt::FramelessWindowHint, true);
 
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
@@ -125,15 +128,42 @@ QSharedPointer<DISP3DLIB::Data3DTreeModel> AbstractView::getTreeModel()
 
 //*************************************************************************************************************
 
+QPointer<QuickControlView> AbstractView::getQuickControl()
+{
+    return m_pQuickControlView;
+}
+
+
+//*************************************************************************************************************
+
+void AbstractView::setQuickControlWidgets(const QList<QWidget*>&lControlWidgets)
+{
+    if(m_pQuickControlView) {
+        for(int i = 0; i < lControlWidgets.size(); i++) {
+            m_pQuickControlView->addGroupBox(lControlWidgets.at(i), lControlWidgets.at(i)->windowTitle());
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void AbstractView::createGUI()
 {
+    m_pQuickControlView = new QuickControlView("Network View", Qt::Widget, this, false);
+    m_pQuickControlView->setVisiblityHideOpacityClose(false);
+
     //Create widget GUI
-    QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+    m_pQuickControlView->addGroupBox(m_pControl3DView.data(), "3D View");
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data(), this, Qt::Widget);
     pWidgetContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pWidgetContainer->setMinimumSize(400,400);
-    mainLayoutView->addWidget(pWidgetContainer,0,0);
-    mainLayoutView->addWidget(m_pControl3DView.data(),0,1);
 
-    this->setLayout(mainLayoutView);
+    QGridLayout* pMainLayoutView = new QGridLayout();
+    pMainLayoutView->addWidget(pWidgetContainer,0,0);
+    pMainLayoutView->addWidget(m_pQuickControlView.data(),0,1);
+
+
+    this->setLayout(pMainLayoutView);
 }

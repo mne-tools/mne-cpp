@@ -128,12 +128,13 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
 
     //Add edges to network
     for(int i = 0; i < vecDebiasedSquaredWPLI.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = j; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecDebiasedSquaredWPLI.at(i).row(j).transpose();
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.getNodeAt(j)->append(pEdge);
             finalNetwork.append(pEdge);
         }
     }
@@ -179,11 +180,7 @@ QVector<MatrixXd> DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWP
         }
 
         // This part could be parallelized with QtConcurrent::mapped
-        QVector<MatrixXcd> vecTapSpectra;
-        for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
-            vecTapSpectra.append(matTmpSpectra);
-        }
+        QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData, tapers.first, iNfft);
 
         // This part could be parallelized with QtConcurrent::mappedReduced
         for (int j = 0; j < iNRows; ++j) {

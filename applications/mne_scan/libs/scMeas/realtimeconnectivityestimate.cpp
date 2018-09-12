@@ -87,7 +87,6 @@ RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
 
 RealTimeConnectivityEstimate::~RealTimeConnectivityEstimate()
 {
-
 }
 
 
@@ -102,7 +101,7 @@ QSharedPointer<Network> &RealTimeConnectivityEstimate::getValue()
 
 //*************************************************************************************************************
 
-void RealTimeConnectivityEstimate::setValue(Network& v)
+void RealTimeConnectivityEstimate::setValue(const Network& v)
 {
     m_qMutex.lock();
 
@@ -114,6 +113,5 @@ void RealTimeConnectivityEstimate::setValue(Network& v)
     m_qMutex.unlock();
 
     emit notify();
-
 }
 
