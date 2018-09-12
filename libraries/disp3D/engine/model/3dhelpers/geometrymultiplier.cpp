@@ -84,12 +84,12 @@ using namespace Qt3DRender;
 
 GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
                                          Qt3DCore::QNode *tParent)
-    : QGeometryRenderer(tParent)
-    , m_pGeometry(tGeometry)
-    , m_pTransformBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-    , m_pColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-    , m_pTransformAttribute(new QAttribute())
-    , m_pColorAttribute(new QAttribute())
+: QGeometryRenderer(tParent)
+, m_pGeometry(tGeometry)
+, m_pTransformBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pTransformAttribute(new QAttribute())
+, m_pColorAttribute(new QAttribute())
 {
     init();
 }
@@ -111,16 +111,10 @@ GeometryMultiplier::~GeometryMultiplier()
 
 void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansform)
 {
-    if(tInstanceTansform.isEmpty())
-    {
-        qDebug ("ERROR!: GeometryMultiplier::setTransforms: QVector is empty!");
-        return;
-    }
-
     //Update buffer content
     m_pTransformBuffer->setData(buildTransformBuffer(tInstanceTansform));
 
-    updateInstanceCount(tInstanceTansform.size());
+    this->setInstanceCount(tInstanceTansform.size());
 }
 
 
@@ -128,12 +122,6 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
 
 void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
 {
-    if(tInstanceColors.isEmpty())
-    {
-        qDebug ("ERROR!: GeometryMultiplier::setColors: QVector is empty!");
-        return;
-    }
-
     //Update buffer content
     m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
 
@@ -147,7 +135,7 @@ void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
         m_pColorAttribute->setDivisor(0);
     }
 
-    updateInstanceCount(tInstanceColors.size());
+    this->setInstanceCount(tInstanceColors.size());
 }
 
 
@@ -163,11 +151,13 @@ void GeometryMultiplier::init()
     m_pTransformAttribute->setDivisor(1);
     m_pTransformAttribute->setByteOffset(0);
     m_pTransformAttribute->setBuffer(m_pTransformBuffer);
+
     //Set color attribute parameters
     m_pColorAttribute->setName(QStringLiteral("instanceColor"));
     m_pColorAttribute->setAttributeType(QAttribute::VertexAttribute);
     m_pColorAttribute->setVertexBaseType(QAttribute::Float);
     m_pColorAttribute->setVertexSize(3);
+
     //Set divisor 0 to enable empty color buffer
     m_pColorAttribute->setDivisor(0);
     m_pColorAttribute->setByteOffset(0);
@@ -175,7 +165,7 @@ void GeometryMultiplier::init()
 
     //Set default instance color
     QVector<QColor> tempColors;
-    tempColors.push_back(QColor(0, 0, 0));
+    tempColors.push_back(QColor(0, 0, 255));
     setColors(tempColors);
 
     //set default transforms
@@ -241,20 +231,3 @@ QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstance
 
     return bufferData;
 }
-
-
-//*************************************************************************************************************
-
-void GeometryMultiplier::updateInstanceCount(const uint tCount)
-{
-    //warning
-    if(this->instanceCount() > 1 && tCount != this->instanceCount())
-    {
-        qDebug ("WARNING!: GeometryMultiplier::InstanceCount mismatch");
-    }
-
-    this->setInstanceCount(tCount);
-}
-
-
-//*************************************************************************************************************

@@ -236,10 +236,10 @@ void RtSourceDataController::setCancelDistance(double dCancelDist)
 
 void RtSourceDataController::setTimeInterval(int iMSec)
 {
-    if(iMSec < 17) {
-        qDebug() << "RtSourceDataController::setTimeInterval - The minimum time interval is 17mSec.";
-        iMSec = 17;
-    }
+//    if(iMSec < 17) {
+//        qDebug() << "RtSourceDataController::setTimeInterval - The minimum time interval is 17mSec.";
+//        iMSec = 17;
+//    }
 
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);

@@ -557,7 +557,8 @@ void Averaging::changeBaselineActive(bool state)
 
 //*************************************************************************************************************
 
-void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
+void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet,
+                             const QStringList& lResponsibleTriggerTypes)
 {
 //    qDebug() << "";
 //    qDebug() << "Averaging::appendEvoked - p_pEvokedSet INFO:";
@@ -578,6 +579,7 @@ void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
         m_qMutex.lock();
         m_qVecEvokedData.push_back(p_pEvokedSet);
+        m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
         m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
 //    }
@@ -686,7 +688,9 @@ void Averaging::run()
 #ifdef DEBUG_AVERAGING
                 std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
 #endif
-                m_pAveragingOutput->data()->setValue(t_fiffEvokedSet, m_pFiffInfo);
+                m_pAveragingOutput->data()->setValue(t_fiffEvokedSet,
+                                                     m_pFiffInfo,
+                                                     m_lResponsibleTriggerTypes);
 
                 m_qVecEvokedData.pop_front();
 

@@ -58,6 +58,7 @@
 #include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QPushButton>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -130,9 +131,6 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             Spline* pSpline = new Spline("Set Threshold", 0);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
-
-            //resize histogram to be readable with default size
-            pSpline->resize(600,400);
 
             return pSpline;
         }
@@ -261,7 +259,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         case MetaTreeItemTypes::NetworkMatrix: {
             QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
             QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
-            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix).value<MatrixXd>();
+            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::Data).value<MatrixXd>();
 
             ImageSc* pPlotLA = new ImageSc(matRTData);
             pPlotLA->show();
@@ -336,7 +334,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::DataThreshold: {
+        case MetaTreeItemTypes::DataThreshold: {              
             if(Spline* pSpline = static_cast<Spline*>(editor)) {
                 //Find the parent and retreive real-time data to calcualte the histogram
                 if(AbstractTreeItem* pParentItem = static_cast<AbstractTreeItem*>(pAbstractItem->QStandardItem::parent())) {
@@ -346,40 +344,34 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
                     MatrixXd matRTData;
                     QVariant data;
 
-                    switch(pParentItem->type()) {
-                        case Data3DTreeModelItemTypes::NetworkItem: {
-                            data = index.model()->data(indexParent, Data3DTreeModelItemRoles::NetworkDataMatrix);
-                            break;
-                        }
-
-                        default: {
-                            data = index.model()->data(indexParent, Data3DTreeModelItemRoles::Data);
-                            break;
-                        }
-                    }
+                    data = index.model()->data(indexParent, Data3DTreeModelItemRoles::Data);
 
                     if(data.canConvert<MatrixXd>()) {
                         matRTData = data.value<MatrixXd>();
                         matRTData = matRTData.cwiseAbs();
-                    }
 
-                    //Calcualte histogram
-                    Eigen::VectorXd resultClassLimit;
-                    Eigen::VectorXi resultFrequency;
-                    MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
+                        //Calcualte histogram
+                        Eigen::VectorXd resultClassLimit;
+                        Eigen::VectorXi resultFrequency;
+                        MNEMath::histcounts(matRTData, false, 50, resultClassLimit, resultFrequency, 0.0, 0.0);
 
-                    //Create histogram plot
-                    pSpline->setData(resultClassLimit, resultFrequency);
-                    QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::DataThreshold).value<QVector3D>();
-                    pSpline->setThreshold(vecThresholdValues);
+                        //Create histogram plot
+                        pSpline->setData(resultClassLimit, resultFrequency);
+                        QVector3D vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::DataThreshold).value<QVector3D>();
+                        pSpline->setThreshold(vecThresholdValues);
 
-                    QList<QStandardItem*> pColormapItem = pParentItem->findChildren(MetaTreeItemTypes::ColormapType);
-                    for(int i = 0; i < pColormapItem.size(); ++i) {
-                        QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
-                        QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::ColormapType).value<QString>();
-                        pSpline->setColorMap(colorMap);
+                        QList<QStandardItem*> pColormapItem = pParentItem->findChildren(MetaTreeItemTypes::ColormapType);
+                        for(int i = 0; i < pColormapItem.size(); ++i) {
+                            if(pColormapItem.at(i)) {
+                                QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
+                                QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::ColormapType).value<QString>();
+                                pSpline->setColorMap(colorMap);
+                            }
+                        }
                     }
                 }
+
+                pSpline->resize(600,400);
             }
 
             break;
@@ -435,7 +427,7 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::DataThreshold: {
-            if(Spline* pSpline = static_cast<Spline*>(editor)) {
+            if(Spline* pSpline = dynamic_cast<Spline*>(editor)) {
                 QVector3D returnVector;
                 returnVector = pSpline->getThreshold();
 

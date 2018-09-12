@@ -78,6 +78,29 @@
 namespace DISP3DLIB
 {
 
+struct VisualizationInfo {
+    double                      dThresholdX;
+    double                      dThresholdZ;
+
+    Eigen::VectorXd             vecSensorValues;
+    Eigen::MatrixX3f            matOriginalVertColor;
+    Eigen::MatrixX3f            matFinalVertColor;
+
+    QSharedPointer<Eigen::SparseMatrix<float> >  pMatInterpolationMatrix;         /**< The interpolation matrix. */
+
+    QRgb (*functionHandlerColorMap)(double v);
+}; /**< The struct specifing visualization info. */
+
+struct ColorComputationInfo {
+    double                      dThresholdX;
+    double                      dThresholdZ;
+    int                         iFinalMatSize;
+
+    Eigen::VectorXf             vecData;
+
+    QRgb (*functionHandlerColorMap)(double v);
+};
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -202,47 +225,27 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * The struct specifing visualization info.
-    */
-    struct VisualizationInfo {
-        double                      dThresholdX;
-        double                      dThresholdZ;
-
-        Eigen::MatrixX3f            matOriginalVertColor;
-        Eigen::MatrixX3f            matFinalVertColor;
-
-        QSharedPointer<Eigen::SparseMatrix<float> >  pMatInterpolationMatrix;         /**< The interpolation matrix. */
-
-        QRgb (*functionHandlerColorMap)(double v);
-    } m_lVisualizationInfoLeft, m_lVisualizationInfoRight;          /**< Container for the visualization info. */
-
-    //=========================================================================================================
-    /**
     * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
     *
     * @param[in] vecData                       The final values for each vertex of the surface
     * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
     * @param[in] dThresholdX                   Lower threshold for normalizing
-    * @param[in] dThreholdZ                    Upper threshold for normalizing
+    * @param[in] dThresholdZ                    Upper threshold for normalizing
     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
     */
-    void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
+    static void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
                                       Eigen::MatrixX3f& matFinalVertColor,
                                       double dThresholdX,
-                                      double dThreholdZ,
+                                      double dThresholdZ,
                                       QRgb (*functionHandlerColorMap)(double v));
 
     //=========================================================================================================
     /**
     * @brief generateColorsFromSensorValues     Produces the final color matrix that is to be emitted
     *
-    * @param[in] vecSensorValues                A vector of sensor signals
     * @param[in/out] visualizationInfoHemi      The needed visualization info
-    *
-    * @return The final color values for the underlying mesh surface
     */
-    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd &vecSensorValues,
-                                                    VisualizationInfo &visualizationInfoHemi);
+    static void generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */
@@ -256,6 +259,7 @@ protected:
 
     double                                              m_dSFreq;                           /**< The current sampling frequency. */
 
+    QList<VisualizationInfo>                            m_lHemiVisualizationInfo;           /**< The visualization info for each hemisphere. */
 
 signals:
     //=========================================================================================================

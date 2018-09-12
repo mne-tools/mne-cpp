@@ -95,8 +95,10 @@ PhaseLagIndex::PhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const MatrixX3f& matVert,
-                                     int iNfft, const QString &sWindowType)
+Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList,
+                                     const MatrixX3f& matVert,
+                                     int iNfft,
+                                     const QString &sWindowType)
 {
     Network finalNetwork("Phase Lag Index");
 
@@ -124,12 +126,13 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList, const M
 
     //Add edges to network
     for(int i = 0; i < vecPLI.length(); ++i) {
-        for(int j = 0; j < matDataList.at(0).rows(); ++j) {
+        for(int j = i; j < matDataList.at(0).rows(); ++j) {
             MatrixXd matWeight = vecPLI.at(i).row(j).transpose();
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(finalNetwork.getNodes()[i], finalNetwork.getNodes()[j], matWeight));
+            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.getNodeAt(j)->append(pEdge);
             finalNetwork.append(pEdge);
         }
     }
@@ -171,11 +174,7 @@ QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList,
         }
 
         // This part could be parallelized with QtConcurrent::mapped
-        QVector<MatrixXcd> vecTapSpectra;
-        for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matTmpSpectra = Spectral::computeTaperedSpectra(matInputData.row(j), tapers.first, iNfft);
-            vecTapSpectra.append(matTmpSpectra);
-        }
+        QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData, tapers.first, iNfft);
 
         // This part could be parallelized with QtConcurrent::mappedReduced
         for (int j = 0; j < iNRows; ++j) {

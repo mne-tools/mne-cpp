@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     phaselagindex.h
-* @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+* @file     connectivitysettingsmanager.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     April, 2018
+* @date     September, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -28,26 +28,21 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
-* @note Notes:
-* - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
 *
-*
-* @brief     PhaseLagIndex class declaration.
+* @brief    Definition of the DraggableFramelessWidget Class.
 *
 */
 
-#ifndef PHASELAGINDEX_H
-#define PHASELAGINDEX_H
-
+#ifndef CONNECTIVITYSETTINGSMANAGER_H
+#define CONNECTIVITYSETTINGSMANAGER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../connectivity_global.h"
-
-#include "abstractmetric.h"
+#include <realtime/rtProcessing/rtconnectivity.h>
+#include <connectivity/connectivitysettings.h>
 
 
 //*************************************************************************************************************
@@ -55,7 +50,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
+#include <QWidget>
 
 
 //*************************************************************************************************************
@@ -63,7 +58,15 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace CONNECTIVITYLIB;
+using namespace REALTIMELIB;
 
 
 //*************************************************************************************************************
@@ -72,79 +75,30 @@
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
-//=============================================================================================================
-
-namespace CONNECTIVITYLIB {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-class Network;
-
-
 //=============================================================================================================
 /**
-* This class computes the phase lag index connectivity metric.
+* DECLARE CLASS ConnectivitySettingsManager
 *
-* @brief This class computes the phase lag index connectivity metric.
+* @brief The ConnectivitySettingsManager class provides a manager to handle connectivty computation for the ex_connectivity example.
 */
-class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
-{    
+class ConnectivitySettingsManager : public QObject
+{
+    Q_OBJECT
 
 public:
-    typedef QSharedPointer<PhaseLagIndex> SPtr;            /**< Shared pointer type for PhaseLagIndex. */
-    typedef QSharedPointer<const PhaseLagIndex> ConstSPtr; /**< Const shared pointer type for PhaseLagIndex. */
 
-    //=========================================================================================================
-    /**
-    * Constructs a PhaseLagIndex object.
-    */
-    explicit PhaseLagIndex();
+    ConnectivitySettingsManager(QObject *parent = 0) : QObject(parent){}
 
-    //=========================================================================================================
-    /**
-    * Calculates the phase lag index between the rows of the data matrix.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The connectivity information in form of a network structure.
-    */
-    static Network phaseLagIndex(const QList<Eigen::MatrixXd> &matDataList,
-                                 const Eigen::MatrixX3f& matVert,
-                                 int iNfft=-1,
-                                 const QString &sWindowType="hanning");
+    ConnectivitySettings m_settings;
+    RtConnectivity::SPtr m_pRtConnectivity = RtConnectivity::SPtr::create();
 
-    //==========================================================================================================
-    /**
-    * Calculates the actual phase lag index between two data vectors.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The PLI value.
-    */
-    static QVector<Eigen::MatrixXd> computePLI(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft,
-                                               const QString &sWindowType);
+    void onConnectivityMetricChanged(const QString& sMetric)
+    {
+        m_settings.m_sConnectivityMethods = QStringList() << sMetric;
+
+        m_pRtConnectivity->append(m_settings);
+    }
+
 };
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-} // namespace CONNECTIVITYLIB
-
-#endif // PHASELAGINDEX_H
+#endif // CONNECTIVITYSETTINGSMANAGER_H

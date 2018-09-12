@@ -124,7 +124,6 @@ RtAve::RtAve(quint32 numAverages,
 
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
-    m_iNewNumAverages = m_iNumAverages;
 }
 
 
@@ -140,7 +139,7 @@ RtAve::~RtAve()
 //*************************************************************************************************************
 
 void RtAve::append(const MatrixXd &p_DataSegment)
-{    
+{
     // ToDo handle change buffersize
     if(!m_pRawMatrixBuffer) {
         QMutexLocker locker(&m_qMutex);
@@ -156,7 +155,7 @@ void RtAve::append(const MatrixXd &p_DataSegment)
 void RtAve::setAverages(qint32 numAve)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iNewNumAverages = numAve;
+    m_iNumAverages = numAve;
 }
 
 
@@ -362,6 +361,8 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
     }
 
     //Do averaging for each trigger type
+    bool bEmitEvoked = false;
+
     QMutableMapIterator<double,bool> idx(m_mapFillingBackBuffer);
     while(idx.hasNext()) {
         idx.next();
@@ -389,9 +390,9 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                 //Calculate the final average/evoked data
                 generateEvoked(dTriggerType);
 
-                //If number of averages was reached emit new average
-                if(m_mapStimAve[dTriggerType].size() > 0) {
-                    emit evokedStim(m_pStimEvokedSet);
+                if(m_mapStimAve[dTriggerType].size() >= m_iNumAverages) {
+                    bEmitEvoked = true;
+                    m_lResponsibleTriggerTypes << QString::number(dTriggerType);
                 }
 
                 m_mapFillingBackBuffer[dTriggerType] = false;
@@ -454,6 +455,12 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
         }
     }
 
+    //If one of the trigger types scheduled a new signal emit
+    if(bEmitEvoked) {
+        emit evokedStim(m_pStimEvokedSet, m_lResponsibleTriggerTypes);
+        m_lResponsibleTriggerTypes.clear();
+    }
+
     //qDebug()<<"RtAve::doAveraging() - time for procesing"<<time.elapsed();
 }
 
@@ -493,15 +500,29 @@ void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
     }
 
     if(m_mapDataPre[dTriggerType].cols() <= data.cols()) {
-        m_mapDataPre[dTriggerType] = data.block(0,data.cols() - m_iPreStimSamples,data.rows(),m_iPreStimSamples);
+        if(m_iPreStimSamples > 0 && data.cols() > m_iPreStimSamples) {
+            m_mapDataPre[dTriggerType] = data.block(0,
+                                                    data.cols() - m_iPreStimSamples,
+                                                    data.rows(),
+                                                    m_iPreStimSamples);
+        }
     } else {
         int residual = m_mapDataPre[dTriggerType].cols() - data.cols();
 
         //Copy shift data
-        m_mapDataPre[dTriggerType].block(0,0,m_mapDataPre[dTriggerType].rows(),residual) = m_mapDataPre[dTriggerType].block(0,m_mapDataPre[dTriggerType].cols() - residual,m_mapDataPre[dTriggerType].rows(),residual);
+        m_mapDataPre[dTriggerType].block(0,
+                                         0,
+                                         m_mapDataPre[dTriggerType].rows(),
+                                         residual) = m_mapDataPre[dTriggerType].block(0,
+                                                                                      m_mapDataPre[dTriggerType].cols() - residual,
+                                                                                      m_mapDataPre[dTriggerType].rows(),
+                                                                                      residual);
 
         //Copy new data in
-        m_mapDataPre[dTriggerType].block(0,residual,m_mapDataPre[dTriggerType].rows(),data.cols()) = data;
+        m_mapDataPre[dTriggerType].block(0,
+                                         residual,
+                                         m_mapDataPre[dTriggerType].rows(),
+                                         data.cols()) = data;
     }
 }
 
@@ -511,6 +532,10 @@ void RtAve::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
 void RtAve::mergeData(double dTriggerType)
 {
     QMutexLocker locker(&m_qMutex);
+
+    if(m_mapDataPre[dTriggerType].rows() != m_mapDataPost[dTriggerType].rows()) {
+        return;
+    }
 
     MatrixXd mergedData(m_mapDataPre[dTriggerType].rows(), m_mapDataPre[dTriggerType].cols() + m_mapDataPost[dTriggerType].cols());
 
@@ -525,7 +550,9 @@ void RtAve::mergeData(double dTriggerType)
 
         //Pop data from buffer
         if(m_mapStimAve[dTriggerType].size() > m_iNumAverages && m_iNumAverages >= 1) {
-            m_mapStimAve[dTriggerType].pop_front();
+            for(int i = 0; i < m_mapStimAve[dTriggerType].size()-m_iNumAverages; ++i) {
+                m_mapStimAve[dTriggerType].pop_front();
+            }
         }
 
         //Proceed a bit different if we use zero number of averages
@@ -656,7 +683,7 @@ void RtAve::generateEvoked(double dTriggerType)
     }
 
     //Init evoked
-    FiffEvoked evoked;    
+    FiffEvoked evoked;
     int iEvokedIdx = -1;
 
     for(int i = 0; i < m_pStimEvokedSet->evoked.size(); ++i) {
@@ -739,21 +766,20 @@ void RtAve::reset()
 //    qDebug()<<"RtAve::reset()";
     QMutexLocker locker(&m_qMutex);
 
-    qDebug()<<"RtAve::reset() - 1";
+    //qDebug()<<"RtAve::reset() - 1";
 
     //Reset
     m_iPreStimSamples = m_iNewPreStimSamples;
     m_iPostStimSamples = m_iNewPostStimSamples;
     m_iTriggerChIndex = m_iNewTriggerIndex;
     m_iAverageMode = m_iNewAverageMode;
-    m_iNumAverages = m_iNewNumAverages;
 
-    qDebug()<<"RtAve::reset() - 2";
+    //qDebug()<<"RtAve::reset() - 2";
 
     //Clear all evoked data information
     m_pStimEvokedSet->evoked.clear();
 
-    qDebug()<<"RtAve::reset() - 3";
+   // qDebug()<<"RtAve::reset() - 3";
 
     //Clear all maps
 //    m_mapDataPre.clear();
@@ -770,7 +796,7 @@ void RtAve::reset()
     m_mapFillingBackBuffer.clear();
     m_mapNumberCalcAverages.clear();
 
-    qDebug()<<"RtAve::reset() - 4";
+ //   qDebug()<<"RtAve::reset() - 4";
 
 //    QMutableMapIterator<double,Eigen::MatrixXd> i0(m_mapDataPre);
 //    while (i0.hasNext()) {

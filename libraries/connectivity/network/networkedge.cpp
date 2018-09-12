@@ -49,6 +49,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,38 +78,106 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
-                         QSharedPointer<NetworkNode> pEndNode,
-                         MatrixXd& matWeight)
-: m_pStartNode(pStartNode)
-, m_pEndNode(pEndNode)
-, m_matWeight(matWeight)
+NetworkEdge::NetworkEdge(int iStartNodeID,
+                         int iEndNodeID,
+                         const MatrixXd& matWeight,
+                         bool bIsActive,
+                         int iStartWeightBin,
+                         int iEndWeightBin)
+: m_iStartNodeID(iStartNodeID)
+, m_iEndNodeID(iEndNodeID)
+, m_bIsActive(bIsActive)
+, m_iMinMaxFreqBins(QPair<int,int>(iStartWeightBin,iEndWeightBin))
+, m_dAveragedWeight(0.0)
 {
+    if(matWeight.rows() == 0 || matWeight.cols() == 0) {
+        m_matWeight = MatrixXd::Zero(1,1);
+        qDebug() << "NetworkEdge::NetworkEdge - Matrix weights number of rows and/or columns are zero. Setting to 1x1 zero matrix.";
+    } else {
+        m_matWeight = matWeight;
+    }
+
+    calculateAveragedWeight();
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<NetworkNode> NetworkEdge::getStartNode()
+int NetworkEdge::getStartNodeID()
 {
-    return m_pStartNode;
+    return m_iStartNodeID;
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<NetworkNode> NetworkEdge::getEndNode()
+int NetworkEdge::getEndNodeID()
 {
-    return m_pEndNode;
+    return m_iEndNodeID;
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd NetworkEdge::getWeight() const
+void NetworkEdge::setActive(bool bActiveFlag)
 {
-    return m_matWeight;
+    m_bIsActive = bActiveFlag;
 }
 
 
+//*************************************************************************************************************
+
+bool NetworkEdge::isActive()
+{
+    return m_bIsActive;
+}
+
+
+//*************************************************************************************************************
+
+double NetworkEdge::getWeight() const
+{
+    return m_dAveragedWeight;
+}
+
+
+//*************************************************************************************************************
+
+void NetworkEdge::calculateAveragedWeight()
+{
+    int iStartWeightBin = m_iMinMaxFreqBins.first;
+    int iEndWeightBin = m_iMinMaxFreqBins.second;
+
+    if(iEndWeightBin < iStartWeightBin || iStartWeightBin < -1 || iEndWeightBin < -1 ) {
+        qDebug() << "NetworkEdge::calculateAveragedWeight - end bin index is larger than start bin index or one of them is < -1.";
+        return;
+    }
+
+    int rows = m_matWeight.rows();
+    int cols = m_matWeight.cols();
+
+    if (iEndWeightBin == -1 && iStartWeightBin == -1) {
+        m_dAveragedWeight = m_matWeight.mean();
+    } else if(iEndWeightBin-iStartWeightBin+1 < rows && iStartWeightBin < rows) {
+        m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin+1,1).mean();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NetworkEdge::setFrequencyBins(const QPair<int,int>& minMaxFreqBins)
+{
+    m_iMinMaxFreqBins = minMaxFreqBins;
+
+    calculateAveragedWeight();
+}
+
+
+//*************************************************************************************************************
+
+const QPair<int,int>& NetworkEdge::getFrequencyBins()
+{
+    return m_iMinMaxFreqBins;
+}
 

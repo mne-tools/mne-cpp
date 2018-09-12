@@ -42,8 +42,10 @@
 
 #include "rtcov.h"
 
-#include <iostream>
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_info.h>
+
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -52,6 +54,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -65,17 +68,121 @@ using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE MEMBER METHODS RtCovWorker
 //=============================================================================================================
 
-RtCov::RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
-: QThread(parent)
-, m_iMaxSamples(p_iMaxSamples)
-, m_iNewMaxSamples(0)
-, m_pFiffInfo(p_pFiffInfo)
-, m_bIsRunning(false)
+void RtCovWorker::doWork(const RtCovInput &inputData)
 {
-    qRegisterMetaType<FiffCov::SPtr>("FiffCov::SPtr");
+    QFuture<RtCovComputeResult> result = QtConcurrent::mappedReduced(inputData.lData,
+                                                                     compute,
+                                                                     reduce);
+
+    result.waitForFinished();
+
+    RtCovComputeResult finalResult = result.result();
+
+    //Final computation
+    FiffCov computedCov;
+    computedCov.data = finalResult.matData;
+
+    QStringList exclude;
+    for(int i = 0; i<inputData.pFiffInfo->chs.size(); i++) {
+        if(inputData.pFiffInfo->chs.at(i).kind != FIFFV_MEG_CH &&
+                inputData.pFiffInfo->chs.at(i).kind != FIFFV_EEG_CH) {
+            exclude << inputData.pFiffInfo->chs.at(i).ch_name;
+        }
+    }
+    bool doProj = true;
+
+    if(inputData.iSamples > 0) {
+        finalResult.mu /= (float)inputData.iSamples;
+        computedCov.data.array() -= inputData.iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
+        computedCov.data.array() /= (inputData.iSamples - 1);
+
+        computedCov.kind = FIFFV_MNE_NOISE_COV;
+        computedCov.diag = false;
+        computedCov.dim = computedCov.data.rows();
+
+        //ToDo do picks
+        computedCov.names = inputData.pFiffInfo->ch_names;
+        computedCov.projs = inputData.pFiffInfo->projs;
+        computedCov.bads = inputData.pFiffInfo->bads;
+        computedCov.nfree = inputData.iSamples;
+
+        // regularize noise covariance
+        computedCov = computedCov.regularize(*inputData.pFiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
+
+        //            qint32 samples = rawSegment.cols();
+        //            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
+
+        //            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
+        //            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
+        //            noise_covariance.array() /= (samples - 1);
+
+        //            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
+
+        //            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+        emit resultReady(computedCov);
+    } else {
+        qDebug() << "RtCovWorker::doWork - Number of samples equals zero. Regularization not possible. Returning without result.";
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+RtCovComputeResult RtCovWorker::compute(const MatrixXd &matData)
+{
+    RtCovComputeResult result;
+    result.mu = matData.rowwise().sum();
+    result.matData = matData * matData.transpose();
+    return result;
+}
+
+
+//*************************************************************************************************************
+
+void RtCovWorker::reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult)
+{
+    if(finalResult.matData.size() == 0 || finalResult.mu.size() == 0) {
+        finalResult.mu = tempResult.mu;
+        finalResult.matData = tempResult.matData;
+    } else {
+        finalResult.mu += tempResult.mu;
+        finalResult.matData += tempResult.matData;
+    }
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS RtCov
+//=============================================================================================================
+
+RtCov::RtCov(qint32 iMaxSamples,
+             FiffInfo::SPtr pFiffInfo,
+             QObject *parent)
+: QObject(parent)
+, m_iMaxSamples(iMaxSamples)
+, m_pFiffInfo(pFiffInfo)
+, m_iSamples(0)
+{
+    RtCovWorker *worker = new RtCovWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtCov::operate,
+            worker, &RtCovWorker::doWork);
+
+    connect(worker, &RtCovWorker::resultReady,
+            this, &RtCov::handleResults);
+
+    m_workerThread.start();
+
+    qRegisterMetaType<RtCovInput>("RtCovInput");
 }
 
 
@@ -83,21 +190,8 @@ RtCov::RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 
 RtCov::~RtCov()
 {
-    if(this->isRunning())
-        stop();
-}
-
-
-//*************************************************************************************************************
-
-void RtCov::append(const MatrixXd &p_DataSegment)
-{
-//    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
-
-    if(!m_pRawMatrixBuffer)
-        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(32, p_DataSegment.rows(), p_DataSegment.cols()));
-
-    m_pRawMatrixBuffer->push(&p_DataSegment);
+    m_workerThread.quit();
+    m_workerThread.wait();
 }
 
 
@@ -105,112 +199,34 @@ void RtCov::append(const MatrixXd &p_DataSegment)
 
 void RtCov::setSamples(qint32 samples)
 {
-    m_iNewMaxSamples = samples;
+    m_iMaxSamples = samples;
 }
 
 
 //*************************************************************************************************************
 
-bool RtCov::start()
+void RtCov::append(const MatrixXd &matDataSegment)
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
-        QThread::wait();
+    m_lData.append(matDataSegment);
+    m_iSamples += matDataSegment.cols();
 
-    m_bIsRunning = true;
-    QThread::start();
+    if(m_iSamples >= m_iMaxSamples) {
+        RtCovInput inputData;
+        inputData.lData = m_lData;
+        inputData.pFiffInfo = m_pFiffInfo;
+        inputData.iSamples = m_iSamples;
 
-    return true;
-}
+        emit operate(inputData);
 
-
-//*************************************************************************************************************
-
-bool RtCov::stop()
-{
-    m_bIsRunning = false;
-
-    m_pRawMatrixBuffer->releaseFromPop();
-
-    m_pRawMatrixBuffer->clear();
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-void RtCov::run()
-{
-    //SETUP
-    QStringList exclude;
-    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-        if(m_pFiffInfo->chs.at(i).kind == FIFFV_STIM_CH) {
-            exclude << m_pFiffInfo->chs.at(i).ch_name;
-        }
+        m_iSamples = 0;
+        m_lData.clear();
     }
-    bool doProj = true;
-
-    quint32 n_samples = 0;
-
-    FiffCov::SPtr cov(new FiffCov());
-    VectorXd mu;
-
-    while(m_bIsRunning)
-    {
-        if(m_pRawMatrixBuffer)
-        {
-            MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
-
-            if(n_samples == 0)
-            {
-                mu = rawSegment.rowwise().sum();
-                cov->data = rawSegment * rawSegment.transpose();
-            }
-            else
-            {
-                mu.array() += rawSegment.rowwise().sum().array();
-                cov->data += rawSegment * rawSegment.transpose();
-            }
-            n_samples += rawSegment.cols();
-
-            if(n_samples > m_iMaxSamples)
-            {
-                mu /= (float)n_samples;
-                cov->data.array() -= n_samples * (mu * mu.transpose()).array();
-                cov->data.array() /= (n_samples - 1);
-
-                cov->kind = FIFFV_MNE_NOISE_COV;
-                cov->diag = false;
-                cov->dim = cov->data.rows();
-
-                //ToDo do picks
-                cov->names = m_pFiffInfo->ch_names;
-                cov->projs = m_pFiffInfo->projs;
-                cov->bads = m_pFiffInfo->bads;
-                cov->nfree = n_samples;
-
-                // regularize noise covariance
-                *cov.data() = cov->regularize(*m_pFiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
-
-                emit covCalculated(cov);
-
-                cov = FiffCov::SPtr(new FiffCov());
-                n_samples = 0;
-            }
+}
 
 
-//            qint32 samples = rawSegment.cols();
-//            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
+//*************************************************************************************************************
 
-//            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
-//            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
-//            noise_covariance.array() /= (samples - 1);
-
-//            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
-
-//            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
-
-        }
-    }
+void RtCov::handleResults(const FIFFLIB::FiffCov& computedCov)
+{
+    emit covCalculated(computedCov);
 }

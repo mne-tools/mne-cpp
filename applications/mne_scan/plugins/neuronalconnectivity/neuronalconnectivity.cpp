@@ -48,8 +48,10 @@
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimeevokedset.h>
 
 #include <mne/mne_epoch_data_list.h>
+#include <mne/mne_bem.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -90,7 +92,11 @@ using namespace IOBUFFER;
 
 NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
-, m_iDownSample(3)
+, m_iDownSample(1)
+, m_iNumberAverages(10)
+, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
+, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
+, m_sAvrType("4")
 {
 }
 
@@ -129,6 +135,12 @@ void NeuronalConnectivity::init()
             this, &NeuronalConnectivity::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
+    m_pRTEVSInput = PluginInputData<RealTimeEvokedSet>::create(this, "NeuronalConnectivityInSensorEvoked", "NeuronalConnectivity evoked input data");
+    connect(m_pRTEVSInput.data(), &PluginInputConnector::notify, this,
+            &NeuronalConnectivity::updateRTEV, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTEVSInput);
+
+    // Output
     m_pRTCEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
     m_outputConnectors.append(m_pRTCEOutput);
     m_pRTCEOutput->data()->setName(this->getName());
@@ -137,6 +149,9 @@ void NeuronalConnectivity::init()
     ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
     connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
+    connect(pConnectivitySettingsView, &ConnectivitySettingsView::numberTrialsChanged,
+            this, &NeuronalConnectivity::onNumberTrialsChanged);
+
     m_pRTCEOutput->data()->addControlWidget(pConnectivitySettingsView);
 
     //Init rt connectivity worker
@@ -200,7 +215,7 @@ IPlugin::PluginType NeuronalConnectivity::getType() const
 
 QString NeuronalConnectivity::getName() const
 {
-    return "Neuronal Connectivity";
+    return "Connectivity";
 }
 
 
@@ -227,6 +242,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
             m_pRTCEOutput->data()->setAnnotSet(pRTSE->getAnnotSet());
             m_pRTCEOutput->data()->setSurfSet(pRTSE->getSurfSet());
+            m_pRTCEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
             //Generate node vertices
@@ -260,19 +276,19 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
         }
 
-        QList<MatrixXd> epochDataList;
-
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
-             epochDataList.append(pRTSE->getValue()[i]->data);
+            m_connectivitySettings.m_matDataList << pRTSE->getValue()[i]->data;
         }
 
-        m_connectivitySettings.m_matDataList = epochDataList;
-
-//        QList<MatrixXd> epochDataList;
-//        epochDataList.append(pRTSE->getValue()->data);
-//        m_connectivitySettings.m_matDataList = epochDataList;
-
+        m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
+
+        //Pop data from buffer
+        if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+            for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
+                m_connectivitySettings.m_matDataList.removeFirst();
+            }
+        }
     }
 }
 
@@ -288,7 +304,10 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
+            //Set 3D sensor surface for visualization
+            QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+            MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
+            m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
             //Generate node vertices
@@ -345,9 +364,116 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             epochDataList.append(data);
         }
 
-        m_connectivitySettings.m_matDataList = epochDataList;
+        m_connectivitySettings.m_matDataList << epochDataList;
 
+        m_timer.restart();
         m_pRtConnectivity->append(m_connectivitySettings);
+
+        //Pop data from buffer
+        if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+            for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
+                m_connectivitySettings.m_matDataList.removeFirst();
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
+{
+    QSharedPointer<RealTimeEvokedSet> pRTEV = pMeasurement.dynamicCast<RealTimeEvokedSet>();
+
+    if(pRTEV) {
+        FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
+        QStringList lResponsibleTriggerTypes = pRTEV->getResponsibleTriggerTypes();
+
+        if(!pFiffEvokedSet || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
+            return;
+        }
+
+        //Fiff Information of the evoked
+        if(!m_pFiffInfo && pFiffEvokedSet->evoked.size() > 0) {
+            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->evoked.at(i).info));
+
+                    //Set 3D sensor surface for visualization
+                    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+                    MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
+                    m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
+                    m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
+
+                    //Generate node vertices
+                    bool bPick = false;
+                    qint32 unit;
+                    int counter = 0;
+                    QString sChType = "mag";
+
+                    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+                        unit = m_pFiffInfo->chs.at(i).unit;
+
+                        if(unit == FIFF_UNIT_T_M &&
+                            sChType == "grad") {
+                            bPick = true;
+                        } else if(unit == FIFF_UNIT_T &&
+                                    sChType == "mag") {
+                            bPick = true;
+                        } else if (unit == FIFF_UNIT_V &&
+                                    sChType == "eeg") {
+                            bPick = true;
+                        }
+
+                        if(bPick) {
+                            //Get the positions
+                            m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
+                            m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
+                            m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
+                            m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
+
+                            m_chIdx << i;
+                            counter++;
+                        }
+
+                        bPick = false;
+                    }
+
+                    //Set node 3D positions to connectivity settings
+                    m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
+
+                    break;
+                }
+            }
+        } else if (m_pFiffInfo) {
+            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                    MatrixXd data;
+                    QList<MatrixXd> epochDataList;
+
+                    const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
+                    data.resize(m_chIdx.size(), t_mat.cols());
+
+                    for(qint32 j = 0; j < m_chIdx.size(); ++j)
+                    {
+                        data.row(j) = t_mat.row(m_chIdx.at(j));
+                    }
+
+                    epochDataList.append(data);
+
+                    m_connectivitySettings.m_matDataList << epochDataList;
+
+                    m_timer.restart();
+                    m_pRtConnectivity->append(m_connectivitySettings);
+
+                    if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
+                        m_connectivitySettings.m_matDataList.removeFirst();
+                    }
+
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -370,11 +496,13 @@ void NeuronalConnectivity::run()
         //Do processing after skip count has reached limit
         if((skip_count % m_iDownSample) == 0)
         {
+            //QMutexLocker locker(&m_mutex);
             //Do connectivity estimation here
             Network connectivityResult = m_pCircularNetworkBuffer->pop();
 
             //Send the data to the connected plugins and the online display
             if(!connectivityResult.isEmpty()) {
+                //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
                 m_pRTCEOutput->data()->setValue(connectivityResult);
             }
         }
@@ -388,6 +516,7 @@ void NeuronalConnectivity::run()
 
 void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult)
 {
+    //QMutexLocker locker(&m_mutex);
     m_pCircularNetworkBuffer->push(connectivityResult);
 }
 
@@ -397,6 +526,14 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << sMetric;
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
+{
+    m_iNumberAverages = iNumberTrials;
 }
 
 

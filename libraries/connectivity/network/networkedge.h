@@ -101,13 +101,19 @@ public:
     /**
     * Constructs a NetworkEdge object.
     *
-    * @param[in]  pStartNode        The start node of the edge.
-    * @param[in]  pEndNode          The end node of the edge.
+    * @param[in]  iStartNodeID      The start node id of the edge.
+    * @param[in]  iEndNodeID        The end node id of the edge.
     * @param[in]  matWeight         The edge weight.
+    * @param[in]  bIsActive         The active flag of this edge. Default is true.
+    * @param[in]  iStartWeightBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
+    * @param[in]  iEndWeightBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
     */
-    explicit NetworkEdge(QSharedPointer<NetworkNode> pStartNode,
-                         QSharedPointer<NetworkNode> pEndNode,
-                         Eigen::MatrixXd& matWeight);
+    explicit NetworkEdge(int iStartNodeID,
+                         int iEndNodeID,
+                         const Eigen::MatrixXd& matWeight,
+                         bool bIsActive = true,
+                         int iStartWeightBin = -1,
+                         int iEndWeightBin = -1);
 
     //=========================================================================================================
     /**
@@ -115,7 +121,7 @@ public:
     *
     * @return The start node of the edge.
     */
-    QSharedPointer<NetworkNode> getStartNode();
+    int getStartNodeID();
 
     //=========================================================================================================
     /**
@@ -123,20 +129,65 @@ public:
     *
     * @return The end node of the edge.
     */
-    QSharedPointer<NetworkNode> getEndNode();
+    int getEndNodeID();
 
     //=========================================================================================================
     /**
-    * Returns the edge weight.
+    * Sets the activity flag of this edge.
+    *
+    * @param[in]  bActiveFlag        The new activity flag of this edge.
     */
-    Eigen::MatrixXd getWeight() const;
+    void setActive(bool bActiveFlag);
+
+    //=========================================================================================================
+    /**
+    * Returns the activity flag of this edge.
+    *
+    * @return The current activity flag of this edge.
+    */
+    bool isActive();
+
+    //=========================================================================================================
+    /**
+    * Returns the edge weight. The weights are averaged between the specified bin indeces and their corresponding tapers.
+    *
+    * @return    The current edge weight.
+    */
+    double getWeight() const;
+
+    //=========================================================================================================
+    /**
+    * Calculates the edge weight based on the currently set min/max frequency bins.
+    */
+    void calculateAveragedWeight();
+
+    //=========================================================================================================
+    /**
+    * Sets the frequency bins to average from/to.
+    *
+    * @param[in] minMaxFreqBins        The new lower/upper bin to average from/to.
+    */
+    void setFrequencyBins(const QPair<int, int> &minMaxFreqBins);
+
+    //=========================================================================================================
+    /**
+    * Returns the current frequency bins to average from/to.
+    *
+    * @return The current upper/lower bin to average from/to.
+    */
+    const QPair<int,int>& getFrequencyBins();
 
 protected:
-    QSharedPointer<NetworkNode>     m_pStartNode;       /**< The start node of the edge.*/
-    QSharedPointer<NetworkNode>     m_pEndNode;         /**< The end node of the edge.*/
+    int             m_iStartNodeID;         /**< The start node of the edge.*/
+    int             m_iEndNodeID;           /**< The end node of the edge.*/
 
-    Eigen::MatrixXd                 m_matWeight;        /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
+    bool            m_bIsActive;            /**< The activity flag indicating whether this edge is part of a thresholded network.*/
 
+    QPair<int,int>  m_iMinMaxFreqBins;      /**< The lower/upper bin indeces to start avergaing from/to. Default is -1 which means an average over all weights.*/
+
+    Eigen::MatrixXd m_matWeight;            /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
+
+    double          m_dAveragedWeight;      /**< The current averaged edge weight.*/
 };
 
 

@@ -81,6 +81,10 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_comboBox_windowType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onWindowTypeChanged);
 
+    connect(ui->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &ConnectivitySettingsView::onNumberTrialsChanged);
+
+
     this->setWindowTitle("Connectivity Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -108,4 +112,12 @@ void ConnectivitySettingsView::onMetricChanged(const QString& metric)
 void ConnectivitySettingsView::onWindowTypeChanged(const QString& windowType)
 {
     emit windowTypeChanged(windowType);
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::onNumberTrialsChanged(int iNumberTrials)
+{
+    emit numberTrialsChanged(iNumberTrials);
 }

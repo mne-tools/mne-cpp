@@ -79,13 +79,18 @@ using namespace CONNECTIVITYLIB;
 void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettings)
 {
     QElapsedTimer time;
+    int iTime = 0;
     time.start();
-    Connectivity tConnectivity(connectivitySettings);
 
-    emit resultReady(tConnectivity.calculateConnectivity());
+    Connectivity tConnectivity(connectivitySettings);
+    Network finalNetwork = tConnectivity.calculateConnectivity();
+
+    iTime = time.elapsed();
+
+    emit resultReady(finalNetwork);
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
-    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed()" << time.elapsed();
+    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed() for"<< connectivitySettings.m_sConnectivityMethods.first() <<"and" << connectivitySettings.m_matDataList.size()<< "trials was" << iTime << "ms";
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
 }

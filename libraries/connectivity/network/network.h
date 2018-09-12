@@ -103,24 +103,42 @@ public:
     * Constructs a Network object.
     *
     * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
+    * @param[in] dThreshold             The threshold of the network. Default is 0.0.
     */
-    explicit Network(const QString& sConnectivityMethod = "Unknown");
+    explicit Network(const QString& sConnectivityMethod = "Unknown",
+                     double dThreshold = 0.0);
 
     //=========================================================================================================
     /**
-    * Returns the connectivity matrix for this network structure.
+    * Returns the full connectivity matrix for this network structure.
     *
-    * @return    The connectivity matrix generated from the current network information.
+    * @return    The full connectivity matrix generated from the current network information.
     */
-    Eigen::MatrixXd getConnectivityMatrix() const;
+    Eigen::MatrixXd getFullConnectivityMatrix() const;
 
     //=========================================================================================================
     /**
-    * Returns the edges.
+    * Returns the thresholded connectivity matrix for this network structure.
+    *
+    * @return    The thresholded connectivity matrix generated from the current network information.
+    */
+    Eigen::MatrixXd getThresholdedConnectivityMatrix() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the full and non thresholded edges.
     *
     * @return Returns the network edges.
     */
-    const QList<QSharedPointer<NetworkEdge> >& getEdges() const;
+    const QList<QSharedPointer<NetworkEdge> >& getFullEdges() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the thresholded edges.
+    *
+    * @return Returns the network edges.
+    */
+    const QList<QSharedPointer<NetworkEdge> >& getThresholdedEdges() const;
 
     //=========================================================================================================
     /**
@@ -152,11 +170,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns network distribution, also known as network degree.
+    * Returns network distribution, also known as network degree, corresponding to the full network.
     *
     * @return   The network distribution calculated as degrees of all nodes together.
     */
-    qint16 getDistribution() const;
+    qint16 getFullDistribution() const;
+
+    //=========================================================================================================
+    /**
+    * Returns network distribution, also known as network degree, corresponding to the thresholded network.
+    *
+    * @return   The network distribution calculated as degrees of all nodes together.
+    */
+    qint16 getThresholdedDistribution() const;
 
     //=========================================================================================================
     /**
@@ -173,6 +199,103 @@ public:
     * @return   The connectivity measure method used to create the data of this network structure.
     */
     QString getConnectivityMethod() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum weight strength of the entire network.
+    *
+    * @return   The minimum and maximum weight strength of the entire network.
+    */
+    QPair<double, double> getMinMaxFullWeights() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum weight strength of the thresholded network.
+    *
+    * @return   The minimum and maximum weight strength of the entire network.
+    */
+    QPair<double, double> getMinMaxThresholdedWeights() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum degree (in and out) corresponding to the full network.
+    *
+    * @return   The minimum and maximum degree of the entire network.
+    */
+    QPair<int,int> getMinMaxFullDegrees() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum degree (in and out) corresponding to the thresholded network.
+    *
+    * @return   The minimum and maximum degree of the entire network.
+    */
+    QPair<int,int> getMinMaxThresholdedDegrees() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum indegree corresponding to the full network.
+    *
+    * @return   The minimum and maximum indegree of the entire network.
+    */
+    QPair<int,int> getMinMaxFullIndegrees() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum indegree corresponding to the thresholded network.
+    *
+    * @return   The minimum and maximum indegree of the entire network.
+    */
+    QPair<int,int> getMinMaxThresholdedIndegrees() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum outdegree corresponding to the full network.
+    *
+    * @return   The minimum and maximum outdegree of the entire network.
+    */
+    QPair<int,int> getMinMaxFullOutdegrees() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the minimum and maximum outdegree corresponding to the thresholded network.
+    *
+    * @return   The minimum and maximum outdegree of the entire network.
+    */
+    QPair<int,int> getMinMaxThresholdedOutdegrees() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the threshold of the network and updates the resulting active edges.
+    *
+    * @param[in] dThreshold        The new threshold.
+    */
+    void setThreshold(double dThreshold = 0.0);
+
+    //=========================================================================================================
+    /**
+    * Returns the current threshold of the network.
+    *
+    * @return The current threshold.
+    */
+    double getThreshold();
+
+    //=========================================================================================================
+    /**
+    * Sets the frequency bins to average from/to.
+    *
+    * @param[in] iLowerBin        The new lower bin to average from.
+    * @param[in] iUpperBin        The new upper bin to average to.
+    */
+    void setFrequencyBins(int iLowerBin, int iUpperBin);
+
+    //=========================================================================================================
+    /**
+    * Returns the current frequency bins to average from/to.
+    *
+    * @return The current upper/lower bin to average from/to.
+    */
+    const QPair<int,int>& getFrequencyBins();
 
     //=========================================================================================================
     /**
@@ -196,27 +319,23 @@ public:
     *
     * @return   The flag identifying whether the Network is empty.
     */
-    bool isEmpty();
+    bool isEmpty() const;
 
 protected:
-    QList<QSharedPointer<NetworkEdge> >     m_lEdges;                   /**< List with all edges of the network.*/
+    QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
+    QList<QSharedPointer<NetworkEdge> >     m_lThresholdedEdges;        /**< List with all the active (thresholded) edges of the network.*/
+
     QList<QSharedPointer<NetworkNode> >     m_lNodes;                   /**< List with all nodes of the network.*/
 
     Eigen::MatrixXd                         m_matDistMatrix;            /**< The distance matrix.*/
 
     QString                                 m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
 
-    //=========================================================================================================
-    /**
-    * Returns the connectivity matrix for this network structure.
-    *
-    * @param[in] idxRow    The row for which the connection matrix is to be produced. E.g. for the first frequency bin/band. Default is 0.
-    * @param[in] idxCol    The column for which the connection matrix is to be produced. E.g. for the first instance in time. Default is 0.
-    *
-    * @return    The connectivity matrix generated from the current network information.
-    */
-    Eigen::MatrixXd generateConnectMat(int idxRow = 0, int idxCol = 0) const;
+    QPair<double,double>                    m_minMaxFullWeights;        /**< The minimum and maximum weight strength of the entire network.*/
+    QPair<double,double>                    m_minMaxThresholdedWeights; /**< The minimum and maximum weight strength of the active edges.*/
+    QPair<int,int>                          m_minMaxFrequencyBins;      /**< The minimum and maximum frequency bins to average from/to.*/
 
+    double                                  m_dThreshold;               /**< The current threshold value.*/
 };
 
 

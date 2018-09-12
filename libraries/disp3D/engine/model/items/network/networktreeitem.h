@@ -80,6 +80,11 @@ namespace Qt3DCore {
     class QEntity;
 }
 
+namespace Qt3DExtras {
+    class QCylinderGeometry;
+    class QSphereGeometry;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,6 +101,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class MetaTreeItem;
+class GeometryMultiplier;
 
 
 //=============================================================================================================
@@ -132,6 +138,14 @@ public:
     */
     void addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
+    //=========================================================================================================
+    /**
+    * This function set the threshold values.
+    *
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
+    */
+    void setThresholds(const QVector3D& vecThresholds);
+
 private:
     //=========================================================================================================
     /**
@@ -152,13 +166,34 @@ private:
     * Call this function whenever you want to calculate the indices/tris for a network.
     *
     * @param[in] tNetworkData     The network data.
-    * @param[in] vecThreshold     The threshold data.
     */
-    void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData, const QVector3D& vecThreshold);
+    void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData);
 
-    bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want plot the network nodes.
+    *
+    * @param[in] tNetworkData     The network data.
+    */
+    void plotNodes(const CONNECTIVITYLIB::Network &tNetworkData);
 
-    QPointer<MetaTreeItem>                      m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want plot the network edges.
+    *
+    * @param[in] tNetworkData     The network data.
+    */
+    void plotEdges(const CONNECTIVITYLIB::Network& tNetworkData);
+
+    QPointer<MetaTreeItem>                          m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+
+    QPointer<QEntity>                               m_pNodesEntity;
+    QSharedPointer<Qt3DExtras::QSphereGeometry>     m_pNodesGeometry;               /**< The network geomtries for incoming edges. */
+    QPointer<GeometryMultiplier>                    m_pNodes;                       /**< The geometry multiplier for incoming edges. */
+
+    QPointer<QEntity>                               m_pEdgeEntity;
+    QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesGeometry;               /**< The network geomtries for edges. */
+    QPointer<GeometryMultiplier>                    m_pEdges;                       /**< The geometry multiplier for edges. */
 
 };
 

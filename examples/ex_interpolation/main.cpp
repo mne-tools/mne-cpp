@@ -93,12 +93,12 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("ex_interpolation");
     parser.addHelpOption();
 
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "pial");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
     parser.addOption(surfOption);
     parser.addOption(annotOption);
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     }
 
     //acquire surface data
-    QFile t_filesensorSurfaceVV("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 
     //projecting with MEG
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
     //realtime interpolation (1 iteration)
     VectorXd signal = VectorXd::Random(megSensors.size());
     qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
-    Interpolation::interpolateSignal(interpolationMatrix, signal);
+    Interpolation::interpolateSignal(*interpolationMatrix, signal.cast<float>());
     std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;
 
     return 0;

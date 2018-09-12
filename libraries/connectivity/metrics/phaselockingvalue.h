@@ -118,8 +118,10 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network phaseLockingValue(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert,
-                                     int iNfft=-1, const QString &sWindowType="hanning");
+    static Network phaseLockingValue(const QList<Eigen::MatrixXd> &matDataList,
+                                     const Eigen::MatrixX3f& matVert,
+                                     int iNfft=-1,
+                                     const QString &sWindowType="hanning");
 
     //==========================================================================================================
     /**
@@ -132,7 +134,8 @@ public:
     * @return                   The PLV value.
     */
     static QVector<Eigen::MatrixXd> computePLV(const QList<Eigen::MatrixXd> &matDataList,
-                                               int iNfft, const QString &sWindowType);
+                                               int iNfft,
+                                               const QString &sWindowType);
 };
 
 

@@ -169,8 +169,8 @@ void InvMNE::calculate()
     // MNE Settings
     //*********************************************************************************************************
 
-    QString evokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QString invFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QString evokedFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QString invFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
 
     float snr = 1.0f;//2.0f
     QString method("dSPM");//"MNE" | "dSPM" | "sLORETA"

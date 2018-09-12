@@ -132,11 +132,23 @@ FiffEvokedSet::SPtr& RealTimeEvokedSet::getValue()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSet::setValue(FiffEvokedSet& v, FiffInfo::SPtr p_fiffinfo)
+const QStringList& RealTimeEvokedSet::getResponsibleTriggerTypes()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_lResponsibleTriggerTypes;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
+                                 const FiffInfo::SPtr &p_fiffinfo,
+                                 const QStringList &lResponsibleTriggerTypes)
 {
     //Store
     m_qMutex.lock();
     *m_pFiffEvokedSet = v;
+    m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
     m_qMutex.unlock();
 
     if(!m_bInitialized)

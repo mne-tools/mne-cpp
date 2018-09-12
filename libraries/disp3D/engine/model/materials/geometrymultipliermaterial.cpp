@@ -82,10 +82,10 @@ using namespace Qt3DRender;
 //=============================================================================================================
 
 GeometryMultiplierMaterial::GeometryMultiplierMaterial(bool bUseSortPolicy, Qt3DCore::QNode *parent)
-    : AbstractPhongAlphaMaterial(bUseSortPolicy, parent)
-    , m_pAmbientColor(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.2f, 0.2f, 0.2f, 1.0f)))
-    , m_pVertexGL3Shader(new QShaderProgram())
-    , m_pVertexES2Shader(new QShaderProgram())
+: AbstractPhongAlphaMaterial(bUseSortPolicy, parent)
+, m_pAmbientColor(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.2f, 0.2f, 0.2f, 1.0f)))
+, m_pVertexGL3Shader(new QShaderProgram())
+, m_pVertexES2Shader(new QShaderProgram())
 {
     init();
     setShaderCode();

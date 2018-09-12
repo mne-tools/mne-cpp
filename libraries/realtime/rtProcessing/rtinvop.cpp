@@ -41,6 +41,11 @@
 
 #include "rtinvop.h"
 
+#include <fiff/fiff_info.h>
+
+#include <mne/mne_forwardsolution.h>
+#include <mne/mne_inverse_operator.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,24 +57,69 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
 
-using namespace REALTIMELIB;
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// USED NAMESPACES
 //=============================================================================================================
 
-RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent)
-: QThread(parent)
-, m_bIsRunning(false)
+using namespace REALTIMELIB;
+using namespace Eigen;
+using namespace MNELIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS RtInvOpWorker
+//=============================================================================================================
+
+void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
+{
+    // Restrict forward solution as necessary for MEG
+    MNEForwardSolution forwardMeg = inputData.pFwd->pick_types(true, false);
+
+    MNEInverseOperator invOpMeg(*inputData.pFiffInfo.data(),
+                                forwardMeg,
+                                inputData.noiseCov,
+                                0.2f,
+                                0.8f);
+
+    emit resultReady(invOpMeg);
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS RtInvOp
+//=============================================================================================================
+
+RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo,
+                 MNEForwardSolution::SPtr &p_pFwd,
+                 QObject *parent)
+: QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_pFwd(p_pFwd)
 {
-    qRegisterMetaType<MNEInverseOperator::SPtr>("MNEInverseOperator::SPtr");
+    RtInvOpWorker *worker = new RtInvOpWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtInvOp::operate,
+            worker, &RtInvOpWorker::doWork);
+
+    connect(worker, &RtInvOpWorker::resultReady,
+            this, &RtInvOp::handleResults);
+
+    m_workerThread.start();
+
+    qRegisterMetaType<RtInvOpInput>("RtInvOpInput");
 }
 
 
@@ -77,54 +127,27 @@ RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, 
 
 RtInvOp::~RtInvOp()
 {
-    stop();
+    m_workerThread.quit();
+    m_workerThread.wait();
 }
 
 
 //*************************************************************************************************************
 
-void RtInvOp::appendNoiseCov(FiffCov &p_noiseCov)
+void RtInvOp::append(const FIFFLIB::FiffCov &noiseCov)
 {
-    mutex.lock();
-    //Use here a circular buffer
-    m_vecNoiseCov.push_back(p_noiseCov);
+    RtInvOpInput inputData;
+    inputData.noiseCov = noiseCov;
+    inputData.pFiffInfo = m_pFiffInfo;
+    inputData.pFwd = m_pFwd;
 
-    qDebug() << "RtInvOp m_vecNoiseCov" << m_vecNoiseCov.size();
-
-    mutex.unlock();
+    emit operate(inputData);
 }
 
 
 //*************************************************************************************************************
 
-bool RtInvOp::stop()
+void RtInvOp::handleResults(const MNELIB::MNEInverseOperator& invOp)
 {
-    m_bIsRunning = false;
-    QThread::wait();
-
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-void RtInvOp::run()
-{
-    m_bIsRunning = true;
-
-    while(m_bIsRunning)
-    {
-        if(m_vecNoiseCov.size() > 0)
-        {
-            // Restrict forward solution as necessary for MEG
-            MNEForwardSolution t_forwardMeg = m_pFwd->pick_types(true, false);
-
-            mutex.lock();
-            MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, m_vecNoiseCov[0], 0.2f, 0.8f));
-            m_vecNoiseCov.pop_front();
-            mutex.unlock();
-
-            emit invOperatorCalculated(t_invOpMeg);
-        }
-    }
+    emit invOperatorCalculated(invOp);
 }

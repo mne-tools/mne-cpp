@@ -108,7 +108,7 @@ public:
     /**
     * Constructs a ConnectivitySettingsView which is a child of parent.
     *
-    * @param [in] parent        parent of widget
+    * @param [in] parent        parent of widget.
     */
     ConnectivitySettingsView(QWidget *parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
@@ -124,7 +124,7 @@ protected:
     /**
     * Slot called when the metric changed.
     *
-    * @param [in] metric        The new metric
+    * @param [in] metric        The new metric.
     */
     void onMetricChanged(const QString& metric);
 
@@ -132,28 +132,44 @@ protected:
     /**
     * Slot called when the window type changed.
     *
-    * @param [in] windowType        The new window type
+    * @param [in] windowType        The new window type.
     */
     void onWindowTypeChanged(const QString& windowType);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the number of trials changed.
+    *
+    * @param [in] iNumberTrials        The new number of trials.
+    */
+    void onNumberTrialsChanged(int iNumberTrials);
 
     Ui::ConnectivitySettingsViewWidget* ui;
 
 signals:
     //=========================================================================================================
     /**
-    * Emit signal whenever the connectivity metric changed
+    * Emit signal whenever the connectivity metric changed.
     *
-    * @param [in] metric        The new metric
+    * @param [in] metric        The new metric.
     */
     void connectivityMetricChanged(const QString& metric);
 
     //=========================================================================================================
     /**
-    * Emit signal whenever the window type changed
+    * Emit signal whenever the window type changed.
     *
     * @param [in] windowType        The new window type
     */
     void windowTypeChanged(const QString& windowType);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the number of trials changed.
+    *
+    * @param [in] iNumberTrials        The new number of trials.
+    */
+    void numberTrialsChanged(int iNumberTrials);
 
 };
 

@@ -174,10 +174,10 @@ QWidget *Music::getView()
 
 void Music::calculate()
 {
-    QString fwdFileOption("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QString evokedFileOption("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QString fwdFileOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QString evokedFileOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QString subjectOption("sample");
-    QString subjectDirectoryOption("./MNE-sample-data/subjects");
+    QString subjectDirectoryOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
 
     QString t_sFileNameStc("");//"RapMusic.stc");
     QString annotOption("aparc.a2009s");

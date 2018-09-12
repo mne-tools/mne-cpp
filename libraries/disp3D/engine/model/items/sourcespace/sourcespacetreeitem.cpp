@@ -119,6 +119,8 @@ void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
     this->setData(data, Data3DTreeModelItemRoles::NumberVertices);
 
     plotSources(tHemisphere);
+
+    this->setAlpha(1.0f);
 }
 
 
