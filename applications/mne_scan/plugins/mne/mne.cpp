@@ -44,6 +44,23 @@
 
 #include <disp/viewers/minimumnormsettingsview.h>
 
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
+
+#include <fiff/fiff_info.h>
+
+#include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourceestimate.h>
+
+#include <inverse/minimumNorm/minimumnorm.h>
+
+#include <realtime/rtProcessing/rtinvop.h>
+
+#include <scMeas/realtimesourceestimate.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimecov.h>
+#include <scMeas/realtimeevokedset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,6 +81,10 @@ using namespace MNEPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
+using namespace INVERSELIB;
+using namespace REALTIMELIB;
+using namespace SCSHAREDLIB;
+using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -445,8 +466,6 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         return;
     }
 
-    qDebug() << "MNE::updateRTE - Found trigger" << m_sAvrType;\
-
     //Fiff Information of the evoked
     if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
         for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
@@ -463,7 +482,6 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-            //qDebug()<<""<<m_sAvrType;
             if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
