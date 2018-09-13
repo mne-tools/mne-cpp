@@ -97,6 +97,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("4")
+, m_pConnectivitySettingsView(new ConnectivitySettingsView())
 {
 }
 
@@ -146,13 +147,14 @@ void NeuronalConnectivity::init()
     m_pRTCEOutput->data()->setName(this->getName());
 
     //Add control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
-    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
+    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::numberTrialsChanged,
+    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
             this, &NeuronalConnectivity::onNumberTrialsChanged);
+    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::triggerTypeChanged,
+            this, &NeuronalConnectivity::onTriggerTypeChanged);
 
-    m_pRTCEOutput->data()->addControlWidget(pConnectivitySettingsView);
+    m_pRTCEOutput->data()->addControlWidget(m_pConnectivitySettingsView);
 
     //Init rt connectivity worker
     m_pRtConnectivity = RtConnectivity::SPtr::create();
@@ -398,9 +400,15 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
         QStringList lResponsibleTriggerTypes = pRTEV->getResponsibleTriggerTypes();
 
+        if(m_pConnectivitySettingsView) {
+            m_pConnectivitySettingsView->setTriggerTypes(lResponsibleTriggerTypes);
+        }
+
         if(!pFiffEvokedSet || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
             return;
         }
+
+        //qDebug() << "NeuronalConnectivity::updateRTEV - Found trigger" << m_sAvrType;
 
         //Fiff Information of the evoked
         if(!m_pFiffInfo && pFiffEvokedSet->evoked.size() > 0) {
@@ -551,4 +559,15 @@ void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
 void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 {
     m_connectivitySettings.m_sWindowType = windowType;
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
+{
+    if(triggerType != m_sAvrType) {
+        m_connectivitySettings.m_matDataList.clear();
+        m_sAvrType = triggerType;
+    }
 }

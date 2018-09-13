@@ -347,8 +347,6 @@ private:
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;         /**< The Circular Raw Matrix Buffer. */
 
-    QStringList                                     m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
-
 signals:
     //=========================================================================================================
     /**

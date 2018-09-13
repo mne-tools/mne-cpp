@@ -83,8 +83,8 @@ using namespace Eigen;
 // DEFINE GLOABAL MEMBER METHODS
 //=============================================================================================================
 
-int             m_dValueVariance = 0.5;           /**< Variance value to detect artifacts */
-double          m_dValueThreshold = 300e-6;          /**< Threshold to detect artifacts */
+int             m_dValueVariance = 0.5;         /**< Variance value to detect artifacts */
+double          m_dValueThreshold = 300e-6;     /**< Threshold to detect artifacts */
 
 
 //*************************************************************************************************************
@@ -342,6 +342,7 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
     //qDebug()<<"RtAve::doAveraging() - time for detection"<<time.elapsed();
     //time.start();
 
+    //TODO: This does not permit the same trigger type twiche in one data block
     for(int i = 0; i < lDetectedTriggers.size(); ++i) {
         if(!m_mapFillingBackBuffer.contains(lDetectedTriggers.at(i).second)) {
             double dTriggerType = lDetectedTriggers.at(i).second;
@@ -361,9 +362,9 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
     }
 
     //Do averaging for each trigger type
-    bool bEmitEvoked = false;
-
     QMutableMapIterator<double,bool> idx(m_mapFillingBackBuffer);
+    QStringList lResponsibleTriggerTypes;
+
     while(idx.hasNext()) {
         idx.next();
 
@@ -390,10 +391,12 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                 //Calculate the final average/evoked data
                 generateEvoked(dTriggerType);
 
-                if(m_mapStimAve[dTriggerType].size() >= m_iNumAverages) {
-                    bEmitEvoked = true;
-                    m_lResponsibleTriggerTypes << QString::number(dTriggerType);
+                //List of all trigger types which lead to the recent emit of a new evoked set. */
+                if(!lResponsibleTriggerTypes.contains(QString::number(dTriggerType))) {
+                    lResponsibleTriggerTypes << QString::number(dTriggerType);
                 }
+
+                emit evokedStim(m_pStimEvokedSet, lResponsibleTriggerTypes);
 
                 m_mapFillingBackBuffer[dTriggerType] = false;
 
@@ -453,12 +456,6 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                 }
             }
         }
-    }
-
-    //If one of the trigger types scheduled a new signal emit
-    if(bEmitEvoked) {
-        emit evokedStim(m_pStimEvokedSet, m_lResponsibleTriggerTypes);
-        m_lResponsibleTriggerTypes.clear();
     }
 
     //qDebug()<<"RtAve::doAveraging() - time for procesing"<<time.elapsed();
