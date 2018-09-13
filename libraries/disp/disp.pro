@@ -117,6 +117,7 @@ SOURCES += \
     viewers/triggerdetectionview.cpp \
     viewers/quickcontrolview.cpp \
     viewers/connectivitysettingsview.cpp \
+    viewers/minimumnormsettingsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -159,6 +160,7 @@ HEADERS += \
     viewers/triggerdetectionview.h \
     viewers/quickcontrolview.h \
     viewers/connectivitysettingsview.h \
+    viewers/minimumnormsettingsview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
@@ -218,6 +220,7 @@ FORMS += \
     viewers/formfiles/triggerdetectionview.ui \
     viewers/formfiles/quickcontrolview.ui \
     viewers/formfiles/connectivitysettingsview.ui \
+    viewers/formfiles/minimumnormsettingsview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
