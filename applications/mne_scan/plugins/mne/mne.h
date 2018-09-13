@@ -241,17 +241,17 @@ protected:
 
     QPointer<DISPLIB::MinimumNormSettingsView>                                              m_pMinimumNormSettingsView; /**< The minimum norm settings widget which will be added to the Quick Control view.*/
 
-    QMutex                          m_qMutex;
-    QFuture<void>                   m_future;
+    QMutex                          m_qMutex;                   /**< The mutex ensuring thread safety. */
+    QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
 
-    QVector<FIFFLIB::FiffEvoked>    m_qVecFiffEvoked;
+    QVector<FIFFLIB::FiffEvoked>    m_qVecFiffEvoked;           /**< The list of stored averages. */
 
-    qint32                          m_iNumAverages;
-    qint32                          m_iDownSample;              /**< Sampling rate */
+    qint32                          m_iNumAverages;             /**< The number of trials/averages to store. */
+    qint32                          m_iDownSample;              /**< Down sample factor. */
 
-    bool                            m_bIsRunning;               /**< If source lab is running */
-    bool                            m_bReceiveData;             /**< If thread is ready to receive data */
-    bool                            m_bProcessData;             /**< If data should be received for processing */
+    bool                            m_bIsRunning;               /**< If source lab is running. */
+    bool                            m_bReceiveData;             /**< If thread is ready to receive data. */
+    bool                            m_bProcessData;             /**< If data should be received for processing. */
     bool                            m_bFinishedClustering;      /**< If clustered forward solution is available. */
 
     QFile                           m_qFileFwdSolution;         /**< File to forward solution. */
@@ -259,23 +259,23 @@ protected:
     QString                         m_sAtlasDir;                /**< File to Atlas. */
     QString                         m_sSurfaceDir;              /**< File to Surface. */
     QString                         m_sAvrType;                 /**< The average type */
-    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA" */
+    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
 
     QStringList                     m_qListCovChNames;          /**< Covariance channel names. */
-    QStringList                     m_qListPickChannels;        /**< Channels to pick */
+    QStringList                     m_qListPickChannels;        /**< Channels to pick. */
 
     MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
 
 signals:
     //=========================================================================================================
     /**
-    * Signal when clsutering is started
+    * Signal when clustering is started
     */
     void clusteringStarted();
 
     //=========================================================================================================
     /**
-    * Signal when clsutering has finished
+    * Signal when clustering has finished
     */
     void clusteringFinished();
 };
