@@ -59,6 +59,7 @@
 
 #include <QMutex>
 #include <QElapsedTimer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -213,6 +214,14 @@ protected:
     */
     void onWindowTypeChanged(const QString& windowType);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the trigger type changed.
+    *
+    * @param [in] triggerType        The new trigger type.
+    */
+    void onTriggerTypeChanged(const QString& triggerType);
+
 private:
     bool                m_bIsRunning;           /**< Flag whether thread is running.*/
     qint32              m_iDownSample;          /**< Sampling rate. */
@@ -231,7 +240,7 @@ private:
     QSharedPointer<IOBUFFER::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularNetworkBuffer;       /**< The circular buffer holding the connectivity estimates.*/
     QSharedPointer<REALTIMELIB::RtConnectivity>                                     m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view.*/
+    QPointer<DISPLIB::ConnectivitySettingsView>                                     m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view.*/
     QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/

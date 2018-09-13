@@ -119,6 +119,14 @@ public:
     */
     ~ConnectivitySettingsView();
 
+    //=========================================================================================================
+    /**
+    * Destroys the ConnectivitySettingsView.
+    *
+    * @param [in] lTriggerTypes        The new trigger types.
+    */
+    void setTriggerTypes(const QStringList& lTriggerTypes);
+
 protected:
     //=========================================================================================================
     /**
@@ -144,6 +152,14 @@ protected:
     */
     void onNumberTrialsChanged(int iNumberTrials);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the trigger type changed.
+    *
+    * @param [in] triggerType        The new trigger type.
+    */
+    void onTriggerTypeChanged(const QString& triggerType);
+
     Ui::ConnectivitySettingsViewWidget* ui;
 
 signals:
@@ -159,7 +175,7 @@ signals:
     /**
     * Emit signal whenever the window type changed.
     *
-    * @param [in] windowType        The new window type
+    * @param [in] windowType        The new window type.
     */
     void windowTypeChanged(const QString& windowType);
 
@@ -170,6 +186,14 @@ signals:
     * @param [in] iNumberTrials        The new number of trials.
     */
     void numberTrialsChanged(int iNumberTrials);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the trigger type changed.
+    *
+    * @param [in] triggerType        The new trigger type.
+    */
+    void triggerTypeChanged(const QString& triggerType);
 
 };
 

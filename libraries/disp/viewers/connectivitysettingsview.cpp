@@ -84,6 +84,8 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &ConnectivitySettingsView::onNumberTrialsChanged);
 
+    connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &ConnectivitySettingsView::onTriggerTypeChanged);
 
     this->setWindowTitle("Connectivity Settings");
     this->setMinimumWidth(330);
@@ -96,6 +98,18 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
 ConnectivitySettingsView::~ConnectivitySettingsView()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
+{
+    for(int i = 0; i < lTriggerTypes.size(); ++i) {
+        if(ui->m_comboBox_triggerType->findText(lTriggerTypes.at(i)) == -1) {
+            ui->m_comboBox_triggerType->addItem(lTriggerTypes.at(i));
+        }
+    }
 }
 
 
@@ -120,4 +134,12 @@ void ConnectivitySettingsView::onWindowTypeChanged(const QString& windowType)
 void ConnectivitySettingsView::onNumberTrialsChanged(int iNumberTrials)
 {
     emit numberTrialsChanged(iNumberTrials);
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::onTriggerTypeChanged(const QString& triggerType)
+{
+    emit triggerTypeChanged(triggerType);
 }
