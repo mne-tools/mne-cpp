@@ -73,10 +73,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEPlugin
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNEPlugin
+namespace DISPLIB {
+    class MinimumNormSettingsView;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEPLUGIN
+//=============================================================================================================
+
+namespace MNEPLUGIN
 {
 
 
@@ -97,7 +107,7 @@ using namespace IOBUFFER;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// MNEPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -191,30 +201,34 @@ public:
     */
     void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Signal when clsutering is started
-    */
-    void clusteringStarted();
-
-    //=========================================================================================================
-    /**
-    * Signal when clsutering has finished
-    */
-    void clusteringFinished();
-
 protected:
+    //=========================================================================================================
+    /**
+    * Slot called when the method changed.
+    *
+    * @param [in] method        The new method.
+    */
+    void onMethodChanged(const QString &method);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the trigger type changed.
+    *
+    * @param [in] triggerType        The new trigger type.
+    */
+    void onTriggerTypeChanged(const QString& triggerType);
+
     virtual void run();
 
-private:
-    PluginInputData<RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
-    PluginInputData<RealTimeEvokedSet>::SPtr                m_pRTESInput;           /**< The RealTimeEvoked input.*/
-    PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;            /**< The RealTimeCov input.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeEvokedSet>::SPtr                m_pRTESInput;                   /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;                    /**< The RealTimeCov input.*/
 
-    PluginOutputData<RealTimeSourceEstimate>::SPtr          m_pRTSEOutput;          /**< The RealTimeSourceEstimate output.*/
+    PluginOutputData<RealTimeSourceEstimate>::SPtr          m_pRTSEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
-    CircularMatrixBuffer<double>::SPtr                      m_pMatrixDataBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
+    CircularMatrixBuffer<double>::SPtr                      m_pMatrixDataBuffer;            /**< Holds incoming RealTimeMultiSampleArray data.*/
+
+    QPointer<DISPLIB::MinimumNormSettingsView>              m_pMinimumNormSettingsView;    /**< The minimum norm settings widget which will be added to the Quick Control view.*/
 
     QMutex m_qMutex;
     QFuture<void> m_future;
@@ -252,8 +266,20 @@ private:
     qint32                      m_iDownSample;      /**< Sampling rate */
 
     QString                     m_sAvrType;         /**< The average type */
+    QString                     m_sMethod;          /**< The method: "MNE" | "dSPM" | "sLORETA" */
 
-//    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
+signals:
+    //=========================================================================================================
+    /**
+    * Signal when clsutering is started
+    */
+    void clusteringStarted();
+
+    //=========================================================================================================
+    /**
+    * Signal when clsutering has finished
+    */
+    void clusteringFinished();
 };
 
 } // NAMESPACE

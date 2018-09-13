@@ -149,11 +149,11 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit signal whenever the connectivity metric changed.
+    * Emit signal whenever the method changed.
     *
-    * @param [in] metric        The new metric.
+    * @param [in] method        The new method.
     */
-    void methodChanged(const QString& metric);
+    void methodChanged(const QString& method);
 
     //=========================================================================================================
     /**

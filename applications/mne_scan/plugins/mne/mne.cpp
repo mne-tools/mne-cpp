@@ -42,6 +42,8 @@
 
 #include "FormFiles/mnesetupwidget.h"
 
+#include <disp/viewers/minimumnormsettingsview.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,9 +60,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEPlugin;
+using namespace MNEPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -79,6 +82,8 @@ MNE::MNE()
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_sAvrType("4")
+, m_pMinimumNormSettingsView(new MinimumNormSettingsView())
+, m_sMethod("MNE")
 {
 
 }
@@ -134,6 +139,14 @@ void MNE::init()
     m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "MNE Out", "MNE output data");
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+
+    //Add control widgets to output data (will be used by QuickControlView in RealTimeSourceEstimateWidget)
+    connect(m_pMinimumNormSettingsView.data(), &MinimumNormSettingsView::methodChanged,
+            this, &MNE::onMethodChanged);
+    connect(m_pMinimumNormSettingsView.data(), &MinimumNormSettingsView::triggerTypeChanged,
+            this, &MNE::onTriggerTypeChanged);
+
+    m_pRTSEOutput->data()->addControlWidget(m_pMinimumNormSettingsView);
 
     // start clustering
     QFuture<void> m_future = QtConcurrent::run(this, &MNE::doClustering);
@@ -422,11 +435,17 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     QMutexLocker locker(&m_qMutex);
 
-    if(!m_bReceiveData || !pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
+    QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+
+    if(m_pMinimumNormSettingsView) {
+        m_pMinimumNormSettingsView->setTriggerTypes(lResponsibleTriggerTypes);
+    }
+
+    if(!m_bReceiveData || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
         return;
     }
 
-    QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+    qDebug() << "MNE::updateRTE - Found trigger" << m_sAvrType;\
 
     //Fiff Information of the evoked
     if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
@@ -468,12 +487,26 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
     double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, method));
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
 
     //Set up the inverse according to the parameters
     m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
+}
+
+
+//*************************************************************************************************************
+
+void MNE::onMethodChanged(const QString& method)
+{
+    m_sMethod = method;
+}
+
+
+//*************************************************************************************************************
+
+void MNE::onTriggerTypeChanged(const QString& triggerType)
+{
+    m_sAvrType = triggerType;
 }
 
 
