@@ -395,8 +395,7 @@ inline bool RtAve::controlValuesChanged()
 
     if(m_iNewPreStimSamples != m_iPreStimSamples
             || m_iNewPostStimSamples != m_iPostStimSamples
-            || m_iNewTriggerIndex != m_iTriggerChIndex
-            || m_iNewAverageMode != m_iAverageMode) {
+            || m_iNewTriggerIndex != m_iTriggerChIndex) {
         result = true;
     }
 

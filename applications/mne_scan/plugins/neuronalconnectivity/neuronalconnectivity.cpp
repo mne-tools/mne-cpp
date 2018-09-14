@@ -335,8 +335,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
                     bPick = true;
                 }
 
-                if(bPick) {
-                    qDebug() <<  "Picked ch:" << m_pFiffInfo->chs.at(i).ch_name;
+                if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
                     //Get the positions
                     m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
                     m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
@@ -426,7 +425,7 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     bool bPick = false;
                     qint32 unit;
                     int counter = 0;
-                    QString sChType = "mag";
+                    QString sChType = "grad";
 
                     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
                         unit = m_pFiffInfo->chs.at(i).unit;
@@ -434,6 +433,9 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                         if(unit == FIFF_UNIT_T_M &&
                             sChType == "grad") {
                             bPick = true;
+
+                            //Skip second gradiometer in triplet
+                            ++i;
                         } else if(unit == FIFF_UNIT_T &&
                                     sChType == "mag") {
                             bPick = true;
@@ -442,14 +444,19 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                             bPick = true;
                         }
 
-                        if(bPick) {
+                        if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
                             //Get the positions
                             m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
                             m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
                             m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
                             m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
 
-                            m_chIdx << i;
+                            if(sChType == "grad") {
+                                m_chIdx << i-1;
+                            } else {
+                                m_chIdx << i;
+                            }
+
                             counter++;
                         }
 
