@@ -149,6 +149,12 @@ public:
     */
     void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
+    //=========================================================================================================
+    /**
+    * Resets the thread by interrupting its computation queue.
+    */
+    void reset();
+
 protected:
     //=========================================================================================================
     /**

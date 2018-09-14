@@ -282,15 +282,15 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_connectivitySettings.m_matDataList << pRTSE->getValue()[i]->data;
         }
 
-        m_timer.restart();
-        m_pRtConnectivity->append(m_connectivitySettings);
-
         //Pop data from buffer
         if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
             for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
                 m_connectivitySettings.m_matDataList.removeFirst();
             }
         }
+
+        m_timer.restart();
+        m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
 
@@ -376,15 +376,15 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
         m_connectivitySettings.m_matDataList << epochDataList;
 
-        m_timer.restart();
-        m_pRtConnectivity->append(m_connectivitySettings);
-
         //Pop data from buffer
         if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
             for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
                 m_connectivitySettings.m_matDataList.removeFirst();
             }
         }
+
+        m_timer.restart();
+        m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
 
@@ -473,7 +473,6 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     MatrixXd data;
-                    QList<MatrixXd> epochDataList;
 
                     const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
                     data.resize(m_chIdx.size(), t_mat.cols());
@@ -483,16 +482,14 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                         data.row(j) = t_mat.row(m_chIdx.at(j));
                     }
 
-                    epochDataList.append(data);
+                    m_connectivitySettings.m_matDataList << data;
 
-                    m_connectivitySettings.m_matDataList << epochDataList;
+                    if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+                        m_connectivitySettings.m_matDataList.removeFirst();
+                    }
 
                     m_timer.restart();
                     m_pRtConnectivity->append(m_connectivitySettings);
-
-                    if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
-                        m_connectivitySettings.m_matDataList.removeFirst();
-                    }
 
                     break;
                 }
@@ -549,6 +546,7 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
+    m_pRtConnectivity->reset();
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << sMetric;
 }
 

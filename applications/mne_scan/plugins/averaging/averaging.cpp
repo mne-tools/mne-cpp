@@ -96,8 +96,8 @@ Averaging::Averaging()
 , m_bProcessData(false)
 , m_iPreStimSeconds(100)
 , m_iPostStimSeconds(400)
-, m_dArtifactThresholdFirst(250)
-, m_iArtifactThresholdSecond(-5)
+, m_dArtifactThresholdFirst(150)
+, m_iArtifactThresholdSecond(-6)
 , m_iBaselineFromSeconds(0)
 , m_iBaselineToSeconds(0)
 , m_iNumAverages(10)
@@ -342,8 +342,8 @@ void Averaging::init()
 
     m_bDoArtifactThresholdReduction = settings.value(QString("Plugin/%1/doArtifactThresholdReduction").arg(this->getName()), false).toBool();
     m_bDoArtifactVarianceReduction = settings.value(QString("Plugin/%1/doArtifactVarianceReduction").arg(this->getName()), false).toBool();
-    m_dArtifactThresholdFirst = settings.value(QString("Plugin/%1/artifactThresholdFirst").arg(this->getName()), 300).toDouble();
-    m_iArtifactThresholdSecond = settings.value(QString("Plugin/%1/artifactThresholdSecond").arg(this->getName()), -6).toInt();
+    m_dArtifactThresholdFirst = settings.value(QString("Plugin/%1/artifactThresholdFirst").arg(this->getName()), m_dArtifactThresholdFirst).toDouble();
+    m_iArtifactThresholdSecond = settings.value(QString("Plugin/%1/artifactThresholdSecond").arg(this->getName()), m_iArtifactThresholdSecond).toInt();
     m_dArtifactVariance = settings.value(QString("Plugin/%1/artifactVariance").arg(this->getName()), 3).toInt();
 
     m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();

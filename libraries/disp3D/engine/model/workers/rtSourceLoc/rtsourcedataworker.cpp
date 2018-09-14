@@ -276,7 +276,6 @@ void RtSourceDataWorker::streamData()
     }
 
     //qDebug()<<"RtSourceDataWorker::streamData - this->thread() "<< this->thread();
-
     //qDebug()<<"RtSourceDataWorker::streamData - time.elapsed()" << time.elapsed();
 }
 

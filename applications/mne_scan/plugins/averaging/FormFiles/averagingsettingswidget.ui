@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>237</width>
-    <height>452</height>
+    <width>296</width>
+    <height>525</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,7 +134,7 @@
    <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Artifact rejection</string>
+      <string>EOG artifact rejection</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="1" column="1">
