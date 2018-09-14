@@ -115,13 +115,14 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
     // Generate tapered spectra, PSD, and CSD and sum over epoch
     // This part could be parallelized with QtConcurrent::mappedReduced
     QList<AbstractMetricInputData> lData;
+    AbstractMetricInputData dataTemp;
+    dataTemp.iNRows = iNRows;
+    dataTemp.iNFreqs = iNFreqs;
+    dataTemp.iNfft = iNfft;
+    dataTemp.tapers = tapers;
+
     for (int i = 0; i < matDataList.size(); ++i) {
-        AbstractMetricInputData dataTemp;
         dataTemp.matInputData = matDataList.at(i);
-        dataTemp.iNRows = iNRows;
-        dataTemp.iNFreqs = iNFreqs;
-        dataTemp.iNfft = iNfft;
-        dataTemp.tapers = tapers;
 
         lData.append(dataTemp);
     }

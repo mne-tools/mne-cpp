@@ -82,8 +82,8 @@ AbstractView::AbstractView(QWidget* parent,
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
 {
     //Init 3D View
-    m_p3DView->setModel(m_pData3DModel);
     m_p3DView->setFlag(Qt::FramelessWindowHint, true);
+    m_p3DView->setModel(m_pData3DModel);
 
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
