@@ -217,6 +217,8 @@ protected:
     Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QList<Eigen::VectorXd>                              m_lDataLoopQ;                       /**< List that holds the matrix data <n_channels x n_samples> for looping. */
+
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */
     QSharedPointer<Eigen::SparseMatrix<float> >         m_pMatInterpolationMatrix;          /**< The interpolation matrix. */
 

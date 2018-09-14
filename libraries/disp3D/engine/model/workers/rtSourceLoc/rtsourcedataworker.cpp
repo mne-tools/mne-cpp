@@ -217,12 +217,8 @@ void RtSourceDataWorker::streamData()
 {
     //QElapsedTimer time;
     //time.start();
-
-    qDebug() << "RtSourceDataWorker::streamData";
-
     if(m_lDataQ.isEmpty()) {
         if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
-            qDebug() << "RtSourceDataWorker::streamData - looping";
             if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
                 m_vecAverage = m_lDataLoopQ.front();
             } else if (m_iCurrentSample < m_lDataLoopQ.size()){
@@ -234,11 +230,9 @@ void RtSourceDataWorker::streamData()
                 m_iCurrentSample = 0;
             }
         } else {
-            qDebug() << "RtSourceDataWorker::streamData - returning looping";
             return;
         }
     } else {
-        qDebug() << "RtSourceDataWorker::streamData - normal";
         if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
             m_vecAverage = m_lDataQ.takeFirst();
         } else {
