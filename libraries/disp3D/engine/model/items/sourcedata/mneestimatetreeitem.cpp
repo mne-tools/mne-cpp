@@ -168,7 +168,7 @@ void MneEstimateTreeItem::initItem()
     data.setValue(17);
     pItemStreamingInterval->setData(data, MetaTreeItemRoles::StreamingTimeInterval);
 
-    MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Looping on/off");
+    MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Loop last data");
     connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
             this, &MneEstimateTreeItem::onCheckStateLoopedStateChanged);
     pItemLoopedStreaming->setCheckable(true);
