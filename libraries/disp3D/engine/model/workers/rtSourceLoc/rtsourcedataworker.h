@@ -247,7 +247,8 @@ protected:
     */
     static void generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi);
 
-    QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the matrix data <n_channels x n_samples>. */
+    QList<Eigen::VectorXd>                              m_lDataLoopQ;                       /**< List that holds the matrix data <n_channels x n_samples> for looping. */
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */
 
     bool                                                m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
