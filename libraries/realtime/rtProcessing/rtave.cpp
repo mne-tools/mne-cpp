@@ -619,10 +619,13 @@ bool RtAve::checkForArtifact(MatrixXd& data)
         //Prepare concurrent data handling
         QList<QPair<bool, RowVectorXd> > lchData;
 
+        int iChType = FIFFV_EOG_CH; //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_EOG_CH
+
         for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-            if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH)
-                    && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name) && m_pFiffInfo->chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG
-                    && m_pFiffInfo->chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
+            if(m_pFiffInfo->chs.at(i).kind == iChType
+               && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)
+               && m_pFiffInfo->chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG
+               && m_pFiffInfo->chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
                 QPair<bool, RowVectorXd> pair;
                 pair.first = false;
                 pair.second = data.row(i);
@@ -659,10 +662,6 @@ bool RtAve::checkForArtifact(MatrixXd& data)
                 }
             }
         }
-    }
-
-    if(bReject) {
-        qDebug() << "RtAve::checkForArtifact - Reject trial";
     }
 
     return bReject;
