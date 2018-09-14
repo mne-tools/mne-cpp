@@ -108,6 +108,8 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
             break;
         }
     }
+
+    m_lDataLoopQ = m_lDataQ;
 }
 
 
@@ -189,48 +191,54 @@ void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<floa
 
 void RtSensorDataWorker::streamData()
 {
-    if(m_lDataQ.size() > 0) {
-        if(m_bIsLooping) {
-            //Down sampling in loop mode
-            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-                m_vecAverage = m_lDataQ.front();
-            } else if (m_iCurrentSample < m_lDataQ.size()){
-                m_vecAverage += m_lDataQ.at(m_iCurrentSample);
+    if(m_lDataQ.isEmpty()) {
+        if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
+            if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
+                m_vecAverage = m_lDataLoopQ.front();
+            } else if (m_iCurrentSample < m_lDataLoopQ.size()){
+                m_vecAverage += m_lDataLoopQ.at(m_iCurrentSample);
+            }
+
+            //Set iterator back to the front if needed
+            if(m_iCurrentSample == m_lDataLoopQ.size()) {
+                m_iCurrentSample = 0;
             }
         } else {
-            //Down sampling in stream mode
-            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-                m_vecAverage = m_lDataQ.takeFirst();
-            } else {
-                m_vecAverage += m_lDataQ.takeFirst();
-            }
+            return;
         }
-
-        m_iCurrentSample++;
-        m_iSampleCtr++;
+    } else {
+        if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+            m_vecAverage = m_lDataQ.takeFirst();
+        } else {
+            m_vecAverage += m_lDataQ.takeFirst();
+        }
 
         //Set iterator back to the front if needed
         if(m_iCurrentSample == m_lDataQ.size()) {
             m_iCurrentSample = 0;
         }
-
-        if(m_iSampleCtr % m_iAverageSamples == 0
-            && m_iAverageSamples != 0) {
-            //Perform the actual interpolation and send signal
-            m_vecAverage /= (double)m_iAverageSamples;
-            if(m_bStreamSmoothedData) {
-                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage));
-            } else {
-                emit newRtRawData(m_vecAverage);
-            }
-            m_vecAverage.setZero(m_vecAverage.rows());
-
-            //reset sample counter
-            m_iSampleCtr = 0;
-        }
-        //qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
-        //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
     }
+
+    m_iCurrentSample++;
+    m_iSampleCtr++;
+
+    if(m_iSampleCtr % m_iAverageSamples == 0
+        && m_iAverageSamples != 0) {
+        //Perform the actual interpolation and send signal
+        m_vecAverage /= (double)m_iAverageSamples;
+        if(m_bStreamSmoothedData) {
+            emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage));
+        } else {
+            emit newRtRawData(m_vecAverage);
+        }
+        m_vecAverage.setZero(m_vecAverage.rows());
+
+        //reset sample counter
+        m_iSampleCtr = 0;
+    }
+
+    //qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
+    //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
 }
 
 
