@@ -140,9 +140,9 @@ protected:
     /**
     * Slot called when the trigger type changed.
     *
-    * @param [in] triggerType        The new trigger type.
+    * @param [in] sTriggerType        The new trigger type.
     */
-    void onTriggerTypeChanged(const QString& triggerType);
+    void onTriggerTypeChanged(const QString& sTriggerType);
 
     Ui::MinimumNormSettingsViewWidget* ui;
 

@@ -99,9 +99,9 @@ MinimumNormSettingsView::~MinimumNormSettingsView()
 
 void MinimumNormSettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
-    for(int i = 0; i < lTriggerTypes.size(); ++i) {
-        if(ui->m_comboBox_triggerType->findText(lTriggerTypes.at(i)) == -1) {
-            ui->m_comboBox_triggerType->addItem(lTriggerTypes.at(i));
+    for(const QString &sTriggerType : lTriggerTypes) {
+        if(ui->m_comboBox_triggerType->findText(sTriggerType) == -1) {
+            ui->m_comboBox_triggerType->addItem(sTriggerType);
         }
     }
 }
@@ -118,7 +118,7 @@ void MinimumNormSettingsView::onMethodChanged(const QString& method)
 
 //*************************************************************************************************************
 
-void MinimumNormSettingsView::onTriggerTypeChanged(const QString& triggerType)
+void MinimumNormSettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 {
-    emit triggerTypeChanged(triggerType);
+    emit triggerTypeChanged(sTriggerType);
 }

@@ -149,6 +149,5 @@ void RtConnectivity::handleResults(const Network& connectivityResult)
 
 void RtConnectivity::reset()
 {
-    int returnCode;
     m_workerThread.requestInterruption();
 }
