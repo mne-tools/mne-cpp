@@ -604,6 +604,7 @@ void MNE::run()
             {
                 MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
 
+                //Pick the same channels as in the inverse operator
                 MatrixXd data(m_invOp.noise_cov->names.size(), rawSegment.cols());
 
                 for(qint32 j = 0; j < m_invOp.noise_cov->names.size(); ++j) {

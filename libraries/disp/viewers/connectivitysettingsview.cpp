@@ -105,9 +105,9 @@ ConnectivitySettingsView::~ConnectivitySettingsView()
 
 void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
-    for(int i = 0; i < lTriggerTypes.size(); ++i) {
-        if(ui->m_comboBox_triggerType->findText(lTriggerTypes.at(i)) == -1) {
-            ui->m_comboBox_triggerType->addItem(lTriggerTypes.at(i));
+    for(const QString &sTriggerType : lTriggerTypes) {
+        if(ui->m_comboBox_triggerType->findText(sTriggerType) == -1) {
+            ui->m_comboBox_triggerType->addItem(sTriggerType);
         }
     }
 }
@@ -115,17 +115,17 @@ void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 
 //*************************************************************************************************************
 
-void ConnectivitySettingsView::onMetricChanged(const QString& metric)
+void ConnectivitySettingsView::onMetricChanged(const QString& sMetric)
 {
-    emit connectivityMetricChanged(metric);
+    emit connectivityMetricChanged(sMetric);
 }
 
 
 //*************************************************************************************************************
 
-void ConnectivitySettingsView::onWindowTypeChanged(const QString& windowType)
+void ConnectivitySettingsView::onWindowTypeChanged(const QString& sWindowType)
 {
-    emit windowTypeChanged(windowType);
+    emit windowTypeChanged(sWindowType);
 }
 
 
@@ -139,7 +139,7 @@ void ConnectivitySettingsView::onNumberTrialsChanged(int iNumberTrials)
 
 //*************************************************************************************************************
 
-void ConnectivitySettingsView::onTriggerTypeChanged(const QString& triggerType)
+void ConnectivitySettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 {
-    emit triggerTypeChanged(triggerType);
+    emit triggerTypeChanged(sTriggerType);
 }
