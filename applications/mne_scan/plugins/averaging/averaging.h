@@ -46,7 +46,6 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <realtime/rtProcessing/rtave.h>
 
 
 //*************************************************************************************************************
@@ -61,8 +60,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-//#define DEBUG_AVERAGING
 
 
 //*************************************************************************************************************
@@ -82,10 +79,10 @@ namespace REALTIMELIB{
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
+// DEFINE NAMESPACE AVERAGINGPLUGIN
 //=============================================================================================================
 
-namespace AveragingPlugin
+namespace AVERAGINGPLUGIN
 {
 
 
@@ -253,12 +250,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Show the averaging widget
-    */
-    void showAveragingWidget();
-
-    //=========================================================================================================
-    /**
     * Reset the averaging plugin and delete all currently stored data
     *
     * @param[in] state     the new state
@@ -269,12 +260,6 @@ protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
-
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
@@ -289,7 +274,7 @@ private:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
     QList<qint32>                                   m_qListStimChs;                     /**< Stimulus channels.*/
 
-    REALTIMELIB::RtAve::SPtr                    m_pRtAve;                               /**< Real-time average. */
+    QSharedPointer<REALTIMELIB::RtAve>              m_pRtAve;                           /**< Real-time average. */
 
     bool                                            m_bIsRunning;                       /**< If this thread is running. */
     bool                                            m_bProcessData;                     /**< If data should be received for processing. */
@@ -313,16 +298,9 @@ private:
     double                                          m_dArtifactVariance;                /**< The rejection variance value. */
     double                                          m_dArtifactThresholdFirst;          /**< The first component of the rejection threshold value. */
 
-    QAction*                                        m_pActionShowAdjustment;            /**< The action triggering the averaging settings window. */
-
     QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
 };
 
 } // NAMESPACE

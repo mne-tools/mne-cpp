@@ -64,10 +64,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
+// DEFINE NAMESPACE AVERAGINGPLUGIN
 //=============================================================================================================
 
-namespace AveragingPlugin
+namespace AVERAGINGPLUGIN
 {
 
 //*************************************************************************************************************
@@ -96,11 +96,11 @@ public:
 
     explicit AveragingSettingsWidget(Averaging *toolbox, QWidget *parent = 0);
 
+    void updateStimChannels();
+
     int getStimChannelIdx();
 
-signals:
-
-public slots:
+public:
 
 private:
     void changePreStim();
@@ -113,6 +113,8 @@ private:
     Ui::AverageSettingsWidgetClass ui;		/**< Holds the user interface for the AverageSettingsWidgetClass.*/
 
     Averaging* m_pAveragingToolbox;
+
+signals:
 };
 
 } // NAMESPACE
