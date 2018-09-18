@@ -88,7 +88,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRtItem(Q_NULLPTR)
 , m_pNetworkView(NetworkView::SPtr::create())
 {
-    QList<QWidget*> lControlWidgets = m_pRTCE->getControlWidgets();
+    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
     m_pNetworkView->setQuickControlWidgets(lControlWidgets);
 
     QGridLayout *mainLayoutView = new QGridLayout();

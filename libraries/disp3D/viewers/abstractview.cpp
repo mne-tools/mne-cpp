@@ -99,6 +99,12 @@ AbstractView::AbstractView(QWidget* parent,
 
 AbstractView::~AbstractView()
 {
+    //Move parentship to 0 pointer because we want to manage the control widgets from elsewhere
+    for(int i = 0; i < m_lControlWidgets.size(); i++) {
+        if(m_lControlWidgets.at(i)) {
+            m_lControlWidgets.at(i)->setParent(0);
+        }
+    }
 }
 
 
@@ -136,11 +142,15 @@ QPointer<QuickControlView> AbstractView::getQuickControl()
 
 //*************************************************************************************************************
 
-void AbstractView::setQuickControlWidgets(const QList<QWidget*>&lControlWidgets)
+void AbstractView::setQuickControlWidgets(const QList<QSharedPointer<QWidget> >& lControlWidgets)
 {
     if(m_pQuickControlView) {
+        m_lControlWidgets << lControlWidgets;
         for(int i = 0; i < lControlWidgets.size(); i++) {
-            m_pQuickControlView->addGroupBox(lControlWidgets.at(i), lControlWidgets.at(i)->windowTitle());
+            //TODO: Note that we are mixing memory management systems here. QSharedPointer and QObjects parenting. See destructor for deparenting.
+            if(lControlWidgets.at(i)) {
+                m_pQuickControlView->addGroupBox(lControlWidgets.at(i).data(), lControlWidgets.at(i)->windowTitle());
+            }
         }
     }
 }

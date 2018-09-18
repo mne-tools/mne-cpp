@@ -239,7 +239,7 @@ protected:
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;                /**< Fiff information. */
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfoInput;           /**< Fiff information of the evoked. */
 
-    QPointer<DISPLIB::MinimumNormSettingsView>                                              m_pMinimumNormSettingsView; /**< The minimum norm settings widget which will be added to the Quick Control view.*/
+    QSharedPointer<DISPLIB::MinimumNormSettingsView>                                        m_pMinimumNormSettingsView; /**< The minimum norm settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
 
     QMutex                          m_qMutex;                   /**< The mutex ensuring thread safety. */
     QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */

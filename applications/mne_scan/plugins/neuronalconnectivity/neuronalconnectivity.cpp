@@ -97,7 +97,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("4")
-, m_pConnectivitySettingsView(new ConnectivitySettingsView())
+, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
 {
 }
 

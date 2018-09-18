@@ -132,7 +132,7 @@ public:
     *
     * @param pWidget    The control widget, which should be added to the corresponding real-time visualization
     */
-    inline void addControlWidget(QWidget* pWidget);
+    inline void addControlWidget(QSharedPointer<QWidget> pWidget);
 
     //=========================================================================================================
     /**
@@ -140,7 +140,7 @@ public:
     *
     * @return A list containting the control widgets
     */
-    inline QList<QWidget*> getControlWidgets();
+    inline QList<QSharedPointer<QWidget> > getControlWidgets();
 
 signals:
     void notify();
@@ -155,11 +155,11 @@ protected:
     inline void setType(int type);
 
 private:
-    mutable QMutex      m_qMutex;           /**< Mutex to ensure thread safety */
-    int                 m_iMetaTypeId;      /**< QMetaType id of the Measurement */
-    QString             m_qString_Name;     /**< Name of the Measurement */
-    bool                m_bVisibility;      /**< Visibility status */
-    QList<QWidget*>     m_lControlWidgets;  /**< The control widgets, which should be added to the corresponding real-time visualization. */
+    mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety */
+    int                                 m_iMetaTypeId;      /**< QMetaType id of the Measurement */
+    QString                             m_qString_Name;     /**< Name of the Measurement */
+    bool                                m_bVisibility;      /**< Visibility status */
+    QList<QSharedPointer<QWidget> >     m_lControlWidgets;  /**< The control widgets, which should be added to the corresponding real-time visualization. */
 
 };
 
@@ -223,7 +223,7 @@ inline int Measurement::type() const
 
 //*************************************************************************************************************
 
-inline void Measurement::addControlWidget(QWidget* pWidget)
+inline void Measurement::addControlWidget(QSharedPointer<QWidget> pWidget)
 {
     QMutexLocker locker(&m_qMutex);
     m_lControlWidgets << pWidget;
@@ -232,7 +232,7 @@ inline void Measurement::addControlWidget(QWidget* pWidget)
 
 //*************************************************************************************************************
 
-inline QList<QWidget*> Measurement::getControlWidgets()
+inline QList<QSharedPointer<QWidget> > Measurement::getControlWidgets()
 {
     QMutexLocker locker(&m_qMutex);
     return m_lControlWidgets;
