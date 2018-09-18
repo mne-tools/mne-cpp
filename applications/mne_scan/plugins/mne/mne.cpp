@@ -103,7 +103,7 @@ MNE::MNE()
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_sAvrType("4")
-, m_pMinimumNormSettingsView(new MinimumNormSettingsView())
+, m_pMinimumNormSettingsView(MinimumNormSettingsView::SPtr::create())
 , m_sMethod("MNE")
 {
 

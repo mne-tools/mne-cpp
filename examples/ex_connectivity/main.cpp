@@ -453,13 +453,13 @@ int main(int argc, char *argv[])
 
     //Create NetworkView and add extra control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
     NetworkView tNetworkView;
-    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
-    QList<QWidget*> lWidgets;
+    ConnectivitySettingsView::SPtr pConnectivitySettingsView = ConnectivitySettingsView::SPtr::create();
+    QList<QSharedPointer<QWidget> > lWidgets;
     lWidgets << pConnectivitySettingsView;
     tNetworkView.setQuickControlWidgets(lWidgets);
     tNetworkView.show();
 
-    QObject::connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
+    QObject::connect(pConnectivitySettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
 
     QObject::connect(pConnectivitySettingsManager->m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
