@@ -131,12 +131,38 @@ public:
     //=========================================================================================================
     /**
     * Add a new group box to this Widget. Takes ownership of the passed widget.
+    * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
+    * This way the memory management stays with the QSharedPointer.
+    *
+    * @param [in] pWidget           The widgets which will be put into the new group box.
+    * @param [in] sGroupBoxName     The name of the new group box.
+    */
+    void addGroupBox(QSharedPointer<QWidget> pWidget,
+                     QString sGroupBoxName);
+
+    //=========================================================================================================
+    /**
+    * Add a new group box to this Widget. Takes ownership of the passed widget.
     *
     * @param [in] pWidget           The widgets which will be put into the new group box.
     * @param [in] sGroupBoxName     The name of the new group box.
     */
     void addGroupBox(QWidget* pWidget,
-                        QString sGroupBoxName);
+                     QString sGroupBoxName);
+
+    //=========================================================================================================
+    /**
+    * Add a new group box with tabs to this Widget. If the group box already exists, a new tab will be added to its QTabWidget.
+    * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
+    * This way the memory management stays with the QSharedPointer.
+    *
+    * @param [in] pWidget           The widgets which will be put into the new group box.
+    * @param [in] sGroupBoxName     The name of the new group box.
+    * @param [in] sTabName          The name of the new tab.
+    */
+    void addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
+                             QString sGroupBoxName,
+                             QString sTabName);
 
     //=========================================================================================================
     /**
@@ -195,6 +221,8 @@ protected:
 private:       
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlViewWidget*                         ui;                             /**< The generated UI file. */
+
+    QList<QSharedPointer<QWidget> >                     m_lControlWidgets;              /**< The quick control view widgets. Note that these are managed elsewhere. */
 
 signals:
 

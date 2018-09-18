@@ -146,7 +146,7 @@ void NeuronalConnectivity::init()
     m_outputConnectors.append(m_pRTCEOutput);
     m_pRTCEOutput->data()->setName(this->getName());
 
-    //Add control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
+    //Add control widgets to output data (will be used by QuickControlView by the measurements display)
     connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
     connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,

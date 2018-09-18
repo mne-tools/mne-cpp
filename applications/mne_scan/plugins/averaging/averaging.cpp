@@ -48,11 +48,7 @@
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
+#include <realtime/rtProcessing/rtave.h>
 
 
 //*************************************************************************************************************
@@ -75,7 +71,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace AveragingPlugin;
+using namespace AVERAGINGPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
@@ -89,10 +85,7 @@ using namespace REALTIMELIB;
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_pAveragingInput(NULL)
-//, m_pAveragingOutput(NULL)
-, m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
-, m_bIsRunning(false)
+: m_bIsRunning(false)
 , m_bProcessData(false)
 , m_iPreStimSeconds(100)
 , m_iPostStimSeconds(400)
@@ -103,8 +96,6 @@ Averaging::Averaging()
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_iAverageMode(0)
-, m_pAveragingWidget(AveragingSettingsWidget::SPtr())
-, m_pActionShowAdjustment(Q_NULLPTR)
 , m_bDoBaselineCorrection(false)
 , m_bDoArtifactThresholdReduction(false)
 , m_bDoArtifactVarianceReduction(false)
@@ -114,18 +105,7 @@ Averaging::Averaging()
 , m_iBaselineFromSamples(0)
 , m_iBaselineToSamples(0)
 , m_iStimChanIdx(0)
-#ifdef DEBUG_AVERAGING
-, m_iTestCount(0)
-, m_iTestCount2(0)
-#endif
 {
-    m_pActionShowAdjustment = new QAction(QIcon(":/images/averagingadjustments.png"), tr("Averaging Adjustments"),this);
-//    m_pActionSetupProject->setShortcut(tr("F12"));
-    m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
-    connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
-    addPluginAction(m_pActionShowAdjustment);
-
-    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -177,17 +157,6 @@ void Averaging::unload()
     settings.setValue(QString("Plugin/%1/baselineFromSamples").arg(this->getName()), m_iBaselineFromSamples);
 
     settings.setValue(QString("Plugin/%1/doBaselineCorrection").arg(this->getName()), m_bDoBaselineCorrection);
-}
-
-
-//*************************************************************************************************************
-
-void Averaging::initConnector()
-{
-//    if(m_pFiffInfo)
-//    {
-
-//    }
 }
 
 
@@ -274,47 +243,13 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
-            emit fiffInfoAvailable();
-
-#ifdef DEBUG_AVERAGING
-            for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
-            {
-                if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-                {
-                    m_iTestStimCh = i;
-                    break;
-                }
-            }
-#endif
         }
-
 
         if(m_bProcessData)
         {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
             {
                 MatrixXd t_mat = pRTMSA->getMultiSampleArray()[i];
-
-#ifdef DEBUG_AVERAGING
-                qsrand(time(NULL)+m_iTestCount);
-
-                t_mat = MatrixXd::Zero(t_mat.rows(), t_mat.cols());
-
-                if(m_iTestCount%10 == 0)//GEN test stim
-                {
-                    qint32 samp = (qrand() % (t_mat.cols()/8))+1; //exclude buggy 0
-                    if(m_iTestCount2 % 5 == 0) // create zero every 5 generations
-                        samp = 0;
-                    RowVectorXd stim = RowVectorXd::Ones(8)*5;
-                    t_mat.block(m_iTestStimCh,samp,1,8) = stim;
-
-                    t_mat.block(0,samp+1,m_iTestStimCh, t_mat.cols()-(samp+1)) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-(samp+1));
-
-                    //qDebug() << "Pos:" << samp;
-                    ++m_iTestCount2;
-                }
-                ++m_iTestCount;
-#endif
                 m_pAveragingBuffer->push(&t_mat);
             }
         }
@@ -326,9 +261,7 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void Averaging::init()
 {
-    //
     // Load Settings
-    //
     QSettings settings;
     m_iPreStimSeconds = settings.value(QString("Plugin/%1/preStimSeconds").arg(this->getName()), 100).toInt();
     m_iPostStimSeconds = settings.value(QString("Plugin/%1/postStimSeconds").arg(this->getName()), 400).toInt();
@@ -363,8 +296,9 @@ void Averaging::init()
     m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
-    //init channels when fiff info is available
-    connect(this, &Averaging::fiffInfoAvailable, this, &Averaging::initConnector);
+    //Add control widgets to output data (will be used by QuickControlView by the measurements display)
+    m_pAveragingWidget = AveragingSettingsWidget::SPtr::create(this);
+    m_pAveragingOutput->data()->addControlWidget(m_pAveragingWidget);
 
     //Delete Buffer - will be initialized with first incoming data
     if(!m_pAveragingBuffer.isNull())
@@ -588,18 +522,6 @@ void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet,
 
 //*************************************************************************************************************
 
-void Averaging::showAveragingWidget()
-{
-    QMutexLocker locker(&m_qMutex);
-    if(!m_pAveragingWidget)
-        m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
-
-    m_pAveragingWidget->show();
-}
-
-
-//*************************************************************************************************************
-
 void Averaging::resetAverage(bool state)
 {
     Q_UNUSED(state)
@@ -616,31 +538,27 @@ void Averaging::resetAverage(bool state)
 void Averaging::run()
 {
     //qDebug() << "START void Averaging::run()";
-    //
     // Read Fiff Info
-    //
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
     m_iPreStimSamples = ((float)m_iPreStimSeconds/1000)*m_pFiffInfo->sfreq;
     m_iPostStimSamples = ((float)m_iPostStimSeconds/1000)*m_pFiffInfo->sfreq;
 
-    m_pActionShowAdjustment->setVisible(true);
-
     for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
     {
         if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
         {
-            qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
+            //qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
             m_qListStimChs.append(i);
         }
     }
 
+    m_pAveragingWidget->updateStimChannels();
+
     m_bProcessData = true;
 
-    //
     // Init Real-Time average
-    //
     m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages,
                                      m_iPreStimSamples,
                                      m_iPostStimSamples,
@@ -685,9 +603,6 @@ void Averaging::run()
             {
                 FiffEvokedSet t_fiffEvokedSet = *m_qVecEvokedData[0].data();
 
-#ifdef DEBUG_AVERAGING
-                std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
-#endif
                 m_pAveragingOutput->data()->setValue(t_fiffEvokedSet,
                                                      m_pFiffInfo,
                                                      m_lResponsibleTriggerTypes);
@@ -699,8 +614,6 @@ void Averaging::run()
 
         }
     }
-
-    m_pActionShowAdjustment->setVisible(false);
 
     m_pRtAve->stop();
 }

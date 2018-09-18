@@ -525,9 +525,16 @@ void RealTimeEvokedSetWidget::init()
                 m_pButterflyView.data(), &ButterflyView::setModalities);
 
         // Quick control average selection
+        QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
+        if(!lControlWidgets.isEmpty()) {
+            if(lControlWidgets.first()) {
+                m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.first(), "Averaging", "Settings");
+            }
+        }
+
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
         pAverageSelectionView->init();
-        m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Other", "Averages");
+        m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection");
 
         //Handle averages
         connect(this->m_pEvokedSetModel.data(), &EvokedSetModel::newAverageTypeReceived,
