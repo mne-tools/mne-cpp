@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AverageSettingsWidgetClass</class>
- <widget class="QWidget" name="AverageSettingsWidgetClass">
+ <class>AverageSettingsViewWidget</class>
+ <widget class="QWidget" name="AverageSettingsViewWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
