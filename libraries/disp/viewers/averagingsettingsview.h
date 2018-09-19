@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagingsettingswidget.h
+* @file     averagingsettingsview.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,21 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AveragingSettingsWidget class.
+* @brief    Contains the declaration of the AveragingSettingsView class.
 *
 */
 
-#ifndef AVERAGINGSETTINGSWIDGET_H
-#define AVERAGINGSETTINGSWIDGET_H
+#ifndef AVERAGINGSETTINGSVIEW_H
+#define AVERAGINGSETTINGSVIEW_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../averaging.h"
-
-#include "../ui_averagingsettingswidget.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -53,27 +52,6 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QSpinBox>
-#include <QPair>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QSpinBox>
-#include <QLabel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
-//=============================================================================================================
-
-namespace AveragingPlugin
-{
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -81,40 +59,93 @@ namespace AveragingPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Averaging;
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace Ui {
+    class AverageSettingsViewWidget;
+}
 
 
-class AveragingSettingsWidget : public QWidget
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+/**
+* DECLARE CLASS AveragingSettingsView
+*
+* @brief The AveragingSettingsView class provides a averaging settings view.
+*/
+class DISPSHARED_EXPORT AveragingSettingsView : public QWidget
 {
     Q_OBJECT
 
-    friend class Averaging;
-
 public:
-    typedef QSharedPointer<AveragingSettingsWidget> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
-    typedef QSharedPointer<AveragingSettingsWidget> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<AveragingSettingsView> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<AveragingSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
 
-    explicit AveragingSettingsWidget(Averaging *toolbox, QWidget *parent = 0);
+    explicit AveragingSettingsView(QWidget *parent,
+                                   QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                                   const QList<qint32>& qListStimChs,
+                                   int iStimChan,
+                                   int iNumAverages,
+                                   int iAverageMode,
+                                   int iPreStimSeconds,
+                                   int iPostStimSeconds,
+                                   bool bDoArtifactThresholdReduction,
+                                   bool bDoArtifactVarianceReduction,
+                                   double dArtifactThresholdFirst,
+                                   int iArtifactThresholdSecond,
+                                   double dArtifactVariance,
+                                   bool bDoBaselineCorrection,
+                                   int iBaselineFromSeconds,
+                                   int iBaselineToSeconds);
+
+    void setStimChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                         QList<qint32> qListStimChs,
+                         int iStimChan);
 
     int getStimChannelIdx();
 
+protected:
+    void onChangePreStim();
+    void onChangePostStim();
+    void onChangeBaselineFrom();
+    void onChangeBaselineTo();
+    void onChangeArtifactThreshold();
+    void onChangeNumAverages();
+
+    Ui::AverageSettingsViewWidget* ui;		/**< Holds the user interface for the AverageSettingsViewWidget.*/
+
 signals:
+    void changePreStim(qint32 value);
+    void changePostStim(qint32 value);
+    void changeBaselineFrom(qint32 value);
+    void changeBaselineTo(qint32 value);
+    void changeArtifactThreshold(qint32 first, qint32 second);
+    void changeNumAverages(qint32 value);
+    void changeStimChannel(qint32 index);
+    void changeArtifactThresholdReductionActive(bool state);
+    void changeArtifactVarianceReductionActive(bool state);
+    void changeArtifactVariance(double dVariance);
+    void changeBaselineActive(bool state);
+    void resetAverage(bool state);
+    void changeAverageMode(qint32 index);
 
-public slots:
-
-private:
-    void changePreStim();
-    void changePostStim();
-    void changeBaselineFrom();
-    void changeBaselineTo();
-    void changeArtifactThreshold();
-    void changeNumAverages();
-
-    Ui::AverageSettingsWidgetClass ui;		/**< Holds the user interface for the AverageSettingsWidgetClass.*/
-
-    Averaging* m_pAveragingToolbox;
 };
 
 } // NAMESPACE
 
-#endif // AVERAGINGSETTINGSWIDGET_H
+#endif // AVERAGINGSETTINGSVIEW_H

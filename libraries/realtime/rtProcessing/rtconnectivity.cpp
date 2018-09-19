@@ -143,3 +143,11 @@ void RtConnectivity::handleResults(const Network& connectivityResult)
 {
     emit newConnectivityResultAvailable(connectivityResult);
 }
+
+
+//*************************************************************************************************************
+
+void RtConnectivity::reset()
+{
+    m_workerThread.requestInterruption();
+}

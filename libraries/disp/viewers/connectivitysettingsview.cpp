@@ -84,6 +84,8 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &ConnectivitySettingsView::onNumberTrialsChanged);
 
+    connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &ConnectivitySettingsView::onTriggerTypeChanged);
 
     this->setWindowTitle("Connectivity Settings");
     this->setMinimumWidth(330);
@@ -101,17 +103,29 @@ ConnectivitySettingsView::~ConnectivitySettingsView()
 
 //*************************************************************************************************************
 
-void ConnectivitySettingsView::onMetricChanged(const QString& metric)
+void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
-    emit connectivityMetricChanged(metric);
+    for(const QString &sTriggerType : lTriggerTypes) {
+        if(ui->m_comboBox_triggerType->findText(sTriggerType) == -1) {
+            ui->m_comboBox_triggerType->addItem(sTriggerType);
+        }
+    }
 }
 
 
 //*************************************************************************************************************
 
-void ConnectivitySettingsView::onWindowTypeChanged(const QString& windowType)
+void ConnectivitySettingsView::onMetricChanged(const QString& sMetric)
 {
-    emit windowTypeChanged(windowType);
+    emit connectivityMetricChanged(sMetric);
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::onWindowTypeChanged(const QString& sWindowType)
+{
+    emit windowTypeChanged(sWindowType);
 }
 
 
@@ -120,4 +134,12 @@ void ConnectivitySettingsView::onWindowTypeChanged(const QString& windowType)
 void ConnectivitySettingsView::onNumberTrialsChanged(int iNumberTrials)
 {
     emit numberTrialsChanged(iNumberTrials);
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::onTriggerTypeChanged(const QString& sTriggerType)
+{
+    emit triggerTypeChanged(sTriggerType);
 }

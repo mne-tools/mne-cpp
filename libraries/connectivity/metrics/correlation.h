@@ -118,6 +118,26 @@ public:
 protected:
     //=========================================================================================================
     /**
+    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
+    *
+    * @param[in] data       The input data.
+    *
+    * @return               The connectivity matrix.
+    */
+    static Eigen::MatrixXd compute(const AbstractMetricInputData& data);
+
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed connectivity matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming, temporary result data.
+    */
+    static void reduce(Eigen::MatrixXd &resultData,
+                       const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
     * Calculates the actual correlation coefficient between two data vectors.
     *
     * @param[in] vecFirst    The first input data row.
@@ -127,24 +147,6 @@ protected:
     */
     static double calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
 
-    //=========================================================================================================
-    /**
-    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
-    *
-    * @param[in] data       The input data.
-    *
-    * @return               The connectivity matrix.
-    */
-    static Eigen::MatrixXd calculate(const Eigen::MatrixXd &data);
-
-    //=========================================================================================================
-    /**
-    * Sums up (reduces) the in parallel processed connectivity matrix.
-    *
-    * @param[out] resultData    The result data.
-    * @param[in]  data          The incoming, temporary result data.
-    */
-    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
 };
 
 

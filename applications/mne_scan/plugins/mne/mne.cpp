@@ -42,6 +42,25 @@
 
 #include "FormFiles/mnesetupwidget.h"
 
+#include <disp/viewers/minimumnormsettingsview.h>
+
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
+
+#include <fiff/fiff_info.h>
+
+#include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourceestimate.h>
+
+#include <inverse/minimumNorm/minimumnorm.h>
+
+#include <realtime/rtProcessing/rtinvop.h>
+
+#include <scMeas/realtimesourceestimate.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimecov.h>
+#include <scMeas/realtimeevokedset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,9 +77,14 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEPlugin;
+using namespace MNEPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
+using namespace DISPLIB;
+using namespace INVERSELIB;
+using namespace REALTIMELIB;
+using namespace SCSHAREDLIB;
+using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -79,6 +103,8 @@ MNE::MNE()
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_sAvrType("4")
+, m_pMinimumNormSettingsView(MinimumNormSettingsView::SPtr::create())
+, m_sMethod("MNE")
 {
 
 }
@@ -134,6 +160,14 @@ void MNE::init()
     m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "MNE Out", "MNE output data");
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+
+    //Add control widgets to output data (will be used by QuickControlView in RealTimeSourceEstimateWidget)
+    connect(m_pMinimumNormSettingsView.data(), &MinimumNormSettingsView::methodChanged,
+            this, &MNE::onMethodChanged);
+    connect(m_pMinimumNormSettingsView.data(), &MinimumNormSettingsView::triggerTypeChanged,
+            this, &MNE::onTriggerTypeChanged);
+
+    m_pRTSEOutput->data()->addControlWidget(m_pMinimumNormSettingsView);
 
     // start clustering
     QFuture<void> m_future = QtConcurrent::run(this, &MNE::doClustering);
@@ -361,23 +395,21 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     if(pRTMSA && m_bReceiveData) {
         //Check if buffer initialized
-        if(!m_pMatrixDataBuffer)
+        if(!m_pMatrixDataBuffer) {
             m_pMatrixDataBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        }
 
         //Fiff Information of the evoked
         if(!m_pFiffInfoInput) {
             //qDebug()<<"MNE::updateRTMSA - Creating m_pFiffInfoInput";
             //m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTMSA->info().data()));
             m_pFiffInfoInput = pRTMSA->info();
+            m_iNumAverages = 1;
         }
 
-        if(m_bProcessData)
-        {
-            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
-            {
-                MatrixXd t_mat = pRTMSA->getMultiSampleArray()[i];
-
-                m_pMatrixDataBuffer->push(&t_mat);
+        if(m_bProcessData) {
+            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+                m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
             }
         }
     }
@@ -424,11 +456,15 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     QMutexLocker locker(&m_qMutex);
 
-    if(!m_bReceiveData || !pRTES->getResponsibleTriggerTypes().contains(m_sAvrType)) {
-        return;
+    QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+
+    if(m_pMinimumNormSettingsView) {
+        m_pMinimumNormSettingsView->setTriggerTypes(lResponsibleTriggerTypes);
     }
 
-    QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+    if(!m_bReceiveData || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
+        return;
+    }
 
     //Fiff Information of the evoked
     if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
@@ -446,7 +482,6 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-            //qDebug()<<""<<m_sAvrType;
             if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
@@ -470,12 +505,26 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
     double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, method));
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
 
     //Set up the inverse according to the parameters
     m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
+}
+
+
+//*************************************************************************************************************
+
+void MNE::onMethodChanged(const QString& method)
+{
+    m_sMethod = method;
+}
+
+
+//*************************************************************************************************************
+
+void MNE::onTriggerTypeChanged(const QString& triggerType)
+{
+    m_sAvrType = triggerType;
 }
 
 
@@ -555,13 +604,20 @@ void MNE::run()
             {
                 MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
 
-                float tmin = 1.0f / m_pFiffInfo->sfreq;
+                //Pick the same channels as in the inverse operator
+                MatrixXd data(m_invOp.noise_cov->names.size(), rawSegment.cols());
+
+                for(qint32 j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
+                    data.row(j) = rawSegment.row(m_pFiffInfoInput->ch_names.indexOf(m_invOp.noise_cov->names.at(j)));
+                }
+
+                float tmin = 0.0f;
                 float tstep = 1.0f / m_pFiffInfo->sfreq;
 
                 m_qMutex.lock();
 
                 //TODO: Add picking here. See evoked part as input.
-                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(rawSegment, tmin, tstep);
+                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(data, tmin, tstep);
 
                 m_qMutex.unlock();
 

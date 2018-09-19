@@ -119,22 +119,30 @@ public:
     */
     ~ConnectivitySettingsView();
 
+    //=========================================================================================================
+    /**
+    * Destroys the ConnectivitySettingsView.
+    *
+    * @param [in] lTriggerTypes        The new trigger types.
+    */
+    void setTriggerTypes(const QStringList& lTriggerTypes);
+
 protected:
     //=========================================================================================================
     /**
     * Slot called when the metric changed.
     *
-    * @param [in] metric        The new metric.
+    * @param [in] sMetric        The new metric.
     */
-    void onMetricChanged(const QString& metric);
+    void onMetricChanged(const QString& sMetric);
 
     //=========================================================================================================
     /**
     * Slot called when the window type changed.
     *
-    * @param [in] windowType        The new window type.
+    * @param [in] sWindowType        The new window type.
     */
-    void onWindowTypeChanged(const QString& windowType);
+    void onWindowTypeChanged(const QString& sWindowType);
 
     //=========================================================================================================
     /**
@@ -144,6 +152,14 @@ protected:
     */
     void onNumberTrialsChanged(int iNumberTrials);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the trigger type changed.
+    *
+    * @param [in] sTriggerType        The new trigger type.
+    */
+    void onTriggerTypeChanged(const QString& sTriggerType);
+
     Ui::ConnectivitySettingsViewWidget* ui;
 
 signals:
@@ -151,15 +167,15 @@ signals:
     /**
     * Emit signal whenever the connectivity metric changed.
     *
-    * @param [in] metric        The new metric.
+    * @param [in] sMetric        The new metric.
     */
-    void connectivityMetricChanged(const QString& metric);
+    void connectivityMetricChanged(const QString& sMetric);
 
     //=========================================================================================================
     /**
     * Emit signal whenever the window type changed.
     *
-    * @param [in] windowType        The new window type
+    * @param [in] windowType        The new window type.
     */
     void windowTypeChanged(const QString& windowType);
 
@@ -170,6 +186,14 @@ signals:
     * @param [in] iNumberTrials        The new number of trials.
     */
     void numberTrialsChanged(int iNumberTrials);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the trigger type changed.
+    *
+    * @param [in] sTriggerType        The new trigger type.
+    */
+    void triggerTypeChanged(const QString& sTriggerType);
 
 };
 

@@ -228,10 +228,10 @@ private:
 
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff info. */
 
-    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;        /**< Annotation set. */
-    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;         /**< Surface set. */
-    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution;     /**< Forward solution. */
-    QSharedPointer<MNELIB::MNEBem>              m_pSensorSurface;   /**< The sensor surface. */
+    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;        /**< Annotation set. Needed for visualization. */
+    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;         /**< Surface set. Needed for visualization. */
+    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution;     /**< Forward solution. Needed for visualization. */
+    QSharedPointer<MNELIB::MNEBem>              m_pSensorSurface;   /**< The sensor surface. Needed for visualization. */
 
     QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;         /**< The network/connectivity estimate. */
     bool                                        m_bInitialized;     /**< Is initialized */

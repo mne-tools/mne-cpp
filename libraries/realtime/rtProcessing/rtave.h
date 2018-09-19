@@ -347,8 +347,6 @@ private:
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;         /**< The Circular Raw Matrix Buffer. */
 
-    QStringList                                     m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
-
 signals:
     //=========================================================================================================
     /**
@@ -397,8 +395,7 @@ inline bool RtAve::controlValuesChanged()
 
     if(m_iNewPreStimSamples != m_iPreStimSamples
             || m_iNewPostStimSamples != m_iPostStimSamples
-            || m_iNewTriggerIndex != m_iTriggerChIndex
-            || m_iNewAverageMode != m_iAverageMode) {
+            || m_iNewTriggerIndex != m_iTriggerChIndex) {
         result = true;
     }
 

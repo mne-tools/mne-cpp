@@ -126,9 +126,9 @@ int main(int argc, char *argv[])
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "IMAGCOH");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "OR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "mag");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
@@ -384,7 +384,6 @@ int main(int argc, char *argv[])
         double lambda2 = 1.0 / pow(dSnr, 2);
         QString method(sSourceLocMethod);
 
-
         // regularize noise covariance
         noise_cov = noise_cov.regularize(raw.info, 0.05, 0.05, 0.1, true);
 
@@ -454,13 +453,13 @@ int main(int argc, char *argv[])
 
     //Create NetworkView and add extra control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
     NetworkView tNetworkView;
-    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
-    QList<QWidget*> lWidgets;
+    ConnectivitySettingsView::SPtr pConnectivitySettingsView = ConnectivitySettingsView::SPtr::create();
+    QList<QSharedPointer<QWidget> > lWidgets;
     lWidgets << pConnectivitySettingsView;
     tNetworkView.setQuickControlWidgets(lWidgets);
     tNetworkView.show();
 
-    QObject::connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
+    QObject::connect(pConnectivitySettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
 
     QObject::connect(pConnectivitySettingsManager->m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
