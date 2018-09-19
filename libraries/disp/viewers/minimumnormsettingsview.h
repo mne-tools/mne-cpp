@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     abstractview.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     minimumnormsettingsview.h
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     September, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    AbstractView class declaration.
+* @brief    Declaration of the MinimumNormSettingsView Class.
 *
 */
 
-#ifndef DISP3DLIB_ABSTRACTVIEW_H
-#define DISP3DLIB_ABSTRACTVIEW_H
+#ifndef MINIMUMNORMSETTINGSVIEW_H
+#define MINIMUMNORMSETTINGSVIEW_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_global.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -49,9 +50,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QWidget>
-#include <QPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -59,111 +64,107 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB {
-    class QuickControlView;
+namespace Ui {
+    class MinimumNormSettingsViewWidget;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DISP3DLIB FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class View3D;
-class Control3DWidget;
-class Data3DTreeModel;
 
 
 //=============================================================================================================
 /**
-* Adapter which provides the abstract class for all adapter views.
+* DECLARE CLASS MinimumNormSettingsView
 *
-* @brief Adapter which provides the abstract class for all adapter views.
+* @brief The MinimumNormSettingsView class provides a view to control settings for estiamting functional connectivity
 */
-class DISP3DSHARED_EXPORT AbstractView : public QWidget
+class DISPSHARED_EXPORT MinimumNormSettingsView : public QWidget
 {
     Q_OBJECT
 
-public:
-    typedef QSharedPointer<AbstractView> SPtr;             /**< Shared pointer type for AbstractView class. */
-    typedef QSharedPointer<const AbstractView> ConstSPtr;  /**< Const shared pointer type for AbstractView class. */
+public:    
+    typedef QSharedPointer<MinimumNormSettingsView> SPtr;              /**< Shared pointer type for MinimumNormSettingsView. */
+    typedef QSharedPointer<const MinimumNormSettingsView> ConstSPtr;   /**< Const shared pointer type for MinimumNormSettingsView. */
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
-    explicit AbstractView(QWidget *parent = 0,
-                          Qt::WindowFlags f = Qt::Widget);
-
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~AbstractView();
-
-    //=========================================================================================================
-    /**
-    * Returns the View3D.
+    * Constructs a MinimumNormSettingsView which is a child of parent.
     *
-    * @return The currently set View3D.
+    * @param [in] parent        parent of widget.
     */
-    QSharedPointer<DISP3DLIB::View3D> getView();
+    MinimumNormSettingsView(QWidget *parent = 0,
+                Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Returns the Control3D.
-    *
-    * @return The currently set Control3D.
+    * Destroys the MinimumNormSettingsView.
     */
-    QSharedPointer<DISP3DLIB::Control3DWidget> getControlView();
+    ~MinimumNormSettingsView();
 
     //=========================================================================================================
     /**
-    * Returns the Data3DTreeModel.
+    * Destroys the MinimumNormSettingsView.
     *
-    * @return The currently set Data3DTreeModel.
+    * @param [in] lTriggerTypes        The new trigger types.
     */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel> getTreeModel();
-
-    //=========================================================================================================
-    /**
-    * Returns the quick control view.
-    *
-    * @return The currently set quick control view.
-    */
-    QPointer<DISPLIB::QuickControlView> getQuickControl();
-
-    //=========================================================================================================
-    /**
-    * Sets the extra control widgets in the quick control view.
-    *
-    * @param[in] lControlWidgets    The new extra control widgets.
-    */
-    void setQuickControlWidgets(const QList<QSharedPointer<QWidget> >& lControlWidgets);
+    void setTriggerTypes(const QStringList& lTriggerTypes);
 
 protected:
     //=========================================================================================================
     /**
-    * Creates the GUI.
+    * Slot called when the method changed.
+    *
+    * @param [in] method        The new method.
     */
-    void createGUI();
+    void onMethodChanged(const QString& method);
 
-    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;              /**< The Disp3D view. */
-    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;       /**< The Disp3D control. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;         /**< The Disp3D model. */
+    //=========================================================================================================
+    /**
+    * Slot called when the trigger type changed.
+    *
+    * @param [in] sTriggerType        The new trigger type.
+    */
+    void onTriggerTypeChanged(const QString& sTriggerType);
 
-    QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< The quick control view. */
+    Ui::MinimumNormSettingsViewWidget* ui;
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the method changed.
+    *
+    * @param [in] method        The new method.
+    */
+    void methodChanged(const QString& method);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the trigger type changed.
+    *
+    * @param [in] triggerType        The new trigger type.
+    */
+    void triggerTypeChanged(const QString& triggerType);
+
 };
 
 } // NAMESPACE
 
-#endif // DISP3DLIB_ABSTRACTVIEW_H
+#endif // MinimumNormSettingsView_H

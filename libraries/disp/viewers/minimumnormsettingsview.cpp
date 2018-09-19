@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimatewidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     minimumnormsettingsview.cpp
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     September, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RealTimeSourceEstimateWidget Class.
+* @brief    Definition of the MinimumNormSettingsView Class.
 *
 */
 
@@ -38,21 +38,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimatewidget.h"
+#include "minimumnormsettingsview.h"
 
-#include <scMeas/realtimesourceestimate.h>
-
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
-#include <disp3D/viewers/sourceestimateview.h>
+#include "ui_minimumnormsettingsview.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <QGridLayout>
-#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -60,17 +54,13 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace DISP3DLIB;
-using namespace SCMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -78,85 +68,57 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
-: MeasurementWidget(parent)
-, m_pRTSE(pRTSE)
-, m_bInitialized(false)
-, m_pRtItem(Q_NULLPTR)
-, m_pSourceEstimateView(SourceEstimateView::SPtr::create())
+MinimumNormSettingsView::MinimumNormSettingsView(QWidget *parent,
+                                                 Qt::WindowFlags f)
+: QWidget(parent, f)
+, ui(new Ui::MinimumNormSettingsViewWidget)
 {
-    QGridLayout *mainLayoutView = new QGridLayout;
-    mainLayoutView->addWidget(m_pSourceEstimateView.data(),0,0);
+    ui->setupUi(this);
 
-    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTSE->getControlWidgets();
-    m_pSourceEstimateView->setQuickControlWidgets(lControlWidgets);
+    connect(ui->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &MinimumNormSettingsView::onMethodChanged);
 
-    this->setLayout(mainLayoutView);
+    connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &MinimumNormSettingsView::onTriggerTypeChanged);
 
-    getData();
+    this->setWindowTitle("MinimumNorm Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 }
 
 
 //*************************************************************************************************************
 
-RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
+MinimumNormSettingsView::~MinimumNormSettingsView()
 {
-    // Store Settings
-    if(!m_pRTSE->getName().isEmpty()) {
-    }
+    delete ui;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
+void MinimumNormSettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
-    getData();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::getData()
-{
-    if(m_bInitialized) {
-        QList<MNESourceEstimate::SPtr> lMNEData = m_pRTSE->getValue();
-
-        // Add source estimate data
-        if(!lMNEData.isEmpty()) {
-            if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
-                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-                m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
-                                                          *lMNEData.first(),
-                                                          *m_pRTSE->getFwdSolution(),
-                                                          *m_pRTSE->getSurfSet(),
-                                                          *m_pRTSE->getAnnotSet());
-
-                m_pRtItem->setLoopState(false);
-                m_pRtItem->setTimeInterval(17);
-                m_pRtItem->setThresholds(QVector3D(0.0,5,10));
-                m_pRtItem->setColormapType("Hot");
-                m_pRtItem->setVisualizationType("Annotation based");
-                m_pRtItem->setNumberAverages(1);
-                m_pRtItem->setStreamingState(true);
-                m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
-            } else {
-                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
-
-                if(m_pRtItem) {
-                    m_pRtItem->addData(*lMNEData.first());
-                }
-            }
+    for(const QString &sTriggerType : lTriggerTypes) {
+        if(ui->m_comboBox_triggerType->findText(sTriggerType) == -1) {
+            ui->m_comboBox_triggerType->addItem(sTriggerType);
         }
-    } else {
-        init();
     }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::init()
+void MinimumNormSettingsView::onMethodChanged(const QString& method)
 {
-    m_bInitialized = true;
+    emit methodChanged(method);
+}
+
+
+
+//*************************************************************************************************************
+
+void MinimumNormSettingsView::onTriggerTypeChanged(const QString& sTriggerType)
+{
+    emit triggerTypeChanged(sTriggerType);
 }

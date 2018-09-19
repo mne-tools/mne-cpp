@@ -58,6 +58,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Realtimed \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
@@ -71,6 +72,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Realtime \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -82,19 +84,16 @@ SOURCES += \
     averaging.cpp \
     FormFiles/averagingsetupwidget.cpp \
     FormFiles/averagingaboutwidget.cpp \
-    FormFiles/averagingsettingswidget.cpp
 
 HEADERS += \
     averaging_global.h \
     averaging.h \
     FormFiles/averagingsetupwidget.h \
     FormFiles/averagingaboutwidget.h \
-    FormFiles/averagingsettingswidget.h
 
 FORMS += \
     FormFiles/averagingsetup.ui \
     FormFiles/averagingabout.ui \
-    FormFiles/averagingsettingswidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

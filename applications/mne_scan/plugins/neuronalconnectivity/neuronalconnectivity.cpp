@@ -97,6 +97,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("4")
+, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
 {
 }
 
@@ -145,14 +146,15 @@ void NeuronalConnectivity::init()
     m_outputConnectors.append(m_pRTCEOutput);
     m_pRTCEOutput->data()->setName(this->getName());
 
-    //Add control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
-    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView();
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
+    //Add control widgets to output data (will be used by QuickControlView by the measurements display)
+    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::numberTrialsChanged,
+    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
             this, &NeuronalConnectivity::onNumberTrialsChanged);
+    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::triggerTypeChanged,
+            this, &NeuronalConnectivity::onTriggerTypeChanged);
 
-    m_pRTCEOutput->data()->addControlWidget(pConnectivitySettingsView);
+    m_pRTCEOutput->data()->addControlWidget(m_pConnectivitySettingsView);
 
     //Init rt connectivity worker
     m_pRtConnectivity = RtConnectivity::SPtr::create();
@@ -280,15 +282,15 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_connectivitySettings.m_matDataList << pRTSE->getValue()[i]->data;
         }
 
-        m_timer.restart();
-        m_pRtConnectivity->append(m_connectivitySettings);
-
         //Pop data from buffer
         if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
             for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
                 m_connectivitySettings.m_matDataList.removeFirst();
             }
         }
+
+        m_timer.restart();
+        m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
 
@@ -314,7 +316,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             bool bPick = false;
             qint32 unit;
             int counter = 0;
-            QString sChType = "mag";
+            QString sChType = "grad";
 
             for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
                 unit = m_pFiffInfo->chs.at(i).unit;
@@ -322,6 +324,9 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
                 if(unit == FIFF_UNIT_T_M &&
                     sChType == "grad") {
                     bPick = true;
+
+                    //Skip second gradiometer in triplet
+                    ++i;
                 } else if(unit == FIFF_UNIT_T &&
                             sChType == "mag") {
                     bPick = true;
@@ -330,14 +335,19 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
                     bPick = true;
                 }
 
-                if(bPick) {
+                if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
                     //Get the positions
                     m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
                     m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
                     m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
                     m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
 
-                    m_chIdx << i;
+                    if(sChType == "grad") {
+                        m_chIdx << i-1;
+                    } else {
+                        m_chIdx << i;
+                    }
+
                     counter++;
                 }
 
@@ -366,15 +376,15 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
         m_connectivitySettings.m_matDataList << epochDataList;
 
-        m_timer.restart();
-        m_pRtConnectivity->append(m_connectivitySettings);
-
         //Pop data from buffer
         if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
             for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
                 m_connectivitySettings.m_matDataList.removeFirst();
             }
         }
+
+        m_timer.restart();
+        m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
 
@@ -389,9 +399,15 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
         QStringList lResponsibleTriggerTypes = pRTEV->getResponsibleTriggerTypes();
 
+        if(m_pConnectivitySettingsView) {
+            m_pConnectivitySettingsView->setTriggerTypes(lResponsibleTriggerTypes);
+        }
+
         if(!pFiffEvokedSet || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
             return;
         }
+
+        //qDebug() << "NeuronalConnectivity::updateRTEV - Found trigger" << m_sAvrType;
 
         //Fiff Information of the evoked
         if(!m_pFiffInfo && pFiffEvokedSet->evoked.size() > 0) {
@@ -409,7 +425,7 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     bool bPick = false;
                     qint32 unit;
                     int counter = 0;
-                    QString sChType = "mag";
+                    QString sChType = "grad";
 
                     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
                         unit = m_pFiffInfo->chs.at(i).unit;
@@ -417,6 +433,9 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                         if(unit == FIFF_UNIT_T_M &&
                             sChType == "grad") {
                             bPick = true;
+
+                            //Skip second gradiometer in triplet
+                            ++i;
                         } else if(unit == FIFF_UNIT_T &&
                                     sChType == "mag") {
                             bPick = true;
@@ -425,14 +444,19 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                             bPick = true;
                         }
 
-                        if(bPick) {
+                        if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
                             //Get the positions
                             m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
                             m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
                             m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
                             m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
 
-                            m_chIdx << i;
+                            if(sChType == "grad") {
+                                m_chIdx << i-1;
+                            } else {
+                                m_chIdx << i;
+                            }
+
                             counter++;
                         }
 
@@ -449,7 +473,6 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     MatrixXd data;
-                    QList<MatrixXd> epochDataList;
 
                     const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
                     data.resize(m_chIdx.size(), t_mat.cols());
@@ -459,16 +482,14 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                         data.row(j) = t_mat.row(m_chIdx.at(j));
                     }
 
-                    epochDataList.append(data);
+                    m_connectivitySettings.m_matDataList << data;
 
-                    m_connectivitySettings.m_matDataList << epochDataList;
+                    if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+                        m_connectivitySettings.m_matDataList.removeFirst();
+                    }
 
                     m_timer.restart();
                     m_pRtConnectivity->append(m_connectivitySettings);
-
-                    if(m_connectivitySettings.m_matDataList.size() >= m_iNumberAverages) {
-                        m_connectivitySettings.m_matDataList.removeFirst();
-                    }
 
                     break;
                 }
@@ -525,6 +546,7 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
+    m_pRtConnectivity->reset();
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << sMetric;
 }
 
@@ -542,4 +564,15 @@ void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
 void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 {
     m_connectivitySettings.m_sWindowType = windowType;
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
+{
+    if(triggerType != m_sAvrType) {
+        m_connectivitySettings.m_matDataList.clear();
+        m_sAvrType = triggerType;
+    }
 }

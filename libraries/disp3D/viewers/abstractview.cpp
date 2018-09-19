@@ -82,8 +82,8 @@ AbstractView::AbstractView(QWidget* parent,
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel()))
 {
     //Init 3D View
-    m_p3DView->setModel(m_pData3DModel);
     m_p3DView->setFlag(Qt::FramelessWindowHint, true);
+    m_p3DView->setModel(m_pData3DModel);
 
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
@@ -136,11 +136,15 @@ QPointer<QuickControlView> AbstractView::getQuickControl()
 
 //*************************************************************************************************************
 
-void AbstractView::setQuickControlWidgets(const QList<QWidget*>&lControlWidgets)
+void AbstractView::setQuickControlWidgets(const QList<QSharedPointer<QWidget> >& lControlWidgets)
 {
     if(m_pQuickControlView) {
+
         for(int i = 0; i < lControlWidgets.size(); i++) {
-            m_pQuickControlView->addGroupBox(lControlWidgets.at(i), lControlWidgets.at(i)->windowTitle());
+            //TODO: Note that we are mixing memory management systems here. QSharedPointer and QObjects parenting. See destructor for deparenting.
+            if(lControlWidgets.at(i)) {
+                m_pQuickControlView->addGroupBox(lControlWidgets.at(i), lControlWidgets.at(i)->windowTitle());
+            }
         }
     }
 }

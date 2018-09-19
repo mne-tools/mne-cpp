@@ -276,7 +276,9 @@ void RealTimeEvokedSetWidget::getData()
 
             m_pEvokedSetModel->updateData();
         }
-    } else {
+    }
+
+    if(m_bInitialized) {
         //Check if block size has changed, if yes update the filter
         if(!m_pRTESet->getValue()->evoked.isEmpty()) {
             if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
@@ -300,8 +302,7 @@ void RealTimeEvokedSetWidget::getData()
 
 void RealTimeEvokedSetWidget::init()
 {
-    if(m_qListChInfo.size() > 0)
-    {
+    if(m_pFiffInfo) {
         QSettings settings;
         QString t_sRTESName = m_pRTESet->getName();
 
@@ -525,9 +526,16 @@ void RealTimeEvokedSetWidget::init()
                 m_pButterflyView.data(), &ButterflyView::setModalities);
 
         // Quick control average selection
+        QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
+        if(!lControlWidgets.isEmpty()) {
+            if(lControlWidgets.first()) {
+                m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.first(), "Averaging", "Settings");
+            }
+        }
+
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
         pAverageSelectionView->init();
-        m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Other", "Averages");
+        m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection");
 
         //Handle averages
         connect(this->m_pEvokedSetModel.data(), &EvokedSetModel::newAverageTypeReceived,

@@ -127,7 +127,6 @@ Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     // Generate tapered spectra, PSD, and CSD and sum over epoch
-    // This part could be parallelized with QtConcurrent::mappedReduced
     QList<AbstractMetricInputData> lData;
     for (int i = 0; i < matDataList.size(); ++i) {
         AbstractMetricInputData dataTemp;
