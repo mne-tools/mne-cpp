@@ -276,7 +276,9 @@ void RealTimeEvokedSetWidget::getData()
 
             m_pEvokedSetModel->updateData();
         }
-    } else {
+    }
+
+    if(m_bInitialized) {
         //Check if block size has changed, if yes update the filter
         if(!m_pRTESet->getValue()->evoked.isEmpty()) {
             if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
@@ -300,8 +302,7 @@ void RealTimeEvokedSetWidget::getData()
 
 void RealTimeEvokedSetWidget::init()
 {
-    if(m_qListChInfo.size() > 0)
-    {
+    if(m_pFiffInfo) {
         QSettings settings;
         QString t_sRTESName = m_pRTESet->getName();
 
