@@ -82,6 +82,12 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+
+/**
+* DECLARE CLASS AveragingSettingsView
+*
+* @brief The AveragingSettingsView class provides a averaging settings view.
+*/
 class DISPSHARED_EXPORT AveragingSettingsView : public QWidget
 {
     Q_OBJECT
@@ -108,12 +114,12 @@ public:
                                    int iBaselineToSeconds);
 
     void setStimChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                            QList<qint32> qListStimChs,
-                            int iStimChan);
+                         QList<qint32> qListStimChs,
+                         int iStimChan);
 
     int getStimChannelIdx();
 
-private:
+protected:
     void onChangePreStim();
     void onChangePostStim();
     void onChangeBaselineFrom();
@@ -121,7 +127,7 @@ private:
     void onChangeArtifactThreshold();
     void onChangeNumAverages();
 
-    Ui::AverageSettingsViewWidget* ui;		/**< Holds the user interface for the AverageSettingsWidgetClass.*/
+    Ui::AverageSettingsViewWidget* ui;		/**< Holds the user interface for the AverageSettingsViewWidget.*/
 
 signals:
     void changePreStim(qint32 value);

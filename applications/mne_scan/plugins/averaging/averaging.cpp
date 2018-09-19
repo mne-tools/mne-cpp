@@ -43,9 +43,6 @@
 
 #include <disp/viewers/averagingsettingsview.h>
 
-//#include <iostream>
-//#include <time.h>
-
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -56,15 +53,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtCore/QtPlugin>
-#include <QMutexLocker>
-#include <QSettings>
-
-#include <QDebug>
-
-#include <QtWidgets>
-#include <QSpinBox>
 
 
 //*************************************************************************************************************
@@ -133,9 +121,7 @@ QSharedPointer<IPlugin> Averaging::clone() const
 
 void Averaging::unload()
 {
-    //
     // Store Settings
-    //
     QSettings settings;
     settings.setValue(QString("Plugin/%1/preStimSeconds").arg(this->getName()), m_iPreStimSeconds);
     settings.setValue(QString("Plugin/%1/postStimSeconds").arg(this->getName()), m_iPostStimSeconds);
@@ -346,10 +332,6 @@ void Averaging::init()
             this, &Averaging::onChangeAverageMode);
 
     m_pAveragingOutput->data()->addControlWidget(m_pAveragingSettingsView);
-
-    //Delete Buffer - will be initialized with first incoming data
-    if(!m_pAveragingBuffer.isNull())
-        m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
@@ -359,8 +341,9 @@ void Averaging::onChangeNumAverages(qint32 numAve)
 {
     QMutexLocker locker(&m_qMutex);
     m_iNumAverages = numAve;
-    if(m_pRtAve)
+    if(m_pRtAve) {
         m_pRtAve->setAverages(numAve);
+    }
 }
 
 
@@ -370,8 +353,9 @@ void Averaging::onChangeAverageMode(qint32 mode)
 {
     QMutexLocker locker(&m_qMutex);
     m_iAverageMode = mode;
-    if(m_pRtAve)
+    if(m_pRtAve) {
         m_pRtAve->setAverageMode(mode);
+    }
 }
 
 
@@ -397,8 +381,9 @@ void Averaging::onChangeStimChannel(qint32 index)
 void Averaging::onChangePreStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    if(mseconds<10)
+    if(mseconds<10) {
         mseconds=10;
+    }
 
     m_iPreStimSeconds = mseconds;
     m_iPreStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
@@ -420,8 +405,9 @@ void Averaging::onChangePreStim(qint32 mseconds)
 void Averaging::onChangePostStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    if(mseconds<10)
+    if(mseconds<10) {
         mseconds=10;
+    }
 
     m_iPostStimSeconds = mseconds;
     m_iPostStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
@@ -472,7 +458,10 @@ void Averaging::onChangeArtifactVariance(double dVariance)
     m_dArtifactVariance = dVariance;
 
     if(m_pRtAve) {
-        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction,
+                                       m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond),
+                                       m_bDoArtifactVarianceReduction,
+                                       m_dArtifactVariance);
     }
 }
 
@@ -486,7 +475,10 @@ void Averaging::onChangeArtifactVarianceReductionActive(bool state)
     m_bDoArtifactVarianceReduction = state;
 
     if(m_pRtAve) {
-        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction,
+                                       m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond),
+                                       m_bDoArtifactVarianceReduction,
+                                       m_dArtifactVariance);
     }
 }
 
@@ -573,10 +565,8 @@ void Averaging::run()
     m_iPreStimSamples = ((float)m_iPreStimSeconds/1000)*m_pFiffInfo->sfreq;
     m_iPostStimSamples = ((float)m_iPostStimSeconds/1000)*m_pFiffInfo->sfreq;
 
-    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
-    {
-        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-        {
+    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
             //qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
             m_qListStimChs.append(i);
         }
@@ -607,8 +597,7 @@ void Averaging::run()
 
     m_pRtAve->start();
 
-    while(true)
-    {
+    while(true) {
         {
             QMutexLocker locker(&m_qMutex);
             if(!m_bIsRunning)
@@ -621,16 +610,14 @@ void Averaging::run()
             doProcessing = m_bProcessData;
         }
 
-        if(doProcessing)
-        {
-            /* Dispatch the inputs */
+        if(doProcessing) {
+            // Dispatch the inputs
             MatrixXd rawSegment = m_pAveragingBuffer->pop();
 
             m_pRtAve->append(rawSegment);
 
             m_qMutex.lock();
-            if(m_qVecEvokedData.size() > 0)
-            {
+            if(m_qVecEvokedData.size() > 0) {
                 FiffEvokedSet t_fiffEvokedSet = *m_qVecEvokedData[0].data();
 
                 m_pAveragingOutput->data()->setValue(t_fiffEvokedSet,
