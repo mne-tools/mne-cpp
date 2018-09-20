@@ -284,7 +284,8 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
         //Pop data from buffer
         if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
-            for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
+            int size = m_connectivitySettings.m_matDataList.size();
+            for(int i = 0; i < size-m_iNumberAverages; ++i) {
                 m_connectivitySettings.m_matDataList.removeFirst();
             }
         }
@@ -378,7 +379,8 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
         //Pop data from buffer
         if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
-            for(int i = 0; i < m_connectivitySettings.m_matDataList.size()-m_iNumberAverages; ++i) {
+            int size = m_connectivitySettings.m_matDataList.size();
+            for(int i = 0; i < size-m_iNumberAverages; ++i) {
                 m_connectivitySettings.m_matDataList.removeFirst();
             }
         }
@@ -477,15 +479,18 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
                     data.resize(m_chIdx.size(), t_mat.cols());
 
-                    for(qint32 j = 0; j < m_chIdx.size(); ++j)
-                    {
+                    for(qint32 j = 0; j < m_chIdx.size(); ++j) {
                         data.row(j) = t_mat.row(m_chIdx.at(j));
                     }
 
                     m_connectivitySettings.m_matDataList << data;
 
+                    //Pop data from buffer
                     if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
-                        m_connectivitySettings.m_matDataList.removeFirst();
+                        int size = m_connectivitySettings.m_matDataList.size();
+                        for(int i = 0; i < size-m_iNumberAverages; ++i) {
+                            m_connectivitySettings.m_matDataList.removeFirst();
+                        }
                     }
 
                     m_timer.restart();
