@@ -1,1 +1,1 @@
-download the MNE sample data from ftp://surfer.nmr.mgh.harvard.edu/pub/data/MNE-sample-data-processed.tar.gz and extract them into this folder.
+download the MNE sample data from https://osf.io/86qa2/download and extract them into this folder.
