@@ -551,7 +551,7 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
-    m_pRtConnectivity->reset();
+    m_pRtConnectivity->restart();
     m_connectivitySettings.m_sConnectivityMethods = QStringList() << sMetric;
 }
 

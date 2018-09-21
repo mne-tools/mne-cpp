@@ -73,6 +73,10 @@ using namespace FIFFLIB;
 
 void RtCovWorker::doWork(const RtCovInput &inputData)
 {
+    if(this->thread()->isInterruptionRequested()) {
+        return;
+    }
+
     QFuture<RtCovComputeResult> result = QtConcurrent::mappedReduced(inputData.lData,
                                                                      compute,
                                                                      reduce);
@@ -190,8 +194,7 @@ RtCov::RtCov(qint32 iMaxSamples,
 
 RtCov::~RtCov()
 {
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 }
 
 
@@ -229,4 +232,38 @@ void RtCov::append(const MatrixXd &matDataSegment)
 void RtCov::handleResults(const FIFFLIB::FiffCov& computedCov)
 {
     emit covCalculated(computedCov);
+}
+
+
+//*************************************************************************************************************
+
+void RtCov::restart()
+{
+    m_workerThread.requestInterruption();
+    m_workerThread.quit();
+    m_workerThread.wait();
+
+    RtCovWorker *worker = new RtCovWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtCov::operate,
+            worker, &RtCovWorker::doWork);
+
+    connect(worker, &RtCovWorker::resultReady,
+            this, &RtCov::handleResults);
+
+    m_workerThread.start();
+}
+
+
+//*************************************************************************************************************
+
+void RtCov::stop()
+{
+    m_workerThread.requestInterruption();
+    m_workerThread.quit();
+    m_workerThread.wait();
 }
