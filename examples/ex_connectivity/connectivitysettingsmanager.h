@@ -89,12 +89,28 @@ public:
 
     ConnectivitySettingsManager(QObject *parent = 0) : QObject(parent){}
 
-    ConnectivitySettings m_settings;
-    RtConnectivity::SPtr m_pRtConnectivity = RtConnectivity::SPtr::create();
+    ConnectivitySettings    m_settings;
+    RtConnectivity::SPtr    m_pRtConnectivity = RtConnectivity::SPtr::create();
+    QList<Eigen::MatrixXd>  m_matDataListOriginal;
 
     void onConnectivityMetricChanged(const QString& sMetric)
     {
         m_settings.m_sConnectivityMethods = QStringList() << sMetric;
+
+        m_pRtConnectivity->append(m_settings);
+    }
+
+    void onNumberTrialsChanged(int iNumberTrials)
+    {
+        if(iNumberTrials > m_matDataListOriginal.size()) {
+            iNumberTrials = m_matDataListOriginal.size();
+        }
+
+        m_settings.m_matDataList.clear();
+
+        for(int i = 0; i < iNumberTrials; i++) {
+            m_settings.m_matDataList << m_matDataListOriginal.at(i);
+        }
 
         m_pRtConnectivity->append(m_settings);
     }

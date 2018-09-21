@@ -127,6 +127,14 @@ public:
     */
     void setTriggerTypes(const QStringList& lTriggerTypes);
 
+    //=========================================================================================================
+    /**
+    * Sets the new number of trials.
+    *
+    * @param [in] iNumberTrials        The new number of trials.
+    */
+    void setNumberTrials(int iNumberTrials);
+
 protected:
     //=========================================================================================================
     /**
@@ -150,7 +158,7 @@ protected:
     *
     * @param [in] iNumberTrials        The new number of trials.
     */
-    void onNumberTrialsChanged(int iNumberTrials);
+    void onNumberTrialsChanged();
 
     //=========================================================================================================
     /**
