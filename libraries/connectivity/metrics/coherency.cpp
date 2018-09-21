@@ -127,20 +127,20 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
         lData.append(dataTemp);
     }
 
-    // Sequential
-    AbstractMetricResultData finalResult;
+//    // Sequential
+//    AbstractMetricResultData finalResult;
 
-    for (int i = 0; i < lData.length(); ++i) {
-        reduce(finalResult, compute(lData.at(i)));
-    }
+//    for (int i = 0; i < lData.length(); ++i) {
+//        reduce(finalResult, compute(lData.at(i)));
+//    }
 
-//    // Parallel
-//    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(lData,
-//                                                                           compute,
-//                                                                           reduce);
-//    result.waitForFinished();
+    // Parallel
+    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(lData,
+                                                                           compute,
+                                                                           reduce);
+    result.waitForFinished();
 
-//    AbstractMetricResultData finalResult = result.result();
+    AbstractMetricResultData finalResult = result.result();
 
     QVector<MatrixXcd> vecCoherency;
     finalResult.matPsdAvg = finalResult.matPsdAvg.cwiseSqrt();
@@ -176,7 +176,7 @@ AbstractMetricResultData Coherency::compute(const AbstractMetricInputData& input
     QVector<Eigen::MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(data,
                                                                                     inputData.tapers.first,
                                                                                     inputData.iNfft,
-                                                                                    true);
+                                                                                    false);
 
     // This part could be parallelized with QtConcurrent::mappedReduced
     for (int j = 0; j < inputData.iNRows; ++j) {
