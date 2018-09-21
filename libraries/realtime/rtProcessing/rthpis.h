@@ -185,6 +185,18 @@ public:
     */
     void setProjectionMatrix(const Eigen::MatrixXd& matProjectors);
 
+    //=========================================================================================================
+    /**
+    * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+    */
+    void restart();
+
+    //=========================================================================================================
+    /**
+    * Stops the thread by interrupting its computation queue, quitting and waiting.
+    */
+    void stop();
+
 protected:
     //=========================================================================================================
     /**

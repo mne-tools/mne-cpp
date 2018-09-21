@@ -151,9 +151,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Resets the thread by interrupting its computation queue.
+    * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
     */
-    void reset();
+    void restart();
+
+    //=========================================================================================================
+    /**
+    * Stops the thread by interrupting its computation queue, quitting and waiting.
+    */
+    void stop();
 
 protected:
     //=========================================================================================================
