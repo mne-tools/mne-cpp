@@ -678,8 +678,11 @@ void RtAve::generateEvoked(double dTriggerType)
         return;
     }
 
+
     //Init evoked
+    m_pStimEvokedSet->info = *m_pFiffInfo.data();
     FiffEvoked evoked;
+    evoked.setInfo(*m_pFiffInfo.data());
     int iEvokedIdx = -1;
 
     for(int i = 0; i < m_pStimEvokedSet->evoked.size(); ++i) {
@@ -694,7 +697,6 @@ void RtAve::generateEvoked(double dTriggerType)
     if(iEvokedIdx == -1) {
         float T = 1.0/m_pFiffInfo->sfreq;
 
-        evoked.setInfo(*m_pFiffInfo.data());
         evoked.baseline = m_pairBaselineSec;
         evoked.times.resize(m_iPreStimSamples + m_iPostStimSamples);
         evoked.times[0] = -T*m_iPreStimSamples;
