@@ -81,7 +81,7 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_comboBox_windowType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onWindowTypeChanged);
 
-    connect(ui->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui->m_spinBox_numberTrials, &QSpinBox::editingFinished,
             this, &ConnectivitySettingsView::onNumberTrialsChanged);
 
     connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
@@ -115,6 +115,14 @@ void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 
 //*************************************************************************************************************
 
+void ConnectivitySettingsView::setNumberTrials(int iNumberTrials)
+{
+    ui->m_spinBox_numberTrials->setValue(iNumberTrials);
+}
+
+
+//*************************************************************************************************************
+
 void ConnectivitySettingsView::onMetricChanged(const QString& sMetric)
 {
     emit connectivityMetricChanged(sMetric);
@@ -131,9 +139,9 @@ void ConnectivitySettingsView::onWindowTypeChanged(const QString& sWindowType)
 
 //*************************************************************************************************************
 
-void ConnectivitySettingsView::onNumberTrialsChanged(int iNumberTrials)
+void ConnectivitySettingsView::onNumberTrialsChanged()
 {
-    emit numberTrialsChanged(iNumberTrials);
+    emit numberTrialsChanged(ui->m_spinBox_numberTrials->value());
 }
 
 
