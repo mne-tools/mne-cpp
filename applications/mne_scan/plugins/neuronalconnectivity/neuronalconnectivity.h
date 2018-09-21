@@ -178,6 +178,12 @@ public:
 protected:
     //=========================================================================================================
     /**
+    * Generate the node positions based on the current incoming data. Also take into account selected bad channels.
+    */
+    void generateNodeVertices();
+
+    //=========================================================================================================
+    /**
     * IAlgorithm function
     */
     virtual void run();
@@ -226,6 +232,7 @@ private:
     bool                m_bIsRunning;           /**< Flag whether thread is running.*/
     qint32              m_iDownSample;          /**< Sampling rate. */
     qint32              m_iNumberAverages;      /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
+    qint32              m_iNumberBadChannels;   /**< The current number of bad channels. USed to test if new bad channels were selected. */
     QString             m_sAtlasDir;            /**< File to Atlas. */
     QString             m_sSurfaceDir;          /**< File to Surface. */
 
