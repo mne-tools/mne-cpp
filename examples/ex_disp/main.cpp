@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     //ToDo: Debug tfplot
     //tf plot example
     dataCol = data.row(0).transpose();
-    MatrixXd dataSpectrum = Spectrogram::make_spectrogram(dataCol, raw.info.sfreq*0.2);
+    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq*0.2);
 
     TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet);
     tfplot.show();
