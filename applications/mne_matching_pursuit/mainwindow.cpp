@@ -3290,7 +3290,7 @@ void MainWindow::on_actionTFplot_triggered()
             }
         }
         */
-        tf_sum = Spectrogram::make_spectrogram(_signal_matrix.col(0), 0);
+        tf_sum = Spectrogram::makeSpectrogram(_signal_matrix.col(0), 0);
 
         TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0, 600, Jet);
         ui->tabWidget->addTab(tfplot, "TF-Overview 0-500Hz");

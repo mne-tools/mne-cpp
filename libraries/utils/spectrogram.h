@@ -61,18 +61,11 @@ namespace UTILSLIB
 
 struct SpectogramInputData {
     Eigen::VectorXd vecInputData;
-    int iRangeLow;
-    int iRangeHigh;
+    quint32 iRangeLow;
+    quint32 iRangeHigh;
     qint32 window_size;
 };
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 class UTILSSHARED_EXPORT Spectrogram
 {
@@ -80,27 +73,20 @@ class UTILSSHARED_EXPORT Spectrogram
 public:
     //=========================================================================================================
     /**
-    * Spectrogram_make_spectrogram
-    *
-     * ### TF plot root function ###
-    *
-    * calculates the spectrogram (tf-representation) of a given signal
+    * Calculates the spectrogram (tf-representation) of a given signal
     *
     * @param[in] signal         input-signal to calculate spectrogram of
-    * @param[in] window_size    size of the window which is used (resolution in time an frequency is depending on it)
+    * @param[in] windowSize     size of the window which is used (resolution in time an frequency is depending on it)
     *
     * @return spectrogram-matrix (tf-representation of the input signal)
     */
-    static MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
+    static Eigen::MatrixXd makeSpectrogram(Eigen::VectorXd signal,
+                                           qint32 windowSize);
 
 private:
     //=========================================================================================================
     /**
-    * Spectrogram_gauss_window
-    *
-    * ### TF plot root function ###
-    *
-    * calculates a gaussean window function
+    * Calculates a gaussean window function
     *
     * @param[in] sample_count   number of samples
     * @param[in] scale          window width
@@ -108,7 +94,9 @@ private:
     *
     * @return samples of window-vector
     */
-    static VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
+    static Eigen::VectorXd gaussWindow (qint32 sample_count,
+                                        qreal scale,
+                                        quint32 translation);
 
     //=========================================================================================================
     /**
