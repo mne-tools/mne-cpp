@@ -86,7 +86,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRTCE(pRTCE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
-, m_pNetworkView(NetworkView::SPtr::create())
+, m_pNetworkView(new NetworkView())
 {
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
     m_pNetworkView->setQuickControlWidgets(lControlWidgets);
@@ -159,5 +159,6 @@ void RealTimeConnectivityEstimateWidget::init()
                                                          m_pRTCE->getFiffInfo()->chs,
                                                          *(m_pRTCE->getSensorSurface()));
     }
+
 }
 
