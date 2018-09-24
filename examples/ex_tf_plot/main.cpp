@@ -84,12 +84,11 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Read Evoked Example");
+    parser.setApplicationDescription("TF Plot Example");
     parser.addHelpOption();
 
-    //QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "/cluster/fusion/data/MEG_EEG/john/170322/assr_40_223_ave.fif");
-    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "0");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "2");
 
     parser.addOption(evokedFileOption);
     parser.addOption(evokedIdxOption);
@@ -102,9 +101,9 @@ int main(int argc, char *argv[])
 
     //tf plot
     VectorXd dataCol = p_FiffEvoked.data.row(0).transpose();
-    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq*0.1);
+    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq*0.15);
 
-    TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 0, 100, ColorMaps::Jet);
+    TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 0, 50, ColorMaps::Jet);
     tfplot.show();
 
     return a.exec();
