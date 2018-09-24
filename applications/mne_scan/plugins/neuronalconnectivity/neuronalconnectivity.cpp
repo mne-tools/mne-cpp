@@ -518,6 +518,7 @@ void NeuronalConnectivity::run()
             //Send the data to the connected plugins and the online display
             if(!connectivityResult.isEmpty()) {
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
+                //connectivityResult.setFrequencyBins(26,33);
                 m_pRTCEOutput->data()->setValue(connectivityResult);
             }
         }

@@ -50,6 +50,7 @@
 #include <QGridLayout>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -225,7 +226,7 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
     QList<QGraphicsItem *> x_axis_values;
     QList<QGraphicsItem *> x_axis_lines;
 
-    qreal scaleXText = (tf_matrix.rows() - 1) /  sample_rate / 20.0;                       // divide signallength
+    qreal scaleXText = (tf_matrix.cols() - 1) /  sample_rate / 20.0;                       // divide signallength
 
     for(qint32 j = 0; j < 21; j++)
     {
@@ -261,8 +262,10 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
 
     qreal scale_y_text = 0;
 
-    if(lower_frq == 0  && upper_frq == 0)  scale_y_text = 0.5* sample_rate / 10.0;                       // divide signallength
-    else scale_y_text = (upper_frq - lower_frq) / 10.0;
+    if(lower_frq == 0  && upper_frq == 0)
+        scale_y_text = 0.5* sample_rate / 10.0;                       // divide signallength
+    else
+        scale_y_text = (upper_frq - lower_frq) / 10.0;
 
 
     for(qint32 j = 0; j < 11; j++)

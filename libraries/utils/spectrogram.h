@@ -59,6 +59,14 @@
 namespace UTILSLIB
 {
 
+struct SpectogramInputData {
+    Eigen::VectorXd vecInputData;
+    int iRangeLow;
+    int iRangeHigh;
+    qint32 window_size;
+};
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -86,7 +94,6 @@ public:
     static MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
 
 private:
-
     //=========================================================================================================
     /**
     * Spectrogram_gauss_window
@@ -103,6 +110,25 @@ private:
     */
     static VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
 
+    //=========================================================================================================
+    /**
+    * Calculates the spectogram matrix for a given input data matrix.
+    *
+    * @param[in] data       The input data.
+    *
+    * @return               The spectogram matrix.
+    */
+    static Eigen::MatrixXd compute(const SpectogramInputData& data);
+
+    //=========================================================================================================
+    /**
+    * Sums up (reduces) the in parallel processed spectogram matrix.
+    *
+    * @param[out] resultData    The result data.
+    * @param[in]  data          The incoming, temporary result data.
+    */
+    static void reduce(Eigen::MatrixXd &resultData,
+                       const Eigen::MatrixXd &data);
 };
 
 }//namespace
