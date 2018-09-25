@@ -51,6 +51,7 @@
 #include "mne_surface.h"
 #include "mne_bem.h"
 #include "mne_bem_surface.h"
+#include "mne_epoch_data_list.h"
 
 
 //*************************************************************************************************************
@@ -330,6 +331,13 @@ public:
     * @return true if succeeded, false otherwise
     */
     static bool read_events(QIODevice &p_IODevice, MatrixXi& eventlist);
+
+    static MNEEpochDataList read_epochs(const FIFFLIB::FiffRawData& raw,
+                                        const Eigen::MatrixXi& events,
+                                        const Eigen::RowVectorXi& picks,
+                                        float tmin,
+                                        float tmax,
+                                        qint32 event);
 
     static void setup_compensators(FiffRawData& raw,
                                   fiff_int_t dest_comp,

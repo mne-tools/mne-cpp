@@ -71,6 +71,7 @@ bool MNE::read_events(QString t_sEventName,
 {
     QFile t_EventFile;
     qint32 p;
+    bool status = false;
 
     if (t_sEventName.size() == 0) {
         p = t_fileRawName.indexOf(".fif");
@@ -83,7 +84,10 @@ bool MNE::read_events(QString t_sEventName,
 //        events = mne_read_events(t_sEventName);
 
         t_EventFile.setFileName(t_sEventName);
-        MNE::read_events(t_EventFile, events);
+        if(!MNE::read_events(t_EventFile, events)) {
+            printf("Error while read events.\n");
+            return false;
+        }
         printf("Events read from %s\n",t_sEventName.toUtf8().constData());
     }
     else
@@ -94,7 +98,7 @@ bool MNE::read_events(QString t_sEventName,
             t_EventFile.setFileName(t_sEventName);
             if(!MNE::read_events(t_EventFile, events)) {
                 printf("Error while read events.\n");
-                return 0;
+                return false;
             }
             printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
         } else {
@@ -139,6 +143,8 @@ bool MNE::read_events(QString t_sEventName,
 //            end
         }
     }
+
+    return true;
 }
 
 
@@ -225,6 +231,71 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     }
 
     return true;
+}
+
+//*************************************************************************************************************
+
+MNEEpochDataList MNE::read_epochs(const FiffRawData& raw,
+                                  const MatrixXi& events,
+                                  const RowVectorXi& picks,
+                                  float tmin,
+                                  float tmax,
+                                  qint32 event)
+{
+    MNEEpochDataList data;
+
+    // Select the desired events
+    qint32 count = 0;
+    qint32 p;
+    MatrixXi selected = MatrixXi::Zero(1, events.rows());
+    for (p = 0; p < events.rows(); ++p)
+    {
+        if (events(p,1) == 0 && events(p,2) == event)
+        {
+            selected(0,count) = p;
+            ++count;
+        }
+    }
+    selected.conservativeResize(1, count);
+    if (count > 0) {
+        printf("%d matching events found\n",count);
+    } else {
+        printf("No desired events found.\n");
+        return MNEEpochDataList();
+    }
+
+    fiff_int_t event_samp, from, to;
+    MatrixXd timesDummy;
+    MatrixXd times;
+
+    MNEEpochData* epoch = Q_NULLPTR;
+
+    for (p = 0; p < count; ++p) {
+        // Read a data segment
+        event_samp = events(selected(p),0);
+        from = event_samp + tmin*raw.info.sfreq;
+        to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
+
+        epoch = new MNEEpochData();
+
+        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picks)) {
+            if (p == 0) {
+                times.resize(1, to-from+1);
+                for (qint32 i = 0; i < times.cols(); ++i)
+                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
+            }
+
+            epoch->event = event;
+            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
+
+            data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
+        } else {
+            printf("Can't read the event data segments");
+        }
+    }
+
+    return data;
 }
 
 

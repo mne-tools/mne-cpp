@@ -43,7 +43,6 @@
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_evoked.h>
-#include <fiff/fiff_raw_data.h>
 
 #include "mne_global.h"
 #include "mne_epoch_data.h"
@@ -89,17 +88,6 @@ public:
     * Default constructor.
     */
     MNEEpochDataList();
-
-    //=========================================================================================================
-    /**
-    * Constructor.
-    */
-    MNEEpochDataList(const FIFFLIB::FiffRawData& raw,
-                     const Eigen::MatrixXi& events,
-                     const Eigen::RowVectorXi& picks,
-                     float tmin,
-                     float tmax,
-                     qint32 event);
 
     //=========================================================================================================
     /**
