@@ -65,6 +65,85 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+bool MNE::read_events(QString t_sEventName,
+                      MatrixXi& events,
+                      QString t_fileRawName)
+{
+    QFile t_EventFile;
+    qint32 p;
+
+    if (t_sEventName.size() == 0) {
+        p = t_fileRawName.indexOf(".fif");
+        if (p > 0) {
+            t_sEventName = t_fileRawName.replace(p, 4, "-eve.fif");
+        } else {
+            printf("Raw file name does not end properly\n");
+            return 0;
+        }
+//        events = mne_read_events(t_sEventName);
+
+        t_EventFile.setFileName(t_sEventName);
+        MNE::read_events(t_EventFile, events);
+        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
+    }
+    else
+    {
+        // Binary file
+        p = t_fileRawName.indexOf(".fif");
+        if (p > 0) {
+            t_EventFile.setFileName(t_sEventName);
+            if(!MNE::read_events(t_EventFile, events)) {
+                printf("Error while read events.\n");
+                return 0;
+            }
+            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
+        } else {
+            //
+            //   Text file
+            //
+            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
+//            try
+//                events = load(eventname);
+//            catch
+//                error(me,mne_omit_first_line(lasterr));
+//            end
+//            if size(events,1) < 1
+//                error(me,'No data in the event file');
+//            end
+//            //
+//            //   Convert time to samples if sample number is negative
+//            //
+//            for p = 1:size(events,1)
+//                if events(p,1) < 0
+//                    events(p,1) = events(p,2)*raw.info.sfreq;
+//                end
+//            end
+//            //
+//            //    Select the columns of interest (convert to integers)
+//            //
+//            events = int32(events(:,[1 3 4]));
+//            //
+//            //    New format?
+//            //
+//            if events(1,2) == 0 && events(1,3) == 0
+//                fprintf(1,'The text event file %s is in the new format\n',eventname);
+//                if events(1,1) ~= raw.first_samp
+//                    error(me,'This new format event file is not compatible with the raw data');
+//                end
+//            else
+//                fprintf(1,'The text event file %s is in the old format\n',eventname);
+//                //
+//                //   Offset with first sample
+//                //
+//                events(:,1) = events(:,1) + raw.first_samp;
+//            end
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
 {
     //
@@ -150,3 +229,57 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
 
 
 //*************************************************************************************************************
+
+void MNE::setup_compensators(FiffRawData& raw,
+                             fiff_int_t dest_comp,
+                             bool keep_comp)
+{
+    qint32 k;
+
+    // Set up projection
+    if (raw.info.projs.size() == 0) {
+        printf("No projector specified for these data\n");
+    } else {
+        // Activate the projection items
+        for (k = 0; k < raw.info.projs.size(); ++k) {
+            raw.info.projs[k].active = true;
+        }
+
+        printf("%d projection items activated\n",raw.info.projs.size());
+        // Create the projector
+//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
+        fiff_int_t nproj = raw.info.make_projector(raw.proj);
+
+        if (nproj == 0)  {
+            printf("The projection vectors do not apply to these channels\n");
+        } else {
+            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+        }
+    }
+
+    // Set up the CTF compensator
+//    qint32 current_comp = MNE::get_current_comp(raw.info);
+    qint32 current_comp = raw.info.get_current_comp();
+    if (current_comp > 0)
+        printf("Current compensation grade : %d\n",current_comp);
+
+    if (keep_comp)
+        dest_comp = current_comp;
+
+    if (current_comp != dest_comp)
+    {
+        qDebug() << "This part needs to be debugged";
+        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
+        {
+//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
+            raw.info.set_current_comp(dest_comp);
+            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+        }
+        else
+        {
+            printf("Could not make the compensator\n");
+            return;
+        }
+    }
+
+}
