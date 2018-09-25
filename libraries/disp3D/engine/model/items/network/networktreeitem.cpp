@@ -283,9 +283,6 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
     QList<NetworkEdge::SPtr> lNetworkEdges = tNetworkData.getThresholdedEdges();
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
 
-    qDebug() << "NetworkTreeItem::plotEdges - lNetworkEdges.size()" << lNetworkEdges.size();
-    qDebug() << "NetworkTreeItem::plotEdges - lNetworkNodes.size()" << lNetworkNodes.size();
-
     if(!m_pEdgeEntity) {
         m_pEdgeEntity = new QEntity(this);
     }
