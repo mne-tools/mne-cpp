@@ -118,8 +118,8 @@ int main(int argc, char *argv[])
 
     qint32 event = parser.value(evokedIdxOption).toInt();
     QString t_sEventName = parser.value(eventsFileOption);
-    float tmin = -1.5;
-    float tmax = 1.5;
+    float fTMin = -1.5;
+    float fTMax = 1.5;
 
     bool keep_comp = false;
     if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
@@ -157,12 +157,11 @@ int main(int argc, char *argv[])
         bool want_eeg   = false;
         bool want_stim  = false;
 
-//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
         picks = raw.info.pick_types(want_meg,
                                     want_eeg,
                                     want_stim,
                                     include,
-                                    raw.info.bads);//prefer member function
+                                    raw.info.bads);
     }
 
     // Read the events
@@ -172,15 +171,16 @@ int main(int argc, char *argv[])
                      t_fileRawName);
 
     //Example for average_epochs
-    MNEEpochDataList data(raw,
-                          events,
-                          picks,
-                          tmin,
-                          tmax,
-                          event);
-    data.average(raw.info,
-                 raw.first_samp,
-                 raw.last_samp);
+    MNEEpochDataList data = MNE::read_epochs(raw,
+                                             events,
+                                             picks,
+                                             fTMin,
+                                             fTMax,
+                                             event);
+
+    FiffEvoked evoked = data.average(raw.info,
+                                     raw.first_samp,
+                                     raw.last_samp);
 
     return a.exec();
 }
