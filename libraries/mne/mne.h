@@ -313,6 +313,8 @@ public:
         return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
 
+    static bool read_events(QString t_sEventName, MatrixXi& events, QString t_fileRawName);
+
 // ToDo Eventlist Class??
     //=========================================================================================================
     /**
@@ -328,6 +330,10 @@ public:
     * @return true if succeeded, false otherwise
     */
     static bool read_events(QIODevice &p_IODevice, MatrixXi& eventlist);
+
+    static void setup_compensators(FiffRawData& raw,
+                                  fiff_int_t dest_comp,
+                                  bool keep_comp);
 
     //=========================================================================================================
     /**
