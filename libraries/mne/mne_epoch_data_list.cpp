@@ -83,6 +83,113 @@ MNEEpochDataList::~MNEEpochDataList()
 
 //*************************************************************************************************************
 
+MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
+                                              const MatrixXi& events,
+                                              const RowVectorXi& picks,
+                                              float tmin,
+                                              float tmax,
+                                              qint32 event,
+                                              double dEOGThreshold)
+{
+    MNEEpochDataList data;
+
+    // Select the desired events
+    qint32 count = 0;
+    qint32 p;
+    MatrixXi selected = MatrixXi::Zero(1, events.rows());
+    for (p = 0; p < events.rows(); ++p)
+    {
+        if (events(p,1) == 0 && events(p,2) == event)
+        {
+            selected(0,count) = p;
+            ++count;
+        }
+    }
+    selected.conservativeResize(1, count);
+    if (count > 0) {
+        printf("%d matching events found\n",count);
+    } else {
+        printf("No desired events found.\n");
+        return MNEEpochDataList();
+    }
+
+    fiff_int_t event_samp, from, to;
+    fiff_int_t dropCount = 0;
+    MatrixXd timesDummy;
+    MatrixXd times;
+    double min, max;
+
+    MNEEpochData* epoch = Q_NULLPTR;
+
+    int iChType = FIFFV_EOG_CH; //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_EOG_CH
+    int iEOGChIdx = -1;
+
+    for(int i = 0; i < raw.info.chs.size(); ++i) {
+        if(raw.info.chs.at(i).kind == iChType) {
+            iEOGChIdx = i;
+            //qDebug() << "EOG channel found";
+            break;
+        }
+    }
+
+    if(iEOGChIdx == -1) {
+        qDebug() << "MNE::read_epochs - No EOG channel found for epoch rejection";
+    }
+
+    for (p = 0; p < count; ++p) {
+        // Read a data segment
+        event_samp = events(selected(p),0);
+        from = event_samp + tmin*raw.info.sfreq;
+        to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
+
+        epoch = new MNEEpochData();
+
+        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picks)) {
+            if (p == 0) {
+                times.resize(1, to-from+1);
+                for (qint32 i = 0; i < times.cols(); ++i)
+                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
+            }
+
+            epoch->event = event;
+            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
+
+            if(iEOGChIdx >= 0 &&
+               iEOGChIdx < epoch->epoch.rows() &&
+               dEOGThreshold > 0.0) {
+                RowVectorXd vecRow = epoch->epoch.row(iEOGChIdx);
+                vecRow = vecRow.array() - vecRow(0);
+                //vecRow = vecRow.array() - vecRow.mean();
+
+                min = vecRow.minCoeff();
+                max = vecRow.maxCoeff();
+
+                //qDebug() << "std::fabs(min)" << std::fabs(min);
+                //qDebug() << "std::fabs(max)" << std::fabs(max);
+
+                //If absolute vaue of min or max if bigger than threshold -> reject
+                if((std::fabs(min) > dEOGThreshold) || (std::fabs(max) > dEOGThreshold)) {
+                    epoch->bReject = true;
+                    dropCount++;
+                    //qDebug() << "Epoch at sample" << event_samp << "rejected based on EOG channel";
+                }
+            }
+
+            data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
+        } else {
+            printf("Can't read the event data segments");
+        }
+    }
+
+    qDebug() << "Read total of"<< data.size() <<"epochs and dropped"<< dropCount <<"of them";
+
+    return data;
+}
+
+
+//*************************************************************************************************************
+
 FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_t last, VectorXi sel, bool proj)
 {
     FiffEvoked p_evoked;

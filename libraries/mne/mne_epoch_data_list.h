@@ -43,6 +43,7 @@
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_evoked.h>
+#include <fiff/fiff_raw_data.h>
 
 #include "mne_global.h"
 #include "mne_epoch_data.h"
@@ -64,11 +65,6 @@
 
 namespace MNELIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //=============================================================================================================
@@ -97,6 +93,26 @@ public:
 
     //=========================================================================================================
     /**
+    * Read the epochs from a raw file based on provided events.
+    *
+    * @param[in] raw            The raw data.
+    * @param[in] events         The events provided in samples and event kind.
+    * @param[in] picks          Which channels to pick.
+    * @param[in] tmin           The start time relative to the event in samples.
+    * @param[in] tmax           The end time relative to the event in samples.
+    * @param[in] event          The event kind.
+    * @param[in] dEOGThreshold  The threshold value to use to reject epochs based on the EOG channel. Default is 0.0 meaning no rejection.
+    */
+    static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
+                                       const Eigen::MatrixXi& events,
+                                       const Eigen::RowVectorXi& picks,
+                                       float tmin,
+                                       float tmax,
+                                       qint32 event,
+                                       double dEOGThreshold = 0.0);
+
+    //=========================================================================================================
+    /**
     * Averages epoch list.
     *
     * @param[in] info     measurement info
@@ -111,6 +127,10 @@ public:
                                 VectorXi sel = FIFFLIB::defaultVectorXi,
                                 bool proj = false);
 
+    //=========================================================================================================
+    /**
+    * Drop/Remove all epochs tagged as rejected
+    */
     void dropRejected();
 };
 
