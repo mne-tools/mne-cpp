@@ -140,3 +140,16 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
 
     return p_evoked;
 }
+
+
+//*************************************************************************************************************
+
+void MNEEpochDataList::dropRejected()
+{
+    QMutableListIterator<MNEEpochData::SPtr> i(*this);
+    while (i.hasNext()) {
+        if (i.next()->bReject) {
+            i.remove();
+        }
+    }
+}

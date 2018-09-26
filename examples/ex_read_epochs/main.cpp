@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
     QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
                      events,
                      t_fileRawName);
 
-    //Example for average_epochs
+    // Read the epochs
     MNEEpochDataList data = MNE::read_epochs(raw,
                                              events,
                                              picks,
@@ -178,6 +178,10 @@ int main(int argc, char *argv[])
                                              fTMax,
                                              event);
 
+    // Drop rejected epochs
+    data.dropRejected();
+
+    // Generate a evoked from the epochs
     FiffEvoked evoked = data.average(raw.info,
                                      raw.first_samp,
                                      raw.last_samp);

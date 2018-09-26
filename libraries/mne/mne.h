@@ -337,7 +337,8 @@ public:
                                         const Eigen::RowVectorXi& picks,
                                         float tmin,
                                         float tmax,
-                                        qint32 event);
+                                        qint32 event,
+                                        double dEOGThreshold = 150*0.0000010);
 
     static void setup_compensators(FiffRawData& raw,
                                   fiff_int_t dest_comp,
