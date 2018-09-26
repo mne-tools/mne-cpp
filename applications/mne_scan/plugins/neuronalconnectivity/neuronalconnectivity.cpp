@@ -446,7 +446,7 @@ void NeuronalConnectivity::generateNodeVertices()
 {
     //Generate node vertices
     bool bPick = false;
-    qint32 unit;
+    qint32 unit, kind;
     int counter = 0;
     QString sChType = "grad";
     m_chIdx.clear();
@@ -454,17 +454,21 @@ void NeuronalConnectivity::generateNodeVertices()
 
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         unit = m_pFiffInfo->chs.at(i).unit;
+        kind = m_pFiffInfo->chs.at(i).kind;
 
         if(unit == FIFF_UNIT_T_M &&
+            kind == FIFFV_MEG_CH &&
             sChType == "grad") {
             bPick = true;
 
             //Skip second gradiometer in triplet
             ++i;
         } else if(unit == FIFF_UNIT_T &&
+                  kind == FIFFV_MEG_CH &&
                     sChType == "mag") {
             bPick = true;
         } else if (unit == FIFF_UNIT_V &&
+                   kind == FIFFV_EEG_CH &&
                     sChType == "eeg") {
             bPick = true;
         }

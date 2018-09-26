@@ -287,5 +287,4 @@ void MNE::setup_compensators(FiffRawData& raw,
             return;
         }
     }
-
 }

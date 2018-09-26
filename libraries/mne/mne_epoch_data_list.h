@@ -101,7 +101,9 @@ public:
     * @param[in] tmin           The start time relative to the event in samples.
     * @param[in] tmax           The end time relative to the event in samples.
     * @param[in] event          The event kind.
-    * @param[in] dEOGThreshold  The threshold value to use to reject epochs based on the EOG channel. Default is 0.0 meaning no rejection.
+    * @param[in] dEOGThreshold  The threshold value to use to reject epochs based on the EOG channel.
+    *                           No filtering is performed on the EOG channel. Default is set to no rejection.
+    *                           The mean is subtracted from the EOG channel data before checking the threshold.
     */
     static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
                                        const Eigen::MatrixXi& events,

@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
@@ -185,12 +185,12 @@ int main(int argc, char *argv[])
         bDoClust = true;
     }
 
-
     //Set parameters
     QList<MatrixXd> matDataList;
     MatrixX3f matNodePositions;
     MatrixXi events;
     RowVectorXi picks;
+    qint32 kind, unit;
 
     MNEForwardSolution t_clusteredFwd;
     MNEForwardSolution t_Fwd;
@@ -204,45 +204,53 @@ int main(int argc, char *argv[])
     // Create sensor level data
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
+    QVector<int> chIdx;
 
     if (!bDoSourceLoc) {
-        QStringList include;
-        bool want_meg, want_eeg, want_stim;
+        QStringList include,exclude;
 
-        if(sChType == "meg") {
-            want_meg = true;
-            want_eeg = false;
-            want_stim = false;
+        for(int i = 0; i < raw.info.chs.size(); ++i) {
+            unit = raw.info.chs.at(i).unit;
+            kind = raw.info.chs.at(i).kind;
 
-            picks = raw.info.pick_types(sCoilType,
-                                        want_eeg,
-                                        want_stim,
-                                        include,
-                                        raw.info.bads);
+            if(unit == FIFF_UNIT_T_M &&
+               kind == FIFFV_MEG_CH &&
+               sChType == "meg"&&
+               sCoilType == "grad") {
+                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
+                    include << raw.info.chs.at(i).ch_name;
+                    chIdx << i;
 
-            // If grad then only pick the first of each triplet
-            if(sCoilType == "grad") {
-                RowVectorXi picksTmp(picks.cols()/2);
-                int counter = 0;
-                for(int i = 0; i < picks.cols(); i+=2) {
-                    picksTmp(counter) = picks(i);
-                    qDebug() << picks(i);
-                    counter++;
+                    //Skip second gradiometer in triplet
+                    i += 1;
                 }
-
-                picks = picksTmp;
+            } else if(unit == FIFF_UNIT_T &&
+                      kind == FIFFV_MEG_CH &&
+                      sChType == "meg"&&
+                      sCoilType == "mag") {
+                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
+                    include << raw.info.chs.at(i).ch_name;
+                    chIdx << i;
+                }
+            } else if (unit == FIFF_UNIT_V &&
+                       kind == FIFFV_EEG_CH &&
+                       sChType == "eeg") {
+                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
+                    include << raw.info.chs.at(i).ch_name;
+                    chIdx << i;
+                }
             }
-        } else if (sChType == "eeg") {
-            want_meg = false;
-            want_eeg = true;
-            want_stim = false;
 
-            picks = raw.info.pick_types(want_meg,
-                                        want_eeg,
-                                        want_stim,
-                                        include,
-                                        raw.info.bads);
+            if(kind == FIFFV_EOG_CH) {
+                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
+                    include << raw.info.chs.at(i).ch_name;
+                }
+            }
         }
+
+        picks = raw.info.pick_channels(raw.info.ch_names,
+                                       include,
+                                       exclude);
     } else {
         picks = raw.info.pick_channels(raw.info.ch_names,
                                        noise_cov.names,
@@ -265,22 +273,35 @@ int main(int argc, char *argv[])
                                                          fTMin,
                                                          fTMax,
                                                          event,
-                                                         150*0.0000010);
+                                                         150.0*0.0000010);
+    data.dropRejected();
 
-    // Transform to a more generic data matrix list
+    // Transform to a more generic data matrix list and remove EOG channel
+    MatrixXd matData;
+
     for(int i = 0; i < data.size(); ++i) {
-        matDataList << data.at(i)->epoch;
+        matData.resize(chIdx.size(), data.at(i)->epoch.cols());
+
+        for(qint32 j = 0; j < chIdx.size(); ++j) {
+            matData.row(j) = data.at(i)->epoch.row(j);
+        }
+
+        matDataList << matData;
     }
 
     if(!bDoSourceLoc) {
         // Generate nodes for 3D network visualization
         matNodePositions = MatrixX3f(picks.cols(),3);
 
-        // Get the 3D positions
+        // Get the 3D positions and exclude EOG channels
         for(int i = 0; i < picks.cols(); ++i) {
-            matNodePositions(i,0) = raw.info.chs.at(picks(i)).chpos.r0(0);
-            matNodePositions(i,1) = raw.info.chs.at(picks(i)).chpos.r0(1);
-            matNodePositions(i,2) = raw.info.chs.at(picks(i)).chpos.r0(2);
+            kind = raw.info.chs.at(i).kind;
+            if(kind == FIFFV_EEG_CH ||
+               kind == FIFFV_MEG_CH) {
+                matNodePositions(i,0) = raw.info.chs.at(picks(i)).chpos.r0(0);
+                matNodePositions(i,1) = raw.info.chs.at(picks(i)).chpos.r0(1);
+                matNodePositions(i,2) = raw.info.chs.at(picks(i)).chpos.r0(2);
+            }
         }
     } else {
         //Create source level data
