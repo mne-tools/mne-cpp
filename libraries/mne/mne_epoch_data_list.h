@@ -110,6 +110,8 @@ public:
                                 FIFFLIB::fiff_int_t last,
                                 VectorXi sel = FIFFLIB::defaultVectorXi,
                                 bool proj = false);
+
+    void dropRejected();
 };
 
 } // NAMESPACE
