@@ -258,13 +258,14 @@ int main(int argc, char *argv[])
                      events,
                      sRaw);
 
-    // Example for average_epochs
-    MNEEpochDataList data = MNE::read_epochs(raw,
-                                             events,
-                                             picks,
-                                             fTMin,
-                                             fTMax,
-                                             event);
+    // Read the epochs and reject bad epochs
+    MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
+                                                         events,
+                                                         picks,
+                                                         fTMin,
+                                                         fTMax,
+                                                         event,
+                                                         150*0.0000010);
 
     // Transform to a more generic data matrix list
     for(int i = 0; i < data.size(); ++i) {
