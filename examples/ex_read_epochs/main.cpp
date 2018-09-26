@@ -170,14 +170,14 @@ int main(int argc, char *argv[])
                      events,
                      t_fileRawName);
 
-    // Read the epochs and reject epochs with EOG higher than 150e-06
+    // Read the epochs and reject epochs with EOG higher than 250e-06
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
                                                          picks,
                                                          fTMin,
                                                          fTMax,
                                                          event,
-                                                         150*0.0000010);
+                                                         250.0*0.0000010);
 
     // Drop rejected epochs
     data.dropRejected();

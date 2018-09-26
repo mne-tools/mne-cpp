@@ -121,19 +121,23 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
 
     MNEEpochData* epoch = Q_NULLPTR;
 
-    int iChType = FIFFV_EOG_CH; //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_EOG_CH
+    int iChType = FIFFV_EOG_CH;
     int iEOGChIdx = -1;
 
     for(int i = 0; i < raw.info.chs.size(); ++i) {
         if(raw.info.chs.at(i).kind == iChType) {
-            iEOGChIdx = i;
-            //qDebug() << "EOG channel found";
+            for(int j = 0; j < picks.cols(); ++j) {
+                if(i == picks(j)) {
+                    iEOGChIdx = j;
+                    break;
+                }
+            }
             break;
         }
     }
 
     if(iEOGChIdx == -1) {
-        qDebug() << "MNE::read_epochs - No EOG channel found for epoch rejection";
+        qDebug() << "No EOG channel found for epoch rejection";
     }
 
     for (p = 0; p < count; ++p) {
@@ -159,8 +163,8 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                iEOGChIdx < epoch->epoch.rows() &&
                dEOGThreshold > 0.0) {
                 RowVectorXd vecRow = epoch->epoch.row(iEOGChIdx);
-                vecRow = vecRow.array() - vecRow(0);
-                //vecRow = vecRow.array() - vecRow.mean();
+                //vecRow = vecRow.array() - vecRow(0);
+                vecRow = vecRow.array() - vecRow.mean();
 
                 min = vecRow.minCoeff();
                 max = vecRow.maxCoeff();
