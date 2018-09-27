@@ -191,19 +191,17 @@ namespace FIFFLIB
 #define FIFFV_COIL_MAGNES_GRAD        4002  /**< Magnes WH gradiometer  */
 #define FIFFV_COIL_CTF_GRAD           5001  /**< CTF axial gradiometer */
 
-
-/*
- * BabySQUID/BabyMEG sensors
- */
-#define FIFFV_COIL_BABY_GRAD            7001  /**< BabySQUID gradiometers */
-#define FIFFV_COIL_BABY_MAG             7002  /**< BabyMEG inner layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG         7003  /**< BabyMEG outer layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG2        7004  /**< BabyMEG reference magnetometer */
-#define FIFFV_COIL_ARTEMIS123_GRAD      7501  /**< Artemis123 gradiometer */
-#define FIFFV_COIL_ARTEMIS123_REF_MAG   7502  /**< Artemis123 reference magnetometer */
-#define FIFFV_COIL_ARTEMIS123_REF_GRAD  7503  /**< Artemis123 reference gradiometer */
-#define FIFFV_COIL_KRISS_GRAD           8001  /**< KRISS gradiometer */
-#define FIFFV_COIL_SAMPLE_TMS_PLANAR    9001  /**< Sample TMS sensor */
+#define FIFFV_COIL_BABY_GRAD                    7001  /**< BabySQUID gradiometers */
+#define FIFFV_COIL_BABY_MAG                     7002  /**< BabyMEG inner layer magnetometers */
+#define FIFFV_COIL_BABY_REF_MAG                 7003  /**< BabyMEG outer layer magnetometers */
+#define FIFFV_COIL_BABY_REF_MAG2                7004  /**< BabyMEG reference magnetometer */
+#define FIFFV_COIL_ARTEMIS123_GRAD              7501  /**< Artemis123 gradiometer */
+#define FIFFV_COIL_ARTEMIS123_REF_MAG           7502  /**< Artemis123 reference magnetometer */
+#define FIFFV_COIL_ARTEMIS123_REF_GRAD          7503  /**< Artemis123 reference gradiometer */
+#define FIFFV_COIL_SAMPLE_TMS_PLANAR            8001  /**< Sample TMS sensor */
+#define FIFFV_COIL_KRISS_GRAD                   9001  /**< KRISS gradiometer */
+#define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       10001  /**< Compumedics adult gradiometer */
+#define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   10002  /**< Compumedics pediatric gradiometer */
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 
