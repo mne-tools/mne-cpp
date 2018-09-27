@@ -43,6 +43,8 @@
 
 #include "../realtime_global.h"
 
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,7 +69,6 @@
 //=============================================================================================================
 
 namespace FIFFLIB {
-    class FiffInfo;
     class FiffCov;
 }
 
@@ -92,9 +93,9 @@ struct RtCovComputeResult {
 };
 
 struct RtCovInput {
-    QList<Eigen::MatrixXd>              lData;
-    QSharedPointer<FIFFLIB::FiffInfo>   pFiffInfo;
-    int                                 iSamples;
+    QList<Eigen::MatrixXd>      lData;
+    FIFFLIB::FiffInfo           fiffInfo;
+    int                         iSamples;
 };
 
 
