@@ -279,15 +279,16 @@ namespace FIFFLIB
 #define FIFFV_MISC_CH    502
 #define FIFFV_RESP_CH    602   /**< Respiration monitoring*/
 
-//
-// More of those defined in MNE
-//
+/*
+* More of those defined in MNE
+*/
 #define FIFFV_MNE_SURF_UNKNOWN       -1
 #define FIFFV_MNE_SURF_LEFT_HEMI     101
 #define FIFFV_MNE_SURF_RIGHT_HEMI    102
-//
-//   These relate to the Isotrak data
-//
+
+/*
+* These relate to the Isotrak data
+*/
 #define FIFFV_POINT_CARDINAL 1
 #define FIFFV_POINT_HPI      2
 #define FIFFV_POINT_EEG      3
@@ -297,9 +298,10 @@ namespace FIFFLIB
 #define FIFFV_POINT_LPA         1
 #define FIFFV_POINT_NASION      2
 #define FIFFV_POINT_RPA         3
-//
-//   These are the MNE fiff definitions
-//
+
+/*
+* These are the MNE fiff definitions
+*/
 #define FIFFB_MNE                    350
 #define FIFFB_MNE_SOURCE_SPACE       351
 #define FIFFB_MNE_FORWARD_SOLUTION   352
@@ -313,17 +315,17 @@ namespace FIFFLIB
 #define FIFFB_MNE_VERTEX_MAP         360
 #define FIFFB_MNE_EVENTS             361
 #define FIFFB_MNE_MORPH_MAP          362
-    //
-    // CTF compensation data
-    //
+
+/*
+* CTF compensation data
+*/
 #define FIFFB_MNE_CTF_COMP           370
 #define FIFFB_MNE_CTF_COMP_DATA      371
-    ////
-    // Fiff tags associated with MNE computations (3500...)
-    //
-    //
-    // 3500... Bookkeeping
-    //
+
+/*
+* Fiff tags associated with MNE computations (3500...)
+* 3500... Bookkeeping
+*/
 #define FIFF_MNE_ROW_NAMES              3502
 #define FIFF_MNE_COL_NAMES              3503
 #define FIFF_MNE_NROW                   3504
@@ -334,9 +336,10 @@ namespace FIFFLIB
 //FIFFB_MNE_INVERSE_SOLUTION   FIFFV_COORD_HEAD
 #define FIFF_MNE_CH_NAME_LIST           3507
 #define FIFF_MNE_FILE_NAME              3508    /**< This removes the collision with fiff_stream.h (used to be 3501)*/
-    //
-    // 3510... 3590... Source space or surface
-    //
+
+/*
+* 3510... 3590... Source space or surface
+*/
 #define FIFF_MNE_SOURCE_SPACE_POINTS        3510    /**< The vertices*/
 #define FIFF_MNE_SOURCE_SPACE_NORMALS       3511    /**< The vertex normals*/
 #define FIFF_MNE_SOURCE_SPACE_NPOINTS       3512    /**< How many vertices*/
@@ -358,16 +361,18 @@ namespace FIFFLIB
 
 #define FIFF_MNE_SOURCE_SPACE_DIST          3599    /**< Distances between vertices in use (along the surface)*/
 #define FIFF_MNE_SOURCE_SPACE_DIST_LIMIT    3600    /**< If distance is above this limit (in the volume) it has not been calculated*/
-    //
-    // 3520... Forward solution
-    //
+
+/*
+* 3520... Forward solution
+*/
 #define FIFF_MNE_FORWARD_SOLUTION       3520
 #define FIFF_MNE_SOURCE_ORIENTATION     3521    /**< Fixed or free*/
 #define FIFF_MNE_INCLUDED_METHODS       3522
 #define FIFF_MNE_FORWARD_SOLUTION_GRAD  3523
-    //
-    // 3530... Covariance matrix
-    //
+
+/*
+* 3530... Covariance matrix
+*/
 #define FIFF_MNE_COV_KIND               3530    /**< What kind of a covariance matrix*/
 #define FIFF_MNE_COV_DIM                3531    /**< Matrix dimension*/
 #define FIFF_MNE_COV                    3532    /**< Full matrix in packed representation (lower triangle)*/
@@ -375,12 +380,11 @@ namespace FIFFLIB
 #define FIFF_MNE_COV_EIGENVALUES        3534    /**< Eigenvalues and eigenvectors of the above*/
 #define FIFF_MNE_COV_EIGENVECTORS       3535
 #define FIFF_MNE_COV_NFREE              3536    /**< Number of degrees of freedom*/
-    //
-    // 3540... Inverse operator
-    //
-    // We store the inverse operator as the eigenleads  eigenfields
-    // and weights
-    //
+
+/*
+* 3540... Inverse operator
+* We store the inverse operator as the eigenleads  eigenfields and weights
+*/
 #define FIFF_MNE_INVERSE_LEADS              3540     /**< The eigenleads*/
 #define FIFF_MNE_INVERSE_LEADS_WEIGHTED     3546     /**< The eigenleads (already weighted with R^0.5)*/
 #define FIFF_MNE_INVERSE_FIELDS             3541     /**< The eigenfields*/
@@ -392,46 +396,48 @@ namespace FIFFLIB
 #define FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS 3545    /**<  orientation of one source per row*/
                                // The source orientations must be expressed in the coordinate system
                                // given by FIFF_MNE_COORD_FRAME
-    //
-    // 3550... Saved environment info
-    //
+
+/*
+* 3550... Saved environment info
+*/
 #define FIFF_MNE_ENV_WORKING_DIR        3550       /**< Working directory where the file was created*/
 #define FIFF_MNE_ENV_COMMAND_LINE       3551       /**< The command used to create the file*/
-    //
-    // 3560... Miscellaneous
-    //
+
+/*
+* 3560... Miscellaneous
+*/
 #define FIFF_MNE_PROJ_ITEM_ACTIVE       3560       /**< Is this projection item active?*/
 #define FIFF_MNE_EVENT_LIST             3561       /**< An event list (for STI 014)*/
 #define FIFF_MNE_HEMI                   3562       /**< Hemisphere association for general purposes*/
-    //
-    // 3570... Morphing maps
-    //
+
+/*
+* 3570... Morphing maps
+*/
 #define FIFF_MNE_MORPH_MAP              3570       /**< Mapping of closest vertices on the sphere*/
 #define FIFF_MNE_MORPH_MAP_FROM         3571       /**< Which subject is this map from*/
 #define FIFF_MNE_MORPH_MAP_TO           3572       /**< Which subject is this map to*/
-    //
-    // 3580... CTF compensation data
-    //
+
+/*
+* 3580... CTF compensation data
+*/
 #define FIFF_MNE_CTF_COMP_KIND         3580       /**< What kind of compensation*/
 #define FIFF_MNE_CTF_COMP_DATA         3581       /**< The compensation data itself*/
 #define FIFF_MNE_CTF_COMP_CALIBRATED   3582       /**< Are the coefficients calibrated?*/
 
-
-//
-// 3700... Real-Time Communication
-//
+/*
+* 3700... Real-Time Communication
+*/
 #define FIFF_MNE_RT_COMMAND         3700              /**< Fiff Real-Time Command */
 #define FIFF_MNE_RT_CLIENT_ID       3701              /**< Fiff Real-Time mne_t_server client id */
 
-//
-// 3710... Real-Time Blocks
-//
+/*
+* 3710... Real-Time Blocks
+*/
 #define FIFFB_MNE_RT_MEAS_INFO      3710              /**< Fiff Real-Time Measurement Info */
 
-
-//
-// Fiff values associated with MNE computations
-//
+/*
+* Fiff values associated with MNE computations
+*/
 #define FIFFV_MNE_FIXED_ORI            1
 #define FIFFV_MNE_FREE_ORI             2
 
@@ -447,27 +453,31 @@ namespace FIFFLIB
 #define FIFFV_MNE_SIGNAL_COV           4           /**< This will be potentially employed in beamformers*/
 #define FIFFV_MNE_DEPTH_PRIOR_COV      5           /**< The depth weighting prior*/
 #define FIFFV_MNE_ORIENT_PRIOR_COV     6           /**< The orientation prior*/
-    //
-    // Source space types (values of FIFF_MNE_SOURCE_SPACE_TYPE)
-    //
+
+/*
+* Source space types (values of FIFF_MNE_SOURCE_SPACE_TYPE)
+*/
 #define FIFFV_MNE_SPACE_UNKNOWN  -1
 #define FIFFV_MNE_SPACE_SURFACE  1
 #define FIFFV_MNE_SPACE_VOLUME   2
 #define FIFFV_MNE_SPACE_DISCRETE 3
-    //
-    // Covariance matrix channel classification
-    //
+
+/*
+* Covariance matrix channel classification
+*/
 #define FIFFV_MNE_COV_CH_UNKNOWN  -1    /**< No idea*/
 #define FIFFV_MNE_COV_CH_MEG_MAG   0    /**< Axial gradiometer or magnetometer [T]*/
 #define FIFFV_MNE_COV_CH_MEG_GRAD  1    /**< Planar gradiometer [T/m]*/
 #define FIFFV_MNE_COV_CH_EEG       2    /**< EEG [V]*/
-    //
-    // Projection item kinds
-    //
+
+/*
+* Projection item kinds
+*/
 #define FIFFV_MNE_PROJ_ITEM_EEG_AVREF  10
-    //
-    // Additional coordinate frames
-    //
+
+/*
+* Additional coordinate frames
+*/
 #define FIFFV_MNE_COORD_TUFTS_EEG    300           /**< For Tufts EEG data*/
 #define FIFFV_MNE_COORD_CTF_DEVICE  1001           /**< CTF device coordinates*/
 #define FIFFV_MNE_COORD_CTF_HEAD    1004           /**< CTF head coordinates*/
@@ -477,12 +487,6 @@ namespace FIFFLIB
 #define FIFFV_MNE_COORD_FS_TAL_GTZ  2004           /**< FreeSurfer Talairach coordinates (MNI z > 0)*/
 #define FIFFV_MNE_COORD_FS_TAL_LTZ  2005           /**< FreeSurfer Talairach coordinates (MNI z < 0)*/
 #define FIFFV_MNE_COORD_FS_TAL      2006           /**< FreeSurfer Talairach coordinates*/
-
-//
-// Others we need
-//
-#define FIFF_UNIT_AM_M2 203    /**< Am/m^2*/
-#define FIFF_UNIT_AM_M3 204    /**< Am/m^3*/
 
 } // NAMESPACE
 
