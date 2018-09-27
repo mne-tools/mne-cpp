@@ -240,7 +240,7 @@ FiffInfoBase FiffInfoBase::pick_info(const RowVectorXi* sel) const
     if (sel == NULL)
         return res;
 
-    //ToDo when pointer List do delation
+    //ToDo when pointer List do deletion
     res.chs.clear();
     res.ch_names.clear();
 
