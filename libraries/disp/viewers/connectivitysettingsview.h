@@ -155,8 +155,6 @@ protected:
     //=========================================================================================================
     /**
     * Slot called when the number of trials changed.
-    *
-    * @param [in] iNumberTrials        The new number of trials.
     */
     void onNumberTrialsChanged();
 

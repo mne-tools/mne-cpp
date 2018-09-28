@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
     float fTMin = parser.value(tMinOption).toFloat();
     float fTMax = parser.value(tMaxOption).toFloat();
     double dSnr = parser.value(snrOption).toDouble();
-    int event = parser.value(evokedIndexOption).toInt();
+    int iEvent = parser.value(evokedIndexOption).toInt();
 
     bool bDoSourceLoc, bDoClust = false;
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
                                                          picks,
                                                          fTMin,
                                                          fTMax,
-                                                         event,
+                                                         iEvent,
                                                          150.0*0.0000010);
     data.dropRejected();
 
