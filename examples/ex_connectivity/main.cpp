@@ -273,11 +273,12 @@ int main(int argc, char *argv[])
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
-                                                         150.0*0.0000010);
+                                                         100.0*0.0000010);
     data.dropRejected();
 
     // Transform to a more generic data matrix list and remove EOG channel
     MatrixXd matData;
+
 
     for(int i = 0; i < data.size(); ++i) {
         if(bDoSourceLoc) {
