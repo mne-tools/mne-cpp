@@ -118,8 +118,8 @@ int main(int argc, char *argv[])
 
     qint32 event = parser.value(evokedIdxOption).toInt();
     QString t_sEventName = parser.value(eventsFileOption);
-    float fTMin = -1.5;
-    float fTMax = 1.5;
+    float fTMin = -1.5f;
+    float fTMax = 1.5f;
 
     bool keep_comp = false;
     if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
@@ -142,12 +142,11 @@ int main(int argc, char *argv[])
     MNE::setup_compensators(raw, dest_comp, keep_comp);
 
     RowVectorXi picks;
-    qint32 k;
     if (pick_all) {
         // Pick all
         picks.resize(raw.info.nchan);
 
-        for(k = 0; k < raw.info.nchan; ++k) {
+        for(qint32 k = 0; k < raw.info.nchan; ++k) {
             picks(k) = k;
         }
     } else {

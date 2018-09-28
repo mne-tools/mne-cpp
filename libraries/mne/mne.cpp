@@ -73,7 +73,7 @@ bool MNE::read_events(QString t_sEventName,
     qint32 p;
     bool status = false;
 
-    if (t_sEventName.size() == 0) {
+    if (t_sEventName.isEmpty()) {
         p = t_fileRawName.indexOf(".fif");
         if (p > 0) {
             t_sEventName = t_fileRawName.replace(p, 4, "-eve.fif");
@@ -240,14 +240,12 @@ void MNE::setup_compensators(FiffRawData& raw,
                              fiff_int_t dest_comp,
                              bool keep_comp)
 {
-    qint32 k;
-
     // Set up projection
     if (raw.info.projs.size() == 0) {
         printf("No projector specified for these data\n");
     } else {
         // Activate the projection items
-        for (k = 0; k < raw.info.projs.size(); ++k) {
+        for (qint32 k = 0; k < raw.info.projs.size(); ++k) {
             raw.info.projs[k].active = true;
         }
 
