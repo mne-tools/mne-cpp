@@ -98,7 +98,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("4")
 , m_iFreqBandLow(1)
-, m_iFreqBandHigh(100)
+, m_iFreqBandHigh(50)
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
 {
@@ -526,7 +526,10 @@ void NeuronalConnectivity::run()
     //
     while(!m_pFiffInfo) {
         msleep(10);
-    }
+    }    
+
+    // Init the frequency band selection to 1 to 50Hz
+    onFrequencyBandChanged(1,50);
 
     int skip_count = 0;
 
