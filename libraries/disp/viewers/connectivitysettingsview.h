@@ -111,7 +111,7 @@ public:
     * @param [in] parent        parent of widget.
     */
     ConnectivitySettingsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+                             Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -166,6 +166,12 @@ protected:
     */
     void onTriggerTypeChanged(const QString& sTriggerType);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the frequency band changed.
+    */
+    void onFrequencyBandChanged();
+
     Ui::ConnectivitySettingsViewWidget* ui;
 
 signals:
@@ -200,6 +206,15 @@ signals:
     * @param [in] sTriggerType        The new trigger type.
     */
     void triggerTypeChanged(const QString& sTriggerType);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the frequency band changed.
+    *
+    * @param [in] iFreqLow        The new lower frequency band.
+    * @param [in] iFreqHigh       The new higher frequency band.
+    */
+    void freqBandChanged(int iFreqLow, int iFreqHigh);
 
 };
 

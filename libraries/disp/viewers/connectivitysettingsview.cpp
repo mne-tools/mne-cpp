@@ -69,7 +69,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
-                         Qt::WindowFlags f)
+                                                   Qt::WindowFlags f)
 : QWidget(parent, f)
 , ui(new Ui::ConnectivitySettingsViewWidget)
 {
@@ -86,6 +86,12 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
 
     connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onTriggerTypeChanged);
+
+    connect(ui->m_spinBox_freqLow, &QSpinBox::editingFinished,
+            this, &ConnectivitySettingsView::onFrequencyBandChanged);
+
+    connect(ui->m_spinBox_freqHigh, &QSpinBox::editingFinished,
+            this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
     this->setWindowTitle("Connectivity Settings");
     this->setMinimumWidth(330);
@@ -150,4 +156,13 @@ void ConnectivitySettingsView::onNumberTrialsChanged()
 void ConnectivitySettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 {
     emit triggerTypeChanged(sTriggerType);
+}
+
+
+//*************************************************************************************************************
+
+void ConnectivitySettingsView::onFrequencyBandChanged()
+{
+    emit freqBandChanged(ui->m_spinBox_freqLow->value(),
+                         ui->m_spinBox_freqHigh->value());
 }

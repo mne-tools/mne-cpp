@@ -97,6 +97,9 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("4")
+, m_iFreqBandLow(1)
+, m_iFreqBandHigh(100)
+, m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
 {
 }
@@ -153,6 +156,8 @@ void NeuronalConnectivity::init()
             this, &NeuronalConnectivity::onNumberTrialsChanged);
     connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::triggerTypeChanged,
             this, &NeuronalConnectivity::onTriggerTypeChanged);
+    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
+            this, &NeuronalConnectivity::onFrequencyBandChanged);
 
     m_pRTCEOutput->data()->addControlWidget(m_pConnectivitySettingsView);
 
@@ -275,7 +280,11 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_matNodeVertComb << m_matNodeVertLeft, m_matNodeVertRight;
 
             //Set node 3D positions to connectivity settings
-            m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
+            m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;            
+        }
+
+        if(!pRTSE->getValue().isEmpty()) {
+            m_iBlockSize = pRTSE->getValue().first()->data.cols();
         }
 
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
@@ -284,6 +293,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
         //Pop data from buffer
         if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+            m_pRtConnectivity->restart();
             int size = m_connectivitySettings.m_matDataList.size();
             for(int i = 0; i < size-m_iNumberAverages; ++i) {
                 m_connectivitySettings.m_matDataList.removeFirst();
@@ -318,7 +328,11 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             m_iNumberBadChannels = m_pFiffInfo->bads.size();
         }
 
-        if(m_pFiffInfo) {
+        if(m_pFiffInfo) {            
+            if(!pRTMSA->getMultiSampleArray().isEmpty()) {
+                m_iBlockSize = pRTMSA->getMultiSampleArray()[0].cols();
+            }
+
             //Generate node vertices because the number of bad channels changed
             if(m_iNumberBadChannels != pRTMSA->info()->bads.size()) {
                 m_pFiffInfo = pRTMSA->info();
@@ -346,6 +360,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
             //Pop data from buffer
             if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+                m_pRtConnectivity->restart();
                 int size = m_connectivitySettings.m_matDataList.size();
                 for(int i = 0; i < size-m_iNumberAverages; ++i) {
                     m_connectivitySettings.m_matDataList.removeFirst();
@@ -401,6 +416,10 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         if(m_pFiffInfo) {
+            if(!pFiffEvokedSet->evoked.isEmpty()) {
+                m_iBlockSize = pFiffEvokedSet->evoked.first().data.cols();
+            }
+
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     //Generate node vertices because the number of bad channels changed
@@ -423,6 +442,7 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                     //Pop data from buffer
                     if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+                        m_pRtConnectivity->restart();
                         int size = m_connectivitySettings.m_matDataList.size();
                         for(int i = 0; i < size-m_iNumberAverages; ++i) {
                             m_connectivitySettings.m_matDataList.removeFirst();
@@ -522,7 +542,7 @@ void NeuronalConnectivity::run()
             //Send the data to the connected plugins and the online display
             if(!connectivityResult.isEmpty()) {
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
-                connectivityResult.setFrequencyBins(26,33);
+                connectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
                 m_pRTCEOutput->data()->setValue(connectivityResult);
             }
         }
@@ -574,4 +594,20 @@ void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
         m_connectivitySettings.m_matDataList.clear();
         m_sAvrType = triggerType;
     }
+}
+
+
+//*************************************************************************************************************
+
+void NeuronalConnectivity::onFrequencyBandChanged(int iFreqLow, int iFreqHigh)
+{
+    // By default the number of frequency bins is half the signal since we only use the half spectrum
+    double dScaleFactor = m_pFiffInfo->sfreq/m_iBlockSize/2;
+
+    // Convert to frequency bins
+    m_iFreqBandLow = lround(static_cast<double>(iFreqLow) * dScaleFactor);
+    m_iFreqBandHigh = lround(static_cast<double>(iFreqHigh) * dScaleFactor);
+
+    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandLow" << m_iFreqBandLow;
+    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandHigh" << m_iFreqBandHigh;
 }
