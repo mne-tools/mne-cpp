@@ -181,9 +181,7 @@ void RtHPIS::handleResults(const REALTIMELIB::FittingResult& fitResult)
 
 void RtHPIS::restart()
 {
-    m_workerThread.requestInterruption();
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 
     RtHPISWorker *worker = new RtHPISWorker;
     worker->moveToThread(&m_workerThread);
