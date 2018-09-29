@@ -238,9 +238,7 @@ void RtCov::handleResults(const FIFFLIB::FiffCov& computedCov)
 
 void RtCov::restart()
 {
-    m_workerThread.requestInterruption();
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 
     RtCovWorker *worker = new RtCovWorker;
     worker->moveToThread(&m_workerThread);

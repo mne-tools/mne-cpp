@@ -156,9 +156,7 @@ void RtConnectivity::handleResults(const Network& connectivityResult)
 
 void RtConnectivity::restart()
 {
-    m_workerThread.requestInterruption();
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 
     RtConnectivityWorker *worker = new RtConnectivityWorker;
     worker->moveToThread(&m_workerThread);

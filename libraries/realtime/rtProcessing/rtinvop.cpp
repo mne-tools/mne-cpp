@@ -160,9 +160,7 @@ void RtInvOp::handleResults(const MNELIB::MNEInverseOperator& invOp)
 
 void RtInvOp::restart()
 {
-    m_workerThread.requestInterruption();
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 
     RtInvOpWorker *worker = new RtInvOpWorker;
     worker->moveToThread(&m_workerThread);
