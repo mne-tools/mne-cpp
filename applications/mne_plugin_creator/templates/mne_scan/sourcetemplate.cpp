@@ -152,7 +152,7 @@ bool {{name}}::stop()
 
 IPlugin::PluginType {{name}}::getType() const
 {
-    return _IAlgorithm;
+    return _{{superclass}};
 }
 
 
