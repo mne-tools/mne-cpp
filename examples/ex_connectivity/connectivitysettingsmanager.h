@@ -99,6 +99,8 @@ public:
     {
         QObject::connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
                          this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
+
+        onFreqBandChanged(m_iFreqBandLow, m_iFreqBandHigh);
     }
 
     ConnectivitySettings    m_settings;
@@ -156,7 +158,9 @@ public:
         m_networkData = tNetworkData;
         m_networkData.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
 
-        emit newConnectivityResultAvailable(m_networkData);
+        if(!m_networkData.isEmpty()) {
+            emit newConnectivityResultAvailable(m_networkData);
+        }
     }
 
 signals:
