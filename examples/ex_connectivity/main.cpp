@@ -121,13 +121,13 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "2");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
@@ -205,10 +205,9 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
     QVector<int> chIdx;
+    QStringList include,exclude;
 
     if (!bDoSourceLoc) {
-        QStringList include,exclude;
-
         for(int i = 0; i < raw.info.chs.size(); ++i) {
             unit = raw.info.chs.at(i).unit;
             kind = raw.info.chs.at(i).kind;
@@ -252,9 +251,22 @@ int main(int argc, char *argv[])
                                        include,
                                        exclude);
     } else {
+        for(int i = 0; i < raw.info.chs.size(); ++i) {
+            if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
+                if(noise_cov.names.contains(raw.info.chs.at(i).ch_name)) {
+                    include << raw.info.chs.at(i).ch_name;
+                    chIdx << i;
+                }
+
+                if(raw.info.chs.at(i).kind == FIFFV_EOG_CH) {
+                    include << raw.info.chs.at(i).ch_name;
+                }
+            }
+        }
+
         picks = raw.info.pick_channels(raw.info.ch_names,
-                                       noise_cov.names,
-                                       noise_cov.bads);
+                                       include,
+                                       exclude);
     }
 
     MNE::setup_compensators(raw,
@@ -280,17 +292,13 @@ int main(int argc, char *argv[])
     MatrixXd matData;
 
     for(int i = 0; i < data.size(); ++i) {
-        if(bDoSourceLoc) {
-            matDataList << data.at(i)->epoch;
-        } else {
-            matData.resize(chIdx.size(), data.at(i)->epoch.cols());
+        matData.resize(chIdx.size(), data.at(i)->epoch.cols());
 
-            for(qint32 j = 0; j < chIdx.size(); ++j) {
-                matData.row(j) = data.at(i)->epoch.row(j);
-            }
-
-            matDataList << matData;
+        for(qint32 j = 0; j < chIdx.size(); ++j) {
+            matData.row(j) = data.at(i)->epoch.row(j);
         }
+
+        matDataList << matData;
     }
 
     if(!bDoSourceLoc) {

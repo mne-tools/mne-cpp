@@ -157,7 +157,7 @@ void NetworkEdge::calculateAveragedWeight()
 
     if ((iEndWeightBin == -1 && iStartWeightBin == -1) ) {
         m_dAveragedWeight = m_matWeight.mean();
-    } else if(iStartWeightBin < rows) {
+    } else if(iStartWeightBin < rows && iEndWeightBin-iStartWeightBin > 0) {
         if(iEndWeightBin < rows) {
             m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin,1).mean();
         } else {
