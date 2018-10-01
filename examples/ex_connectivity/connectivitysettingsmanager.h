@@ -42,7 +42,9 @@
 //=============================================================================================================
 
 #include <realtime/rtProcessing/rtconnectivity.h>
+
 #include <connectivity/connectivitysettings.h>
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +53,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -87,14 +90,31 @@ class ConnectivitySettingsManager : public QObject
 
 public:
 
-    ConnectivitySettingsManager(QObject *parent = 0) : QObject(parent){}
+    ConnectivitySettingsManager(float sFreq = 1000.0f, QObject *parent = 0)
+    : QObject(parent)
+    , m_pRtConnectivity(RtConnectivity::SPtr::create())
+    , m_iFreqBandLow(1)
+    , m_iFreqBandHigh(50)
+    , m_fSFreq(sFreq)
+    {
+        QObject::connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
+                         this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
+    }
 
     ConnectivitySettings    m_settings;
-    RtConnectivity::SPtr    m_pRtConnectivity = RtConnectivity::SPtr::create();
+    RtConnectivity::SPtr    m_pRtConnectivity;
     QList<Eigen::MatrixXd>  m_matDataListOriginal;
+    Network                 m_networkData;
+
+    int                     m_iFreqBandLow;
+    int                     m_iFreqBandHigh;
+
+    float                   m_fSFreq;
 
     void onConnectivityMetricChanged(const QString& sMetric)
     {
+        m_pRtConnectivity->restart();
+
         m_settings.m_sConnectivityMethods = QStringList() << sMetric;
 
         m_pRtConnectivity->append(m_settings);
@@ -114,6 +134,33 @@ public:
 
         m_pRtConnectivity->append(m_settings);
     }
+
+    void onFreqBandChanged(int iFreqLow, int iFreqHigh)
+    {
+        if(m_settings.m_matDataList.isEmpty()) {
+            return;
+        }
+
+        // By default the number of frequency bins is half the signal since we only use the half spectrum
+        double dScaleFactor = m_settings.m_matDataList.first().cols()/m_fSFreq;
+
+        // Convert to frequency bins
+        m_iFreqBandLow = iFreqLow * dScaleFactor;
+        m_iFreqBandHigh = iFreqHigh * dScaleFactor;
+
+        onNewConnectivityResultAvailable(m_networkData);
+    }
+
+    void onNewConnectivityResultAvailable(const Network& tNetworkData)
+    {
+        m_networkData = tNetworkData;
+        m_networkData.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+
+        emit newConnectivityResultAvailable(m_networkData);
+    }
+
+signals:
+    void newConnectivityResultAvailable(const Network& tNetworkData);
 
 };
 

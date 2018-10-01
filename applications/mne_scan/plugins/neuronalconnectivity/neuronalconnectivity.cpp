@@ -605,11 +605,11 @@ void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
 void NeuronalConnectivity::onFrequencyBandChanged(int iFreqLow, int iFreqHigh)
 {
     // By default the number of frequency bins is half the signal since we only use the half spectrum
-    double dScaleFactor = m_pFiffInfo->sfreq/m_iBlockSize/2;
+    double dScaleFactor = m_iBlockSize/m_pFiffInfo->sfreq;
 
     // Convert to frequency bins
-    m_iFreqBandLow = lround(static_cast<double>(iFreqLow) * dScaleFactor);
-    m_iFreqBandHigh = lround(static_cast<double>(iFreqHigh) * dScaleFactor);
+    m_iFreqBandLow = iFreqLow * dScaleFactor;
+    m_iFreqBandHigh = iFreqHigh * dScaleFactor;
 
     //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandLow" << m_iFreqBandLow;
     //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandHigh" << m_iFreqBandHigh;

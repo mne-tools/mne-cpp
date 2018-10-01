@@ -121,13 +121,13 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
@@ -279,7 +279,6 @@ int main(int argc, char *argv[])
     // Transform to a more generic data matrix list and remove EOG channel
     MatrixXd matData;
 
-
     for(int i = 0; i < data.size(); ++i) {
         if(bDoSourceLoc) {
             matDataList << data.at(i)->epoch;
@@ -380,7 +379,7 @@ int main(int argc, char *argv[])
     }
 
     //Do connectivity estimation and visualize results
-    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create();
+    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(raw.info.sfreq);
 
     pConnectivitySettingsManager->m_settings.m_sConnectivityMethods << sConnectivityMethod;
     pConnectivitySettingsManager->m_settings.m_matDataList = matDataList;
@@ -404,7 +403,10 @@ int main(int argc, char *argv[])
     QObject::connect(pConnectivitySettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
 
-    QObject::connect(pConnectivitySettingsManager->m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
+    QObject::connect(pConnectivitySettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
+                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
+
+    QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      &tNetworkView, &NetworkView::addData);
 
     if(bDoSourceLoc) {
