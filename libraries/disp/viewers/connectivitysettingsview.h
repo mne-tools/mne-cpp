@@ -170,7 +170,7 @@ protected:
     /**
     * Slot called when the frequency band changed.
     */
-    void onFrequencyBandChanged();
+    void onFrequencyBandChanged(int value);
 
     Ui::ConnectivitySettingsViewWidget* ui;
 
