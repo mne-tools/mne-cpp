@@ -50,12 +50,13 @@
 #include <connectivity/network/network.h>
 
 #include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/items/sourcespace/sourcespacetreeitem.h>
+#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
 #include <fs/label.h>
 #include <fs/annotationset.h>
+#include <fs/surfaceset.h>
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_epoch_data_list.h>
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
@@ -132,8 +133,8 @@ int main(int argc, char *argv[])
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.3");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.6");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.0");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -194,6 +195,9 @@ int main(int argc, char *argv[])
 
     MNEForwardSolution t_clusteredFwd;
     MNEForwardSolution t_Fwd;
+
+    SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
+    AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
     QFile t_fileCov(sCov);
     FiffCov noise_cov(t_fileCov);
@@ -317,8 +321,6 @@ int main(int argc, char *argv[])
         }
     } else {
         //Create source level data
-        AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
-
         QFile t_fileFwd(sFwd);
         t_Fwd = MNEForwardSolution(t_fileFwd);
 
@@ -363,22 +365,22 @@ int main(int argc, char *argv[])
             matNodeVertLeft.resize(t_clusteredFwd.src[0].cluster_info.centroidVertno.size(),3);
 
             for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-                matNodeVertLeft.row(j) = t_clusteredFwd.src[0].rr.row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j));
+                matNodeVertLeft.row(j) = tSurfSetInflated[0].rr().row(t_clusteredFwd.src[0].cluster_info.centroidVertno.at(j)) - tSurfSetInflated[0].offset().transpose();
             }
 
             matNodeVertRight.resize(t_clusteredFwd.src[1].cluster_info.centroidVertno.size(),3);
             for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-                matNodeVertRight.row(j) = t_clusteredFwd.src[1].rr.row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j));
+                matNodeVertRight.row(j) = tSurfSetInflated[1].rr().row(t_clusteredFwd.src[1].cluster_info.centroidVertno.at(j)) - tSurfSetInflated[1].offset().transpose();
             }
         } else {
             matNodeVertLeft.resize(t_Fwd.src[0].vertno.rows(),3);
             for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-                matNodeVertLeft.row(j) = t_clusteredFwd.src[0].rr.row(t_Fwd.src[0].vertno(j));
+                matNodeVertLeft.row(j) = tSurfSetInflated[0].rr().row(t_Fwd.src[0].vertno(j)) - tSurfSetInflated[0].offset().transpose();
             }
 
             matNodeVertRight.resize(t_Fwd.src[1].vertno.rows(),3);
             for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-                matNodeVertRight.row(j) = t_clusteredFwd.src[1].rr.row(t_Fwd.src[1].vertno(j));
+                matNodeVertRight.row(j) = tSurfSetInflated[1].rr().row(t_Fwd.src[1].vertno(j)) - tSurfSetInflated[1].offset().transpose();
             }
         }
 
@@ -398,6 +400,7 @@ int main(int argc, char *argv[])
 
     //Create NetworkView and add extra control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
     NetworkView tNetworkView;
+
     ConnectivitySettingsView::SPtr pConnectivitySettingsView = ConnectivitySettingsView::SPtr::create();
     pConnectivitySettingsView->setNumberTrials(matDataList.size());
     QList<QSharedPointer<QWidget> > lWidgets;
@@ -418,16 +421,15 @@ int main(int argc, char *argv[])
                      &tNetworkView, &NetworkView::addData);
 
     if(bDoSourceLoc) {
-        QList<SourceSpaceTreeItem*> pSourceSpaceTreeItem;
+        QList<FsSurfaceTreeItem*> pFsSurfaceTreeItem;
 
-        if(bDoClust) {
-            pSourceSpaceTreeItem = tNetworkView.getTreeModel()->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
-        } else {
-            pSourceSpaceTreeItem = tNetworkView.getTreeModel()->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_Fwd);
-        }
+        pFsSurfaceTreeItem = tNetworkView.getTreeModel()->addSurfaceSet(sSubj,
+                                                                        "Inflated",
+                                                                        tSurfSetInflated,
+                                                                        tAnnotSet);
 
-        for(int i = 0; i < pSourceSpaceTreeItem.size(); i++) {
-            pSourceSpaceTreeItem.at(i)->setAlpha(0.3f);
+        for(int i = 0; i < pFsSurfaceTreeItem.size(); i++) {
+            pFsSurfaceTreeItem.at(i)->setAlpha(0.5f);
         }
     }
 

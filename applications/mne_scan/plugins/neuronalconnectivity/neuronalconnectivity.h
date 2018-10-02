@@ -246,9 +246,6 @@ private:
     qint32              m_iFreqBandHigh;        /**< The higher frequency band to average the connectivy weights to. In frequency bins. */
     qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
 
-    QString             m_sAtlasDir;            /**< File to Atlas. */
-    QString             m_sSurfaceDir;          /**< File to Surface. */
-
     QString             m_sAvrType;             /**< The average type */
 
     QMutex              m_mutex;
