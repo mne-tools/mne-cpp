@@ -147,6 +147,10 @@ QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataLi
                                                 int iNfft,
                                                 const QString &sWindowType)
 {
+    if(matDataList.isEmpty()) {
+        return QVector<MatrixXd>();
+    }
+
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
     if (iNfft < iSignalLength) {
@@ -156,40 +160,101 @@ QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataLi
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
 
-    // Initialize vecPsdAvg and vecCsdAvg
     int iNRows = matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-    QVector<MatrixXcd> vecCsdAvg;
-    for (int j = 0; j < iNRows; ++j) {
-        vecCsdAvg.append(MatrixXcd::Zero(iNRows, iNFreqs));
+
+    // Prepare parallel processing
+    QList<AbstractMetricInputData> lData;
+    AbstractMetricInputData dataTemp;
+    dataTemp.iNRows = iNRows;
+    dataTemp.iNFreqs = iNFreqs;
+    dataTemp.iNfft = iNfft;
+    dataTemp.tapers = tapers;
+
+    for (int i = 0; i < matDataList.size(); ++i) {
+        dataTemp.matInputData = matDataList.at(i);
+
+        lData.append(dataTemp);
     }
 
-    // Generate tapered spectra and CSD and sum over epoch
-    // This part could be parallelized with QtConcurrent::mappedReduced
-    for (int i = 0; i < matDataList.length(); ++i) {
-        //Remove mean
-        MatrixXd matInputData = matDataList.at(i);
-        for (int i = 0; i < matInputData.rows(); ++i) {
-            matInputData.row(i).array() -= matInputData.row(i).mean();
-        }
+//    // Sequential
+//    AbstractMetricResultData finalResult;
 
-        // This part could be parallelized with QtConcurrent::mapped
-        QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData, tapers.first, iNfft);
+//    for (int i = 0; i < lData.length(); ++i) {
+//        reduce(finalResult, compute(lData.at(i)));
+//    }
 
-        // This part could be parallelized with QtConcurrent::mappedReduced
-        for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-            for (int k = 0; k < iNRows; ++k) {
-                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
-                                                                tapers.second, tapers.second, iNfft, 1.0);
-            }
-            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.cwiseQuotient(matCsd.cwiseAbs()));
-        }
-    }
+    // Parallel
+    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(lData,
+                                                                           compute,
+                                                                           reduce);
+    result.waitForFinished();
+
+    AbstractMetricResultData finalResult = result.result();
 
     QVector<MatrixXd> vecPLV;
-    for (int i = 0; i < iNRows; ++i) {
-        vecPLV.append(vecCsdAvg.at(i).cwiseAbs() / matDataList.length());
+    for (int i = 0; i < finalResult.vecCsdAvg.size(); ++i) {
+        vecPLV.append(finalResult.vecCsdAvg.at(i).cwiseAbs() / matDataList.length());
     }
+
     return vecPLV;
+}
+
+//*************************************************************************************************************
+
+AbstractMetricResultData PhaseLockingValue::compute(const AbstractMetricInputData& inputData)
+{
+    // Initialize vecCsdAvg
+    QVector<MatrixXcd> vecCsdAvg;
+
+    // Generate tapered spectra and CSD
+    // Remove mean
+    MatrixXd matInputData = inputData.matInputData;
+    for (int i = 0; i < matInputData.rows(); ++i) {
+        matInputData.row(i).array() -= matInputData.row(i).mean();
+    }
+
+    // This part could be parallelized with QtConcurrent::mapped
+    QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData,
+                                                                             inputData.tapers.first,
+                                                                             inputData.iNfft,
+                                                                             false);
+
+    // This part could be parallelized with QtConcurrent::mappedReduced
+    for (int j = 0; j < inputData.iNRows; ++j) {
+        MatrixXcd matCsd = MatrixXcd(inputData.iNRows, inputData.iNFreqs);
+        for (int k = 0; k < inputData.iNRows; ++k) {
+            matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j),
+                                                            vecTapSpectra.at(k),
+                                                            inputData.tapers.second,
+                                                            inputData.tapers.second,
+                                                            inputData.iNfft,
+                                                            1.0);
+        }
+
+        vecCsdAvg.append(matCsd.cwiseQuotient(matCsd.cwiseAbs()));
+    }
+
+    AbstractMetricResultData resultData;
+    resultData.iNFreqs = inputData.iNFreqs;
+    resultData.iNRows = inputData.iNRows;
+    resultData.vecCsdAvg = vecCsdAvg;
+
+    return resultData;
+}
+
+
+//*************************************************************************************************************
+
+void PhaseLockingValue::reduce(AbstractMetricResultData& finalData,
+                               const AbstractMetricResultData& resultData)
+{
+    // Sum over epoch
+    if(finalData.vecCsdAvg.isEmpty()) {
+        finalData.vecCsdAvg = resultData.vecCsdAvg;
+    } else {
+        for (int j = 0; j < finalData.vecCsdAvg.size(); ++j) {
+            finalData.vecCsdAvg[j] += resultData.vecCsdAvg.at(j);
+        }
+    }
 }

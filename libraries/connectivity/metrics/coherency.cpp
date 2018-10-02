@@ -99,6 +99,10 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
                                                int iNfft,
                                                const QString &sWindowType)
 {
+    if(matDataList.isEmpty()) {
+        return QVector<MatrixXcd>();
+    }
+
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
     if (iNfft < iSignalLength) {
@@ -112,8 +116,7 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
     int iNRows = matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
-    // Generate tapered spectra, PSD, and CSD and sum over epoch
-    // This part could be parallelized with QtConcurrent::mappedReduced
+    // Prepare parallel processing
     QList<AbstractMetricInputData> lData;
     AbstractMetricInputData dataTemp;
     dataTemp.iNRows = iNRows;
@@ -161,13 +164,12 @@ QVector<MatrixXcd> Coherency::computeCoherency(const QList<MatrixXd> &matDataLis
 
 AbstractMetricResultData Coherency::compute(const AbstractMetricInputData& inputData)
 {
-    MatrixXd data = inputData.matInputData;
-
+    // Generate tapered spectra, PSD, and CSD
     MatrixXd matPsdAvg = MatrixXd::Zero(inputData.iNRows, inputData.iNFreqs);
-
     QVector<MatrixXcd> vecCsdAvg;
 
-    //Remove mean
+    // Remove mean
+    MatrixXd data = inputData.matInputData;
     for (int i = 0; i < data.rows(); ++i) {
         data.row(i).array() -= data.row(i).mean();
     }
@@ -217,6 +219,7 @@ AbstractMetricResultData Coherency::compute(const AbstractMetricInputData& input
 void Coherency::reduce(AbstractMetricResultData& finalData,
                        const AbstractMetricResultData& resultData)
 {
+    // Sum over epoch
     if(finalData.matPsdAvg.rows() == 0 || finalData.matPsdAvg.cols() == 0) {
         finalData.matPsdAvg = resultData.matPsdAvg;
     } else {

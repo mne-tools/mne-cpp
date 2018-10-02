@@ -136,6 +136,26 @@ public:
     static QVector<Eigen::MatrixXd> computePLV(const QList<Eigen::MatrixXd> &matDataList,
                                                int iNfft,
                                                const QString &sWindowType);
+protected:
+    //=========================================================================================================
+    /**
+    * Computes the PLV values. This function gets called in parallel.
+    *
+    * @param[in] data    The input data.
+    *
+    * @return            The coherency result in form of AbstractMetricResultData.
+    */
+    static AbstractMetricResultData compute(const AbstractMetricInputData& data);
+
+    //=========================================================================================================
+    /**
+    * Reduces the PLV computation results to a final result. This function gets called in parallel.
+    *
+    * @param[out] finalData    The final data data.
+    * @param[in]  resultData   The resulting data from the computation step.
+    */
+    static void reduce(AbstractMetricResultData &finalData,
+                       const AbstractMetricResultData& resultData);
 };
 
 

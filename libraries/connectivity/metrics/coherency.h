@@ -140,7 +140,7 @@ private:
     * @param[in]  resultData   The resulting data from the computation step.
     */
     static void reduce(AbstractMetricResultData &finalData,
-                const AbstractMetricResultData& resultData);
+                       const AbstractMetricResultData& resultData);
 
 };
 
