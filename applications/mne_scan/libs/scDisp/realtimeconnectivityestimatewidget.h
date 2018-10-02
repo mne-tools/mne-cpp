@@ -165,7 +165,7 @@ protected:
     FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
     FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
-    QSharedPointer<DISP3DLIB::NetworkView>                      m_pNetworkView;         /**< The 3D network view. */
+    QPointer<DISP3DLIB::NetworkView>                            m_pNetworkView;         /**< The 3D network view. */
 
     DISP3DLIB::NetworkTreeItem*                                 m_pRtItem;              /**< The Disp3D real time item. */
 

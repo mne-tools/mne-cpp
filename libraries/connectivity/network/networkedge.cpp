@@ -154,12 +154,15 @@ void NetworkEdge::calculateAveragedWeight()
     }
 
     int rows = m_matWeight.rows();
-    int cols = m_matWeight.cols();
 
-    if (iEndWeightBin == -1 && iStartWeightBin == -1) {
+    if ((iEndWeightBin == -1 && iStartWeightBin == -1) ) {
         m_dAveragedWeight = m_matWeight.mean();
-    } else if(iEndWeightBin-iStartWeightBin+1 < rows && iStartWeightBin < rows) {
-        m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin+1,1).mean();
+    } else if(iStartWeightBin < rows && iEndWeightBin-iStartWeightBin > 0) {
+        if(iEndWeightBin < rows) {
+            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin,1).mean();
+        } else {
+            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,rows-iStartWeightBin,1).mean();
+        }
     }
 }
 

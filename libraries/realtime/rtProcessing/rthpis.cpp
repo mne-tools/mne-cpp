@@ -82,7 +82,11 @@ using namespace INVERSELIB;
 void RtHPISWorker::doWork(const Eigen::MatrixXd& matData,
             const Eigen::MatrixXd& m_matProjectors,
             const QVector<int>& vFreqs,
-            QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo) {
+            QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+{
+    if(this->thread()->isInterruptionRequested()) {
+        return;
+    }
 
     //Perform actual fitting
     FittingResult fitResult;
@@ -134,8 +138,7 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 
 RtHPIS::~RtHPIS()
 {
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 }
 
 
@@ -171,4 +174,36 @@ void RtHPIS::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
 void RtHPIS::handleResults(const REALTIMELIB::FittingResult& fitResult)
 {
     emit newFittingResultAvailable(fitResult);
+}
+
+
+//*************************************************************************************************************
+
+void RtHPIS::restart()
+{
+    stop();
+
+    RtHPISWorker *worker = new RtHPISWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtHPIS::operate,
+            worker, &RtHPISWorker::doWork);
+
+    connect(worker, &RtHPISWorker::resultReady,
+            this, &RtHPIS::handleResults);
+
+    m_workerThread.start();
+}
+
+
+//*************************************************************************************************************
+
+void RtHPIS::stop()
+{
+    m_workerThread.requestInterruption();
+    m_workerThread.quit();
+    m_workerThread.wait();
 }

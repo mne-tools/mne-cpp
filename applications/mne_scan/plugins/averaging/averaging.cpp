@@ -233,10 +233,8 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFiffInfo = pRTMSA->info();
         }
 
-        if(m_bProcessData)
-        {
-            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
-            {
+        if(m_bProcessData) {
+            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 MatrixXd t_mat = pRTMSA->getMultiSampleArray()[i];
                 m_pAveragingBuffer->push(&t_mat);
             }
@@ -565,6 +563,7 @@ void Averaging::run()
     m_iPreStimSamples = ((float)m_iPreStimSeconds/1000)*m_pFiffInfo->sfreq;
     m_iPostStimSamples = ((float)m_iPostStimSeconds/1000)*m_pFiffInfo->sfreq;
 
+    // Init the stim channels
     for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
             //qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
@@ -575,6 +574,12 @@ void Averaging::run()
     m_pAveragingSettingsView->setStimChannels(m_pFiffInfo,
                                         m_qListStimChs,
                                         m_iStimChan);
+
+    // If initital stim channel index does not match current data choose the first one
+    if(!m_qListStimChs.contains(m_iStimChanIdx) &&
+       !m_qListStimChs.isEmpty()) {
+        m_iStimChanIdx = m_qListStimChs.first();
+    }
 
     m_bProcessData = true;
 

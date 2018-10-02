@@ -157,6 +157,20 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
 
     m_pRTESetLayout->addWidget(m_pToolBox);
 
+    // Init quick control view
+    m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", Qt::Window | Qt::CustomizeWindowHint, this);
+    QSettings settings;
+    m_pQuickControlView->setOpacityValue(settings.value(QString("RTESW/%1/viewOpacity").arg(m_pRTESet->getName()), 100).toInt());
+    m_pActionQuickControl->setVisible(true);
+
+    // Quick control average selection
+    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
+    if(!lControlWidgets.isEmpty()) {
+        if(lControlWidgets.first()) {
+            m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.first(), "Averaging", "Settings");
+        }
+    }
+
     //set layouts
     this->setLayout(m_pRTESetLayout);
 }
@@ -311,7 +325,6 @@ void RealTimeEvokedSetWidget::init()
         m_pLabelInit->hide();
         m_pToolBox->show();
         m_pActionSelectSensors->setVisible(true);
-        m_pActionQuickControl->setVisible(true);
 
         //Choose current view toolbox index - butterfly or 2D layout
         m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESName), 0).toInt());
@@ -443,10 +456,6 @@ void RealTimeEvokedSetWidget::init()
         m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
-        //Init quick control widget
-        m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", Qt::Window | Qt::CustomizeWindowHint, this);
-        m_pQuickControlView->setOpacityValue(settings.value(QString("RTESW/%1/viewOpacity").arg(t_sRTESName), 95).toInt());
-
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView();
         pScalingView->init(m_pEvokedSetModel->getScaling());
@@ -525,13 +534,7 @@ void RealTimeEvokedSetWidget::init()
         connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
                 m_pButterflyView.data(), &ButterflyView::setModalities);
 
-        // Quick control average selection
-        QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
-        if(!lControlWidgets.isEmpty()) {
-            if(lControlWidgets.first()) {
-                m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.first(), "Averaging", "Settings");
-            }
-        }
+
 
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
         pAverageSelectionView->init();

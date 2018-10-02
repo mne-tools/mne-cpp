@@ -116,11 +116,12 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
 
     //Calculate connectivity matrix over epochs and average afterwards
     QList<AbstractMetricInputData> lData;
-    double dScalingStep = 1.0/matDataList.size();
+    //double dScalingStep = 1.0/matDataList.size();
 
     for (int i = 0; i < matDataList.size(); ++i) {
         AbstractMetricInputData dataTemp;
-        dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
+        //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
+        dataTemp.matInputData = matDataList.at(i);
 
         lData.append(dataTemp);
     }
