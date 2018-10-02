@@ -130,7 +130,7 @@ Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
     QList<AbstractMetricInputData> lData;
     for (int i = 0; i < matDataList.size(); ++i) {
         AbstractMetricInputData dataTemp;
-        dataTemp.matInputData = matDataList.at(i);
+        dataTemp.matInputData = matDataList.at(i).array().abs();
         dataTemp.iNRows = iNRows;
         dataTemp.iNFreqs = iNFreqs;
         dataTemp.iNfft = iNfft;

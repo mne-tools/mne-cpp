@@ -50,6 +50,7 @@
 #include <QGridLayout>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -82,8 +83,7 @@ TFplot::TFplot(Eigen::MatrixXd tf_matrix,
 
     if(upper_frq > max_frq || upper_frq <= 0) upper_frq = max_frq;
     if(lower_frq < 0 || lower_frq >= max_frq) lower_frq = 0;
-    if(upper_frq < lower_frq)
-    {
+    if(upper_frq < lower_frq) {
         qreal temp = upper_frq;
         upper_frq = lower_frq;
         lower_frq = temp;
@@ -97,8 +97,7 @@ TFplot::TFplot(Eigen::MatrixXd tf_matrix,
     //printf(("fff   "+QString::number(zoomed_tf_matrix(12,12))).toUtf8().data());// << ";  " << zoomed_tf_matrix.rows(2) << ";   ";
 
     qint32 pxls = 0;
-    for(qint32 it = lower_px; it < upper_px; it++)
-    {
+    for(qint32 it = lower_px; it < upper_px; it++) {
         zoomed_tf_matrix.row(pxls) = tf_matrix.row(it);
         pxls++;
     }
@@ -106,7 +105,6 @@ TFplot::TFplot(Eigen::MatrixXd tf_matrix,
     //zoomed_tf_matrix = tf_matrix.block(tf_matrix.rows() - upper_px, 0, upper_px-lower_px, tf_matrix.cols());
 
     calc_plot(zoomed_tf_matrix, sample_rate, cmap, lower_frq, upper_frq);
-
 }
 
 
@@ -139,11 +137,9 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
 
     //setup pixelcolors in image
     QColor color;
-    for ( qint32 y = 0; y < tf_matrix.rows(); y++ )
-        for ( qint32 x = 0; x < tf_matrix.cols(); x++ )
-        {
-            switch  (cmap)
-            {
+    for ( qint32 y = 0; y < tf_matrix.rows(); y++ ) {
+        for ( qint32 x = 0; x < tf_matrix.cols(); x++ ) {
+            switch  (cmap) {
                 case Jet:
                     color.setRgb(ColorMap::valueToJet(std::fabs(tf_matrix(y, x))));
                     break;
@@ -165,6 +161,7 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
             }
             image_to_tf_plot->setPixel(x, tf_matrix.rows() - 1 -  y,  color.rgb());
         }
+    }
 
     *image_to_tf_plot = image_to_tf_plot->scaled(tf_matrix.cols(), tf_matrix.cols()/2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     *image_to_tf_plot = image_to_tf_plot->scaledToWidth(/*0.9 **/ 1026, Qt::SmoothTransformation);
@@ -176,12 +173,9 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
 
     QImage * coeffs_image = new QImage(10, tf_matrix.rows(), QImage::Format_RGB32);
     qreal norm = tf_matrix.maxCoeff();
-    for(qint32 it = 0; it < tf_matrix.rows(); it++)
-    {
-        for ( qint32 x = 0; x < 10; x++ )
-        {
-            switch  (cmap)
-            {
+    for(qint32 it = 0; it < tf_matrix.rows(); it++) {
+        for ( qint32 x = 0; x < 10; x++ ) {
+            switch  (cmap) {
                 case Jet:
                     color.setRgb(ColorMap::valueToJet(it*norm/tf_matrix.rows()));
                     break;
@@ -225,10 +219,9 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
     QList<QGraphicsItem *> x_axis_values;
     QList<QGraphicsItem *> x_axis_lines;
 
-    qreal scaleXText = (tf_matrix.rows() - 1) /  sample_rate / 20.0;                       // divide signallength
+    qreal scaleXText = (tf_matrix.cols() - 1) /  sample_rate / 20.0;                       // divide signallength
 
-    for(qint32 j = 0; j < 21; j++)
-    {
+    for(qint32 j = 0; j < 21; j++) {
         QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j * scaleXText, 'f', 2), tf_pixmap);
         text_item->setFont(QFont("arial", 10));
         x_axis_values.append(text_item);    // scalevalue as string
@@ -243,8 +236,7 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
 
     qreal scale_x = qreal(tf_pixmap->boundingRect().width()) / qreal(x_axis_values.length()-1);
 
-    for(qint32 i = 0; i < x_axis_values.length(); i++)
-    {
+    for(qint32 i = 0; i < x_axis_values.length(); i++) {
        x_axis_values.at(i)->setPos(qreal(i)*scale_x - x_axis_values.at(0)->boundingRect().width()/2,
                                    tf_pixmap->boundingRect().height());
        x_axis_lines.at(i)->setPos(qreal(i)*scale_x,
@@ -261,12 +253,13 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
 
     qreal scale_y_text = 0;
 
-    if(lower_frq == 0  && upper_frq == 0)  scale_y_text = 0.5* sample_rate / 10.0;                       // divide signallength
-    else scale_y_text = (upper_frq - lower_frq) / 10.0;
+    if(lower_frq == 0  && upper_frq == 0) {
+        scale_y_text = 0.5* sample_rate / 10.0;                       // divide signallength
+    } else {
+        scale_y_text = (upper_frq - lower_frq) / 10.0;
+    }
 
-
-    for(qint32 j = 0; j < 11; j++)
-    {
+    for(qint32 j = 0; j < 11; j++) {
         QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(lower_frq + j*scale_y_text,//pow(10, j)/pow(10, 11) /*(j+1)/log(12)*/ * max_frequency,//scale_y_text,
                                                                              'f', 0), tf_pixmap);
         text_item->setFont(QFont("arial", 10));
@@ -284,8 +277,7 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
     qreal scale_y = qreal(tf_pixmap->boundingRect().height()) / qreal(y_axis_values.length()-1);
 
 
-    for(qint32 i = 0; i < y_axis_values.length(); i++)
-    {
+    for(qint32 i = 0; i < y_axis_values.length(); i++) {
        y_axis_values.at(i)->setPos( -y_axis_values.last()->boundingRect().width()
                                     -0.5*y_axis_lines.last()->boundingRect().width()
                                     -1
@@ -319,7 +311,6 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
     view->fitInView(layout->contentsRect(),Qt::KeepAspectRatio);
     layout->addWidget(view);
     this->setLayout(layout);
-
 }
 
 
@@ -330,11 +321,9 @@ void TFplot::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);   
 
     QWidget *widget = this->layout()->itemAt(0)-> widget();
-    if (widget != NULL )
-    {
+    if (widget != NULL ) {
         QGraphicsView* view = (QGraphicsView*)widget;
         view->fitInView(view->sceneRect(),Qt::KeepAspectRatio);
     }
-
 }
 

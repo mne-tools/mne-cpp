@@ -78,6 +78,10 @@ using namespace CONNECTIVITYLIB;
 
 void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettings)
 {
+    if(this->thread()->isInterruptionRequested()) {
+        return;
+    }
+
     QElapsedTimer time;
     int iTime = 0;
     time.start();
@@ -90,7 +94,11 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     emit resultReady(finalNetwork);
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
-    qDebug()<<"RtConnectivityWorker::doWork() - time.elapsed() for"<< connectivitySettings.m_sConnectivityMethods.first() <<"and" << connectivitySettings.m_matDataList.size()<< "trials was" << iTime << "ms";
+    qDebug()<<"------RtConnectivityWorker::doWork()";
+    qDebug()<<"------Method:"<<connectivitySettings.m_sConnectivityMethods.first();
+    qDebug()<<"------Data dim:"<<connectivitySettings.m_matDataList.first().rows() << "x"<<connectivitySettings.m_matDataList.first().cols();
+    qDebug()<<"------Number trials:"<< connectivitySettings.m_matDataList.size();
+    qDebug()<<"------Total time:"<<iTime << "ms";
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
 }
@@ -124,8 +132,7 @@ RtConnectivity::RtConnectivity(QObject *parent)
 
 RtConnectivity::~RtConnectivity()
 {
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 }
 
 
@@ -147,7 +154,31 @@ void RtConnectivity::handleResults(const Network& connectivityResult)
 
 //*************************************************************************************************************
 
-void RtConnectivity::reset()
+void RtConnectivity::restart()
+{
+    stop();
+
+    RtConnectivityWorker *worker = new RtConnectivityWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtConnectivity::operate,
+            worker, &RtConnectivityWorker::doWork);
+
+    connect(worker, &RtConnectivityWorker::resultReady,
+            this, &RtConnectivity::handleResults);
+
+    m_workerThread.start();
+}
+
+
+//*************************************************************************************************************
+
+void RtConnectivity::stop()
 {
     m_workerThread.requestInterruption();
+    m_workerThread.quit();
+    m_workerThread.wait();
 }

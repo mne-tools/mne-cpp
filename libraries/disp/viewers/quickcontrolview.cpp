@@ -120,6 +120,8 @@ void QuickControlView::addWidget(QWidget* pWidget)
 void QuickControlView::addGroupBox(QSharedPointer<QWidget> pWidget,
                                    QString sGroupBoxName)
 {
+    //Store a reference here so we can unparent them in the destructor. Unparenting is neded because we do not want
+    //to mix the memory management of QObject and QSharedPointer
     m_lControlWidgets << pWidget;
 
     addGroupBox(pWidget.data(), sGroupBoxName);

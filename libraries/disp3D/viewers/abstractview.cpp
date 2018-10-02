@@ -139,9 +139,7 @@ QPointer<QuickControlView> AbstractView::getQuickControl()
 void AbstractView::setQuickControlWidgets(const QList<QSharedPointer<QWidget> >& lControlWidgets)
 {
     if(m_pQuickControlView) {
-
         for(int i = 0; i < lControlWidgets.size(); i++) {
-            //TODO: Note that we are mixing memory management systems here. QSharedPointer and QObjects parenting. See destructor for deparenting.
             if(lControlWidgets.at(i)) {
                 m_pQuickControlView->addGroupBox(lControlWidgets.at(i), lControlWidgets.at(i)->windowTitle());
             }
