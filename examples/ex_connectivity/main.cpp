@@ -279,8 +279,8 @@ int main(int argc, char *argv[])
 
     // Read the events
     MNE::read_events(sEve,
-                     events,
-                     sRaw);
+                     sRaw,
+                     events);
 
     // Read the epochs and reject bad epochs
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
