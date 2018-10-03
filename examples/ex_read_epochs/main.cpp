@@ -166,8 +166,8 @@ int main(int argc, char *argv[])
     // Read the events
     MatrixXi events;    
     MNE::read_events(t_sEventName,
-                     events,
-                     t_fileRawName);
+                     t_fileRawName,
+                     events);
 
     // Read the epochs and reject epochs with EOG higher than 250e-06
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,

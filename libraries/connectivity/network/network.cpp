@@ -378,9 +378,14 @@ void Network::setFrequencyBins(int iLowerBin, int iUpperBin)
     m_minMaxFrequencyBins.first = iLowerBin;
     m_minMaxFrequencyBins.second = iUpperBin;
 
+    if(m_minMaxFrequencyBins.second < m_minMaxFrequencyBins.first) {
+        qDebug() << "Network::setFrequencyBins - end bin index is larger than start bin index. Weights will not be recalculated.";
+    }
+
     for(int i = 0; i < m_lFullEdges.size(); ++i) {
         m_lFullEdges.at(i)->setFrequencyBins(QPair<int,int>(iLowerBin,iUpperBin));
     }
+
 }
 
 
