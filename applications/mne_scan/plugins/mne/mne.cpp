@@ -438,7 +438,7 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         if(m_bProcessData && m_pRtInvOp){
-            m_pRtInvOp->append(pRTC->getValue()->pick_channels(m_qListPickChannels));
+            m_pRtInvOp->append(*pRTC->getValue());
         }
     }
 }
