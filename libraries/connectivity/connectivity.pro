@@ -122,3 +122,15 @@ win32 {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 
+#Activate FFTW backend in Eigen on Windows
+#DEFINES += EIGEN_FFTW_DEFAULT
+#INCLUDEPATH += $$shell_path(C:/fftw)
+#LIBS += -L$$shell_path(C:/fftw)
+#LIBS += -llibfftw3-3 \
+#        -llibfftw3f-3 \
+#        -llibfftw3l-3 \
+
+# Activate FFTW backend in Eigen on Linux
+DEFINES += EIGEN_FFTW_DEFAULT
+LIBS += -lfftw3 \
+        -lfftw3_threads \

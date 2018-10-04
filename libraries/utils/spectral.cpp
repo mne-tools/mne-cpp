@@ -50,8 +50,6 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <unsupported/Eigen/FFT>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,6 +104,69 @@ MatrixXcd Spectral::computeTaperedSpectraRow(const RowVectorXd &vecData,
 
 //*************************************************************************************************************
 
+void Spectral::computeTaperedSpectraMatrix(QVector<MatrixXcd> &finalResult,
+                                           const MatrixXd &matData,
+                                           const MatrixXd &matTaper,
+                                           int iNfft,
+                                           QSharedPointer<FFT<double> > fft,
+                                           bool bUseMultithread)
+{
+//    QElapsedTimer timer;
+//    int iTime = 0;
+//    int iTimeAll = 0;
+//    timer.start();
+
+    if(!bUseMultithread) {
+        // Sequential
+        RowVectorXd vecInputFFT, rowData;
+        RowVectorXcd vecTmpFreq;
+
+        MatrixXcd matTapSpectrum(matTaper.rows(), int(floor(iNfft / 2.0)) + 1);
+        int j;
+        for (int i = 0; i < matData.rows(); ++i) {
+            rowData = matData.row(i);
+
+            //FFT for freq domain returning the half spectrum
+            for (j = 0; j < matTaper.rows(); j++) {
+                vecInputFFT = rowData.cwiseProduct(matTaper.row(j));
+                fft->fwd(vecTmpFreq, vecInputFFT, iNfft);
+                matTapSpectrum.row(j) = vecTmpFreq;
+            }
+
+            finalResult.append(matTapSpectrum);
+
+//            iTime = timer.elapsed();
+//            qDebug() << QThread::currentThreadId() << "Spectral::computeTaperedSpectraMatrix - Row-wise computation:" << iTime;
+//            iTimeAll += iTime;
+//            timer.restart();
+        }
+
+//        qDebug() << QThread::currentThreadId() << "Spectral::computeTaperedSpectraMatrix - Complete computation:" << iTimeAll;
+    } else {
+        // Parallel
+        QList<TaperedSpectraInputData> lData;
+        TaperedSpectraInputData dataTemp;
+        dataTemp.matTaper = matTaper;
+        dataTemp.iNfft = iNfft;
+
+        for (int i = 0; i < matData.rows(); ++i) {
+            dataTemp.vecData = matData.row(i);
+
+            lData.append(dataTemp);
+        }
+
+        QFuture<QVector<MatrixXcd> > result = QtConcurrent::mappedReduced(lData,
+                                                                          compute,
+                                                                          reduce,
+                                                                          QtConcurrent::OrderedReduce);
+        result.waitForFinished();
+        finalResult = result.result();
+    }
+}
+
+
+//*************************************************************************************************************
+
 QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData,
                                                          const MatrixXd &matTaper,
                                                          int iNfft,
@@ -117,11 +178,38 @@ QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData
 
     if(!bUseMultithread) {
         // Sequential
+//        QElapsedTimer timer;
+//        int iTime = 0;
+//        int iTimeAll = 0;
+//        timer.start();
+
+        FFT<double> fft;
+        fft.SetFlag(fft.HalfSpectrum);
+
+        RowVectorXd vecInputFFT, rowData;
+        RowVectorXcd vecTmpFreq;
+
+        MatrixXcd matTapSpectrum(matTaper.rows(), int(floor(iNfft / 2.0)) + 1);
+        int j;
         for (int i = 0; i < matData.rows(); ++i) {
-            finalResult.append(computeTaperedSpectraRow(matData.row(i),
-                                                        matTaper,
-                                                        iNfft));
+            rowData = matData.row(i);
+
+            //FFT for freq domain returning the half spectrum
+            for (j = 0; j < matTaper.rows(); j++) {
+                vecInputFFT = rowData.cwiseProduct(matTaper.row(j));
+                fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
+                matTapSpectrum.row(j) = vecTmpFreq;
+            }
+
+            finalResult.append(matTapSpectrum);
+
+//            iTime = timer.elapsed();
+//            qDebug() << QThread::currentThreadId() << "Spectral::computeTaperedSpectraMatrix - Row-wise computation:" << iTime;
+//            iTimeAll += iTime;
+//            timer.restart();
         }
+
+//        qDebug() << QThread::currentThreadId() << "Spectral::computeTaperedSpectraMatrix - Complete computation:" << iTimeAll;
     } else {
         // Parallel
         QList<TaperedSpectraInputData> lData;
@@ -207,6 +295,10 @@ RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed
                                              int iNfft,
                                              double dSampFreq)
 {
+//    QElapsedTimer timer;
+//    int iTime = 0;
+//    timer.start();
+
     //Check inputs
     if (vecTapSpectrumSeed.rows() != vecTapSpectrumTarget.rows()) {
         return MatrixXcd();
@@ -221,9 +313,17 @@ RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed
         return MatrixXcd();
     }
 
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - Prepare:" << iTime;
+//    timer.restart();
+
     //Compute PSD (average over tapers if necessary)
     double denom = sqrt(vecTapWeightsSeed.cwiseAbs2().sum()) * sqrt(vecTapWeightsTarget.cwiseAbs2().sum());
     RowVectorXcd vecCsd = (vecTapWeightsSeed.asDiagonal() * vecTapSpectrumSeed).cwiseProduct((vecTapWeightsTarget.asDiagonal() * vecTapSpectrumTarget).conjugate()).colwise().sum() / denom;
+
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - compute PSD:" << iTime;
+//    timer.restart();
 
     //multiply by 2 due to half spectrum
     vecCsd *= 2.0;
@@ -232,8 +332,16 @@ RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed
         vecCsd.tail(1) /= 2.0;
     }
 
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - half spectrum:" << iTime;
+//    timer.restart();
+
     //Normalization
     vecCsd /= dSampFreq;
+
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - normalization:" << iTime;
+//    timer.restart();
 
     return vecCsd;
 }
