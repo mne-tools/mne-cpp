@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <utils/ioutils.h>
+#include "connectivity/metrics/coherency.h"
 #include "connectivity/metrics/coherence.h"
 #include "connectivity/metrics/imagcoherence.h"
 #include "connectivity/metrics/phaselockingvalue.h"
@@ -141,8 +142,9 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> Coh = Coherence::computeCoherence(matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = Coh.at(0).row(1);
+    QVector<MatrixXcd> Coh;
+    Coherency::computeCoherency(Coh, matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = Coh.at(0).row(1).cwiseAbs();
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -176,8 +178,9 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> ImagCoh = ImagCoherence::computeImagCoherence(matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = ImagCoh.at(0).row(1);
+    QVector<MatrixXcd> ImagCoh;
+    Coherency::computeCoherency(ImagCoh, matDataList, iNfft, sWindowType);
+    m_ConnectivityOutput = ImagCoh.at(0).row(1).imag();
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference

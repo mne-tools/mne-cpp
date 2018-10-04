@@ -50,6 +50,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <unsupported/Eigen/FFT>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -108,7 +110,6 @@ void Spectral::computeTaperedSpectraMatrix(QVector<MatrixXcd> &finalResult,
                                            const MatrixXd &matData,
                                            const MatrixXd &matTaper,
                                            int iNfft,
-                                           QSharedPointer<FFT<double> > fft,
                                            bool bUseMultithread)
 {
 //    QElapsedTimer timer;
@@ -118,6 +119,10 @@ void Spectral::computeTaperedSpectraMatrix(QVector<MatrixXcd> &finalResult,
 
     if(!bUseMultithread) {
         // Sequential
+
+        FFT<double> fft;
+        fft.SetFlag(fft.HalfSpectrum);
+
         RowVectorXd vecInputFFT, rowData;
         RowVectorXcd vecTmpFreq;
 
@@ -129,7 +134,7 @@ void Spectral::computeTaperedSpectraMatrix(QVector<MatrixXcd> &finalResult,
             //FFT for freq domain returning the half spectrum
             for (j = 0; j < matTaper.rows(); j++) {
                 vecInputFFT = rowData.cwiseProduct(matTaper.row(j));
-                fft->fwd(vecTmpFreq, vecInputFFT, iNfft);
+                fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
                 matTapSpectrum.row(j) = vecTmpFreq;
             }
 
@@ -172,8 +177,6 @@ QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData
                                                          int iNfft,
                                                          bool bUseMultithread)
 {
-    //qDebug() << "Spectral::computeTaperedSpectra Rowise";
-
     QVector<MatrixXcd> finalResult;
 
     if(!bUseMultithread) {

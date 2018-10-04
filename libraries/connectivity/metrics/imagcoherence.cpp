@@ -119,12 +119,17 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
     }
 
     //Calculate all-to-all imaginary coherence matrix over epochs
-    QVector<MatrixXd> vecCoh = ImagCoherence::computeImagCoherence(matDataList, iNfft, sWindowType);
+    QVector<MatrixXcd> vecCoh;
+
+    Coherency::computeCoherency(vecCoh,
+                                matDataList,
+                                iNfft,
+                                sWindowType);
 
     //Add edges to network
     for(int i = 0; i < vecCoh.length(); ++i) {
         for(int j = i; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecCoh.at(i).row(j).transpose();
+            MatrixXd matWeight = vecCoh.at(i).row(j).imag().transpose();
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
@@ -135,19 +140,4 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
     }
 
     return finalNetwork;
-}
-
-
-//*************************************************************************************************************
-
-QVector<MatrixXd> ImagCoherence::computeImagCoherence(const QList<MatrixXd> &matDataList,
-                                                      int iNfft,
-                                                      const QString &sWindowType)
-{
-    QVector<MatrixXcd> vecCoherency = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
-    QVector<MatrixXd> vecImagCoherence;
-    for(int i = 0; i < vecCoherency.length(); ++i) {
-        vecImagCoherence.append(vecCoherency.at(i).imag());
-    }
-    return vecImagCoherence;
 }

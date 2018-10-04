@@ -53,7 +53,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -125,7 +124,6 @@ public:
                                             const Eigen::MatrixXd &matData,
                                             const Eigen::MatrixXd &matTaper,
                                             int iNfft,
-                                            QSharedPointer<Eigen::FFT<double> > fft,
                                             bool bUseMultithread = true);
 
     static QVector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd &matData,
