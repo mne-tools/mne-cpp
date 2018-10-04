@@ -64,6 +64,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -130,7 +131,12 @@ private:
     *
     * @return            The coherency result in form of AbstractMetricResultData.
     */
-    static AbstractMetricResultData compute(const AbstractMetricInputData& data);
+    static AbstractMetricResultData compute(const Eigen::MatrixXd& matInputData,
+                                            int iNRows,
+                                            int iNFreqs,
+                                            int iNfft,
+                                            QSharedPointer<Eigen::FFT<double> > fft,
+                                            const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**

@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -62,6 +63,7 @@
 
 #include <QString>
 #include <QPair>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -119,6 +121,13 @@ public:
     *
     * @return tapered spectra of the input data
     */
+    static void computeTaperedSpectraMatrix(QVector<Eigen::MatrixXcd> & finalResult,
+                                            const Eigen::MatrixXd &matData,
+                                            const Eigen::MatrixXd &matTaper,
+                                            int iNfft,
+                                            QSharedPointer<Eigen::FFT<double> > fft,
+                                            bool bUseMultithread = true);
+
     static QVector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd &matData,
                                                                  const Eigen::MatrixXd &matTaper,
                                                                  int iNfft,
