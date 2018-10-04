@@ -122,17 +122,17 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 #Activate FFTW backend in Eigen on Windows
-#DEFINES += EIGEN_FFTW_DEFAULT
-#INCLUDEPATH += $$shell_path(C:/fftw)
-#LIBS += -L$$shell_path(C:/fftw)
-#LIBS += -llibfftw3-3 \
-#        -llibfftw3f-3 \
-#        -llibfftw3l-3 \
+DEFINES += EIGEN_FFTW_DEFAULT
+INCLUDEPATH += $$shell_path(C:/fftw-3.3.5)
+LIBS += -L$$shell_path(C:/fftw-3.3.5)
+LIBS += -llibfftw3-3 \
+        -llibfftw3f-3 \
+        -llibfftw3l-3 \
 
 # Activate FFTW backend in Eigen on Linux
-DEFINES += EIGEN_FFTW_DEFAULT
-LIBS += -lfftw3 \
-        -lfftw3_threads \
+#DEFINES += EIGEN_FFTW_DEFAULT
+#LIBS += -lfftw3 \
+#        -lfftw3_threads \
 
 # Install headers to include directory
 header_files.files = $${HEADERS}

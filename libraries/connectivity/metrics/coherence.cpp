@@ -131,7 +131,11 @@ Network Coherence::coherence(const QList<MatrixXd> &matDataList,
 //    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecCoh = Coherence::computeCoherence(matDataList, iNfft, sWindowType);
+    QVector<MatrixXcd> vecCoh;
+    Coherency::computeCoherency(vecCoh,
+                                matDataList,
+                                iNfft,
+                                sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "Coherence::coherence timer - Actual computation:" << iTime;
@@ -140,7 +144,7 @@ Network Coherence::coherence(const QList<MatrixXd> &matDataList,
     //Add edges to network
     for(int i = 0; i < vecCoh.length(); ++i) {
         for(int j = i; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecCoh.at(i).row(j).transpose();
+            MatrixXd matWeight = vecCoh.at(i).row(j).cwiseAbs().transpose();
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
@@ -154,19 +158,4 @@ Network Coherence::coherence(const QList<MatrixXd> &matDataList,
 //    timer.restart();
 
     return finalNetwork;
-}
-
-
-//*************************************************************************************************************
-
-QVector<MatrixXd> Coherence::computeCoherence(const QList<MatrixXd> &matDataList,
-                                              int iNfft,
-                                              const QString &sWindowType)
-{
-    QVector<MatrixXcd> vecCoherency = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
-    QVector<MatrixXd> vecCoherence;
-    for(int i = 0; i < vecCoherency.length(); ++i) {
-        vecCoherence.append(vecCoherency.at(i).cwiseAbs());
-    }
-    return vecCoherence;
 }

@@ -64,7 +64,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -118,9 +117,10 @@ public:
     *
     * @return                   The connectivity information in form of a QVector of matrices.
     */
-    static QVector<Eigen::MatrixXcd> computeCoherency(const QList<Eigen::MatrixXd> &matDataList,
-                                                      int iNfft=-1,
-                                                      const QString &sWindowType="hanning");
+    static void computeCoherency(QVector<Eigen::MatrixXcd>& vecCoherency,
+                                 const QList<Eigen::MatrixXd> &matDataList,
+                                 int iNfft = -1,
+                                 const QString &sWindowType="hanning");
 
 private:
     //=========================================================================================================
@@ -135,7 +135,6 @@ private:
                                             int iNRows,
                                             int iNFreqs,
                                             int iNfft,
-                                            QSharedPointer<Eigen::FFT<double> > fft,
                                             const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
