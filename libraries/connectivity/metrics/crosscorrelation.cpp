@@ -95,6 +95,8 @@ CrossCorrelation::CrossCorrelation()
 Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
                                            const MatrixX3f& matVert)
 {
+    fftw_make_planner_thread_safe();
+
     Network finalNetwork("Cross Correlation");
 
     if(matDataList.empty()) {

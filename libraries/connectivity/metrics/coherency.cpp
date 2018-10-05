@@ -64,6 +64,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <unsupported/Eigen/FFT>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,10 +100,6 @@ void Coherency::computeCoherency(QVector<MatrixXcd>& vecCoherency,
                                  int iNfft,
                                  const QString &sWindowType)
 {
-//    fftw_init_threads();
-//    fftw_plan_with_nthreads(8);
-//    fftw_make_planner_thread_safe();
-
 //    QElapsedTimer timer;
 //    int iTime = 0;
 //    timer.start();
@@ -118,20 +116,6 @@ void Coherency::computeCoherency(QVector<MatrixXcd>& vecCoherency,
     // Initialize vecPsdAvg and vecCsdAvg
     int iNRows = matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-
-//    // Prepare parallel processing
-//    QList<AbstractMetricInputData> lData;
-//    AbstractMetricInputData dataTemp;
-//    dataTemp.iNRows = iNRows;
-//    dataTemp.iNFreqs = iNFreqs;
-//    dataTemp.iNfft = iNfft;
-//    dataTemp.tapers = tapers;
-
-//    for (int i = 0; i < matDataList.size(); ++i) {
-//        dataTemp.matInputData = matDataList.at(i);
-
-//        lData.append(dataTemp);
-//    }
 
     std::function<AbstractMetricResultData(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
         return compute(matInputData,
@@ -162,7 +146,7 @@ void Coherency::computeCoherency(QVector<MatrixXcd>& vecCoherency,
 //    qDebug() << "Coherency::computeCoherency timer - Parallel computation:" << iTime;
 //    timer.restart();
 
-   AbstractMetricResultData finalResult = result.result();
+    AbstractMetricResultData finalResult = result.result();
 
 //    iTime = timer.elapsed();
 //    qDebug() << "Coherency::computeCoherency timer - Result copy:" << iTime;
@@ -170,10 +154,18 @@ void Coherency::computeCoherency(QVector<MatrixXcd>& vecCoherency,
 
     finalResult.matPsdAvg = finalResult.matPsdAvg.cwiseSqrt();
 
-    for (int i = 0; i < iNRows; ++i) {
-        MatrixXd matPSDtmp = MatrixXd::Zero(iNRows, iNFreqs);
-        for(int j = 0; j < iNRows; ++j) {
-            matPSDtmp.row(j) = finalResult.matPsdAvg.row(i).cwiseProduct(finalResult.matPsdAvg.row(j));
+//    iTime = timer.elapsed();
+//    qDebug() << "Coherency::computeCoherency timer - Cwise sqrt:" << iTime;
+//    timer.restart();
+
+    MatrixXd matPSDtmp = MatrixXd::Zero(iNRows, iNFreqs);
+    RowVectorXd vecPsdAvg;
+    int j;
+    for(int i = 0; i < iNRows; ++i) {
+        vecPsdAvg = finalResult.matPsdAvg.row(i);
+
+        for(j = 0; j < iNRows; ++j) {
+            matPSDtmp.row(j) = vecPsdAvg.cwiseProduct(finalResult.matPsdAvg.row(j));
         }
 
         vecCoherency.append(finalResult.vecCsdAvg.at(i).cwiseQuotient(matPSDtmp));
@@ -182,8 +174,6 @@ void Coherency::computeCoherency(QVector<MatrixXcd>& vecCoherency,
 //    iTime = timer.elapsed();
 //    qDebug() << "Coherency::computeCoherency timer - Cwise abs,produce, quotient:" << iTime;
 //    timer.restart();
-
-//   fftw_cleanup_threads();
 }
 
 
@@ -231,11 +221,10 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 
     // This part could be parallelized with QtConcurrent::mappedReduced
     for (int j = 0; j < iNRows; ++j) {
-        RowVectorXd vecTmpPsd = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j),
+        resultData.matPsdAvg.row(j) = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j),
                                                                 tapers.second,
                                                                 iNfft,
                                                                 1.0);
-        resultData.matPsdAvg.row(j) = vecTmpPsd;
     }
 
 //    iTime = timer.elapsed();
@@ -244,8 +233,9 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 
     // This part could be parallelized with QtConcurrent::mappedReduced
     MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+    int k;
     for (int j = 0; j < iNRows; ++j) {
-        for (int k = j; k < iNRows; ++k) {
+        for (k = j; k < iNRows; ++k) {
             matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j),
                                                             vecTapSpectra.at(k),
                                                             tapers.second,

@@ -112,6 +112,8 @@ void Spectral::computeTaperedSpectraMatrix(QVector<MatrixXcd> &finalResult,
                                            int iNfft,
                                            bool bUseMultithread)
 {
+    fftw_make_planner_thread_safe();
+
 //    QElapsedTimer timer;
 //    int iTime = 0;
 //    int iTimeAll = 0;
@@ -320,16 +322,17 @@ RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed
 //    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - Prepare:" << iTime;
 //    timer.restart();
 
-    //Compute PSD (average over tapers if necessary)
-    double denom = sqrt(vecTapWeightsSeed.cwiseAbs2().sum()) * sqrt(vecTapWeightsTarget.cwiseAbs2().sum());
-    RowVectorXcd vecCsd = (vecTapWeightsSeed.asDiagonal() * vecTapSpectrumSeed).cwiseProduct((vecTapWeightsTarget.asDiagonal() * vecTapSpectrumTarget).conjugate()).colwise().sum() / denom;
+    // Compute PSD (average over tapers if necessary)
+    // Multiply by 2 due to half spectrum
+    // Normalize via sFreq
+    double denom = sqrt(vecTapWeightsSeed.cwiseAbs2().sum()) * sqrt(vecTapWeightsTarget.cwiseAbs2().sum()) * dSampFreq;
+    RowVectorXcd vecCsd = 2.0 * (vecTapWeightsSeed.asDiagonal() * vecTapSpectrumSeed).cwiseProduct((vecTapWeightsTarget.asDiagonal() * vecTapSpectrumTarget).conjugate()).colwise().sum() / denom;
 
 //    iTime = timer.elapsed();
 //    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - compute PSD:" << iTime;
 //    timer.restart();
 
-    //multiply by 2 due to half spectrum
-    vecCsd *= 2.0;
+    //multiply first and last element by 2 due to half spectrum
     vecCsd(0) /= 2.0;
     if (iNfft % 2 == 0){
         vecCsd.tail(1) /= 2.0;
@@ -337,13 +340,6 @@ RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed
 
 //    iTime = timer.elapsed();
 //    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - half spectrum:" << iTime;
-//    timer.restart();
-
-    //Normalization
-    vecCsd /= dSampFreq;
-
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - normalization:" << iTime;
 //    timer.restart();
 
     return vecCsd;
