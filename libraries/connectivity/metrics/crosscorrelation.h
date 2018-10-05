@@ -124,7 +124,9 @@ protected:
     *
     * @return               The connectivity matrix.
     */
-    static Eigen::MatrixXd calculate(const AbstractMetricInputData& inputData);
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd& matInputData,
+                                     int iNfft,
+                                     const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**

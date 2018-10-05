@@ -124,26 +124,15 @@ Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNfft, "Ones");
 
-    // Initialize vecPsdAvg and vecCsdAvg
-    int iNRows = matDataList.at(0).rows();
-    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-
-    // Generate tapered spectra, PSD, and CSD and sum over epoch
-    QList<AbstractMetricInputData> lData;
-    for (int i = 0; i < matDataList.size(); ++i) {
-        AbstractMetricInputData dataTemp;
-        dataTemp.matInputData = matDataList.at(i).array().abs();
-        dataTemp.iNRows = iNRows;
-        dataTemp.iNFreqs = iNFreqs;
-        dataTemp.iNfft = iNfft;
-        dataTemp.tapers = tapers;
-
-        lData.append(dataTemp);
-    }
+    std::function<MatrixXd(const MatrixXd&)> calculateLambda = [&](const MatrixXd& matInputData) {
+        return calculate(matInputData,
+                       iNfft,
+                       tapers);
+    };
 
     // Calculate connectivity matrix over epochs and average afterwards
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(lData,
-                                                              calculate,
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList,
+                                                              calculateLambda,
                                                               sum);
     resultMat.waitForFinished();
 
@@ -170,22 +159,24 @@ Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
 
 //*************************************************************************************************************
 
-MatrixXd CrossCorrelation::calculate(const AbstractMetricInputData& inputData)
+MatrixXd CrossCorrelation::calculate(const MatrixXd& matInputData,
+                                     int iNfft,
+                                     const QPair<MatrixXd, VectorXd>& tapers)
 {
     // Compute tapered spectra. Note: Multithread option to false as default because nested multithreading is not permitted in qt.
-    QVector<Eigen::MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(inputData.matInputData,
-                                                                                    inputData.tapers.first,
-                                                                                    inputData.iNfft,
+    QVector<Eigen::MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData,
+                                                                                    tapers.first,
+                                                                                    iNfft,
                                                                                     false);
 
-    MatrixXd matDist(inputData.matInputData.rows(), inputData.matInputData.rows());
+    MatrixXd matDist(matInputData.rows(), matInputData.rows());
     matDist.setZero();
 
-    for(int i = 0; i < vecTapSpectra.size(); ++i) {
-        for(int j = i; j < vecTapSpectra.size(); ++j) {
-            matDist(i,j) = calcCrossCorrelation(vecTapSpectra.at(i), vecTapSpectra.at(j)).second;
-        }
-    }
+//    for(int i = 0; i < vecTapSpectra.size(); ++i) {
+//        for(int j = i; j < vecTapSpectra.size(); ++j) {
+//            matDist(i,j) = calcCrossCorrelation(vecTapSpectra.at(i), vecTapSpectra.at(j)).second;
+//        }
+//    }
 
     return matDist;
 }
