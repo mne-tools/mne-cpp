@@ -53,20 +53,6 @@ CONFIG(debug, debug|release) {
 #QMAKE_CXXFLAGS+=-Zi
 #QMAKE_LFLAGS+=/DEBUG
 
-# Activate FFTW backend in Eigen on Windows
-DEFINES += EIGEN_FFTW_DEFAULT
-INCLUDEPATH += $$shell_path(C:/fftw-3.3.5-dll64)
-LIBS += -L$$shell_path(C:/fftw-3.3.5-dll64)
-LIBS += -llibfftw3-3 \
-        -llibfftw3f-3 \
-        -llibfftw3l-3 \
-
-## Activate FFTW backend in Eigen on Linux
-#DEFINES += EIGEN_FFTW_DEFAULT
-#INCLUDEPATH += $$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/include)
-#LIBS += -L$$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib) -lfftw3
-#LIBS += -L$$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib) -lfftw3_threads
-
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -113,3 +99,23 @@ unix:!macx {
     # === Unix ===
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR})
+    LIBS += -L$$shell_path($${FFTW_DIR})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
+
