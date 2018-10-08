@@ -107,19 +107,19 @@ HEADERS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-#Activate FFTW backend in Eigen on Windows
-#DEFINES += EIGEN_FFTW_DEFAULT
-#INCLUDEPATH += $$shell_path(C:/fftw-3.3.5)
-#LIBS += -L$$shell_path(C:/fftw-3.3.5)
-#LIBS += -llibfftw3-3 \
-#        -llibfftw3f-3 \
-#        -llibfftw3l-3 \
+# Activate FFTW backend in Eigen on Windows
+DEFINES += EIGEN_FFTW_DEFAULT
+INCLUDEPATH += $$shell_path(C:/fftw-3.3.5-dll64)
+LIBS += -L$$shell_path(C:/fftw-3.3.5-dll64)
+LIBS += -llibfftw3-3 \
+        -llibfftw3f-3 \
+        -llibfftw3l-3 \
 
 ## Activate FFTW backend in Eigen on Linux
-DEFINES += EIGEN_FFTW_DEFAULT
-INCLUDEPATH += $$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/include)
-LIBS += -L$$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib) -lfftw3
-LIBS += -L$$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib) -lfftw3_threads
+#DEFINES += EIGEN_FFTW_DEFAULT
+#INCLUDEPATH += $$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/include)
+#LIBS += -L$$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib) -lfftw3
+#LIBS += -L$$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib) -lfftw3_threads
 
 # Install headers to include directory
 header_files.files = $${HEADERS}
