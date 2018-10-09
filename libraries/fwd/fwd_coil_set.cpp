@@ -459,7 +459,7 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
     FwdCoil* def;
 
     if (in == NULL) {
-        qWarning() << name;
+        qWarning() << "FwdCoilSet::read_coil_defs - File is NULL" << name;
         goto bad;
     }
 
