@@ -57,7 +57,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
@@ -67,7 +66,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Connectivity
 }
 
 DESTDIR = $${MNE_BINARY_DIR}

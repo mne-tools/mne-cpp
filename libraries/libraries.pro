@@ -40,7 +40,6 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     utils \
-    connectivity \
     fs \
     fiff \
     mne \
@@ -48,15 +47,16 @@ SUBDIRS += \
     inverse \
     realtime \
 
+# Libraries which are not supported in the minimalVersion
 !contains(MNECPP_CONFIG, minimalVersion) {
-
     !isEmpty( CNTK_INCLUDE_DIR ) {
         SUBDIRS += \
             deep
     }
 
     SUBDIRS += \
-        disp
+        connectivity \
+        disp \
 
     qtHaveModule(charts) {
         SUBDIRS += \
@@ -76,5 +76,5 @@ fwd.depends = utils fs fiff mne
 deep.depends = utils fs fiff mne
 inverse.depends = utils fs fiff mne fwd
 disp.depends = utils fs fiff mne fwd inverse
-realtime.depends = utils connectivity fiff mne fwd inverse
-disp3D.depends = utils fs fiff mne fwd inverse realtime disp
+realtime.depends = utils fiff mne fwd inverse
+disp3D.depends = utils connectivity fs fiff mne fwd inverse realtime disp
