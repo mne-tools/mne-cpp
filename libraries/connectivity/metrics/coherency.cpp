@@ -186,7 +186,7 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
                                             const QPair<MatrixXd, VectorXd>& tapers)
 {
 //    QElapsedTimer timer;
-//    int iTime = 0;
+//    qint64 iTime = 0;
 //    timer.start();
 
     // Generate tapered spectra, PSD, and CSD
@@ -220,35 +220,46 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 //    timer.restart();
 
     // This part could be parallelized with QtConcurrent::mappedReduced
-    for (int j = 0; j < iNRows; ++j) {
-        resultData.matPsdAvg.row(j) = Spectral::psdFromTaperedSpectra(vecTapSpectra.at(j),
-                                                                tapers.second,
-                                                                iNfft,
-                                                                1.0);
-    }
+    double denomPSD = tapers.second.cwiseAbs2().sum() / 2.0;
+    double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - PSD from spectra:" << iTime;
-//    timer.restart();
-
-    // This part could be parallelized with QtConcurrent::mappedReduced
     MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
     int k;
+
+    bool bNfftEven = false;
+    if (iNfft % 2 == 0){
+        bNfftEven = true;
+    }
+
     for (int j = 0; j < iNRows; ++j) {
+        // Multiply tapers
+        vecTapSpectra[j] = tapers.second.asDiagonal() * vecTapSpectra.at(j);
+
+        //Compute PSD (average over tapers if necessary)
+        resultData.matPsdAvg.row(j) = vecTapSpectra.at(j).cwiseAbs2().colwise().sum() / denomPSD;
+
+        resultData.matPsdAvg.row(j)(0) /= 2.0;
+        if(bNfftEven) {
+            resultData.matPsdAvg.row(j).tail(1) /= 2.0;
+        }
+
+        // Compute PSD (average over tapers if necessary)
         for (k = j; k < iNRows; ++k) {
-            matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j),
-                                                            vecTapSpectra.at(k),
-                                                            tapers.second,
-                                                            tapers.second,
-                                                            iNfft,
-                                                            1.0);
+            // Compute PSD (average over tapers if necessary)
+            matCsd.row(k) = vecTapSpectra.at(j).cwiseProduct(vecTapSpectra.at(k).conjugate()).colwise().sum() / denomCSD;
+
+            //multiply first and last element by 2 due to half spectrum
+            matCsd.row(k)(0) /= 2.0;
+            if(bNfftEven) {
+                matCsd.row(k).tail(1) /= 2.0;
+            }
         }
 
         resultData.vecCsdAvg.append(matCsd);
     }
 
 //    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD from spectra:" << iTime;
+//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - PSD/CSD from spectra:" << iTime;
 //    timer.restart();
 
     return resultData;

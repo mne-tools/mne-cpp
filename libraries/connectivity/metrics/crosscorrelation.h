@@ -137,18 +137,6 @@ protected:
     */
     static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
 
-    //=========================================================================================================
-    /**
-    * Calculates the actual correlation coefficient between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return                The cross position where the maximum correlation was computed.
-    */
-    static QPair<int,double> calcCrossCorrelation(const Eigen::MatrixXcd &matDataFirst,
-                                                  const Eigen::MatrixXcd &matDataSecond);
-
 };
 
 

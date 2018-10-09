@@ -168,15 +168,48 @@ MatrixXd CrossCorrelation::calculate(const MatrixXd& matInputData,
                                                                                     tapers.first,
                                                                                     iNfft,
                                                                                     false);
+    QVector<Eigen::RowVectorXcd> vecAvrSpectra;
+    RowVectorXcd temp;
+    double denom = tapers.second.sum() / 2.0;
+
+    bool bNfftEven = false;
+    if (iNfft % 2 == 0){
+        bNfftEven = true;
+    }
+
+    for(int i = 0; i < vecTapSpectra.size(); ++i) {
+        temp = (tapers.second.asDiagonal() * vecTapSpectra.at(i)).colwise().sum() / denom;
+
+        temp(0) /= 2.0;
+        if(bNfftEven) {
+            temp.tail(1) /= 2.0;
+        }
+
+        vecAvrSpectra << temp;
+    }
 
     MatrixXd matDist(matInputData.rows(), matInputData.rows());
     matDist.setZero();
+    RowVectorXcd vecResultFreq;
+    RowVectorXd vecResultTime;
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+    int idx = 0;
+    int j;
 
-//    for(int i = 0; i < vecTapSpectra.size(); ++i) {
-//        for(int j = i; j < vecTapSpectra.size(); ++j) {
-//            matDist(i,j) = calcCrossCorrelation(vecTapSpectra.at(i), vecTapSpectra.at(j)).second;
-//        }
-//    }
+    for(int i = 0; i < vecTapSpectra.size(); ++i) {
+        idx = 0;
+
+        for(j = i; j < vecTapSpectra.size(); ++j) {
+            vecResultFreq = vecAvrSpectra.at(i).array() * vecAvrSpectra.at(j).conjugate().array();
+
+            fft.inv(vecResultTime, vecResultFreq);
+
+            vecResultTime.maxCoeff(&idx);
+
+            matDist(i,j) = vecResultTime(idx);
+        }
+    }
 
     return matDist;
 }
@@ -193,33 +226,5 @@ void CrossCorrelation::sum(MatrixXd &resultData,
     }
 
     resultData += data;
-}
-
-
-//*************************************************************************************************************
-
-QPair<int,double> CrossCorrelation::calcCrossCorrelation(const MatrixXcd &matDataFirst,
-                                                         const MatrixXcd &matDataSecond)
-{
-    MatrixXcd matResultFreq = matDataSecond.array() * matDataFirst.conjugate().array();
-    RowVectorXcd vecResultFreq = matResultFreq.colwise().sum();
-    vecResultFreq /= matDataSecond.rows();
-    RowVectorXd vecResultTime;
-
-    Eigen::FFT<double> fft;
-    fft.inv(vecResultTime, vecResultFreq);
-
-    QPair<int,int> minMaxRange;
-    int idx = 0;
-    vecResultTime.minCoeff(&idx);
-    minMaxRange.first = idx;
-    vecResultTime.maxCoeff(&idx);
-    minMaxRange.second = idx;
-
-    //Return val
-    int resultIndex = minMaxRange.second;
-    double maxValue = vecResultTime(resultIndex);
-
-    return QPair<int,double>(resultIndex, maxValue);
 }
 
