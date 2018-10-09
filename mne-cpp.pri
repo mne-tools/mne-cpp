@@ -219,4 +219,5 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
 
 
 # FFTW dir
-FFTW_DIR = $$shell_path(C:/fftw-3.3.5-dll64)
+FFTW_DIR_LIBS = $$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib)
+FFTW_DIR_INCLUDE = $$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/include)

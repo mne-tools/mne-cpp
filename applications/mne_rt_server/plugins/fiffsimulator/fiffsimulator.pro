@@ -100,6 +100,26 @@ UI_DIR = $${PWD}
 
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
+
 #  The QML_INFRA_FILES and QML_MESHES_FILES are both about QML based
 # applications, so we'll install them into QT_INSTALL_DATA instead of
 # QT_INSTALL_BINS
