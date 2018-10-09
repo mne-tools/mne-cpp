@@ -163,43 +163,42 @@ namespace FIFFLIB
 /*
 * Coil types
 */
-#define FIFFV_COIL_NONE                         0  /**< The location info contains no data */
-#define FIFFV_COIL_EEG                          1  /**< EEG electrode position in r0 */
-#define FIFFV_COIL_NM_122                       2  /**< Neuromag 122 coils */
-#define FIFFV_COIL_NM_24                        3  /**< Old 24 channel system in HUT */
-#define FIFFV_COIL_NM_MCG_AXIAL                 4  /**< The axial devices in the HUCS MCG system */
-#define FIFFV_COIL_EEG_BIPOLAR                  5  /**< Bipolar EEG lead */
-#define FIFFV_COIL_DIPOLE                       200  /**< Time-varying dipole definition The coil info contains dipole location (r0) and direction (ex) */
-#define FIFFV_COIL_MCG_42                       1000  /**< For testing the MCG software */
-#define FIFFV_COIL_POINT_MAGNETOMETER           2000  /**< Simple point magnetometer */
-#define FIFFV_COIL_AXIAL_GRAD_5CM               2001  /**< Generic axial gradiometer */
-#define FIFFV_COIL_VV_PLANAR_W                  3011  /**< VV prototype wirewound planar sensor */
-#define FIFFV_COIL_VV_PLANAR_T1                 3012  /**< Vectorview SQ20483N planar gradiometer */
-#define FIFFV_COIL_VV_PLANAR_T2                 3013  /**< Vectorview SQ20483N-A planar gradiometer */
-#define FIFFV_COIL_VV_PLANAR_T3                 3014  /**< Vectorview SQ20950N planar gradiometer */
-#define FIFFV_COIL_VV_MAG_W                     3021  /**< VV prototype wirewound magnetometer */
-#define FIFFV_COIL_VV_MAG_T1                    3022  /**< Vectorview SQ20483N magnetometer */
-#define FIFFV_COIL_VV_MAG_T2                    3023  /**< Vectorview SQ20483-A magnetometer */
-#define FIFFV_COIL_VV_MAG_T3                    3024  /**< Vectorview SQ20950N magnetometer */
-#define FIFFV_COIL_MAGNES_MAG                   4001  /**< Magnes WH magnetometer */
-#define FIFFV_COIL_MAGNES_GRAD                  4002  /**< Magnes WH gradiometer  */
-#define FIFFV_COIL_CTF_GRAD                     5001  /**< CTF axial gradiometer */
-#define FIFFV_COIL_CTF_REF_MAG                  5002  /**< CTF reference magnetometer */
-#define FIFFV_COIL_CTF_REF_GRAD                 5003  /**< CTF reference gradiometer */
-#define FIFFV_COIL_CTF_REF_GOFF                 5004  /**< CTF offdiagonal reference gradiometer */
-#define FIFFV_COIL_KIT_GRAD                     6001  /**< KIT MIT gradiometer */
-#define FIFFV_COIL_KIT_REF_GRAD                 6002  /**< KIT MIT reference magnetometer */
-#define FIFFV_COIL_BABY_GRAD                    7001  /**< BabySQUID gradiometers */
-#define FIFFV_COIL_BABY_MAG                     7002  /**< BabyMEG inner layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG                 7003  /**< BabyMEG outer layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG2                7004  /**< BabyMEG reference magnetometer */
-#define FIFFV_COIL_ARTEMIS123_GRAD              7501  /**< Artemis123 gradiometer */
-#define FIFFV_COIL_ARTEMIS123_REF_MAG           7502  /**< Artemis123 reference magnetometer */
-#define FIFFV_COIL_ARTEMIS123_REF_GRAD          7503  /**< Artemis123 reference gradiometer */
-#define FIFFV_COIL_SAMPLE_TMS_PLANAR            8001  /**< Sample TMS sensor */
-#define FIFFV_COIL_KRISS_GRAD                   9001  /**< KRISS gradiometer */
-#define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       10001  /**< Compumedics adult gradiometer */
-#define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   10002  /**< Compumedics pediatric gradiometer */
+#define FIFFV_COIL_NONE                         0       /**< The location info contains no data */
+#define FIFFV_COIL_EEG                          1       /**< EEG electrode position in r0 */
+#define FIFFV_COIL_NM_122                       2       /**< Neuromag 122 coils */
+#define FIFFV_COIL_NM_24                        3       /**< Old 24 channel system in HUT */
+#define FIFFV_COIL_NM_MCG_AXIAL                 4       /**< The axial devices in the HUCS MCG system */
+#define FIFFV_COIL_EEG_BIPOLAR                  5       /**< Bipolar EEG lead */
+#define FIFFV_COIL_DIPOLE                       200     /**< Time-varying dipole definition The coil info contains dipole location (r0) and direction (ex) */
+#define FIFFV_COIL_MCG_42                       1000    /**< For testing the MCG software */
+#define FIFFV_COIL_POINT_MAGNETOMETER           2000    /**< Simple point magnetometer */
+#define FIFFV_COIL_AXIAL_GRAD_5CM               2001    /**< Generic axial gradiometer */
+#define FIFFV_COIL_VV_PLANAR_W                  3011    /**< VV prototype wirewound planar sensor */
+#define FIFFV_COIL_VV_PLANAR_T1                 3012    /**< Vectorview SQ20483N planar gradiometer */
+#define FIFFV_COIL_VV_PLANAR_T2                 3013    /**< Vectorview SQ20483N-A planar gradiometer */
+#define FIFFV_COIL_VV_PLANAR_T3                 3014    /**< Vectorview SQ20950N planar gradiometer */
+#define FIFFV_COIL_VV_MAG_W                     3021    /**< VV prototype wirewound magnetometer */
+#define FIFFV_COIL_VV_MAG_T1                    3022    /**< Vectorview SQ20483N magnetometer */
+#define FIFFV_COIL_VV_MAG_T2                    3023    /**< Vectorview SQ20483-A magnetometer */
+#define FIFFV_COIL_VV_MAG_T3                    3024    /**< Vectorview SQ20950N magnetometer */
+#define FIFFV_COIL_MAGNES_MAG                   4001    /**< Magnes WH magnetometer */
+#define FIFFV_COIL_MAGNES_GRAD                  4002    /**< Magnes WH gradiometer  */
+#define FIFFV_COIL_CTF_GRAD                     5001    /**< CTF axial gradiometer */
+#define FIFFV_COIL_CTF_REF_MAG                  5002    /**< CTF reference magnetometer */
+#define FIFFV_COIL_CTF_REF_GRAD                 5003    /**< CTF reference gradiometer */
+#define FIFFV_COIL_CTF_REF_GOFF                 5004    /**< CTF offdiagonal reference gradiometer */
+#define FIFFV_COIL_KIT_GRAD                     6001    /**< KIT MIT gradiometer */
+#define FIFFV_COIL_KIT_REF_GRAD                 6002    /**< KIT MIT reference magnetometer */
+#define FIFFV_COIL_BABY_GRAD                    7001    /**< BabySQUID gradiometers */
+#define FIFFV_COIL_BABY_MAG                     7002    /**< BabyMEG inner layer magnetometers */
+#define FIFFV_COIL_BABY_REF_MAG                 7003    /**< BabyMEG outer layer magnetometers */
+#define FIFFV_COIL_BABY_REF_MAG2                7004    /**< BabyMEG reference magnetometer */
+#define FIFFV_COIL_ARTEMIS123_GRAD              7501    /**< Artemis123 gradiometer */
+#define FIFFV_COIL_ARTEMIS123_REF_MAG           7502    /**< Artemis123 reference magnetometer */
+#define FIFFV_COIL_ARTEMIS123_REF_GRAD          7503    /**< Artemis123 reference gradiometer */
+#define FIFFV_COIL_KRISS_GRAD                   9001    /**< KRISS gradiometer */
+#define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       10001   /**< Compumedics adult gradiometer */
+#define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   10002   /**< Compumedics pediatric gradiometer */
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 
