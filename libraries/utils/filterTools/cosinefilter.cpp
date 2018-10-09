@@ -81,7 +81,9 @@ CosineFilter::CosineFilter()
 
 CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type)
 {
-    fftw_make_planner_thread_safe();
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
 
     m_iFilterOrder = fftLength;
 

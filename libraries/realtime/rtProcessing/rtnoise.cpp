@@ -199,7 +199,9 @@ bool RtNoise::stop()
 
 void RtNoise::run()
 {
-    fftw_make_planner_thread_safe();
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
 
     bool FirstStart = true;
 
