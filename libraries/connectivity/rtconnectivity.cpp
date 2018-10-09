@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -42,9 +42,9 @@
 
 #include "rtconnectivity.h"
 
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/connectivity.h>
-#include <connectivity/network/network.h>
+#include "connectivitysettings.h"
+#include "connectivity.h"
+#include "network/network.h"
 
 
 //*************************************************************************************************************
@@ -67,7 +67,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REALTIMELIB;
 using namespace CONNECTIVITYLIB;
 
 
@@ -83,7 +82,7 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     }
 
     QElapsedTimer time;
-    int iTime = 0;
+    qint64 iTime = 0;
     time.start();
 
     Connectivity tConnectivity(connectivitySettings);

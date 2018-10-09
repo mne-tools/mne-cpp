@@ -64,7 +64,7 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <realtime/rtProcessing/rtconnectivity.h>
+#include <connectivity/rtconnectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -93,7 +93,6 @@ using namespace INVERSELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace CONNECTIVITYLIB;
-using namespace REALTIMELIB;
 using namespace Eigen;
 
 

@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -37,12 +37,13 @@
 #ifndef RTCONNECTIVITY_H
 #define RTCONNECTIVITY_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../realtime_global.h"
+#include "connectivity_global.h"
 
 
 //*************************************************************************************************************
@@ -69,25 +70,23 @@ namespace FIFFLIB{
     class FiffInfo;
 }
 
-namespace CONNECTIVITYLIB{
-    class ConnectivitySettings;
-    class Network;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE REALTIMELIB
+// DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace REALTIMELIB
+namespace CONNECTIVITYLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// REALTIMELIB FORWARD DECLARATIONS
+// CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class ConnectivitySettings;
+class Network;
 
 
 //=============================================================================================================
@@ -96,7 +95,7 @@ namespace REALTIMELIB
 *
 * @brief Real-time connectivity worker.
 */
-class RtConnectivityWorker : public QObject
+class CONNECTIVITYSHARED_EXPORT RtConnectivityWorker : public QObject
 {
     Q_OBJECT
 
@@ -107,10 +106,10 @@ public:
     *
     * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
     */
-    void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void doWork(const ConnectivitySettings& connectivitySettings);
 
 signals:
-    void resultReady(const CONNECTIVITYLIB::Network& connectivityResult);
+    void resultReady(const Network& connectivityResult);
 };
 
 //=============================================================================================================
@@ -119,7 +118,7 @@ signals:
 *
 * @brief Real-time connectivity estimation.
 */
-class REALTIMESHARED_EXPORT RtConnectivity : public QObject
+class CONNECTIVITYSHARED_EXPORT RtConnectivity : public QObject
 {
     Q_OBJECT
 
@@ -147,7 +146,7 @@ public:
     *
     * @param[in] data  Data to estimate the connectivity from
     */
-    void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void append(const ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -166,14 +165,14 @@ protected:
     /**
     * Handles the result
     */
-    void handleResults(const CONNECTIVITYLIB::Network& connectivityResult);
+    void handleResults(const Network& connectivityResult);
 
     QThread             m_workerThread;         /**< The worker thread. */
 
 signals:
-    void newConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult);
+    void newConnectivityResultAvailable(const Network& connectivityResult);
 
-    void operate(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void operate(const ConnectivitySettings& connectivitySettings);
 };
 
 //*************************************************************************************************************

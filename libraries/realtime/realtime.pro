@@ -52,7 +52,6 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
@@ -60,7 +59,6 @@ CONFIG(debug, debug|release) {
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fwd \
@@ -91,7 +89,6 @@ SOURCES += \
     rtProcessing/rtnoise.cpp \
     rtProcessing/rthpis.cpp \
     rtProcessing/rtfilter.cpp \
-    rtProcessing/rtconnectivity.cpp
 
 HEADERS +=  \
     realtime_global.h \
@@ -108,7 +105,6 @@ HEADERS +=  \
     rtProcessing/rtnoise.h \
     rtProcessing/rthpis.h \
     rtProcessing/rtfilter.h \
-    rtProcessing/rtconnectivity.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
