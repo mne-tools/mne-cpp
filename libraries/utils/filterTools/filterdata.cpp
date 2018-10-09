@@ -209,7 +209,9 @@ void FilterData::designFilter()
 
 void FilterData::fftTransformCoeffs()
 {
-    fftw_make_planner_thread_safe();
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
 
     //zero-pad m_dCoeffA to m_iFFTlength
     RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
@@ -270,7 +272,9 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
 
 RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
 {
-    fftw_make_planner_thread_safe();
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
 
     if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData) {
         qDebug()<<QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols());

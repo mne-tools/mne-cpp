@@ -105,7 +105,9 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
                                                       qint32 simplex_it = 1E3, qreal simplex_reflection = 1.0, qreal simplex_expansion = 0.2 ,
                                                       qreal simplex_contraction = 0.5, qreal simplex_full_contraction = 0.5, bool trial_separation = false)
 {
-    fftw_make_planner_thread_safe();
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
 
     //stop_running = false;
     std::cout << "\nAdaptive Matching Pursuit Algorithm started...\n";
