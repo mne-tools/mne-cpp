@@ -68,13 +68,13 @@ SUBDIRS += \
 
 # Specify library dependencies
 utils.depends =
+connectivity.depends = utils
 fs.depends = utils
 fiff.depends = utils
 mne.depends = utils fs fiff
 fwd.depends = utils fs fiff mne
-inverse.depends = utils fs fiff mne fwd
-realtime.depends = utils connectivity fiff mne fwd inverse
 deep.depends = utils fs fiff mne
-connectivity.depends = utils
+inverse.depends = utils fs fiff mne fwd
 disp.depends = utils fs fiff mne fwd inverse
+realtime.depends = utils connectivity fiff mne fwd inverse
 disp3D.depends = utils fs fiff mne fwd inverse realtime disp

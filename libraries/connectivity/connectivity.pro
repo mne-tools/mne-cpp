@@ -125,8 +125,8 @@ win32 {
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {
     DEFINES += EIGEN_FFTW_DEFAULT
-    INCLUDEPATH += $$shell_path($${FFTW_DIR})
-    LIBS += -L$$shell_path($${FFTW_DIR})
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
 
     win32 {
         # On Windows
@@ -134,11 +134,10 @@ contains(MNECPP_CONFIG, useFFTW) {
                 -llibfftw3f-3 \
                 -llibfftw3l-3 \
     }
+
     unix:!macx {
         # On Linux
         LIBS += -lfftw3 \
                 -lfftw3_threads \
     }
 }
-
-
