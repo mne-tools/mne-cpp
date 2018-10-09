@@ -132,6 +132,8 @@ VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 tran
 
 MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
 {
+    fftw_make_planner_thread_safe();
+
     Eigen::FFT<double> fft;
     MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows()/2, inputData.vecInputData.rows());
     VectorXd envelope, windowed_sig, real_coeffs;
