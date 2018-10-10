@@ -79,4 +79,4 @@ deep.depends = utils fs fiff mne
 rtprocessing.depends = utils connectivity fiff mne fwd inverse
 connectivity.depends = utils
 disp.depends = utils fs fiff mne fwd inverse
-disp3D.depends = utils rtprocessing fs fiff mne fwd inverse disp
+disp3D.depends = utils connectivity rtprocessing fs fiff mne fwd inverse disp
