@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <connectivity/rtconnectivity.h>
+#include <rtprocessing/rtconnectivity.h>
 
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
@@ -69,6 +69,7 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************

@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity_global.h"
+#include "rtprocessing_global.h"
 
 
 //*************************************************************************************************************
@@ -66,17 +66,22 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
+namespace FIFFLIB {
     class FiffInfo;
+}
+
+namespace CONNECTIVITYLIB {
+    class ConnectivitySettings;
+    class Network;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace RTPROCESSINGLIB
 {
 
 
@@ -85,9 +90,6 @@ namespace CONNECTIVITYLIB
 // CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ConnectivitySettings;
-class Network;
-
 
 //=============================================================================================================
 /**
@@ -95,7 +97,7 @@ class Network;
 *
 * @brief Real-time connectivity worker.
 */
-class CONNECTIVITYSHARED_EXPORT RtConnectivityWorker : public QObject
+class RTPROCESINGSHARED_EXPORT RtConnectivityWorker : public QObject
 {
     Q_OBJECT
 
@@ -106,10 +108,10 @@ public:
     *
     * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
     */
-    void doWork(const ConnectivitySettings& connectivitySettings);
+    void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
 signals:
-    void resultReady(const Network& connectivityResult);
+    void resultReady(const CONNECTIVITYLIB::Network& connectivityResult);
 };
 
 //=============================================================================================================
@@ -118,7 +120,7 @@ signals:
 *
 * @brief Real-time connectivity estimation.
 */
-class CONNECTIVITYSHARED_EXPORT RtConnectivity : public QObject
+class RTPROCESINGSHARED_EXPORT RtConnectivity : public QObject
 {
     Q_OBJECT
 
@@ -146,7 +148,7 @@ public:
     *
     * @param[in] data  Data to estimate the connectivity from
     */
-    void append(const ConnectivitySettings& connectivitySettings);
+    void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -165,14 +167,14 @@ protected:
     /**
     * Handles the result
     */
-    void handleResults(const Network& connectivityResult);
+    void handleResults(const CONNECTIVITYLIB::Network& connectivityResult);
 
     QThread             m_workerThread;         /**< The worker thread. */
 
 signals:
-    void newConnectivityResultAvailable(const Network& connectivityResult);
+    void newConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult);
 
-    void operate(const ConnectivitySettings& connectivitySettings);
+    void operate(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //*************************************************************************************************************

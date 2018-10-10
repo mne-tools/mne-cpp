@@ -84,7 +84,6 @@ SOURCES += \
     network/networkedge.cpp \
     connectivitysettings.cpp \
     connectivity.cpp \
-    rtconnectivity.cpp
 
 HEADERS += \
     connectivity_global.h \
@@ -104,7 +103,6 @@ HEADERS += \
     network/networkedge.h \
     connectivitysettings.h \
     connectivity.h \
-    rtconnectivity.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
