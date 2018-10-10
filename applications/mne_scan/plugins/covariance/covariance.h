@@ -71,7 +71,7 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace REALTIMELIB {
+namespace RTPROCESSINGLIB {
     class RtCov;
 }
 
@@ -176,7 +176,7 @@ private:
     QAction*                    m_pActionShowAdjustment;
 
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;        /**< Fiff measurement info.*/
-    QSharedPointer<REALTIMELIB::RtCov>              m_pRtCov;           /**< Real-time covariance. */
+    QSharedPointer<RTPROCESSINGLIB::RtCov>        m_pRtCov;           /**< Real-time covariance. */
 
     QSharedPointer<CovarianceSettingsWidget>        m_pCovarianceWidget;
 

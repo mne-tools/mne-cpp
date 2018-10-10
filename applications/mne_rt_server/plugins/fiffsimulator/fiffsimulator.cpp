@@ -44,7 +44,7 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_types.h>
 
-#include <realtime/rtCommand/command.h>
+#include <communication/rtCommand/command.h>
 
 
 //*************************************************************************************************************

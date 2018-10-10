@@ -51,7 +51,6 @@
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Interfaces/IPlugin.h>
 
-
 #include <Eigen/Core>
 
 
