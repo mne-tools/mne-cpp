@@ -46,7 +46,7 @@
 #include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
-#include <realtime/rtProcessing/rtcov.h>
+#include <rtprocessing/rtcov.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
@@ -78,7 +78,7 @@ using namespace COVARIANCEPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
-using namespace REALTIMELIB;
+using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 
 

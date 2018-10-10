@@ -44,7 +44,7 @@
 #include "../fiffsimulator.h"
 
 #include <fiff/fiff_info.h>
-#include <realtime/rtClient/rtcmdclient.h>
+#include <communication/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************

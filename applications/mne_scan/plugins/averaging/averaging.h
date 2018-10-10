@@ -72,7 +72,7 @@ namespace SCMEASLIB{
     class RealTimeEvokedSet;
 }
 
-namespace REALTIMELIB{
+namespace RTPROCESSINGLIB{
     class RtAve;
 }
 
@@ -276,7 +276,7 @@ private:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
     QList<qint32>                                   m_qListStimChs;                     /**< Stimulus channels.*/
 
-    QSharedPointer<REALTIMELIB::RtAve>              m_pRtAve;                           /**< Real-time average. */
+    QSharedPointer<RTPROCESSINGLIB::RtAve>          m_pRtAve;                           /**< Real-time average. */
 
     bool                                            m_bIsRunning;                       /**< If this thread is running. */
     bool                                            m_bProcessData;                     /**< If data should be received for processing. */

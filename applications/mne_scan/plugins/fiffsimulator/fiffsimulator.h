@@ -46,7 +46,7 @@
 
 #include <scShared/Interfaces/ISensor.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <realtime/rtClient/rtcmdclient.h>
+#include <communication/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -232,7 +232,7 @@ protected:
     QSharedPointer<FiffSimulatorProducer>       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
     QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
-    QSharedPointer<REALTIMELIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
+    QSharedPointer<COMMUNICATIONLIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
     QSharedPointer<DISP3DLIB::HpiView>          m_pHPIWidget;               /**< HPI widget. */
 
     QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */

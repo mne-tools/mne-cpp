@@ -45,7 +45,7 @@ SUBDIRS += \
     mne \
     fwd \
     inverse \
-    realtime \
+    communication \
 
 # Libraries which are not supported in the minimalVersion
 !contains(MNECPP_CONFIG, minimalVersion) {
@@ -55,6 +55,7 @@ SUBDIRS += \
     }
 
     SUBDIRS += \
+        rtprocessing \
         connectivity \
         disp \
 
@@ -68,13 +69,14 @@ SUBDIRS += \
 
 # Specify library dependencies
 utils.depends =
-connectivity.depends = utils
 fs.depends = utils
 fiff.depends = utils
 mne.depends = utils fs fiff
 fwd.depends = utils fs fiff mne
-deep.depends = utils fs fiff mne
 inverse.depends = utils fs fiff mne fwd
+communication.depends = utils fiff
+deep.depends = utils fs fiff mne
+rtprocessing.depends = utils connectivity fiff mne fwd inverse
+connectivity.depends = utils
 disp.depends = utils fs fiff mne fwd inverse
-realtime.depends = utils fiff mne fwd inverse
-disp3D.depends = utils connectivity fs fiff mne fwd inverse realtime disp
+disp3D.depends = utils rtprocessing fs fiff mne fwd inverse disp
