@@ -42,7 +42,7 @@
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
 #include <connectivity/connectivity.h>
-#include <connectivity/rtconnectivity.h>
+#include <rtprocessing/rtconnectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -81,6 +81,7 @@ using namespace MNELIB;
 using namespace CONNECTIVITYLIB;
 using namespace DISPLIB;
 using namespace IOBUFFER;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************

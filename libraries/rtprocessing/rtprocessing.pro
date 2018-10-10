@@ -82,6 +82,7 @@ SOURCES += \
     rtnoise.cpp \
     rthpis.cpp \
     rtfilter.cpp \
+    rtconnectivity.cpp
 
 HEADERS +=  \
     rtprocessing_global.h \
@@ -91,6 +92,7 @@ HEADERS +=  \
     rtnoise.h \
     rthpis.h \
     rtfilter.h \
+    rtconnectivity.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

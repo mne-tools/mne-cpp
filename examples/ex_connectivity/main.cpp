@@ -64,7 +64,6 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <connectivity/rtconnectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 

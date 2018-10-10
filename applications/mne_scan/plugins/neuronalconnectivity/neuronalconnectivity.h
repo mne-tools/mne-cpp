@@ -83,7 +83,7 @@ namespace DISPLIB {
     class ConnectivitySettingsView;
 }
 
-namespace CONNECTIVITYLIB {
+namespace RTPROCESSINGLIB {
     class RtConnectivity;
 }
 
@@ -255,7 +255,7 @@ private:
     CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
     QSharedPointer<IOBUFFER::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularNetworkBuffer;       /**< The circular buffer holding the connectivity estimates.*/
-    QSharedPointer<CONNECTIVITYLIB::RtConnectivity>                                 m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
+    QSharedPointer<RTPROCESSINGLIB::RtConnectivity>                                 m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
     QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/

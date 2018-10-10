@@ -42,9 +42,9 @@
 
 #include "rtconnectivity.h"
 
-#include "connectivitysettings.h"
-#include "connectivity.h"
-#include "network/network.h"
+#include <connectivity/connectivitysettings.h>
+#include <connectivity/connectivity.h>
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
@@ -67,6 +67,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace RTPROCESSINGLIB;
 using namespace CONNECTIVITYLIB;
 
 
