@@ -53,7 +53,7 @@
 #include <utils/detecttrigger.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dig_point_set.h>
-#include <realtime/rtClient/rtcmdclient.h>
+#include <communication/rtClient/rtcmdclient.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <disp3D/viewers/hpiview.h>
 

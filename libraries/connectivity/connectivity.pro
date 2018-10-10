@@ -83,7 +83,7 @@ SOURCES += \
     network/networknode.cpp \
     network/networkedge.cpp \
     connectivitysettings.cpp \
-    connectivity.cpp
+    connectivity.cpp \
 
 HEADERS += \
     connectivity_global.h \
@@ -102,7 +102,7 @@ HEADERS += \
     network/networknode.h \
     network/networkedge.h \
     connectivitysettings.h \
-    connectivity.h
+    connectivity.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
