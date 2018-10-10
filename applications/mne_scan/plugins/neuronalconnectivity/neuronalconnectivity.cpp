@@ -42,6 +42,7 @@
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
 #include <connectivity/connectivity.h>
+#include <rtprocessing/rtconnectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -54,8 +55,6 @@
 #include <mne/mne_bem.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
-
-#include <realtime/rtProcessing/rtconnectivity.h>
 
 
 //*************************************************************************************************************
@@ -81,8 +80,8 @@ using namespace SCMEASLIB;
 using namespace MNELIB;
 using namespace CONNECTIVITYLIB;
 using namespace DISPLIB;
-using namespace REALTIMELIB;
 using namespace IOBUFFER;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************

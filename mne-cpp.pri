@@ -129,7 +129,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## To build basic MNE Scan version run: qmake MNECPP_CONFIG+=buildBasicMneScanVersion
 ## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
-## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIR below): qmake MNECPP_CONFIG+=useFFTW
+## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
 
 # Default flags
 MNECPP_CONFIG +=

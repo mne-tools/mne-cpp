@@ -45,7 +45,7 @@
 
 #include <fiff/fiff_coord_trans.h>
 
-#include <realtime/rtProcessing/rthpis.h>
+#include <rtprocessing/rthpis.h>
 
 
 //*************************************************************************************************************
@@ -179,7 +179,7 @@ protected:
     *
     * @param[in] fitResult  The fit result coming from the rt HPI class.
     */
-    void onNewFittingResultAvailable(REALTIMELIB::FittingResult fitResult);
+    void onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);
 
     //=========================================================================================================
     /**
@@ -271,7 +271,7 @@ protected:
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The FiffInfo. */
-    QSharedPointer<REALTIMELIB::RtHPIS>         m_pRtHPI;               /**< The real-time HPI object. */
+    QSharedPointer<RTPROCESSINGLIB::RtHPIS>         m_pRtHPI;               /**< The real-time HPI object. */
 
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadKid;          /**< The BEM head model for a kid. */
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAdult;        /**< The BEM head model for an adult. */
