@@ -105,6 +105,10 @@ RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo,
 , m_pFiffInfo(p_pFiffInfo)
 , m_pFwd(p_pFwd)
 {
+    if(this->thread()->isInterruptionRequested()) {
+        return;
+    }
+
     RtInvOpWorker *worker = new RtInvOpWorker;
     worker->moveToThread(&m_workerThread);
 
@@ -127,8 +131,7 @@ RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo,
 
 RtInvOp::~RtInvOp()
 {
-    m_workerThread.quit();
-    m_workerThread.wait();
+    stop();
 }
 
 
@@ -150,4 +153,36 @@ void RtInvOp::append(const FIFFLIB::FiffCov &noiseCov)
 void RtInvOp::handleResults(const MNELIB::MNEInverseOperator& invOp)
 {
     emit invOperatorCalculated(invOp);
+}
+
+
+//*************************************************************************************************************
+
+void RtInvOp::restart()
+{
+    stop();
+
+    RtInvOpWorker *worker = new RtInvOpWorker;
+    worker->moveToThread(&m_workerThread);
+
+    connect(&m_workerThread, &QThread::finished,
+            worker, &QObject::deleteLater);
+
+    connect(this, &RtInvOp::operate,
+            worker, &RtInvOpWorker::doWork);
+
+    connect(worker, &RtInvOpWorker::resultReady,
+            this, &RtInvOp::handleResults);
+
+    m_workerThread.start();
+}
+
+
+//*************************************************************************************************************
+
+void RtInvOp::stop()
+{
+    m_workerThread.requestInterruption();
+    m_workerThread.quit();
+    m_workerThread.wait();
 }

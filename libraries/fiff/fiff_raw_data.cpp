@@ -120,7 +120,12 @@ void FiffRawData::clear()
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel, bool do_debug)
+bool FiffRawData::read_raw_segment(MatrixXd& data,
+                                   MatrixXd& times,
+                                   fiff_int_t from,
+                                   fiff_int_t to,
+                                   const RowVectorXi& sel,
+                                   bool do_debug) const
 {
     bool projAvailable = true;
 
@@ -446,7 +451,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel, bool do_debug)
+bool FiffRawData::read_raw_segment(MatrixXd& data,
+                                   MatrixXd& times,
+                                   SparseMatrix<double>& multSegment,
+                                   fiff_int_t from,
+                                   fiff_int_t to,
+                                   const RowVectorXi& sel,
+                                   bool do_debug) const
 {
     bool projAvailable = true;
 
@@ -776,7 +787,11 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const RowVectorXi& sel)
+bool FiffRawData::read_raw_segment_times(MatrixXd& data,
+                                         MatrixXd& times,
+                                         float from,
+                                         float to,
+                                         const RowVectorXi& sel) const
 {
     //
     //   Convert to samples

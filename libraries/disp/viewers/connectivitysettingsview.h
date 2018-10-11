@@ -111,7 +111,7 @@ public:
     * @param [in] parent        parent of widget.
     */
     ConnectivitySettingsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+                             Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -126,6 +126,14 @@ public:
     * @param [in] lTriggerTypes        The new trigger types.
     */
     void setTriggerTypes(const QStringList& lTriggerTypes);
+
+    //=========================================================================================================
+    /**
+    * Sets the new number of trials.
+    *
+    * @param [in] iNumberTrials        The new number of trials.
+    */
+    void setNumberTrials(int iNumberTrials);
 
 protected:
     //=========================================================================================================
@@ -147,10 +155,8 @@ protected:
     //=========================================================================================================
     /**
     * Slot called when the number of trials changed.
-    *
-    * @param [in] iNumberTrials        The new number of trials.
     */
-    void onNumberTrialsChanged(int iNumberTrials);
+    void onNumberTrialsChanged();
 
     //=========================================================================================================
     /**
@@ -159,6 +165,12 @@ protected:
     * @param [in] sTriggerType        The new trigger type.
     */
     void onTriggerTypeChanged(const QString& sTriggerType);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the frequency band changed.
+    */
+    void onFrequencyBandChanged(int value);
 
     Ui::ConnectivitySettingsViewWidget* ui;
 
@@ -194,6 +206,15 @@ signals:
     * @param [in] sTriggerType        The new trigger type.
     */
     void triggerTypeChanged(const QString& sTriggerType);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the frequency band changed.
+    *
+    * @param [in] iFreqLow        The new lower frequency band.
+    * @param [in] iFreqHigh       The new higher frequency band.
+    */
+    void freqBandChanged(int iFreqLow, int iFreqHigh);
 
 };
 

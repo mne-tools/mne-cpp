@@ -104,7 +104,7 @@ MNE::MNE()
 , m_iDownSample(1)
 , m_sAvrType("4")
 , m_pMinimumNormSettingsView(MinimumNormSettingsView::SPtr::create())
-, m_sMethod("MNE")
+, m_sMethod("dSPM")
 {
 
 }

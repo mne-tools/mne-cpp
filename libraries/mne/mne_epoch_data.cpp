@@ -58,6 +58,7 @@ MNEEpochData::MNEEpochData()
 : event(-1)
 , tmin(-1)
 , tmax(-1)
+, bReject(false)
 {
 
 }
@@ -70,6 +71,7 @@ MNEEpochData::MNEEpochData(const MNEEpochData &p_MNEEpochData)
 , event(p_MNEEpochData.event)
 , tmin(p_MNEEpochData.tmin)
 , tmax(p_MNEEpochData.tmax)
+, bReject(p_MNEEpochData.bReject)
 {
 
 }
