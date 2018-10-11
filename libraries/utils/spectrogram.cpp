@@ -38,7 +38,6 @@
 //=============================================================================================================
 
 #include "spectrogram.h"
-#include "math.h"
 
 
 //*************************************************************************************************************
@@ -52,10 +51,22 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+#include <QElapsedTimer>
+#include <QThread>
+#include <QtConcurrent>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -63,7 +74,47 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-VectorXd Spectrogram::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
+MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
+{
+    //QElapsedTimer timer;
+    //timer.start();
+
+    signal.array() -= signal.mean();
+    QList<SpectogramInputData> lData;
+    int iThreadSize = QThread::idealThreadCount()*2;
+    int iStepsSize = signal.rows()/iThreadSize;
+    int iResidual = signal.rows()%iThreadSize;
+
+    SpectogramInputData dataTemp;
+    dataTemp.vecInputData = signal;
+    dataTemp.window_size = windowSize;
+    if(dataTemp.window_size == 0) {
+        dataTemp.window_size = signal.rows()/15;
+    }
+
+    for (int i = 0; i < iThreadSize; ++i) {
+        dataTemp.iRangeLow = i*iStepsSize;
+        dataTemp.iRangeHigh = i*iStepsSize+iStepsSize;
+        lData.append(dataTemp);
+    }
+
+    dataTemp.iRangeLow = iThreadSize*iStepsSize;
+    dataTemp.iRangeHigh = iThreadSize*iStepsSize+iResidual;
+    lData.append(dataTemp);
+
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(lData,
+                                                              compute,
+                                                              reduce);
+    resultMat.waitForFinished();
+
+    //qDebug() << "Spectrogram::make_spectrogram - timer.elapsed()" << timer.elapsed();
+    return resultMat.result();
+}
+
+
+//*************************************************************************************************************
+
+VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 translation)
 {
     VectorXd gauss = VectorXd::Zero(sample_count);
 
@@ -79,35 +130,41 @@ VectorXd Spectrogram::gauss_window (qint32 sample_count, qreal scale, quint32 tr
 
 //*************************************************************************************************************
 
-MatrixXd Spectrogram::make_spectrogram(VectorXd signal, qint32 window_size = 0)
+MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
 {
-    if(window_size == 0)
-        window_size = signal.rows()/4;
-
     Eigen::FFT<double> fft;
-    MatrixXd tf_matrix = MatrixXd::Zero(signal.rows()/2, signal.rows());
+    MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows()/2, inputData.vecInputData.rows());
+    VectorXd envelope, windowed_sig, real_coeffs;
+    VectorXcd fft_win_sig;
+    qint32 window_size = inputData.window_size;
 
-    for(qint32 translate = 0; translate < signal.rows(); translate++)
-    {
-        VectorXd envelope = gauss_window(signal.rows(), window_size, translate);
+    for(quint32 translate = inputData.iRangeLow; translate < inputData.iRangeHigh; translate++) {
+        envelope = gaussWindow(inputData.vecInputData.rows(), window_size, translate);
 
-        VectorXd windowed_sig = VectorXd::Zero(signal.rows());
-        VectorXcd fft_win_sig = VectorXcd::Zero(signal.rows());
+        windowed_sig = VectorXd::Zero(inputData.vecInputData.rows());
+        fft_win_sig = VectorXcd::Zero(inputData.vecInputData.rows());
 
-        VectorXd real_coeffs = VectorXd::Zero(signal.rows()/2);
-
-        for(qint32 sample = 0; sample < signal.rows(); sample++)
-            windowed_sig[sample] = signal[sample] * envelope[sample];
+        windowed_sig = inputData.vecInputData.array() * envelope.array();\
 
         fft.fwd(fft_win_sig, windowed_sig);
 
-        for(qint32 i= 0; i<signal.rows()/2; i++)
-        {
-            qreal value = pow(std::abs(fft_win_sig[i]), 2.0);
-            real_coeffs[i] = value;
-        }
+        real_coeffs = fft_win_sig.segment(0,inputData.vecInputData.rows()/2).array().abs2();
 
         tf_matrix.col(translate) = real_coeffs;
     }
+
     return tf_matrix;
+}
+
+
+//*************************************************************************************************************
+
+void Spectrogram::reduce(MatrixXd &resultData,
+                         const MatrixXd &data)
+{
+    if(resultData.size() == 0) {
+        resultData = data;
+    } else {
+        resultData += data;
+    }
 }
