@@ -88,6 +88,7 @@ struct AbstractMetricResultData {
     int iNFreqs;
     Eigen::MatrixXd matPsdAvg;
     QVector<Eigen::MatrixXcd> vecCsdAvg;
+    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdAvg;
 };
 
 struct AbstractMetricFinalData {
