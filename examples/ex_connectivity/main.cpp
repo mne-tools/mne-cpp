@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.5");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.57");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -297,11 +297,13 @@ int main(int argc, char *argv[])
     // Transform to a more generic data matrix list and remove EOG channel
     MatrixXd matData;
 
-    int iNumberEpochs = 25; //data.size()
-    for(int i = 0; i < iNumberEpochs; ++i) {
-        matData.resize(chIdx.size(), data.at(i)->epoch.cols());
+    int iNumberEpochs = data.size(); //data.size() 25
+    int iNumberRows = chIdx.size(); //chIdx.size() 32
 
-        for(qint32 j = 0; j < chIdx.size(); ++j) {
+    for(int i = 0; i < iNumberEpochs; ++i) {
+        matData.resize(iNumberRows, data.at(i)->epoch.cols());
+
+        for(qint32 j = 0; j < iNumberRows; ++j) {
             matData.row(j) = data.at(i)->epoch.row(j);
         }
 

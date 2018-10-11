@@ -117,7 +117,7 @@ public:
     *
     * @return                   The connectivity information in form of a QVector of matrices.
     */
-    static void computeCoherency(QVector<Eigen::MatrixXcd>& vecCoherency,
+    static void computeCoherency(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
                                  const QList<Eigen::MatrixXd> &matDataList,
                                  int iNfft = -1,
                                  const QString &sWindowType="hanning");
@@ -146,6 +146,9 @@ private:
     */
     static void reduce(AbstractMetricResultData &finalData,
                        const AbstractMetricResultData& resultData);
+
+    static void computePSDCSD(QPair<int,Eigen::MatrixXcd>& pairInput,
+                              const Eigen::MatrixXd& matPsdAvg);
 
 };
 
