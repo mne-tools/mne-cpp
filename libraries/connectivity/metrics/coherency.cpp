@@ -213,7 +213,7 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 //    timer.restart();
 
     // Compute tapered spectra and PSD
-    // This code was copied and changed from Utils/Spectra since we do not want to call the function due to time loss.
+    // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
     bool bNfftEven = false;
     if (iNfft % 2 == 0){
         bNfftEven = true;
@@ -260,7 +260,7 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 //    timer.restart();
 
     // Compute CSD
-    // This code was copied and changed from Utils/Spectra since we do not want to call the function due to time loss.
+    // This code was copied and modified from Utils/Spectra since we do not want to call the function due to time loss.
     double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
     MatrixXcd matCsd(iNRows, iNFreqs);
