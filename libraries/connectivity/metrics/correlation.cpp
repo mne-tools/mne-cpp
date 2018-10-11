@@ -114,30 +114,22 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    //Calculate connectivity matrix over epochs and average afterwards
-    QList<AbstractMetricInputData> lData;
+    // Calculate connectivity matrix over epochs and average afterwards
     //double dScalingStep = 1.0/matDataList.size();
+    //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
 
-    for (int i = 0; i < matDataList.size(); ++i) {
-        AbstractMetricInputData dataTemp;
-        //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
-        dataTemp.matInputData = matDataList.at(i);
-
-        lData.append(dataTemp);
-    }
-
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(lData,
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList,
                                                               compute,
                                                               reduce);
     resultMat.waitForFinished();
 
     MatrixXd matDist = resultMat.result();
     matDist /= matDataList.size();
+    MatrixXd matWeight(1,1);
 
     //Add edges to network
     for(int i = 0; i < matDist.rows(); ++i) {
         for(int j = i; j < matDist.cols(); ++j) {
-            MatrixXd matWeight(1,1);
             matWeight << matDist(i,j);
 
             QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -155,14 +147,17 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
 
 //*************************************************************************************************************
 
-MatrixXd Correlation::compute(const AbstractMetricInputData& inputData)
+MatrixXd Correlation::compute(const MatrixXd& inputData)
 {
-    MatrixXd matDist(inputData.matInputData.rows(), inputData.matInputData.rows());
-    matDist.setZero();
+    MatrixXd matDist = MatrixXd::Zero(inputData.rows(), inputData.rows());
+    RowVectorXd vecRow;
+    int j;
 
-    for(int i = 0; i < inputData.matInputData.rows(); ++i) {
-        for(int j = i; j < inputData.matInputData.rows(); ++j) {
-            matDist(i,j) += calcCorrelationCoeff(inputData.matInputData.row(i), inputData.matInputData.row(j));
+    for(int i = 0; i < inputData.rows(); ++i) {
+        vecRow = inputData.row(i);
+
+        for(j = i; j < inputData.rows(); ++j) {
+            matDist(i,j) += vecRow.dot(inputData.row(j))/vecRow.cols();
         }
     }
 
@@ -181,17 +176,4 @@ void Correlation::reduce(MatrixXd &resultData,
     }
 
     resultData += data;
-}
-
-
-//*************************************************************************************************************
-
-double Correlation::calcCorrelationCoeff(const RowVectorXd &vecFirst,
-                                         const RowVectorXd &vecSecond)
-{
-    if(vecFirst.cols() != vecSecond.cols()) {
-        qDebug() << "Correlation::calcCorrelationCoeff - Vectors length do not match!";
-    }
-
-    return (vecFirst.dot(vecSecond))/vecFirst.cols();
 }
