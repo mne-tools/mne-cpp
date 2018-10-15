@@ -130,7 +130,11 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList,
 //    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecPLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> vecPLI;
+    PhaseLagIndex::computePLI(vecPLI,
+                              matDataList,
+                              iNfft,
+                              sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "PhaseLagIndex::phaseLagIndex timer - Actual computation:" << iTime;
@@ -163,16 +167,17 @@ Network PhaseLagIndex::phaseLagIndex(const QList<MatrixXd> &matDataList,
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList,
-                                            int iNfft,
-                                            const QString &sWindowType)
+void PhaseLagIndex::computePLI(QVector<MatrixXd>& vecPLI,
+                               const QList<MatrixXd> &matDataList,
+                               int iNfft,
+                               const QString &sWindowType)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
 
     if(matDataList.isEmpty()) {
-        return QVector<MatrixXd>();
+        return;
     }
 
     // Check that iNfft >= signal length
@@ -210,12 +215,9 @@ QVector<MatrixXd> PhaseLagIndex::computePLI(const QList<MatrixXd> &matDataList,
 
     QVector<MatrixXcd> finalResult = result.result();
 
-    QVector<MatrixXd> vecPLI;
     for (int i = 0; i < iNRows; ++i) {
         vecPLI.append(finalResult.at(i).cwiseAbs() / matDataList.length());
     }
-
-    return vecPLI;
 }
 
 

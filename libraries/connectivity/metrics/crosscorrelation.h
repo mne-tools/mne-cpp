@@ -113,7 +113,8 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network crossCorrelation(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
+    static Network crossCorrelation(const QList<Eigen::MatrixXd> &matDataList,
+                                    const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
