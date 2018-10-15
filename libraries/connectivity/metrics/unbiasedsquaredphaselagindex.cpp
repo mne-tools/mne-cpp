@@ -146,7 +146,7 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<M
 
 //*************************************************************************************************************
 
-void UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(QVector<MatrixXd> vecUnbiasedSquaredPLI,
+void UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(QVector<MatrixXd>& vecUnbiasedSquaredPLI,
                                                              const QList<MatrixXd> &matDataList,
                                                              int iNfft,
                                                              const QString &sWindowType)

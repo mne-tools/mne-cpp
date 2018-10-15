@@ -133,9 +133,10 @@ public:
     *
     * @return                   The PLI value.
     */
-    static void computeUnbiasedSquaredPLI(QVector<Eigen::MatrixXd> vecUnbiasedSquaredPLI,
-                                                              const QList<Eigen::MatrixXd> &matDataList,
-                                                              int iNfft, const QString &sWindowType);
+    static void computeUnbiasedSquaredPLI(QVector<Eigen::MatrixXd>& vecUnbiasedSquaredPLI,
+                                          const QList<Eigen::MatrixXd> &matDataList,
+                                          int iNfft,
+                                          const QString &sWindowType);
 };
 
 
