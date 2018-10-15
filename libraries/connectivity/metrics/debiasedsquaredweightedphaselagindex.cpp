@@ -100,9 +100,9 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
                                                                                    int iNfft,
                                                                                    const QString &sWindowType)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     Network finalNetwork("Debiased Squared Weighted Phase Lag Index");
 
@@ -125,26 +125,26 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    iTime = timer.elapsed();
-    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Preparation:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Preparation:" << iTime;
+//    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecDebiasedSquaredWPLI = DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(matDataList,
                                                                                                                 iNfft,
                                                                                                                 sWindowType);
 
-    iTime = timer.elapsed();
-    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Actual computation:" << iTime;
-    timer.restart();
-
+//    iTime = timer.elapsed();
+//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Actual computation:" << iTime;
+//    timer.restart();
 
     //Add edges to network
     MatrixXd matWeight;
     QSharedPointer<NetworkEdge> pEdge;
+    int j;
 
     for(int i = 0; i < vecDebiasedSquaredWPLI.length(); ++i) {
-        for(int j = i; j < matDataList.at(0).rows(); ++j) {
+        for(j = i; j < matDataList.at(0).rows(); ++j) {
             matWeight = vecDebiasedSquaredWPLI.at(i).row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -155,9 +155,9 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
         }
     }
 
-    iTime = timer.elapsed();
+/*    iTime = timer.elapsed();
     qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Network creation:" << iTime;
-    timer.restart();
+    timer.restart()*/;
 
     return finalNetwork;
 }

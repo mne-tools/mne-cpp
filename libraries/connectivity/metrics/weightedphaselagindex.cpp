@@ -125,11 +125,15 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
     QVector<MatrixXd> vecWPLI = WeightedPhaseLagIndex::computeWPLI(matDataList, iNfft, sWindowType);
 
     //Add edges to network
-    for(int i = 0; i < vecWPLI.length(); ++i) {
-        for(int j = i; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecWPLI.at(i).row(j).transpose();
+    QSharedPointer<NetworkEdge> pEdge;
+    MatrixXd matWeight;
+    int j;
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
+    for(int i = 0; i < vecWPLI.length(); ++i) {
+        for(j = i; j < matDataList.at(0).rows(); ++j) {
+            matWeight = vecWPLI.at(i).row(j).transpose();
+
+            pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.getNodeAt(j)->append(pEdge);

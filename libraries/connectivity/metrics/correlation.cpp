@@ -125,14 +125,17 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
 
     MatrixXd matDist = resultMat.result();
     matDist /= matDataList.size();
-    MatrixXd matWeight(1,1);
 
     //Add edges to network
+    MatrixXd matWeight(1,1);
+    QSharedPointer<NetworkEdge> pEdge;
+    int j;
+
     for(int i = 0; i < matDist.rows(); ++i) {
-        for(int j = i; j < matDist.cols(); ++j) {
+        for(j = i; j < matDist.cols(); ++j) {
             matWeight << matDist(i,j);
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
+            pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.getNodeAt(j)->append(pEdge);
