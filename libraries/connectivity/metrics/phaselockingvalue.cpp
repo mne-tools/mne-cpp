@@ -100,9 +100,9 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
                                              int iNfft,
                                              const QString &sWindowType)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     Network finalNetwork("Phase Locking Value");
 
@@ -125,18 +125,18 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherency timer - Preparation:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::phaseLockingValue timer - Preparation:" << iTime;
+//    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecPLV = PhaseLockingValue::computePLV(matDataList,
                                                              iNfft,
                                                              sWindowType);
 
-    iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherency timer - Actual computation:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::phaseLockingValue timer - Actual computation:" << iTime;
+//    timer.restart();
 
     //Add edges to network
     for(int i = 0; i < vecPLV.length(); ++i) {
@@ -151,9 +151,9 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
         }
     }
 
-    iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherency timer - Network creation:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::phaseLockingValue timer - Network creation:" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
