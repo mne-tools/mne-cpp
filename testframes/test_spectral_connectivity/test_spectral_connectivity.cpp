@@ -142,9 +142,10 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<QPair<int,Eigen::MatrixXcd> > Coh;
-    Coherency::computeCoherency(Coh, matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = Coh.at(0).second.row(1).cwiseAbs();
+    QVector<MatrixXd> vecCoh = Coherence::computeCoherence(matDataList,
+                                                           iNfft,
+                                                           sWindowType);
+    m_ConnectivityOutput = vecCoh.at(0).row(1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -178,9 +179,10 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<QPair<int,Eigen::MatrixXcd> > ImagCoh;
-    Coherency::computeCoherency(ImagCoh, matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = ImagCoh.at(0).second.row(1).imag();
+    QVector<MatrixXd> vecImagCoh = ImagCoherence::computeImagCoherence(matDataList,
+                                                                       iNfft,
+                                                                       sWindowType);
+    m_ConnectivityOutput = vecImagCoh.at(0).row(1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
