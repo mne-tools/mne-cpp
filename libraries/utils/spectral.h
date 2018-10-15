@@ -120,12 +120,6 @@ public:
     *
     * @return tapered spectra of the input data
     */
-    static void computeTaperedSpectraMatrix(QVector<Eigen::MatrixXcd> &finalResult,
-                                            const Eigen::MatrixXd &matData,
-                                            const Eigen::MatrixXd &matTaper,
-                                            int iNfft,
-                                            bool bUseMultithread = true);
-
     static QVector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd &matData,
                                                                  const Eigen::MatrixXd &matTaper,
                                                                  int iNfft,
