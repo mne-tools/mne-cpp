@@ -141,3 +141,27 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
 
     return finalNetwork;
 }
+
+
+//*************************************************************************************************************
+
+QVector<MatrixXd> ImagCoherence::computeImagCoherence(const QList<MatrixXd> &matDataList,
+                                                      int iNfft,
+                                                      const QString &sWindowType)
+{
+    QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
+
+    Coherency::computeCoherency(vecCoh,
+                                matDataList,
+                                iNfft,
+                                sWindowType);
+
+
+    QVector<MatrixXd> result;
+
+    for(int i = 0; i < vecCoh.length(); ++i) {
+        result << vecCoh.at(i).second.imag();
+    }
+
+    return result;
+}

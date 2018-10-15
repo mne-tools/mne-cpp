@@ -161,3 +161,27 @@ Network Coherence::coherence(const QList<MatrixXd> &matDataList,
 
     return finalNetwork;
 }
+
+
+//*******************************************************************************************************
+
+QVector<MatrixXd> Coherence::computeCoherence(const QList<MatrixXd> &matDataList,
+                                              int iNfft,
+                                              const QString &sWindowType)
+{
+    //Calculate all-to-all coherence matrix over epochs
+    QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
+
+    Coherency::computeCoherency(vecCoh,
+                                matDataList,
+                                iNfft,
+                                sWindowType);
+
+    QVector<Eigen::MatrixXd> result;
+
+    for(int i = 0; i < vecCoh.length(); ++i) {
+        result << vecCoh.at(i).second.cwiseAbs();
+    }
+
+    return result;
+}

@@ -122,6 +122,20 @@ public:
                                  const Eigen::MatrixX3f& matVert,
                                  int iNfft=-1,
                                  const QString &sWindowType="hanning");
+
+    //=========================================================================================================
+    /**
+    * Calculates the imaginary coherence of the rows of the data matrix.
+    *
+    * @param[in] matDataList    The input data.
+    * @param[in] iNfft          The FFT length.
+    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    *
+    * @return                   The connectivity information in form of a QVector of matrices.
+    */
+    static QVector<Eigen::MatrixXd> computeImagCoherence(const QList<Eigen::MatrixXd> &matDataList,
+                                                         int iNfft,
+                                                         const QString &sWindowType="hanning");
 };
 
 
