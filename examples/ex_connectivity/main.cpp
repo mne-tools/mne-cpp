@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "PLV");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
     MatrixXd matData;
 
     int iNumberEpochs = data.size(); //data.size() 25
-    int iNumberRows = chIdx.size(); //chIdx.size() 32
+    int iNumberRows = 32; //chIdx.size() 32
 
     for(int i = 0; i < iNumberEpochs; ++i) {
         matData.resize(iNumberRows, data.at(i)->epoch.cols());

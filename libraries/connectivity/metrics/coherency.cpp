@@ -192,19 +192,7 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 //    qint64 iTime = 0;
 //    timer.start();
 
-    // Remove mean
-    MatrixXd data = matInputData;
-    int i;
-
-    for (i = 0; i < data.rows(); ++i) {
-        data.row(i).array() -= data.row(i).mean();
-    }
-
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - Remove mean:" << iTime;
-//    timer.restart();
-
-    // Compute tapered spectra and PSD
+    // Substract mean, compute tapered spectra and PSD
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
     bool bNfftEven = false;
     if (iNfft % 2 == 0){
@@ -223,13 +211,14 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 
     MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
 
-    int j;
+    int i,j;
 
     AbstractMetricResultData resultData;
     resultData.matPsdAvg = MatrixXd(iNRows, iNFreqs);
 
     for (i = 0; i < iNRows; ++i) {
-        rowData = data.row(i);
+        // Substract mean
+        rowData.array() = matInputData.row(i).array() - matInputData.row(i).mean();
 
         // FFT for freq domain returning the half spectrum and multiply taper weights
         for(j = 0; j < tapers.first.rows(); j++) {
