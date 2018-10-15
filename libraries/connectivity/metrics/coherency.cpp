@@ -104,6 +104,10 @@ void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
 //    qint64 iTime = 0;
 //    timer.start();
 
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
+
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
     if (iNfft < iSignalLength) {
@@ -188,18 +192,6 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
 //    qint64 iTime = 0;
 //    timer.start();
 
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
-
-    // Generate tapered spectra, PSD, and CSD
-    AbstractMetricResultData resultData;
-    resultData.matPsdAvg = MatrixXd(iNRows, iNFreqs);
-
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - Preparation:" << iTime;
-//    timer.restart();
-
     // Remove mean
     MatrixXd data = matInputData;
     int i;
@@ -232,6 +224,9 @@ AbstractMetricResultData Coherency::compute(const MatrixXd& matInputData,
     MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
 
     int j;
+
+    AbstractMetricResultData resultData;
+    resultData.matPsdAvg = MatrixXd(iNRows, iNFreqs);
 
     for (i = 0; i < iNRows; ++i) {
         rowData = data.row(i);
@@ -316,7 +311,6 @@ void Coherency::reduce(AbstractMetricResultData& finalData,
 void Coherency::computePSDCSD(QPair<int,MatrixXcd>& pairInput,
                               const MatrixXd& matPsdAvg)
 {
-    //qDebug() << QThread::currentThreadId() << "" << pairInput.first;
     MatrixXd matPSDtmp(matPsdAvg.rows(), matPsdAvg.cols());
     RowVectorXd vecPsdAvg = matPsdAvg.row(pairInput.first);
 
@@ -325,21 +319,4 @@ void Coherency::computePSDCSD(QPair<int,MatrixXcd>& pairInput,
     }
 
     pairInput.second = pairInput.second.cwiseQuotient(matPSDtmp);
-
-
-
-//    finalResult.matPsdAvg = finalResult.matPsdAvg.cwiseSqrt();
-
-//       MatrixXd matPSDtmp = MatrixXd::Zero(iNRows, iNFreqs);
-//       RowVectorXd vecPsdAvg;
-//       int j;
-//       for(int i = 0; i < iNRows; ++i) {
-//           vecPsdAvg = finalResult.matPsdAvg.row(i);
-
-//           for(j = 0; j < iNRows; ++j) {
-//               matPSDtmp.row(j) = vecPsdAvg.cwiseProduct(finalResult.matPsdAvg.row(j));
-//           }
-
-//           vecCoherency.append(finalResult.vecCsdAvg.at(i).cwiseQuotient(matPSDtmp));
-//   }
 }

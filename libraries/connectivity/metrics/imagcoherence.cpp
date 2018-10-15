@@ -97,7 +97,7 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
                                      int iNfft,
                                      const QString &sWindowType)
 {
-    Network finalNetwork("ImagCoherence");
+    Network finalNetwork("Imaginary Coherence");
 
     if(matDataList.empty()) {
         qDebug() << "ImagCoherence::imagcoherence - Input data is empty";
