@@ -134,6 +134,35 @@ public:
     */
     static QVector<Eigen::MatrixXd> computeDebiasedSquaredWPLI(const QList<Eigen::MatrixXd> &matDataList,
                                                                int iNfft, const QString &sWindowType);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Computes the PLV values. This function gets called in parallel.
+    *
+    * @param[in] matInputData           The input data.
+    * @param[in] iNRows                 The number of rows.
+    * @param[in] iNFreqs                The number of frequenciy bins.
+    * @param[in] iNfft                  The FFT length.
+    * @param[in] tapers                 The taper information.
+    *
+    * @return            The coherency result in form of AbstractMetricResultData.
+    */
+    static AbstractMetricResultData compute(const Eigen::MatrixXd& matInputData,
+                                             int iNRows,
+                                             int iNFreqs,
+                                             int iNfft,
+                                             const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+
+    //=========================================================================================================
+    /**
+    * Reduces the PLV computation to a final result. This function gets called in parallel.
+    *
+    * @param[out] finalData    The final data.
+    * @param[in]  resultData   The resulting data from the computation step.
+    */
+    static void reduce(AbstractMetricResultData& finalData,
+                       const AbstractMetricResultData& resultData);
 };
 
 
