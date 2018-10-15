@@ -100,6 +100,10 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
                                                      int iNfft,
                                                      const QString &sWindowType)
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     Network finalNetwork("Weighted Phase Lag Index");
 
     if(matDataList.empty()) {
@@ -121,8 +125,20 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
+//    iTime = timer.elapsed();
+//    qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex timer - Preparation:" << iTime;
+//    timer.restart();
+
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecWPLI = WeightedPhaseLagIndex::computeWPLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> vecWPLI;
+    WeightedPhaseLagIndex::computeWPLI(vecWPLI,
+                                       matDataList,
+                                       iNfft,
+                                       sWindowType);
+
+//    iTime = timer.elapsed();
+//    qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex timer - Actual computation:" << iTime;
+//    timer.restart();
 
     //Add edges to network
     QSharedPointer<NetworkEdge> pEdge;
@@ -141,16 +157,25 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
         }
     }
 
+//    iTime = timer.elapsed();
+//    qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex timer - Final network structure creation:" << iTime;
+//    timer.restart();
+
     return finalNetwork;
 }
 
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> WeightedPhaseLagIndex::computeWPLI(const QList<MatrixXd> &matDataList,
-                                                     int iNfft,
-                                                     const QString &sWindowType)
+void WeightedPhaseLagIndex::computeWPLI(QVector<MatrixXd>& vecWPLI,
+                                        const QList<MatrixXd> &matDataList,
+                                        int iNfft,
+                                        const QString &sWindowType)
 {
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
+
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
     if (iNfft < iSignalLength) {
@@ -160,45 +185,141 @@ QVector<MatrixXd> WeightedPhaseLagIndex::computeWPLI(const QList<MatrixXd> &matD
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
 
-    // Initialize vecPsdAvg and vecCsdAvg
+    // Initialize
     int iNRows = matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-    QVector<MatrixXd> vecCsdAvg;
-    QVector<MatrixXd> vecCsdAbsAvg;
-    for (int j = 0; j < iNRows; ++j) {
-        vecCsdAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
-        vecCsdAbsAvg.append(MatrixXd::Zero(iNRows, iNFreqs));
-    }
 
-    // Generate tapered spectra and CSD and sum over epoch
-    // This part could be parallelized with QtConcurrent::mappedReduced
-    for (int i = 0; i < matDataList.length(); ++i) {
-        //Remove mean
-        MatrixXd matInputData = matDataList.at(i);
-        for (int i = 0; i < matInputData.rows(); ++i) {
-            matInputData.row(i).array() -= matInputData.row(i).mean();
-        }
+    //    // Sequential
+    //    AbstractMetricResultData finalResult;
 
-        // This part could be parallelized with QtConcurrent::mapped
-        QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData, tapers.first, iNfft);
+    //    for (int i = 0; i < matDataList.length(); ++i) {
+    //        reduce(finalResult, computeLambda(matDataList.at(i)));
+    //    }
 
-        // This part could be parallelized with QtConcurrent::mappedReduced
-        for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-            for (int k = 0; k < iNRows; ++k) {
-                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
-                                                                tapers.second, tapers.second, iNfft, 1.0);
-            }
-            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.imag());
-            vecCsdAbsAvg.replace(j, vecCsdAbsAvg.at(j) + matCsd.imag().cwiseAbs());
-        }
-    }
+    std::function<AbstractMetricResultData(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
+        return compute(matInputData,
+                       iNRows,
+                       iNFreqs,
+                       iNfft,
+                       tapers);
+    };
 
-    QVector<MatrixXd> vecWPLI;
+    // Parallel
+    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(matDataList,
+                                                                           computeLambda,
+                                                                           reduce);
+    result.waitForFinished();
+
+    AbstractMetricResultData finalResult = result.result();
+
+    MatrixXd matDenom;
+
     for (int i = 0; i < iNRows; ++i) {
-        MatrixXd matDenom = vecCsdAbsAvg.at(i);
+        matDenom = finalResult.vecCsdAbsAvgImag.at(i);
         matDenom = (matDenom.array() == 0.).select(INFINITY, matDenom);
-        vecWPLI.append(vecCsdAvg.at(i).cwiseAbs().cwiseQuotient(matDenom));
+
+        vecWPLI.append(finalResult.vecCsdAvgImag.at(i).cwiseAbs().cwiseQuotient(matDenom));
     }
-    return vecWPLI;
 }
+
+
+//*************************************************************************************************************
+
+AbstractMetricResultData WeightedPhaseLagIndex::compute(const MatrixXd& matInputData,
+                                                        int iNRows,
+                                                        int iNFreqs,
+                                                        int iNfft,
+                                                        const QPair<MatrixXd, VectorXd>& tapers)
+{
+    // Subtract mean, generate tapered spectra and CSD
+    // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
+    RowVectorXd vecInputFFT, rowData;
+    RowVectorXcd vecTmpFreq;
+
+    MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
+
+    QVector<Eigen::MatrixXcd> vecTapSpectra;
+
+    int i,j;
+
+    FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    for (i = 0; i < iNRows; ++i) {
+        // Substract mean
+        rowData.array() = matInputData.row(i).array() - matInputData.row(i).mean();
+
+        // FFT for freq domain returning the half spectrum and multiply taper weights
+        for(j = 0; j < tapers.first.rows(); j++) {
+            vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+            fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
+            matTapSpectrum.row(j) = vecTmpFreq * tapers.second(j);
+        }
+
+        vecTapSpectra.append(matTapSpectrum);
+    }
+
+    // Compute CSD
+    bool bNfftEven = false;
+    if (iNfft % 2 == 0){
+        bNfftEven = true;
+    }
+
+    double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+
+    MatrixXd matCsd(iNRows, iNFreqs);
+
+    AbstractMetricResultData resultData;
+
+    for (i = 0; i < iNRows; ++i) {
+        for (j = i; j < iNRows; ++j) {
+            // Compute CSD (average over tapers if necessary)
+            matCsd.row(j) = vecTapSpectra.at(i).cwiseProduct(vecTapSpectra.at(j).conjugate()).colwise().sum().imag() / denomCSD;
+
+            // Divide first and last element by 2 due to half spectrum
+            matCsd.row(j)(0) /= 2.0;
+            if(bNfftEven) {
+                matCsd.row(j).tail(1) /= 2.0;
+            }
+        }
+
+        resultData.vecCsdAvgImag.append(matCsd);
+        resultData.vecCsdAbsAvgImag.append(matCsd.cwiseAbs());
+    }
+
+    return resultData;
+}
+
+
+//*************************************************************************************************************
+
+void WeightedPhaseLagIndex::reduce(AbstractMetricResultData& finalData,
+                                   const AbstractMetricResultData& resultData)
+{
+    // Sum over epoch
+    if(finalData.vecCsdAvgImag.isEmpty()) {
+        finalData.vecCsdAvgImag = resultData.vecCsdAvgImag;
+    } else {
+        for (int j = 0; j < finalData.vecCsdAvgImag.size(); ++j) {
+            finalData.vecCsdAvgImag[j] += resultData.vecCsdAvgImag.at(j);
+        }
+    }
+
+    if(finalData.vecSquaredCsdAvgImag.isEmpty()) {
+        finalData.vecSquaredCsdAvgImag = resultData.vecSquaredCsdAvgImag;
+    } else {
+        for (int j = 0; j < finalData.vecSquaredCsdAvgImag.size(); ++j) {
+            finalData.vecSquaredCsdAvgImag[j] += resultData.vecSquaredCsdAvgImag.at(j);
+        }
+    }
+
+    if(finalData.vecCsdAbsAvgImag.isEmpty()) {
+        finalData.vecCsdAbsAvgImag = resultData.vecCsdAbsAvgImag;
+    } else {
+        for (int j = 0; j < finalData.vecCsdAbsAvgImag.size(); ++j) {
+            finalData.vecCsdAbsAvgImag[j] += resultData.vecCsdAbsAvgImag.at(j);
+        }
+    }
+}
+
+

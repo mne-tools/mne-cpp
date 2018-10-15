@@ -120,20 +120,24 @@ public:
     */
     static Network debiasedSquaredWeightedPhaseLagIndex(const QList<Eigen::MatrixXd> &matDataList,
                                                         const Eigen::MatrixX3f& matVert,
-                                                        int iNfft=-1, const QString &sWindowType="hanning");
+                                                        int iNfft=-1,
+                                                        const QString &sWindowType="hanning");
 
     //==========================================================================================================
     /**
     * Calculates the actual debiased squared weighted phase lag index between two data vectors.
     *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[out] vecDebiasedSquaredWPLI    The resulting data.
+    * @param[in] matDataList                The input data.
+    * @param[in] iNfft                      The FFT length.
+    * @param[in] sWindowType                The type of the window function used to compute tapered spectra.
     *
     * @return                   The DebiasedSquaredWPLI value.
     */
-    static QVector<Eigen::MatrixXd> computeDebiasedSquaredWPLI(const QList<Eigen::MatrixXd> &matDataList,
-                                                               int iNfft, const QString &sWindowType);
+    static void computeDebiasedSquaredWPLI(QVector<Eigen::MatrixXd>& vecDebiasedSquaredWPLI,
+                                           const QList<Eigen::MatrixXd> &matDataList,
+                                           int iNfft,
+                                           const QString &sWindowType);
 
 protected:
     //=========================================================================================================
@@ -149,10 +153,10 @@ protected:
     * @return            The coherency result in form of AbstractMetricResultData.
     */
     static AbstractMetricResultData compute(const Eigen::MatrixXd& matInputData,
-                                             int iNRows,
-                                             int iNFreqs,
-                                             int iNfft,
-                                             const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+                                            int iNRows,
+                                            int iNFreqs,
+                                            int iNfft,
+                                            const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**

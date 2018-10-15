@@ -111,11 +111,10 @@ public:
     /**
     * Calculates the coherency of the rows of the data matrix.
     *
+    * @param[out] vecCoherency  The resulting data.
     * @param[in] matDataList    The input data.
     * @param[in] iNfft          FFT length
     * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The connectivity information in form of a QVector of matrices.
     */
     static void computeCoherency(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
                                  const QList<Eigen::MatrixXd> &matDataList,

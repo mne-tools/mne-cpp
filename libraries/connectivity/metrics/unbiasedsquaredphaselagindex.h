@@ -126,13 +126,15 @@ public:
     /**
     * Calculates the actual phase lag index between two data vectors.
     *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[out] vecUnbiasedSquaredPLI     The resulting data.
+    * @param[in] matDataList                The input data.
+    * @param[in] iNfft                      The FFT length.
+    * @param[in] sWindowType                The type of the window function used to compute tapered spectra.
     *
     * @return                   The PLI value.
     */
-    static QVector<Eigen::MatrixXd> computeUnbiasedSquaredPLI(const QList<Eigen::MatrixXd> &matDataList,
+    static void computeUnbiasedSquaredPLI(QVector<Eigen::MatrixXd> vecUnbiasedSquaredPLI,
+                                                              const QList<Eigen::MatrixXd> &matDataList,
                                                               int iNfft, const QString &sWindowType);
 };
 

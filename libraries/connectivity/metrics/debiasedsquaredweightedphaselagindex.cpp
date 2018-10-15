@@ -130,9 +130,11 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
 //    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecDebiasedSquaredWPLI = DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(matDataList,
-                                                                                                                iNfft,
-                                                                                                                sWindowType);
+    QVector<MatrixXd> vecDebiasedSquaredWPLI;
+    DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(vecDebiasedSquaredWPLI,
+                                                                     matDataList,
+                                                                     iNfft,
+                                                                     sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Actual computation:" << iTime;
@@ -155,9 +157,9 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
         }
     }
 
-/*    iTime = timer.elapsed();
-    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Network creation:" << iTime;
-    timer.restart()*/;
+//    iTime = timer.elapsed();
+//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Network creation:" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
@@ -165,9 +167,10 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(const QList<MatrixXd> &matDataList,
-                                                                                   int iNfft,
-                                                                                   const QString &sWindowType)
+void DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(QVector<MatrixXd>& vecDebiasedSquaredWPLI,
+                                                                      const QList<MatrixXd> &matDataList,
+                                                                      int iNfft,
+                                                                      const QString &sWindowType)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -209,7 +212,6 @@ QVector<MatrixXd> DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWP
 
     AbstractMetricResultData finalResult = result.result();
 
-    QVector<MatrixXd> vecDebiasedSquaredWPLI;
     MatrixXd matNom, matDenom;
 
     for (int j = 0; j < iNRows; ++j) {
@@ -222,8 +224,6 @@ QVector<MatrixXd> DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWP
 
         vecDebiasedSquaredWPLI.append(matNom.cwiseQuotient(matDenom));
     }
-
-    return vecDebiasedSquaredWPLI;
 }
 
 
@@ -271,16 +271,14 @@ AbstractMetricResultData DebiasedSquaredWeightedPhaseLagIndex::compute(const Mat
 
     double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
-    MatrixXd matCsdImag;
-    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-    MatrixXd matCsdImag2;
+    MatrixXd matCsd(iNRows, iNFreqs);
 
     AbstractMetricResultData resultData;
 
     for (i = 0; i < iNRows; ++i) {
         for (j = i; j < iNRows; ++j) {
             // Compute CSD (average over tapers if necessary)
-            matCsd.row(j) = vecTapSpectra.at(i).cwiseProduct(vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+            matCsd.row(j) = vecTapSpectra.at(i).cwiseProduct(vecTapSpectra.at(j).conjugate()).colwise().sum().imag() / denomCSD;
 
             // Divide first and last element by 2 due to half spectrum
             matCsd.row(j)(0) /= 2.0;
@@ -289,11 +287,9 @@ AbstractMetricResultData DebiasedSquaredWeightedPhaseLagIndex::compute(const Mat
             }
         }
 
-        matCsdImag = matCsd.imag();
-        resultData.vecCsdAvgImag.append(matCsdImag);
-        matCsdImag2 = matCsdImag.array().square();
-        resultData.vecSquaredCsdAvgImag.append(matCsdImag2);
-        resultData.vecCsdAbsAvgImag.append(matCsdImag.cwiseAbs());
+        resultData.vecCsdAvgImag.append(matCsd);
+        resultData.vecCsdAbsAvgImag.append(matCsd.cwiseAbs());
+        resultData.vecSquaredCsdAvgImag.append(matCsd.array().square());
     }
 
     return resultData;
