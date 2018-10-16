@@ -76,6 +76,15 @@ SOURCES += \
 
 HEADERS += \
 
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/general/surf2bem/icos.fif \
+    $${ROOT_DIR}/resources/general/coilDefinitions/coil_def.dat \
+    $${ROOT_DIR}/resources/general/coilDefinitions/coil_def_Elekta.dat \
+
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
@@ -88,7 +97,6 @@ win32 {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
-
 }
 
 # Activate FFTW backend in Eigen
