@@ -135,7 +135,8 @@ public:
     * @return                   The connectivity information in form of a QVector of matrices.
     */
     static QVector<Eigen::MatrixXd> computeCoherence(const QList<Eigen::MatrixXd> &matDataList,
-                                                     int iNfft, const QString &sWindowType);
+                                                     int iNfft,
+                                                     const QString &sWindowType="hanning");
 };
 
 

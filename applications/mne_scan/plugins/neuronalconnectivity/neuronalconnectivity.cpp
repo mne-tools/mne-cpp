@@ -42,6 +42,7 @@
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
 #include <connectivity/connectivity.h>
+#include <rtprocessing/rtconnectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -54,8 +55,6 @@
 #include <mne/mne_bem.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
-
-#include <realtime/rtProcessing/rtconnectivity.h>
 
 
 //*************************************************************************************************************
@@ -81,8 +80,8 @@ using namespace SCMEASLIB;
 using namespace MNELIB;
 using namespace CONNECTIVITYLIB;
 using namespace DISPLIB;
-using namespace REALTIMELIB;
 using namespace IOBUFFER;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************
@@ -94,8 +93,6 @@ NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
 , m_iDownSample(1)
 , m_iNumberAverages(10)
-, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
-, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("4")
 , m_iFreqBandLow(1)
 , m_iFreqBandHigh(50)

@@ -314,7 +314,7 @@ public:
         return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
 
-    static bool read_events(QString t_sEventName, MatrixXi& events, QString t_fileRawName);
+    static bool read_events(QString t_sEventName, QString t_fileRawName, MatrixXi& events);
 
 // ToDo Eventlist Class??
     //=========================================================================================================

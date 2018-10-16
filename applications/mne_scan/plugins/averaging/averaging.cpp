@@ -46,7 +46,7 @@
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
-#include <realtime/rtProcessing/rtave.h>
+#include <rtprocessing/rtave.h>
 
 
 //*************************************************************************************************************
@@ -65,8 +65,8 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace FIFFLIB;
-using namespace REALTIMELIB;
 using namespace DISPLIB;
+using namespace RTPROCESSINGLIB;
 
 
 //*************************************************************************************************************

@@ -129,6 +129,10 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## To build basic MNE Scan version run: qmake MNECPP_CONFIG+=buildBasicMneScanVersion
 ## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
+## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
+
+# Default flags
+MNECPP_CONFIG +=
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
@@ -213,3 +217,7 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
     MNE_INSTALL_INCLUDE_DIR = $$shell_path($${PWD}/include)
 }
 
+
+# FFTW dir
+FFTW_DIR_LIBS = $$shell_path(C:/fftw-3.3.8/lib)
+FFTW_DIR_INCLUDE = $$shell_path(C:/fftw-3.3.8/include)

@@ -83,7 +83,7 @@ SOURCES += \
     network/networknode.cpp \
     network/networkedge.cpp \
     connectivitysettings.cpp \
-    connectivity.cpp
+    connectivity.cpp \
 
 HEADERS += \
     connectivity_global.h \
@@ -102,7 +102,7 @@ HEADERS += \
     network/networknode.h \
     network/networkedge.h \
     connectivitysettings.h \
-    connectivity.h
+    connectivity.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -122,3 +122,22 @@ win32 {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
