@@ -113,7 +113,8 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network correlationCoeff(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
+    static Network correlationCoeff(const QList<Eigen::MatrixXd> &matDataList,
+                                    const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
@@ -124,7 +125,7 @@ protected:
     *
     * @return               The connectivity matrix.
     */
-    static Eigen::MatrixXd compute(const AbstractMetricInputData& data);
+    static Eigen::MatrixXd compute(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
@@ -135,18 +136,6 @@ protected:
     */
     static void reduce(Eigen::MatrixXd &resultData,
                        const Eigen::MatrixXd &data);
-
-    //=========================================================================================================
-    /**
-    * Calculates the actual correlation coefficient between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return               The correlation coefficient.
-    */
-    static double calcCorrelationCoeff(const Eigen::RowVectorXd &vecFirst, const Eigen::RowVectorXd &vecSecond);
-
 };
 
 

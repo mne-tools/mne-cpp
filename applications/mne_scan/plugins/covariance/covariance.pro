@@ -56,8 +56,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Realtimed \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
@@ -69,8 +68,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Realtime \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -112,3 +110,23 @@ unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 RESOURCES += \
     covariance.qrc
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}

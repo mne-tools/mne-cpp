@@ -63,7 +63,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <realtime/rtClient/rtcmdclient.h>
+#include <communication/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -92,7 +92,7 @@ namespace MneRtClientPlugin
 
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 

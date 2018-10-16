@@ -54,7 +54,7 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <realtime/rtProcessing/rtinvop.h>
+#include <rtprocessing/rtinvop.h>
 
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -82,7 +82,7 @@ using namespace FIFFLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace INVERSELIB;
-using namespace REALTIMELIB;
+using namespace RTPROCESSINGLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 
@@ -438,7 +438,7 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         if(m_bProcessData && m_pRtInvOp){
-            m_pRtInvOp->append(pRTC->getValue()->pick_channels(m_qListPickChannels));
+            m_pRtInvOp->append(*pRTC->getValue());
         }
     }
 }

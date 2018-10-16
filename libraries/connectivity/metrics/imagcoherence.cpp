@@ -97,7 +97,7 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
                                      int iNfft,
                                      const QString &sWindowType)
 {
-    Network finalNetwork("ImagCoherence");
+    Network finalNetwork("Imaginary Coherence");
 
     if(matDataList.empty()) {
         qDebug() << "ImagCoherence::imagcoherence - Input data is empty";
@@ -119,14 +119,23 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
     }
 
     //Calculate all-to-all imaginary coherence matrix over epochs
-    QVector<MatrixXd> vecCoh = ImagCoherence::computeImagCoherence(matDataList, iNfft, sWindowType);
+    QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
+
+    Coherency::computeCoherency(vecCoh,
+                                matDataList,
+                                iNfft,
+                                sWindowType);
 
     //Add edges to network
-    for(int i = 0; i < vecCoh.length(); ++i) {
-        for(int j = i; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecCoh.at(i).row(j).transpose();
+    QSharedPointer<NetworkEdge> pEdge;
+    MatrixXd matWeight;
+    int j;
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
+    for(int i = 0; i < vecCoh.length(); ++i) {
+        for(j = i; j < matDataList.at(0).rows(); ++j) {
+            matWeight = vecCoh.at(i).second.row(j).imag().transpose();
+
+            pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.getNodeAt(j)->append(pEdge);
@@ -144,10 +153,19 @@ QVector<MatrixXd> ImagCoherence::computeImagCoherence(const QList<MatrixXd> &mat
                                                       int iNfft,
                                                       const QString &sWindowType)
 {
-    QVector<MatrixXcd> vecCoherency = Coherency::computeCoherency(matDataList, iNfft, sWindowType);
-    QVector<MatrixXd> vecImagCoherence;
-    for(int i = 0; i < vecCoherency.length(); ++i) {
-        vecImagCoherence.append(vecCoherency.at(i).imag());
+    QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
+
+    Coherency::computeCoherency(vecCoh,
+                                matDataList,
+                                iNfft,
+                                sWindowType);
+
+
+    QVector<MatrixXd> result;
+
+    for(int i = 0; i < vecCoh.length(); ++i) {
+        result << vecCoh.at(i).second.imag();
     }
-    return vecImagCoherence;
+
+    return result;
 }
