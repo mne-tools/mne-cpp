@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <utils/ioutils.h>
+#include "connectivity/metrics/coherency.h"
 #include "connectivity/metrics/coherence.h"
 #include "connectivity/metrics/imagcoherence.h"
 #include "connectivity/metrics/phaselockingvalue.h"
@@ -141,8 +142,10 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> Coh = Coherence::computeCoherence(matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = Coh.at(0).row(1);
+    QVector<MatrixXd> vecCoh = Coherence::computeCoherence(matDataList,
+                                                           iNfft,
+                                                           sWindowType);
+    m_ConnectivityOutput = vecCoh.at(0).row(1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -176,8 +179,10 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> ImagCoh = ImagCoherence::computeImagCoherence(matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = ImagCoh.at(0).row(1);
+    QVector<MatrixXd> vecImagCoh = ImagCoherence::computeImagCoherence(matDataList,
+                                                                       iNfft,
+                                                                       sWindowType);
+    m_ConnectivityOutput = vecImagCoh.at(0).row(1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -248,7 +253,11 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> PLI = PhaseLagIndex::computePLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> PLI;
+    PhaseLagIndex::computePLI(PLI,
+                              matDataList,
+                              iNfft,
+                              sWindowType);
     m_ConnectivityOutput = PLI.at(0).row(1);
 
     //*********************************************************************************************************
@@ -284,7 +293,11 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> PLI2 = UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> PLI2;
+    UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(PLI2,
+                                                            matDataList,
+                                                            iNfft,
+                                                            sWindowType);
     m_ConnectivityOutput = PLI2.at(0).row(1);
 
     //*********************************************************************************************************
@@ -320,7 +333,11 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> WPLI = WeightedPhaseLagIndex::computeWPLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> WPLI;
+    WeightedPhaseLagIndex::computeWPLI(WPLI,
+                                       matDataList,
+                                       iNfft,
+                                       sWindowType);
     m_ConnectivityOutput = WPLI.at(0).row(1);
 
     //*********************************************************************************************************
@@ -356,7 +373,11 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> WPLI2 = DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> WPLI2;
+    DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(WPLI2,
+                                                                     matDataList,
+                                                                     iNfft,
+                                                                     sWindowType);
     m_ConnectivityOutput = WPLI2.at(0).row(1);
 
     //*********************************************************************************************************

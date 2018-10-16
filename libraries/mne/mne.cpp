@@ -66,8 +66,8 @@ using namespace MNELIB;
 //=============================================================================================================
 
 bool MNE::read_events(QString t_sEventName,
-                      MatrixXi& events,
-                      QString t_fileRawName)
+                      QString t_fileRawName,
+                      MatrixXi& events)
 {
     QFile t_EventFile;
     qint32 p;
@@ -81,7 +81,6 @@ bool MNE::read_events(QString t_sEventName,
             printf("Raw file name does not end properly\n");
             return 0;
         }
-//        events = mne_read_events(t_sEventName);
 
         t_EventFile.setFileName(t_sEventName);
         if(!MNE::read_events(t_EventFile, events)) {
@@ -89,12 +88,9 @@ bool MNE::read_events(QString t_sEventName,
             return false;
         }
         printf("Events read from %s\n",t_sEventName.toUtf8().constData());
-    }
-    else
-    {
+    } else {
         // Binary file
-        p = t_fileRawName.indexOf(".fif");
-        if (p > 0) {
+        if (t_sEventName.contains(".fif")) {
             t_EventFile.setFileName(t_sEventName);
             if(!MNE::read_events(t_EventFile, events)) {
                 printf("Error while read events.\n");
@@ -102,9 +98,7 @@ bool MNE::read_events(QString t_sEventName,
             }
             printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
         } else {
-            //
-            //   Text file
-            //
+            // Text file
             printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
 //            try
 //                events = load(eventname);

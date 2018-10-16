@@ -85,7 +85,6 @@ SOURCES += \
     generics/observerpattern.cpp \
     spectral.cpp
 
-
 HEADERS += \
     kmeans.h\
     utils_global.h \
@@ -121,14 +120,6 @@ HEADERS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-#Activate FFTW backend in Eigen
-#DEFINES += EIGEN_FFTW_DEFAULT
-#INCLUDEPATH += $$shell_path(C:/fftw)
-#LIBS += -L$$shell_path(C:/fftw)
-#LIBS += -llibfftw3-3 \
-#        -llibfftw3f-3 \
-#        -llibfftw3l-3 \
-
 # Install headers to include directory
 header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/utils
@@ -142,4 +133,24 @@ win32 {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
 }
