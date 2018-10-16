@@ -113,7 +113,8 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network crossCorrelation(const QList<Eigen::MatrixXd> &matDataList, const Eigen::MatrixX3f& matVert);
+    static Network crossCorrelation(const QList<Eigen::MatrixXd> &matDataList,
+                                    const Eigen::MatrixX3f& matVert);
 
 protected:
     //=========================================================================================================
@@ -124,7 +125,9 @@ protected:
     *
     * @return               The connectivity matrix.
     */
-    static Eigen::MatrixXd calculate(const AbstractMetricInputData& inputData);
+    static Eigen::MatrixXd calculate(const Eigen::MatrixXd& matInputData,
+                                     int iNfft,
+                                     const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**
@@ -134,18 +137,6 @@ protected:
     * @param[in]  data          The incoming and temporary result data.
     */
     static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
-
-    //=========================================================================================================
-    /**
-    * Calculates the actual correlation coefficient between two data vectors.
-    *
-    * @param[in] vecFirst    The first input data row.
-    * @param[in] vecSecond   The second input data row.
-    *
-    * @return                The cross position where the maximum correlation was computed.
-    */
-    static QPair<int,double> calcCrossCorrelation(const Eigen::MatrixXcd &matDataFirst,
-                                                  const Eigen::MatrixXcd &matDataSecond);
 
 };
 

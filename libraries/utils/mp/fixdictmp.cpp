@@ -287,6 +287,10 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 // calc scalarproduct of Atom and Signal
 FixDictAtom FixDictMp::correlation(Dictionary current_pdict, MatrixXd current_resid, qint32 boost)
 {
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
+
     qint32 channel_count = current_resid.cols() * (boost / 100.0); //reducing the number of observed channels in the algorithm to increase speed performance
     if(boost == 0 || channel_count == 0)
         channel_count = 1;

@@ -86,7 +86,7 @@ namespace INVERSELIB {
     class MinimumNorm;
 }
 
-namespace REALTIMELIB {
+namespace RTPROCESSINGLIB {
     class RtInvOp;
 }
 
@@ -230,7 +230,7 @@ protected:
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate> >       m_pRTSEOutput;              /**< The RealTimeSourceEstimate output.*/
     QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                                 m_pMatrixDataBuffer;        /**< Holds incoming RealTimeMultiSampleArray data.*/
     QSharedPointer<INVERSELIB::MinimumNorm>                                                 m_pMinimumNorm;             /**< Minimum Norm Estimation. */
-    QSharedPointer<REALTIMELIB::RtInvOp>                                                    m_pRtInvOp;                 /**< Real-time inverse operator. */
+    QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
     QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
     QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pClusteredFwd;            /**< Clustered forward solution. */
     QSharedPointer<FSLIB::AnnotationSet>                                                    m_pAnnotationSet;           /**< Annotation set. */

@@ -149,7 +149,6 @@ void NetworkEdge::calculateAveragedWeight()
     int iEndWeightBin = m_iMinMaxFreqBins.second;
 
     if(iEndWeightBin < iStartWeightBin || iStartWeightBin < -1 || iEndWeightBin < -1 ) {
-        qDebug() << "NetworkEdge::calculateAveragedWeight - end bin index is larger than start bin index or one of them is < -1.";
         return;
     }
 
@@ -172,6 +171,10 @@ void NetworkEdge::calculateAveragedWeight()
 void NetworkEdge::setFrequencyBins(const QPair<int,int>& minMaxFreqBins)
 {
     m_iMinMaxFreqBins = minMaxFreqBins;
+
+    if(m_iMinMaxFreqBins.second < m_iMinMaxFreqBins.first || m_iMinMaxFreqBins.first < -1 || m_iMinMaxFreqBins.second < -1 ) {
+        return;
+    }
 
     calculateAveragedWeight();
 }

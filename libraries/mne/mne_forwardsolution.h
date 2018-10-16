@@ -363,7 +363,14 @@ public:
     * @param[out] p_outWhitener     Whitener
     * @param[out] p_outNumNonZero   the rank (non zeros)
     */
-    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero) const;
+    void prepare_forward(const FiffInfo &p_info,
+                         const FiffCov &p_noise_cov,
+                         bool p_pca,
+                         FiffInfo &p_outFwdInfo,
+                         MatrixXd &gain,
+                         FiffCov &p_outNoiseCov,
+                         MatrixXd &p_outWhitener,
+                         qint32 &p_outNumNonZero) const;
 
 //    //=========================================================================================================
 //    /**

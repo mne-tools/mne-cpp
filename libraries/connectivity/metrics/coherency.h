@@ -111,36 +111,54 @@ public:
     /**
     * Calculates the coherency of the rows of the data matrix.
     *
+    * @param[out] vecCoherency  The resulting data.
     * @param[in] matDataList    The input data.
     * @param[in] iNfft          FFT length
     * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The connectivity information in form of a QVector of matrices.
     */
-    static QVector<Eigen::MatrixXcd> computeCoherency(const QList<Eigen::MatrixXd> &matDataList,
-                                                      int iNfft=-1,
-                                                      const QString &sWindowType="hanning");
+    static void computeCoherency(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
+                                 const QList<Eigen::MatrixXd> &matDataList,
+                                 int iNfft = -1,
+                                 const QString &sWindowType="hanning");
 
 private:
     //=========================================================================================================
     /**
     * Computes the coherency values. This function gets called in parallel.
     *
-    * @param[in] data    The input data.
+    * @param[in] matInputData           The input data.
+    * @param[in] iNRows                 The number of rows.
+    * @param[in] iNFreqs                The number of frequenciy bins.
+    * @param[in] iNfft                  The FFT length.
+    * @param[in] tapers                 The taper information.
     *
     * @return            The coherency result in form of AbstractMetricResultData.
     */
-    static AbstractMetricResultData compute(const AbstractMetricInputData& data);
+    static AbstractMetricResultData compute(const Eigen::MatrixXd& matInputData,
+                                            int iNRows,
+                                            int iNFreqs,
+                                            int iNfft,
+                                            const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**
-    * Reduces the coherency computation results to a final result. This function gets called in parallel.
+    * Reduces the coherency computation to a final result. This function gets called in parallel.
     *
     * @param[out] finalData    The final data data.
     * @param[in]  resultData   The resulting data from the computation step.
     */
     static void reduce(AbstractMetricResultData &finalData,
-                const AbstractMetricResultData& resultData);
+                       const AbstractMetricResultData& resultData);
+
+    //=========================================================================================================
+    /**
+    * Computes the PSD and CSD. This function gets called in parallel.
+    *
+    * @param[out] pairInput     The in/out data.
+    * @param[in]  matPsdAvg     The averaged PSD.
+    */
+    static void computePSDCSD(QPair<int,Eigen::MatrixXcd>& pairInput,
+                              const Eigen::MatrixXd& matPsdAvg);
 
 };
 

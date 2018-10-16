@@ -100,6 +100,10 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
                                              int iNfft,
                                              const QString &sWindowType)
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     Network finalNetwork("Phase Locking Value");
 
     if(matDataList.empty()) {
@@ -121,21 +125,39 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::phaseLockingValue timer - Preparation:" << iTime;
+//    timer.restart();
+
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecPLV = PhaseLockingValue::computePLV(matDataList, iNfft, sWindowType);
+    QVector<MatrixXd> vecPLV = PhaseLockingValue::computePLV(matDataList,
+                                                             iNfft,
+                                                             sWindowType);
+
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::phaseLockingValue timer - Actual computation:" << iTime;
+//    timer.restart();
 
     //Add edges to network
-    for(int i = 0; i < vecPLV.length(); ++i) {
-        for(int j = i; j < matDataList.at(0).rows(); ++j) {
-            MatrixXd matWeight = vecPLV.at(i).row(j).transpose();
+    QSharedPointer<NetworkEdge> pEdge;
+    MatrixXd matWeight;
+    int j;
 
-            QSharedPointer<NetworkEdge> pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
+    for(int i = 0; i < vecPLV.length(); ++i) {
+        for(j = i; j < matDataList.at(0).rows(); ++j) {
+            matWeight = vecPLV.at(i).row(j).transpose();
+
+            pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
             finalNetwork.getNodeAt(i)->append(pEdge);
             finalNetwork.getNodeAt(j)->append(pEdge);
             finalNetwork.append(pEdge);
         }
     }
+
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::phaseLockingValue timer - Network creation:" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
@@ -147,6 +169,14 @@ QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataLi
                                                 int iNfft,
                                                 const QString &sWindowType)
 {
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
+
+    if(matDataList.isEmpty()) {
+        return QVector<MatrixXd>();
+    }
+
     // Check that iNfft >= signal length
     int iSignalLength = matDataList.at(0).cols();
     if (iNfft < iSignalLength) {
@@ -156,40 +186,121 @@ QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataLi
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
 
-    // Initialize vecPsdAvg and vecCsdAvg
     int iNRows = matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-    QVector<MatrixXcd> vecCsdAvg;
-    for (int j = 0; j < iNRows; ++j) {
-        vecCsdAvg.append(MatrixXcd::Zero(iNRows, iNFreqs));
-    }
 
-    // Generate tapered spectra and CSD and sum over epoch
-    // This part could be parallelized with QtConcurrent::mappedReduced
-    for (int i = 0; i < matDataList.length(); ++i) {
-        //Remove mean
-        MatrixXd matInputData = matDataList.at(i);
-        for (int i = 0; i < matInputData.rows(); ++i) {
-            matInputData.row(i).array() -= matInputData.row(i).mean();
-        }
+//    // Sequential
+//    AbstractMetricResultData finalResult;
 
-        // This part could be parallelized with QtConcurrent::mapped
-        QVector<MatrixXcd> vecTapSpectra = Spectral::computeTaperedSpectraMatrix(matInputData, tapers.first, iNfft);
+//    for (int i = 0; i < lData.length(); ++i) {
+//        reduce(finalResult, compute(lData.at(i)));
+//    }
 
-        // This part could be parallelized with QtConcurrent::mappedReduced
-        for (int j = 0; j < iNRows; ++j) {
-            MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-            for (int k = 0; k < iNRows; ++k) {
-                matCsd.row(k) = Spectral::csdFromTaperedSpectra(vecTapSpectra.at(j), vecTapSpectra.at(k),
-                                                                tapers.second, tapers.second, iNfft, 1.0);
-            }
-            vecCsdAvg.replace(j, vecCsdAvg.at(j) + matCsd.cwiseQuotient(matCsd.cwiseAbs()));
-        }
-    }
+    // Parallel
+    std::function<QVector<MatrixXcd>(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
+        return compute(matInputData,
+                       iNRows,
+                       iNFreqs,
+                       iNfft,
+                       tapers);
+    };
+
+    QFuture<QVector<MatrixXcd> > result = QtConcurrent::mappedReduced(matDataList,
+                                                                      computeLambda,
+                                                                      reduce);
+    result.waitForFinished();
+
+    QVector<MatrixXcd> finalResult = result.result();
 
     QVector<MatrixXd> vecPLV;
-    for (int i = 0; i < iNRows; ++i) {
-        vecPLV.append(vecCsdAvg.at(i).cwiseAbs() / matDataList.length());
+    for (int i = 0; i < finalResult.size(); ++i) {
+        vecPLV.append(finalResult.at(i).cwiseAbs() / matDataList.length());
     }
+
     return vecPLV;
 }
+
+
+//*************************************************************************************************************
+
+QVector<MatrixXcd> PhaseLockingValue::compute(const MatrixXd& matInputData,
+                                              int iNRows,
+                                              int iNFreqs,
+                                              int iNfft,
+                                              const QPair<MatrixXd, VectorXd>& tapers)
+{
+    // Initialize vecCsdAvg
+    QVector<MatrixXcd> vecCsdAvg;
+
+    // Subtract mean, generate tapered spectra and CSD
+    // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
+    RowVectorXd vecInputFFT, rowData;
+    RowVectorXcd vecTmpFreq;
+
+    MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
+
+    QVector<Eigen::MatrixXcd> vecTapSpectra;
+
+    int i,j;
+
+    FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    for (i = 0; i < iNRows; ++i) {
+        // Substract mean
+        rowData.array() = matInputData.row(i).array() - matInputData.row(i).mean();
+
+        // FFT for freq domain returning the half spectrum and multiply taper weights
+        for(j = 0; j < tapers.first.rows(); j++) {
+            vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+            fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
+            matTapSpectrum.row(j) = vecTmpFreq * tapers.second(j);
+        }
+
+        vecTapSpectra.append(matTapSpectrum);
+    }
+
+    // Compute CSD
+    bool bNfftEven = false;
+    if (iNfft % 2 == 0){
+        bNfftEven = true;
+    }
+
+    double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+
+    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+
+    for (i = 0; i < iNRows; ++i) {
+        for (j = i; j < iNRows; ++j) {
+            // Compute CSD (average over tapers if necessary)
+            matCsd.row(j) = vecTapSpectra.at(i).cwiseProduct(vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+
+            // Divide first and last element by 2 due to half spectrum
+            matCsd.row(j)(0) /= 2.0;
+            if(bNfftEven) {
+                matCsd.row(j).tail(1) /= 2.0;
+            }
+        }
+
+        vecCsdAvg.append(matCsd.cwiseQuotient(matCsd.cwiseAbs()));
+    }
+
+    return vecCsdAvg;
+}
+
+
+//*************************************************************************************************************
+
+void PhaseLockingValue::reduce(QVector<MatrixXcd>& finalData,
+                               const QVector<MatrixXcd>& resultData)
+{
+    // Sum over epoch
+    if(finalData.isEmpty()) {
+        finalData = resultData;
+    } else {
+        for (int j = 0; j < finalData.size(); ++j) {
+            finalData[j] += resultData.at(j);
+        }
+    }
+}
+

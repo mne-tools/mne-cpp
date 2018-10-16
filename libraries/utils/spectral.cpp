@@ -111,17 +111,46 @@ QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData
                                                          int iNfft,
                                                          bool bUseMultithread)
 {
-    //qDebug() << "Spectral::computeTaperedSpectra Rowise";
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
 
     QVector<MatrixXcd> finalResult;
 
     if(!bUseMultithread) {
         // Sequential
+//        QElapsedTimer timer;
+//        int iTime = 0;
+//        int iTimeAll = 0;
+//        timer.start();
+
+        FFT<double> fft;
+        fft.SetFlag(fft.HalfSpectrum);
+
+        RowVectorXd vecInputFFT, rowData;
+        RowVectorXcd vecTmpFreq;
+
+        MatrixXcd matTapSpectrum(matTaper.rows(), int(floor(iNfft / 2.0)) + 1);
+        int j;
         for (int i = 0; i < matData.rows(); ++i) {
-            finalResult.append(computeTaperedSpectraRow(matData.row(i),
-                                                        matTaper,
-                                                        iNfft));
+            rowData = matData.row(i);
+
+            //FFT for freq domain returning the half spectrum
+            for (j = 0; j < matTaper.rows(); j++) {
+                vecInputFFT = rowData.cwiseProduct(matTaper.row(j));
+                fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
+                matTapSpectrum.row(j) = vecTmpFreq;
+            }
+
+            finalResult.append(matTapSpectrum);
+
+//            iTime = timer.elapsed();
+//            qDebug() << QThread::currentThreadId() << "Spectral::computeTaperedSpectraMatrix - Row-wise computation:" << iTime;
+//            iTimeAll += iTime;
+//            timer.restart();
         }
+
+//        qDebug() << QThread::currentThreadId() << "Spectral::computeTaperedSpectraMatrix - Complete computation:" << iTimeAll;
     } else {
         // Parallel
         QList<TaperedSpectraInputData> lData;
@@ -170,29 +199,26 @@ void Spectral::reduce(QVector<MatrixXcd>& finalData,
 
 //*************************************************************************************************************
 
-RowVectorXd Spectral::psdFromTaperedSpectra(const MatrixXcd &matTapSpectrum,
-                                            const VectorXd &vecTapWeights,
-                                            int iNfft,
-                                            double dSampFreq)
+Eigen::RowVectorXd Spectral::psdFromTaperedSpectra(const Eigen::MatrixXcd &matTapSpectrum,
+                                                   const Eigen::VectorXd &vecTapWeights,
+                                                   int iNfft,
+                                                   double dSampFreq)
 {
     //Check inputs
     if (matTapSpectrum.rows() != vecTapWeights.rows()) {
-        return RowVectorXd();
+        return Eigen::RowVectorXd();
     }
 
     //Compute PSD (average over tapers if necessary)
-    double denom = vecTapWeights.cwiseAbs2().sum();
-    RowVectorXd vecPsd = (vecTapWeights.asDiagonal() * matTapSpectrum).cwiseAbs2().colwise().sum() / denom;
-
+    //Normalization via sFreq
     //multiply by 2 due to half spectrum
-    vecPsd *= 2.0;
+    double denom = vecTapWeights.cwiseAbs2().sum() * dSampFreq;
+    Eigen::RowVectorXd vecPsd = 2.0 * (vecTapWeights.asDiagonal() * matTapSpectrum).cwiseAbs2().colwise().sum() / denom;
+
     vecPsd(0) /= 2.0;
     if (iNfft % 2 == 0){
         vecPsd.tail(1) /= 2.0;
     }
-
-    //Normalization
-    vecPsd /= dSampFreq;
 
     return vecPsd;
 }
@@ -200,40 +226,54 @@ RowVectorXd Spectral::psdFromTaperedSpectra(const MatrixXcd &matTapSpectrum,
 
 //*************************************************************************************************************
 
-RowVectorXcd Spectral::csdFromTaperedSpectra(const MatrixXcd &vecTapSpectrumSeed,
-                                             const MatrixXcd &vecTapSpectrumTarget,
-                                             const VectorXd &vecTapWeightsSeed,
-                                             const VectorXd &vecTapWeightsTarget,
-                                             int iNfft,
-                                             double dSampFreq)
+Eigen::RowVectorXcd Spectral::csdFromTaperedSpectra(const Eigen::MatrixXcd &vecTapSpectrumSeed,
+                                                    const Eigen::MatrixXcd &vecTapSpectrumTarget,
+                                                    const Eigen::VectorXd &vecTapWeightsSeed,
+                                                    const Eigen::VectorXd &vecTapWeightsTarget,
+                                                    int iNfft,
+                                                    double dSampFreq)
 {
+//    QElapsedTimer timer;
+//    int iTime = 0;
+//    timer.start();
+
     //Check inputs
     if (vecTapSpectrumSeed.rows() != vecTapSpectrumTarget.rows()) {
-        return MatrixXcd();
+        return Eigen::MatrixXcd();
     }
     if (vecTapSpectrumSeed.cols() != vecTapSpectrumTarget.cols()) {
-        return MatrixXcd();
+        return Eigen::MatrixXcd();
     }
     if (vecTapSpectrumSeed.rows() != vecTapWeightsSeed.rows()) {
-        return MatrixXcd();
+        return Eigen::MatrixXcd();
     }
     if (vecTapSpectrumTarget.rows() != vecTapWeightsTarget.rows()) {
-        return MatrixXcd();
+        return Eigen::MatrixXcd();
     }
 
-    //Compute PSD (average over tapers if necessary)
-    double denom = sqrt(vecTapWeightsSeed.cwiseAbs2().sum()) * sqrt(vecTapWeightsTarget.cwiseAbs2().sum());
-    RowVectorXcd vecCsd = (vecTapWeightsSeed.asDiagonal() * vecTapSpectrumSeed).cwiseProduct((vecTapWeightsTarget.asDiagonal() * vecTapSpectrumTarget).conjugate()).colwise().sum() / denom;
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - Prepare:" << iTime;
+//    timer.restart();
 
-    //multiply by 2 due to half spectrum
-    vecCsd *= 2.0;
+    // Compute PSD (average over tapers if necessary)
+    // Multiply by 2 due to half spectrum
+    // Normalize via sFreq
+    double denom = sqrt(vecTapWeightsSeed.cwiseAbs2().sum()) * sqrt(vecTapWeightsTarget.cwiseAbs2().sum()) * dSampFreq;
+    Eigen::RowVectorXcd vecCsd = 2.0 * (vecTapWeightsSeed.asDiagonal() * vecTapSpectrumSeed).cwiseProduct((vecTapWeightsTarget.asDiagonal() * vecTapSpectrumTarget).conjugate()).colwise().sum() / denom;
+
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - compute PSD:" << iTime;
+//    timer.restart();
+
+    //multiply first and last element by 2 due to half spectrum
     vecCsd(0) /= 2.0;
     if (iNfft % 2 == 0){
         vecCsd.tail(1) /= 2.0;
     }
 
-    //Normalization
-    vecCsd /= dSampFreq;
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Spectral::csdFromTaperedSpectra timer - half spectrum:" << iTime;
+//    timer.restart();
 
     return vecCsd;
 }

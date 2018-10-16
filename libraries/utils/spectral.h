@@ -62,6 +62,7 @@
 
 #include <QString>
 #include <QPair>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -105,8 +106,8 @@ public:
     * @return tapered spectra of the input data
     */
     static Eigen::MatrixXcd computeTaperedSpectraRow(const Eigen::RowVectorXd &vecData,
-                                                  const Eigen::MatrixXd &matTaper,
-                                                  int iNfft);
+                                                     const Eigen::MatrixXd &matTaper,
+                                                     int iNfft);
 
     //=========================================================================================================
     /**
@@ -178,7 +179,7 @@ public:
                                                      const Eigen::VectorXd &vecTapWeightsSeed,
                                                      const Eigen::VectorXd &vecTapWeightsTarget,
                                                      int iNfft,
-                                                     double dSampFreq=1.0);
+                                                     double dSampFreq = 1.0);
 
     //=========================================================================================================
     /**
@@ -215,6 +216,13 @@ private:
     static Eigen::MatrixXd hanningWindow(int iSignalLength);
 
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
 
 }//namespace
 
