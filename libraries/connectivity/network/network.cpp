@@ -437,3 +437,21 @@ bool Network::isEmpty() const
     return false;
 }
 
+
+//*************************************************************************************************************
+
+void Network::normalize()
+{
+    // Normalize full network
+    if(m_minMaxFullWeights.second == 0.0) {
+        qDebug() << "Network::normalize() - Max weight is 0. Returning.";
+        return;
+    }
+
+    for(int i = 0; i < m_lFullEdges.size(); ++i) {
+        m_lFullEdges.at(i)->setWeight(m_lFullEdges.at(i)->getWeight()/m_minMaxFullWeights.second);
+    }
+
+    m_minMaxFullWeights.first = m_minMaxFullWeights.first/m_minMaxFullWeights.second;
+    m_minMaxFullWeights.second = 1.0;
+}

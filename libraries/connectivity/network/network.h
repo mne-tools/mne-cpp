@@ -321,6 +321,8 @@ public:
     */
     bool isEmpty() const;
 
+    void normalize();
+
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
     QList<QSharedPointer<NetworkEdge> >     m_lThresholdedEdges;        /**< List with all the active (thresholded) edges of the network.*/
