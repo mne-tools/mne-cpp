@@ -166,6 +166,9 @@ Control3DWidget::Control3DWidget(QWidget* parent,
 
     //Set on top as default
     onAlwaysOnTop(ui->m_checkBox_alwaysOnTop->isChecked());
+
+    //Set description hidden as default
+    this->onTreeViewDescriptionHide();
 }
 
 
@@ -203,9 +206,6 @@ void Control3DWidget::init(QSharedPointer<Data3DTreeModel> pData3DTreeModel,
 
     connect(this, &Control3DWidget::lightIntensityChanged,
             pView3D.data(), &View3D::setLightIntensity);
-
-    //Set description hidden as default
-    this->onTreeViewDescriptionHide();
 }
 
 

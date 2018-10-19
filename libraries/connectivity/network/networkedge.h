@@ -157,6 +157,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the averaged edge weight.
+    *
+    * @param[in] dAveragedWeight        The new weight.
+    */
+    void setWeight(double dAveragedWeight);
+
+    //=========================================================================================================
+    /**
     * Calculates the edge weight based on the currently set min/max frequency bins.
     */
     void calculateAveragedWeight();

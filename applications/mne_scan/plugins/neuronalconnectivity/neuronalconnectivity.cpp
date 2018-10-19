@@ -98,6 +98,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_iFreqBandHigh(50)
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
+, m_iCounter(0)
 {
 }
 
@@ -447,7 +448,10 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     }
 
                     m_timer.restart();
-                    m_pRtConnectivity->append(m_connectivitySettings);
+                    //if(m_iCounter < 30) {
+                        m_pRtConnectivity->append(m_connectivitySettings);
+                    //    m_iCounter++;
+                    //}
 
                     break;
                 }
@@ -543,6 +547,7 @@ void NeuronalConnectivity::run()
             if(!connectivityResult.isEmpty()) {
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
                 connectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+                connectivityResult.normalize();
                 m_pRTCEOutput->data()->setValue(connectivityResult);
             }
         }
