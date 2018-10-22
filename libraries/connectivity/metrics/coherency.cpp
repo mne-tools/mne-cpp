@@ -104,6 +104,11 @@ void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
 //    qint64 iTime = 0;
 //    timer.start();
 
+    if(matDataList.empty()) {
+        qDebug() << "Coherency::computeCoherency - Input data is empty";
+        return;
+    }
+
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif

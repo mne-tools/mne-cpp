@@ -245,7 +245,6 @@ private:
     qint32              m_iFreqBandLow;         /**< The lower frequency band to average the connectivy weights from. */
     qint32              m_iFreqBandHigh;        /**< The higher frequency band to average the connectivy weights to. In frequency bins. */
     qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
-    qint32              m_iCounter;
 
     QString             m_sAvrType;             /**< The average type */
 

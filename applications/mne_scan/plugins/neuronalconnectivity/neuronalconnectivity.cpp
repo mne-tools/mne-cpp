@@ -98,7 +98,6 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_iFreqBandHigh(50)
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
-, m_iCounter(0)
 {
 }
 
@@ -427,6 +426,12 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                         m_iNumberBadChannels = pFiffEvokedSet->evoked.at(i).info.bads.size();
                     }
 
+                    if(!m_connectivitySettings.m_matDataList.isEmpty()) {
+                        if(m_chIdx.size() != m_connectivitySettings.m_matDataList.first().rows()) {
+                            m_connectivitySettings.m_matDataList.clear();
+                        }
+                    }
+
                     MatrixXd data;
 
                     const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
@@ -448,10 +453,7 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     }
 
                     m_timer.restart();
-                    //if(m_iCounter < 30) {
-                        m_pRtConnectivity->append(m_connectivitySettings);
-                    //    m_iCounter++;
-                    //}
+                    m_pRtConnectivity->append(m_connectivitySettings);
 
                     break;
                 }
@@ -515,6 +517,7 @@ void NeuronalConnectivity::generateNodeVertices()
 
     //Set node 3D positions to connectivity settings
     m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
+    m_connectivitySettings.m_matDataList.clear();
 }
 
 

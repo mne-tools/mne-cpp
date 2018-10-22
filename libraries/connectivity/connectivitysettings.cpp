@@ -76,6 +76,8 @@ using namespace CONNECTIVITYLIB;
 //=============================================================================================================
 
 ConnectivitySettings::ConnectivitySettings()
+: m_iNfft(-1)
+, m_sWindowType("hanning")
 {
     qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
 }

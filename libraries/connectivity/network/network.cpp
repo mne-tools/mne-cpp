@@ -382,10 +382,20 @@ void Network::setFrequencyBins(int iLowerBin, int iUpperBin)
         qDebug() << "Network::setFrequencyBins - end bin index is larger than start bin index. Weights will not be recalculated.";
     }
 
+    // Update the min max values
+    m_minMaxFullWeights = QPair<double,double>(std::numeric_limits<double>::max(),0.0);
+
     for(int i = 0; i < m_lFullEdges.size(); ++i) {
         m_lFullEdges.at(i)->setFrequencyBins(QPair<int,int>(iLowerBin,iUpperBin));
+
+        if(fabs(m_lFullEdges.at(i)->getWeight()) < m_minMaxFullWeights.first) {
+            m_minMaxFullWeights.first = fabs(m_lFullEdges.at(i)->getWeight());
+        } else if(fabs(m_lFullEdges.at(i)->getWeight()) > m_minMaxFullWeights.second) {
+            m_minMaxFullWeights.second = fabs(m_lFullEdges.at(i)->getWeight());
+        }
     }
 
+    setThreshold(m_dThreshold);
 }
 
 
@@ -454,4 +464,7 @@ void Network::normalize()
 
     m_minMaxFullWeights.first = m_minMaxFullWeights.first/m_minMaxFullWeights.second;
     m_minMaxFullWeights.second = 1.0;
+
+    m_minMaxThresholdedWeights.first = m_minMaxThresholdedWeights.first/m_minMaxThresholdedWeights.second;
+    m_minMaxThresholdedWeights.second = 1.0;
 }
