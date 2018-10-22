@@ -335,6 +335,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
                 m_pFiffInfo = pRTMSA->info();
                 generateNodeVertices();
                 m_iNumberBadChannels = m_pFiffInfo->bads.size();
+                m_pRtConnectivity->restart();
             }
 
             MatrixXd data;
@@ -343,6 +344,15 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
             {
                 const MatrixXd& t_mat = pRTMSA->getMultiSampleArray()[i];
+
+                // Check row and colum integrity and restart if necessary
+                if(!m_connectivitySettings.m_matDataList.isEmpty()) {
+                    if(t_mat.cols() != m_connectivitySettings.m_matDataList.first().cols()) {
+                        m_connectivitySettings.m_matDataList.clear();
+                        m_pRtConnectivity->restart();
+                    }
+                }
+
                 data.resize(m_chIdx.size(), t_mat.cols());
 
                 for(qint32 j = 0; j < m_chIdx.size(); ++j)
@@ -419,22 +429,25 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                    const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
+
                     //Generate node vertices because the number of bad channels changed
                     if(m_iNumberBadChannels != pFiffEvokedSet->info.bads.size()) {
                         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->info));
                         generateNodeVertices();
                         m_iNumberBadChannels = pFiffEvokedSet->evoked.at(i).info.bads.size();
+                        m_pRtConnectivity->restart();
                     }
 
+                    // Check column integrity and restart if necessary
                     if(!m_connectivitySettings.m_matDataList.isEmpty()) {
-                        if(m_chIdx.size() != m_connectivitySettings.m_matDataList.first().rows()) {
+                        if(t_mat.cols() != m_connectivitySettings.m_matDataList.first().cols()) {
                             m_connectivitySettings.m_matDataList.clear();
+                            m_pRtConnectivity->restart();
                         }
                     }
 
                     MatrixXd data;
-
-                    const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
                     data.resize(m_chIdx.size(), t_mat.cols());
 
                     for(qint32 j = 0; j < m_chIdx.size(); ++j) {
