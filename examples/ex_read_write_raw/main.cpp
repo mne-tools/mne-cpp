@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
     //
     fiff_int_t from = raw.first_samp;
     //fiff_int_t to = raw.last_samp;
-    fiff_int_t to = raw.info.sfreq * 100;
+    fiff_int_t to = raw.info.sfreq * 101;
     float quantum_sec = 10.0f;//read and write in 10 sec junks
     fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
     //
