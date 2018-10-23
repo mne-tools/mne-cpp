@@ -394,8 +394,6 @@ void Network::setFrequencyBins(int iLowerBin, int iUpperBin)
             m_minMaxFullWeights.second = fabs(m_lFullEdges.at(i)->getWeight());
         }
     }
-
-    setThreshold(m_dThreshold);
 }
 
 
