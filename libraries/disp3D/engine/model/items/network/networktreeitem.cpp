@@ -235,7 +235,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
-        pMaterial->setAmbient(ColorMap::valueToHot(0.0));
+        pMaterial->setAmbient(ColorMap::valueToJet(0.0));
         pMaterial->setAlpha(1.0f);
         m_pNodesEntity->addComponent(pMaterial);
     }
@@ -263,9 +263,9 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
 
             // Normalize colors
             if(iMaxDegree != 0.0f) {
-                vColorsNodes.push_back(QColor(ColorMap::valueToHot((float)iDegree/(float)iMaxDegree)));
+                vColorsNodes.push_back(QColor(ColorMap::valueToJet((float)iDegree/(float)iMaxDegree)));
             } else {
-                vColorsNodes.push_back(QColor(ColorMap::valueToHot(0.0f)));
+                vColorsNodes.push_back(QColor(ColorMap::valueToJet(0.0f)));
             }
         }
     }
@@ -307,7 +307,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
 
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
-        pMaterial->setAmbient(ColorMap::valueToHot(0.0));
+        pMaterial->setAmbient(ColorMap::valueToJet(0.0));
         pMaterial->setAlpha(1.0f);
         m_pEdgeEntity->addComponent(pMaterial);
     }
@@ -351,9 +351,9 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
 
                 // Normalize colors
                 if(dMaxWeight != 0.0f) {
-                    vColorsEdges.push_back(QColor(ColorMap::valueToHot(dWeight/dMaxWeight)));
+                    vColorsEdges.push_back(QColor(ColorMap::valueToJet(dWeight/dMaxWeight)));
                 } else {
-                    vColorsEdges.push_back(QColor(ColorMap::valueToHot(0.0f)));
+                    vColorsEdges.push_back(QColor(ColorMap::valueToJet(0.0f)));
                 }
             }
         }
