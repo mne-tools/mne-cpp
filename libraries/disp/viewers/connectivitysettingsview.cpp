@@ -87,7 +87,10 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onTriggerTypeChanged);
 
-    connect(ui->m_spinBox_freqLow, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+/*    connect(ui->m_spinBox_freqLow, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &ConnectivitySettingsView::onFrequencyBandChanged)*/;
+
+    connect(ui->m_spinBox_freqLow, &QSpinBox::editingFinished,
             this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
     connect(ui->m_spinBox_freqHigh, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
@@ -161,7 +164,7 @@ void ConnectivitySettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 
 //*************************************************************************************************************
 
-void ConnectivitySettingsView::onFrequencyBandChanged(int value)
+void ConnectivitySettingsView::onFrequencyBandChanged()
 {
     //Q_UNUSED(value)
     emit freqBandChanged(ui->m_spinBox_freqLow->value(),
