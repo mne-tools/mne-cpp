@@ -287,16 +287,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Checks the givven matrix for artifacts beyond a threshold value.
-    *
-    * @param[in] data           The data matrix.
-    *
-    * @return   Whether a thresold artifact was detected.
-    */
-    bool checkForArtifact(Eigen::MatrixXd& data);
-
-    //=========================================================================================================
-    /**
     * Check if data buffer has been initialized
     */
     inline bool isDataBufferInit();

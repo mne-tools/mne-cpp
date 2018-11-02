@@ -66,6 +66,11 @@
 namespace MNELIB
 {
 
+struct ArtifactRejectionData {
+    bool bRejected;
+    Eigen::RowVectorXd data;
+    double dThreshold;
+};
 
 //=============================================================================================================
 /**
@@ -75,6 +80,7 @@ namespace MNELIB
 */
 class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData::SPtr>
 {
+
 public:
     typedef QSharedPointer<MNEEpochDataList> SPtr;              /**< Shared pointer type for MNEEpochDataList. */
     typedef QSharedPointer<const MNEEpochDataList> ConstSPtr;   /**< Const shared pointer type for MNEEpochDataList. */
@@ -142,6 +148,27 @@ public:
     * @param[in] sel     The selected rows to keep.
     */
     void pick_channels(const Eigen::RowVectorXi& sel);
+
+    //=========================================================================================================
+    /**
+    * Checks the givven matrix for artifacts beyond a threshold value.
+    *
+    * @param[in] data           The data matrix.
+    * @param[in] pFiffInfo      The fiff info.
+    * @param[in] dThreshold     The thresholded value.
+    * @param[in] sCheckType     The detection type. Threshold or variance based (default is Threshold).
+    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG (default is EOG).
+    *
+    * @return   Whether a threshold artifact was detected.
+    */
+    static bool checkForArtifact(Eigen::MatrixXd& data,
+                                 const FIFFLIB::FiffInfo& pFiffInfo,
+                                 double dThreshold,
+                                 const QString& sCheckType = QString("threshold"),
+                                 const QString& sChType = QString("eog"));
+
+    static void checkChVariance(ArtifactRejectionData& inputData);
+    static void checkChThreshold(ArtifactRejectionData& inputData);
 };
 
 } // NAMESPACE
