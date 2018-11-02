@@ -199,7 +199,6 @@ int main(int argc, char *argv[])
     MatrixX3f matNodePositions;
     MatrixXi events;
     RowVectorXi picks;
-    qint32 kind, unit;
 
     MNEForwardSolution t_clusteredFwd;
     MNEForwardSolution t_Fwd;
@@ -217,73 +216,8 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
 
-    QVector<int> chIdx;
-    QStringList include,exclude;
-
     // Select bad channels
-    //raw.info.bads << "MEG2412" << "MEG2413";
-
-    if (!bDoSourceLoc) {
-        for(int i = 0; i < raw.info.chs.size(); ++i) {
-            unit = raw.info.chs.at(i).unit;
-            kind = raw.info.chs.at(i).kind;
-
-            if(unit == FIFF_UNIT_T_M &&
-               kind == FIFFV_MEG_CH &&
-               sChType == "meg"&&
-               sCoilType == "grad") {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-
-                    //Skip second gradiometer in triplet
-                    i += 1;
-                }
-            } else if(unit == FIFF_UNIT_T &&
-                      kind == FIFFV_MEG_CH &&
-                      sChType == "meg"&&
-                      sCoilType == "mag") {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-                }
-            } else if (unit == FIFF_UNIT_V &&
-                       kind == FIFFV_EEG_CH &&
-                       sChType == "eeg") {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-                }
-            }
-
-            if(kind == FIFFV_EOG_CH) {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                }
-            }
-        }
-
-        picks = raw.info.pick_channels(raw.info.ch_names,
-                                       include,
-                                       exclude);
-    } else {
-        for(int i = 0; i < raw.info.chs.size(); ++i) {
-            if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                if(noise_cov.names.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-                }
-
-                if(raw.info.chs.at(i).kind == FIFFV_EOG_CH) {
-                    include << raw.info.chs.at(i).ch_name;
-                }
-            }
-        }
-
-        picks = raw.info.pick_channels(raw.info.ch_names,
-                                       include,
-                                       exclude);
-    }
+    raw.info.bads << "MEG2412" << "MEG2413";
 
     MNE::setup_compensators(raw,
                             dest_comp,
@@ -307,10 +241,20 @@ int main(int argc, char *argv[])
     MNESourceEstimate sourceEstimateEvoked;
 
     if(!bDoSourceLoc) {
+        // Pick relevant channels
+        if(sChType.contains("EEG", Qt::CaseInsensitive)) {
+            picks = raw.info.pick_types(false,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        } else if(sCoilType == "grad", Qt::CaseInsensitive) {
+            picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        } else if (sCoilType == "mag", Qt::CaseInsensitive) {
+            picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        }
+
         // Generate nodes for 3D network visualization
         matNodePositions = MatrixX3f(picks.cols(),3);
 
         // Get the 3D positions and exclude EOG channels
+        qint32 kind;
         for(int i = 0; i < picks.cols(); ++i) {
             kind = raw.info.chs.at(i).kind;
             if(kind == FIFFV_EEG_CH ||
@@ -323,13 +267,13 @@ int main(int argc, char *argv[])
 
         // Transform to a more generic data matrix list, pick only channels of interest and remove EOG channel
         MatrixXd matData;
-        int iNumberRows = chIdx.size(); //chIdx.size() 32
+        int iNumberRows = picks.cols(); //picks.cols() 32
 
         for(int i = 0; i < data.size(); ++i) {
             matData.resize(iNumberRows, data.at(i)->epoch.cols());
 
             for(qint32 j = 0; j < iNumberRows; ++j) {
-                matData.row(j) = data.at(i)->epoch.row(chIdx.at(j));
+                matData.row(j) = data.at(i)->epoch.row(picks(j));
             }
 
             matDataList << matData;
@@ -361,7 +305,8 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        data.pick_channels(raw.info.pick_types(QString("all"),true,false,QStringList(),raw.info.bads));
+        picks = raw.info.pick_types(true,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        data.pick_channels(picks);
 
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
@@ -441,7 +386,7 @@ int main(int argc, char *argv[])
                      &tNetworkView, &NetworkView::addData);
 
     //Read and show sensor helmets
-    if(!bDoSourceLoc) {
+    if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
         QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
         MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
         tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
@@ -469,8 +414,6 @@ int main(int argc, char *argv[])
 
     pConnectivitySettingsView->setNumberTrials(1);
     pConnectivitySettingsManager->onNumberTrialsChanged(1);
-
-
 
     return a.exec();
 }
