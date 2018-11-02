@@ -80,8 +80,6 @@ namespace MNELIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-
 
 //=============================================================================================================
 /**
@@ -118,6 +116,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Reduces the data to the selected rows.
+    *
+    * @param[in] sel     The selected rows to keep.
+    */
+    void pick_channels(const Eigen::RowVectorXi& sel);
+
+    //=========================================================================================================
+    /**
     * Comparison of two Epoch data
     *
     * @param[in] MED_other     Epoch data to compare with
@@ -130,11 +136,11 @@ public:
     }
 
 public:
-    MatrixXd    epoch;          /**< The data */
-    FIFFLIB::fiff_int_t  event; /**< The event code */
-    float       tmin;           /**< New start time (must be >= 0). */
-    float       tmax;           /**< New end time of the data (cannot exceed data duration). */
-    bool        bReject;        /**< Whether this epoch is to be rejected */
+    Eigen::MatrixXd     epoch;          /**< The data */
+    FIFFLIB::fiff_int_t event;          /**< The event code */
+    float               tmin;           /**< New start time (must be >= 0). */
+    float               tmax;           /**< New end time of the data (cannot exceed data duration). */
+    bool                bReject;        /**< Whether this epoch is to be rejected */
 };
 
 } // NAMESPACE

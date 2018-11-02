@@ -296,9 +296,9 @@ void Control3DWidget::onCustomContextMenuRequested(QPoint pos)
     connect(pHideHeader, &QAction::triggered,
             this, &Control3DWidget::onTreeViewHeaderHide);
 
-    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
-    connect(pHideDesc, &QAction::triggered,
-            this, &Control3DWidget::onTreeViewDescriptionHide);
+//    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
+//    connect(pHideDesc, &QAction::triggered,
+//            this, &Control3DWidget::onTreeViewDescriptionHide);
 
     //show context menu
     menu->popup(ui->m_treeView_loadedData->viewport()->mapToGlobal(pos));
