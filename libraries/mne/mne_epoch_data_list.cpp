@@ -93,6 +93,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                                               float tmax,
                                               qint32 event,
                                               double dEOGThreshold,
+                                              const QString& sChType,
                                               const RowVectorXi& picks)
 {
     MNEEpochDataList data;
@@ -176,7 +177,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                                               raw.info,
                                               dEOGThreshold,
                                               "threshold",
-                                              "eog");
+                                              sChType);
 
             if (epoch->bReject) {
                 dropCount++;

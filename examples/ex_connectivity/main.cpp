@@ -234,7 +234,8 @@ int main(int argc, char *argv[])
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
-                                                         150.0*0.0000010);
+                                                         150.0*0.0000010,
+                                                         "eog");
     data.dropRejected();
 
     FiffEvoked evoked = data.average(raw.info,

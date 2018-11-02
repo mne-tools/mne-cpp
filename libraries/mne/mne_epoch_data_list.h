@@ -109,6 +109,7 @@ public:
     * @param[in] dEOGThreshold  The threshold value to use to reject epochs based on the EOG channel.
     *                           No filtering is performed on the EOG channel. Default is set to no rejection.
     *                           The mean is subtracted from the EOG channel data before checking the threshold.
+    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG (default is EOG).
     * @param[in] picks          Which channels to pick.
     */
     static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
@@ -117,6 +118,7 @@ public:
                                        float tmax,
                                        qint32 event,
                                        double dEOGThreshold = 0.0,
+                                       const QString& sChType = QString("eog"),
                                        const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
     //=========================================================================================================
