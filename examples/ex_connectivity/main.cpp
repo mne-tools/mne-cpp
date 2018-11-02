@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileRaw);
 
     // Select bad channels
-    raw.info.bads << "MEG2412" << "MEG2413";
+    //raw.info.bads << "MEG2412" << "MEG2413";
 
     MNE::setup_compensators(raw,
                             dest_comp,
@@ -237,7 +237,11 @@ int main(int argc, char *argv[])
                                                          150.0*0.0000010);
     data.dropRejected();
 
-    FiffEvoked evoked = data.average(raw.info, 0, data.first()->epoch.cols()-1, VectorXi(), true);
+    FiffEvoked evoked = data.average(raw.info,
+                                     0,
+                                     data.first()->epoch.cols()-1,
+                                     VectorXi(),
+                                     true);
     MNESourceEstimate sourceEstimateEvoked;
 
     if(!bDoSourceLoc) {
