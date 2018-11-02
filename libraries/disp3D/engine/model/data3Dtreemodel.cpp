@@ -125,7 +125,8 @@ QVariant Data3DTreeModel::data(const QModelIndex& index,
 int Data3DTreeModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return 2;
+    // Return 2 to activate item description in tree view
+    return 1;
 }
 
 

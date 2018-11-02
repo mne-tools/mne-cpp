@@ -600,6 +600,25 @@ void MneEstimateTreeItem::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
+void MneEstimateTreeItem::setAlpha(float fAlpha)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->setAlpha(fAlpha);
+    }
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->setAlpha(fAlpha);
+    }
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->setAlpha(fAlpha);
+    }
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->setAlpha(fAlpha);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(m_pRtSourceDataController) {

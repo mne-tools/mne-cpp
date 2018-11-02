@@ -81,16 +81,19 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_comboBox_windowType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onWindowTypeChanged);
 
-    connect(ui->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//    connect(ui->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//            this, &ConnectivitySettingsView::onNumberTrialsChanged);
+
+    connect(ui->m_spinBox_numberTrials, &QSpinBox::editingFinished,
             this, &ConnectivitySettingsView::onNumberTrialsChanged);
 
     connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onTriggerTypeChanged);
 
-/*    connect(ui->m_spinBox_freqLow, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &ConnectivitySettingsView::onFrequencyBandChanged)*/;
+//    connect(ui->m_spinBox_freqLow, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//            this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
-    connect(ui->m_spinBox_freqLow, &QSpinBox::editingFinished,
+    connect(ui->m_spinBox_freqLow, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
     connect(ui->m_spinBox_freqHigh, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),

@@ -51,6 +51,7 @@
 
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -127,7 +128,7 @@ int main(int argc, char *argv[])
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.0");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
 
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
@@ -137,7 +138,7 @@ int main(int argc, char *argv[])
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 
 //    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_raw-eve.fif");
-//    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_cut_raw.fif");
+//    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_raw.fif");
 //    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "jgs-20160519");
 //    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/subjects/");
 //    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_raw-fwd.fif");
@@ -215,6 +216,7 @@ int main(int argc, char *argv[])
     // Create sensor level data
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
+
     QVector<int> chIdx;
     QStringList include,exclude;
 
@@ -295,28 +297,14 @@ int main(int argc, char *argv[])
     // Read the epochs and reject bad epochs
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
-                                                         picks,
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
                                                          150.0*0.0000010);
     data.dropRejected();
 
-    // Transform to a more generic data matrix list and remove EOG channel
-    MatrixXd matData;
-
-    int iNumberEpochs = data.size(); //data.size() 25
-    int iNumberRows = chIdx.size(); //chIdx.size() 32
-
-    for(int i = 0; i < iNumberEpochs; ++i) {
-        matData.resize(iNumberRows, data.at(i)->epoch.cols());
-
-        for(qint32 j = 0; j < iNumberRows; ++j) {
-            matData.row(j) = data.at(i)->epoch.row(j);
-        }
-
-        matDataList << matData;
-    }
+    FiffEvoked evoked = data.average(raw.info, 0, data.first()->epoch.cols()-1, VectorXi(), true);
+    MNESourceEstimate sourceEstimateEvoked;
 
     if(!bDoSourceLoc) {
         // Generate nodes for 3D network visualization
@@ -331,6 +319,20 @@ int main(int argc, char *argv[])
                 matNodePositions(i,1) = raw.info.chs.at(picks(i)).chpos.r0(1);
                 matNodePositions(i,2) = raw.info.chs.at(picks(i)).chpos.r0(2);
             }
+        }
+
+        // Transform to a more generic data matrix list, pick only channels of interest and remove EOG channel
+        MatrixXd matData;
+        int iNumberRows = chIdx.size(); //chIdx.size() 32
+
+        for(int i = 0; i < data.size(); ++i) {
+            matData.resize(iNumberRows, data.at(i)->epoch.cols());
+
+            for(qint32 j = 0; j < iNumberRows; ++j) {
+                matData.row(j) = data.at(i)->epoch.row(chIdx.at(j));
+            }
+
+            matDataList << matData;
         }
     } else {
         //Create source level data
@@ -359,8 +361,10 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        for(int i = 0; i < matDataList.size(); i++) {
-            sourceEstimate = minimumNorm.calculateInverse(matDataList.at(i),
+        data.pick_channels(raw.info.pick_types(QString("all"),true,false,QStringList(),raw.info.bads));
+
+        for(int i = 0; i < data.size(); i++) {
+            sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
                                                           0.0f,
                                                           1/raw.info.sfreq);
 
@@ -368,8 +372,11 @@ int main(int argc, char *argv[])
                 printf("Source estimate is empty");
             }
 
-            matDataList.replace(i, sourceEstimate.data);
+            matDataList << sourceEstimate.data;
         }
+
+        MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
+        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
 
         //Generate node vertices
         MatrixX3f matNodeVertLeft, matNodeVertRight;
@@ -402,7 +409,7 @@ int main(int argc, char *argv[])
     }
 
     //Do connectivity estimation and visualize results
-    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matData.cols(), raw.info.sfreq);
+    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols(), raw.info.sfreq);
 
     pConnectivitySettingsManager->m_settings.m_sConnectivityMethods << sConnectivityMethod;
     pConnectivitySettingsManager->m_settings.m_matDataList = matDataList;
@@ -433,29 +440,37 @@ int main(int argc, char *argv[])
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      &tNetworkView, &NetworkView::addData);
 
-
-    if(bDoSourceLoc) {
-        QList<FsSurfaceTreeItem*> pFsSurfaceTreeItem;
-
-        pFsSurfaceTreeItem = tNetworkView.getTreeModel()->addSurfaceSet(sSubj,
-                                                                        "Inflated",
-                                                                        tSurfSetInflated,
-                                                                        tAnnotSet);
-
-        for(int i = 0; i < pFsSurfaceTreeItem.size(); i++) {
-            pFsSurfaceTreeItem.at(i)->setAlpha(0.5f);
-        }
-    } else {
-        //Read and show sensor helmets
+    //Read and show sensor helmets
+    if(!bDoSourceLoc) {
         QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
         MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
         tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
                                                       "VectorView",
                                                       raw.info.chs,
                                                       t_sensorSurfaceVV);
+    } else {
+        //Add source loc data and init some visualization values
+        if(MneEstimateTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                                         evoked.comment,
+                                                                                         sourceEstimateEvoked,
+                                                                                         t_clusteredFwd,
+                                                                                         tSurfSetInflated,
+                                                                                         tAnnotSet)) {
+            pRTDataItem->setLoopState(true);
+            pRTDataItem->setTimeInterval(17);
+            pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setStreamingState(false);
+            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
+            pRTDataItem->setVisualizationType("Interpolation based");
+            pRTDataItem->setColormapType("Jet");
+            pRTDataItem->setAlpha(0.5f);
+        }
     }
 
     pConnectivitySettingsView->setNumberTrials(1);
+    pConnectivitySettingsManager->onNumberTrialsChanged(1);
+
+
 
     return a.exec();
 }

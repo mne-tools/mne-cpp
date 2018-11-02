@@ -704,8 +704,8 @@ void RtAve::generateEvoked(double dTriggerType)
             evoked.times[i] = evoked.times[i-1] + T;
         }
         evoked.times[m_iPreStimSamples] = 0.0f;
-        evoked.first = evoked.times[0];
-        evoked.last = evoked.times[evoked.times.size()-1];
+        evoked.first = 0;
+        evoked.last = m_iPreStimSamples + m_iPostStimSamples;
         evoked.comment = QString::number(dTriggerType);
     }
 
