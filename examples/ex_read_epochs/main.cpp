@@ -176,6 +176,7 @@ int main(int argc, char *argv[])
                                                          fTMax,
                                                          event,
                                                          250.0*0.0000010,
+                                                         "eog",
                                                          picks);
 
     // Drop rejected epochs
