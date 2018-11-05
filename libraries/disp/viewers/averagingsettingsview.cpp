@@ -224,11 +224,12 @@ void AveragingSettingsView::setDetectedEpochs(QSharedPointer<FIFFLIB::FiffEvoked
     topLayout->addWidget(new QLabel("Type"),0,0);
     topLayout->addWidget(new QLabel("#"),0,1);
 
-    //for(int i = 0; i < pEvokedSet->evoked.size(); i++) {
-    // Show only a maximum of 10 average types
-    for(int i = 0; i < 10; i++) {
-        topLayout->addWidget(new QLabel(pEvokedSet->evoked.at(i).comment),i+1,0);
-        topLayout->addWidget(new QLabel(QString::number(pEvokedSet->evoked.at(i).nave)),i+1,1);
+    for(int i = 0; i < pEvokedSet->evoked.size(); i++) {
+        if(i < 10) {
+            // Show only a maximum of 10 average types
+            topLayout->addWidget(new QLabel(pEvokedSet->evoked.at(i).comment),i+1,0);
+            topLayout->addWidget(new QLabel(QString::number(pEvokedSet->evoked.at(i).nave)),i+1,1);
+        }
     }
 
     //Find Filter tab and add current layout
