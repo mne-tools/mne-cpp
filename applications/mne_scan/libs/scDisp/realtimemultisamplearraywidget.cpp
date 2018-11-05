@@ -443,8 +443,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         // Quick control trigger detection settings
         if(slFlags.contains("triggerdetection")) {
-            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView();
-            pTriggerDetectionView->init(m_pFiffInfo);
+            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(t_sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
 
             connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
@@ -455,6 +454,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
             connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
                     pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
+
+            pTriggerDetectionView->init(m_pFiffInfo);
         }
 
         //Initialized
