@@ -61,6 +61,7 @@
 
 namespace FIFFLIB {
     class FiffInfo;
+    class FiffEvokedSet;
 }
 
 namespace Ui {
@@ -119,6 +120,8 @@ public:
 
     int getStimChannelIdx();
 
+    void setDetectedEpochs(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
+
 protected:
     void onChangePreStim();
     void onChangePostStim();
@@ -126,6 +129,7 @@ protected:
     void onChangeBaselineTo();
     void onChangeArtifactThreshold();
     void onChangeNumAverages();
+    void onChangeAverageMode();
 
     Ui::AverageSettingsViewWidget* ui;		/**< Holds the user interface for the AverageSettingsViewWidget.*/
 

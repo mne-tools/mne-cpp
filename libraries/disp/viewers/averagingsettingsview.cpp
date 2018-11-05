@@ -43,6 +43,7 @@
 #include "ui_averagingsettingsview.h"
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked_set.h>
 
 
 //*************************************************************************************************************
@@ -101,7 +102,7 @@ AveragingSettingsView::AveragingSettingsView(QWidget *parent,
 
     ui->m_comboBox_runningAvr->setCurrentIndex(iAverageMode);
     connect(ui->m_comboBox_runningAvr, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &AveragingSettingsView::changeAverageMode);
+            this, &AveragingSettingsView::onChangeAverageMode);
 
     //Pre Post stimulus
     ui->m_pSpinBoxPreStimSamples->setValue(iPreStimSeconds);
@@ -161,6 +162,11 @@ AveragingSettingsView::AveragingSettingsView(QWidget *parent,
     ui->m_pcheckBox_varianceReduction->hide();
     ui->m_label_varianceValue->hide();
     ui->m_spinBox_variance->hide();
+
+    // Init average mode
+    onChangeAverageMode();
+
+    ui->m_groupBox_detectedTrials->hide();
 }
 
 
@@ -190,6 +196,41 @@ void AveragingSettingsView::setStimChannels(FiffInfo::SPtr pFiffInfo,
 int AveragingSettingsView::getStimChannelIdx()
 {
     return ui->m_pComboBoxChSelection->currentData().toInt();
+}
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsView::setDetectedEpochs(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet)
+{
+    if(pEvokedSet->evoked.isEmpty()) {
+        ui->m_groupBox_detectedTrials->hide();
+        return;
+    } else {
+        ui->m_groupBox_detectedTrials->show();
+    }
+
+    QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_detectedTrials->layout());
+    if(!topLayout) {
+       topLayout = new QGridLayout();
+    }
+
+    QLayoutItem *child;
+    while ((child = topLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
+    }
+
+    topLayout->addWidget(new QLabel("Type"),0,0);
+    topLayout->addWidget(new QLabel("#"),0,1);
+
+    for(int i = 0; i < pEvokedSet->evoked.size(); i++) {
+        topLayout->addWidget(new QLabel(pEvokedSet->evoked.at(i).comment),i+1,0);
+        topLayout->addWidget(new QLabel(QString::number(pEvokedSet->evoked.at(i).nave)),i+1,1);
+    }
+
+    //Find Filter tab and add current layout
+    ui->m_groupBox_detectedTrials->setLayout(topLayout);
 }
 
 
@@ -255,3 +296,18 @@ void AveragingSettingsView::onChangeNumAverages()
     emit changeNumAverages(ui->m_pSpinBoxNumAverages->value());
 }
 
+
+//*************************************************************************************************************
+
+void AveragingSettingsView::onChangeAverageMode()
+{
+    if(ui->m_comboBox_runningAvr->currentText() == "Cumulative") {
+        ui->m_label_numberAverages->hide();
+        ui->m_pSpinBoxNumAverages->hide();
+    } else if (ui->m_comboBox_runningAvr->currentText() == "Running"){
+        ui->m_label_numberAverages->show();
+        ui->m_pSpinBoxNumAverages->show();
+    }
+
+    emit changeAverageMode(ui->m_comboBox_runningAvr->currentIndex());
+}

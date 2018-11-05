@@ -72,6 +72,10 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
+namespace DISPLIB{
+    class AveragingSettingsView;
+}
+
 namespace DISPLIB {
     class EvokedSetModel;
     class ButterflyView;
@@ -205,6 +209,8 @@ private:
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
     QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
+
+    QSharedPointer<DISPLIB::AveragingSettingsView>      m_pAveragingSettingsView;   /**< Holds averaging settings widget.*/
 
     QList<SCMEASLIB::RealTimeSampleArrayChInfo>         m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on.*/
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
