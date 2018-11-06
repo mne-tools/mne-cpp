@@ -124,11 +124,11 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
@@ -226,24 +226,22 @@ int main(int argc, char *argv[])
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
-                                                         150.0*0.0000010,
+                                                         150.0*pow(10.0,-6),
                                                          "eog");
     data.dropRejected();
 
     FiffEvoked evoked = data.average(raw.info,
                                      0,
-                                     data.first()->epoch.cols()-1,
-                                     VectorXi(),
-                                     true);
+                                     data.first()->epoch.cols()-1);
     MNESourceEstimate sourceEstimateEvoked;
 
     if(!bDoSourceLoc) {
         // Pick relevant channels
         if(sChType.contains("EEG", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(false,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
-        } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
+        } else if(sCoilType == "grad", Qt::CaseInsensitive) {
             picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
-        } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
+        } else if (sCoilType == "mag", Qt::CaseInsensitive) {
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         }
 
@@ -283,7 +281,7 @@ int main(int argc, char *argv[])
         // Load data
         MNESourceEstimate sourceEstimate;
 
-        float lambda2 = 1.0 / pow(dSnr, 2);
+        double lambda2 = 1.0 / pow(dSnr, 2);
         QString method(sSourceLocMethod);
 
         // regularize noise covariance
@@ -302,7 +300,7 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        picks = raw.info.pick_types(true,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         data.pick_channels(picks);
 
         for(int i = 0; i < data.size(); i++) {
